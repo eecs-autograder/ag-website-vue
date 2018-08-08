@@ -95,14 +95,15 @@ let my_list = [
 - Imports
     - In imports, you may use `./` to import from a module in the same directory as the current one.
     - Avoid using `../` relative imports. Prefer an absolute import in those cases.
-    - To use an absolute import of a module in the `src` folder, begin the import with `@ag`:
+    - To use an absolute import of a module in the `src` folder, begin the import with `@`:
     ```
     // There is a mapping defined in tsconfig.json so that we can say
-    // "@ag" instead of "src".
-    import { spam } from "@ag/my/module";
+    // "@" instead of "src".
+    import { spam } from "@/my/module";
     ```
-    - Similarly, absolute imports in the `test` folder should begin with `@ag/tests`:
+        - Note: This same method works for scss imports.
+    - Similarly, absolute imports in the `test` folder should begin with `@/tests`:
     ```
-    // "@ag/tests" is mapped to "tests" in tsconfig.json.
-    import { egg } from "@ag/tests/utils";
+    // "@/tests" is mapped to "tests" in tsconfig.json.
+    import { egg } from "@/tests/utils";
     ```

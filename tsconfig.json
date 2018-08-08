@@ -19,10 +19,10 @@
             "node_modules/@types"
         ],
         "paths": {
-            "@ag/*": [
+            "@/*": [
                 "src/*"
             ],
-            "@ag/tests/*": [
+            "@/tests/*": [
                 "tests/*"
             ]
         },
