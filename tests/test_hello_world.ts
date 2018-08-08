@@ -1,4 +1,4 @@
-import HelloWorld from '@ag/components/hello_world.vue';
+import HelloWorld from '@/components/hello_world.vue';
 
 import { mount } from '@vue/test-utils';
 
