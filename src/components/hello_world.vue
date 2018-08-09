@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    
     <h1>{{ msg }}</h1>
 
     <Toggle id="toggle" v-model="switchy" ref="switchy_toggle"/>
@@ -14,7 +15,7 @@
     </div>
 
     <view-file></view-file>
-    
+
   </div>
 </template>
 
