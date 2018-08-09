@@ -16,6 +16,8 @@
 
     <view-file></view-file>
 
+    <view-file></view-file>
+
   </div>
 </template>
 
