@@ -1,5 +1,6 @@
 <template>
   <div id="toggle-button-space">
+
     <div v-if="is_on" class="active-option-style on-border">
       <p> {{on_side_text}} </p>
     </div>
@@ -13,6 +14,7 @@
     <div v-else class="active-option-style off-border">
       <p> {{off_side_text}} </p>
     </div>
+
   </div>
 </template>
 
@@ -98,4 +100,11 @@ export default class Toggle extends Vue {
 .off-border {
   border-radius: 0px 3px 3px 0;
 }
+
+p {
+  position: relative;
+  top: 52%;
+  transform: perspective(1px) translateY(-50%);
+}
+
 </style>
