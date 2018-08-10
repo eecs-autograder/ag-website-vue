@@ -17,14 +17,14 @@
   @Component
   export default class ViewFile extends Vue {
 
-    @Prop({default: "name", type: String})
+    @Prop({default: "filename", type: String})
     incoming_filename: String;
 
-    @Prop({default:"content", type: String})
+    @Prop({default:"file content", type: String})
     incoming_file_content: String;
 
-    filename: String = "n";
-    file_content: String = "c";
+    filename: String = "name";
+    file_content: String = "content";
 
     created() {
       this.file_content = this.incoming_file_content;
@@ -41,9 +41,9 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     width: 100%;
     padding: 5px 0px 0px 0px;
-    border-left: 1px solid lightgray;
-    border-bottom: 1px solid lightgray;
-    border-right: 1px solid lightgray;
+    border-left: 1px solid $light-brown-gray;
+    border-bottom: 1px solid $light-brown-gray;
+    border-right: 1px solid $light-brown-gray;
   }
 
   #scrollable-container {
@@ -67,7 +67,7 @@
     z-index: 10;
     padding: 1px 0px 0px 0px;
     font-size: 13px;
-    color: rgba(27, 31, 35, 0.35);
+    color: $light-brown-gray;
   }
 
   .file-content-container {
@@ -75,6 +75,7 @@
     position: relative;
     left: 51px;
     vertical-align: top;
+    color: black;
   }
 
   .line-of-file-content {
