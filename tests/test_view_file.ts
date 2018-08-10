@@ -3,16 +3,15 @@ import { mount } from '@vue/test-utils';
 
 describe('ViewFile.vue', () => {
 
-    test('Data set to default values when props are not specified by parent', () => {
+    test('ViewFile data set to default values when props are not specified by parent', () => {
         const wrapper = mount(ViewFile);
 
         const vm = wrapper.vm;
         expect(vm.$data.filename).toBe("filename");
         expect(vm.$data.file_content).toBe("file content");
-
     });
 
-    test('Data set to values passed in by parent', () => {
+    test('ViewFile data set to values passed in by parent', () => {
         const filename = 'ke$ha_file.cpp';
         const content = 'blah\nblah\nblah';
         const wrapper = mount(ViewFile, {
@@ -25,7 +24,6 @@ describe('ViewFile.vue', () => {
         const vm = wrapper.vm;
         expect(vm.$data.filename).toBe(filename);
         expect(vm.$data.file_content).toBe(content);
-
     });
 
     test('The amount of line numbers corresponds to the number of lines with content', () => {

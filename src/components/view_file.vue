@@ -37,50 +37,50 @@
   @import '@/styles/colors.scss';
 
   #viewing-container {
-    border-radius: 0px 0px 3px 3px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    width: 100%;
-    padding: 5px 0px 0px 0px;
-    border-left: 1px solid $light-brown-gray;
     border-bottom: 1px solid $light-brown-gray;
+    border-left: 1px solid $light-brown-gray;
     border-right: 1px solid $light-brown-gray;
+    border-radius: 0 0 3px 3px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding: 5px 0 0 0;
+    width: 100%;
   }
 
   #scrollable-container {
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
-    overflow: scroll;
+    margin: 0;
     min-height: 455px;
     max-height: 545px;
+    overflow: scroll;
+    padding: 0;
     position: relative;
+    width: 100%;
   }
 
   .line-numbers-container {
     position: absolute;
-    width: 51px;
     vertical-align: top;
+    width: 51px;
   }
 
   .line-number {
+    color: $light-brown-gray;
+    font-size: 13px;
+    padding: 1px 0 0 0;
     text-align: center;
     z-index: 10;
-    padding: 1px 0px 0px 0px;
-    font-size: 13px;
-    color: $light-brown-gray;
   }
 
   .file-content-container {
-    display: inline-block;
-    position: relative;
-    left: 51px;
-    vertical-align: top;
     color: black;
+    display: inline-block;
+    left: 51px;
+    position: relative;
+    vertical-align: top;
   }
 
   .line-of-file-content {
-    margin: 0px;
-    padding: 0px 10px 1px 0px;
+    margin: 0;
+    padding: 0 10px 1px 0;
   }
 
   .line-of-file-content:last-child {
