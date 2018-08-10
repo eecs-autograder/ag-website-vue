@@ -2,11 +2,13 @@ import ViewFile from '@/components/view_file.vue';
 import { mount } from '@vue/test-utils';
 
 describe('ViewFile.vue', () => {
+
     test('Data set to default values when props are not specified by parent', () => {
         const wrapper = mount(ViewFile);
+
         const vm = wrapper.vm;
-        expect(vm.$data.filename).toBe("name");
-        expect(vm.$data.file_content).toBe("content");
+        expect(vm.$data.filename).toBe("filename");
+        expect(vm.$data.file_content).toBe("file content");
 
     });
 
@@ -33,8 +35,9 @@ describe('ViewFile.vue', () => {
                 incoming_file_content: content
             }
         });
+
         const vm = wrapper.vm;
-        expect(vm.$data.filename).toBe("name");
+        expect(vm.$data.filename).toBe("filename");
         expect(vm.$data.file_content).toBe(content);
         expect(wrapper.html()).toContain('<div class="line-number"> 1 </div>');
         expect(wrapper.html()).toContain('<div class="line-number"> 2 </div>');
