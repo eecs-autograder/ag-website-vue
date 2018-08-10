@@ -17,18 +17,18 @@
   @Component
   export default class ViewFile extends Vue {
 
-    @Prop({default: "my_filename", type: String})
-    incoming_file_name!: string;
+    @Prop({default: "name", type: String})
+    incoming_filename: String;
 
-    @Prop({default: "coffeeeeeeeeeeeee\neee\neee\neeeeeeeeeeeeeeeeeee", type: String})
-    incoming_file_content!: string;
+    @Prop({default:"content", type: String})
+    incoming_file_content: String;
 
-    filename: string = "name";
-    file_content: string = "content";
+    filename: String = "n";
+    file_content: String = "c";
 
     created() {
       this.file_content = this.incoming_file_content;
-      this.filename = this.incoming_file_name;
+      this.filename = this.incoming_filename;
     }
   }
 </script>

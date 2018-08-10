@@ -16,7 +16,7 @@
 
     <view-file></view-file>
 
-    <view-file></view-file>
+    <view-file :incoming_filename="filename" :incoming_file_content="content" ref="viewing_file"></view-file>
 
   </div>
 </template>
@@ -39,6 +39,10 @@ export default class HelloWorld extends Vue {
   on = "Hello";
 
   off = "Super Off";
+
+  filename ="ke$ha.cpp";
+
+  content = "blah\nblah\nblah";
 
   switchy: boolean = true;
 }
