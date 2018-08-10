@@ -36,8 +36,8 @@ export default class Toggle extends Vue {
 
   // data must be public and be initialized.
   is_on: boolean = false;
-  on_side_text: string;
-  off_side_text: string;
+  on_side_text: string = "On";
+  off_side_text: string = "Off";
 
   // Vue doesn't like mutable properties, so we copy the value
   // into a data member.
