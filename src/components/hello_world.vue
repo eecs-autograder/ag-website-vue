@@ -1,8 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <!-- Add ref= so that we can select this component instance in tests. -->
-    <!--:switch_is_on_text="on" :switch_is_off_text="off"-->
+
     <Toggle id="toggle" v-model="switchy" ref="switchy_toggle"/>
 
     <Toggle/>
@@ -15,8 +14,7 @@
     </div>
 
     <view-file></view-file>
-
->>>>>>> Moved view_file component over to vue project. Changed the view_file component to use side by side divs instead of a table so that the file contents can be copied without copying the line numbers!
+    
   </div>
 </template>
 
