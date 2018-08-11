@@ -5,6 +5,12 @@
     <Toggle id="toggle" v-model="switchy" ref="switchy_toggle"/>
     <Toggle/>
     {{switchy}}
+
+    <div class="icon-poc">
+      <i class="fas fa-check"></i>
+      <i class="far fa-check-circle"></i>
+      <i class="fas fa-angle-down"></i>
+    </div>
   </div>
 </template>
 
