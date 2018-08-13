@@ -26,10 +26,10 @@ export default class Toggle extends Vue {
   value!: boolean;
 
   @Prop({default: "On", type: String})
-  switch_is_on_text: string;
+  switch_is_on_text!: string;
 
   @Prop({default: "Off", type: String})
-  switch_is_off_text: string;
+  switch_is_off_text!: string;
 
   is_on: boolean = false;
   on_side_text: string = "On";
