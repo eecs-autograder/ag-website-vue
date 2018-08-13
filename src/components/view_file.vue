@@ -15,16 +15,16 @@
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component
-  export default class viewFile extends Vue {
+  export default class ViewFile extends Vue {
 
     @Prop({default: "my_filename", type: String})
-    incoming_file_name: String;
+    incoming_file_name!: string;
 
-    @Prop({default:"coffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\neeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\neeeeeeeeeeeeeeeeeeeee\nee", type: String})
-    incoming_file_content: String;
+    @Prop({default: "coffeeeeeeeeeeeee\neee\neee\neeeeeeeeeeeeeeeeeee", type: String})
+    incoming_file_content!: string;
 
-    filename: String;
-    file_content: String;
+    filename: string = "name";
+    file_content: string = "content";
 
     created() {
       this.file_content = this.incoming_file_content;
