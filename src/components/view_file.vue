@@ -37,6 +37,7 @@
   @import '@/styles/colors.scss';
 
   #viewing-container {
+    border-top: 1px solid $light-brown-gray;
     border-bottom: 1px solid $light-brown-gray;
     border-left: 1px solid $light-brown-gray;
     border-right: 1px solid $light-brown-gray;
@@ -65,7 +66,7 @@
   .line-number {
     color: $light-brown-gray;
     font-size: 13px;
-    padding: 1px 0 0 0;
+    padding: 1px 0 1px 0;
     text-align: center;
     z-index: 10;
   }
@@ -79,8 +80,9 @@
   }
 
   .line-of-file-content {
+    font-size: 13px;
     margin: 0;
-    padding: 0 10px 1px 0;
+    padding: 1px 10px 1px 0;
   }
 
   .line-of-file-content:last-child {
