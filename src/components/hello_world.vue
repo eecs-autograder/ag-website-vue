@@ -39,7 +39,7 @@ export default class HelloWorld extends Vue {
 
   off = "Super Off";
 
-  filename ="ke$ha.cpp";
+  filename = "ke$ha.cpp";
 
   content = "#include \"macklemore.cpp\"\nblah\nblah\nblah\n5coffeeeeeeee\n";
 
