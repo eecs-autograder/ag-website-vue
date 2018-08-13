@@ -14,8 +14,7 @@
       <i class="fas fa-angle-down"></i>
     </div>
 
-    <view-file></view-file>
-
+    <br>
     <view-file :incoming_filename="filename" :incoming_file_content="content" ref="viewing_file"></view-file>
 
   </div>
@@ -42,7 +41,7 @@ export default class HelloWorld extends Vue {
 
   filename ="ke$ha.cpp";
 
-  content = "blah\nblah\nblah";
+  content = "#include \"macklemore.cpp\"\nblah\nblah\nblah\n5coffeeeeeeee\n";
 
   switchy: boolean = true;
 }
