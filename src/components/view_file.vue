@@ -19,7 +19,7 @@
 
   @Component
   export default class ViewFile extends Vue {
-
+    
     @Prop({required: true, type: String})
     incoming_filename!: string;
 
