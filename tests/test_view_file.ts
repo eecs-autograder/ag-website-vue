@@ -3,14 +3,6 @@ import { mount } from '@vue/test-utils';
 
 describe('ViewFile.vue', () => {
 
-    test('ViewFile data set to default values when props are not specified by parent', () => {
-        const wrapper = mount(ViewFile);
-
-        const vm = wrapper.vm;
-        expect(vm.$data.filename).toBe("filename");
-        expect(vm.$data.file_content).toBe("file content");
-    });
-
     test('ViewFile data set to values passed in by parent', () => {
         const filename = 'ke$ha_file.cpp';
         const content = 'blah\nblah\nblah';
@@ -26,21 +18,23 @@ describe('ViewFile.vue', () => {
         expect(vm.$data.file_content).toBe(content);
     });
 
-    test('The amount of line numbers corresponds to the number of lines with content', () => {
-        const content = 'blah\nblah\nblah';
+    test('File content and line numbers displayed in order', () => {
         const wrapper = mount(ViewFile, {
             propsData: {
-                incoming_file_content: content
+                incoming_filename: 'filename',
+                incoming_file_content: 'line one\nline two'
             }
         });
 
-        const vm = wrapper.vm;
-        expect(vm.$data.filename).toBe("filename");
-        expect(vm.$data.file_content).toBe(content);
-        expect(wrapper.html()).toContain('<div class="line-number"> 1 </div>');
-        expect(wrapper.html()).toContain('<div class="line-number"> 2 </div>');
-        expect(wrapper.html()).toContain('<div class="line-number"> 3 </div>');
-        expect(wrapper.findAll('.line-number')).toHaveLength(3);
+        const line_numbers = wrapper.findAll('.line-number');
+        expect(line_numbers.length).toEqual(2);
+        expect(line_numbers.at(0).text()).toContain('1');
+        expect(line_numbers.at(1).text()).toContain('2');
+
+        const content_lines = wrapper.findAll('.line-of-file-content');
+        expect(content_lines.length).toEqual(2);
+        expect(content_lines.at(0).text()).toContain('line one');
+        expect(content_lines.at(1).text()).toContain('line two');
     });
 
 });
