@@ -2,7 +2,9 @@
   <div id="viewing-container">
     <div id="scrollable-container">
       <div class="line-numbers-container">
-        <div v-for="(line, index) of file_content.split('\n')" class="line-number"> {{index + 1}} </div>
+        <div v-for="(line, index) of file_content.split('\n')" class="line-number">
+          {{index + 1}}
+        </div>
       </div>
       <div class="file-content-container">
         <pre v-for="(line) of file_content.split('\n')" class="line-of-file-content">{{line}}</pre>
@@ -17,14 +19,14 @@
   @Component
   export default class ViewFile extends Vue {
 
-    @Prop({default: "filename", type: String})
+    @Prop({required: true, type: String})
     incoming_filename!: string;
 
-    @Prop({default: "file content", type: String})
+    @Prop({required: true, type: String})
     incoming_file_content!: string;
 
-    filename: string = "name";
-    file_content: string = "content";
+    filename: string = "";
+    file_content: string = "";
 
     created() {
       this.file_content = this.incoming_file_content;
