@@ -8,23 +8,25 @@ describe('Toggle.vue', () => {
 
         const vm = wrapper.vm;
         expect(vm.$data.is_on).toBe(false);
-        expect(vm.$data.on_side_text).toBe("On");
-        expect(vm.$data.off_side_text).toBe("Off");
     });
 
     test('Toggle data set to values passed in by parent', () => {
         const wrapper = mount(Toggle, {
             propsData: {
                 value: true,
-                switch_is_on_text: "Come in, we're open!",
-                switch_is_off_text: "Sorry, we're closed"
+            },
+            slots: {
+                on: "<p> Come in, we're open! </p>",
+                off: "<p> Sorry, we're closed </p>"
             }
         });
 
         const vm = wrapper.vm;
         expect(vm.$data.is_on).toBe(true);
-        expect(vm.$data.on_side_text).toBe("Come in, we're open!");
-        expect(vm.$data.off_side_text).toBe("Sorry, we're closed");
+        let toggle_on_side = wrapper.find('.active-option-style');
+        expect(toggle_on_side.text()).toContain("Come in, we're open!");
+        let toggle_off_side = wrapper.find('.inactive-option-style');
+        expect(toggle_off_side.text()).toBe("Sorry, we're closed");
     });
 
     test('Toggle from off to on then off again', () => {
@@ -32,6 +34,10 @@ describe('Toggle.vue', () => {
             propsData: {
                 switch_is_on_text: "Come in, we're open!",
                 switch_is_off_text: "Sorry, we're closed"
+            },
+            slots: {
+                on: "<p> Come in, we're open! </p>",
+                off: "<p> Sorry, we're closed </p>"
             }
         });
 
