@@ -3,10 +3,16 @@
 
     <h1>{{ msg }}</h1>
 
-    <Toggle id="toggle" v-model="switchy" ref="switchy_toggle"/>
+    <toggle id="toggle" v-model="switchy" :incoming_active_background_color="active_bkgrnd_color" ref="switchy_toggle">
+      <template slot="on">
+        <p> Happy </p>
+      </template>
+      <template slot="off">
+        <p> <i class="fas fa-frown fa-lg"> </i></p>
+      </template>
+    </toggle>
 
-    <Toggle/>
-    {{switchy}}
+    <br>
 
     <div class="icon-poc">
       <i class="fas fa-check"></i>
@@ -45,6 +51,10 @@ export default class HelloWorld extends Vue {
   content = "#include \"macklemore.cpp\"\nblah\nblah\nblah\n5coffeeeeeeee\n";
 
   switchy: boolean = true;
+
+  active_bkgrnd_color = {
+    'backgroundColor': 'hotpink'
+  };
 }
 </script>
 
@@ -64,4 +74,5 @@ li {
 a {
   color: #42b983;
 }
+
 </style>
