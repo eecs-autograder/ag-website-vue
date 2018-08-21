@@ -1,0 +1,90 @@
+.button-styling {
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    display: inline-block;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 14px;
+    padding: 7px 12px;
+}
+
+.red-button {
+    background-color: hsl(348, 83%, 60%);
+    border: 1px solid hsl(348, 83%, 76%);
+}
+
+.red-button:hover {
+    background-color: hsl(348, 83%, 55%);
+}
+
+.red-button:focus {
+    outline-color: hsl(0.61, 79%, 97%);
+}
+
+.yellow-button {
+    background-color: hsl(55, 95%, 75%);
+    border: 1px solid hsl(55, 95%, 89%);
+    color: black;
+}
+
+.yellow-button:hover {
+    background-color: hsl(55, 100%, 57%);
+}
+
+.yellow-button:focus {
+    outline-color: hsl(55, 95%, 95%);
+}
+
+.green-button {
+    background-color: hsl(150, 55%, 44%);
+    border: 1px solid hsl(150, 55%, 60%);
+}
+
+.green-button:hover {
+    background-color: hsl(150, 55%, 39%);
+}
+
+.green-button:focus {
+    outline-color: hsl(101.25, 80%, 95%);
+}
+
+.blue-button {
+    background-color: hsl(208, 59%, 55%);
+    border: 1px solid hsl(208, 59%, 71%);
+}
+
+.blue-button:hover {
+    background-color: hsl(208, 59%, 44%);
+}
+
+.blue-button:focus {
+    outline-color: hsl(208, 79%, 95%);
+}
+
+.purple-button {
+    background-color: hsl(275, 48%, 63%);
+    border: 1px solid hsl(275, 48%, 83%);
+}
+
+.purple-button:hover {
+    background-color: hsl(275, 48%, 58%);
+}
+
+.purple-button:focus {
+    outline-color: hsl(275, 48%, 95%);
+}
+
+.gray-button {
+    background-color: hsl(210, 13%, 63%);
+    border: 1px solid hsl(210, 13%, 80%);
+}
+
+.gray-button:hover {
+    background-color: hsl(210, 13%, 58%);
+}
+
+.gray-button:focus {
+    outline-color: hsl(210, 13%, 95%);
+}
+
+
