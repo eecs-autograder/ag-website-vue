@@ -9,17 +9,30 @@
 }
 
 .red-button {
-    background-color: hsl(348, 83%, 60%);
-    border: 1px solid hsl(348, 83%, 76%);
+    background-color: hsl(0.61, 85%, 60%);
+    border: 1px solid hsl(0.61, 89%, 71%);
 }
 
 .red-button:hover {
-    background-color: hsl(348, 83%, 55%);
+    background-color: hsl(0.61, 85%, 45%);
 }
 
 .red-button:focus {
     outline-color: hsl(0.61, 79%, 97%);
 }
+
+//.orange-button {
+//    background-color: hsl(40, 90%, 75%);
+//    border: 1px solid
+//}
+//
+//.orange-button:hover {
+//    background-color:
+//}
+//
+//.orange-button:focus {
+//    outline-color:
+//}
 
 .yellow-button {
     background-color: hsl(55, 95%, 75%);
@@ -71,7 +84,7 @@
 }
 
 .purple-button:focus {
-    outline-color: hsl(275, 48%, 95%);
+    outline-color: hsl(275, 48%, 65%);
 }
 
 .gray-button {
