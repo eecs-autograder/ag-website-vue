@@ -9,30 +9,31 @@
 }
 
 .red-button {
-    background-color: hsl(0.61, 85%, 60%);
-    border: 1px solid hsl(0.61, 89%, 71%);
+    background-color: hsl(0, 80%, 50%);
+    border: 1px solid hsl(0, 90%, 70%);
 }
 
 .red-button:hover {
-    background-color: hsl(0.61, 85%, 45%);
+    background-color: hsl(0, 80%, 43%);
 }
 
 .red-button:focus {
-    outline-color: hsl(0.61, 79%, 97%);
+    outline-color: hsl(0.61, 79%, 85%);
 }
 
-//.orange-button {
-//    background-color: hsl(40, 90%, 75%);
-//    border: 1px solid
-//}
-//
-//.orange-button:hover {
-//    background-color:
-//}
-//
-//.orange-button:focus {
-//    outline-color:
-//}
+.orange-button {
+    background-color: hsl(20, 100%, 62%);
+    border: 1px solid hsl(20, 100%, 78%);
+}
+
+.orange-button:hover {
+    background-color: hsl(20, 100%, 55%);
+
+}
+
+.orange-button:focus {
+    outline-color: hsl(20, 100%, 75%);
+}
 
 .yellow-button {
     background-color: hsl(55, 95%, 75%);
@@ -58,7 +59,7 @@
 }
 
 .green-button:focus {
-    outline-color: hsl(101.25, 80%, 95%);
+    outline-color: hsl(101.25, 80%, 80%);
 }
 
 .blue-button {
@@ -71,7 +72,7 @@
 }
 
 .blue-button:focus {
-    outline-color: hsl(208, 79%, 95%);
+    outline-color: hsl(208, 79%, 85%);
 }
 
 .purple-button {
@@ -80,11 +81,11 @@
 }
 
 .purple-button:hover {
-    background-color: hsl(275, 48%, 58%);
+    background-color: hsl(275, 48%, 57%);
 }
 
 .purple-button:focus {
-    outline-color: hsl(275, 48%, 65%);
+    outline-color: hsl(275, 48%, 85%);
 }
 
 .gray-button {
@@ -97,7 +98,7 @@
 }
 
 .gray-button:focus {
-    outline-color: hsl(210, 13%, 95%);
+    outline-color: hsl(210, 13%, 85%);
 }
 
 

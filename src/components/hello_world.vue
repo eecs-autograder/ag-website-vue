@@ -3,24 +3,24 @@
 =======
   <div class="hello">
 
-    <!--<button class="button-styling blue-button"> Click On Me </button>-->
-    <!--<br>-->
-    <!--<br>-->
-    <!--<button class="button-styling green-button"> Save </button>-->
-    <!--<br>-->
-    <!--<br>-->
-    <button class="button-styling red-button"> Delete </button>
+    <button class="button-styling blue-button"> Click On Me </button>
     <br>
     <br>
-    <!--<button class="button-styling gray-button"> Cancel </button>-->
-    <!--<br>-->
-    <!--<br>-->
-    <!--<button class="button-styling yellow-button"> Yield </button>-->
-    <!--<br>-->
-    <!--<br>-->
-    <!--<button class="button-styling purple-button"> Enter Contest </button>-->
-    <!--<br>-->
-    <!--<br>-->
+    <button class="button-styling green-button"> Save </button>
+    <br>
+    <br>
+    <button class="button-styling red-button"> Delete  <p class="trash-can fas fa-trash"></p> </button>
+    <br>
+    <br>
+    <button class="button-styling gray-button"> Cancel </button>
+    <br>
+    <br>
+    <button class="button-styling orange-button"> Happy Halloween </button>
+    <br>
+    <br>
+    <button class="button-styling purple-button"> Enter Contest </button>
+    <br>
+    <br>
 
     <!--<div class="button-styling green-button"> Hello </div>-->
 >>>>>>> Changed the color of the red button to be the color of the incorrect row in the submission_detail component.
@@ -49,5 +49,9 @@ export default class HelloWorld extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+  .trash-can {
+    margin: 0 0 0 5px;
+  }
 
 </style>
