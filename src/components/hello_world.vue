@@ -1,4 +1,29 @@
 <template>
+<<<<<<< HEAD
+=======
+  <div class="hello">
+
+    <!--<button class="button-styling blue-button"> Click On Me </button>-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--<button class="button-styling green-button"> Save </button>-->
+    <!--<br>-->
+    <!--<br>-->
+    <button class="button-styling red-button"> Delete </button>
+    <br>
+    <br>
+    <!--<button class="button-styling gray-button"> Cancel </button>-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--<button class="button-styling yellow-button"> Yield </button>-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--<button class="button-styling purple-button"> Enter Contest </button>-->
+    <!--<br>-->
+    <!--<br>-->
+
+    <!--<div class="button-styling green-button"> Hello </div>-->
+>>>>>>> Changed the color of the red button to be the color of the incorrect row in the submission_detail component.
 
   <div>
     <TabsDemo></TabsDemo>
