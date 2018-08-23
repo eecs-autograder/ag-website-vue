@@ -3,7 +3,9 @@
 
     <h1>{{ msg }}</h1>
 
-    <toggle id="toggle" v-model="switchy" :incoming_active_background_color="active_bkgrnd_color" ref="switchy_toggle">
+    <toggle id="toggle" v-model="switchy"
+            :incoming_active_background_color="active_bkgrnd_color"
+            ref="switchy_toggle">
       <template slot="on">
         <p> Happy </p>
       </template>
