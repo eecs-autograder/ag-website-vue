@@ -26,6 +26,29 @@
     <view-file :incoming_filename="filename"
                :incoming_file_content="content" ref="viewing_file"></view-file>
 
+    <tabs v-model="current_tab_index">
+      <tab>
+        <template slot="header">
+          Tab 1
+        </template>
+
+        <template slot="body">
+          Spam
+        </template>
+      </tab>
+
+      <tab>
+        <template slot="header">
+          <i>Tab 2</i>
+        </template>
+        <template slot="body">
+          Egg
+        </template>
+      </tab>
+    </tabs>
+
+    {{current_tab_index}}
+
   </div>
 </template>
 
@@ -36,8 +59,10 @@ import Toggle from './toggle.vue';
 
 import ViewFile from './view_file.vue';
 
+import { Tab, Tabs } from './tabs';
+
 @Component({
-  components: {Toggle, ViewFile}
+  components: {Toggle, ViewFile, Tabs, Tab}
 })
 
 export default class HelloWorld extends Vue {
@@ -57,6 +82,8 @@ export default class HelloWorld extends Vue {
   active_bkgrnd_color = {
     'backgroundColor': 'hotpink'
   };
+
+  current_tab_index = 1;
 }
 </script>
 
