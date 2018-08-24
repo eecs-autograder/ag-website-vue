@@ -10,95 +10,81 @@
 
 .red-button {
     background-color: hsl(0, 80%, 50%);
-    border: 1px solid hsl(0, 90%, 70%);
+    border: 1px solid hsl(0, 80%, 66%); // L up 16%
 }
 
 .red-button:hover {
-    background-color: hsl(0, 80%, 45%);
+    background-color: hsl(0, 80%, 45%); // L down 5%
 }
 
 .red-button:focus {
-    outline-color: hsl(0.61, 79%, 85%);
+    outline-color: hsl(0.61, 80%, 85%); // L up 35%
 }
 
 .orange-button {
-    background-color: hsl(20, 100%, 62%);
-    border: 1px solid hsl(20, 100%, 78%);
+    background-color: hsl(20, 100%, 55%);
+    border: 1px solid hsl(20, 100%, 71%); // L up 16%
 }
 
 .orange-button:hover {
-    background-color: hsl(20, 100%, 57%);
+    background-color: hsl(20, 100%, 50%); // L down 5%
 
 }
 
 .orange-button:focus {
-    outline-color: hsl(20, 100%, 80%);
-}
-
-.yellow-button {
-    background-color: hsl(55, 95%, 75%);
-    border: 1px solid hsl(55, 95%, 89%);
-    color: black;
-}
-
-.yellow-button:hover {
-    background-color: hsl(55, 100%, 57%);
-}
-
-.yellow-button:focus {
-    outline-color: hsl(55, 95%, 95%);
+    outline-color: hsl(20, 100%, 80%); // L up 18%
 }
 
 .green-button {
     background-color: hsl(150, 55%, 44%);
-    border: 1px solid hsl(150, 55%, 60%);
+    border: 1px solid hsl(150, 55%, 60%); // L up 16%
 }
 
 .green-button:hover {
-    background-color: hsl(150, 55%, 39%);
+    background-color: hsl(150, 55%, 39%); // L down 5%
 }
 
 .green-button:focus {
-    outline-color: hsl(101.25, 80%, 80%);
+    outline-color: hsl(150, 55%, 79%); // L up 35%
 }
 
 .blue-button {
-    background-color: hsl(208, 59%, 55%);
-    border: 1px solid hsl(208, 59%, 71%);
+    background-color: hsl(208, 59%, 54%);
+    border: 1px solid hsl(208, 59%, 70%); // L up 16%
 }
 
 .blue-button:hover {
-    background-color: hsl(208, 59%, 50%);
+    background-color: hsl(208, 59%, 49%); // L down 5%
 }
 
 .blue-button:focus {
-    outline-color: hsl(208, 79%, 85%);
+    outline-color: hsl(208, 59%, 85%); // L up 30%
 }
 
 .purple-button {
     background-color: hsl(275, 48%, 63%);
-    border: 1px solid hsl(275, 48%, 79%);
+    border: 1px solid hsl(275, 48%, 79%); // L up 16%
 }
 
 .purple-button:hover {
-    background-color: hsl(275, 48%, 58%);
+    background-color: hsl(275, 48%, 58%); // L down 5%
 }
 
 .purple-button:focus {
-    outline-color: hsl(275, 48%, 85%);
+    outline-color: hsl(275, 48%, 88%); // L up 25%
 }
 
 .gray-button {
     background-color: hsl(210, 13%, 63%);
-    border: 1px solid hsl(210, 13%, 80%);
+    border: 1px solid hsl(210, 13%, 79%); // L up 16%
 }
 
 .gray-button:hover {
-    background-color: hsl(210, 13%, 58%);
+    background-color: hsl(210, 13%, 58%); // L down 5%
 }
 
 .gray-button:focus {
-    outline-color: hsl(210, 13%, 85%);
+    outline-color: hsl(210, 13%, 88%); // L up 25%
 }
 
 
