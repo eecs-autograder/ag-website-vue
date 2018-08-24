@@ -62,13 +62,11 @@ if (spamspamspamspamspam &&
     ...
 }
 ```
-- If the first statement of an `if` block is indented to the same level as the wrapped condition, you may put a blank line before the first statement of the `if` block.
-    - Note: The tslint "align" rule disallows indenting the wrapped condition an extra level, otherwise we would do that.
+- If the first statement of an `if` block is indented to the same level as the wrapped condition, indent the wrapped condition an extra level.
     - Note: This is only an issue in files where indentation is 4 spaces.
 ```
 if (spamspamspamspamspam
-    && egg) {
-
+        && egg) {
     do_something();
 }
 ```
