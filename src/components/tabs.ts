@@ -1,6 +1,8 @@
 import { CreateElement, VNode } from 'vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import { safe_assign } from '@/utils';
+
 
 @Component({
     template: `<div>
@@ -14,6 +16,13 @@ export class Tab extends Vue {
 
     @Prop({type: String, required: true})
     title!: string;
+}
+
+interface ExtractedTabData {
+    ref?: string;
+    listeners?: object;
+    header: VNode;
+    body: VNode;
 }
 
 @Component({
@@ -30,47 +39,39 @@ export class Tabs extends Vue {
     }
 
     render(el: CreateElement) {
-        let tab_headers: VNode[] = [];
-        let tab_bodies: VNode[] = [];
+        let tab_data: ExtractedTabData[] = [];
 
         for (let slot of this.$slots.default) {
-            let tab_children = this._get_tab_children(slot);
+            // console.log(slot);
+            // Skip any tags or content that isn't a <tab>
+            if (slot.componentOptions === undefined
+                    || slot.componentOptions.tag !== 'tab') {
+                continue;
+            }
+
+            if (slot.componentOptions.children === undefined
+                    || !Array.isArray(slot.componentOptions.children)
+                    || slot.componentOptions.children.length < 2) {
+                throw new Error('Make sure <tab> elements have "header" and "body" slots');
+            }
+
+            let tab_children = <VNode[]> slot.componentOptions.children;
             let header = this._extract_slot(tab_children, 'header');
             let body = this._extract_slot(tab_children, 'body');
 
-            tab_headers.push(header);
-            tab_bodies.push(body);
+            let ref;
+            if (slot.data !== undefined) {
+                ref = slot.data.ref;
+            }
+            tab_data.push({ref: ref, listeners: slot.componentOptions.listeners,
+                           header: header, body: body});
         }
 
         return el(
             'div',
-            [this._render_tab_headers(el, tab_headers),
-             this._render_tab_body(el, tab_bodies)]
+            [this._render_tab_headers(el, tab_data),
+             this._render_tab_body(el, tab_data)]
         );
-    }
-
-    private _get_tab_children(slot: VNode): VNode[] {
-        if (slot.componentOptions === undefined || slot.componentOptions.tag !== 'tab') {
-            throw new Error(`Non-tab tag found inside tabs component: ${slot.tag}`);
-        }
-        else if (slot.componentOptions.tag !== 'tab') {
-            throw new Error(
-                `Non-tab tag found inside tabs component: ${slot.componentOptions.tag}`);
-        }
-
-        let slot_children = slot.componentOptions.children;
-        if (slot_children === undefined
-                || !Array.isArray(slot_children)
-                || slot_children.length !== 2) {
-        throw new Error(
-            'Make sure <tab> elements have exactly 2 children: '
-            + 'One for the "header" slot and one for the "body" slot');
-        }
-
-        // At this point, the type system still thinks slot_children
-        // could be [ScopedSlot] (a tuple containing one item), but we know
-        // that it has length 2 from our checks.
-        return <VNode[]> slot_children;
     }
 
     private _extract_slot(tab_children: VNode[], slot_name: 'header' | 'body') {
@@ -79,26 +80,39 @@ export class Tabs extends Vue {
         if (header === undefined) {
             throw new Error(`Missing "${slot_name}" slot in <tab>.`);
         }
+        if (header.tag !== 'template') {
+            throw new Error(`"${slot_name}" slot must be a <template> tag.`);
+        }
         return header;
     }
 
-    private _render_tab_headers(el: CreateElement, tab_headers: VNode[]) {
-        let header_elts = tab_headers.map(
-            (header_node, index) => {
+    private _render_tab_headers(el: CreateElement, tab_data: ExtractedTabData[]) {
+        let header_elts = tab_data.map(
+            ({header, ref, listeners}, index) => {
+                let event_listeners: { [key: string]: EventListener | EventListener[] } = {};
+                safe_assign(event_listeners, listeners);
+
+                if (event_listeners.click === undefined) {
+                    event_listeners.click = [];
+                }
+                if (!Array.isArray(event_listeners.click)) {
+                    event_listeners.click = [event_listeners.click];
+                }
+                event_listeners.click.push(() => {
+                    this.active_tab_index = index;
+                    this.$emit('input', this.active_tab_index);
+                });
+
                 return el(
-                    'span',
+                    'div',
                     {
+                        ref: ref,
                         style: {
 
                         },
-                        on: {
-                            'click': () => {
-                                this.active_tab_index = index;
-                                this.$emit('input', this.active_tab_index);
-                            }
-                        }
+                        on: event_listeners
                     },
-                    header_node.children
+                    header.children
                 );
             }
         );
@@ -113,19 +127,20 @@ export class Tabs extends Vue {
             header_elts);
     }
 
-    private _render_tab_body(el: CreateElement, tab_bodies: VNode[]) {
-        if (this.active_tab_index >= tab_bodies.length) {
-            this.active_tab_index = tab_bodies.length - 1;
+    private _render_tab_body(el: CreateElement, tab_data: ExtractedTabData[]) {
+        if (this.active_tab_index >= tab_data.length) {
+            this.active_tab_index = tab_data.length - 1;
         }
 
         return el(
             'div',
             {
+                ref: 'active-tab-body',
                 style: {
 
                 }
             },
-            tab_bodies[this.active_tab_index].children
+            tab_data[this.active_tab_index].body.children
         );
     }
 }
