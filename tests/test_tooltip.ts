@@ -30,4 +30,5 @@ describe('Tooltip.vue', () => {
         expect(wrapper.find('.tooltip-text').classes()).toContain("medium-text-area");
         expect(wrapper.find('.tooltip-text').classes()).toContain("placement-left");
     });
+
 });
