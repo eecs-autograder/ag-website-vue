@@ -82,9 +82,6 @@
         "strict-boolean-expressions": {
             "severity": "warning"
         },
-        "strict-type-predicates": {
-            "severity": "warning"
-        },
         "triple-equals": true,
         "use-isnan": true,
 

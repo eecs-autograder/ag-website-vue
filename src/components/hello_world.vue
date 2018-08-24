@@ -26,7 +26,7 @@
     <view-file :incoming_filename="filename"
                :incoming_file_content="content" ref="viewing_file"></view-file>
 
-    <tabs v-model="current_tab_index">
+    <!-- <tabs v-model="current_tab_index">
       <tab>
         <template slot="header">
           Tab 1
@@ -45,9 +45,28 @@
           Egg
         </template>
       </tab>
-    </tabs>
+    </tabs> -->
 
-    {{current_tab_index}}
+    <!-- {{current_tab_index}} -->
+
+<tabs ref="tabs">
+  <tab ref="tabby" v-on:click="wee">
+    <template slot="header">
+      Tab 1
+    </template>
+    <template slot="body">
+     Tab 1 body
+    </template>
+  </tab>
+  <tab>
+    <template slot="header">
+      Tab 2
+    </template>
+    <template slot="body">
+      Tab 2 body
+    </template>
+  </tab>
+</tabs>
 
   </div>
 </template>
@@ -82,6 +101,10 @@ export default class HelloWorld extends Vue {
   active_bkgrnd_color = {
     'backgroundColor': 'hotpink'
   };
+
+  wee(e) {
+    console.log(e);
+  }
 
   current_tab_index = 1;
 }
