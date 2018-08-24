@@ -7,8 +7,5 @@ describe('HelloWorld.vue', () => {
         // const msg = 'new message';
         const wrapper = mount(HelloWorld);
 
-        let tooltip = wrapper.find({ref: 'first_tooltip'});
-
-        expect(tooltip.vm.$data.tooltip_message).toEqual("Right<br>Right<br>Right<br>Right");
     });
 });

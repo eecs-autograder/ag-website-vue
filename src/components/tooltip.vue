@@ -32,11 +32,8 @@
       let parent = <HTMLElement> this.$el.parentElement;
       let tooltip_text = <HTMLElement> this.$el.getElementsByClassName("tooltip-text")[0];
 
-      if (parent === null) {
-        throw new Error("Tooltip parent is null!");
-      }
-      else {
-        parent.style.position = "relative";
+      if (parent !== null) {
+        parent!.style.position = "relative";
         parent.style.display = "inline-block";
 
         parent.addEventListener("mouseenter", () => {
@@ -49,6 +46,10 @@
           tooltip_text.style.opacity = "0";
         });
       }
+      else {
+        throw new Error("Parent element is null!");
+      }
+
 
       // Width
       if (this.tooltip_width === "small") {
