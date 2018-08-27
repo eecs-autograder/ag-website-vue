@@ -93,4 +93,28 @@ describe('Toggle.vue', () => {
         expect(vm.$data.is_on).toBe(true);
     });
 
+    test("v-model binding", () => {
+        const component = {
+            template:  `<toggle ref="toggle" v-model="my_toggle"></toggle>`,
+            components: {
+                'toggle': Toggle
+            },
+            data: () => {
+                return {
+                    my_toggle: false
+                };
+            }
+        };
+
+        const wrapper = mount(component);
+        const toggle = wrapper.find({ref: 'toggle'});
+        expect(toggle.vm.$data.is_on).toEqual(false);
+
+        wrapper.setData({my_toggle: true});
+        expect(toggle.vm.$data.is_on).toEqual(true);
+
+        toggle.find('.inactive-option-style').trigger('click');
+        expect(toggle.vm.$data.is_on).toEqual(false);
+        expect(wrapper.vm.$data.my_toggle).toEqual(false);
+    });
 });

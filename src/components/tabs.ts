@@ -1,5 +1,5 @@
 import { CreateElement, VNode } from 'vue';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { safe_assign } from '@/utils';
 
@@ -11,9 +11,6 @@ import { safe_assign } from '@/utils';
 </div>`
 })
 export class Tab extends Vue {
-    // @Prop({type: String})
-    // tab_id!: string;
-
     @Prop({type: String, required: true})
     title!: string;
 }
@@ -31,6 +28,13 @@ interface ExtractedTabData {
 export class Tabs extends Vue {
     @Prop({default: 0, type: Number})
     value!: number;
+
+    @Watch('value')
+    on_value_changed(new_value: number, old_value: number) {
+        if (new_value !== old_value) {
+            this.active_tab_index = new_value;
+        }
+    }
 
     active_tab_index: number = 0;
 

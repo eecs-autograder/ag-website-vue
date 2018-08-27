@@ -3,6 +3,8 @@
 
     <h1>{{ msg }}</h1>
 
+    <button type="button" @click="switchy = !switchy">things</button>
+
     <toggle id="toggle" v-model="switchy"
             :incoming_active_background_color="active_bkgrnd_color"
             ref="switchy_toggle">
@@ -49,7 +51,7 @@
 
     <!-- {{current_tab_index}} -->
 
-<tabs ref="tabs">
+<tabs ref="tabs" v-model="current_tab_index">
   <tab ref="tabby" v-on:click="wee">
     <template slot="header">
       Tab 1
@@ -83,7 +85,6 @@ import { Tab, Tabs } from './tabs';
 @Component({
   components: {Toggle, ViewFile, Tabs, Tab}
 })
-
 export default class HelloWorld extends Vue {
   @Prop()
   msg!: string;
@@ -102,7 +103,7 @@ export default class HelloWorld extends Vue {
     'backgroundColor': 'hotpink'
   };
 
-  wee(e) {
+  wee(e: Event) {
     console.log(e);
   }
 
