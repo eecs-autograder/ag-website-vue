@@ -3,14 +3,14 @@ import Vue from 'vue';
 import { config, mount } from '@vue/test-utils';
 import Component from 'vue-class-component';
 
-import { Tab, Tabs } from "@/components/tabs";
+import { Tab, Tabs, TabsError } from "@/components/tabs";
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 describe('Tabs tests', () => {
-    test('Empty tabset', async () => {
+    test('Empty tabset', () => {
         const component = {
             template:  `<tabs ref="tabs"></tabs>`,
             components: {
@@ -24,7 +24,30 @@ describe('Tabs tests', () => {
         expect(tabs.isEmpty()).toEqual(true);
     });
 
-    test('First tab selected by default', async () => {
+    test.skip('Empty tab header and body', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <template ref="tab_1" slot="header">
+    </template>
+    <template slot="body">
+    </template>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+        const wrapper = mount(component);
+        const tabs = wrapper.find({ref: 'tabs'});
+        expect(tabs.exists).toEqual(true);
+
+        expect(tabs.find({ref: 'tab_1'}).isEmpty()).toEqual(true);
+        expect(tabs.find({ref: 'active-tab-body'}).isEmpty()).toEqual(true);
+    });
+
+    test('First tab selected by default', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -59,7 +82,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 1 body');
     });
 
-    test('Custom initial active tab', async () => {
+    test('Custom initial active tab', () => {
         const component = {
             template:  `<tabs ref="tabs" v-model="selected_tab">
   <tab>
@@ -99,7 +122,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
-    test('Tab selected on click', async () => {
+    test('Tab selected on click', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -141,7 +164,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
-    test('Custom click handler on <tab>', async () => {
+    test('Custom click handler on <tab>', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -193,7 +216,7 @@ describe('Tabs tests', () => {
         expect(wrapper.vm.$data.datum).toEqual(2);
     });
 
-    test('Tab v-model binding', async () => {
+    test('Tab v-model binding', () => {
         const component = {
             template:  `<tabs ref="tabs" v-model="current_tab">
   <tab ref="tab_1">
@@ -248,7 +271,7 @@ describe('Tabs tests', () => {
         expect(wrapper.vm.$data.current_tab).toEqual(0);
     });
 
-    test('Active index off end selects last tab', async () => {
+    test('Active index off end selects last tab', () => {
         const component = {
             template:  `<tabs ref="tabs" v-model="current_tab">
   <tab ref="tab_1">
@@ -289,7 +312,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
-    test('Closing selected first tab selects second', async () => {
+    test('Closing selected first tab selects second', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
@@ -324,7 +347,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
-    test('Closing selected middle tab selects right sibling', async () => {
+    test('Closing selected middle tab selects right sibling', () => {
         const component = {
             template:  `<tabs ref="tabs" :value="1">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
@@ -359,7 +382,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 3 body');
     });
 
-    test('Closing selected last tab selects left sibling', async () => {
+    test('Closing selected last tab selects left sibling', () => {
         const component = {
             template:  `<tabs ref="tabs" :value="2">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
@@ -394,7 +417,7 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
-    test('Closing unselected tab does not change selected tab', async () => {
+    test('Closing unselected tab does not change selected tab', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
@@ -430,7 +453,7 @@ describe('Tabs tests', () => {
         expect(tabs.vm.$data.active_tab_index).toEqual(0);
     });
 
-    test('Adding new tab does not change selected tab', async () => {
+    test('Adding new tab does not change selected tab', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
@@ -466,7 +489,7 @@ describe('Tabs tests', () => {
         expect(tabs.vm.$data.active_tab_index).toEqual(0);
     });
 
-    test('Possible to manually select newly added tab', async () => {
+    test('Possible to manually select newly added tab', () => {
         @Component({
             template:  `<tabs ref="tabs" v-model="current_tab">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
@@ -506,7 +529,7 @@ describe('Tabs tests', () => {
         expect(tabs.vm.$data.active_tab_index).toEqual(3);
     });
 
-    test('Non <tab> tag in <tabs> is discarded', async () => {
+    test('Non <tab> tag in <tabs> is discarded', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab ref="real_tab">
@@ -532,7 +555,7 @@ describe('Tabs tests', () => {
         expect(tabs.find('#bad').exists()).toEqual(false);
     });
 
-    test('String content in <tabs> is discarded', async () => {
+    test('String content in <tabs> is discarded', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -560,7 +583,7 @@ describe('Tabs tests', () => {
         expect(tabs.text()).not.toContain('some extra text');
     });
 
-    test('Extra children in <tab> ignored', async () => {
+    test('Extra children in <tab> ignored', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -588,19 +611,129 @@ describe('Tabs tests', () => {
         expect(tabs.find('#extra').exists()).toEqual(false);
     });
 
-    test.skip('Error missing header in <tab>', async () => {
-        fail();
+    test('Error no children in <tab>', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        expect(
+            () => mount(component)
+        ).toThrow('Make sure <tab> elements have "header" and "body" slots');
     });
 
-    test.skip('Error tab header not <template>', async () => {
-        fail();
+    test('Error only 1 child in <tab>', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <template slot="body">
+      Tab 1 body
+    </template>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        expect(
+            () => mount(component)
+        ).toThrow('Make sure <tab> elements have "header" and "body" slots');
     });
 
-    test.skip('Error missing body in <tab>', async () => {
-        fail();
+    test('Error missing header in <tab>, extra child present', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <div>extra</div>
+
+    <template slot="body">
+      Tab 1 body
+    </template>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        expect(
+            () => mount(component)
+        ).toThrow('Missing "header" slot in <tab>.');
     });
 
-    test.skip('Error tab body not <template>', async () => {
-        fail();
+    test('Error tab header not <template>', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <div slot="header">
+      Tab 1
+    </div>
+    <template slot="body">
+      Tab 1 body
+    </template>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        expect(
+            () => mount(component)
+        ).toThrow('"header" slot must be a <template> tag.');
+    });
+
+    test('Error missing body in <tab>, extra child present', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <template slot="header">
+      Tab 1
+    </template>
+    <div>Extra</div>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        expect(
+            () => mount(component)
+        ).toThrow('Missing "body" slot in <tab>.');
+    });
+
+    test('Error tab body not <template>', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <template slot="header">
+      Tab 1
+    </template>
+    <div slot="body">
+      Tab 1 body
+    </div>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        expect(
+            () => mount(component)
+        ).toThrow('"body" slot must be a <template> tag.');
     });
 });

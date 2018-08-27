@@ -3,6 +3,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { safe_assign } from '@/utils';
 
+export class TabsError extends Error {}
 
 @Component({
     template: `<div>
@@ -31,9 +32,7 @@ export class Tabs extends Vue {
 
     @Watch('value')
     on_value_changed(new_value: number, old_value: number) {
-        if (new_value !== old_value) {
-            this.active_tab_index = new_value;
-        }
+        this.active_tab_index = new_value;
     }
 
     active_tab_index: number = 0;
@@ -60,7 +59,7 @@ export class Tabs extends Vue {
             if (slot.componentOptions.children === undefined
                     || !Array.isArray(slot.componentOptions.children)
                     || slot.componentOptions.children.length < 2) {
-                throw new Error('Make sure <tab> elements have "header" and "body" slots');
+                throw new TabsError('Make sure <tab> elements have "header" and "body" slots');
             }
 
             let tab_children = <VNode[]> slot.componentOptions.children;
@@ -86,10 +85,10 @@ export class Tabs extends Vue {
         let header = tab_children.find(
             (vnode: VNode) => vnode.data !== undefined && vnode.data.slot === slot_name);
         if (header === undefined) {
-            throw new Error(`Missing "${slot_name}" slot in <tab>.`);
+            throw new TabsError(`Missing "${slot_name}" slot in <tab>.`);
         }
         if (header.tag !== 'template') {
-            throw new Error(`"${slot_name}" slot must be a <template> tag.`);
+            throw new TabsError(`"${slot_name}" slot must be a <template> tag.`);
         }
         return header;
     }

@@ -30,9 +30,7 @@ export default class Toggle extends Vue {
 
   @Watch('value')
   on_value_changed(new_value: boolean, old_value: boolean) {
-    if (new_value !== old_value) {
-      this.is_on = new_value;
-    }
+    this.is_on = new_value;
   }
 
   @Prop({default: false, type: Boolean})
