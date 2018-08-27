@@ -506,16 +506,86 @@ describe('Tabs tests', () => {
         expect(tabs.vm.$data.active_tab_index).toEqual(3);
     });
 
-    test.skip('Error non <tab> tag in <tabs>', async () => {
-        fail();
+    test('Non <tab> tag in <tabs> is discarded', async () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab ref="real_tab">
+    <template slot="header">
+      Tab 1
+    </template>
+    <template slot="body">
+     Tab 1 body
+    </template>
+  </tab>
+
+  <div id="bad">BAD</div>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = wrapper.find({ref: 'tabs'});
+        expect(tabs.find({ref: 'real_tab'}).exists()).toEqual(true);
+        expect(tabs.find('#bad').exists()).toEqual(false);
     });
 
-    test.skip('Error string content in <tabs>', async () => {
-        fail();
+    test('String content in <tabs> is discarded', async () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <template slot="header">
+      Tab 1
+    </template>
+    <template slot="body">
+      Tab 1 body
+    </template>
+  </tab>
+
+  some extra text
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = wrapper.find({ref: 'tabs'});
+
+        expect(tabs.text()).toContain('Tab 1');
+        expect(tabs.text()).toContain('Tab 1 body');
+        expect(tabs.text()).not.toContain('some extra text');
     });
 
-    test.skip('Error extra children in <tab>', async () => {
-        fail();
+    test('Extra children in <tab> ignored', async () => {
+        const component = {
+            template:  `<tabs ref="tabs">
+  <tab>
+    <template slot="header">
+      <div id="tab_header">Tab 1</div>
+    </template>
+    <template slot="body">
+      Tab 1 body
+    </template>
+
+    <div id="extra"></div>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = wrapper.find({ref: 'tabs'});
+
+        expect(tabs.find('#tab_header').exists()).toEqual(true);
+        expect(tabs.find('#tab_header').text()).toContain('Tab 1');
+        expect(tabs.find('#extra').exists()).toEqual(false);
     });
 
     test.skip('Error missing header in <tab>', async () => {
