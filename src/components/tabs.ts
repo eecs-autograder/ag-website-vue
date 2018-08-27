@@ -45,6 +45,10 @@ export class Tabs extends Vue {
     render(el: CreateElement) {
         let tab_data: ExtractedTabData[] = [];
 
+        if (this.$slots.default === undefined) {
+            return undefined;
+        }
+
         for (let slot of this.$slots.default) {
             // console.log(slot);
             // Skip any tags or content that isn't a <tab>
@@ -103,8 +107,7 @@ export class Tabs extends Vue {
                     event_listeners.click = [event_listeners.click];
                 }
                 event_listeners.click.push(() => {
-                    this.active_tab_index = index;
-                    this.$emit('input', this.active_tab_index);
+                    this._set_active_tab(index);
                 });
 
                 return el(
@@ -133,7 +136,7 @@ export class Tabs extends Vue {
 
     private _render_tab_body(el: CreateElement, tab_data: ExtractedTabData[]) {
         if (this.active_tab_index >= tab_data.length) {
-            this.active_tab_index = tab_data.length - 1;
+            this._set_active_tab(tab_data.length - 1);
         }
 
         return el(
@@ -146,5 +149,10 @@ export class Tabs extends Vue {
             },
             tab_data[this.active_tab_index].body.children
         );
+    }
+
+    private _set_active_tab(new_active_tab_index: number) {
+        this.active_tab_index = new_active_tab_index;
+        this.$emit('input', this.active_tab_index);
     }
 }

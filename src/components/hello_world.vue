@@ -51,7 +51,7 @@
 
     <!-- {{current_tab_index}} -->
 
-<tabs ref="tabs" v-model="current_tab_index">
+<!-- <tabs ref="tabs" v-model="current_tab_index">
   <tab ref="tabby" v-on:click="wee">
     <template slot="header">
       Tab 1
@@ -66,6 +66,19 @@
     </template>
     <template slot="body">
       Tab 2 body
+    </template>
+  </tab>
+</tabs> -->
+
+<button type="button" @click="add_tab()">Add tab</button>
+
+<tabs ref="tabs" v-model="current_tab_index">
+  <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
+    <template slot="header">
+      <span>Tab {{tab_val}} <span @click="remove_tab(index)">XX</span></span>
+    </template>
+    <template slot="body">
+     Tab {{tab_val}} body
     </template>
   </tab>
 </tabs>
@@ -108,6 +121,17 @@ export default class HelloWorld extends Vue {
   }
 
   current_tab_index = 1;
+
+  tab_labels = [1, 2, 3];
+
+  add_tab() {
+    this.tab_labels.push(this.tab_labels.length + 1);
+    this.current_tab_index = this.tab_labels.length - 1;
+  }
+
+  remove_tab(index: number) {
+    this.tab_labels.splice(index, 1);
+  }
 }
 </script>
 
