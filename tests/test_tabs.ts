@@ -24,11 +24,11 @@ describe('Tabs tests', () => {
         expect(tabs.isEmpty()).toEqual(true);
     });
 
-    test.skip('Empty tab header and body', () => {
+    test('Empty tab header and body', () => {
         const component = {
             template:  `<tabs ref="tabs">
-  <tab>
-    <template ref="tab_1" slot="header">
+  <tab ref="tab_1">
+    <template slot="header">
     </template>
     <template slot="body">
     </template>
@@ -41,8 +41,9 @@ describe('Tabs tests', () => {
         };
         const wrapper = mount(component);
         const tabs = wrapper.find({ref: 'tabs'});
-        expect(tabs.exists).toEqual(true);
+        expect(tabs.exists()).toEqual(true);
 
+        console.log(tabs.html());
         expect(tabs.find({ref: 'tab_1'}).isEmpty()).toEqual(true);
         expect(tabs.find({ref: 'active-tab-body'}).isEmpty()).toEqual(true);
     });

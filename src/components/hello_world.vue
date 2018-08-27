@@ -75,7 +75,10 @@
 <tabs ref="tabs" v-model="current_tab_index">
   <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
     <template slot="header">
-      <span>Tab {{tab_val}} <span @click="remove_tab(index)">XX</span></span>
+      <span>
+        Tab {{tab_val}}
+        <span @click="$event.preventDefault(); remove_tab(index)">XX</span>
+      </span>
     </template>
     <template slot="body">
      Tab {{tab_val}} body
