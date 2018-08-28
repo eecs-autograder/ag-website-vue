@@ -77,11 +77,14 @@
     <template slot="header">
       <span>
         Tab {{tab_val}}
-        <span @click="$event.preventDefault(); remove_tab(index)">XX</span>
+        <i class="fas fa-times close_x"
+            @click="$event.stopPropagation(); remove_tab(index)"></i>
       </span>
     </template>
     <template slot="body">
-     Tab {{tab_val}} body
+      <div class="tab-body">
+        Tab {{tab_val}} body
+      </div>
     </template>
   </tab>
 </tabs>
@@ -92,11 +95,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import Toggle from './toggle.vue';
-
-import ViewFile from './view_file.vue';
-
-import { Tab, Tabs } from './tabs';
+import Tab from '@/components/tabs/tab.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import Toggle from '@/components/toggle.vue';
+import ViewFile from '@/components/view_file.vue';
 
 @Component({
   components: {Toggle, ViewFile, Tabs, Tab}
@@ -153,6 +155,15 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.close_x:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}
+
+.tab-body {
+  margin: 10px;
 }
 
 </style>
