@@ -3,7 +3,8 @@ import Vue from 'vue';
 import { config, mount } from '@vue/test-utils';
 import Component from 'vue-class-component';
 
-import { Tab, Tabs, TabsError } from "@/components/tabs";
+import Tab from '@/components/tabs/tab.vue';
+import Tabs from '@/components/tabs/tabs.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
