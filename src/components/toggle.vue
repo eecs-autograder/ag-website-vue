@@ -68,9 +68,10 @@ export default class Toggle extends Vue {
   cursor: pointer;
   display: inline-block;
   font-weight: normal;
-  opacity: 0.85;
+  opacity: 1;
   z-index: 3;
   padding: 8px 12px 7.5px 12px;
+  background-color: white;
 }
 
 .active-option-style p, .inactive-option-style p {
