@@ -1,238 +1,237 @@
 <template>
-  <div class="diff-container">
-
-    <div class="parent-of-all-divs">
-
-      <div class="diff-headers">
-        <div class="one-row">
-          <p class="left-header"> {{left_header}} </p>
-          <p class="right-header"> {{right_header}} </p>
-        </div>
-      </div>
-
-      <div class="restricted-scroll" :style="actual_diff_height">
-        <div class="diff-outputs">
-            <div class="one-row" v-for="(line, i) of left">
-                <p class="left-numbers"> {{i}} </p>
-                <p class="left-output-section"> {{(show_whitespace ? left_with_visible_whitespace[i] : left[i]).substr(2)}} </p>
-                <p class="right-numbers"> {{i}} </p>
-                <p class="right-output-section"> {{(show_whitespace ? right_with_visible_whitespace[i] : right[i]).substr(2)}} </p>
-            </div>
-        </div>
-      </div>
-
-      <div class="toggle-container">
-        <toggle v-model="show_whitespace" :incoming_active_background_color="toggle_color">
-          <template slot="on">
-            <p> Show Whitespace</p>
-          </template>
-          <template slot="off">
-            <p> Hide Whitespace</p>
-          </template>
-        </toggle>
-      </div>
-
+  <div>
+    <div class="diff-headers">
+      <div class="header"> {{left_header}} </div>
+      <div class="header"> {{right_header}} </div>
     </div>
 
+    <div class="diff-body-wrapper" :style="diff_height">
+      <table class="diff-body" cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr class="row" v-for="(left_cell, i) of left">
+            <td :class="['column', 'line-num', line_num_highlighting[left_cell.prefix]]">
+              {{left_cell.line_number}}
+            </td>
+            <td :class="['column', content_highlighting[left_cell.prefix]]">
+              <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
+                   Do NOT add whitespace to these <span> elements.-->
+              <span class="prefix">{{left_cell.prefix}}</span>
+              <span class="content">{{
+                show_whitespace ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
+            </td>
+
+            <td :class="['column', 'line-num', line_num_highlighting[right[i].prefix]]">
+              {{right[i].line_number}}
+            </td>
+            <td :class="['column', content_highlighting[right[i].prefix]]">
+              <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
+                   Do NOT add whitespace to these <span> elements.-->
+              <span class="prefix">{{right[i].prefix}}</span>
+              <span class="content">{{
+                show_whitespace ? replace_whitespace(right[i].content) : right[i].content}}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="toggle-container">
+      <toggle v-model="show_whitespace" :incoming_active_background_color="toggle_color">
+        <template slot="on">
+          <p>Show Whitespace</p>
+        </template>
+        <template slot="off">
+          <p>Hide Whitespace</p>
+        </template>
+      </toggle>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import Toggle from './toggle.vue';
-
-  @Component({
-    components: { Toggle }
-  })
-
-  export default class Diff extends Vue {
-
-    @Prop({default: ["hi", "bye"], type: Array})
-    diff_contents!: string[];
-
-    @Prop({default: "left header", type: String})
-    left_header!: string;
-
-    @Prop({default: "right header", type: String})
-    right_header!: string;
-
-    @Prop({default: () => ({ 'height': '100%' }), type: Object})
-    diff_height!: object;
+import Toggle from './toggle.vue';
 
 
-    left: string[] = [];
-    right: string[] = [];
+interface DiffCell {
+  line_number: number | null;
+  prefix: string | null;
+  content: string | null
+}
 
-    left_with_visible_whitespace: string[] = [];
-    right_with_visible_whitespace: string[] = [];
+@Component({
+  components: { Toggle }
+})
+export default class Diff extends Vue {
 
-    show_whitespace = false;
+  @Prop({default: [], type: Array})
+  diff_contents!: string[];
 
-    toggle_color = {
-      "backgroundColor": "slategray"
-    };
+  @Prop({default: "", type: String})
+  left_header!: string;
 
-    actual_diff_height = {};
+  @Prop({default: "", type: String})
+  right_header!: string;
 
-    diff_results: string[] = [];
-    diff_left_header = "";
-    diff_right_header = "";
+  @Prop({default: () => ({ 'height': '100%' }), type: Object})
+  diff_height!: object;
 
-    created() {
-      this.diff_results = this.diff_contents;
-      this.diff_left_header = this.left_header;
-      this.diff_right_header = this.right_header;
-      this.actual_diff_height = this.diff_height;
+  left: DiffCell[] = [];
+  right: DiffCell[] = [];
 
-      for (let item of this.diff_results) {
-        let prefix = item.substring(0, 2);
-        if (prefix === "- ") {
-          this.left.push(item);
-          this.left_with_visible_whitespace.push(this.replace_whitespace(item));
-        }
-        else if (prefix === "+ ") {
-          this.right.push(item);
-          this.right_with_visible_whitespace.push(this.replace_whitespace(item));
-        }
-        else if (prefix === "  ") {
-          this.pad_if_needed(this.left, this.right);
-          this.pad_if_needed(this.left_with_visible_whitespace, this.right_with_visible_whitespace);
-          this.left.push(item);
-          this.left_with_visible_whitespace.push(this.replace_whitespace(item));
-          this.right.push(item);
-          this.right_with_visible_whitespace.push(this.replace_whitespace(item));
-        }
+  show_whitespace = false;
+
+  toggle_color = {
+    "backgroundColor": "slategray"
+  };
+
+  created() {
+    let left_line_number = 1;
+    let right_line_number = 1;
+    for (let item of this.diff_contents) {
+      let prefix = item.substring(0, 2);
+      item = item.substring(2);
+      if (prefix === "- ") {
+        this.left.push({line_number: left_line_number, prefix: prefix, content: item});
+        left_line_number += 1;
       }
-      this.pad_if_needed(this.left, this.right);
-      this.pad_if_needed(this.left_with_visible_whitespace, this.right_with_visible_whitespace);
-    }
+      else if (prefix === "+ ") {
+        this.right.push({line_number: right_line_number, prefix: prefix, content: item});
+        right_line_number += 1;
+      }
+      else if (prefix === "  ") {
+        this.pad_if_needed(this.left, this.right);
 
-    pad_if_needed(left: string[], right: string[]) {
-      if (left.length === right.length) {
-        return;
-      }
-      let to_pad: string[] = null;
-      let bigger: string[] = null;
-      if (left.length > right.length) {
-        bigger = left;
-        to_pad = right;
-      }
-      else {
-        bigger = right;
-        to_pad = left;
-      }
-      while (to_pad.length < bigger.length) {
-        to_pad.push('');
+        this.left.push({line_number: left_line_number, prefix: prefix, content: item});
+        this.right.push({line_number: right_line_number, prefix: prefix, content: item});
+
+        left_line_number += 1;
+        right_line_number += 1;
       }
     }
-
-    replace_whitespace(current: string): string {
-      current = current.split(' ').join('\u2219');
-      current = current.split('\n').join('\u21b5\n');
-      current = current.split('\r').join('\\r\r');
-      return current;
-    }
-
+    this.pad_if_needed(this.left, this.right);
   }
+
+  pad_if_needed(left: DiffCell[], right: DiffCell[]) {
+    if (left.length === right.length) {
+      return;
+    }
+    let to_pad: DiffCell[];
+    let bigger: DiffCell[];
+    if (left.length > right.length) {
+      bigger = left;
+      to_pad = right;
+    }
+    else {
+      bigger = right;
+      to_pad = left;
+    }
+    while (to_pad.length < bigger.length) {
+      to_pad.push({line_number: null, prefix: null, content: null});
+    }
+  }
+
+  replace_whitespace(current: string | null): string | null {
+    if (current === null) {
+      return null;
+    }
+    current = current.split(' ').join('\u2219');
+    current = current.split('\n').join('\u21b5\n');
+    current = current.split('\r').join('\\r\r');
+    return current;
+  }
+
+  line_num_highlighting = {
+    '- ': 'negative-line-num',
+    '+ ': 'positive-line-num',
+    '  ': ''
+  };
+
+  content_highlighting = {
+    '- ': 'negative',
+    '+ ': 'positive',
+    '  ': ''
+  };
+
+}
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  .diff-container {
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-  }
+.diff-headers {
+  width: 100%;
+  display: flex;
+}
 
-  .negative {
-    background-color: hsl(-355, 96%, 83%);
-  }
+.header {
+  flex: 1;
 
-  .left-output, .right-output {
-    border-bottom: 1px solid $diff-lines;
-    min-width: 150px;
-    word-break: break-word;
-  }
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  padding: 18px 10px 18px 10px;
+  text-align: center;
+}
 
-  .positive {
-    background-color: hsl(208, 80%, 90%);
-  }
+.diff-body-wrapper {
+  overflow-y: scroll;
+}
 
-  .negative-line-num {
-    background-color: hsl(0, 100%, 95%);
-  }
+.diff-body {
+  width: 100%;
+}
 
-  .positive-line-num {
-    background-color: hsl(120, 100%, 95%);
-  }
+.line-num, .prefix, .content {
+  margin: 0;
+  padding: 5px 6px;
+  font-family: "Courier New", Courier, monospace;
+}
 
-  .parent-of-all-divs {
-    width: 100%;
-  }
+.line-num {
+  width: 1%;
+  min-width: 10px;
+  text-align: center;
 
-  .one-row {
-    display: table-row;
-    width: 100%;
-  }
+  user-select: none;
+  color: lightslategray;
+}
 
-  .diff-headers {
-    display: table;
-    width: 100%;
-  }
+.prefix {
+  white-space: pre;
+  user-select: none;
+}
 
-  .diff-outputs {
-    overflow-y: scroll;
-    display: table;
-    width: 100%;
-    word-break: break-word;
-    word-wrap: break-word;
-  }
+.content {
+  white-space: pre;
+  word-break: break-word;
+}
 
-  .left-header, .right-header {
-    color: darkslategray;
-    display: table-cell;
-    font-size: 17px;
-    font-weight: 500;
-    margin: 0;
-    padding: 18px 10px 18px 10px;
-    text-align: center;
-    width: 50%;
-  }
+$negative-color: hsl(0, 100%, 95%);
+$positive-color: hsl(120, 100%, 95%);
 
-  .left-numbers, .right-numbers {
-    color: slategray;
-    display: table-cell;
-    margin: 0;
-    padding: 5px;
-    text-align: right;
-    vertical-align: top;
-    width: 3%;
-    word-break: break-word;
-    word-wrap: break-word;
-  }
+.negative {
+  background-color: $negative-color;
+}
 
-  .left-output-section, .right-output-section {
-    color: slategrey;
-    display: table-cell;
-    margin: 0;
-    padding: 5px 10px 5px 10px;
-    width: 47%;
-  }
+.positive {
+  background-color: $positive-color;
+}
 
-  ::-webkit-scrollbar {
-    background: transparent;
-    width: 0px;
-  }
+.negative-line-num {
+  background-color: darken($negative-color, 5%);
+}
 
-  .restricted-scroll {
-    overflow-y: scroll;
-  }
+.positive-line-num {
+  background-color: darken($positive-color, 5%);
+}
 
-  .toggle-container {
-    background-color: $lightest-gray;
-    display: block;
-    padding: 22px 10px 20px 10px;
-    text-align: center;
-  }
+.toggle-container {
+  background-color: $lightest-gray;
+  display: block;
+  padding: 22px 10px 20px 10px;
+  text-align: center;
+}
 
 </style>
