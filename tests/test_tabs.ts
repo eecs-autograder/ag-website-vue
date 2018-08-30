@@ -782,15 +782,14 @@ describe('Tabs tests', () => {
             () => mount(component)
         ).toThrow('"body" slot must be a <template> tag.');
     });
-});
 
-// --------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------
 
-test('Tab style changes based on whether a tab is active or not', () => {
-    const component = {
-        template:  `<tabs ref="tabs"
-  tab_active_class="blue-theme-active"
-  tab_inactive_class="blue-theme-inactive">
+    test('Tab style changes based on whether a tab is active or not', () => {
+        const component = {
+            template:  `<tabs ref="tabs"
+    tab_active_class="blue-theme-active"
+    tab_inactive_class="blue-theme-inactive">
   <tab ref="tab_1">
     <template slot="header">
       Tab 1
@@ -808,43 +807,45 @@ test('Tab style changes based on whether a tab is active or not', () => {
     </template>
   </tab>
 </tabs>`,
-        components: {
-            'tab': Tab,
-            'tabs': Tabs
-        }
-    };
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
 
-    const wrapper = mount(component);
+        const wrapper = mount(component);
 
-    const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = wrapper.find({ref: 'tabs'});
 
-    expect(tabs.vm.$data.tab_active_theme).toBe("blue-theme-active");
+        expect(tabs.vm.$data.tab_active_theme).toBe("blue-theme-active");
 
-    expect(tabs.vm.$data.tab_inactive_theme).toBe("blue-theme-inactive");
+        expect(tabs.vm.$data.tab_inactive_theme).toBe("blue-theme-inactive");
 
-    expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.$data.active_tab_index).toEqual(0);
 
-    let active_body = tabs.find({ref: 'active-tab-body'});
-    expect(active_body.text()).toEqual('Tab 1 body');
+        let active_body = tabs.find({ref: 'active-tab-body'});
+        expect(active_body.text()).toEqual('Tab 1 body');
 
-    let tab_1 = tabs.find({ref: 'tab_1'});
-    expect(tab_1.classes()).toContain("blue-theme-active");
+        let tab_1 = tabs.find({ref: 'tab_1'});
+        expect(tab_1.classes()).toContain("blue-theme-active");
 
-    let tab_2 = tabs.find({ref: 'tab_2'});
-    expect(tab_2.classes()).toContain("blue-theme-inactive");
+        let tab_2 = tabs.find({ref: 'tab_2'});
+        expect(tab_2.classes()).toContain("blue-theme-inactive");
 
-    tab_2.trigger('click');
-    expect(tab_2.classes()).toContain("blue-theme-active");
-    expect(tab_1.classes()).toContain("blue-theme-inactive");
+        tab_2.trigger('click');
+        expect(tab_2.classes()).toContain("blue-theme-active");
+        expect(tab_1.classes()).toContain("blue-theme-inactive");
 
-    expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.$data.active_tab_index).toEqual(1);
 
-    expect(active_body.text()).toEqual('Tab 2 body');
-});
+        expect(active_body.text()).toEqual('Tab 2 body');
+    });
 
-test('Tab style resorts to default settings if no inputs are supplied', () => {
-    const component = {
-        template:  `<tabs ref="tabs">
+    // --------------------------------------------------------------------------------------------
+
+    test('Tab style resorts to default settings if no inputs are supplied', () => {
+        const component = {
+            template:  `<tabs ref="tabs">
   <tab ref="tab_1">
     <template slot="header">
       Tab 1
@@ -862,38 +863,39 @@ test('Tab style resorts to default settings if no inputs are supplied', () => {
     </template>
   </tab>
 </tabs>`,
-        components: {
-            'tab': Tab,
-            'tabs': Tabs
-        }
-    };
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
 
-    const wrapper = mount(component);
+        const wrapper = mount(component);
 
-    const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = wrapper.find({ref: 'tabs'});
 
-    console.log(tabs.html());
+        console.log(tabs.html());
 
-    expect(tabs.vm.$data.tab_active_theme).toBe("white-theme-active");
+        expect(tabs.vm.$data.tab_active_theme).toBe("white-theme-active");
 
-    expect(tabs.vm.$data.tab_inactive_theme).toBe("white-theme-inactive");
+        expect(tabs.vm.$data.tab_inactive_theme).toBe("white-theme-inactive");
 
-    expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.$data.active_tab_index).toEqual(0);
 
-    let active_body = tabs.find({ref: 'active-tab-body'});
-    expect(active_body.text()).toEqual('Tab 1 body');
+        let active_body = tabs.find({ref: 'active-tab-body'});
+        expect(active_body.text()).toEqual('Tab 1 body');
 
-    let tab_1 = tabs.find({ref: 'tab_1'});
-    expect(tab_1.classes()).toContain("white-theme-active");
+        let tab_1 = tabs.find({ref: 'tab_1'});
+        expect(tab_1.classes()).toContain("white-theme-active");
 
-    let tab_2 = tabs.find({ref: 'tab_2'});
-    expect(tab_2.classes()).toContain("white-theme-inactive");
+        let tab_2 = tabs.find({ref: 'tab_2'});
+        expect(tab_2.classes()).toContain("white-theme-inactive");
 
-    tab_2.trigger('click');
-    expect(tab_2.classes()).toContain("white-theme-active");
-    expect(tab_1.classes()).toContain("white-theme-inactive");
+        tab_2.trigger('click');
+        expect(tab_2.classes()).toContain("white-theme-active");
+        expect(tab_1.classes()).toContain("white-theme-inactive");
 
-    expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.$data.active_tab_index).toEqual(1);
 
-    expect(active_body.text()).toEqual('Tab 2 body');
+        expect(active_body.text()).toEqual('Tab 2 body');
+    });
 });
