@@ -22,6 +22,8 @@ export default class Tabs extends Vue {
   }
 
   active_tab_index: number = 0;
+  active_theme = 'white-theme-active';
+  inactive_theme = 'white-theme-inactive';
 
   created() {
     this.active_tab_index = this.value;
@@ -101,7 +103,8 @@ export default class Tabs extends Vue {
             ref: ref,
             class: [
               'tab-header',
-              index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header'
+              index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
+              index === this.active_tab_index ? this.active_theme : this.inactive_theme
             ],
             on: event_listeners
           },
@@ -145,24 +148,33 @@ interface ExtractedTabData {
 <style scoped lang="scss">
 
 @import '@/styles/colors.scss';
+@import '@/styles/tab_styles.scss';
 .tab-header {
   display: inline-block;
 }
 
 .active-tab-header {
-  padding: 10px 15px;
-  background-color: lightblue;
-  border-radius: 3px 3px 0 0;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  margin-right: 5px;
+  margin-top: 5px;
+  padding: 11px 15px 10px 15px;
+  position: relative;
+  top: 2px;
+  z-index: 5;
 }
 
 .inactive-tab-header {
-  padding: 10px 15px 9px 15px;
-  border-bottom: 1px solid lightgray;
-  border-radius: 3px 3px 0 0;
+  border-radius: 10px 10px 0 0;
+  margin-right: 5px;
+  margin-top: 5px;
+  padding: 11px 15px 9px 15px;
+  position: relative;
+  top: 2px;
+  z-index: 0;
 }
 
 .inactive-tab-header:hover {
-  background-color: $lighter-gray;
   cursor: pointer;
 }
 

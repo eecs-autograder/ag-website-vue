@@ -1,0 +1,53 @@
+.gray-theme-active {
+    background-color: white;
+    border: 2px solid slategrey;
+    color: slategrey;
+};
+
+.gray-theme-inactive  {
+    background-color: $lighter-gray;
+    border: 2px solid $lighter-gray;
+    color: slategrey;
+};
+
+.gray-theme-inactive:hover {
+    background-color: slategrey;
+    border: 2px solid slategrey;
+    color: white;
+}
+
+.blue-theme-active {
+    background-color: white;
+    border: 2px solid $medium-dark-blue;
+    color: black;
+}
+
+.blue-theme-inactive {
+    background-color: $lighter-gray;
+    border: 2px solid $lighter-gray;
+    color: black;
+}
+
+.blue-theme-inactive:hover  {
+    background-color: $medium-dark-blue;
+    border: 2px solid $medium-dark-blue;
+    color: white;
+}
+
+.white-theme-active {
+    background-color: white;
+    border: 2px solid lightgray;
+    color: black;
+}
+
+.white-theme-inactive {
+    background-color: $lighter-gray;
+    border: 2px solid $lighter-gray;
+    color: slategrey;
+}
+
+.white-theme-inactive:hover {
+    background-color: $light-gray;
+    border: 2px solid $light-gray;
+    color: black;
+}

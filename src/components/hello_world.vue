@@ -1,32 +1,32 @@
 <template>
   <div class="hello">
 
-    <h1>{{ msg }}</h1>
+    <!--<h1>{{ msg }}</h1>-->
 
-    <button type="button" @click="switchy = !switchy">things</button>
+    <!--<button type="button" @click="switchy = !switchy">things</button>-->
 
-    <toggle id="toggle" v-model="switchy"
-            :incoming_active_background_color="active_bkgrnd_color"
-            ref="switchy_toggle">
-      <template slot="on">
-        <p> Happy </p>
-      </template>
-      <template slot="off">
-        <p> <i class="fas fa-frown fa-lg"> </i></p>
-      </template>
-    </toggle>
+    <!--<toggle id="toggle" v-model="switchy"-->
+            <!--:incoming_active_background_color="active_bkgrnd_color"-->
+            <!--ref="switchy_toggle">-->
+      <!--<template slot="on">-->
+        <!--<p> Happy </p>-->
+      <!--</template>-->
+      <!--<template slot="off">-->
+        <!--<p> <i class="fas fa-frown fa-lg"> </i></p>-->
+      <!--</template>-->
+    <!--</toggle>-->
 
-    <br>
+    <!--<br>-->
 
-    <div class="icon-poc">
-      <i class="fas fa-check"></i>
-      <i class="far fa-check-circle"></i>
-      <i class="fas fa-angle-down"></i>
-    </div>
+    <!--<div class="icon-poc">-->
+      <!--<i class="fas fa-check"></i>-->
+      <!--<i class="far fa-check-circle"></i>-->
+      <!--<i class="fas fa-angle-down"></i>-->
+    <!--</div>-->
 
-    <br>
-    <view-file :incoming_filename="filename"
-               :incoming_file_content="content" ref="viewing_file"></view-file>
+    <!--<br>-->
+    <!--<view-file :incoming_filename="filename"-->
+               <!--:incoming_file_content="content" ref="viewing_file"></view-file>-->
 
     <!-- <tabs v-model="current_tab_index">
       <tab>
@@ -70,25 +70,30 @@
   </tab>
 </tabs> -->
 
-<button type="button" @click="add_tab()">Add tab</button>
+    <div class="outside">
+    <button type="button" @click="add_tab()">Add tab</button>
 
-<tabs ref="tabs" v-model="current_tab_index">
-  <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
-    <template slot="header">
-      <span>
-        Tab {{tab_val}}
-        <i class="fas fa-times close_x"
-            @click="$event.stopPropagation(); remove_tab(index)"></i>
-      </span>
-    </template>
-    <template slot="body">
-      <div class="tab-body">
-        Tab {{tab_val}} body
+
+        <br> <br>
+      <div class="shrink-tabs">
+        <tabs ref="tabs" v-model="current_tab_index">
+          <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
+            <template slot="header">
+              <div class="tab-label">
+                <p class="tab-heading"> Tab {{tab_val}} </p>
+                <i class="fas fa-times close_x"
+                    @click="$event.stopPropagation(); remove_tab(index)"></i>
+              </div>
+            </template>
+            <template slot="body">
+              <div class="tab-body">
+                Tab {{tab_val}} body
+              </div>
+            </template>
+          </tab>
+        </tabs>
       </div>
-    </template>
-  </tab>
-</tabs>
-
+    </div>
   </div>
 </template>
 
@@ -127,6 +132,8 @@ export default class HelloWorld extends Vue {
 
   current_tab_index = 1;
 
+  hippo_tab_index = 1;
+
   tab_labels = [1, 2, 3];
 
   add_tab() {
@@ -142,6 +149,7 @@ export default class HelloWorld extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  @import '@/styles/colors.scss';
 h3 {
   margin: 40px 0 0;
 }
@@ -158,12 +166,40 @@ a {
 }
 
 .close_x:hover {
-  background-color: lightgray;
+  color: $warning-red;
   cursor: pointer;
 }
 
 .tab-body {
-  margin: 10px;
+  padding: 10px;
+  background-color: white;
+  height: 500px;
+  border-top: 2px solid $lighter-gray;
+  position: relative;
+  top: -1px;
+  z-index: 0;
 }
+
+  .tab-label {
+    margin: 0;
+  }
+
+  .tab-heading {
+    margin: 0;
+    padding-right: 15px;
+    display: inline-block;
+    font-family: "Helvetica Neue", Helvetica;
+  }
+
+  .outside {
+    background-color: white;
+    z-index: 0;
+  }
+
+  .shrink-tabs {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+  }
 
 </style>
