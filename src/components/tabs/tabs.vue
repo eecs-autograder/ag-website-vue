@@ -16,17 +16,25 @@ export default class Tabs extends Vue {
   @Prop({default: 0, type: Number})
   value!: number;
 
+  @Prop({default: "white-theme-active", type: String})
+  tab_active_class!: string;
+
+  @Prop({default: "white-theme-inactive", type: String})
+  tab_inactive_class!: string;
+
   @Watch('value')
   on_value_changed(new_value: number, old_value: number) {
     this.active_tab_index = new_value;
   }
 
   active_tab_index: number = 0;
-  active_theme = 'white-theme-active';
-  inactive_theme = 'white-theme-inactive';
+  tab_active_theme = '';
+  tab_inactive_theme = '';
 
   created() {
     this.active_tab_index = this.value;
+    this.tab_active_theme = this.tab_active_class;
+    this.tab_inactive_theme = this.tab_inactive_class;
   }
 
   render(create_element: CreateElement) {
@@ -104,7 +112,7 @@ export default class Tabs extends Vue {
             class: [
               'tab-header',
               index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
-              index === this.active_tab_index ? this.active_theme : this.inactive_theme
+              index === this.active_tab_index ? this.tab_active_theme : this.tab_inactive_theme
             ],
             on: event_listeners
           },

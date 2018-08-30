@@ -76,7 +76,9 @@
 
         <br> <br>
       <div class="shrink-tabs">
-        <tabs ref="tabs" v-model="current_tab_index">
+        <tabs ref="tabs" v-model="current_tab_index"
+              tab_active_class="gray-theme-active"
+              tab_inactive_class="gray-theme-inactive">
           <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
             <template slot="header">
               <div class="tab-label">
@@ -122,17 +124,11 @@ export default class HelloWorld extends Vue {
 
   switchy: boolean = true;
 
-  active_bkgrnd_color = {
-    'backgroundColor': 'hotpink'
-  };
-
   wee(e: Event) {
     console.log(e);
   }
 
   current_tab_index = 1;
-
-  hippo_tab_index = 1;
 
   tab_labels = [1, 2, 3];
 
@@ -150,35 +146,39 @@ export default class HelloWorld extends Vue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 
-.close_x:hover {
-  color: $warning-red;
-  cursor: pointer;
-}
+  h3 {
+    margin: 40px 0 0;
+  }
 
-.tab-body {
-  padding: 10px;
-  background-color: white;
-  height: 500px;
-  border-top: 2px solid $lighter-gray;
-  position: relative;
-  top: -1px;
-  z-index: 0;
-}
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+
+  a {
+    color: #42b983;
+  }
+
+  .close_x:hover {
+    color: $warning-red;
+    cursor: pointer;
+  }
+
+  .tab-body {
+    padding: 10px;
+    background-color: white;
+    height: 500px;
+    border-top: 2px solid slategrey;
+    position: relative;
+    top: -1px;
+    z-index: 0;
+  }
 
   .tab-label {
     margin: 0;
@@ -189,11 +189,6 @@ a {
     padding-right: 15px;
     display: inline-block;
     font-family: "Helvetica Neue", Helvetica;
-  }
-
-  .outside {
-    background-color: white;
-    z-index: 0;
   }
 
   .shrink-tabs {
