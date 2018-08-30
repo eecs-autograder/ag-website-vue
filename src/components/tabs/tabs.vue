@@ -154,9 +154,8 @@ interface ExtractedTabData {
 </script>
 
 <style scoped lang="scss">
-
-@import '@/styles/colors.scss';
 @import '@/styles/tab_styles.scss';
+
 .tab-header {
   display: inline-block;
 }

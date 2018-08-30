@@ -17,14 +17,4 @@ export default class Tab extends Vue {}
 
 <style scoped lang="scss">
 
-  @import '@/styles/colors.scss';
-
-  .outer-tab-header {
-    z-index: 10;
-  }
-
-  .outer-tab-body {
-    z-index: 1;
-  }
-
 </style>

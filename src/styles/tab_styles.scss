@@ -1,3 +1,5 @@
+@import '@/styles/colors.scss';
+
 /* ---------------- Gray ---------------- */
 
 .gray-theme-active {
@@ -6,7 +8,7 @@
     color: slategrey;
 };
 
-.gray-theme-inactive  {
+.gray-theme-inactive {
     background-color: $lighter-gray;
     border: 2px solid $lighter-gray;
     color: slategrey;
