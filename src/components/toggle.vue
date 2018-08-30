@@ -1,6 +1,5 @@
 <template>
   <div id="toggle-button-space">
-
     <div v-if="is_on" class="active-option-style on-border" :style="active_background_color">
       <slot name="on"> </slot>
     </div>
@@ -19,13 +18,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component
 export default class Toggle extends Vue {
 
   @Prop({default: false, type: Boolean})
   value!: boolean;
+
+  @Watch('value')
+  on_value_changed(new_value: boolean, old_value: boolean) {
+    this.is_on = new_value;
+  }
+
+  @Prop({default: false, type: Boolean})
+  wee!: boolean;
 
   @Prop({default: () => ({ 'backgroundColor': 'hsl(208, 59%, 49%)' }), type: Object})
   incoming_active_background_color!: object;
