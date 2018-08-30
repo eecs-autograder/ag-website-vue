@@ -163,10 +163,12 @@
             // {"allowSingleLine": false}
         ],
 
+        // tslint-consistent-codestyle
         "naming-convention": [
             true,
             // Use snake_case unless otherwise specified.
-            {"type": "default", "format": ["snake_case"], "leadingUnderscore": "forbid"},
+            {"type": "default", "format": ["snake_case"],
+                "leadingUnderscore": "forbid", "trailingUnderscore": "allow"},
             {"type": "enumMember", "format": "snake_case"},
 
             // Readonly members can be upper case.
