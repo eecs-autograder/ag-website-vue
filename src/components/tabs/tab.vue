@@ -1,8 +1,8 @@
 <template>
 
 <div>
-  <slot class="outer-tab-header" name="header"></slot>
-  <slot class="outer-tab-body" name="body"></slot>
+  <slot name="header"></slot>
+  <slot name="body"></slot>
 </div>
 
 </template>
