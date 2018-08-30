@@ -48,6 +48,18 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
         static readonly CLASS_VAR = 43;
     }
     ```
+    - In Vue (with vue-class-component), private member variables and member variables starting
+      with a leading underscore are not registered as data members. If you need to distinguish
+      between the name of an input property and its corresponding internal data member, you may
+      add a trailing underscore to the data member name:
+    ```
+    class Diff extends Vue {
+        @Prop({default: false, type: Boolean})
+        show_whitespace!: boolean;
+
+        show_whitespace_: boolean = false;
+    }
+    ```
 - When wrapping a line at an operator, break _before_ the operator:
 ```
 // Yes

@@ -5,30 +5,30 @@
       <div class="header"> {{right_header}} </div>
     </div>
 
-    <div class="diff-body-wrapper" :style="diff_height">
-      <table class="diff-body" cellpadding="0" cellspacing="0">
+    <div id="diff-body-wrapper" :style="diff_height">
+      <table id="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
-          <tr class="row" v-for="(left_cell, i) of left">
-            <td :class="['column', 'line-num', line_num_highlighting[left_cell.prefix]]">
+          <tr v-for="(left_cell, i) of left">
+            <td :class="['line-num', line_num_highlighting[left_cell.prefix]]">
               {{left_cell.line_number}}
             </td>
-            <td :class="['column', content_highlighting[left_cell.prefix]]">
+            <td :class="[content_highlighting[left_cell.prefix]]">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these <span> elements.-->
               <span class="prefix">{{left_cell.prefix}}</span>
               <span class="content">{{
-                show_whitespace ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
+                show_whitespace_ ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
             </td>
 
-            <td :class="['column', 'line-num', line_num_highlighting[right[i].prefix]]">
+            <td :class="['line-num', line_num_highlighting[right[i].prefix]]">
               {{right[i].line_number}}
             </td>
-            <td :class="['column', content_highlighting[right[i].prefix]]">
+            <td :class="[content_highlighting[right[i].prefix]]">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these <span> elements.-->
               <span class="prefix">{{right[i].prefix}}</span>
               <span class="content">{{
-                show_whitespace ? replace_whitespace(right[i].content) : right[i].content}}</span>
+                show_whitespace_ ? replace_whitespace(right[i].content) : right[i].content}}</span>
             </td>
           </tr>
         </tbody>
@@ -36,7 +36,7 @@
     </div>
 
     <div class="toggle-container">
-      <toggle v-model="show_whitespace" :incoming_active_background_color="toggle_color">
+      <toggle v-model="show_whitespace_" :incoming_active_background_color="toggle_color">
         <template slot="on">
           <p>Show Whitespace</p>
         </template>
@@ -57,8 +57,10 @@ import Toggle from './toggle.vue';
 interface DiffCell {
   line_number: number | null;
   prefix: string | null;
-  content: string | null
+  content: string | null;
 }
+
+export class DiffPrefixError extends Error {}
 
 @Component({
   components: { Toggle }
@@ -77,16 +79,21 @@ export default class Diff extends Vue {
   @Prop({default: () => ({ 'height': '100%' }), type: Object})
   diff_height!: object;
 
+  @Prop({default: false, type: Boolean})
+  show_whitespace!: boolean;
+
   left: DiffCell[] = [];
   right: DiffCell[] = [];
-
-  show_whitespace = false;
 
   toggle_color = {
     "backgroundColor": "slategray"
   };
 
+  show_whitespace_: boolean = false;
+
   created() {
+    this.show_whitespace_ = this.show_whitespace;
+
     let left_line_number = 1;
     let right_line_number = 1;
     for (let item of this.diff_contents) {
@@ -108,6 +115,10 @@ export default class Diff extends Vue {
 
         left_line_number += 1;
         right_line_number += 1;
+      }
+      else {
+        throw new DiffPrefixError(
+          `Invalid prefix: "${prefix}". Prefixes must be one of: "- ", "+ ", "  "`);
       }
     }
     this.pad_if_needed(this.left, this.right);
@@ -175,11 +186,11 @@ export default class Diff extends Vue {
   text-align: center;
 }
 
-.diff-body-wrapper {
+#diff-body-wrapper {
   overflow-y: scroll;
 }
 
-.diff-body {
+#diff-body {
   width: 100%;
 }
 
