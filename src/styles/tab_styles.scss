@@ -1,3 +1,5 @@
+/* ---------------- Gray ---------------- */
+
 .gray-theme-active {
     background-color: white;
     border: 2px solid slategrey;
@@ -16,6 +18,8 @@
     color: white;
 }
 
+/* ---------------- Blue ---------------- */
+
 .blue-theme-active {
     background-color: white;
     border: 2px solid $medium-dark-blue;
@@ -23,26 +27,28 @@
 }
 
 .blue-theme-inactive {
-    background-color: $lighter-gray;
-    border: 2px solid $lighter-gray;
-    color: black;
-}
-
-.blue-theme-inactive:hover  {
-    background-color: $medium-dark-blue;
-    border: 2px solid $medium-dark-blue;
+    background-color: hsl(30, 100%, 68%);
+    border: 2px solid hsl(30, 100%, 68%);
     color: white;
 }
 
+.blue-theme-inactive:hover  {
+    background-color: hsl(30, 100%, 60%);
+    border: 2px solid hsl(30, 100%, 60%);
+    color: white;
+}
+
+/* ---------------- White ---------------- */
+
 .white-theme-active {
     background-color: white;
-    border: 2px solid lightgray;
+    border: 2px solid $light-gray;
     color: black;
 }
 
 .white-theme-inactive {
-    background-color: $lighter-gray;
-    border: 2px solid $lighter-gray;
+    background-color: white;
+    border: 2px solid white;
     color: slategrey;
 }
 
