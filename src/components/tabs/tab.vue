@@ -1,8 +1,8 @@
 <template>
 
 <div>
-  <slot name="header"></slot>
-  <slot name="body"></slot>
+  <slot class="outer-tab-header" name="header"></slot>
+  <slot class="outer-tab-body" name="body"></slot>
 </div>
 
 </template>
@@ -14,3 +14,17 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class Tab extends Vue {}
 
 </script>
+
+<style scoped lang="scss">
+
+  @import '@/styles/colors.scss';
+
+  .outer-tab-header {
+    z-index: 10;
+  }
+
+  .outer-tab-body {
+    z-index: 1;
+  }
+
+</style>
