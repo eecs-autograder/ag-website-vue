@@ -1,7 +1,5 @@
 <template>
   <div id="toggle-button-space">
-    {{value}}
-
     <div v-if="is_on" class="active-option-style on-border" :style="active_background_color">
       <slot name="on"> </slot>
     </div>
