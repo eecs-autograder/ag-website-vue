@@ -161,24 +161,23 @@ interface ExtractedTabData {
 }
 
 .active-tab-header {
-  border-bottom: 0;
   border-radius: 10px 10px 0 0;
-  margin-right: 5px;
-  margin-top: 5px;
-  padding: 11px 15px 10px 15px;
+  margin-right: 2px;
+  margin-top: 4px;
+  padding: 10px 15px;
   position: relative;
   top: 2px;
-  z-index: 5;
+  z-index: 20;
 }
 
 .inactive-tab-header {
   border-radius: 10px 10px 0 0;
-  margin-right: 5px;
-  margin-top: 5px;
-  padding: 11px 15px 9px 15px;
+  margin-right: 2px;
+  margin-top: 4px;
+  padding: 10px 15px;
   position: relative;
   top: 2px;
-  z-index: 0;
+  z-index: 3;
 }
 
 .inactive-tab-header:hover {

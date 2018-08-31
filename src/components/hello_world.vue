@@ -76,9 +76,7 @@
 
         <br> <br>
       <div class="shrink-tabs">
-        <tabs ref="tabs" v-model="current_tab_index"
-              tab_active_class="gray-theme-active"
-              tab_inactive_class="gray-theme-inactive">
+        <tabs ref="tabs" v-model="current_tab_index">
           <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
             <template slot="header">
               <div class="tab-label">
@@ -174,10 +172,10 @@ export default class HelloWorld extends Vue {
     padding: 10px;
     background-color: white;
     height: 500px;
-    border-top: 2px solid slategrey;
+    border-top: 2px solid $light-gray;
     position: relative;
-    top: -1px;
-    z-index: 0;
+    bottom: 0px;
+    z-index: 15;
   }
 
   .tab-label {
