@@ -76,7 +76,9 @@
 
         <br> <br>
       <div class="shrink-tabs">
-        <tabs ref="tabs" v-model="current_tab_index">
+        <tabs ref="tabs" v-model="current_tab_index"
+              tab_active_class="no-border-active"
+              tab_inactive_class="no-border-inactive">
           <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
             <template slot="header">
               <div class="tab-label">
@@ -88,6 +90,39 @@
             <template slot="body">
               <div class="tab-body">
                 Tab {{tab_val}} body
+              </div>
+            </template>
+          </tab>
+        </tabs>
+
+        <tabs ref="tabs" v-model="current_tab_index"
+              tab_active_class="white-theme-active"
+              tab_inactive_class="white-theme-inactive">
+          <tab ref="tabby" v-on:click="wee" :key="tab_val">
+            <template slot="header">
+              <div class="tab-label">
+                <p class="tab-heading"> Tab {{tab_val}} </p>
+                <i class="fas fa-times close_x"
+                   @click="$event.stopPropagation(); remove_tab(index)"></i>
+              </div>
+            </template>
+            <template slot="body">
+              <div class="tab-body2">
+                Hi 1
+              </div>
+            </template>
+          </tab>
+          <tab ref="tabby" v-on:click="wee" :key="tab_val">
+            <template slot="header">
+              <div class="tab-label">
+                <p class="tab-heading"> Tab {{tab_val}} </p>
+                <i class="fas fa-times close_x"
+                   @click="$event.stopPropagation(); remove_tab(index)"></i>
+              </div>
+            </template>
+            <template slot="body">
+              <div class="tab-body2">
+                Bye 2
               </div>
             </template>
           </tab>
@@ -172,7 +207,16 @@ export default class HelloWorld extends Vue {
     padding: 10px;
     background-color: white;
     height: 500px;
-    border-top: 2px solid $light-gray;
+    position: relative;
+    bottom: 0px;
+    z-index: 15;
+  }
+
+  .tab-body2 {
+    padding: 10px;
+    background-color: white;
+    border: 2px solid $light-gray;
+    height: 500px;
     position: relative;
     bottom: 0px;
     z-index: 15;

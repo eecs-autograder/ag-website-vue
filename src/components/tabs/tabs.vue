@@ -165,9 +165,6 @@ interface ExtractedTabData {
   margin-right: 2px;
   margin-top: 4px;
   padding: 10px 15px;
-  position: relative;
-  top: 2px;
-  z-index: 20;
 }
 
 .inactive-tab-header {
@@ -175,9 +172,6 @@ interface ExtractedTabData {
   margin-right: 2px;
   margin-top: 4px;
   padding: 10px 15px;
-  position: relative;
-  top: 2px;
-  z-index: 3;
 }
 
 .inactive-tab-header:hover {

@@ -1,8 +1,21 @@
 @import '@/styles/colors.scss';
 
+%behind-the-border {
+    position: relative;
+    top: 2px;
+    z-index: 3;
+}
+
+%in-front-of-the-border {
+    position: relative;
+    top: 2px;
+    z-index: 20;
+}
+
 /* ---------------- Gray ---------------- */
 
 .gray-theme-active {
+    @extend %in-front-of-the-border;
     background-color: white;
     border: 2px solid slategrey;
     border-bottom: none;
@@ -11,6 +24,7 @@
 };
 
 .gray-theme-inactive {
+    @extend %behind-the-border;
     background-color: $lighter-gray;
     border: 2px solid $lighter-gray;
     border-bottom: none;
@@ -19,6 +33,7 @@
 };
 
 .gray-theme-inactive:hover {
+    @extend %behind-the-border;
     background-color: slategrey;
     border: 2px solid slategrey;
     border-bottom: none;
@@ -29,6 +44,7 @@
 /* ---------------- Blue ---------------- */
 
 .blue-theme-active {
+    @extend %in-front-of-the-border;
     background-color: white;
     border: 2px solid $medium-dark-blue;
     border-bottom: none;
@@ -37,6 +53,7 @@
 }
 
 .blue-theme-inactive {
+    @extend %behind-the-border;
     background-color: hsl(30, 100%, 68%);
     border: 2px solid hsl(30, 100%, 68%);
     border-bottom: none;
@@ -45,6 +62,7 @@
 }
 
 .blue-theme-inactive:hover  {
+    @extend %behind-the-border;
     background-color: hsl(30, 100%, 60%);
     border: 2px solid hsl(30, 100%, 60%);
     border-bottom: none;
@@ -55,6 +73,7 @@
 /* ---------------- White ---------------- */
 
 .white-theme-active {
+    @extend %in-front-of-the-border;
     background-color: white;
     border: 2px solid $light-gray;
     border-bottom: none;
@@ -63,6 +82,7 @@
 }
 
 .white-theme-inactive {
+    @extend %behind-the-border;
     background-color: white;
     border: 2px solid white;
     border-bottom: none;
@@ -71,9 +91,36 @@
 }
 
 .white-theme-inactive:hover {
+    @extend %behind-the-border;
     background-color: $light-gray;
     border: 2px solid $light-gray;
     border-bottom: none;
     box-shadow: inset 0 0 0 4px $light-gray;
+    color: black;
+}
+
+/* ---------------- White ---------------- */
+
+.no-border-active {
+    background-color: $light-gray;
+    border: 2px solid $light-gray;
+    border-bottom: none;
+    box-shadow: inset 0 0 0 4px $light-gray;
+    color: black;
+}
+
+.no-border-inactive {
+    background-color: hsl(184, 5%, 95%);
+    border: 2px solid hsl(184, 5%, 95%);
+    border-bottom: none;
+    box-shadow: inset 0 0 0 4px hsl(184, 5%, 95%);
+    color: slategrey;
+}
+
+.no-border-inactive:hover {
+    background-color: $lighter-gray;
+    border: 2px solid $lighter-gray;
+    border-bottom: none;
+    box-shadow: inset 0 0 0 4px $lighter-gray;
     color: black;
 }
