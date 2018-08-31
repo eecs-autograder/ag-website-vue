@@ -31,9 +31,6 @@ export default class Toggle extends Vue {
     this.is_on = new_value;
   }
 
-  @Prop({default: false, type: Boolean})
-  wee!: boolean;
-
   @Prop({default: () => ({ 'backgroundColor': 'hsl(208, 59%, 49%)' }), type: Object})
   incoming_active_background_color!: object;
 
