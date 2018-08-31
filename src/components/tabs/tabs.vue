@@ -45,7 +45,6 @@ export default class Tabs extends Vue {
     }
 
     for (let slot of this.$slots.default) {
-      // console.log(slot);
       // Skip any tags or content that isn't a <tab>
       if (slot.componentOptions === undefined
           || slot.componentOptions.tag !== 'tab') {
