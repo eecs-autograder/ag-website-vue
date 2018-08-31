@@ -35,6 +35,7 @@
 .gray-theme-inactive:hover {
     @extend %behind-the-border;
     background-color: slategrey;
+    
     border: 2px solid slategrey;
     border-bottom: none;
     box-shadow: inset 0 0 0 4px slategrey;
