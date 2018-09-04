@@ -54,6 +54,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
   }
 })
 export default class HelloWorld extends Vue {}
+
 </script>
 
 <style scoped lang="scss">
