@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="droptype-container">
+    <!--<p> <b> Filtered_choices: </b> {{filtered_choices}}</p>-->
+    <p> <b> Filter Text: </b> {{filter_text}}</p>
+    <!--<p> {{filtered_choices_priv === null ? "filter_text is null" : "filter_text is NOT NULL"}}</p>-->
       <div class="dropdown">
         <input class="dropbtn"
                id="search-field"
@@ -24,40 +27,78 @@
 
 <script lang="ts">
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component
   export default class DropdownTypeahead extends Vue {
 
-    @Prop({default: () => ['bye', 'by', 'buy'], type: Array})
+    @Prop({default: () => [{name: "Tommy", age: 1}, {name: "Phil", age: 2},
+        {name: "Lil", age: 2}, {name: "Lila", age: 24}, {name: "Tominsky", age: 83},
+        {name: "Tom", age: 40}, {name: "Liza", age: 40}], type: Array})
     incoming_choices!: any[];
 
-    // @Prop({default: function(item: any, filter_text: string)
-    //   { let toReturn = this.default_filter_fn; return toReturn }, type: Function})
+    @Watch('filter_text')
+    on_filter_text_changed(new_text: string, old_text: string) {
+      console.log("Old: " + old_text + " New: " + new_text);
+      if (new_text === "") {
+        console.log("new text empty");
+        this.filtered_choices_priv = null;
+      }
+    }
+
+
+    // @Prop({default: function(item: any, filter_text: string) {
+    //     console.log("Item");
+    //     console.log(item);
+    //   if (this.item_field_name !== null) {
+    //     item = item[this.item_field_name];
+    //   }
+    //   return item.indexOf(filter_text) >= 0;
+    //   }, type: Function})
     // incoming_filter_fn!: any;
     //
-    // @Prop({default: function() {}, type: Function})
+    // @Prop({default: function(item: any) {
+    //   if (this.item_field_name !== null) {
+    //     return item[this.item_field_name];
+    //   }
+    //   return item;
+    //   }, type: Function})
     // incoming_display_item_fn: any;
 
-    @Prop({default: null, type: String})
+    // @Prop({default: (item: any, filter_text: string) => { return this.default_filter_fn },
+    // type: Function})
+    // incoming_filter_fn!: any;
+    //
+    // @Prop({default: (item: any) => { return this.default_display_item_fn }, type: Function})
+    // incoming_display_item_fn!: any;
+
+    // @Prop({type: Function})
+    // incoming_filter_fn = (item: any, filter_text: string) => boolean = this.default_filter_fn;
+    //
+    // @Prop({type: Function})
+    // incoming_display_item_fn = (item: any) => string = this.default_display_item_fn;
+
+    @Prop({default: "name", type: String})
     item_field_name!: string;
 
     @Prop({default: "Enter a username", type: String})
     placeholder_text!: string;
 
-    display_item_fn: (item: any) => string = this.default_display_item_fn;
+    display_item_fn = this.default_display_item_fn;
 
     field_name: string = null;
 
-    filter_fn: (item: any, filter_text: string) => boolean = this.filter_words_fn;
+    filter_fn = this.default_filter_fn;
 
-    filter_text: string = null;
+    filter_text: string  = null;
 
-    _filtered_choices: any[] = null;
+    filtered_choices_priv: any[] = [];
 
     highlighted_index = 0;
 
-    choices: any[];
+    choices: any[] = [];
+
+    blah = this.filter_text === "T" ? "filter_text is null" : "filter_text is NOT NULL";
 
     typeahead_placeholder_text = "";
 
@@ -65,34 +106,34 @@
       this.typeahead_placeholder_text = this.placeholder_text;
       this.choices = this.incoming_choices;
       this.field_name = this.item_field_name;
+      // console.log("Filtered choices is null: ");
+      // console.log(this.filtered_choices_priv === null);
       // this.filter_fn = this.incoming_filter_fn;
       // this.display_item_fn = this.incoming_display_item_fn;
-      console.log(this.typeahead_placeholder_text);
-      console.log(this.choices);
-      console.log(this.field_name);
-      console.log(this.filter_fn);
-      console.log(this.display_item_fn);
+      // console.log(this.typeahead_placeholder_text);
+      // console.log(this.choices);
+      // console.log(this.field_name);
+      // console.log(this.filter_fn);
+      // console.log(this.display_item_fn);
     }
 
-    filter_words_fn(words: string[], filter_text: string) {
-      let matching: string[] = [];
-      let prefix = 'by';
-      for (let word of words) {
-        if (word.substr(0, 2) == prefix) {
-          matching.push(word);
-        }
-      }
-      return matching;
-    }
+    // v-on:change="reset_filtered_choices()"
+    // reset_filtered_choices() {
+    //   console.log("resetting");
+    //   this.filtered_choices_priv = null;
+    // }
 
     default_filter_fn(item: any, filter_text: string): boolean {
+      // console.log("DEFAULT FILTER");
       if (this.item_field_name !== null) {
         item = item[this.item_field_name];
       }
+      console.log(item.indexOf(filter_text));
       return item.indexOf(filter_text) >= 0;
     }
 
     default_display_item_fn(item: any): string {
+      // console.log("DEFAULT DISPLAY");
       if (this.item_field_name !== null) {
         return item[this.item_field_name];
       }
@@ -100,46 +141,54 @@
     }
 
     get filtered_choices() {
+      // console.log("I ran");
       if (!this.filter_text) {
+        // console.log("I returned choices");
         return this.choices;
       }
-      if (this._filtered_choices !== null) {
-        return this._filtered_choices;
+
+      if (this.filtered_choices_priv !== null) {
+        // console.log("I returned _filtered_choices");
+        return this.filtered_choices_priv;
       }
-      this._filtered_choices = this.choices.filter(
+
+      // console.log("I computed _filtered_choices");
+      this.filtered_choices_priv = this.choices.filter(
         (item) => this.filter_fn(item, this.filter_text));
-      // How can it be undefined here?
-      console.log("I got here");
-      if (this.highlighted_index >= this._filtered_choices.length) {
-        this.highlighted_index = this._filtered_choices.length - 1;
+      if (this.highlighted_index >= this.filtered_choices_priv.length) {
+        this.highlighted_index = this.filtered_choices_priv.length - 1;
       }
-      return this._filtered_choices;
+      return this.filtered_choices_priv;
     }
 
     move_highlighted(event: KeyboardEvent) {
-      if (event.code === 'ArrowDown' || event.keyCode === 40) {
-        this.highlighted_index += 1;
-        if (this.highlighted_index === this.filtered_choices.length) {
-          this.highlighted_index = this.filtered_choices.length - 1;
+      // only allow movement when there are things to choose from
+      if (this.filtered_choices) {
+        if (event.code === 'ArrowDown' || event.keyCode === 40) {
+          this.highlighted_index += 1;
+          if (this.highlighted_index === this.filtered_choices.length) {
+            this.highlighted_index = this.filtered_choices.length - 1;
+          }
         }
-      }
-      else if (event.code === 'ArrowUp' || event.keyCode === 38) {
-        this.highlighted_index -= 1;
-        if (this.highlighted_index < 0) {
+        else if (event.code === 'ArrowUp' || event.keyCode === 38) {
+          this.highlighted_index -= 1;
+          if (this.highlighted_index < 0) {
+            this.highlighted_index = 0;
+          }
+        }
+        else if (event.code === 'Escape' || event.keyCode === 27) {
           this.highlighted_index = 0;
         }
-      }
-      else if (event.code ===  'Escape' || event.keyCode === 27) {
-          this.highlighted_index = 0;
-      }
-      else if (event.keyCode === 13) {
-        this.select_item_from_menu(this.filtered_choices[this.highlighted_index]);
+        else if (event.keyCode === 13) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.select_item_from_menu(this.filtered_choices[this.highlighted_index]);
+        }
       }
     }
 
-    select_item_from_menu(item) {
-      this.$emit("change_item_selected", item);
-      console.log("Selected an item!");
+    select_item_from_menu(item: any) {
+      this.$emit("add_item_selected", item);
       this.hide_the_dropdown();
     }
 
@@ -151,14 +200,7 @@
     hide_the_dropdown() {
       let dropdown_menu = <HTMLElement> this.$el.getElementsByClassName("dropdown-content")[0];
       dropdown_menu.style.display = "none";
-      console.log("Hide the dropdown");
     }
-
-    // select_highlighted() {
-    //   this.$emit("change_item_selected", this.filtered_choices[this.highlighted_index]);
-    //   console.log("Do I get called?");
-    //   this.hide_the_dropdown();
-    // }
 
   }
 </script>
@@ -239,6 +281,11 @@
 
   .highlight {
     background-color: hsl(210, 13%, 80%);
+  }
+
+  .droptype-container {
+    margin-left: 60px;
+    margin-top: 60px;
   }
 
 </style>

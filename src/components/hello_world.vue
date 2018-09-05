@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <ViewFileDemo></ViewFileDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
@@ -60,5 +61,12 @@ export default class HelloWorld extends Vue {}
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
+
+  .collection-of-items {
+    margin-top: 200px;
+    padding: 20px;
+    background-color: mediumpurple;
+    color: white;
+  }
 
 </style>
