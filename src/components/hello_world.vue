@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <ViewFileDemo></ViewFileDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
