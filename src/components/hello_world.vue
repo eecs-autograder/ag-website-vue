@@ -62,7 +62,7 @@ export default class HelloWorld extends Vue {}
 
 
   .collection-of-items {
-    margin-top: 200px;
+    margin-top: 70px;
     padding: 20px;
     background-color: mediumpurple;
     color: white;
