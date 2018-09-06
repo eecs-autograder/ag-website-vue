@@ -1,18 +1,14 @@
 <template>
-  <div class="dropdowntypeahead-container">
-    <p> Highlighted Index = {{highlighted_index}}</p>
-    <p> {{filtered_choices}}</p>
-    <p> <b> Filter Text: </b> {{filter_text}}</p>
+  <div class="dropdown-typeahead-container">
       <div class="dropdown">
-        <input class="dropbtn"
-               id="search-field"
+        <input id="search-field"
                type="text"
                :placeholder="placeholder_text"
                v-model="filter_text"
                @blur="hide_the_dropdown()"
                @keydown="move_highlighted($event)"
                @click="show_the_dropdown()">
-        <div ref="dropdown_menu" class="dropdown-content">
+        <div class="dropdown-content">
           <a v-for="(item, index) of filtered_choices"
                @click.stop="select_item_from_menu(item)"
                @mousedown="$event.preventDefault()"
@@ -35,17 +31,16 @@
     @Prop({required: true, type: Array})
     incoming_choices!: object[];
 
-    //5934
-    @Watch('filter_text')
-    on_filter_text_changed() {
-      this.filtered_choices_priv = null;
-    }
-
     @Prop({default: null, type: String})
     item_field_name!: string | null;
 
     @Prop({required: true, type: String})
     incoming_placeholder_text!: string;
+
+    @Watch('filter_text')
+    on_filter_text_changed() {
+      this.filtered_choices_priv = null;
+    }
 
     display_item_fn = this.default_display_item_fn;
 
@@ -99,38 +94,49 @@
       if (this.highlighted_index >= this.filtered_choices_priv.length) {
         this.highlighted_index = this.filtered_choices_priv.length - 1;
       }
+      // Reset to 0th index when backtracking
+      if (this.filtered_choices_priv.length > 0 && this.highlighted_index < 0) {
+        this.highlighted_index = 0;
+      }
       return this.filtered_choices_priv;
     }
 
     move_highlighted(event: KeyboardEvent) {
-      if (!this.dropdown_visible) {
-        this.show_the_dropdown();
-      }
-      if (event.code === 'ArrowDown') {
-        this.highlighted_index += 1;
-        if (this.highlighted_index === this.filtered_choices.length) {
-          this.highlighted_index = this.filtered_choices.length - 1;
-        }
-      }
-      else if (event.code === 'ArrowUp') {
-        this.highlighted_index -= 1;
-        if (this.highlighted_index < 0) {
-          this.highlighted_index = 0;
-        }
-      }
-      else if (event.code === 'Escape') {
-        this.highlighted_index = 0;
-      }
-      else if (event.code === "Enter") {
+      if (event.code === "Enter") {
         event.preventDefault();
         event.stopPropagation();
-        this.select_item_from_menu(this.filtered_choices[this.highlighted_index]);
+        if (this.dropdown_visible) {
+          this.select_item_from_menu(this.filtered_choices[this.highlighted_index]);
+        }
+      }
+      else {
+        if (!this.dropdown_visible) {
+          this.show_the_dropdown();
+        }
+        if (event.code === 'ArrowDown') {
+          this.highlighted_index += 1;
+          if (this.highlighted_index >= this.filtered_choices.length) {
+            this.highlighted_index = this.filtered_choices.length - 1;
+          }
+        }
+        else if (event.code === 'ArrowUp') {
+          if (this.highlighted_index !== -1) {
+            this.highlighted_index -= 1;
+            if (this.highlighted_index < 0) {
+              this.highlighted_index = 0;
+            }
+          }
+        }
+        else if (event.code === 'Escape') {
+          this.highlighted_index = 0;
+        }
       }
     }
 
     select_item_from_menu(item: object) {
       if (item) {
         this.$emit("add_item_selected", item);
+        this.highlighted_index = 0;
         this.hide_the_dropdown();
       }
     }
@@ -228,11 +234,6 @@
     border-bottom-right-radius: 5px;
   }
 
-  .dropdown-content a:hover {
-    /*background-color: hsl(210, 12%, 93%);*/
-    /*filter: brightness(80%);*/
-  }
-
   #search-field {
     font-size: 16px;
     margin: 0;
@@ -261,8 +262,8 @@
     background-color: hsl(210, 13%, 80%);
   }
 
-  .droptype-container {
-    margin-left: 60px;
+  .dropdown-typeahead-container {
+    margin-left: 100px;
     margin-top: 60px;
   }
 
