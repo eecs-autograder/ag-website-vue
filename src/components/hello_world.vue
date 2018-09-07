@@ -1,30 +1,61 @@
 <template>
   <div class="hello">
 
-    <h1>{{ msg }}</h1>
+    <button @click="modal_1_open = true">Open Default Modal</button>
+    <modal v-if="modal_1_open" :close="() => modal_1_open = false">
+      <h2>Title Example (Default)</h2>
+      <hr>
+      <p>The cool thing about this is that its totally reusable!</p>
+      <small>You can even close it using the little x at the top :D</small>
+    </modal>
 
-    <toggle id="toggle" v-model="switchy"
-            :incoming_active_background_color="active_bkgrnd_color"
-            ref="switchy_toggle">
-      <template slot="on">
-        <p> Happy </p>
-      </template>
-      <template slot="off">
-        <p> <i class="fas fa-frown fa-lg"> </i></p>
-      </template>
-    </toggle>
+    <br/>
+    <br/>
 
-    <br>
+    <button @click="modal_2_open = true">Open Small Modal</button>
+    <modal v-if="modal_2_open" :close="() => modal_2_open = false"
+           :size="'small'">
+      <h2>Title Example (Small)</h2>
+      <hr>
+      <p>The cool thing about this is that its totally reusable!</p>
+      <small>You can even close it using the little x at the top :D</small>
+    </modal>
 
-    <div class="icon-poc">
-      <i class="fas fa-check"></i>
-      <i class="far fa-check-circle"></i>
-      <i class="fas fa-angle-down"></i>
-    </div>
+    <br/>
+    <br/>
 
-    <br>
-    <view-file :incoming_filename="filename"
-               :incoming_file_content="content" ref="viewing_file"></view-file>
+    <button @click="modal_3_open = true">Open Medium Modal</button>
+    <modal v-if="modal_3_open" :close="() => modal_3_open = false"
+           :size="'medium'">
+      <h2>Title Example (Medium)</h2>
+      <hr>
+      <p>The cool thing about this is that its totally reusable!</p>
+      <small>You can even close it using the little x at the top :D</small>
+    </modal>
+
+    <br/>
+    <br/>
+
+    <button @click="modal_4_open = true">Open Large Modal</button>
+    <modal v-if="modal_4_open" :close="() => modal_4_open = false"
+           :size="'large'">
+      <h2>Title Example (Large)</h2>
+      <hr>
+      <p>The cool thing about this is that its totally reusable!</p>
+      <small>You can even close it using the little x at the top :D</small>
+    </modal>
+
+    <br/>
+    <br/>
+
+    <button @click="modal_5_open = true">Open Custom Size Modal</button>
+    <modal v-if="modal_5_open" :close="() => modal_5_open = false"
+           :custom_width="'900px'">
+      <h2>Title Example (900px)</h2>
+      <hr>
+      <p>The cool thing about this is that its totally reusable!</p>
+      <small>You can even close it using the little x at the top :D</small>
+    </modal>
 
   </div>
 </template>
@@ -32,31 +63,20 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import Toggle from './toggle.vue';
-
-import ViewFile from './view_file.vue';
+import Modal from './modal.vue';
 
 @Component({
-  components: {Toggle, ViewFile}
+  components: { Modal }
 })
-
 export default class HelloWorld extends Vue {
   @Prop()
   msg!: string;
 
-  on = "Hello";
-
-  off = "Super Off";
-
-  filename = "ke$ha.cpp";
-
-  content = "#include \"macklemore.cpp\"\nblah\nblah\nblah\n5coffeeeeeeee\n";
-
-  switchy: boolean = true;
-
-  active_bkgrnd_color = {
-    'backgroundColor': 'hotpink'
-  };
+  modal_1_open: boolean = false;
+  modal_2_open: boolean = false;
+  modal_3_open: boolean = false;
+  modal_4_open: boolean = false;
+  modal_5_open: boolean = false;
 }
 </script>
 
