@@ -1,22 +1,22 @@
 <template>
   <div class="dropdown-typeahead-container">
-      <div class="dropdown">
-        <input id="search-field"
-               type="text"
-               :placeholder="placeholder_text"
-               v-model="filter_text"
-               @blur="hide_the_dropdown()"
-               @keydown="move_highlighted($event)"
-               @click="show_the_dropdown()">
-        <div class="dropdown-content">
-          <a v-for="(item, index) of filtered_choices"
-               @click.stop="select_item_from_menu(item)"
-               @mousedown="$event.preventDefault()"
-               :class="index == highlighted_index ? 'highlight' : ''">
-            {{display_item_fn(item)}}
-          </a>
-        </div>
+    <div class="dropdown">
+      <input id="search-field"
+             type="text"
+             :placeholder="placeholder_text"
+             v-model="filter_text"
+             @blur="hide_the_dropdown()"
+             @keydown="move_highlighted($event)"
+             @click="show_the_dropdown()">
+      <div class="dropdown-content">
+        <a v-for="(item, index) of filtered_choices"
+             @click.stop="select_item_from_menu(item)"
+             @mousedown="$event.preventDefault()"
+             :id="index == highlighted_index ? 'highlight' : ''">
+          {{display_item_fn(item)}}
+        </a>
       </div>
+    </div>
 
   </div>
 </template>
@@ -42,48 +42,65 @@
       this.filtered_choices_priv = null;
     }
 
-    display_item_fn = this.default_display_item_fn;
+    @Prop(
+      { default: function(item: object) {
+        if (this.item_field_name !== null) {
+          return item[this.item_field_name];
+        }
+        return item;
+        },
+        type: Function
+      }
+    )
+    incoming_display_item_fn!: (item: object) => object;
 
-    field_name: string = "";
+    @Prop(
+      { default: function(item: object, filter_text: string) {
+        if (this.item_field_name !== null) {
+          item = item[this.item_field_name];
+        }
+        return item.indexOf(filter_text) >= 0;
+        },
+        type: Function
+      }
+    )
+    incoming_filter_fn!: (item: object, filter: string) => boolean;
 
-    filter_fn = this.default_filter_fn;
+    display_item_fn = function(item: object) {
+      return item;
+    };
 
-    filter_text: string = "";
+    filter_fn = function(item: object, filter: string) {
+      return true;
+    };
 
-    filtered_choices_priv: object[] = [];
+    field_name: string | null = "";
 
-    highlighted_index = 0;
+    filter_text = "";
+
+    filtered_choices_priv: object[] | null = [];
 
     choices: object[] = [];
+
+    highlighted_index = 0;
 
     placeholder_text = "";
 
     dropdown_visible = false;
 
+    is_item: {[index: string ]: object} = {};
+
     created() {
       this.placeholder_text = this.incoming_placeholder_text;
       this.choices = this.incoming_choices;
       this.field_name = this.item_field_name;
-      // this.filter_fn = this.incoming_filter_fn;
-      // this.display_item_fn = this.incoming_display_item_fn;
-    }
-
-    default_filter_fn(item: object, filter_text: string): boolean {
-      if (this.item_field_name !== null) {
-        item = item[this.item_field_name];
-      }
-      return item.indexOf(filter_text) >= 0;
-    }
-
-    default_display_item_fn(item: object): object {
-      if (this.item_field_name !== null) {
-        return item[this.item_field_name];
-      }
-      return item;
+      this.filter_fn = this.incoming_filter_fn;
+      this.display_item_fn = this.incoming_display_item_fn;
     }
 
     get filtered_choices() {
       if (!this.filter_text) {
+        this.highlighted_index = 0;
         return this.choices;
       }
       if (this.filtered_choices_priv !== null) {
@@ -105,7 +122,7 @@
       if (event.code === "Enter") {
         event.preventDefault();
         event.stopPropagation();
-        if (this.dropdown_visible) {
+        if (this.dropdown_visible && this.highlighted_index !== -1) {
           this.select_item_from_menu(this.filtered_choices[this.highlighted_index]);
         }
       }
@@ -135,8 +152,13 @@
 
     select_item_from_menu(item: object) {
       if (item) {
+        // console.log("Added Item");
         this.$emit("add_item_selected", item);
         this.highlighted_index = 0;
+        this.hide_the_dropdown();
+      }
+      else {
+        // console.log("I am nothing");
         this.hide_the_dropdown();
       }
     }
@@ -153,80 +175,50 @@
       this.dropdown_visible = false;
     }
 
-    // @Prop({default: function(item: any, filter_text: string) {
-    //     console.log("Item");
-    //     console.log(item);
-    //   if (this.item_field_name !== null) {
-    //     item = item[this.item_field_name];
-    //   }
-    //   return item.indexOf(filter_text) >= 0;
-    //   }, type: Function})
-    // incoming_filter_fn!: any;
-    //
-    // @Prop({default: function(item: any) {
-    //   if (this.item_field_name !== null) {
-    //     return item[this.item_field_name];
-    //   }
-    //   return item;
-    //   }, type: Function})
-    // incoming_display_item_fn: any;
-
-    // @Prop({default: (item: any, filter_text: string) => { return this.default_filter_fn },
-    // type: Function})
-    // incoming_filter_fn!: any;
-    //
-    // @Prop({default: (item: any) => { return this.default_display_item_fn }, type: Function})
-    // incoming_display_item_fn!: any;
-
-    // @Prop({type: Function})
-    // incoming_filter_fn = (item: any, filter_text: string) => boolean = this.default_filter_fn;
-    //
-    // @Prop({type: Function})
-    // incoming_display_item_fn = (item: any) => string = this.default_display_item_fn;
-
   }
 </script>
 
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
-  .item-highlighted {
-    background-color: lightgray;
+  .dropdown-typeahead-container {
+    margin-left: 100px;
+    margin-top: 60px;
   }
 
   .dropdown {
-    position: relative;
     display: inline-block;
+    position: relative;
   }
 
   .dropdown-content {
-    display: none;
-    border-radius: 5px;
-    position: absolute;
     background-color: white;
-    min-width: 160px;
-    width: 100%;
+    border-radius: 5px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    z-index: 1;
+    display: none;
     margin-top: 10px;
+    min-width: 160px;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
   }
 
   .dropdown-content a {
+    border-top: 1px solid $light-gray;
     color: black;
+    cursor: pointer;
+    display: block;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    margin: 0;
+    min-height: 13px;
     padding: 8px 10px;
     text-decoration: none;
-    display: block;
-    border-top: 1px solid $light-gray;
-    margin: 0;
-    cursor: pointer;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-    min-height: 13px;
   }
 
   .dropdown-content a:first-child {
+    border-top: none;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    border-top: none;
   }
 
   .dropdown-content a:last-child {
@@ -234,37 +226,40 @@
     border-bottom-right-radius: 5px;
   }
 
-  #search-field {
-    font-size: 16px;
-    margin: 0;
-    border-radius: 5px;
+  .dropdown-content a:hover {
     background-color: hsl(210, 13%, 95%);
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-    width: 400px;
-    height: 24px;
-    color: black;
+  }
+
+  #highlight:hover {
+    background-color: hsl(210, 13%, 80%);
+  }
+
+  #highlight {
+    background-color: hsl(210, 13%, 80%);
+  }
+
+  #search-field {
+    background-color: hsl(210, 13%, 95%);
     border: 2px solid hsl(210, 13%, 95%);
-    padding: 6px 10px;
+    border-radius: 5px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    color: black;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 16px;
+    height: 24px;
+    margin: 0;
+    padding: 6px 10px;
+    width: 400px;
+  }
+
+  #search-field:focus {
+    outline: none;
   }
 
   #search-field:hover {
     background-color: hsl(210, 12%, 93%);
     border-color: hsl(210, 12%, 93%);
     color: black;
-  }
-
-  input:focus {
-    outline: none;
-  }
-
-  .highlight {
-    background-color: hsl(210, 13%, 80%);
-  }
-
-  .dropdown-typeahead-container {
-    margin-left: 100px;
-    margin-top: 60px;
   }
 
 </style>
