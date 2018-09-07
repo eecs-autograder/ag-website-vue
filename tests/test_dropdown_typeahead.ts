@@ -211,7 +211,7 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_menu.element.style.display).toEqual("none");
     });
 
-    test('Item selected is delivered to the parent', () => {
+    test('Item selected in dropdown is delivered to the parent component', () => {
         @Component({
             template: `<div>
                           <dropdown-typeahead ref="dropT" :incoming_choices="arr"
@@ -535,7 +535,8 @@ describe('DropdownTypeahead.vue', () => {
             custom_filter_function(group: Group, filter: string) {
                 let partner1_result = group.partner1;
                 let partner2_result = group.partner2;
-                return partner1_result.indexOf(filter) >= 0 || partner2_result.indexOf(filter) >= 0;
+                return partner1_result.indexOf(filter) >= 0
+                       || partner2_result.indexOf(filter) >= 0;
             }
 
             pairs: object[] = [];
