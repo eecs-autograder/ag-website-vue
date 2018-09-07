@@ -72,4 +72,12 @@ export default class HelloWorld extends Vue {}
     color: white;
   }
 
+  .one-drop {
+    margin: 50px 0 0 50px;
+  }
+
+  .two-drop {
+    padding: 100px;
+    display: inline-block;
+  }
 </style>
