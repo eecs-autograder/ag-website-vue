@@ -152,13 +152,11 @@
 
     select_item_from_menu(item: object) {
       if (item) {
-        // console.log("Added Item");
         this.$emit("add_item_selected", item);
         this.highlighted_index = 0;
         this.hide_the_dropdown();
       }
       else {
-        // console.log("I am nothing");
         this.hide_the_dropdown();
       }
     }
@@ -180,11 +178,6 @@
 
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
-
-  .dropdown-typeahead-container {
-    margin-left: 100px;
-    margin-top: 60px;
-  }
 
   .dropdown {
     display: inline-block;
