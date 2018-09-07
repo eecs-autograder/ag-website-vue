@@ -15,6 +15,11 @@
 
 <script lang="ts">
 
+interface Group {
+  partner1: string;
+  partner2: string;
+}
+
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
@@ -59,7 +64,6 @@ export default class HelloWorld extends Vue {}
 
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
-
 
   .collection-of-items {
     margin-top: 70px;
