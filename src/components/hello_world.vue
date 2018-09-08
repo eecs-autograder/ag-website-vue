@@ -5,6 +5,7 @@
     <DiffDemo></DiffDemo>
     <TabsDemo></TabsDemo>
     <TooltipDemo></TooltipDemo>
+    <ModalDemo></ModalDemo>
   </div>
 
 </template>
@@ -19,11 +20,12 @@ import ViewFile from '@/components/view_file.vue';
 
 import ButtonDemo from '@/demos/button_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
+import ModalDemo from '@/demos/modal_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
 
 @Component({
-  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, TabsDemo, TooltipDemo}
+  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, TabsDemo, TooltipDemo, ModalDemo}
 })
 export default class HelloWorld extends Vue {
 }
