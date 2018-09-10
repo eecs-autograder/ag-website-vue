@@ -1,6 +1,7 @@
 <template>
 
   <div>
+    <ButtonDemo></ButtonDemo>
     <TabsDemo></TabsDemo>
   </div>
 
@@ -13,10 +14,13 @@ import Tab from '@/components/tabs/tab.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import Toggle from '@/components/toggle.vue';
 import ViewFile from '@/components/view_file.vue';
+
+import ButtonDemo from '@/demos/button_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 
+
 @Component({
-  components: {Toggle, ViewFile, Tab, Tabs, TabsDemo}
+  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, TabsDemo}
 })
 export default class HelloWorld extends Vue {
 }

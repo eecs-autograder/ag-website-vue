@@ -1,4 +1,4 @@
-.button-styling {
+.button {
     border-radius: 4px;
     cursor: pointer;
     color: white;
@@ -9,6 +9,7 @@
 }
 
 .red-button {
+    @extend .button;
     background-color: hsl(0, 80%, 50%);
     border: 1px solid hsl(0, 80%, 66%);
 }
@@ -22,6 +23,7 @@
 }
 
 .orange-button {
+    @extend .button;
     background-color: hsl(20, 100%, 55%);
     border: 1px solid hsl(20, 100%, 71%);
 }
@@ -36,6 +38,7 @@
 }
 
 .green-button {
+    @extend .button;
     background-color: hsl(150, 55%, 44%);
     border: 1px solid hsl(150, 55%, 60%);
 }
@@ -49,6 +52,7 @@
 }
 
 .blue-button {
+    @extend .button;
     background-color: hsl(208, 59%, 54%);
     border: 1px solid hsl(208, 59%, 70%);
 }
@@ -62,6 +66,7 @@
 }
 
 .purple-button {
+    @extend .button;
     background-color: hsl(275, 48%, 63%);
     border: 1px solid hsl(275, 48%, 79%);
 }
@@ -75,6 +80,7 @@
 }
 
 .gray-button {
+    @extend .button;
     background-color: hsl(210, 13%, 63%);
     border: 1px solid hsl(210, 13%, 79%);
 }
@@ -86,5 +92,3 @@
 .gray-button:focus {
     outline-color: hsl(210, 13%, 88%);
 }
-
-
