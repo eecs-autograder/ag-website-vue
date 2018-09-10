@@ -26,15 +26,13 @@
           </tab>
         </tabs>
 
-        <tabs ref="tabs2" v-model="current_tab_index2"
+        <tabs ref="tabs2"
               tab_active_class="white-theme-active"
               tab_inactive_class="white-theme-inactive">
           <tab ref="tabby" v-on:click="wee">
             <template slot="header">
               <div class="tab-label">
                 <p class="tab-heading"> Cat Tab </p>
-                <i class="fas fa-times close_x"
-                   @click="$event.stopPropagation(); remove_tab(0)"></i>
               </div>
             </template>
             <template slot="body">
@@ -47,8 +45,6 @@
             <template slot="header">
               <div class="tab-label">
                 <p class="tab-heading"> Dog Tab </p>
-                <i class="fas fa-times close_x"
-                   @click="$event.stopPropagation(); remove_tab(1)"></i>
               </div>
             </template>
             <template slot="body">
@@ -92,8 +88,6 @@
 
     current_tab_index = 1;
 
-    current_tab_index2 = 0;
-
     tab_labels = [1, 2, 3];
 
     add_tab() {
@@ -102,6 +96,9 @@
     }
 
     remove_tab(index: number) {
+      if (index < this.current_tab_index) {
+        this.current_tab_index -= 1;
+      }
       this.tab_labels.splice(index, 1);
     }
   }
