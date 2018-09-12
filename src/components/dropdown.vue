@@ -6,7 +6,7 @@
        @blur="hide_the_dropdown_menu">
 
     <div @click="toggle_dropdown_menu">
-      <slot name="drop_top"> </slot>
+      <slot name="header"> </slot>
     </div>
 
     <div class="dropdown-container">
