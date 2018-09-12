@@ -30,9 +30,7 @@ describe('Diff tests', () => {
             propsData: {
                 diff_contents: diff,
                 show_whitespace: false,
-                diff_height: {
-                    'height': '100px'
-                }
+                diff_height: '100px'
             }
         });
 
@@ -201,6 +199,6 @@ describe('Diff test edge cases', () => {
                     show_whitespace: false
                 }
             });
-        }).toThrow('Invalid prefix: "sp". Prefixes must be one of: "- ", "+ ", "  "')
+        }).toThrow('Invalid prefix: "sp". Prefixes must be one of: "- ", "+ ", "  "');
     });
 });
