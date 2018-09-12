@@ -5,7 +5,7 @@
       <div class="header"> {{right_header}} </div>
     </div>
 
-    <div id="diff-body-wrapper" :style="diff_height">
+    <div id="diff-body-wrapper" :style="{'height': diff_height}">
       <table id="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
           <tr v-for="(left_cell, i) of left">
@@ -76,8 +76,8 @@ export default class Diff extends Vue {
   @Prop({default: "", type: String})
   right_header!: string;
 
-  @Prop({default: () => ({ 'height': '100%' }), type: Object})
-  diff_height!: object;
+  @Prop({default: '100%', type: String})
+  diff_height!: string;
 
   @Prop({default: false, type: Boolean})
   show_whitespace!: boolean;
