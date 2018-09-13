@@ -1,15 +1,14 @@
+<template>
+  <div class="outermost-dropdown-container">
+    <div class="dropdown-container"
+         tabindex="1"
+         @keydown="move_highlighted($event)"
+         @blur="hide_the_dropdown_menu">
 
+      <div @click="toggle_the_dropdown_menu">
+        <slot name="header"> </slot>
+      </div>
 
-  <div class="dropdown"
-       tabindex="1"
-       @keydown="move_highlighted($event)"
-       @blur="hide_the_dropdown_menu">
-
-    <div @click="toggle_dropdown_menu">
-      <slot name="header"> </slot>
-    </div>
-
-    <div class="dropdown-container">
       <div class="dropdown-content" :style="content_styling">
         <a v-for="(item, index) of items"
         @click="choose_item_from_dropdown_menu(item, index)"
@@ -19,7 +18,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -84,17 +82,14 @@
       }
     }
 
-    mounted() {
-      if (this.is_open) {
-        this.show_the_dropdown_menu();
-      }
-      else {
-        this.hide_the_dropdown_menu();
-      }
+    invoke_focus_on_dropdown() {
+      let dropdown_outer = <HTMLElement> this.$el.getElementsByClassName("dropdown-container")[0];
+      dropdown_outer.focus();
     }
 
-    find_chosen_item(item: string) {
-      return item === this.chosen_item;
+    invoke_blur_on_dropdown() {
+      let dropdown_outer = <HTMLElement> this.$el.getElementsByClassName("dropdown-container")[0];
+      dropdown_outer.blur();
     }
 
     show_the_dropdown_menu() {
@@ -107,6 +102,7 @@
       let dropdown_menu = <HTMLElement> this.$el.getElementsByClassName("dropdown-content")[0];
       dropdown_menu.style.display = "none";
       this.is_open_ = false;
+      this.invoke_blur_on_dropdown();
     }
 
     choose_item_from_dropdown_menu(item_selected: string, index: number) {
@@ -118,7 +114,7 @@
       this.hide_the_dropdown_menu();
     }
 
-    toggle_dropdown_menu() {
+    toggle_the_dropdown_menu() {
       if (this.is_open) {
         this.is_open_ = false;
         this.hide_the_dropdown_menu();
@@ -149,14 +145,12 @@
           if (this.highlighted_index < this.items.length - 1) {
             this.highlighted_index += 1;
           }
-          console.log(this.highlighted_index);
         }
         else if (event.code === 'ArrowUp') {
           if (this.highlighted_index !== -1) {
             this.highlighted_index -= 1;
             if (this.highlighted_index < 0) {
               this.highlighted_index = 0;
-              console.log(this.highlighted_index);
             }
           }
         }
@@ -173,29 +167,25 @@
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
-  .dropdown:focus {
+  .dropdown-container:focus {
     outline: none;
   }
 
-  .dropdown {
+  .dropdown-container {
     display: inline-block;
     position: relative;
   }
 
-  .dropdown-outer:focus {
-    outline: none;
-  }
-
   .dropdown-content {
     background-color: white;
-    border-radius: 5px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     display: none;
-    margin-top: 10px;
+    margin-top: 0px;
     width: 100%;
     position: absolute;
     z-index: 1;
   }
+
   .dropdown-content a {
     border-top: 1px solid $light-gray;
     color: black;
@@ -207,21 +197,25 @@
     padding: 10px 15px;
     text-decoration: none;
   }
+
   .dropdown-content a:first-child {
     border-top: none;
   }
-  .dropdown-content a:last-child {
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
+
   .dropdown-content a:hover {
     background-color: hsl(210, 13%, 95%);
   }
+
   #highlight:hover {
     background-color: hsl(210, 13%, 80%);
   }
+
   #highlight {
     background-color: hsl(210, 13%, 80%);
+  }
+
+  .outermost-dropdown-container {
+    display: inline-block;
   }
 
 </style>
