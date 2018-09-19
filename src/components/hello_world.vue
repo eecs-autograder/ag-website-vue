@@ -3,6 +3,7 @@
   <div>
     <ButtonDemo></ButtonDemo>
     <TabsDemo></TabsDemo>
+    <TooltipDemo></TooltipDemo>
   </div>
 
 </template>
@@ -17,10 +18,10 @@ import ViewFile from '@/components/view_file.vue';
 
 import ButtonDemo from '@/demos/button_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
-
+import TooltipDemo from '@/demos/tooltip_demo.vue';
 
 @Component({
-  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, TabsDemo}
+  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, TabsDemo, TooltipDemo}
 })
 export default class HelloWorld extends Vue {
 }
