@@ -1,7 +1,7 @@
 <template>
 
-  <div id="tooltip">
-    <span class="tooltip-text"> <slot> </slot> </span>
+  <div ref="tooltip" id="tooltip">
+    <slot></slot>
   </div>
 
 </template>
@@ -20,7 +20,6 @@
     width!: string;
 
     tooltip_width = "";
-
     tooltip_placement = "";
 
     created() {
@@ -30,114 +29,121 @@
 
     mounted() {
       let parent = <HTMLElement> this.$el.parentElement;
-      let tooltip_text = <HTMLElement> this.$el.getElementsByClassName("tooltip-text")[0];
+      let tooltip = <HTMLElement> this.$refs['tooltip'];
+      tooltip.style.visibility = "hidden";
+      tooltip.style.opacity = "0";
 
-      if (parent !== null) {
-        parent!.style.position = "relative";
-        parent.style.display = "inline-block";
-
-        parent.addEventListener("mouseenter", () => {
-          tooltip_text.style.visibility = "visible";
-          tooltip_text.style.opacity = "1";
-        });
-
-        parent.addEventListener("mouseout", () => {
-          tooltip_text.style.visibility = "hidden";
-          tooltip_text.style.opacity = "0";
-        });
-      }
-      else {
-        throw new Error("Parent element is null!");
+      if (parent === null) {
+        throw new Error('Tooltips must have a parent element.');
       }
 
+      parent.style.position = "relative";
+      parent.style.display = "inline-block";
 
-      // Width
+      parent.addEventListener("mouseenter", () => {
+        tooltip.style.visibility = "visible";
+        tooltip.style.opacity = "1";
+      });
+
+      parent.addEventListener("mouseout", () => {
+        tooltip.style.visibility = "hidden";
+        tooltip.style.opacity = "0";
+      });
+
+      this.set_tooltip_width(tooltip);
+      this.set_tooltip_placement(tooltip);
+    }
+
+    set_tooltip_width(tooltip: HTMLElement) {
       if (this.tooltip_width === "small") {
-        tooltip_text.className += " small-text-area";
+        tooltip.classList.add('small-text-area');
       }
       else if (this.tooltip_width === "medium") {
-        tooltip_text.className += " medium-text-area";
+        tooltip.classList.add('medium-text-area');
+      }
+      else if (this.tooltip_width === "large") {
+        tooltip.classList.add('large-text-area');
       }
       else {
-        tooltip_text.className += " large-text-area";
+        throw new Error(`Invalid tooltip width: "${this.tooltip_width}"`);
       }
+    }
 
-      let height_of_tooltip_text = tooltip_text.clientHeight;
+    set_tooltip_placement(tooltip: HTMLElement) {
+      let height_of_tooltip = tooltip.clientHeight;
 
-      // Placement
       if (this.tooltip_placement === "left" || this.tooltip_placement === "right") {
-
-        let half_height_of_tooltip_text = (height_of_tooltip_text - 20) / 2;
-        half_height_of_tooltip_text = -half_height_of_tooltip_text;
-        half_height_of_tooltip_text -= 1;
-        let top_num = half_height_of_tooltip_text.toString();
+        let half_height_of_tooltip = (height_of_tooltip - 20) / 2;
+        half_height_of_tooltip = -half_height_of_tooltip;
+        half_height_of_tooltip -= 1;
+        let top_num = half_height_of_tooltip.toString();
         top_num += "px";
-        tooltip_text.style.top = top_num;
+        tooltip.style.top = top_num;
 
         if (this.tooltip_placement === "left") {
-          tooltip_text.className += " placement-left";
+          tooltip.className += " placement-left";
           if (this.tooltip_width === "medium") {
-            tooltip_text.style.marginLeft = "-120px";
+            tooltip.style.marginLeft = "-120px";
           }
           else if (this.tooltip_width === "large") {
-            tooltip_text.style.marginLeft = "-220px";
+            tooltip.style.marginLeft = "-220px";
           }
         }
         else {
-          tooltip_text.className += " placement-right";
+          tooltip.className += " placement-right";
           if (this.tooltip_width === "medium") {
-            tooltip_text.style.marginRight = "-120px";
+            tooltip.style.marginRight = "-120px";
           }
           else if (this.tooltip_width === "large") {
-            tooltip_text.style.marginRight = "-220px";
+            tooltip.style.marginRight = "-220px";
           }
         }
       }
-      else  {
+      else if (this.tooltip_placement === "top" || this.tooltip_placement === "bottom") {
 
-        let space_away_from_parent = height_of_tooltip_text + 15;
+        let space_away_from_parent = height_of_tooltip + 15;
         space_away_from_parent = -space_away_from_parent;
         let positioning_to_apply = space_away_from_parent.toString();
         positioning_to_apply += "px";
 
         if (this.tooltip_placement === "bottom") {
-          tooltip_text.className += " placement-bottom";
-          tooltip_text.style.bottom = positioning_to_apply;
+          tooltip.className += " placement-bottom";
+          tooltip.style.bottom = positioning_to_apply;
         }
         else {
-          tooltip_text.className += " placement-top";
-          tooltip_text.style.top = positioning_to_apply;
+          tooltip.className += " placement-top";
+          tooltip.style.top = positioning_to_apply;
         }
 
         if (this.tooltip_width === "small") {
-          tooltip_text.style.marginLeft = "-60px";
+          tooltip.style.marginLeft = "-60px";
         }
         else if (this.tooltip_width === "medium") {
-          tooltip_text.style.marginLeft = "-120px";
+          tooltip.style.marginLeft = "-120px";
         }
         else if (this.tooltip_width === "large") {
-          tooltip_text.style.marginLeft = "-170px";
+          tooltip.style.marginLeft = "-170px";
         }
       }
+      else {
+        throw new Error(`Invalid tooltip placement: "${this.tooltip_placement}"`);
+      }
     }
-
   }
 </script>
 
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
-  .tooltip-text {
+  #tooltip {
     background-color: $darker-gray;
     border-radius: 6px;
     color: white;
     display: inline-block;
-    opacity: 0;
     padding: 10px;
     position: absolute;
     text-align: center;
     transition: opacity 0.3s;
-    visibility: hidden;
     word-wrap: break-word;
     z-index: 0;
   }
@@ -166,7 +172,7 @@
     width: 320px;
   }
 
-  .tooltip-text::after {
+  #tooltip::after {
     border-style: solid;
     border-width: 5px;
     content: "";

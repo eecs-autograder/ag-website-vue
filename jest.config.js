@@ -25,5 +25,6 @@ module.exports = {
     testRegex: "(test_.*)|(test_.*\\.ts)$",
     testURL: 'http://localhost/',
 
-    "collectCoverage": true,
+    collectCoverage: true,
+    collectCoverageFrom: ["<rootDir>/src/**/*.{ts,vue}", "!<rootDir>/src/demos/**"]
 }
