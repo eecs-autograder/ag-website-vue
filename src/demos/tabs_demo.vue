@@ -4,13 +4,12 @@
     <div class="outside">
       <button type="button" @click="add_tab()">Add tab</button>
 
-
       <br> <br>
       <div class="shrink-tabs">
         <tabs ref="tabs" v-model="current_tab_index"
               tab_active_class="no-border-active"
               tab_inactive_class="no-border-inactive">
-          <tab ref="tabby" v-on:click="wee" v-for="(tab_val, index) in tab_labels" :key="tab_val">
+          <tab ref="tabby" v-on:click="log_event" v-for="(tab_val, index) in tab_labels" :key="tab_val">
             <template slot="header">
               <div class="tab-label">
                 <p class="tab-heading"> Tab {{tab_val}} </p>
@@ -29,7 +28,7 @@
         <tabs ref="tabs2"
               tab_active_class="white-theme-active"
               tab_inactive_class="white-theme-inactive">
-          <tab ref="tabby" v-on:click="wee">
+          <tab ref="tabby" v-on:click="log_event">
             <template slot="header">
               <div class="tab-label">
                 <p class="tab-heading"> Cat Tab </p>
@@ -41,7 +40,7 @@
               </div>
             </template>
           </tab>
-          <tab ref="tabby" v-on:click="wee">
+          <tab ref="tabby" v-on:click="log_event">
             <template slot="header">
               <div class="tab-label">
                 <p class="tab-heading"> Dog Tab </p>
@@ -69,20 +68,7 @@
     components: {Tabs, Tab}
   })
   export default class TabsDemo extends Vue {
-    @Prop()
-    msg!: string;
-
-    on = "Hello";
-
-    off = "Super Off";
-
-    filename = "ke$ha.cpp";
-
-    content = "#include \"macklemore.cpp\"\nblah\nblah\nblah\n5coffeeeeeeee\n";
-
-    switchy: boolean = true;
-
-    wee(e: Event) {
+    log_event(e: Event) {
       console.log(e);
     }
 
