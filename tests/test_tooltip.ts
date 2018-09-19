@@ -125,14 +125,6 @@ describe('Tooltip.vue', () => {
         expect(large_right.text()).toContain('Large right');
         expect(large_right.find('#tooltip').classes()).toContain('large-text-area');
         expect(large_right.find('#tooltip').classes()).toContain('placement-right');
-
-        // expect(tooltip.vm.$data.tooltip_width).toBe("medium");
-        // expect(tooltip.vm.$data.tooltip_placement).toBe("left");
-        // expect(
-        //     wrapper.find('#tooltip').text()
-        // ).toContain("This is a tooltip message");
-        // expect(wrapper.find('#tooltip').classes()).toContain("medium-text-area");
-        // expect(wrapper.find('#tooltip').classes()).toContain("placement-left");
     });
 
     test('Tooltip show on mouse enter and hide on mouse exit', () => {
