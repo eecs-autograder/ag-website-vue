@@ -84,6 +84,12 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.$data.active_tab_index).toEqual(0);
 
+        let active_headers = tabs.findAll('.active-tab-header');
+        expect(active_headers.length).toBe(1);
+        expect(active_headers.at(0).text()).toEqual('Tab 1');
+
+        expect(tabs.findAll('.inactive-tab-header').length).toBe(1);
+
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
     });
@@ -126,6 +132,12 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.$data.active_tab_index).toEqual(1);
 
+        let active_headers = tabs.findAll('.active-tab-header');
+        expect(active_headers.length).toBe(1);
+        expect(active_headers.at(0).text()).toEqual('Tab 2');
+
+        expect(tabs.findAll('.inactive-tab-header').length).toBe(1);
+
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 2 body');
     });
@@ -151,6 +163,14 @@ describe('Tabs tests', () => {
       Tab 2 body
     </template>
   </tab>
+  <tab ref="tab_3">
+    <template slot="header">
+        Tab 3
+    </template>
+    <template slot="body">
+        Tab 3 body
+    </template>
+    </tab>
 </tabs>`,
             components: {
                 'tab': Tab,
@@ -170,6 +190,12 @@ describe('Tabs tests', () => {
         tab_2.trigger('click');
 
         expect(tabs.vm.$data.active_tab_index).toEqual(1);
+
+        let active_headers = tabs.findAll('.active-tab-header');
+        expect(active_headers.length).toBe(1);
+        expect(active_headers.at(0).text()).toEqual('Tab 2');
+
+        expect(tabs.findAll('.inactive-tab-header').length).toBe(2);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });
