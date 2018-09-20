@@ -9,7 +9,8 @@
         <tabs ref="tabs" v-model="current_tab_index"
               tab_active_class="no-border-active"
               tab_inactive_class="no-border-inactive">
-          <tab ref="tabby" v-on:click="log_event" v-for="(tab_val, index) in tab_labels" :key="tab_val">
+          <tab ref="tabby" v-on:click="log_event"
+               v-for="(tab_val, index) in tab_labels" :key="tab_val">
             <template slot="header">
               <div class="tab-label">
                 <p class="tab-heading"> Tab {{tab_val}} </p>
