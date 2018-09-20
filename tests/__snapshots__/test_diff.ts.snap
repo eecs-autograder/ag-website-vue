@@ -38,12 +38,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -55,7 +55,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             1
@@ -68,7 +68,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -89,12 +89,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -106,7 +106,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             2
@@ -119,7 +119,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -140,12 +140,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="negative"
+            class="negative code-cell"
           >
             <span
               class="prefix"
             >
-              - 
+              -
             </span>
              
             <span
@@ -157,7 +157,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             
@@ -170,7 +170,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -190,12 +190,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="negative"
+            class="negative code-cell"
           >
             <span
               class="prefix"
             >
-              - 
+              -
             </span>
              
             <span
@@ -207,7 +207,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             
@@ -220,7 +220,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -240,12 +240,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="negative"
+            class="negative code-cell"
           >
             <span
               class="prefix"
             >
-              - 
+              -
             </span>
              
             <span
@@ -257,7 +257,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             
@@ -270,7 +270,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -290,12 +290,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -307,7 +307,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             3
@@ -320,7 +320,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -341,12 +341,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -357,7 +357,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num positive-line-num"
+            class="line-num positive-line-num code-cell"
           >
             
             4
@@ -370,7 +370,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-              + 
+              +
             </span>
              
             <span
@@ -391,12 +391,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -407,7 +407,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num positive-line-num"
+            class="line-num positive-line-num code-cell"
           >
             
             5
@@ -420,7 +420,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-              + 
+              +
             </span>
              
             <span
@@ -441,12 +441,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -458,7 +458,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             6
@@ -471,7 +471,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -492,12 +492,12 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -509,7 +509,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             7
@@ -522,7 +522,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -601,12 +601,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -619,7 +619,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             1
@@ -632,7 +632,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -654,12 +654,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -671,7 +671,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             2
@@ -684,7 +684,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -705,12 +705,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="negative"
+            class="negative code-cell"
           >
             <span
               class="prefix"
             >
-              - 
+              -
             </span>
              
             <span
@@ -722,7 +722,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             
@@ -735,7 +735,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -755,12 +755,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="negative"
+            class="negative code-cell"
           >
             <span
               class="prefix"
             >
-              - 
+              -
             </span>
              
             <span
@@ -772,7 +772,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             
@@ -785,7 +785,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -805,12 +805,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="negative"
+            class="negative code-cell"
           >
             <span
               class="prefix"
             >
-              - 
+              -
             </span>
              
             <span
@@ -822,7 +822,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             
@@ -835,7 +835,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -855,12 +855,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -872,7 +872,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             3
@@ -885,7 +885,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -906,12 +906,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -922,7 +922,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num positive-line-num"
+            class="line-num positive-line-num code-cell"
           >
             
             4
@@ -935,7 +935,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-              + 
+              +
             </span>
              
             <span
@@ -956,12 +956,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-              
+               
             </span>
              
             <span
@@ -972,7 +972,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num positive-line-num"
+            class="line-num positive-line-num code-cell"
           >
             
             5
@@ -985,7 +985,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-              + 
+              +
             </span>
              
             <span
@@ -1006,12 +1006,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -1023,7 +1023,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             6
@@ -1036,7 +1036,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -1057,12 +1057,12 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class=""
+            class="code-cell"
           >
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
@@ -1074,7 +1074,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
           </td>
            
           <td
-            class="line-num"
+            class="line-num code-cell"
           >
             
             7
@@ -1087,7 +1087,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
             <span
               class="prefix"
             >
-                
+               
             </span>
              
             <span
