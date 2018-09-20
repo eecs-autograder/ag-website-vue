@@ -7,8 +7,8 @@
     <TooltipDemo></TooltipDemo>
     <ModalDemo></ModalDemo>
     <ColorPaletteDemo></ColorPaletteDemo>
+    <DropdownDemo></DropdownDemo>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -36,9 +36,7 @@ import TooltipDemo from '@/demos/tooltip_demo.vue';
     TabsDemo, TooltipDemo, MultiFileViewerDemo, ModalDemo, ColorPaletteDemo
   }
 })
-export default class HelloWorld extends Vue {
-
-}
+export default class HelloWorld extends Vue {}
 </script>
 
 <style scoped lang="scss">
