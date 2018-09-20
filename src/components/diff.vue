@@ -173,25 +173,31 @@ export default class Diff extends Vue {
 
 .diff-headers {
   width: 100%;
-  display: flex;
 }
 
 .header {
-  flex: 1;
+  display: inline-block;
+  width: 50%;
 
   font-size: 20px;
   font-weight: 500;
   margin: 0;
-  padding: 18px 10px 18px 10px;
+  padding: 18px 0;
+
   text-align: center;
 }
 
 #diff-body-wrapper {
   overflow-y: scroll;
+  overflow-wrap: break-word;
 }
 
 #diff-body {
   width: 100%;
+}
+
+#diff-body > td {
+  max-width: 49%;
 }
 
 .line-num, .prefix, .content {
@@ -215,8 +221,9 @@ export default class Diff extends Vue {
 }
 
 .content {
-  white-space: pre;
+  white-space: pre-wrap;
   word-break: break-word;
+  word-wrap: break-word;
 }
 
 $negative-color: hsl(0, 100%, 95%);
