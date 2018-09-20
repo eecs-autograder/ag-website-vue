@@ -12,21 +12,22 @@
             <td :class="['line-num', line_num_highlighting[left_cell.prefix]]">
               {{left_cell.line_number}}
             </td>
-            <td :class="[content_highlighting[left_cell.prefix]]">
+            <td :class="[content_highlighting[left_cell.prefix], 'code-cell']">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these <span> elements.-->
-              <span class="prefix">{{left_cell.prefix}}</span>
+              <span class="prefix">{{left_cell.prefix !== null ? left_cell.prefix[0] : ' '}}</span>
               <span class="content">{{
-                show_whitespace_ ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
+                show_whitespace_ ? replace_whitespace(left_cell.content)
+                                   : left_cell.content}}</span>
             </td>
 
-            <td :class="['line-num', line_num_highlighting[right[i].prefix]]">
+            <td :class="['line-num', line_num_highlighting[right[i].prefix], 'code-cell']">
               {{right[i].line_number}}
             </td>
             <td :class="[content_highlighting[right[i].prefix]]">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these <span> elements.-->
-              <span class="prefix">{{right[i].prefix}}</span>
+              <span class="prefix">{{right[i].prefix !== null ? right[i].prefix[0] : ' '}}</span>
               <span class="content">{{
                 show_whitespace_ ? replace_whitespace(right[i].content) : right[i].content}}</span>
             </td>
@@ -189,21 +190,20 @@ export default class Diff extends Vue {
 
 #diff-body-wrapper {
   overflow-y: scroll;
-  overflow-wrap: break-word;
 }
 
 #diff-body {
   width: 100%;
 }
 
-#diff-body > td {
-  max-width: 49%;
+.code-cell {
+  width: 49%;
 }
 
 .line-num, .prefix, .content {
   margin: 0;
   padding: 5px 6px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Lucida Console", Consolas, "Courier New", Courier, monospace;
 }
 
 .line-num {
