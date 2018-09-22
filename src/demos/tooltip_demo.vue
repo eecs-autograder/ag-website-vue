@@ -95,8 +95,10 @@ export default class TooltipDemo extends Vue {
 </script>
 
 <style scoped lang="scss">
-  .tooltip-example {
-    display: inline-block;
-    margin: 80px 100px;
-  }
+
+.tooltip-example {
+  display: inline-block;
+  margin: 80px 100px;
+}
+
 </style>
