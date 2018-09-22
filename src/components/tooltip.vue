@@ -145,7 +145,7 @@
     text-align: center;
     transition: opacity 0.3s;
     word-wrap: break-word;
-    z-index: 0;
+    z-index: 1;
   }
 
   .placement-left {
