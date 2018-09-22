@@ -99,41 +99,41 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  .close-x {
-    color: $none-correct-color;
-    cursor: pointer;
-    display: inline-block;
-    margin-bottom: 0;
-    position: absolute;
-    right: 15px;
-    top: 12px;
-  }
+.close-x {
+  color: $none-correct-color;
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 0;
+  position: absolute;
+  right: 15px;
+  top: 12px;
+}
 
-  .close-x:hover {
-    color: $none-correct-hover-color;
-  }
+.close-x:hover {
+  color: $none-correct-hover-color;
+}
 
-  .tab-body {
-    background-color: white;
-    border: 2px solid hsl(210, 11%, 90%);
-    bottom: 0;
-    color: #24292e;
-    min-width: 800px;
-    position: relative;
-    z-index: 15;
-  }
+.tab-body {
+  background-color: white;
+  border: 2px solid hsl(210, 11%, 90%);
+  bottom: 0;
+  color: #24292e;
+  min-width: 800px;
+  position: relative;
+  z-index: 15;
+}
 
-  .tab-header {
-    margin: 0;
-  }
+.tab-header {
+  margin: 0;
+}
 
-  .tab-label {
-    display: inline-block;
-    font-family: "Helvetica Neue", Helvetica;
-    margin: 0;
-    padding-right: 25px;
-  }
+.tab-label {
+  display: inline-block;
+  font-family: "Helvetica Neue", Helvetica;
+  margin: 0;
+  padding-right: 25px;
+}
 
 </style>

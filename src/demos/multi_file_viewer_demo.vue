@@ -120,53 +120,53 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  p {
-    background-color: $medium-dark-blue;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    display: inline-block;
-    margin-right: 10px;
-    padding: 20px;
-  }
+p {
+  background-color: $medium-dark-blue;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 20px;
+}
 
-  .mvf-container {
-    width: 90%;
-  }
+.mvf-container {
+  width: 90%;
+}
 
-  .faux-incorrect-row {
-    height: 40px;
-    border-radius: 5px;
-    background-color: $third-red;
-    margin-top: 30px;
-    width: 90%;
-  }
+.faux-incorrect-row {
+  height: 40px;
+  border-radius: 5px;
+  background-color: $third-red;
+  margin-top: 30px;
+  width: 90%;
+}
 
-  .faux-incorrect-row:hover {
-    background-color: $none-correct-hover-color;
-  }
+.faux-incorrect-row:hover {
+  background-color: $none-correct-hover-color;
+}
 
-  .faux-correct-row {
-    height: 40px;
-    border-radius: 5px;
-    background-color: hsl(212, 100%, 90%);
-    margin-top: 30px;
-    width: 90%;
-  }
+.faux-correct-row {
+  height: 40px;
+  border-radius: 5px;
+  background-color: hsl(212, 100%, 90%);
+  margin-top: 30px;
+  width: 90%;
+}
 
-  .faux-unavailable-row {
-    height: 40px;
-    border-radius: 5px;
-    background-color: hsl(210, 12%, 93%);
-    margin-top: 30px;
-    width: 90%;
-  }
+.faux-unavailable-row {
+  height: 40px;
+  border-radius: 5px;
+  background-color: hsl(210, 12%, 93%);
+  margin-top: 30px;
+  width: 90%;
+}
 
-  .letters {
-    background-color: $mello-yello;
-    color: black;
-  }
+.letters {
+  background-color: $mello-yello;
+  color: black;
+}
 
 </style>
