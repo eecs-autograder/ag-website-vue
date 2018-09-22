@@ -1,6 +1,7 @@
 <template>
 
   <div>
+    <MultiFileViewerDemo></MultiFileViewerDemo>
     <ButtonDemo></ButtonDemo>
     <DiffDemo></DiffDemo>
     <TabsDemo></TabsDemo>
@@ -25,7 +26,7 @@ import TooltipDemo from '@/demos/tooltip_demo.vue';
 
 @Component({
   components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, MultiFileViewerDemo, TabsDemo,
-    TooltipDemo}
+               TooltipDemo}
 })
 export default class HelloWorld extends Vue {
 }
