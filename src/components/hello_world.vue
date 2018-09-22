@@ -19,11 +19,13 @@ import ViewFile from '@/components/view_file.vue';
 
 import ButtonDemo from '@/demos/button_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
+import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
 
 @Component({
-  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, TabsDemo, TooltipDemo}
+  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, MultiFileViewerDemo, TabsDemo,
+    TooltipDemo}
 })
 export default class HelloWorld extends Vue {
 }

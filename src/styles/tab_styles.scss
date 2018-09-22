@@ -100,7 +100,36 @@
     color: black;
 }
 
-/* ---------------- White ---------------- */
+/* -------------- No Border ------------- */
+
+.gray-white-theme-active {
+    @extend %in-front-of-the-border;
+    background-color: white;
+    border: 2px solid hsl(210, 11%, 90%);
+    border-bottom: none;
+    box-shadow: inset 0 0 0 4px white;
+    color: black;
+}
+
+.gray-white-theme-inactive:hover {
+    @extend %behind-the-border;
+    background-color: hsl(210, 12%, 93%);
+    border: 2px solid hsl(210, 12%, 93%);
+    border-bottom: none;
+    box-shadow: inset 0 0 0 4px hsl(210, 12%, 93%);
+    color: black;
+}
+
+.gray-white-theme-inactive {
+    @extend %behind-the-border;
+    background-color: hsl(210, 11%, 95%);
+    border: 2px solid hsl(210, 11%, 95%);
+    border-bottom: none;
+    box-shadow: inset 0 0 0 4px hsl(210, 11%, 95%);
+    color: black;
+}
+
+/* -------------- No Border ------------- */
 
 .no-border-active {
     background-color: $light-gray;

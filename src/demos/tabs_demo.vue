@@ -6,6 +6,7 @@
 
       <br> <br>
       <div class="shrink-tabs">
+        <p> Current Tab Index = {{current_tab_index}}</p>
         <tabs ref="tabs" v-model="current_tab_index"
               tab_active_class="no-border-active"
               tab_inactive_class="no-border-inactive">
@@ -20,7 +21,7 @@
             </template>
             <template slot="body">
               <div class="tab-body">
-                Tab {{tab_val}} body
+                {{tab_val}}
               </div>
             </template>
           </tab>
@@ -37,7 +38,6 @@
             </template>
             <template slot="body">
               <div class="tab-body2">
-                Hi 1
               </div>
             </template>
           </tab>
@@ -60,13 +60,15 @@
 </template>
 
 <script lang="ts">
+
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import Tab from '@/components/tabs/tab.vue';
   import Tabs from '@/components/tabs/tabs.vue';
+  import ViewFile from '@/components/view_file.vue';
 
   @Component({
-    components: {Tabs, Tab}
+    components: {Tabs, Tab, ViewFile}
   })
   export default class TabsDemo extends Vue {
     log_event(e: Event) {
