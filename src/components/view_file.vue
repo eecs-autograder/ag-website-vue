@@ -59,6 +59,7 @@
 
   #scrollable-container {
     margin: 0;
+    height: 100%;
     overflow: scroll;
     padding: 0;
     position: relative;
