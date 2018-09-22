@@ -23,13 +23,14 @@ import ButtonDemo from '@/demos/button_demo.vue';
 import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import ModalDemo from '@/demos/modal_demo.vue';
+import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
 
 @Component({
   components: {
     Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo,
-    TabsDemo, TooltipDemo, ModalDemo, ColorPaletteDemo
+    TabsDemo, TooltipDemo, MultiFileViewerDemo, ModalDemo, ColorPaletteDemo
   }
 })
 export default class HelloWorld extends Vue {

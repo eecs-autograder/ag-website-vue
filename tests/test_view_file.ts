@@ -9,20 +9,20 @@ describe('ViewFile.vue', () => {
         const wrapper = mount(ViewFile, {
             propsData: {
                 incoming_filename: filename,
-                incoming_file_content: content
+                incoming_file_contents: content
             }
         });
 
         const vm = wrapper.vm;
         expect(vm.$data.filename).toBe(filename);
-        expect(vm.$data.file_content).toBe(content);
+        expect(vm.$data.file_contents).toBe(content);
     });
 
     test('File content and line numbers displayed in order', () => {
         const wrapper = mount(ViewFile, {
             propsData: {
                 incoming_filename: 'filename',
-                incoming_file_content: 'line one\nline two'
+                incoming_file_contents: 'line one\nline two'
             }
         });
 
