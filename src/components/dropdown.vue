@@ -1,5 +1,6 @@
 <template>
   <div class="outermost-dropdown-container">
+
     <div class="dropdown-container"
          tabindex="1"
          @keydown="move_highlighted($event)"
@@ -10,11 +11,11 @@
       </div>
 
       <div class="dropdown-content" :style="content_styling">
-        <a v-for="(item, index) of items"
+        <div class="dropdown-row" v-for="(item, index) of items"
         @click="choose_item_from_dropdown_menu(item, index)"
         :id="index === highlighted_index ? 'highlight' : ''">
-        {{item}}
-        </a>
+          <slot v-bind="item">  </slot>
+        </div>
       </div>
     </div>
   </div>
@@ -27,10 +28,10 @@
   export default class Dropdown extends Vue {
 
     @Prop({required: true, type: Array})
-    incoming_items!: string[];
+    incoming_items!: object[];
 
-    @Prop({default: "", type: String})
-    incoming_chosen_item!: string;
+    @Prop({default: 0, type: Number})
+    highlighted_index_in!: number;
 
     @Prop({default: "", type: String})
     dropdown_content_min_width!: string;
@@ -38,9 +39,9 @@
     @Prop({default: "", type: String})
     dropdown_content_max_width!: string;
 
-    chosen_item: string = "";
+    chosen_item: object = {};
     highlighted_index = 0;
-    items: string[] = [];
+    items: object[] = [];
     content_min_width = "";
     content_max_width = "";
     content_styling = {};
@@ -48,9 +49,7 @@
 
     created() {
       this.items = this.incoming_items;
-      this.chosen_item = this.incoming_chosen_item === ""
-        ? this.items[0] : this.incoming_chosen_item;
-      this.highlighted_index = this.items.findIndex(item => item === this.chosen_item);
+      this.highlighted_index = this.highlighted_index_in;
       this.content_min_width = this.dropdown_content_min_width;
       this.content_max_width = this.dropdown_content_max_width;
       this.add_styling();
@@ -105,8 +104,8 @@
       this.invoke_blur_on_dropdown();
     }
 
-    choose_item_from_dropdown_menu(item_selected: string, index: number) {
-      if (item_selected) {
+    choose_item_from_dropdown_menu(item_selected: object, index: number) {
+      if (item_selected !== undefined) {
         this.chosen_item = item_selected;
         this.highlighted_index = index;
         this.$emit("update_item_selected", item_selected);
@@ -179,14 +178,14 @@
   .dropdown-content {
     background-color: white;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    display: none;
+    display: block;
     margin-top: 0px;
     width: 100%;
     position: absolute;
     z-index: 1;
   }
 
-  .dropdown-content a {
+  .dropdown-row {
     border-top: 1px solid $light-gray;
     color: black;
     cursor: pointer;
@@ -198,11 +197,11 @@
     text-decoration: none;
   }
 
-  .dropdown-content a:first-child {
+  .dropdown-row:first-child {
     border-top: none;
   }
 
-  .dropdown-content a:hover {
+  .dropdown-row:hover {
     background-color: hsl(210, 13%, 95%);
   }
 
@@ -216,6 +215,10 @@
 
   .outermost-dropdown-container {
     display: inline-block;
+  }
+
+  .chosen {
+    background-color: #ace7c9;
   }
 
 </style>

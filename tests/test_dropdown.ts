@@ -30,7 +30,6 @@ describe('Dropdown.vue', () => {
         const wrapper = mount(WrapperComponent);
         let dropdown_menu_container = wrapper.find({ref: 'dropdown_example_1'});
         expect(dropdown_menu_container.vm.$data.items).toEqual(wrapper.vm.$data.food);
-        expect(dropdown_menu_container.vm.$data.chosen_item).toEqual(wrapper.vm.$data.food[0]);
         expect(dropdown_menu_container.vm.$data.content_min_width).toEqual("");
         expect(dropdown_menu_container.vm.$data.content_max_width).toEqual("");
         expect(dropdown_menu_container.vm.$data.content_styling).toEqual({});
@@ -63,7 +62,6 @@ describe('Dropdown.vue', () => {
         const wrapper = mount(WrapperComponent);
         let dropdown_component = wrapper.find({ref: 'dropdown_example_1'});
         expect(dropdown_component.vm.$data.items).toEqual(wrapper.vm.$data.cakes);
-        expect(dropdown_component.vm.$data.chosen_item).toEqual(wrapper.vm.$data.cakes[0]);
         expect(dropdown_component.vm.$data.content_min_width).toEqual("200px");
         expect(dropdown_component.vm.$data.content_max_width).toEqual("");
         expect(dropdown_component.vm.$data.content_styling).toEqual(
@@ -107,7 +105,6 @@ describe('Dropdown.vue', () => {
         const wrapper = mount(WrapperComponent);
         let dropdown_component = wrapper.find({ref: 'dropdown_example_1'});
         expect(dropdown_component.vm.$data.items).toEqual(wrapper.vm.$data.letters);
-        expect(dropdown_component.vm.$data.chosen_item).toEqual(wrapper.vm.$data.letters[0]);
         expect(dropdown_component.vm.$data.content_min_width).toEqual("");
         expect(dropdown_component.vm.$data.content_max_width).toEqual("100px");
         expect(dropdown_component.vm.$data.content_styling).toEqual(
@@ -130,26 +127,38 @@ describe('Dropdown.vue', () => {
                  <template slot="header">
                   <p ref="dropdown_header"> States that Start with M </p>
                  </template>
-                </dropdown>`,
+                  <div slot-scope="state">
+                    <span> {{state.name}} </span>
+                  </div>
+                 </dropdown>`,
             components: {
                 'dropdown': Dropdown
             }
         })
 
         class WrapperComponent extends Vue {
-            states = ["Missouri", "Mississippi", "Minnesota", "Massachusetts", "Maine",
-                      "Montana", "Michigan", "Maryland"];
+            states = [{name: "Missouri"},
+                      {name: "Mississippi"},
+                      {name: "Minnesota"},
+                      {name: "Massachusetts"},
+                      {name: "Maine"},
+                      {name: "Montana"},
+                      {name: "Michigan"},
+                      {name: "Maryland"}
+                      ];
         }
 
         const wrapper = mount(WrapperComponent);
 
         let dropdown_component = wrapper.find({ref: 'dropdown_example_2'});
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu_content = dropdown_component.find(".dropdown-content");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
         dropdown_header.trigger('click');
+
+        console.log(dropdown_menu_content.html());
 
         expect(dropdown_menu_content.element.children.length).toEqual(
             wrapper.vm.$data.states.length
@@ -204,6 +213,9 @@ describe('Dropdown.vue', () => {
                     <template slot="header">
                       <p ref="dropdown_header"> States that Start with M </p>
                     </template>
+                    <div slot-scope="state">
+                      <span> {{state.name}} </span>
+                    </div>
                   </dropdown>
                   <p v-for="state of selected_states"> {{ state }} </p>
                 </div>`,
@@ -213,7 +225,9 @@ describe('Dropdown.vue', () => {
         })
 
         class WrapperComponent extends Vue {
-            states = ["Missouri", "Mississippi"];
+            states = [{name: "Missouri"},
+                      {name: "Mississippi"}
+                     ];
 
             selected_states: string[] = [];
 
@@ -252,7 +266,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.element.style.display).toEqual("none");
 
         expect(wrapper.vm.$data.selected_states.length).toEqual(1);
-        expect(wrapper.vm.$data.selected_states[0]).toEqual("Missouri");
+        expect(wrapper.vm.$data.selected_states[0].name).toEqual("Missouri");
     });
 
     test('Pressing enter emits the selected item and closes the menu', () => {
@@ -265,6 +279,9 @@ describe('Dropdown.vue', () => {
                     <template slot="header">
                       <p ref="dropdown_header"> States that Start with M </p>
                     </template>
+                    <div slot-scope="state">
+                      <span> {{state.name}} </span>
+                    </div>
                   </dropdown>
                   <p v-for="state of selected_states"> {{ state }} </p>
                 </div>`,
@@ -274,7 +291,9 @@ describe('Dropdown.vue', () => {
         })
 
         class WrapperComponent extends Vue {
-            states = ["Missouri", "Mississippi"];
+            states = [{name: "Missouri"},
+                      {name: "Mississippi"}
+            ];
 
             selected_states: string[] = [];
 
@@ -314,7 +333,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.element.style.display).toEqual("none");
 
         expect(wrapper.vm.$data.selected_states.length).toEqual(1);
-        expect(wrapper.vm.$data.selected_states[0]).toEqual("Mississippi");
+        expect(wrapper.vm.$data.selected_states[0].name).toEqual("Mississippi");
     });
 
     test('Buttons can be used in the header slot', () => {
@@ -322,16 +341,18 @@ describe('Dropdown.vue', () => {
         @Component({
             template: `<div class="surround-2">
                         <dropdown ref="dropdown_on_a_button"
-                                  :incoming_items="names"
-                                  :incoming_chosen_item="chosen_name"
-                                  @update_item_selected="update_name($event)">
+                                  :incoming_items="employees"
+                                  @update_item_selected="update_employee($event)">
                           <template slot="header">
                             <button ref="dropdown_header"
                                     class="header-button"
                                     @focus="transfer_focus_to_parent()">
-                              {{ chosen_name }}
+                              {{chosen_employee.last_name}}, {{chosen_employee.first_name}}
                             </button>
                           </template>
+                          <div slot-scope="employee">
+                           <span> {{employee.last_name}} </span>
+                          </div>
                         </dropdown>
                        </div>`,
             components: {
@@ -341,12 +362,17 @@ describe('Dropdown.vue', () => {
 
         class WrapperComponent extends Vue {
 
-            names = ["Elora", "Brittany", "Sam", "Jordan", "Michelle"];
+            employees = [{first_name: "Elora", last_name: "Blue"},
+                         {first_name: "Brittany", last_name: "Cost"},
+                         {first_name: "Sam", last_name: "Sanchez"},
+                         {first_name: "Jordan", last_name: "Johnson"},
+                         {first_name: "Michelle", last_name: "Smith"}
+                        ];
 
-            chosen_name = "Brittany";
+            chosen_employee = {first_name: "Michelle", last_name: "Smith"};
 
-            update_name(name_in: string) {
-                this.chosen_name = name_in;
+            update_employee(employee_in: {first_name: string, last_name: string}) {
+                this.chosen_employee = employee_in;
             }
 
             transfer_focus_to_parent() {
@@ -357,39 +383,36 @@ describe('Dropdown.vue', () => {
 
         const wrapper = mount(WrapperComponent);
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu = wrapper.find({ref: 'dropdown_on_a_button'});
+
+        let dropdown_menu_content = dropdown_menu.find('.dropdown-content');
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
         dropdown_header.trigger('click');
 
-        // let focused_element = document.activeElement;
-        // expect(document.activeElement).toEqual(dropdown_menu_content);
+        console.log(wrapper.html());
 
-        // expect(dropdown_menu_content.element.hasAttribute("focus"));
+        let highlighted_item = wrapper.find("#highlight");
+        expect(highlighted_item.text()).toContain("Blue");
 
-        expect(dropdown_menu_content.element.style.display).toEqual("block");
+        expect(dropdown_menu.vm.$data.highlighted_index).toEqual(0);
 
-        expect(wrapper.vm.$data.chosen_name).toEqual("Brittany");
-
-        let highlighted_name = wrapper.find('#highlight');
-
-        expect(highlighted_name.text()).toContain("Brittany");
-
-        expect(dropdown_menu_content.text()).toContain("Elora");
-        expect(dropdown_menu_content.text()).toContain("Brittany");
-        expect(dropdown_menu_content.text()).toContain("Sam");
-        expect(dropdown_menu_content.text()).toContain("Jordan");
-        expect(dropdown_menu_content.text()).toContain("Michelle");
+        expect(dropdown_menu_content.text()).toContain("Blue");
+        expect(dropdown_menu_content.text()).toContain("Cost");
+        expect(dropdown_menu_content.text()).toContain("Sanchez");
+        expect(dropdown_menu_content.text()).toContain("Johnson");
+        expect(dropdown_menu_content.text()).toContain("Smith");
 
         dropdown_menu_content.trigger('keydown', { code: 'ArrowDown' });
+        expect(dropdown_menu.vm.$data.highlighted_index).toEqual(1);
         dropdown_menu_content.trigger('keydown', { code: 'Enter' });
 
         expect(dropdown_menu_content.element.style.display).toEqual("none");
 
-        // expect(dropdown_menu_content.element.hasAttribute("blur"));
+        expect(dropdown_menu_content.element.hasAttribute("blur"));
 
-        expect(wrapper.vm.$data.chosen_name).toEqual("Sam");
+        expect(wrapper.vm.$data.chosen_employee.last_name).toBe("Cost");
 
     });
 
@@ -405,6 +428,10 @@ describe('Dropdown.vue', () => {
                               Chooses a Color
                             </p>
                           </template>
+                          <template slot-scope="color">
+                            <div class="swatch" :style="{ background: color.hex }"></div>
+                            <span>{{color.name}}</span>
+                          </template>
                         </dropdown>
                         <p class="hello-para"> Hello </p>
                        </div>`,
@@ -415,8 +442,10 @@ describe('Dropdown.vue', () => {
 
         class WrapperComponent extends Vue {
 
-            colors = ["Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet"];
-
+            colors = [{ name: "Red", hex: "#FF0000"},
+                      { name: "Green", hex: "#00FF00"},
+                      { name: "Blue", hex: "#0000FF"}
+                     ];
         }
 
         const wrapper = mount(WrapperComponent);
@@ -458,6 +487,11 @@ describe('Dropdown.vue', () => {
                               Chooses a Color
                             </p>
                           </template>
+                          <template slot-scope="color">
+                            <div class="swatch" :style="{ background: color.hex }"></div>
+                            <span>{{color.name}}</span>
+                          </template>
+                        </dropdown>
                         </dropdown>
                        </div>`,
             components: {
@@ -467,7 +501,10 @@ describe('Dropdown.vue', () => {
 
         class WrapperComponent extends Vue {
 
-            colors = ["Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet"];
+            colors = [{ name: "Red", hex: "#FF0000"},
+                      { name: "Green", hex: "#00FF00"},
+                      { name: "Blue", hex: "#0000FF"}
+            ];
 
         }
 
@@ -487,11 +524,10 @@ describe('Dropdown.vue', () => {
 
         dropdown_menu_content.trigger('keydown', { code: 'ArrowDown'});
         dropdown_menu_content.trigger('keydown', { code: 'ArrowDown'});
-        dropdown_menu_content.trigger('keydown', { code: 'ArrowDown'});
 
         highlighted_color = wrapper.find('#highlight');
 
-        expect(highlighted_color.text()).toContain("Green");
+        expect(highlighted_color.text()).toContain("Blue");
 
         dropdown_menu_content.trigger('keydown', { code: 'Escape'});
 
