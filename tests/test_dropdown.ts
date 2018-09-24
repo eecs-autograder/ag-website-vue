@@ -158,8 +158,6 @@ describe('Dropdown.vue', () => {
 
         dropdown_header.trigger('click');
 
-        console.log(dropdown_menu_content.html());
-
         expect(dropdown_menu_content.element.children.length).toEqual(
             wrapper.vm.$data.states.length
         );
@@ -390,8 +388,6 @@ describe('Dropdown.vue', () => {
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
         dropdown_header.trigger('click');
-
-        console.log(wrapper.html());
 
         let highlighted_item = wrapper.find("#highlight");
         expect(highlighted_item.text()).toContain("Blue");
