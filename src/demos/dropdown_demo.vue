@@ -3,18 +3,22 @@
 
     <dropdown ref="dropdown_menu_ex_1"
               :incoming_items="menu_items"
-              :incoming_chosen_item="selected_choice"
+              :highlighted_index_in="1"
               dropdown_content_min_width = "130px"
               dropdown_content_max_width = "180px"
               @update_item_selected="add_item_1($event)">
       <template slot="header">
         <p class="header-para">
-          {{selected_choice}}
+          {{selected_menu_item.option}}
         </p>
+      </template>
+      <template slot-scope="menu_item">
+         <div class="airplane"><i class="fas fa-plane"></i></div>
+         <span> {{menu_item.option}} </span>
       </template>
     </dropdown>
 
-    <p v-for="item of chosen_items_1"> {{item}}</p>
+    <p v-for="item of chosen_items_1"> {{item.option}}</p>
 
   <div class="surround-2">
     <dropdown ref="dropdown_menu_ex_2"
@@ -26,27 +30,31 @@
           Menu On A Button
         </button>
       </template>
+      <div slot-scope="employee">
+        <span> {{employee.first_name}} </span>
+        <!--<span> {{employee.last_name}} </span>-->
+      </div>
     </dropdown>
   </div>
 
-    <p v-for="item of chosen_items_2"> {{item}}</p>
+    <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}}</p>
 
-    <div class="surround-3">
-      <dropdown ref="dropdown_menu_ex_3"
-                :incoming_items="names"
-                @update_item_selected="add_item_3($event)">
-        <template slot="header">
-          <input class="header-input"
-                 type="text"
-                 placeholder="Enter a Name"
-                 @blur ="hide_the_dropdown_3()"
-                 @focus ="show_the_dropdown_3()">
-        </template>
-      </dropdown>
+    <!--<div class="surround-3">-->
+      <!--<dropdown ref="dropdown_menu_ex_3"-->
+                <!--:incoming_items="names"-->
+                <!--@update_item_selected="add_item_3($event)">-->
+        <!--<template slot="header">-->
+          <!--<input class="header-input"-->
+                 <!--type="text"-->
+                 <!--placeholder="Enter a Name"-->
+                 <!--@blur ="hide_the_dropdown_3()"-->
+                 <!--@focus ="show_the_dropdown_3()">-->
+        <!--</template>-->
+      <!--</dropdown>-->
 
-      <p v-for="item of chosen_items_3"> {{item}}</p>
+      <!--<p v-for="item of chosen_items_3"> {{item}}</p>-->
 
-  </div>
+  <!--</div>-->
 
   <ul class="web-menu">
     <li class="menu-option"> <p> Home </p> </li>
@@ -56,6 +64,9 @@
         <li class="menu-option navy-tile">
           <p> Products </p>
         </li>
+      </template>
+      <template slot-scope="food_item">
+        <p class="food"> {{food_item.name}}</p>
       </template>
     </dropdown>
     <li class="menu-option"> <p> Contact </p> </li>
@@ -76,29 +87,45 @@
 
     selected_choice = "5 Passengers";
 
-    menu_items = ["1 Passenger", "2 Passengers", "3 Passengers", "4 Passengers", "5 Passengers",
-                  "6 Passengers", "7 Passengers", "8 Passengers", "9 Passengers"];
+    menu_items = [{ option: "1 Passenger" },
+                  { option: "2 Passengers" },
+                  { option: "3 Passengers" },
+                  { option: "4 Passengers" },
+                  { option: "5 Passengers" },
+                  { option: "6 Passengers" },
+                  { option: "7 Passengers" },
+                  { option: "8 Passengers" },
+                  { option: "9 Passengers" }
+                 ];
 
-    names = ["Elora", "Brittany", "Sam", "Jordan", "Michelle"];
+    selected_menu_item = { option: "2 Passengers" };
 
-    food_menu_items = ["Cheeseburger", "Fries", "Shake"];
+    names = [{ first_name: "Elora", last_name: "Blue"},
+             { first_name: "Brittany", last_name: "Cost"},
+             { first_name: "Sam", last_name: "Sanchez"},
+             { first_name: "Jordan", last_name: "Johnson"},
+             { first_name: "Michelle", last_name: "Brandt"}
+            ];
 
-    add_item_1(item: string) {
-      this.selected_choice = item;
+    food_menu_items = [{name: "Cheeseburger"},
+                       {name: "Fries"},
+                       {name: "Shake"}
+                      ];
+
+    add_item_1(item: {option: string}) {
+      this.selected_menu_item = item;
       this.chosen_items_1.push(item);
     }
 
     add_item_2(item: string) {
-      console.log("Adding via parent");
       this.chosen_items_2.push(item);
     }
 
     add_item_3(item: string) {
-      console.log("Adding via parent");
       this.chosen_items_3.push(item);
     }
 
-    chosen_items_1: string[] = [];
+    chosen_items_1: object[] = [];
     chosen_items_2: string[] = [];
     chosen_items_3: string[] = [];
 
@@ -122,6 +149,11 @@
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
+  .food {
+    margin: 0;
+    padding-top: 2px;
+  }
+
   .header-para {
     background-color: cornflowerblue;
     border: none;
@@ -141,17 +173,20 @@
     color: white;
     cursor: pointer;
     margin: 0;
-    padding: 10px;
+    padding: 10px 20px 10px 20px;
+    font-size: 14px;
   }
 
   .surround-2 {
-    margin-left: 500px;
+    margin-top: 100px;
   }
 
   .header-input {
     background-color: lightgray;
     border: ghostwhite;
     padding: 10px;
+    height: 20px;
+    font-size: 14px;
   }
 
   .header-input:focus {
@@ -176,5 +211,12 @@
     color: white;
   }
 
+
+  .airplane {
+    margin-left: 5px;
+    margin-right: 10px;
+    display: inline-block;
+    color: coral;
+  }
 
 </style>
