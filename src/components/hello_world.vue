@@ -31,7 +31,6 @@ import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 =======
 >>>>>>> Removed 'chosen_item' from the dropdown_component. Added a scoped slot in the v-for of the dropdown component so that dropdown content rows can be personalized in the parent component. Updated the tests in test_dropdown.ts to reflect these changes.
 import TabsDemo from '@/demos/tabs_demo.vue';
-import TodoListDemo from '@/demos/todo_list_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
 
 @Component({
