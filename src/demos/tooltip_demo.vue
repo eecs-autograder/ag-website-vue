@@ -63,21 +63,18 @@
 
     <div class="tooltip-example">
       <p>
-        Large
+        Large and overlap
         <tooltip width="large" placement="right">
           This is a large tooltip. It is rather large, wouldn't you say?
+          It also overlaps content to the right.
         </tooltip>
       </p>
     </div>
     <div class="tooltip-example">
-      <span>
-        Overlap
-        <tooltip width="large" placement="right">
-          This tooltip overlaps content on the right
-        </tooltip>
-      </span>
-
-      <span>This will get covered</span>
+      This gets covered
+      <tooltip width="large" placement="right">
+        This tooltip overlaps content on the right
+      </tooltip>
     </div>
   </div>
 </template>
