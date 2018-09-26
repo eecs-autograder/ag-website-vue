@@ -25,10 +25,10 @@
 
 .gray-theme-inactive {
     @extend %behind-the-border;
-    background-color: $lighter-gray;
-    border: 2px solid $lighter-gray;
+    background-color: $pebble-medium;
+    border: 2px solid $pebble-medium;
     border-bottom: none;
-    box-shadow: inset 0 0 0 4px $lighter-gray;
+    box-shadow: inset 0 0 0 4px $pebble-medium;
     color: slategrey;
 };
 
@@ -47,7 +47,7 @@
 .blue-theme-active {
     @extend %in-front-of-the-border;
     background-color: white;
-    border: 2px solid $medium-dark-blue;
+    border: 2px solid $ocean-blue;
     border-bottom: none;
     box-shadow: inset 0 0 0 4px white;
     color: black;
@@ -76,7 +76,7 @@
 .white-theme-active {
     @extend %in-front-of-the-border;
     background-color: white;
-    border: 2px solid $light-gray;
+    border: 2px solid $pebble-dark;
     border-bottom: none;
     box-shadow: inset 0 0 0 4px white;
     color: black;
@@ -93,20 +93,20 @@
 
 .white-theme-inactive:hover {
     @extend %behind-the-border;
-    background-color: $light-gray;
-    border: 2px solid $light-gray;
+    background-color: $pebble-dark;
+    border: 2px solid $pebble-dark;
     border-bottom: none;
-    box-shadow: inset 0 0 0 4px $light-gray;
+    box-shadow: inset 0 0 0 4px $pebble-dark;
     color: black;
 }
 
 /* ---------------- White ---------------- */
 
 .no-border-active {
-    background-color: $light-gray;
-    border: 2px solid $light-gray;
+    background-color: $pebble-dark;
+    border: 2px solid $pebble-dark;
     border-bottom: none;
-    box-shadow: inset 0 0 0 4px $light-gray;
+    box-shadow: inset 0 0 0 4px $pebble-dark;
     color: black;
 }
 
@@ -119,9 +119,9 @@
 }
 
 .no-border-inactive:hover {
-    background-color: $lighter-gray;
-    border: 2px solid $lighter-gray;
+    background-color: $pebble-medium;
+    border: 2px solid $pebble-medium;
     border-bottom: none;
-    box-shadow: inset 0 0 0 4px $lighter-gray;
+    box-shadow: inset 0 0 0 4px $pebble-medium;
     color: black;
 }
