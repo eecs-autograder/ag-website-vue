@@ -6,7 +6,8 @@
     <DiffDemo></DiffDemo>
     <TabsDemo></TabsDemo>
     <TooltipDemo></TooltipDemo>
-  </div>
+    <ViewFileDemo></ViewFileDemo>
+ </div>
 
 </template>
 
@@ -23,6 +24,7 @@ import DiffDemo from '@/demos/diff_demo.vue';
 import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
+import ViewFileDemo from '@/demos/view_file_demo.vue';
 
 @Component({
   components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, MultiFileViewerDemo, TabsDemo,
