@@ -48,7 +48,7 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
   #viewing-container {
     border-radius: 0 0 3px 3px;
@@ -65,37 +65,38 @@
     width: 100%;
   }
 
-  .line-numbers-container {
-    position: absolute;
-    vertical-align: top;
-    width: 51px;
-  }
+.line-numbers-container {
+  position: absolute;
+  vertical-align: top;
+  user-select: none;
+  width: 51px;
+}
 
-  .line-number {
-    color: $baking-pan;
-    font-size: 13px;
-    padding: 1px 0 1px 0;
-    text-align: center;
-    z-index: 10;
-    height: 16px;
-  }
+.line-number {
+  color: $baking-pan;
+  font-size: 13px;
+  padding: 1px 0 1px 0;
+  text-align: center;
+  z-index: 10;
+  height: 16px;
+}
 
-  .file-content-container {
-    color: black;
-    display: inline-block;
-    position: relative;
-    vertical-align: top;
-  }
+.file-content-container {
+  color: black;
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+}
 
-  .line-of-file-content {
-    font-size: 13px;
-    height: 16px;
-    margin: 0;
-    padding: 1px 10px 1px 0;
-  }
+.line-of-file-content {
+  font-size: 13px;
+  height: 16px;
+  margin: 0;
+  padding: 1px 10px 1px 0;
+}
 
-  .line-of-file-content:last-child {
-    margin-bottom: 5px;
-  }
+.line-of-file-content:last-child {
+  margin-bottom: 5px;
+}
 
 </style>
