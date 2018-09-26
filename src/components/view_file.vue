@@ -50,20 +50,20 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
-  #viewing-container {
-    border-radius: 0 0 3px 3px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    padding: 10px 0 0 0;
-    width: 100%;
-  }
+#viewing-container {
+  border-radius: 0 0 3px 3px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 10px 0 0 0;
+  width: 100%;
+}
 
-  #scrollable-container {
-    margin: 0;
-    overflow: scroll;
-    padding: 0;
-    position: relative;
-    width: 100%;
-  }
+#scrollable-container {
+  margin: 0;
+  overflow: scroll;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
 
 .line-numbers-container {
   position: absolute;

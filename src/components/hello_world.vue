@@ -6,7 +6,8 @@
     <DiffDemo></DiffDemo>
     <TabsDemo></TabsDemo>
     <TooltipDemo></TooltipDemo>
-  </div>
+    <ViewFileDemo></ViewFileDemo>
+ </div>
 
 </template>
 
