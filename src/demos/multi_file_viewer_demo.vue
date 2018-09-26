@@ -63,12 +63,12 @@
 
     open_file(file_in: string) {
       let mfv = <MultiFileViewer> this.$refs.multi_file;
-      mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
+      mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
     }
 
     open_file2(file_in: string) {
       let mfv = <MultiFileViewer> this.$refs.multi_file;
-      mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
+      mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
     }
 
     height_of_view_file = {

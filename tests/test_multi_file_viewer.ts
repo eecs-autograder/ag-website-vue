@@ -7,6 +7,38 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+@Component({
+    template:  `<div>
+                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
+                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
+                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
+                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
+                          </p>
+                          <div class="mvf-container">
+                            <multi_file_viewer
+                              ref="multi_file">
+                            </multi_file_viewer>
+                          </div>
+                        </div>`,
+    components: {
+        'multi_file_viewer': MultiFileViewer
+    }
+})
+class WrapperComponent extends Vue {
+
+    files_and_content = new Map<string, string>([
+        ['Kiwi', 'Kiwi Body'],
+        ['Lime', 'Lime Body'],
+        ['Mango', 'Mango Body'],
+        ['Nectarine', 'Nectarine Body']
+    ]);
+
+    open_file(file_in: string) {
+        let mfv = <MultiFileViewer> this.$refs.multi_file;
+        mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
+    }
+}
+
 describe('MultiFileViewer.vue', () => {
 
     test('MultiFileViewer data set to values passed in by parent', () => {
@@ -19,11 +51,11 @@ describe('MultiFileViewer.vue', () => {
             }
         })
 
-        class WrapperComponent extends Vue {
+        class WrapperComponent2 extends Vue {
             height_of_view_file_in = { "height": "540px" };
         }
 
-        const wrapper = mount(WrapperComponent);
+        const wrapper = mount(WrapperComponent2);
         const multi_file_viewer = wrapper.find({ref: 'multi_file'});
         expect(multi_file_viewer.vm.$data.file_names_and_content.size).toEqual(0);
         expect(multi_file_viewer.vm.$data.files_currently_viewing.length).toEqual(0);
@@ -35,38 +67,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('When a file is added it becomes the active file/tab ', () => {
-        @Component({
-            template:  `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -108,37 +108,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Clicking on a tab makes it the active tab', () => {
-        @Component({
-            template:  `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -183,32 +152,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Only one copy of a file and its contents can exist at once in the mfv', () => {
-        @Component({
-            template:  `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -242,37 +185,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('When leftmost tab is active & gets deleted, right neighbor becomes active', () => {
-        @Component({
-            template: `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -306,37 +218,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('When the only tab gets deleted, the active_tab_index becomes negative', () => {
-        @Component({
-            template: `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -364,37 +245,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('When an active middle tab gets deleted, the right neighbor becomes active', () => {
-        @Component({
-            template: `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -433,37 +283,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Deleting rightmost active tab causes left neighbor to become active', () => {
-        @Component({
-            template:  `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -499,37 +318,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Close middle tab when middle tab is not active', () => {
-        @Component({
-            template: `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -565,37 +353,6 @@ describe('MultiFileViewer.vue', () => {
 
 
     test('Close leftmost tab when it is not active', () => {
-        @Component({
-            template: `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -628,37 +385,6 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Close rightmost tab when it is not active', () => {
-        @Component({
-            template: `<div>
-                          <p class="first-button" @click="open_file('Kiwi')"> Add Kiwi </p>
-                          <p class="second-button" @click="open_file('Lime')"> Add Lime </p>
-                          <p class="third-button" @click="open_file('Mango')"> Add Mango </p>
-                          <p class="fourth-button" @click="open_file('Nectarine')"> Add Nectarine
-                          </p>
-                          <div class="mvf-container">
-                            <multi_file_viewer
-                              ref="multi_file">
-                            </multi_file_viewer>
-                          </div>
-                        </div>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
-
-        class WrapperComponent extends Vue {
-            files_and_content = new Map<string, string>([
-                ['Kiwi', 'Kiwi Body'],
-                ['Lime', 'Lime Body'],
-                ['Mango', 'Mango Body'],
-                ['Nectarine', 'Nectarine Body']
-            ]);
-
-            open_file(file_in: string) {
-                let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
-            }
-        }
 
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
@@ -719,7 +445,7 @@ describe('MultiFileViewer.vue', () => {
             }
         })
 
-        class WrapperComponent extends Vue {
+        class WrapperComponent3 extends Vue {
 
             files_and_content = new Map<string, string>([
                 ['Monday', 'Monday Body'],
@@ -731,11 +457,11 @@ describe('MultiFileViewer.vue', () => {
 
             open_file(file_in: string) {
                 let mfv = <MultiFileViewer> this.$refs.multi_file;
-                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in));
+                mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
             }
         }
 
-        const wrapper = mount(WrapperComponent);
+        const wrapper = mount(WrapperComponent3);
         let multi_file_viewer = wrapper.find({ref: 'multi_file'});
 
         let add_first_file_button = wrapper.find(".first-button");

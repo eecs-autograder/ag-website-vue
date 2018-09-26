@@ -49,7 +49,7 @@
     @Prop({default: () => {}, type: Object})
     height_of_view_file!: object;
 
-    file_names_and_content = new Map<string, string | undefined>();
+    file_names_and_content = new Map<string, string>();
     files_currently_viewing: string[] = [];
     active_tab_index = -1;
     scrollable_height: object = {};
@@ -66,7 +66,7 @@
       this.active_tab_index = index;
     }
 
-    add_to_viewing(filename: string, file_contents: string | undefined) {
+    add_to_viewing(filename: string, file_contents: string) {
       if (!this.file_names_and_content.has(filename)) {
         let names_and_content_copy = new Map(this.file_names_and_content);
         let currently_viewing_copy = this.files_currently_viewing;
