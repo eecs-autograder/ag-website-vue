@@ -53,7 +53,7 @@ export default class Toggle extends Vue {
 @import '@/styles/colors.scss';
 
 .active-option-style {
-  box-shadow: 0 1px 1px $shadow-color;
+  box-shadow: 0 1px 1px $dark-gray;
   color: white;
   display: inline-block;
   font-weight: normal;
@@ -63,7 +63,7 @@ export default class Toggle extends Vue {
 }
 
 .inactive-option-style {
-  box-shadow: inset 1px 1px 3px $shadow-color;
+  box-shadow: inset 1px 1px 3px $dark-gray;
   color: black;
   cursor: pointer;
   display: inline-block;

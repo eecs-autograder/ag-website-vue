@@ -136,7 +136,7 @@
   @import '@/styles/colors.scss';
 
   #tooltip {
-    background-color: $darker-gray;
+    background-color: $stormy-gray-dark;
     border-radius: 6px;
     color: white;
     display: inline-block;
@@ -180,28 +180,28 @@
   }
 
   .placement-left::after {
-    border-color: transparent transparent transparent $darker-gray;
+    border-color: transparent transparent transparent $stormy-gray-dark;
     left: 100%;
     margin-top: -5px;
     top: 50%;
   }
 
   .placement-right::after {
-    border-color: transparent $darker-gray transparent transparent;
+    border-color: transparent $stormy-gray-dark transparent transparent;
     margin-top: -5px;
     right: 100%;
     top: 50%;
   }
 
   .placement-top::after {
-    border-color: $darker-gray transparent transparent transparent;
+    border-color: $stormy-gray-dark transparent transparent transparent;
     left: 50%;
     margin-left: -5px;
     top: 100%;
   }
 
   .placement-bottom::after {
-    border-color: transparent transparent $darker-gray transparent;
+    border-color: transparent transparent $stormy-gray-dark transparent;
     left: 50%;
     margin-left: -5px;
     bottom: 100%;

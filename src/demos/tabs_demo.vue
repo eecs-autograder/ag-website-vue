@@ -105,17 +105,17 @@
     background-color: white;
     height: 500px;
     position: relative;
-    bottom: 0px;
+    bottom: 0;
     z-index: 15;
   }
 
   .tab-body2 {
     padding: 10px;
     background-color: white;
-    border: 2px solid $light-gray;
+    border: 2px solid $pebble-dark;
     height: 500px;
     position: relative;
-    bottom: 0px;
+    bottom: 0;
     z-index: 15;
   }
 

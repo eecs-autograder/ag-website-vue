@@ -246,7 +246,7 @@ $positive-color: hsl(120, 100%, 95%);
 }
 
 .toggle-container {
-  background-color: $lightest-gray;
+  background-color: $pebble-light;
   display: block;
   padding: 22px 10px 20px 10px;
   text-align: center;

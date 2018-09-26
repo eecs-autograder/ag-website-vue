@@ -39,10 +39,10 @@
   @import '@/styles/colors.scss';
 
   #viewing-container {
-    border-top: 1px solid $light-brown-gray;
-    border-bottom: 1px solid $light-brown-gray;
-    border-left: 1px solid $light-brown-gray;
-    border-right: 1px solid $light-brown-gray;
+    border-top: 1px solid $baking-pan;
+    border-bottom: 1px solid $baking-pan;
+    border-left: 1px solid $baking-pan;
+    border-right: 1px solid $baking-pan;
     border-radius: 0 0 3px 3px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     padding: 5px 0 0 0;
@@ -66,7 +66,7 @@
   }
 
   .line-number {
-    color: $light-brown-gray;
+    color: $baking-pan;
     font-size: 13px;
     padding: 1px 0 1px 0;
     text-align: center;
