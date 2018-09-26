@@ -1,10 +1,11 @@
 <template>
 
   <div>
-    <ButtonDemo></ButtonDemo>
-    <DiffDemo></DiffDemo>
-    <TabsDemo></TabsDemo>
-    <TooltipDemo></TooltipDemo>
+    <ViewFileDemo></ViewFileDemo>
+    <!--<ButtonDemo></ButtonDemo>-->
+    <!--<DiffDemo></DiffDemo>-->
+    <!--<TabsDemo></TabsDemo>-->
+    <!--<TooltipDemo></TooltipDemo>-->
   </div>
 
 </template>
@@ -21,9 +22,11 @@ import ButtonDemo from '@/demos/button_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
+import ViewFileDemo from '@/demos/view_file_demo.vue';
 
 @Component({
-  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, TabsDemo, TooltipDemo}
+  components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, TabsDemo, TooltipDemo,
+               ViewFileDemo}
 })
 export default class HelloWorld extends Vue {
 }

@@ -36,59 +36,62 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  #viewing-container {
-    border-top: 1px solid $light-brown-gray;
-    border-bottom: 1px solid $light-brown-gray;
-    border-left: 1px solid $light-brown-gray;
-    border-right: 1px solid $light-brown-gray;
-    border-radius: 0 0 3px 3px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    padding: 5px 0 0 0;
-    width: 100%;
-  }
+#viewing-container {
+  border-top: 1px solid $light-brown-gray;
+  border-bottom: 1px solid $light-brown-gray;
+  border-left: 1px solid $light-brown-gray;
+  border-right: 1px solid $light-brown-gray;
+  border-radius: 0 0 3px 3px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 5px 0 0 0;
+  width: 100%;
+}
 
-  #scrollable-container {
-    margin: 0;
-    min-height: 455px;
-    max-height: 545px;
-    overflow: scroll;
-    padding: 0;
-    position: relative;
-    width: 100%;
-  }
+#scrollable-container {
+  margin: 0;
+  min-height: 455px;
+  max-height: 545px;
+  overflow: scroll;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
 
-  .line-numbers-container {
-    position: absolute;
-    vertical-align: top;
-    width: 51px;
-  }
+.line-numbers-container {
+  position: absolute;
+  vertical-align: top;
+  user-select: none;
+  width: 51px;
+}
 
-  .line-number {
-    color: $light-brown-gray;
-    font-size: 13px;
-    padding: 1px 0 1px 0;
-    text-align: center;
-    z-index: 10;
-  }
+.line-number {
+  color: $light-brown-gray;
+  font-size: 13px;
+  padding: 1px 0 1px 0;
+  text-align: center;
+  z-index: 10;
+  height: 16px;
+}
 
-  .file-content-container {
-    color: black;
-    display: inline-block;
-    left: 51px;
-    position: relative;
-    vertical-align: top;
-  }
+.file-content-container {
+  color: black;
+  display: inline-block;
+  left: 51px;
+  position: relative;
+  vertical-align: top;
+}
 
-  .line-of-file-content {
-    font-size: 13px;
-    margin: 0;
-    padding: 1px 10px 1px 0;
-  }
+.line-of-file-content {
+  font-size: 13px;
+  height: 16px;
+  margin: 0;
+  padding: 1px 10px 1px 0;
+}
 
-  .line-of-file-content:last-child {
-    padding-bottom: 5px;
-  }
+.line-of-file-content:last-child {
+  padding-bottom: 5px;
+}
 
 </style>
