@@ -2,10 +2,10 @@
 
   <div>
     <ViewFileDemo></ViewFileDemo>
-    <!--<ButtonDemo></ButtonDemo>-->
-    <!--<DiffDemo></DiffDemo>-->
-    <!--<TabsDemo></TabsDemo>-->
-    <!--<TooltipDemo></TooltipDemo>-->
+    <ButtonDemo></ButtonDemo>
+    <DiffDemo></DiffDemo>
+    <TabsDemo></TabsDemo>
+    <TooltipDemo></TooltipDemo>
   </div>
 
 </template>
