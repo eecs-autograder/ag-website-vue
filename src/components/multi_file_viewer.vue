@@ -44,13 +44,12 @@
   @Component({
     components: { Tab, Tabs, ViewFile }
   })
-
   export default class MultiFileViewer extends Vue {
 
     @Prop({default: () => {}, type: Object})
     height_of_view_file!: object;
 
-    file_names_and_content = new Map<string, string>();
+    file_names_and_content = new Map<string, string | undefined>();
     files_currently_viewing: string[] = [];
     active_tab_index = -1;
     scrollable_height: object = {};
@@ -67,7 +66,7 @@
       this.active_tab_index = index;
     }
 
-    add_to_viewing(filename: string, file_contents: string) {
+    add_to_viewing(filename: string, file_contents: string | undefined) {
       if (!this.file_names_and_content.has(filename)) {
         let names_and_content_copy = new Map(this.file_names_and_content);
         let currently_viewing_copy = this.files_currently_viewing;
@@ -94,7 +93,6 @@
         this.active_tab_index -= 1;
       }
     }
-
   }
 </script>
 
@@ -102,7 +100,7 @@
 @import '@/styles/colors.scss';
 
 .close-x {
-  color: $none-correct-color;
+  color: hsl(0.61, 89%, 71%);
   cursor: pointer;
   display: inline-block;
   margin-bottom: 0;
@@ -112,7 +110,7 @@
 }
 
 .close-x:hover {
-  color: $none-correct-hover-color;
+  color: hsl(0.61, 85%, 60%);
 }
 
 .tab-body {
@@ -122,7 +120,6 @@
   color: #24292e;
   min-width: 800px;
   position: relative;
-  z-index: 15;
 }
 
 .tab-header {
