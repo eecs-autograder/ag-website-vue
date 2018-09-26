@@ -8,7 +8,6 @@
     <TooltipDemo></TooltipDemo>
     <ViewFileDemo></ViewFileDemo>
  </div>
-
 </template>
 
 <script lang="ts">
