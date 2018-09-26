@@ -195,7 +195,6 @@ describe('MultiFileViewer.vue', () => {
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(1);
 
         let view_file_component = mvf.find({ref: 'view_file_component'});
-        console.log(view_file_component.html());
         expect(view_file_component.text()).toContain('Kiwi Body');
 
         let leftmost_tab = wrapper.findAll('.tab-label').at(0);
