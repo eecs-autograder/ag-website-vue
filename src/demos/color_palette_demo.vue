@@ -35,7 +35,7 @@
 
     <div class="color">
       <p class="color-name"> dark-gray </p>
-      <p class="color-square shadow"></p>
+      <p class="color-square dark-gray"></p>
     </div>
 
     <div class="color-divider"></div>
@@ -73,7 +73,7 @@
 
     <div class="color">
       <p class="color-name"> yellow </p>
-      <p class="color-square baby-chick"></p>
+      <p class="color-square light-yellow"></p>
     </div>
 
     <div class="color-divider"></div>
@@ -194,7 +194,7 @@
   background-color: $stormy-gray-dark;
 }
 
-.shadow {
+.dark-gray {
   background-color: $dark-gray;
 }
 
@@ -218,7 +218,7 @@
   background-color: $coral-pink;
 }
 
-.baby-chick {
+.light-yellow {
   background-color: $light-yellow;
 }
 
@@ -237,5 +237,5 @@
 .ocean-blue {
   background-color: $ocean-blue;
 }
-  
+
 </style>
