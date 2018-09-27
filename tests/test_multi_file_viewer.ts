@@ -37,9 +37,8 @@ describe('MultiFileViewer.vue', () => {
 
         const wrapper = mount(WrapperComponent2);
         const multi_file_viewer = wrapper.find({ref: 'multi_file'});
-        expect(multi_file_viewer.vm.$data.file_names_and_content.size).toEqual(0);
         expect(multi_file_viewer.vm.$data.files_currently_viewing.length).toEqual(0);
-        expect(multi_file_viewer.vm.$data.active_tab_index).toEqual(-1);
+        expect(multi_file_viewer.vm.$data.active_tab_index).toEqual(0);
         expect(multi_file_viewer.vm.$data.scrollable_height).toEqual(
             wrapper.vm.$data.height_of_view_file_in
         );
@@ -50,33 +49,29 @@ describe('MultiFileViewer.vue', () => {
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = <MultiFileViewer> wrapper.find({ref: 'multi_file'}).vm;
         let mvf = wrapper.find({ref: 'multi_file'});
-        expect(multi_file_viewer.$data.active_tab_index).toEqual(-1);
+        expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
 
         multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
 
         let view_file_component = mvf.find({ref: 'view_file_component'});
         expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(1);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(1);
         expect(view_file_component.text()).toContain('Kiwi Body');
 
         multi_file_viewer.add_to_viewing('Lime', 'Lime Body');
         view_file_component = mvf.find({ref: 'view_file_component'});
         expect(multi_file_viewer.$data.active_tab_index).toEqual(1);
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(2);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(2);
         expect(view_file_component.text()).toContain('Lime Body');
 
         multi_file_viewer.add_to_viewing('Mango', 'Mango Body');
         view_file_component = mvf.find({ref: 'view_file_component'});
         expect(multi_file_viewer.$data.active_tab_index).toEqual(2);
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(3);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(3);
         expect(view_file_component.text()).toContain('Mango Body');
 
         multi_file_viewer.add_to_viewing('Nectarine', 'Nectarine Body');
         view_file_component = mvf.find({ref: 'view_file_component'});
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(4);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(4);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(3);
         expect(view_file_component.text()).toContain('Nectarine Body');
@@ -88,7 +83,7 @@ describe('MultiFileViewer.vue', () => {
         let mvf = wrapper.find({ref: 'multi_file'});
         let multi_file_viewer = <MultiFileViewer> wrapper.find({ref: 'multi_file'}).vm;
 
-        expect(multi_file_viewer.$data.active_tab_index).toEqual(-1);
+        expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
 
         multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
         expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
@@ -109,7 +104,6 @@ describe('MultiFileViewer.vue', () => {
         mvf = wrapper.find({ref: 'multi_file'});
 
         let view_file_component = mvf.find({ref: 'view_file_component'});
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(4);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(4);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(3);
         expect(view_file_component.text()).toContain('Nectarine Body');
@@ -129,12 +123,11 @@ describe('MultiFileViewer.vue', () => {
         let multi_file_viewer = <MultiFileViewer> wrapper.find({ref: 'multi_file'}).vm;
         let mvf = wrapper.find({ref: 'multi_file'});
 
-        expect(multi_file_viewer.$data.active_tab_index).toEqual(-1);
+        expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
 
         multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
 
         let view_file_component = mvf.find({ref: 'view_file_component'});
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(1);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(1);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
         expect(view_file_component.text()).toContain('Kiwi Body');
@@ -142,14 +135,12 @@ describe('MultiFileViewer.vue', () => {
         multi_file_viewer.add_to_viewing('Lime', 'Lime Body');
 
         view_file_component = mvf.find({ref: 'view_file_component'});
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(2);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(2);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(1);
         expect(view_file_component.text()).toContain('Lime Body');
 
         multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
         view_file_component = mvf.find({ref: 'view_file_component'});
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(2);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(2);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(1);
         expect(view_file_component.text()).toContain('Lime Body');
@@ -248,7 +239,7 @@ describe('MultiFileViewer.vue', () => {
         const wrapper = mount(WrapperComponent);
         let multi_file_viewer = <MultiFileViewer> wrapper.find({ref: 'multi_file'}).vm;
         let mvf = wrapper.find({ref: 'multi_file'});
-        expect(multi_file_viewer.$data.active_tab_index).toEqual(-1);
+        expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
 
         multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
         expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
@@ -266,7 +257,6 @@ describe('MultiFileViewer.vue', () => {
         expect(multi_file_viewer.$data.active_tab_index).toEqual(3);
 
         view_file_component = mvf.find({ref: 'view_file_component'});
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(4);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(4);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(3);
         expect(view_file_component.text()).toContain('Nectarine Body');
@@ -274,7 +264,6 @@ describe('MultiFileViewer.vue', () => {
         let rightmost_tab_close_x = wrapper.findAll('.close-x').at(3);
         rightmost_tab_close_x.trigger('click');
 
-        expect(multi_file_viewer.$data.file_names_and_content.size).toEqual(3);
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(3);
         expect(multi_file_viewer.$data.active_tab_index).toEqual(2);
     });
