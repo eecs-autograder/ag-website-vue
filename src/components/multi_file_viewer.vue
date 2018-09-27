@@ -5,14 +5,14 @@
           tab_active_class="gray-white-theme-active"
           tab_inactive_class="gray-white-theme-inactive">
        <tab ref="single-tab"
-            v-for="(filename, index) of Array.from(files_currently_viewing)"
-            @click="update_viewing(index)">
+            v-for="(open_file, index) of files_currently_viewing"
+            @click="active_tab_index = index">
 
          <template slot="header">
            <div class="tab-header">
-             <p class="tab-label"> {{ filename }} </p>
+             <p class="tab-label"> {{ open_file.name }} </p>
              <i class="fas fa-times close-x"
-                @click="$event.stopPropagation(); remove_from_viewing(filename, index)"></i>
+                @click="$event.stopPropagation(); remove_from_viewing(index)"></i>
            </div>
          </template>
 
@@ -21,8 +21,8 @@
 
              <view-file
                ref="view_file_component"
-               :incoming_filename="filename"
-               :incoming_file_contents="get_contents(filename)"
+               :incoming_filename="open_file.name"
+               :incoming_file_contents="open_file.content"
                :incoming_height_specifications="scrollable_height">
              </view-file>
 
@@ -41,6 +41,11 @@
   import Tabs from '@/components/tabs/tabs.vue';
   import ViewFile from '@/components/view_file.vue';
 
+  interface OpenFile {
+    name: string;
+    content: string;
+  }
+
   @Component({
     components: { Tab, Tabs, ViewFile }
   })
@@ -49,49 +54,31 @@
     @Prop({default: () => {}, type: Object})
     height_of_view_file!: object;
 
-    file_names_and_content = new Map<string, string>();
-    files_currently_viewing: string[] = [];
-    active_tab_index = -1;
+    files_currently_viewing: OpenFile[] = [];
+    active_tab_index = 0;
     scrollable_height: object = {};
 
     created() {
       this.scrollable_height = this.height_of_view_file;
     }
 
-    get_contents(filename: string) {
-      return this.file_names_and_content.get(filename);
-    }
-
-    update_viewing(index: number) {
-      this.active_tab_index = index;
-    }
-
     add_to_viewing(filename: string, file_contents: string) {
-      if (!this.file_names_and_content.has(filename)) {
-        let names_and_content_copy = new Map(this.file_names_and_content);
-        let currently_viewing_copy = this.files_currently_viewing;
-        names_and_content_copy.set(filename, file_contents);
-        currently_viewing_copy.push(filename);
-        this.file_names_and_content = names_and_content_copy;
-        this.files_currently_viewing = currently_viewing_copy;
-        this.active_tab_index = this.files_currently_viewing.length - 1;
+      let file_exists = this.files_currently_viewing.find(
+        open_file => open_file.name === filename
+      ) !== undefined;
+      if (file_exists) {
+        return;
       }
+
+      this.files_currently_viewing.push({name: filename, content: file_contents});
+      this.active_tab_index = this.files_currently_viewing.length - 1;
     }
 
-    remove_from_viewing(filename_to_delete: string, tab_index: number) {
-      let names_and_content_copy = new Map(this.file_names_and_content);
-      let currently_viewing_copy = this.files_currently_viewing;
-      let old_size = this.file_names_and_content.size;
-      let old_active_index = this.active_tab_index;
-      let is_rightmost_tab = (old_size - 1) === old_active_index;
-
-      names_and_content_copy.delete(filename_to_delete);
-      currently_viewing_copy.splice(tab_index, 1);
-      this.file_names_and_content = names_and_content_copy;
-      this.files_currently_viewing = currently_viewing_copy;
-      if (tab_index < this.active_tab_index && !is_rightmost_tab) {
+    remove_from_viewing(tab_index: number) {
+      if (tab_index < this.active_tab_index) {
         this.active_tab_index -= 1;
       }
+      this.files_currently_viewing.splice(tab_index, 1);
     }
   }
 </script>
