@@ -4,9 +4,9 @@ import { mount } from '@vue/test-utils';
 describe('Modal.vue', () => {
     test('Modal open, close, and toggle methods open and close modal', () => {
         const wrapper = mount(Modal);
-
         const vm = wrapper.vm;
         expect(vm.$data.is_open).toBe(false);
+
         vm.open();
         expect(vm.$data.is_open).toBe(true);
         vm.open();
@@ -21,6 +21,22 @@ describe('Modal.vue', () => {
         expect(vm.$data.is_open).toBe(true);
         vm.toggle();
         expect(vm.$data.is_open).toBe(false);
+    });
+
+    test('Ensure content is only displayed if is_open is true', () => {
+        const wrapper = mount(Modal);
+        const vm = wrapper.vm;
+
+        expect(vm.$data.is_open).toBe(false);
+        expect(wrapper.find('#modal-mask').exists()).toBe(false);
+        expect(wrapper.find('.modal-container').exists()).toBe(false);
+        expect(wrapper.find('#close-button').exists()).toBe(false);
+
+        vm.open();
+        expect(vm.$data.is_open).toBe(true);
+        expect(wrapper.find('#modal-mask').isVisible()).toBe(true);
+        expect(wrapper.find('.modal-container').isVisible()).toBe(true);
+        expect(wrapper.find('#close-button').isVisible()).toBe(true);
     });
 
     test('Modal runs close function on click of x', () => {
@@ -34,7 +50,7 @@ describe('Modal.vue', () => {
         expect(vm.$data.is_open).toBe(false);
     });
 
-    test('Modal runs close function on click of shadow but not text content', () => {
+    test('Modal does not run close function on click of shadow by default', () => {
         const wrapper = mount(Modal);
         const vm = wrapper.vm;
         vm.open();
@@ -42,6 +58,28 @@ describe('Modal.vue', () => {
         const outside_modal = wrapper.find('#modal-mask');
         const inside_modal = wrapper.find('.modal-container');
         expect(vm.$data.is_open).toBe(true);
+
+        inside_modal.trigger('click');
+        expect(vm.$data.is_open).toBe(true);
+
+        outside_modal.trigger('click');
+        expect(vm.$data.is_open).toBe(true);
+    });
+
+    test('Modal runs close function on click of shadow with close_on_click flag', () => {
+        const wrapper = mount(Modal, {
+            propsData: {
+                click_to_close: true
+            }
+        });
+
+        const vm = wrapper.vm;
+        vm.open();
+
+        const outside_modal = wrapper.find('#modal-mask');
+        const inside_modal = wrapper.find('.modal-container');
+        expect(vm.$data.is_open).toBe(true);
+
         inside_modal.trigger('click');
         expect(vm.$data.is_open).toBe(true);
 
@@ -83,5 +121,15 @@ describe('Modal.vue', () => {
         wrapper.vm.open();
         const modal_container = wrapper.find('.modal-container');
         expect(modal_container.attributes().style).toBe('width: 50px;');
+    });
+
+    test('Modal does not show close button with remove_x flag', () => {
+        const wrapper = mount(Modal, {
+            propsData: {
+                remove_x: true
+            }
+        });
+
+        expect(wrapper.find('#close-button').exists()).toBe(false);
     });
 });
