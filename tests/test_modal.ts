@@ -69,7 +69,7 @@ describe('Modal.vue', () => {
     test('Modal runs close function on click of shadow with close_on_click flag', () => {
         const wrapper = mount(Modal, {
             propsData: {
-                click_to_close: true
+                click_outside_to_close: true
             }
         });
 
@@ -126,7 +126,7 @@ describe('Modal.vue', () => {
     test('Modal does not show close button with remove_x flag', () => {
         const wrapper = mount(Modal, {
             propsData: {
-                remove_x: true
+                include_closing_x: false
             }
         });
 

@@ -1,10 +1,11 @@
 <template>
   <transition name="modal">
-    <div v-if="is_open" id="modal-mask" @click.self="() => { click_to_close ? close() : null}">
+    <div v-if="is_open" id="modal-mask"
+         @click.self="() => {click_outside_to_close ? close() : null}">
       <div class="modal-container"
            :class="size" :style="custom_width ? {width: custom_width} : ''">
         <slot></slot>
-        <button v-if="!remove_x"
+        <button v-if="include_closing_x"
                 id="close-button" @click="close"><strong>&#10005;</strong></button>
       </div>
     </div>
@@ -17,10 +18,10 @@
   @Component
   export default class Modal extends Vue {
     @Prop({default: false, type: Boolean})
-    click_to_close!: boolean;
+    click_outside_to_close!: boolean;
 
-    @Prop({default: false, type: Boolean})
-    remove_x!: boolean;
+    @Prop({default: true, type: Boolean})
+    include_closing_x!: boolean;
 
     @Prop()
     size!: string;
