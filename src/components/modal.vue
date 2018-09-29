@@ -4,7 +4,8 @@
       <div class="modal-container"
            :class="size" :style="custom_width ? {width: custom_width} : ''">
         <slot></slot>
-        <button v-if="!remove_x" id="close-button" @click="close"><strong>&#10005;</strong></button>
+        <button v-if="!remove_x"
+                id="close-button" @click="close"><strong>&#10005;</strong></button>
       </div>
     </div>
   </transition>
