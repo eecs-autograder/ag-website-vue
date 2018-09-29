@@ -57,7 +57,7 @@
     <br/>
 
     <button @click="$refs.modal6.open()">Click outside of modal to close</button>
-    <modal ref="modal6" click_to_close>
+    <modal ref="modal6" click_outside_to_close>
       <h2>Title Example</h2>
       <hr>
       <p>Clicking outside of the modal will close it!</p>
@@ -68,7 +68,7 @@
     <br/>
 
     <button @click="$refs.modal7.open()">No x at the top</button>
-    <modal ref="modal7" remove_x>
+    <modal ref="modal7" :include_closing_x="false">
       <h2>Title Example</h2>
       <hr>
       <p>The cool thing about this is that its totally reusable!</p>
