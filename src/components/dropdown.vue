@@ -2,22 +2,22 @@
   <div class="outermost-dropdown-container">
 
     <div class="dropdown-container"
-         tabindex="1"
-         @keydown="move_highlighted($event)"
-         @blur="hide_the_dropdown_menu">
+         @keydown="move_highlighted($event)">
 
-      <div @click="toggle_the_dropdown_menu">
+      <div class="header-container">
         <slot name="header"> </slot>
       </div>
 
       <div class="dropdown-content" :style="content_styling">
         <div class="dropdown-row" v-for="(item, index) of items"
-        @click="choose_item_from_dropdown_menu(item, index)"
-        :id="index === highlighted_index ? 'highlight' : ''">
+             @mousedown="$event.preventDefault()"
+             @click="choose_item_from_dropdown_menu(item, index)"
+             :id="index === highlighted_index ? 'highlight' : ''">
           <slot v-bind="item">  </slot>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -53,6 +53,19 @@
       this.content_min_width = this.dropdown_content_min_width;
       this.content_max_width = this.dropdown_content_max_width;
       this.add_styling();
+      this.hide_the_dropdown_menu = this.hide_the_dropdown_menu.bind(this);
+    }
+
+    mounted() {
+      let dropdown_container = <HTMLElement> this.$el.childNodes[0];
+      let header_container = <HTMLElement> dropdown_container.childNodes[0];
+      let header_slot_content = <HTMLElement> header_container.childNodes[0];
+      header_slot_content.addEventListener("blur", () => {
+        this.hide_the_dropdown_menu();
+      });
+      header_slot_content.addEventListener("click", () => {
+        this.toggle_the_dropdown_menu();
+      });
     }
 
     get is_open() {
@@ -81,16 +94,6 @@
       }
     }
 
-    invoke_focus_on_dropdown() {
-      let dropdown_outer = <HTMLElement> this.$el.getElementsByClassName("dropdown-container")[0];
-      dropdown_outer.focus();
-    }
-
-    invoke_blur_on_dropdown() {
-      let dropdown_outer = <HTMLElement> this.$el.getElementsByClassName("dropdown-container")[0];
-      dropdown_outer.blur();
-    }
-
     show_the_dropdown_menu() {
       let dropdown_menu = <HTMLElement> this.$el.getElementsByClassName("dropdown-content")[0];
       dropdown_menu.style.display = "block";
@@ -101,7 +104,6 @@
       let dropdown_menu = <HTMLElement> this.$el.getElementsByClassName("dropdown-content")[0];
       dropdown_menu.style.display = "none";
       this.is_open_ = false;
-      this.invoke_blur_on_dropdown();
     }
 
     choose_item_from_dropdown_menu(item_selected: object, index: number) {
@@ -125,8 +127,6 @@
     }
 
     move_highlighted(event: KeyboardEvent) {
-      event.preventDefault();
-      event.stopPropagation();
       if (event.code === "Enter") {
         event.preventDefault();
         event.stopPropagation();
@@ -154,71 +154,69 @@
           }
         }
         else if (event.code === 'Escape') {
-          this.highlighted_index = 0;
+          this.toggle_the_dropdown_menu();
         }
       }
     }
-
-
   }
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  .dropdown-container:focus {
-    outline: none;
-  }
+.dropdown-container:focus {
+  outline: none;
+}
 
-  .dropdown-container {
-    display: inline-block;
-    position: relative;
-  }
+.dropdown-container {
+  display: inline-block;
+  position: relative;
+}
 
-  .dropdown-content {
-    background-color: white;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    display: none;
-    margin-top: 0px;
-    width: 100%;
-    position: absolute;
-    z-index: 1;
-  }
+.dropdown-content {
+  background-color: white;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  display: none;
+  margin-top: 0.5px;
+  width: 100%;
+  position: absolute;
+  z-index: 1;
+}
 
-  .dropdown-row {
-    border-top: 1px solid $light-gray;
-    color: black;
-    cursor: pointer;
-    display: block;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-    margin: 0;
-    min-height: 13px;
-    padding: 10px 15px;
-    text-decoration: none;
-  }
+.dropdown-row {
+  border-top: 1px solid $light-gray;
+  color: black;
+  cursor: pointer;
+  display: block;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  margin: 0;
+  min-height: 13px;
+  padding: 10px 15px;
+  text-decoration: none;
+}
 
-  .dropdown-row:first-child {
-    border-top: none;
-  }
+.dropdown-row:first-child {
+  border-top: none;
+}
 
-  .dropdown-row:hover {
-    background-color: hsl(210, 13%, 95%);
-  }
+.dropdown-row:hover {
+  background-color: hsl(210, 13%, 95%);
+}
 
-  #highlight:hover {
-    background-color: hsl(210, 13%, 80%);
-  }
+#highlight:hover {
+  background-color: hsl(210, 13%, 80%);
+}
 
-  #highlight {
-    background-color: hsl(210, 13%, 80%);
-  }
+#highlight {
+  background-color: hsl(210, 13%, 80%);
+}
 
-  .outermost-dropdown-container {
-    display: inline-block;
-  }
+.outermost-dropdown-container {
+  display: inline-block;
+}
 
-  .chosen {
-    background-color: #ace7c9;
-  }
+.chosen {
+  background-color: #ace7c9;
+}
 
 </style>

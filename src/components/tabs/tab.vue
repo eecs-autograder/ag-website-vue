@@ -15,6 +15,7 @@ export default class Tab extends Vue {}
 
 </script>
 
+
 <style scoped lang="scss">
 
 </style>

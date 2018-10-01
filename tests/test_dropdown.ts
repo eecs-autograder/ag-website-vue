@@ -343,8 +343,7 @@ describe('Dropdown.vue', () => {
                                   @update_item_selected="update_employee($event)">
                           <template slot="header">
                             <button ref="dropdown_header"
-                                    class="header-button"
-                                    @focus="transfer_focus_to_parent()">
+                                    class="header-button">
                               {{chosen_employee.last_name}}, {{chosen_employee.first_name}}
                             </button>
                           </template>
@@ -371,11 +370,6 @@ describe('Dropdown.vue', () => {
 
             update_employee(employee_in: {first_name: string, last_name: string}) {
                 this.chosen_employee = employee_in;
-            }
-
-            transfer_focus_to_parent() {
-                let dropdown_component = <Dropdown> this.$refs.dropdown_on_a_button;
-                dropdown_component.invoke_focus_on_dropdown();
             }
         }
 
@@ -464,13 +458,13 @@ describe('Dropdown.vue', () => {
 
         // unrelated_para_element.trigger('click');
 
-        dropdown_menu_content.trigger('blur');
+        dropdown_header.trigger('blur');
 
         expect(dropdown_menu_content.element.style.display).toEqual("none");
 
     });
 
-    test('Hitting esc in the dropdown menu causes the first item to become highlighted',
+    test('Hitting esc in the dropdown menu causes menu to close',
          () => {
 
         @Component({
@@ -527,8 +521,6 @@ describe('Dropdown.vue', () => {
 
         dropdown_menu_content.trigger('keydown', { code: 'Escape'});
 
-        highlighted_color = wrapper.find('#highlight');
-
-        expect(highlighted_color.text()).toContain("Red");
+        expect(dropdown_menu_content.element.style.display).toEqual("none");
     });
 });

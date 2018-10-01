@@ -1,76 +1,92 @@
 <template>
   <div>
 
-    <dropdown ref="dropdown_menu_ex_1"
-              :incoming_items="menu_items"
-              :highlighted_index_in="1"
-              dropdown_content_min_width = "130px"
-              dropdown_content_max_width = "180px"
-              @update_item_selected="add_item_1($event)">
-      <template slot="header">
-        <p class="header-para">
-          {{selected_menu_item.option}}
-        </p>
-      </template>
-      <template slot-scope="menu_item">
-         <div class="airplane"><i class="fas fa-plane"></i></div>
-         <span> {{menu_item.option}} </span>
-      </template>
-    </dropdown>
+    <div class="surround-1">
+      <p class="tabindex-explanation"> If the element that the Dropdown component is on is not an
+          element that normally receives focus, you must add the tabindex attribute to that
+          element so that it can receive focus and blur.
+      </p>
+      <dropdown ref="dropdown_menu_ex_1"
+                :incoming_items="menu_items"
+                :highlighted_index_in="1"
+                dropdown_content_min_width = "130px"
+                dropdown_content_max_width = "180px"
+                @update_item_selected="add_item_1($event)">
+        <template slot="header">
+          <p tabindex="1" class="header-para">
+            {{selected_menu_item.option}}
+          </p>
+        </template>
+        <template slot-scope="menu_item">
+           <div class="airplane"><i class="fas fa-plane"></i></div>
+           <span> {{menu_item.option}} </span>
+        </template>
+      </dropdown>
+    </div>
 
     <p v-for="item of chosen_items_1"> {{item.option}}</p>
 
-  <div class="surround-2">
-    <dropdown ref="dropdown_menu_ex_2"
-              :incoming_items="names"
-              @update_item_selected="add_item_2($event)">
-      <template slot="header">
-        <button class="header-button"
-          @focus ="show_the_dropdown_2()">
-          Menu On A Button
-        </button>
-      </template>
-      <div slot-scope="employee">
-        <span> {{employee.first_name}} </span>
-        <!--<span> {{employee.last_name}} </span>-->
-      </div>
-    </dropdown>
-  </div>
+    <div class="surround-2">
+      <dropdown ref="dropdown_menu_ex_2"
+                :incoming_items="names"
+                @update_item_selected="add_item_2($event)">
+        <template slot="header">
+          <button class="header-button">
+            Menu On A Button
+          </button>
+        </template>
+        <div slot-scope="employee">
+          <span> {{employee.first_name}} </span>
+        </div>
+      </dropdown>
+    </div>
 
     <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}}</p>
 
-    <!--<div class="surround-3">-->
-      <!--<dropdown ref="dropdown_menu_ex_3"-->
-                <!--:incoming_items="names"-->
-                <!--@update_item_selected="add_item_3($event)">-->
-        <!--<template slot="header">-->
-          <!--<input class="header-input"-->
-                 <!--type="text"-->
-                 <!--placeholder="Enter a Name"-->
-                 <!--@blur ="hide_the_dropdown_3()"-->
-                 <!--@focus ="show_the_dropdown_3()">-->
-        <!--</template>-->
-      <!--</dropdown>-->
+    <div class="surround-3">
+      <p> {{some_word}}</p>
+      <dropdown ref="dropdown_menu_ex_3"
+                :incoming_items="names"
+                @update_item_selected="add_item_3($event)">
+        <template slot="header">
+          <input type=text
+                 name="some_word_stuff"
+                 v-model="some_word">
+        </template>
+        <div slot-scope="employee">
+          <span> {{employee.first_name}} </span>
+        </div>
+      </dropdown>
+    </div>
 
-      <!--<p v-for="item of chosen_items_3"> {{item}}</p>-->
+    <p v-for="item of chosen_items_3"> {{item.last_name}}, {{item.first_name}}</p>
 
-  <!--</div>-->
+    <ul class="web-menu">
+      <li class="menu-option"> <p> Home </p> </li>
+      <dropdown ref="dropdown_menu_ex_4"
+          :incoming_items="food_menu_items">
+        <template slot="header">
+          <li tabindex="1" class="menu-option navy-tile">
+            <p> Products </p>
+          </li>
+        </template>
+        <template slot-scope="food_item">
+          <p class="food"> {{food_item.name}} </p>
+        </template>
+      </dropdown>
+      <dropdown ref="dropdown_menu_ex_5"
+                :incoming_items="contact_methods">
+        <template slot="header">
+          <li tabindex="1" class="menu-option">
+            <p> Contact </p>
+          </li>
+        </template>
+        <template slot-scope="contact_method">
+          <p class="food"> {{contact_method.contact}}</p>
+        </template>
+      </dropdown>
+    </ul>
 
-  <ul class="web-menu">
-    <li class="menu-option"> <p> Home </p> </li>
-    <dropdown ref="dropdown_menu_ex_4"
-        :incoming_items="food_menu_items">
-      <template slot="header">
-        <li class="menu-option navy-tile">
-          <p> Products </p>
-        </li>
-      </template>
-      <template slot-scope="food_item">
-        <p class="food"> {{food_item.name}}</p>
-      </template>
-    </dropdown>
-    <li class="menu-option"> <p> Contact </p> </li>
-  </ul>
   </div>
 </template>
 
@@ -85,7 +101,7 @@
   })
   export default class DropdownDemo extends Vue {
 
-    selected_choice = "5 Passengers";
+    some_word = "";
 
     menu_items = [{ option: "1 Passenger" },
                   { option: "2 Passengers" },
@@ -112,6 +128,8 @@
                        {name: "Shake"}
                       ];
 
+    contact_methods = [{contact: "By Phone"}, {contact: "By Email"}];
+
     add_item_1(item: {option: string}) {
       this.selected_menu_item = item;
       this.chosen_items_1.push(item);
@@ -121,102 +139,80 @@
       this.chosen_items_2.push(item);
     }
 
-    add_item_3(item: string) {
+    add_item_3(item: {first_name: string, last_name: string}) {
       this.chosen_items_3.push(item);
     }
 
     chosen_items_1: object[] = [];
     chosen_items_2: string[] = [];
-    chosen_items_3: string[] = [];
-
-    show_the_dropdown_2() {
-      let dropdown_component = <Dropdown> this.$refs.dropdown_menu_ex_2;
-      dropdown_component.invoke_focus_on_dropdown();
-    }
-
-    hide_the_dropdown_3() {
-      let dropdown_component = <Dropdown> this.$refs.dropdown_menu_ex_3;
-    }
-
-    show_the_dropdown_3() {
-      let dropdown_component = <Dropdown> this.$refs.dropdown_menu_ex_3;
-      dropdown_component.invoke_focus_on_dropdown();
-    }
+    chosen_items_3: object[] = [];
 
   }
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  .food {
-    margin: 0;
-    padding-top: 2px;
-  }
+.tabindex-explanation {
+  font-size: 14px;
+  width: 600px;
+}
 
-  .header-para {
-    background-color: cornflowerblue;
-    border: none;
-    color: black;
-    cursor: pointer;
-    font-size: 20px;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
-    width: 200px;
-  }
+.food {
+  margin: 0;
+  padding-top: 2px;
+}
 
-  .header-button {
-    background-color: mediumpurple;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    margin: 0;
-    padding: 10px 20px 10px 20px;
-    font-size: 14px;
-  }
+.header-para {
+  background-color: cornflowerblue;
+  border: none;
+  color: black;
+  cursor: pointer;
+  font-size: 20px;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  width: 200px;
+}
 
-  .surround-2 {
-    margin-top: 100px;
-  }
+.header-button {
+  background-color: mediumpurple;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 0;
+  padding: 20px 20px 20px 20px;
+}
 
-  .header-input {
-    background-color: lightgray;
-    border: ghostwhite;
-    padding: 10px;
-    height: 20px;
-    font-size: 14px;
-  }
+.surround-2 {
+  margin-top: 100px;
+}
 
-  .header-input:focus {
-    background-color: darkorange;
-  }
+.web-menu {
+  display: block;
+  margin-top: 100px;
+}
 
-  .web-menu {
-    display: block;
-    margin-top: 100px;
-  }
+.menu-option {
+  background-color: ghostwhite;
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 10px;
+  width: 200px;
+}
 
-  .menu-option {
-    background-color: ghostwhite;
-    cursor: pointer;
-    display: inline-block;
-    padding: 0 10px;
-    width: 200px;
-  }
+.navy-tile {
+  background-color: navy;
+  color: white;
+}
 
-  .navy-tile {
-    background-color: navy;
-    color: white;
-  }
-
-
-  .airplane {
-    margin-left: 5px;
-    margin-right: 10px;
-    display: inline-block;
-    color: coral;
-  }
+.airplane {
+  margin-left: 5px;
+  margin-right: 10px;
+  display: inline-block;
+  color: coral;
+}
 
 </style>
