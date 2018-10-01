@@ -60,12 +60,14 @@ describe('SafeMap', () => {
     test('SafeMap clear', () => {
         let safer_map = new SafeMap<string, string>();
         safer_map.set("Blue", "Jay");
-        safer_map.set("Yellow", "Submarine");
-        safer_map.set("Red", "Sea");
 
-        expect(safer_map.size).toBe(3);
+        expect(safer_map.size()).toEqual(1);
+        safer_map.set("Yellow", "Submarine");
+        expect(safer_map.size()).toEqual(2);
+        safer_map.set("Red", "Sea");
+        expect(safer_map.size()).toEqual(3);
         safer_map.clear();
-        expect(safer_map.size).toBe(0);
+        expect(safer_map.size()).toEqual(0);
     });
 
     test('SafeMap delete', () => {
@@ -76,7 +78,7 @@ describe('SafeMap', () => {
 
         safer_map.delete("Yellow");
 
-        expect(safer_map.size).toBe(2);
+        expect(safer_map.size()).toEqual(2);
         expect(safer_map.get("Blue")).toEqual("Jay");
         expect(safer_map.get("Red")).toEqual("Sea");
         try {
@@ -182,5 +184,22 @@ describe('SafeMap', () => {
         expect(iter.next().value).toEqual(21);
         expect(iter.next().value).toEqual(7);
         expect(iter.next().value).toEqual(3);
+    });
+
+    test('SafeMap size', () => {
+        let safer_map = new SafeMap<string, number>();
+        expect(safer_map.my_map.size === 0);
+        safer_map.set("Blue", 21);
+        expect(safer_map.size() === 1);
+        safer_map.set("Yellow", 7);
+        expect(safer_map.size() === 2);
+        safer_map.set("Red", 3);
+        expect(safer_map.size() === 3);
+        safer_map.delete("Red");
+        expect(safer_map.size() === 2);
+        safer_map.delete("Yellow");
+        expect(safer_map.size() === 1);
+        safer_map.delete("Blue");
+        expect(safer_map.size() === 0);
     });
 });
