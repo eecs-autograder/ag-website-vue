@@ -193,6 +193,7 @@
 .web-menu {
   display: block;
   margin-top: 100px;
+  margin-bottom: 100px;
 }
 
 .menu-option {

@@ -6,8 +6,8 @@
     <TabsDemo></TabsDemo>
     <TooltipDemo></TooltipDemo>
     <ModalDemo></ModalDemo>
-    <ColorPaletteDemo></ColorPaletteDemo>
     <DropdownDemo></DropdownDemo>
+    <ColorPaletteDemo></ColorPaletteDemo>
   </div>
 </template>
 
