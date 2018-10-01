@@ -29,10 +29,158 @@ describe('SafeMap', () => {
         }
 
         const wrapper = mount(WrapperComponent);
-        console.log(wrapper.html());
 
         expect(wrapper.vm.$data.my_map.get("Blue")).toEqual("Jay");
-        expect(wrapper.vm.$data.my_map.get("Green")).toThrow('Key is not in map!');
+        try {
+            wrapper.vm.$data.my_map.get('Green');
+        }
+        catch (error_in) {
+             expect(error_in.message).toBe('Key: Green, is not in the map!');
+        }
     });
 
+    test('SafeMap get and set', () => {
+        let map = new SafeMap<string, number>();
+        map.set('spam', 44);
+        expect(map.get('spam')).toBe(44);
+    });
+
+    test('SafeMap get undefined', () => {
+        let map = new SafeMap<string, number>();
+        map.set('spam', 44);
+
+        try {
+            map.get('tofu');
+        }
+        catch (error_in) {
+            expect(error_in.message).toBe("Key: tofu, is not in the map!");
+        }
+    });
+
+    test('SafeMap clear', () => {
+        let safer_map = new SafeMap<string, string>();
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        expect(safer_map.size).toBe(3);
+        safer_map.clear();
+        expect(safer_map.size).toBe(0);
+    });
+
+    test('SafeMap delete', () => {
+        let safer_map = new SafeMap<string, string>();
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        safer_map.delete("Yellow");
+
+        expect(safer_map.size).toBe(2);
+        expect(safer_map.get("Blue")).toEqual("Jay");
+        expect(safer_map.get("Red")).toEqual("Sea");
+        try {
+            safer_map.get('Yellow');
+        }
+        catch (error_in) {
+            expect(error_in.message).toBe("Key: Yellow, is not in the map!");
+        }
+    });
+
+    test('SafeMap forEach', () => {
+
+        let safer_map = new SafeMap<string, string>();
+
+        let key_collab = "";
+
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        function print_key_and_value(value: string, key: string, map: Map<string, string>) {
+            key_collab += value;
+        }
+
+        safer_map.forEach(print_key_and_value);
+
+        expect(key_collab).toContain('JaySubmarineSea');
+
+    });
+
+    test('SafeMap has', () => {
+
+        let safer_map = new SafeMap<string, string>();
+
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        expect(safer_map.has("Blue")).toBe(true);
+        expect(safer_map.has("Blues")).toBe(false);
+        expect(safer_map.has("Purple")).toBe(false);
+        expect(safer_map.has("Yellow")).toBe(true);
+        expect(safer_map.has("Orange")).toBe(false);
+        expect(safer_map.has("Red")).toBe(true);
+    });
+
+    test('SafeMap has', () => {
+
+        let safer_map = new SafeMap<string, string>();
+
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        expect(safer_map.has("Blue")).toBe(true);
+        expect(safer_map.has("Blues")).toBe(false);
+        expect(safer_map.has("Purple")).toBe(false);
+        expect(safer_map.has("Yellow")).toBe(true);
+        expect(safer_map.has("Orange")).toBe(false);
+        expect(safer_map.has("Red")).toBe(true);
+    });
+
+    test('SafeMap entries', () => {
+
+        let safer_map = new SafeMap<string, string>();
+
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        let iter = safer_map.entries();
+
+        expect(iter.next().value).toEqual(["Blue" , "Jay"]);
+        expect(iter.next().value).toEqual(["Yellow", "Submarine"]);
+        expect(iter.next().value).toEqual(["Red", "Sea"]);
+    });
+
+    test('SafeMap keys', () => {
+
+        let safer_map = new SafeMap<string, string>();
+
+        safer_map.set("Blue", "Jay");
+        safer_map.set("Yellow", "Submarine");
+        safer_map.set("Red", "Sea");
+
+        let iter = safer_map.keys();
+
+        expect(iter.next().value).toEqual("Blue");
+        expect(iter.next().value).toEqual("Yellow");
+        expect(iter.next().value).toEqual("Red");
+    });
+
+    test('SafeMap values', () => {
+
+        let safer_map = new SafeMap<string, number>();
+
+        safer_map.set("Blue", 21);
+        safer_map.set("Yellow", 7);
+        safer_map.set("Red", 3);
+
+        let iter = safer_map.values();
+
+        expect(iter.next().value).toEqual(21);
+        expect(iter.next().value).toEqual(7);
+        expect(iter.next().value).toEqual(3);
+    });
 });
