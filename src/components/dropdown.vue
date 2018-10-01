@@ -13,7 +13,7 @@
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
              :id="index === highlighted_index ? 'highlight' : ''">
-          <slot v-bind="item">  </slot>
+          <slot v-bind="item"> </slot>
         </div>
       </div>
     </div>
@@ -163,10 +163,6 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-
-.dropdown-container:focus {
-  outline: none;
-}
 
 .dropdown-container {
   display: inline-block;
