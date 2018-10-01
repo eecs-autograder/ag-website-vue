@@ -13,6 +13,7 @@ export class TabsError extends Error {}
   components: {Tab}
 })
 export default class Tabs extends Vue {
+
   @Prop({default: 0, type: Number})
   value!: number;
 
