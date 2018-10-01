@@ -1,7 +1,7 @@
 interface Iterator<T> {
-    next(value?: any): IteratorResult<T>;
-    return?(value?: any): IteratorResult<T>;
-    throw?(e?: any): IteratorResult<T>;
+    next(value?: T): IteratorResult<T>;
+    return?(value?: T): IteratorResult<T>;
+    throw?(e?: T): IteratorResult<T>;
 }
 
 interface ForEachable<T> {
@@ -14,19 +14,22 @@ export class SafeMap<K, V>  {
 
     my_map = new Map<K, V>();
 
+    size() {
+        return this.my_map.size;
+    }
+
     constructor(iterable?: ForEachable<[K, V]>) { }
 
     clear() {
         this.my_map.clear();
-        this.size = 0;
     }
 
     delete(key: K) {
         this.my_map.delete(key);
-        this.size -= 1;
     }
 
-    forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, this_arg?: any): void {
+    // I'm not sure what this_arg refers to? --> was of type any, replaced it with type object
+    forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, this_arg?: object): void {
         return this.my_map.forEach(callbackfn);
     }
 
@@ -41,8 +44,7 @@ export class SafeMap<K, V>  {
         return this.my_map.has(key);
     }
 
-    set(key: K, value?: V): Map<K, V> {
-        this.size += 1;
+    set(key: K, value: V): Map<K, V> {
         return this.my_map.set(key, value);
     }
 
@@ -57,9 +59,6 @@ export class SafeMap<K, V>  {
     values(): Iterator<V> {
         return this.my_map.values();
     }
-
-    // what to do with this var
-    size: number = 0;
 }
 
 
