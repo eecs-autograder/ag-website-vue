@@ -26,10 +26,7 @@ import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
 import ModalDemo from '@/demos/modal_demo.vue';
-<<<<<<< d3f39a1e4583b52553ad07b491844c304ca4c753
 import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
-=======
->>>>>>> Removed 'chosen_item' from the dropdown_component. Added a scoped slot in the v-for of the dropdown component so that dropdown content rows can be personalized in the parent component. Updated the tests in test_dropdown.ts to reflect these changes.
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
 
