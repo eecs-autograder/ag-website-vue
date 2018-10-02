@@ -8,41 +8,13 @@ beforeAll(() => {
 
 describe('SafeMap', () => {
 
-    test('If item is not in the map, throw error', () => {
-        @Component({
-            template: `<div>
-                     <p v-for="[key, val] of Array.from(my_map)">
-                       {{val}}
-                     </p>
-                   </div>`,
-            components: {}
-        })
-
-        class WrapperComponent extends Vue {
-            my_map = new SafeMap<string, string>();
-
-            created() {
-                this.my_map.set("Blue", "Jay");
-                this.my_map.set("Yellow", "Submarine");
-                this.my_map.set("Red", "Sea");
-            }
-        }
-
-        const wrapper = mount(WrapperComponent);
-        expect(wrapper.vm.$data.my_map.get("Blue")).toEqual("Jay");
-
-        try {
-            wrapper.vm.$data.my_map.get('Green');
-        }
-        catch (error_in) {
-             expect(error_in.message).toBe('Key: Green, is not in the map!');
-        }
-    });
-
     test('SafeMap get and set', () => {
         let map = new SafeMap<string, number>();
         map.set('spam', 44);
+        map.set('tofu', 300);
         expect(map.get('spam')).toBe(44);
+        expect(map.get('tofu')).toBe(300);
+
     });
 
     test('SafeMap get undefined', () => {
@@ -93,36 +65,20 @@ describe('SafeMap', () => {
 
         let safer_map = new SafeMap<string, string>();
 
-        let key_collab = "";
+        let val_collab = "";
 
         safer_map.set("Blue", "Jay");
         safer_map.set("Yellow", "Submarine");
         safer_map.set("Red", "Sea");
 
         function print_key_and_value(value: string, key: string, map: Map<string, string>) {
-            key_collab += value;
+            val_collab += value;
         }
 
         safer_map.for_each(print_key_and_value);
 
-        expect(key_collab).toContain('JaySubmarineSea');
+        expect(val_collab).toContain('JaySubmarineSea');
 
-    });
-
-    test('SafeMap has', () => {
-
-        let safer_map = new SafeMap<string, string>();
-
-        safer_map.set("Blue", "Jay");
-        safer_map.set("Yellow", "Submarine");
-        safer_map.set("Red", "Sea");
-
-        expect(safer_map.has("Blue")).toBe(true);
-        expect(safer_map.has("Blues")).toBe(false);
-        expect(safer_map.has("Purple")).toBe(false);
-        expect(safer_map.has("Yellow")).toBe(true);
-        expect(safer_map.has("Orange")).toBe(false);
-        expect(safer_map.has("Red")).toBe(true);
     });
 
     test('SafeMap has', () => {
@@ -181,14 +137,18 @@ describe('SafeMap', () => {
 
         let iter = safer_map.values();
 
-        expect(iter.next().value).toEqual(21);
+        let idk = iter.next();
+        expect(idk.value).toEqual(21);
+        expect(idk.done).toEqual(false);
         expect(iter.next().value).toEqual(7);
         expect(iter.next().value).toEqual(3);
+
+        // expect(iter.next().value).toThrow(); nope -> but value is undefined so?
     });
 
     test('SafeMap size', () => {
         let safer_map = new SafeMap<string, number>();
-        expect(safer_map.my_map.size === 0);
+        expect(safer_map.size === 0);
         safer_map.set("Blue", 21);
         expect(safer_map.size === 1);
         safer_map.set("Yellow", 7);
@@ -201,5 +161,25 @@ describe('SafeMap', () => {
         expect(safer_map.size === 1);
         safer_map.delete("Blue");
         expect(safer_map.size === 0);
+    });
+
+    test('SafeMap iteration', () => {
+        let safer_map = new SafeMap<string, number>();
+
+        safer_map.set("Blue", 21);
+        safer_map.set("Yellow", 7);
+        safer_map.set("Red", 3);
+
+        let key_collab = "";
+        let val_collab = "";
+
+        for (let [key, val] of safer_map) {
+            key_collab += key;
+            val_collab += val;
+        }
+
+        expect(key_collab).toContain('BlueYellowRed');
+        expect(val_collab).toContain('2173');
+
     });
 });
