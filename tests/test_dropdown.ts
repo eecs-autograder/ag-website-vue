@@ -22,7 +22,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
             food = ["Lettuce", "Pineapple", "Onion"];
         }
@@ -54,7 +53,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
             cakes = ["Fruitcake", "Pineapple Upside Down Cake", "Molten Chocolate Cake"];
         }
@@ -97,7 +95,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
             letters = ["A", "B", "C"];
         }
@@ -135,7 +132,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
             states = [{name: "Missouri"},
                       {name: "Mississippi"},
@@ -221,7 +217,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
             states = [{name: "Missouri"},
                       {name: "Mississippi"}
@@ -287,7 +282,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
             states = [{name: "Missouri"},
                       {name: "Mississippi"}
@@ -356,7 +350,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
 
             employees = [{first_name: "Elora", last_name: "Blue"},
@@ -429,7 +422,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
 
             colors = [{ name: "Red", hex: "#FF0000"},
@@ -448,15 +440,11 @@ describe('Dropdown.vue', () => {
 
         dropdown_header.trigger('click');
 
-        // expect(dropdown_menu_content.element.hasAttribute("focus"));
-
         expect(dropdown_menu_content.element.style.display).toEqual("block");
 
         let highlighted_color = wrapper.find('#highlight');
 
         expect(highlighted_color.text()).toContain("Red");
-
-        // unrelated_para_element.trigger('click');
 
         dropdown_header.trigger('blur');
 
@@ -488,7 +476,6 @@ describe('Dropdown.vue', () => {
                 'dropdown': Dropdown
             }
         })
-
         class WrapperComponent extends Vue {
 
             colors = [{ name: "Red", hex: "#FF0000"},
@@ -520,7 +507,98 @@ describe('Dropdown.vue', () => {
         expect(highlighted_color.text()).toContain("Blue");
 
         dropdown_menu_content.trigger('keydown', { code: 'Escape'});
-
+        let dropdown = <Dropdown> wrapper.find({ref: 'dropdown_with_colors'}).vm;
+        expect(dropdown.is_open).toBe(false);
         expect(dropdown_menu_content.element.style.display).toEqual("none");
+
+        // Make sure pressing esc again doesn't open it.
+        dropdown_menu_content.trigger('keydown', { code: 'Escape'});
+        expect(dropdown.is_open).toBe(false);
+    });
+
+    test('Public show and hide dropdown functions', () => {
+        const component = {
+            template: `
+<dropdown :incoming_items="[1, 2, 3]" ref="dropdown">
+    <template slot="header">
+        <p>Hello</p>
+    </template>
+</dropdown>`,
+            components: {
+                'dropdown': Dropdown
+            }
+        };
+
+        const wrapper = mount(component);
+        let dropdown = <Dropdown> wrapper.find({ref: 'dropdown'}).vm;
+        expect(dropdown.is_open).toBe(false);
+
+        dropdown.show_the_dropdown_menu();
+        expect(dropdown.is_open).toBe(true);
+
+        dropdown.hide_the_dropdown_menu();
+        expect(dropdown.is_open).toBe(false);
+    });
+
+    test("Arrow key navigation doesn't go off the end", async () => {
+        const component = {
+            template: `
+<dropdown :incoming_items="[1, 2]" ref="dropdown">
+    <template slot="header">
+        <p ref="header">Hello</p>
+    </template>
+</dropdown>`,
+            components: {
+                'dropdown': Dropdown
+            }
+        };
+
+        const wrapper = mount(component);
+        let dropdown = <Dropdown> wrapper.find({ref: 'dropdown'}).vm;
+        let header = wrapper.find({ref: 'header'});
+
+        header.trigger('click');
+        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.$data.highlighted_index).toBe(0);
+
+        let content = wrapper.find('.dropdown-content');
+        content.trigger('keydown', { code: 'ArrowUp'});
+        expect(dropdown.$data.highlighted_index).toBe(0);
+
+        content.trigger('keydown', { code: 'ArrowDown'});
+        expect(dropdown.$data.highlighted_index).toBe(1);
+        content.trigger('keydown', { code: 'ArrowDown'});
+        expect(dropdown.$data.highlighted_index).toBe(1);
+
+        content.trigger('keydown', { code: 'ArrowUp'});
+        expect(dropdown.$data.highlighted_index).toBe(0);
+        content.trigger('keydown', { code: 'ArrowUp'});
+        expect(dropdown.$data.highlighted_index).toBe(0);
+    });
+
+    test("Other keys don't open menu", async () => {
+        const component = {
+            template: `
+<dropdown :incoming_items="[1, 2]" ref="dropdown">
+    <template slot="header">
+        <p ref="header">Hello</p>
+    </template>
+</dropdown>`,
+            components: {
+                'dropdown': Dropdown
+            }
+        };
+
+        const wrapper = mount(component);
+        let dropdown = <Dropdown> wrapper.find({ref: 'dropdown'}).vm;
+        let header = wrapper.find({ref: 'header'});
+
+        header.trigger('click');
+        expect(dropdown.is_open).toBe(true);
+
+        dropdown.hide_the_dropdown_menu();
+        let content = wrapper.find('.dropdown-content');
+        content.trigger('keydown', { code: 'A'});
+        expect(dropdown.is_open).toBe(false);
     });
 });

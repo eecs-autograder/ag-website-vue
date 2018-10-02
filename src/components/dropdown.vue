@@ -8,7 +8,8 @@
         <slot name="header"> </slot>
       </div>
 
-      <div class="dropdown-content" :style="content_styling">
+      <div class="dropdown-content"
+           :style="[content_styling, {display: is_open ? 'block' : 'none'}]">
         <div class="dropdown-row" v-for="(item, index) of items"
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
@@ -95,14 +96,10 @@
     }
 
     show_the_dropdown_menu() {
-      let dropdown_menu = <HTMLElement> this.$el.getElementsByClassName("dropdown-content")[0];
-      dropdown_menu.style.display = "block";
       this.is_open_ = true;
     }
 
     hide_the_dropdown_menu() {
-      let dropdown_menu = <HTMLElement> this.$el.getElementsByClassName("dropdown-content")[0];
-      dropdown_menu.style.display = "none";
       this.is_open_ = false;
     }
 
@@ -116,14 +113,7 @@
     }
 
     toggle_the_dropdown_menu() {
-      if (this.is_open) {
-        this.is_open_ = false;
-        this.hide_the_dropdown_menu();
-      }
-      else {
-        this.is_open_ = true;
-        this.show_the_dropdown_menu();
-      }
+      this.is_open_ = !this.is_open_;
     }
 
     move_highlighted(event: KeyboardEvent) {
@@ -139,9 +129,7 @@
         event.preventDefault();
         event.stopPropagation();
 
-        if (!this.is_open) {
-          this.show_the_dropdown_menu();
-        }
+        this.show_the_dropdown_menu();
 
         if (this.highlighted_index < this.items.length - 1) {
           this.highlighted_index += 1;
@@ -151,16 +139,14 @@
         event.preventDefault();
         event.stopPropagation();
 
-        if (!this.is_open) {
-          this.show_the_dropdown_menu();
-        }
+        this.show_the_dropdown_menu();
 
         if (this.highlighted_index > 0) {
           this.highlighted_index -= 1;
         }
       }
       else if (event.code === 'Escape') {
-        this.toggle_the_dropdown_menu();
+        this.hide_the_dropdown_menu();
       }
     }
   }
@@ -185,7 +171,7 @@
 }
 
 .dropdown-row {
-  border-top: 1px solid $light-gray;
+  border-top: 1px solid $pebble-dark;
   color: black;
   cursor: pointer;
   display: block;
