@@ -1,3 +1,4 @@
+// All arguments had type any
 interface Iterator<T> {
     next(value?: T): IteratorResult<T>;
     return?(value?: T): IteratorResult<T>;
@@ -14,7 +15,7 @@ export class SafeMap<K, V>  {
 
     my_map = new Map<K, V>();
 
-    size() {
+    get size() {
         return this.my_map.size;
     }
 
@@ -29,7 +30,7 @@ export class SafeMap<K, V>  {
     }
 
     // I'm not sure what this_arg refers to? --> was of type any, replaced it with type object
-    forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, this_arg?: object): void {
+    for_each(callbackfn: (value: V, index: K, map: Map<K, V>) => void, this_arg?: object): void {
         return this.my_map.forEach(callbackfn);
     }
 
