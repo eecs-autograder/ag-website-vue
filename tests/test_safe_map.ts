@@ -1,6 +1,5 @@
 import { SafeMap } from '@/safe_map';
-import { config, mount } from '@vue/test-utils';
-import { Component, Vue } from 'vue-property-decorator';
+import { config } from '@vue/test-utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
