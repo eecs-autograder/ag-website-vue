@@ -9,7 +9,8 @@
       </div>
 
       <div class="dropdown-content"
-           :style="[content_styling, {display: is_open ? 'block' : 'none'}]">
+           :style="[{minWidth: dropdown_content_min_width, maxWidth: dropdown_content_max_width},
+                    {display: is_open ? 'block' : 'none'}]">
         <div class="dropdown-row" v-for="(item, index) of items"
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
@@ -43,18 +44,12 @@
     chosen_item: object = {};
     highlighted_index = 0;
     items: object[] = [];
-    content_min_width = "";
-    content_max_width = "";
-    content_styling = {};
+
     is_open_ = false;
 
     created() {
       this.items = this.incoming_items;
       this.highlighted_index = this.highlighted_index_in;
-      this.content_min_width = this.dropdown_content_min_width;
-      this.content_max_width = this.dropdown_content_max_width;
-      this.add_styling();
-      this.hide_the_dropdown_menu = this.hide_the_dropdown_menu.bind(this);
     }
 
     mounted() {
@@ -71,28 +66,6 @@
 
     get is_open() {
       return this.is_open_;
-    }
-
-    add_styling() {
-      if (this.content_min_width !== "" && this.content_max_width !== "") {
-        this.content_styling = {
-          'minWidth' : this.content_min_width,
-          'maxWidth' : this.content_max_width
-        };
-      }
-      else if (this.content_min_width === "" && this.content_max_width !== "") {
-        this.content_styling = {
-          'maxWidth' : this.content_max_width
-        };
-      }
-      else if (this.content_min_width !== "" && this.content_max_width === "") {
-        this.content_styling = {
-          'minWidth' : this.content_min_width
-        };
-      }
-      else {
-        this.content_styling = { };
-      }
     }
 
     show_the_dropdown_menu() {
