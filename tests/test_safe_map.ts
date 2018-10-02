@@ -29,8 +29,8 @@ describe('SafeMap', () => {
         }
 
         const wrapper = mount(WrapperComponent);
-
         expect(wrapper.vm.$data.my_map.get("Blue")).toEqual("Jay");
+
         try {
             wrapper.vm.$data.my_map.get('Green');
         }
@@ -61,13 +61,13 @@ describe('SafeMap', () => {
         let safer_map = new SafeMap<string, string>();
         safer_map.set("Blue", "Jay");
 
-        expect(safer_map.size()).toEqual(1);
+        expect(safer_map.size).toEqual(1);
         safer_map.set("Yellow", "Submarine");
-        expect(safer_map.size()).toEqual(2);
+        expect(safer_map.size).toEqual(2);
         safer_map.set("Red", "Sea");
-        expect(safer_map.size()).toEqual(3);
+        expect(safer_map.size).toEqual(3);
         safer_map.clear();
-        expect(safer_map.size()).toEqual(0);
+        expect(safer_map.size).toEqual(0);
     });
 
     test('SafeMap delete', () => {
@@ -78,7 +78,7 @@ describe('SafeMap', () => {
 
         safer_map.delete("Yellow");
 
-        expect(safer_map.size()).toEqual(2);
+        expect(safer_map.size).toEqual(2);
         expect(safer_map.get("Blue")).toEqual("Jay");
         expect(safer_map.get("Red")).toEqual("Sea");
         try {
@@ -89,7 +89,7 @@ describe('SafeMap', () => {
         }
     });
 
-    test('SafeMap forEach', () => {
+    test('SafeMap for_each', () => {
 
         let safer_map = new SafeMap<string, string>();
 
@@ -103,7 +103,7 @@ describe('SafeMap', () => {
             key_collab += value;
         }
 
-        safer_map.forEach(print_key_and_value);
+        safer_map.for_each(print_key_and_value);
 
         expect(key_collab).toContain('JaySubmarineSea');
 
@@ -190,16 +190,16 @@ describe('SafeMap', () => {
         let safer_map = new SafeMap<string, number>();
         expect(safer_map.my_map.size === 0);
         safer_map.set("Blue", 21);
-        expect(safer_map.size() === 1);
+        expect(safer_map.size === 1);
         safer_map.set("Yellow", 7);
-        expect(safer_map.size() === 2);
+        expect(safer_map.size === 2);
         safer_map.set("Red", 3);
-        expect(safer_map.size() === 3);
+        expect(safer_map.size === 3);
         safer_map.delete("Red");
-        expect(safer_map.size() === 2);
+        expect(safer_map.size === 2);
         safer_map.delete("Yellow");
-        expect(safer_map.size() === 1);
+        expect(safer_map.size === 1);
         safer_map.delete("Blue");
-        expect(safer_map.size() === 0);
+        expect(safer_map.size === 0);
     });
 });
