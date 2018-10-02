@@ -51,5 +51,3 @@ export class SafeMap<K, V>  {
         return this._my_map[Symbol.iterator]();
     }
 }
-
-
