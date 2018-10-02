@@ -127,35 +127,40 @@
     }
 
     move_highlighted(event: KeyboardEvent) {
-      if (event.code === "Enter") {
+      if (event.code === "Enter" && this.is_open) {
         event.preventDefault();
         event.stopPropagation();
-        if (this.highlighted_index !== -1 && this.is_open) {
-          this.choose_item_from_dropdown_menu(
-            this.items[this.highlighted_index], this.highlighted_index
-          );
-        }
+
+        this.choose_item_from_dropdown_menu(
+          this.items[this.highlighted_index], this.highlighted_index
+        );
       }
-      else {
+      else if (event.code === 'ArrowDown') {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this.is_open) {
           this.show_the_dropdown_menu();
         }
-        if (event.code === 'ArrowDown') {
-          if (this.highlighted_index < this.items.length - 1) {
-            this.highlighted_index += 1;
-          }
+
+        if (this.highlighted_index < this.items.length - 1) {
+          this.highlighted_index += 1;
         }
-        else if (event.code === 'ArrowUp') {
-          if (this.highlighted_index !== -1) {
-            this.highlighted_index -= 1;
-            if (this.highlighted_index < 0) {
-              this.highlighted_index = 0;
-            }
-          }
+      }
+      else if (event.code === 'ArrowUp') {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.is_open) {
+          this.show_the_dropdown_menu();
         }
-        else if (event.code === 'Escape') {
-          this.toggle_the_dropdown_menu();
+
+        if (this.highlighted_index > 0) {
+          this.highlighted_index -= 1;
         }
+      }
+      else if (event.code === 'Escape') {
+        this.toggle_the_dropdown_menu();
       }
     }
   }
