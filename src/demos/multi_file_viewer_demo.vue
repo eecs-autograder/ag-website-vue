@@ -67,7 +67,7 @@
     }
 
     open_file2(file_in: string) {
-      let mfv = <MultiFileViewer> this.$refs.multi_file;
+      let mfv = <MultiFileViewer> this.$refs.multi_file2;
       mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
     }
 
