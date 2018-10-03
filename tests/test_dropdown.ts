@@ -29,9 +29,8 @@ describe('Dropdown.vue', () => {
         const wrapper = mount(WrapperComponent);
         let dropdown_menu_container = wrapper.find({ref: 'dropdown_example_1'});
         expect(dropdown_menu_container.vm.$data.items).toEqual(wrapper.vm.$data.food);
-        expect(dropdown_menu_container.vm.$data.content_min_width).toEqual("");
-        expect(dropdown_menu_container.vm.$data.content_max_width).toEqual("");
-        expect(dropdown_menu_container.vm.$data.content_styling).toEqual({});
+        expect(dropdown_menu_container.element.style.minWidth).toEqual("");
+        expect(dropdown_menu_container.element.style.maxWidth).toEqual("");
     });
 
     test('Width of dropdown content is set to min-width when size of header is smaller ' +
@@ -59,15 +58,13 @@ describe('Dropdown.vue', () => {
 
         const wrapper = mount(WrapperComponent);
         let dropdown_component = wrapper.find({ref: 'dropdown_example_1'});
+        let dropdown_menu_content = wrapper.find(".dropdown-content");
+
         expect(dropdown_component.vm.$data.items).toEqual(wrapper.vm.$data.cakes);
-        expect(dropdown_component.vm.$data.content_min_width).toEqual("200px");
-        expect(dropdown_component.vm.$data.content_max_width).toEqual("");
-        expect(dropdown_component.vm.$data.content_styling).toEqual(
-            {'minWidth' : "200px"}
-        );
+        expect(dropdown_menu_content.element.style.minWidth).toEqual("200px");
+        expect(dropdown_menu_content.element.style.maxWidth).toEqual("");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
         dropdown_header.trigger("click");
 
         expect(dropdown_header.element.style.width).toEqual("150px");
@@ -101,15 +98,13 @@ describe('Dropdown.vue', () => {
 
         const wrapper = mount(WrapperComponent);
         let dropdown_component = wrapper.find({ref: 'dropdown_example_1'});
+        let dropdown_menu_content = wrapper.find(".dropdown-content");
+
         expect(dropdown_component.vm.$data.items).toEqual(wrapper.vm.$data.letters);
-        expect(dropdown_component.vm.$data.content_min_width).toEqual("");
-        expect(dropdown_component.vm.$data.content_max_width).toEqual("100px");
-        expect(dropdown_component.vm.$data.content_styling).toEqual(
-            {'maxWidth' : "100px"}
-        );
+        expect(dropdown_menu_content.element.style.minWidth).toEqual("");
+        expect(dropdown_menu_content.element.style.maxWidth).toEqual("100px");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
         dropdown_header.trigger("click");
 
         expect(dropdown_header.element.style.width).toEqual("150px");
