@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ViewFileDemo></ViewFileDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
     <ButtonDemo></ButtonDemo>
     <DiffDemo></DiffDemo>
@@ -13,41 +14,44 @@
 
 <script lang="ts">
 
-import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import Dropdown from '@/components/dropdown.vue';
-import Tab from '@/components/tabs/tab.vue';
-import Tabs from '@/components/tabs/tabs.vue';
-import Toggle from '@/components/toggle.vue';
-import ViewFile from '@/components/view_file.vue';
+  import Dropdown from '@/components/dropdown.vue';
+  import Tab from '@/components/tabs/tab.vue';
+  import Tabs from '@/components/tabs/tabs.vue';
+  import Toggle from '@/components/toggle.vue';
+  import ViewFile from '@/components/view_file.vue';
 
-import ButtonDemo from '@/demos/button_demo.vue';
-import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
-import DiffDemo from '@/demos/diff_demo.vue';
-import DropdownDemo from '@/demos/dropdown_demo.vue';
-import ModalDemo from '@/demos/modal_demo.vue';
-import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
-import TabsDemo from '@/demos/tabs_demo.vue';
-import TooltipDemo from '@/demos/tooltip_demo.vue';
+  import ButtonDemo from '@/demos/button_demo.vue';
+  import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
+  import DiffDemo from '@/demos/diff_demo.vue';
+  import DropdownDemo from '@/demos/dropdown_demo.vue';
+  import ModalDemo from '@/demos/modal_demo.vue';
+  import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
+  import TabsDemo from '@/demos/tabs_demo.vue';
+  import TooltipDemo from '@/demos/tooltip_demo.vue';
+  import ViewFileDemo from '@/demos/view_file_demo.vue';
 
-@Component({
-  components: {
-    ButtonDemo,
-    ColorPaletteDemo,
-    DiffDemo,
-    Dropdown,
-    DropdownDemo,
-    ModalDemo,
-    MultiFileViewerDemo,
-    Tab,
-    Tabs,
-    TabsDemo,
-    Toggle,
-    TooltipDemo,
-    ViewFile,
-  }
-})
-export default class HelloWorld extends Vue {}
+  @Component({
+    components: {
+      ButtonDemo,
+      ColorPaletteDemo,
+      DiffDemo,
+      Dropdown,
+      DropdownDemo,
+      ModalDemo,
+      MultiFileViewerDemo,
+      Tab,
+      Tabs,
+      TabsDemo,
+      Toggle,
+      TooltipDemo,
+      ViewFile,
+      ViewFileDemo
+    }
+  })
+  export default class HelloWorld extends Vue {}
+
 </script>
 
 <style scoped lang="scss">

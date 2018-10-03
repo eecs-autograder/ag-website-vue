@@ -4,32 +4,32 @@
           v-model="active_tab_index"
           tab_active_class="gray-white-theme-active"
           tab_inactive_class="gray-white-theme-inactive">
-       <tab ref="single-tab"
-            v-for="(open_file, index) of files_currently_viewing"
-            @click="active_tab_index = index">
+      <tab ref="single-tab"
+           v-for="(open_file, index) of files_currently_viewing"
+           @click="active_tab_index = index">
 
-         <template slot="header">
-           <div class="tab-header">
-             <p class="tab-label"> {{ open_file.name }} </p>
-             <i class="fas fa-times close-x"
-                @click="$event.stopPropagation(); remove_from_viewing(index)"></i>
-           </div>
-         </template>
+        <template slot="header">
+          <div class="tab-header">
+            <p class="tab-label"> {{ open_file.name }} </p>
+            <i class="fas fa-times close-x"
+               @click="$event.stopPropagation(); remove_from_viewing(index)"></i>
+          </div>
+        </template>
 
-         <template slot="body">
-           <div class="tab-body">
+        <template slot="body">
+          <div class="tab-body">
 
-             <view-file
-               ref="view_file_component"
-               :incoming_filename="open_file.name"
-               :incoming_file_contents="open_file.content"
-               :incoming_height_specifications="scrollable_height">
-             </view-file>
+            <view-file
+              ref="view_file_component"
+              :incoming_filename="open_file.name"
+              :incoming_file_contents="open_file.content"
+              :incoming_height_specifications="scrollable_height">
+            </view-file>
 
-           </div>
-         </template>
+          </div>
+        </template>
 
-       </tab>
+      </tab>
     </tabs>
   </div>
 </template>
