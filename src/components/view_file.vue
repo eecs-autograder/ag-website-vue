@@ -7,9 +7,8 @@
         </div>
       </div>
       <div class="file-content-container">
-        <pre v-for="(line) of file_contents.split('\n')" class="line-of-file-content">
-          {{line}}
-        </pre>
+        <pre v-for="(line) of file_contents.split('\n')"
+             class="line-of-file-content">{{line === "" ? " " : line}}</pre>
       </div>
     </div>
   </div>
@@ -77,13 +76,13 @@
   font-size: 13px;
   padding: 1px 0 1px 0;
   text-align: center;
-  z-index: 10;
   height: 16px;
 }
 
 .file-content-container {
   color: black;
   display: inline-block;
+  margin-left: 51px;
   position: relative;
   vertical-align: top;
 }
@@ -93,10 +92,11 @@
   height: 16px;
   margin: 0;
   padding: 1px 10px 1px 0;
+  white-space: pre;
 }
 
 .line-of-file-content:last-child {
-  margin-bottom: 5px;
+  padding-bottom: 5px;
 }
 
 </style>

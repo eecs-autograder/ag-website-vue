@@ -4,15 +4,31 @@
       <p> <b> View File allows for horizontal scrolling when the text is longer than
         the width of the display. </b></p>
       <view-file :incoming_filename="filename_1"
-                 :incoming_file_content="file_contents_1">
+                 :incoming_file_contents="file_contents_1">
       </view-file>
     </div>
     <div class="view_file_ex_2">
       <p> <b> View File allows for vertical scrolling when there are more lines than can
         fit in the height of the display. </b></p>
-      <view-file :incoming_filename="filename_2"
-                 :incoming_file_content="file_contents_2">
-      </view-file>
+      <div class="border-box">
+        <view-file :incoming_filename="filename_2"
+                   :incoming_file_contents="file_contents_2"
+                   :incoming_height_specifications="height_in">
+        </view-file>
+      </div>
+    </div>
+    <div class="view_file_ex_3">
+      <p> <b> File contents can be swapped out for different contents </b></p>
+      <button
+        id="swap-contents-button"
+        @click="change_contents()">
+        Change Contents (once)
+      </button>
+      <div class="border-box">
+        <view-file :incoming_filename="filename_3"
+                   :incoming_file_contents="file_contents_3">
+        </view-file>
+      </div>
     </div>
   </div>
 </template>
@@ -26,52 +42,42 @@
     components: {ViewFile}
   })
   export default class ViewFileDemo extends Vue {
+    height_in = {'height': '200px'};
     filename_1 = "long_lines.txt";
     file_contents_1 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
                       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
                       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
                       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     filename_2 = "many_lines.txt";
-    file_contents_2 = "Doe, a deer, a female deer\n" +
-                      "Ray, a drop of golden sun\n" +
-                      "Me, a name I call myself\n" +
-                      "Far, a long, long way to run\n" +
-                      "Sew, a needle pulling thread\n" +
-                      "La, a note to follow Sew\n" +
-                      "Tea, a drink with jam and bread\n" +
-                      "That will bring us back to Do (oh-oh-oh)\n\n" +
-                      "Doe, a deer, a female deer\n" +
-                      "Ray, a drop of golden sun\n" +
-                      "Me, a name I call myself\n" +
-                      "Far, a long, long way to run\n" +
-                      "Sew, a needle pulling thread\n" +
-                      "La, a note to follow Sew\n" +
-                      "Tea, a drink with jam and bread\n" +
-                      "That will bring us back to Do (oh-oh-oh)\n\n" +
-                      "Doe, a deer, a female deer\n" +
-                      "Ray, a drop of golden sun\n" +
-                      "Me, a name I call myself\n" +
-                      "Far, a long, long way to run\n" +
-                      "Sew, a needle pulling thread\n" +
-                      "La, a note to follow Sew\n" +
-                      "Tea, a drink with jam and bread\n" +
-                      "That will bring us back to Do (oh-oh-oh)\n\n" +
-                      "Doe, a deer, a female deer\n" +
-                      "Ray, a drop of golden sun\n" +
-                      "Me, a name I call myself\n" +
-                      "Far, a long, long way to run\n" +
-                      "Sew, a needle pulling thread\n" +
-                      "La, a note to follow Sew\n" +
-                      "Tea, a drink with jam and bread\n" +
-                      "That will bring us back to Do (oh-oh-oh)\n\n" +
-                      "Doe, a deer, a female deer\n" +
-                      "Ray, a drop of golden sun\n" +
-                      "Me, a name I call myself\n" +
-                      "Far, a long, long way to run\n" +
-                      "Sew, a needle pulling thread\n" +
-                      "La, a note to follow Sew\n" +
-                      "Tea, a drink with jam and bread\n" +
-                      "That will bring us back to Do (oh-oh-oh)\n";
+    file_contents_2 =
+`#file-container {
+    border: 0px solid lightgray;
+    border-radius: 0px 0px 3px 3px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    width: 100%;
+    border-left: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+}
+
+.continue-bar {
+    background-color: white;
+    height: 5px;
+    width: 45px;
+    border-radius: 0px;
+}
+
+#current-file {
+    background-color: #E8EEFE;
+}`;
+    filename_3 = "Ice_Cream.cpp";
+    file_contents_3 = "Mint Chocolate Chip";
+    alternate_file_contents_3 = "Blue Moon";
+
+    change_contents() {
+      this.file_contents_3 = this.alternate_file_contents_3;
+    }
+
   }
 
 </script>
@@ -84,9 +90,26 @@
 }
 
 .view_file_ex_2 {
-  width: 400px;
-  height: 40px;
+  width: 600px;
   margin: 20px;
+}
+
+.border-box {
+  border: 1px solid lightgray;
+  border-radius: 2px;
+  font-weight: 300;
+}
+
+#swap-contents-button {
+  background-color: #ace7c9;
+  border-radius: 5px;
+  color: black;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 10px 0 20px 0;
+  outline: none;
+  padding: 10px;
 }
 
 </style>
