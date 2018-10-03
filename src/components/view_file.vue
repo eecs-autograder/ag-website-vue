@@ -8,7 +8,7 @@
       </div>
       <div class="file-content-container">
         <pre v-for="(line) of file_contents.split('\n')"
-             class="line-of-file-content">{{line === "" ? " " : line}}</pre>
+             class="line-of-file-content">{{line === "" ? "\n" : line}}</pre>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
 
 #viewing-container {
   border-radius: 0 0 3px 3px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: monospace;
   padding: 5px 0 0 0;
   width: 100%;
 }
@@ -77,6 +77,8 @@
   padding: 1px 0 1px 0;
   text-align: center;
   height: 16px;
+  border-bottom: 1px solid transparent;
+  vertical-align: top;
 }
 
 .file-content-container {
@@ -92,7 +94,8 @@
   height: 16px;
   margin: 0;
   padding: 1px 10px 1px 0;
-  white-space: pre;
+  white-space: pre-wrap;
+  border-bottom: 1px solid transparent;
 }
 
 .line-of-file-content:last-child {
