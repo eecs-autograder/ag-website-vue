@@ -77,7 +77,6 @@
     change_contents() {
       this.file_contents_3 = this.alternate_file_contents_3;
     }
-
   }
 
 </script>
