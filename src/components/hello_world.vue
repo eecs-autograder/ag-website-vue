@@ -28,6 +28,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
 @Component({
   components: {Toggle, ViewFile, Tab, Tabs, ButtonDemo, DiffDemo, MultiFileViewerDemo, TabsDemo,
                TooltipDemo, ViewFileDemo}
+
 })
 export default class HelloWorld extends Vue {
 }

@@ -4,6 +4,7 @@
       <p> <b> View File allows for horizontal scrolling when the text is longer than
         the width of the display. </b></p>
       <view-file :incoming_filename="filename_1"
+
                  :incoming_file_contents="file_contents_1">
       </view-file>
     </div>
@@ -77,7 +78,6 @@
     change_contents() {
       this.file_contents_3 = this.alternate_file_contents_3;
     }
-
   }
 
 </script>
