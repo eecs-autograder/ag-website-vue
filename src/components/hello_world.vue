@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ViewFileDemo></ViewFileDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
     <ButtonDemo></ButtonDemo>
     <DiffDemo></DiffDemo>
@@ -29,6 +30,7 @@ import ModalDemo from '@/demos/modal_demo.vue';
 import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
+import ViewFileDemo from '@/demos/view_file_demo.vue';
 
 @Component({
   components: {
@@ -45,6 +47,7 @@ import TooltipDemo from '@/demos/tooltip_demo.vue';
     Toggle,
     TooltipDemo,
     ViewFile,
+    ViewFileDemo
   }
 })
 export default class HelloWorld extends Vue {}
