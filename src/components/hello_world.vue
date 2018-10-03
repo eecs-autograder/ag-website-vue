@@ -9,6 +9,7 @@
     <ModalDemo></ModalDemo>
     <DropdownDemo></DropdownDemo>
     <ColorPaletteDemo></ColorPaletteDemo>
+    <ToggleDemo></ToggleDemo>
   </div>
 </template>
 
@@ -29,6 +30,7 @@ import DropdownDemo from '@/demos/dropdown_demo.vue';
 import ModalDemo from '@/demos/modal_demo.vue';
 import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
+import ToggleDemo from '@/demos/toggle_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
 import ViewFileDemo from '@/demos/view_file_demo.vue';
 
@@ -45,6 +47,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     Tabs,
     TabsDemo,
     Toggle,
+    ToggleDemo,
     TooltipDemo,
     ViewFile,
     ViewFileDemo
