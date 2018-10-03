@@ -1,0 +1,51 @@
+// Grays -------------------------------------
+
+$pebble-light: hsl(210, 13%, 95%);
+
+$pebble-medium: hsl(210, 12%, 93%);
+
+$pebble-dark: hsl(210, 12%, 80%);
+
+$stormy-gray-light: hsl(210, 13%, 65%);
+
+$stormy-gray-dark: slategray;
+
+$baking-pan: rgba(27, 31, 35, 0.35);
+
+$dark-gray: #666;
+
+// Reds ---------------------------------------
+
+$ballet-slipper: hsl(9, 90%, 88%);
+
+$bubble-gum: hsl(-355, 96%, 83%);
+
+$coral-pink: hsl(0.61, 89%, 71%);
+
+$cherry: crimson;
+
+$burnt-red: darkred;
+
+// Yellows -------------------------------------
+
+$light-yellow: hsl(55, 95%, 75%);
+
+// Greens --------------------------------------
+
+$green: hsl(150, 55%, 44%);
+
+// Blues ---------------------------------------
+
+$sky-blue: hsl(208, 79%, 79%);
+
+$light-blue: hsl(212, 100%, 90%);
+
+$ocean-blue: hsl(208, 59%, 49%);
+
+// Uses ----------------------------------------
+
+$save-green: $green;
+
+$warning-red: $cherry;
+
+$toggle-blue: $ocean-blue;

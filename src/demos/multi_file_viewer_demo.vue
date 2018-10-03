@@ -95,7 +95,7 @@
 }
 
 .fruits {
-  background-color: $medium-dark-blue;
+  background-color: $ocean-blue;
 }
 
 .letters {
