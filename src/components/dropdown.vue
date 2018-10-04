@@ -1,6 +1,5 @@
 <template>
   <div class="outermost-dropdown-container">
-
     <div class="dropdown-container"
          @keydown="move_highlighted($event)">
 
@@ -47,6 +46,17 @@
 
     is_open_ = false;
 
+    @Watch('incoming_items')
+    on_filter_text_changed(new_val, old_val) {
+      // console.log(`Old ${old_val}`);
+      // console.log(`New ${new_val}`);
+      // console.log("Highlighted: " + this.highlighted_index);
+      this.items = new_val;
+      if (this.highlighted_index >= this.items.length && this.items.length > 0) {
+        this.highlighted_index = this.items.length - 1;
+      }
+    }
+
     created() {
       this.items = this.incoming_items;
       this.highlighted_index = this.highlighted_index_in;
@@ -77,6 +87,7 @@
     }
 
     choose_item_from_dropdown_menu(item_selected: object, index: number) {
+      console.log("Choose Called");
       if (item_selected !== undefined) {
         this.chosen_item = item_selected;
         this.highlighted_index = index;
@@ -90,10 +101,10 @@
     }
 
     move_highlighted(event: KeyboardEvent) {
-      if (event.code === "Enter" && this.is_open) {
+      if (event.code === "Enter" && this.is_open && this.items.length > 0) {
         event.preventDefault();
         event.stopPropagation();
-
+        // console.log(this.highlighted_index);
         this.choose_item_from_dropdown_menu(
           this.items[this.highlighted_index], this.highlighted_index
         );

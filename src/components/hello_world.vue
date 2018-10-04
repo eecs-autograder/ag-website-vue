@@ -32,6 +32,7 @@ import ButtonDemo from '@/demos/button_demo.vue';
 import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
+import DropdownTypeaheadDemo from '@/demos/dropdown_typeahead_demo.vue';
 import ModalDemo from '@/demos/modal_demo.vue';
 import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
@@ -46,6 +47,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     DiffDemo,
     Dropdown,
     DropdownDemo,
+    DropdownTypeaheadDemo,
     ModalDemo,
     MultiFileViewerDemo,
     Tab,
