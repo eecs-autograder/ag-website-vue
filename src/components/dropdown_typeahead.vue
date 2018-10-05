@@ -1,6 +1,5 @@
 <template>
   <div class="dropdown-typeahead-container">
-    <p> filter_text = {{filter_text}} </p>
     <Dropdown ref="dropdown_component"
               :incoming_items="filtered_choices"
               @update_item_selected="choose_item($event)">
@@ -12,9 +11,9 @@
                v-model="filter_text"
                @keydown="resume_search()">
       </template>
-      <template slot-scope="dropdown_item">
-        <slot v-bind="dropdown_item">
-          {{dropdown_item}}
+      <template slot-scope="{item}">
+        <slot v-bind:item="item">
+          {{item}}
         </slot>
       </template>
 
@@ -38,26 +37,20 @@
     @Prop({required: true, type: String})
     incoming_placeholder_text!: string;
 
-    @Prop(
-      { default: function(item: object, filter_text: string) {
-          return item.indexOf(filter_text) >= 0;
-        },
-        type: Function
-      }
-    )
+    @Prop({ required: true, type: Function })
     incoming_filter_fn!: (item: object, filter: string) => boolean;
 
     filter_text: string = "";
     placeholder_text = "";
-    choices = [];
+    choices: object[] = [];
     filter_fn = function(item: object, filter: string) {
       return true;
     };
-    private _filtered_choices: object[];
+    private _filtered_choices: object[] = [];
 
     @Watch('filter_text')
-    on_filter_text_changed(new_val, old_val) {
-      this._filtered_choices = null;
+    on_filter_text_changed(new_val: string, old_val: string) {
+      // this._filtered_choices = null;
     }
 
     created() {
@@ -77,15 +70,16 @@
     }
 
     get filtered_choices() {
-      if (!this.filter_text) {
-        // console.log("One");
+      console.log("filtered choices called");
+      if (this.filter_text === "") {
+        console.log("One");
         return this.choices;
       }
-      if (this._filtered_choices !== null) {
-        // console.log("Two");
-        return this._filtered_choices;
-      }
-      // console.log("Three");
+      // if (this._filtered_choices !== null) {
+      //   console.log("Two");
+      //   return this._filtered_choices;
+      // }
+      console.log("Three");
       this._filtered_choices = this.choices.filter(
         (item) => this.filter_fn(item, this.filter_text));
       return this._filtered_choices;

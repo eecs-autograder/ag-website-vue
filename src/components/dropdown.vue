@@ -14,7 +14,7 @@
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
              :id="index === highlighted_index ? 'highlight' : ''">
-          <slot v-bind="item"> </slot>
+          <slot v-bind:item="item"> </slot>
         </div>
       </div>
     </div>
@@ -47,7 +47,7 @@
     is_open_ = false;
 
     @Watch('incoming_items')
-    on_filter_text_changed(new_val, old_val) {
+    on_filter_text_changed(new_val: object[], old_val: object[]) {
       // console.log(`Old ${old_val}`);
       // console.log(`New ${new_val}`);
       // console.log("Highlighted: " + this.highlighted_index);
@@ -104,7 +104,6 @@
       if (event.code === "Enter" && this.is_open && this.items.length > 0) {
         event.preventDefault();
         event.stopPropagation();
-        // console.log(this.highlighted_index);
         this.choose_item_from_dropdown_menu(
           this.items[this.highlighted_index], this.highlighted_index
         );

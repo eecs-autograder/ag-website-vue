@@ -6,8 +6,8 @@
       @update_item_chosen="print_item($event)"
       item_field_name="state"
       :incoming_filter_fn="filter_fn_1">
-      <template slot-scope="dropdown_item">
-        <span> {{ dropdown_item.state }}</span>
+      <template slot-scope="{ item }">
+        <span> {{ item.state }}</span>
       </template>
     </dropdown-typeahead>
 
@@ -43,12 +43,10 @@
 
     chosen_items: object[] = [];
 
-    filter_fn_1(item: string, filter_text: string) {
-      let field_name = "state";
-      let str_at_field = item[field_name];
-      return str_at_field.indexOf(filter_text) >= 0;
-    };
-
+    filter_fn_1(item: {state: string}, filter_text: string) {
+      // let field_name = "state";
+      return item.state.indexOf(filter_text) >= 0;
+    }
   }
 </script>
 

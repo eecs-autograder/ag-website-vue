@@ -17,9 +17,9 @@
             {{selected_menu_item.option}}
           </p>
         </template>
-        <template slot-scope="menu_item">
+        <template slot-scope="{item}">
            <div class="airplane"><i class="fas fa-plane"></i></div>
-           <span> {{menu_item.option}} </span>
+           <span> {{item.option}} </span>
         </template>
       </dropdown>
     </div>
@@ -35,8 +35,8 @@
             Menu On A Button
           </button>
         </template>
-        <div slot-scope="employee">
-          <span> {{employee.first_name}} </span>
+        <div slot-scope="{item}">
+          <span> {{item.first_name}} </span>
         </div>
       </dropdown>
     </div>
@@ -53,8 +53,8 @@
                  name="some_word_stuff"
                  v-model="some_word">
         </template>
-        <div slot-scope="employee">
-          <span> {{employee.first_name}} </span>
+        <div slot-scope="{item}">
+          <span> {{item.first_name}} </span>
         </div>
       </dropdown>
     </div>
@@ -70,8 +70,8 @@
             <p> Products </p>
           </li>
         </template>
-        <template slot-scope="food_item">
-          <p class="food"> {{food_item.name}} </p>
+        <template slot-scope="{item}">
+          <p class="food"> {{item}} </p>
         </template>
       </dropdown>
       <dropdown ref="dropdown_menu_ex_5"
@@ -81,8 +81,8 @@
             <p> Contact </p>
           </li>
         </template>
-        <template slot-scope="contact_method">
-          <p class="food"> {{contact_method.contact}}</p>
+        <template slot-scope="{item}">
+          <p class="food"> {{item.contact}}</p>
         </template>
       </dropdown>
     </ul>
@@ -123,9 +123,9 @@
              { first_name: "Michelle", last_name: "Brandt"}
             ];
 
-    food_menu_items = [{name: "Cheeseburger"},
-                       {name: "Fries"},
-                       {name: "Shake"}
+    food_menu_items = ["Cheeseburger",
+                       "Fries",
+                       "Shake"
                       ];
 
     contact_methods = [{contact: "By Phone"}, {contact: "By Email"}];
