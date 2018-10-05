@@ -3,7 +3,7 @@
     <dropdown-typeahead
       incoming_placeholder_text="Enter a State"
       :incoming_choices="states"
-      @update_item_chosen="print_item($event)"
+      @update_item_chosen="add_item_1($event)"
       :incoming_filter_fn="filter_fn_1">
       <template slot-scope="{ item }">
         <span> {{ item.state }}</span>
@@ -12,8 +12,24 @@
 
     <div class="typeahead-1-selections">
       <h3> Chosen from Typeahead: </h3>
-      <p v-for="item of chosen_items"> {{item.state}} </p>
+      <p v-for="item of chosen_items_1"> {{item.state}} </p>
     </div>
+
+    <dropdown-typeahead
+      incoming_placeholder_text="Enter a Character"
+      :incoming_choices="strangers"
+      @update_item_chosen="add_item_2($event)"
+      :incoming_filter_fn="stranger_things_filter_fn">
+      <template slot-scope="{ item }">
+        <span> {{ item.first_name }} {{item.last_name}}</span>
+      </template>
+    </dropdown-typeahead>
+
+    <div class="typeahead-2-selections">
+      <h3> Chosen from Typeahead: </h3>
+      <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>
+    </div>
+
   </div>
 </template>
 
@@ -36,24 +52,52 @@
                {state: "Michigan"},
                {state: "Maryland"}];
 
-    print_item(item: object) {
-      this.chosen_items.push(item);
+    add_item_1(item: object) {
+      this.chosen_items_1.push(item);
     }
 
-    chosen_items: object[] = [];
+    chosen_items_1: object[] = [];
 
     filter_fn_1(item: {state: string}, filter_text: string) {
       // let field_name = "state";
       return item.state.indexOf(filter_text) >= 0;
     }
+
+    strangers = [ {first_name: "Joyce", last_name: "Byers"},
+                  {first_name: "Will", last_name: "Byers"},
+                  {first_name: "Jonathan", last_name: "Byers"},
+                  {first_name: "Nancy", last_name: "Wheeler"},
+                  {first_name: "Mike", last_name: "Wheeler"},
+                  {first_name: "Steve", last_name: "Harrington"},
+                  {first_name: "Jim", last_name: "Hopper"}
+    ];
+
+    stranger_things_filter_fn(item: {first_name: string, last_name: string},
+                              filter_text: string) {
+      let full_name: string = item.first_name + " " + item.last_name;
+      return full_name.indexOf(filter_text) >= 0;
+    }
+
+    chosen_items_2: object[] = [];
+
+    add_item_2(item: object) {
+      this.chosen_items_2.push(item);
+    }
+
   }
 </script>
 
 <style scoped lang="scss">
 
 .typeahead-1-selections {
-  margin-top: 100px;
+  margin: 50px 0;
   background-color: darkseagreen;
+  padding: 20px;
+}
+
+.typeahead-2-selections {
+  margin: 50px 0;
+  background-color: indianred;
   padding: 20px;
 }
 
