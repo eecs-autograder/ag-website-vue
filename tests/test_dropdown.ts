@@ -119,8 +119,8 @@ describe('Dropdown.vue', () => {
                  <template slot="header">
                   <p ref="dropdown_header"> States that Start with M </p>
                  </template>
-                  <div slot-scope="state">
-                    <span> {{state.name}} </span>
+                  <div slot-scope="{item}">
+                    <span> {{item.name}} </span>
                   </div>
                  </dropdown>`,
             components: {
@@ -202,8 +202,8 @@ describe('Dropdown.vue', () => {
                     <template slot="header">
                       <p ref="dropdown_header"> States that Start with M </p>
                     </template>
-                    <div slot-scope="state">
-                      <span> {{state.name}} </span>
+                    <div slot-scope="{item}">
+                      <span> {{item.name}} </span>
                     </div>
                   </dropdown>
                   <p v-for="state of selected_states"> {{ state }} </p>
@@ -267,8 +267,8 @@ describe('Dropdown.vue', () => {
                     <template slot="header">
                       <p ref="dropdown_header"> States that Start with M </p>
                     </template>
-                    <div slot-scope="state">
-                      <span> {{state.name}} </span>
+                    <div slot-scope="{item}">
+                      <span> {{item.name}} </span>
                     </div>
                   </dropdown>
                   <p v-for="state of selected_states"> {{ state }} </p>
@@ -336,8 +336,8 @@ describe('Dropdown.vue', () => {
                               {{chosen_employee.last_name}}, {{chosen_employee.first_name}}
                             </button>
                           </template>
-                          <div slot-scope="employee">
-                           <span> {{employee.last_name}} </span>
+                          <div slot-scope="{item}">
+                           <span> {{item.last_name}} </span>
                           </div>
                         </dropdown>
                        </div>`,
@@ -406,9 +406,9 @@ describe('Dropdown.vue', () => {
                               Chooses a Color
                             </p>
                           </template>
-                          <template slot-scope="color">
-                            <div class="swatch" :style="{ background: color.hex }"></div>
-                            <span>{{color.name}}</span>
+                          <template slot-scope="{item}">
+                            <div class="swatch" :style="{ background: item.hex }"></div>
+                            <span>{{item.name}}</span>
                           </template>
                         </dropdown>
                         <p class="hello-para"> Hello </p>
@@ -460,9 +460,9 @@ describe('Dropdown.vue', () => {
                               Chooses a Color
                             </p>
                           </template>
-                          <template slot-scope="color">
-                            <div class="swatch" :style="{ background: color.hex }"></div>
-                            <span>{{color.name}}</span>
+                          <template slot-scope="{item}">
+                            <div class="swatch" :style="{ background: item.hex }"></div>
+                            <span>{{item.name}}</span>
                           </template>
                         </dropdown>
                         </dropdown>
@@ -595,5 +595,79 @@ describe('Dropdown.vue', () => {
         let content = wrapper.find('.dropdown-content');
         content.trigger('keydown', { code: 'A'});
         expect(dropdown.is_open).toBe(false);
+    });
+
+    test("Dropdown contents can change and the highlighted index adjusts appropriately ",
+         async () => {
+        @Component({
+            template: `<div>
+                          <p class="change-breed-button" @click="change_breeds()"> Change Breeds!
+                          </p>
+                          <dropdown ref="dropdown_component"
+                            :incoming_items="dog_breeds"
+                            @update_item_selected="add_breed($event)">
+                              <template slot="header">
+                                <p ref="header" tabindex="1" class="header-para">
+                                    Dropdown Header
+                                </p>
+                              </template>
+                              <template slot-scope="breed">
+                                <span> {{breed}} </span>
+                              </template>
+                          </dropdown>
+                      </div>`,
+            components: {
+                'dropdown': Dropdown
+            },
+        })
+
+        class WrapperComponent extends Vue {
+
+            dog_breeds: string[] = ["Boxer", "Siberian Husky", "Border Collie"];
+
+            cat_breeds: string[] = ["Tonkinese", "Maine Coon"];
+
+            chosen_words: object[] = [];
+
+            add_breed(word: object) {
+                this.chosen_words.push(word);
+            }
+
+            change_breeds() {
+                this.dog_breeds = this.cat_breeds;
+            }
+        }
+
+        const wrapper = mount(WrapperComponent);
+        let dropdown = <Dropdown> wrapper.find({ref: 'dropdown_component'}).vm;
+        let header = wrapper.find({ref: 'header'});
+
+        header.trigger("click");
+
+        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        expect(dropdown_menu_content.element.children.length).toEqual(3);
+
+        expect(dropdown_menu_content.text()).toContain("Boxer");
+        expect(dropdown_menu_content.text()).toContain("Siberian Husky");
+        expect(dropdown_menu_content.text()).toContain("Border Collie");
+
+        expect(dropdown.highlighted_index).toEqual(0);
+
+        dropdown_menu_content.trigger("keydown", { code: "ArrowDown" });
+
+        dropdown_menu_content.trigger("keydown", { code: "ArrowDown" });
+
+        expect(dropdown.highlighted_index).toEqual(2);
+
+        let changer_button = wrapper.find('.change-breed-button');
+        changer_button.trigger("click");
+
+        await dropdown.$nextTick();
+
+        expect(dropdown_menu_content.text()).toContain("Tonkinese");
+        expect(dropdown_menu_content.text()).toContain("Maine Coon");
+
+        expect(dropdown.highlighted_index).toEqual(1);
+
     });
 });
