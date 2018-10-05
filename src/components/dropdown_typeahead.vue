@@ -2,6 +2,7 @@
   <div class="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :incoming_items="filtered_choices"
+              :dropdown_content_min_width="search_field_min_width"
               @update_item_selected="choose_item($event)">
       <template slot="header">
         <input id="search-field"
@@ -9,6 +10,7 @@
                :placeholder="placeholder_text"
                name="some_word_stuff"
                v-model="filter_text"
+               :style="[{minWidth: search_field_min_width}]"
                @keydown="resume_search($event)">
       </template>
       <template slot-scope="{item}">
@@ -37,12 +39,16 @@
     @Prop({required: true, type: String})
     incoming_placeholder_text!: string;
 
-    @Prop({ required: true, type: Function })
+    @Prop({required: true, type: Function})
     incoming_filter_fn!: (item: object, filter: string) => boolean;
+
+    @Prop({default: "0px", type: String})
+    search_field_min_width_in!: string;
 
     filter_text: string = "";
     placeholder_text = "";
     choices: object[] = [];
+    search_field_min_width = "400px";
     filter_fn = function(item: object, filter: string) {
       return true;
     };
@@ -57,6 +63,7 @@
       this.placeholder_text = this.incoming_placeholder_text;
       this.choices = this.incoming_choices;
       this.filter_fn = this.incoming_filter_fn;
+      this.search_field_min_width = this.search_field_min_width_in;
     }
 
     choose_item(chosen_item: object) {
@@ -90,7 +97,6 @@
 
 #search-field {
   border-radius: 5px;
-  min-width: 160px;
   background-color: hsl(210, 13%, 95%);
   border: 2px solid hsl(210, 13%, 95%);
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
@@ -100,7 +106,6 @@
   height: 24px;
   margin: 0;
   padding: 6px 10px;
-  width: 400px;
 }
 
 #search-field:hover {

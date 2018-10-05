@@ -6,7 +6,8 @@
       incoming_placeholder_text="Enter a State"
       :incoming_choices="states"
       @update_item_chosen="add_item_1($event)"
-      :incoming_filter_fn="filter_fn_1">
+      :incoming_filter_fn="filter_fn_1"
+      search_field_min_width_in="350px">
       <template slot-scope="{ item }">
         <span> {{ item.state }}</span>
       </template>
@@ -61,7 +62,7 @@
   })
   export default class ModalDemo extends Vue {
 
-    states = [ {state: "Missouri"},
+    states = [ {state: "MissouriMissouriMissouriMissouriMissouri"},
                {state: "Mississippi"},
                {state: "Minnesota"},
                {state: "Massachusetts"},
