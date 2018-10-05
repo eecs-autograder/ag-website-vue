@@ -48,8 +48,8 @@
 
     @Watch('incoming_items')
     on_filter_text_changed(new_val: object[], old_val: object[]) {
-      // console.log(`Old ${old_val}`);
-      // console.log(`New ${new_val}`);
+      console.log(`Old ${old_val}`);
+      console.log(`New ${new_val}`);
       // console.log("Highlighted: " + this.highlighted_index);
       this.items = new_val;
       if (this.highlighted_index >= this.items.length && this.items.length > 0) {

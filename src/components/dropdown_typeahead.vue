@@ -50,14 +50,15 @@
 
     @Watch('filter_text')
     on_filter_text_changed(new_val: string, old_val: string) {
-      // this._filtered_choices = null;
+      console.log(`Old ${old_val}`);
+      console.log(`New ${new_val}`);
+      this._filtered_choices = [];
     }
 
     created() {
       this.placeholder_text = this.incoming_placeholder_text;
       this.choices = this.incoming_choices;
       this.filter_fn = this.incoming_filter_fn;
-      console.log(this.filter_fn);
     }
 
     choose_item(chosen_item: object) {
@@ -70,16 +71,9 @@
     }
 
     get filtered_choices() {
-      console.log("filtered choices called");
       if (this.filter_text === "") {
-        console.log("One");
         return this.choices;
       }
-      // if (this._filtered_choices !== null) {
-      //   console.log("Two");
-      //   return this._filtered_choices;
-      // }
-      console.log("Three");
       this._filtered_choices = this.choices.filter(
         (item) => this.filter_fn(item, this.filter_text));
       return this._filtered_choices;
@@ -89,28 +83,27 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  #search-field {
-    border-radius: 5px;
-    min-width: 160px;
-    background-color: hsl(210, 13%, 95%);
-    border: 2px solid hsl(210, 13%, 95%);
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    color: black;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-    font-size: 16px;
-    height: 24px;
-    margin: 0;
-    padding: 6px 10px;
-    width: 400px;
-  }
+#search-field {
+  border-radius: 5px;
+  min-width: 160px;
+  background-color: hsl(210, 13%, 95%);
+  border: 2px solid hsl(210, 13%, 95%);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  color: black;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 16px;
+  height: 24px;
+  margin: 0;
+  padding: 6px 10px;
+  width: 400px;
+}
 
-  #search-field:hover {
-    background-color: hsl(210, 12%, 93%);
-    border-color: hsl(210, 12%, 93%);
-    color: black;
-  }
-
+#search-field:hover {
+  background-color: hsl(210, 12%, 93%);
+  border-color: hsl(210, 12%, 93%);
+  color: black;
+}
 
 </style>

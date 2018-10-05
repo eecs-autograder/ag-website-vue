@@ -668,6 +668,5 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Maine Coon");
 
         expect(dropdown.highlighted_index).toEqual(1);
-
     });
 });
