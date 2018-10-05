@@ -50,8 +50,6 @@
 
     @Watch('filter_text')
     on_filter_text_changed(new_val: string, old_val: string) {
-      console.log(`Old ${old_val}`);
-      console.log(`New ${new_val}`);
       this._filtered_choices = [];
     }
 
