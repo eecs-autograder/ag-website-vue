@@ -9,7 +9,7 @@
                :placeholder="placeholder_text"
                name="some_word_stuff"
                v-model="filter_text"
-               @keydown="resume_search()">
+               @keydown="resume_search($event)">
       </template>
       <template slot-scope="{item}">
         <slot v-bind:item="item">
@@ -63,9 +63,14 @@
       this.$emit("update_item_chosen", chosen_item);
     }
 
-    resume_search() {
+    resume_search(key: KeyboardEvent) {
       let dropdown = <Dropdown> this.$refs.dropdown_component;
-      dropdown.show_the_dropdown_menu();
+      if (!dropdown.is_open) {
+        // don't want to automatically select what was previously selected
+        if (key.code !== "Enter") {
+          dropdown.show_the_dropdown_menu();
+        }
+      }
     }
 
     get filtered_choices() {

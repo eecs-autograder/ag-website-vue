@@ -1,5 +1,7 @@
 <template>
   <div class="typeahead-demo">
+    <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { state: string }
+      objects and uses a scoped slot </b></p>
     <dropdown-typeahead
       incoming_placeholder_text="Enter a State"
       :incoming_choices="states"
@@ -15,6 +17,8 @@
       <p v-for="item of chosen_items_1"> {{item.state}} </p>
     </div>
 
+    <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { first_name:
+      string, last_name: string } objects and uses a scoped slot</b></p>
     <dropdown-typeahead
       incoming_placeholder_text="Enter a Character"
       :incoming_choices="strangers"
@@ -28,6 +32,20 @@
     <div class="typeahead-2-selections">
       <h3> Chosen from Typeahead: </h3>
       <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>
+    </div>
+
+    <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with string objects
+      and uses the default scoped-slot styling </b></p>
+    <dropdown-typeahead
+      incoming_placeholder_text="Enter a Season"
+      :incoming_choices="seasons"
+      @update_item_chosen="add_item_3($event)"
+      :incoming_filter_fn="seasons_filter_fn">
+    </dropdown-typeahead>
+
+    <div class="typeahead-3-selections">
+      <h3> Chosen from Typeahead: </h3>
+      <p v-for="item of chosen_items_3"> {{item}} </p>
     </div>
 
   </div>
@@ -84,21 +102,55 @@
       this.chosen_items_2.push(item);
     }
 
+    seasons = [ "Fall",
+                "Winter",
+                "Spring",
+                "Summer"
+    ];
+
+    seasons_filter_fn(item: string, filter_text: string) {
+      return item.indexOf(filter_text) >= 0;
+    }
+
+    chosen_items_3: object[] = [];
+
+    add_item_3(item: object) {
+      this.chosen_items_3.push(item);
+    }
+
   }
 </script>
 
 <style scoped lang="scss">
 
+.typeahead-1-selections, .typeahead-2-selections, .typeahead-3-selections{
+  margin: 30px 0 75px 0;
+  padding: 30px;
+  display: inline-block;
+}
+
 .typeahead-1-selections {
-  margin: 50px 0;
   background-color: darkseagreen;
-  padding: 20px;
 }
 
 .typeahead-2-selections {
-  margin: 50px 0;
   background-color: indianred;
-  padding: 20px;
+}
+
+.typeahead-3-selections {
+  background-color: plum;
+}
+
+.typeahead-label {
+  margin: 20px 0;
+}
+
+h3 {
+  margin: 0;
+}
+
+p {
+  margin: 10px 0;
 }
 
 </style>
