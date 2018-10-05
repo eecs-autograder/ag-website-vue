@@ -4,7 +4,6 @@
       incoming_placeholder_text="Enter a State"
       :incoming_choices="states"
       @update_item_chosen="print_item($event)"
-      item_field_name="state"
       :incoming_filter_fn="filter_fn_1">
       <template slot-scope="{ item }">
         <span> {{ item.state }}</span>
