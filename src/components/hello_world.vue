@@ -1,6 +1,7 @@
 <template>
   <div>
     <ViewFileDemo></ViewFileDemo>
+    <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
     <ButtonDemo></ButtonDemo>
     <DiffDemo></DiffDemo>

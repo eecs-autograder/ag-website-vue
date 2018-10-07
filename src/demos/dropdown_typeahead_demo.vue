@@ -24,8 +24,7 @@
       incoming_placeholder_text="Enter a Character"
       :incoming_choices="strangers"
       @update_item_chosen="add_item_2($event)"
-      :incoming_filter_fn="stranger_things_filter_fn"
-      typeahead_min_width="290px">
+      :incoming_filter_fn="stranger_things_filter_fn">
       <template slot-scope="{ item }">
         <span> {{ item.first_name }} {{item.last_name}}</span>
       </template>
@@ -42,7 +41,8 @@
       incoming_placeholder_text="Enter a Season"
       :incoming_choices="seasons"
       @update_item_chosen="add_item_3($event)"
-      :incoming_filter_fn="seasons_filter_fn">
+      :incoming_filter_fn="seasons_filter_fn"
+      typeahead_max_width="155px">
     </dropdown-typeahead>
 
     <div class="typeahead-3-selections">

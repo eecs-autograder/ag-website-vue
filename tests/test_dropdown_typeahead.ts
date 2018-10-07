@@ -25,7 +25,7 @@ describe('DropdownTypeahead.vue', () => {
                   incoming_placeholder_text="Enter a State"
                   :incoming_choices="states"
                   :incoming_filter_fn="states_filter_fn"
-                  min_width_in="200px"
+                  typeahead_min_width="200px"
                   @update_item_chosen="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
@@ -55,6 +55,9 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
         expect(dropdown_typeahead.filter_fn).toBeDefined();
+
+        let search_field = wrapper.find('#search-field');
+        expect(search_field.element.style.minWidth).toEqual("200px");
     });
 
     test('Different values of "filter_text" produce different filtered_choices',
@@ -65,7 +68,8 @@ describe('DropdownTypeahead.vue', () => {
                   incoming_placeholder_text="Enter a State"
                   :incoming_choices="states"
                   :incoming_filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @update_item_chosen="add_item($event)"
+                  typeahead_max_width="400px">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -91,6 +95,9 @@ describe('DropdownTypeahead.vue', () => {
         let wrapper = mount(WrapperComponent);
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
+
+        let search_field = wrapper.find('#search-field');
+        expect(search_field.element.style.maxWidth).toEqual("400px");
 
         search_bar.trigger("click");
 
