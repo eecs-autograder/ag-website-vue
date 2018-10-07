@@ -25,7 +25,7 @@ describe('DropdownTypeahead.vue', () => {
                   incoming_placeholder_text="Enter a State"
                   :incoming_choices="states"
                   :incoming_filter_fn="states_filter_fn"
-                  search_field_min_width_in="200px"
+                  min_width_in="200px"
                   @update_item_chosen="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
@@ -54,7 +54,6 @@ describe('DropdownTypeahead.vue', () => {
 
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
-        expect(dropdown_typeahead.search_field_min_width).toEqual("200px");
         expect(dropdown_typeahead.filter_fn).toBeDefined();
     });
 

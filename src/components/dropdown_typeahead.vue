@@ -2,7 +2,7 @@
   <div class="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :incoming_items="filtered_choices"
-              :dropdown_content_min_width="search_field_min_width"
+              :dropdown_content_min_width="typeahead_min_width"
               @update_item_selected="choose_item($event)">
       <template slot="header">
         <input id="search-field"
@@ -10,7 +10,7 @@
                :placeholder="placeholder_text"
                name="some_word_stuff"
                v-model="filter_text"
-               :style="[{minWidth: search_field_min_width}]"
+               :style="[{minWidth: typeahead_min_width}]"
                @keydown="resume_search($event)">
       </template>
       <template slot-scope="{item}">
@@ -42,28 +42,22 @@
     @Prop({required: true, type: Function})
     incoming_filter_fn!: (item: object, filter: string) => boolean;
 
-    @Prop({default: "0px", type: String})
-    search_field_min_width_in!: string;
+    @Prop({default: "200px", type: String})
+    typeahead_min_width!: string;
 
-    filter_text: string = "";
-    placeholder_text = "";
-    choices: object[] = [];
-    search_field_min_width = "400px";
     filter_fn = function(item: object, filter: string) {
       return true;
     };
-    private _filtered_choices: object[] = [];
 
-    @Watch('filter_text')
-    on_filter_text_changed(new_val: string, old_val: string) {
-      this._filtered_choices = [];
-    }
+    choices: object[] = [];
+    filter_text: string = "";
+    placeholder_text = "";
+    private _filtered_choices: object[] = [];
 
     created() {
       this.placeholder_text = this.incoming_placeholder_text;
       this.choices = this.incoming_choices;
       this.filter_fn = this.incoming_filter_fn;
-      this.search_field_min_width = this.search_field_min_width_in;
     }
 
     choose_item(chosen_item: object) {
@@ -112,6 +106,10 @@
   background-color: hsl(210, 12%, 93%);
   border-color: hsl(210, 12%, 93%);
   color: black;
+}
+
+#search-field:focus {
+  outline-color: $ocean-blue;
 }
 
 </style>
