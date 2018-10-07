@@ -7,7 +7,7 @@
       :incoming_choices="states"
       @update_item_chosen="add_item_1($event)"
       :incoming_filter_fn="filter_fn_1"
-      search_field_min_width_in="350px">
+      typeahead_min_width="400px">
       <template slot-scope="{ item }">
         <span> {{ item.state }}</span>
       </template>
@@ -24,7 +24,8 @@
       incoming_placeholder_text="Enter a Character"
       :incoming_choices="strangers"
       @update_item_chosen="add_item_2($event)"
-      :incoming_filter_fn="stranger_things_filter_fn">
+      :incoming_filter_fn="stranger_things_filter_fn"
+      typeahead_min_width="290px">
       <template slot-scope="{ item }">
         <span> {{ item.first_name }} {{item.last_name}}</span>
       </template>
@@ -62,7 +63,7 @@
   })
   export default class ModalDemo extends Vue {
 
-    states = [ {state: "MissouriMissouriMissouriMissouriMissouri"},
+    states = [ {state: "Missouri"},
                {state: "Mississippi"},
                {state: "Minnesota"},
                {state: "Massachusetts"},
