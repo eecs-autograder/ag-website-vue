@@ -8,8 +8,7 @@
       </div>
 
       <div class="dropdown-content"
-           :style="[{minWidth: dropdown_content_min_width, maxWidth: dropdown_content_max_width},
-                    {display: is_open ? 'block' : 'none'}]">
+           :style="[{display: is_open ? 'block' : 'none'}]">
         <div class="dropdown-row" v-for="(item, index) of items"
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
@@ -34,16 +33,9 @@
     @Prop({default: 0, type: Number})
     highlighted_index_in!: number;
 
-    @Prop({default: "", type: String})
-    dropdown_content_min_width!: string;
-
-    @Prop({default: "", type: String})
-    dropdown_content_max_width!: string;
-
     chosen_item: object = {};
     highlighted_index = 0;
     items: object[] = [];
-
     is_open_ = false;
 
     @Watch('incoming_items')
@@ -135,16 +127,15 @@
 @import '@/styles/colors.scss';
 
 .dropdown-container {
-  display: inline-block;
+  display: block;
   position: relative;
 }
 
 .dropdown-content {
   background-color: white;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  display: none;
+  display: block;
   margin-top: 0.5px;
-  width: 100%;
   position: absolute;
   z-index: 1;
 }
@@ -175,10 +166,6 @@
 
 #highlight {
   background-color: hsl(210, 13%, 80%);
-}
-
-.outermost-dropdown-container {
-  display: inline-block;
 }
 
 .chosen {

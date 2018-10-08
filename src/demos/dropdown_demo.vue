@@ -9,8 +9,6 @@
       <dropdown ref="dropdown_menu_ex_1"
                 :incoming_items="menu_items"
                 :highlighted_index_in="1"
-                dropdown_content_min_width = "130px"
-                dropdown_content_max_width = "180px"
                 @update_item_selected="add_item_1($event)">
         <template slot="header">
           <p tabindex="1" class="header-para">
@@ -36,7 +34,9 @@
           </button>
         </template>
         <div slot-scope="{item}">
-          <span> {{item.first_name}} </span>
+          <div class="row-content-2">
+            <span> {{item.first_name}} </span>
+          </div>
         </div>
       </dropdown>
     </div>
@@ -61,14 +61,14 @@
 
     <p v-for="item of chosen_items_3"> {{item.last_name}}, {{item.first_name}}</p>
 
-    <ul class="web-menu">
-      <li class="menu-option"> <p> Home </p> </li>
+    <div class="web-menu">
+      <div class="menu-option"> <p> Home </p> </div>
       <dropdown ref="dropdown_menu_ex_4"
           :incoming_items="food_menu_items">
         <template slot="header">
-          <li tabindex="1" class="menu-option navy-tile">
+          <div tabindex="1" class="menu-option navy-tile">
             <p> Products </p>
-          </li>
+          </div>
         </template>
         <template slot-scope="{item}">
           <p class="food"> {{item}} </p>
@@ -77,15 +77,15 @@
       <dropdown ref="dropdown_menu_ex_5"
                 :incoming_items="contact_methods">
         <template slot="header">
-          <li tabindex="1" class="menu-option">
+          <div tabindex="1" class="menu-option">
             <p> Contact </p>
-          </li>
+          </div>
         </template>
         <template slot-scope="{item}">
           <p class="food"> {{item.contact}}</p>
         </template>
       </dropdown>
-    </ul>
+    </div>
 
   </div>
 </template>
@@ -191,17 +191,18 @@
 }
 
 .web-menu {
-  display: block;
   margin-top: 100px;
   margin-bottom: 100px;
+  display: flex;
+  text-decoration: none;
 }
 
 .menu-option {
   background-color: ghostwhite;
   cursor: pointer;
-  display: inline-block;
-  padding: 0 10px;
   width: 200px;
+  padding: 10px;
+  text-decoration: none;
 }
 
 .navy-tile {
@@ -216,4 +217,7 @@
   color: coral;
 }
 
+.row-content-2 {
+  width: 125px;
+}
 </style>
