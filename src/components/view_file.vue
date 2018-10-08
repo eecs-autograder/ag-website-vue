@@ -36,7 +36,6 @@
 
     filename: string = "";
     file_contents: string = "";
-    height_specifications = {};
 
     created() {
       this.file_contents = this.incoming_file_contents;
