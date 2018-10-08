@@ -23,7 +23,7 @@
                ref="view_file_component"
                :incoming_filename="open_file.name"
                :incoming_file_contents="open_file.content"
-               :incoming_height_specifications="scrollable_height">
+               :view_file_height="height_of_view_file">
              </view-file>
 
            </div>
@@ -51,16 +51,11 @@
   })
   export default class MultiFileViewer extends Vue {
 
-    @Prop({default: () => {}, type: Object})
-    height_of_view_file!: object;
+    @Prop({default: "", type: String})
+    height_of_view_file!: string;
 
     files_currently_viewing: OpenFile[] = [];
     active_tab_index = 0;
-    scrollable_height: object = {};
-
-    created() {
-      this.scrollable_height = this.height_of_view_file;
-    }
 
     add_to_viewing(filename: string, file_contents: string) {
       let file_exists = this.files_currently_viewing.find(

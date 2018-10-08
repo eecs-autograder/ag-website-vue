@@ -1,23 +1,23 @@
 <template>
   <div>
-    <div class="view_file_ex_1">
+    <div class="view-file-ex-1">
       <p> <b> View File allows for horizontal scrolling when the text is longer than
         the width of the display. </b></p>
       <view-file :incoming_filename="filename_1"
                  :incoming_file_contents="file_contents_1">
       </view-file>
     </div>
-    <div class="view_file_ex_2">
+    <div class="view-file-ex-2">
       <p> <b> View File allows for vertical scrolling when there are more lines than can
         fit in the height of the display. </b></p>
       <div class="border-box">
         <view-file :incoming_filename="filename_2"
                    :incoming_file_contents="file_contents_2"
-                   :incoming_height_specifications="height_in">
+                   :view_file_height="height_in">
         </view-file>
       </div>
     </div>
-    <div class="view_file_ex_3">
+    <div class="view-file-ex-3">
       <p> <b> File contents can be swapped out for different contents </b></p>
       <button
         id="swap-contents-button"
@@ -26,7 +26,8 @@
       </button>
       <div class="border-box">
         <view-file :incoming_filename="filename_3"
-                   :incoming_file_contents="file_contents_3">
+                   :incoming_file_contents="file_contents_3"
+                   view_file_height="200px">
         </view-file>
       </div>
     </div>
@@ -42,7 +43,7 @@
     components: {ViewFile}
   })
   export default class ViewFileDemo extends Vue {
-    height_in = {'height': '200px'};
+    height_in = '200px';
     filename_1 = "long_lines.txt";
     file_contents_1 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
                       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
@@ -83,13 +84,18 @@
 
 <style scoped lang="scss">
 
-.view_file_ex_1{
+.view-file-ex-1{
   width: 700px;
   margin: 20px;
 }
 
-.view_file_ex_2 {
+.view-file-ex-2 {
   width: 600px;
+  margin: 20px;
+}
+
+.view-file-ex-3 {
+  width: 300px;
   margin: 20px;
 }
 

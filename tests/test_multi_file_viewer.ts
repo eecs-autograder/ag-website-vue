@@ -10,38 +10,35 @@ beforeAll(() => {
 @Component({
     template:  `<div>
                   <multi_file_viewer
-                    ref="multi_file">
+                    ref="multi_file"
+                    :height_of_view_file="height_of_view_file_in">
                   </multi_file_viewer>
                 </div>`,
     components: {
         'multi_file_viewer': MultiFileViewer
     }
 })
-class WrapperComponent extends Vue { }
+class WrapperComponent extends Vue {
+    height_of_view_file_in = "540px";
+}
 
 describe('MultiFileViewer.vue', () => {
 
-    test('MultiFileViewer data set to values passed in by parent', () => {
-        @Component({
-            template:  `<multi_file_viewer ref="multi_file"
-                                           :height_of_view_file="height_of_view_file_in">
-                        </multi_file_viewer>`,
-            components: {
-                'multi_file_viewer': MultiFileViewer
-            }
-        })
+    test('MultiFileViewer data set to values passed in by parent', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
 
-        class WrapperComponent2 extends Vue {
-            height_of_view_file_in = { "height": "540px" };
-        }
+        expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
 
-        const wrapper = mount(WrapperComponent2);
-        const multi_file_viewer = wrapper.find({ref: 'multi_file'});
-        expect(multi_file_viewer.vm.$data.files_currently_viewing.length).toEqual(0);
-        expect(multi_file_viewer.vm.$data.active_tab_index).toEqual(0);
-        expect(multi_file_viewer.vm.$data.scrollable_height).toEqual(
-            wrapper.vm.$data.height_of_view_file_in
-        );
+        multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
+        await multi_file_viewer.$nextTick();
+
+        let view_file_component = wrapper.find({ref: 'view_file_component'});
+        let scrollable_container = view_file_component.find('#scrollable-container');
+
+        expect(scrollable_container.element.style.height).toEqual("540px");
+
     });
 
     test('When a file is added it becomes the active file/tab ', async () => {

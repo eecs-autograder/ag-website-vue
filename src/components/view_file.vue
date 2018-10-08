@@ -1,6 +1,6 @@
 <template>
   <div id="viewing-container">
-    <div id="scrollable-container" :style="height_specifications">
+    <div id="scrollable-container" :style="[{height: view_file_height}]">
       <div class="line-numbers-container">
         <div v-for="(line, index) of file_contents.split('\n')" class="line-number">
           {{index + 1}}
@@ -26,8 +26,8 @@
     @Prop({required: true, type: String})
     incoming_file_contents!: string;
 
-    @Prop({default: () => {}, type: Object})
-    incoming_height_specifications!: object;
+    @Prop({default: "", type: String})
+    view_file_height!: string;
 
     @Watch('incoming_file_contents')
     on_file_content_change(new_content: string, old_content: string) {
@@ -41,7 +41,6 @@
     created() {
       this.file_contents = this.incoming_file_contents;
       this.filename = this.incoming_filename;
-      this.height_specifications = this.incoming_height_specifications;
     }
   }
 </script>
