@@ -49,7 +49,7 @@ describe('ViewFile.vue', () => {
             template:  `<view_file ref='view_file'
                           incoming_filename='filename'
                           incoming_file_contents='line one\nline two'
-                          :incoming_height_specifications="height_of_view_file_in">
+                          :view_file_height="height_of_view_file_in">
                         </view_file>`,
             components: {
                 'view_file': ViewFile
@@ -57,15 +57,11 @@ describe('ViewFile.vue', () => {
         })
 
         class WrapperComponent2 extends Vue {
-            height_of_view_file_in = { "height": "250px" };
+            height_of_view_file_in = "250px";
         }
 
         const wrapper = mount(WrapperComponent2);
         const view_file_component = wrapper.find({ref: 'view_file'});
-
-        expect(view_file_component.vm.$data.height_specifications).toEqual(
-            {'height': '250px'}
-        );
 
         let scrollable_container = view_file_component.find('#scrollable-container');
         expect(scrollable_container.element.style.height).toEqual('250px');

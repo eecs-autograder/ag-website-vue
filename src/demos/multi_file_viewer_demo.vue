@@ -71,9 +71,7 @@
       mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
     }
 
-    height_of_view_file = {
-      "height": "585px"
-    };
+    height_of_view_file = "350px";
 
   }
 </script>
