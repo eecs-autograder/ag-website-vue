@@ -2,8 +2,6 @@
   <div class="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :incoming_items="filtered_choices"
-              :dropdown_content_min_width="typeahead_min_width"
-              :dropdown_content_max_width="typeahead_max_width"
               @update_item_selected="choose_item($event)">
       <template slot="header">
         <input id="search-field"
@@ -11,7 +9,6 @@
                :placeholder="placeholder_text"
                name="some_word_stuff"
                v-model="filter_text"
-               :style="[{minWidth: typeahead_min_width, maxWidth: typeahead_max_width}]"
                @keydown="resume_search($event)">
       </template>
       <template slot-scope="{item}">
@@ -42,13 +39,6 @@
 
     @Prop({required: true, type: Function})
     incoming_filter_fn!: (item: object, filter: string) => boolean;
-
-    @Prop({default: "", type: String})
-    typeahead_min_width!: string;
-
-    @Prop({default: "", type: String})
-    typeahead_max_width!: string;
-
 
     filter_fn = function(item: object, filter: string) {
       return true;
@@ -105,6 +95,7 @@
   height: 24px;
   margin: 0;
   padding: 6px 10px;
+  width: 100%;
 }
 
 #search-field:hover {

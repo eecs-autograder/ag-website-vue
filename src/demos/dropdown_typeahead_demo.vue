@@ -2,16 +2,17 @@
   <div class="typeahead-demo">
     <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { state: string }
       objects and uses a scoped slot </b></p>
-    <dropdown-typeahead
-      incoming_placeholder_text="Enter a State"
-      :incoming_choices="states"
-      @update_item_chosen="add_item_1($event)"
-      :incoming_filter_fn="filter_fn_1"
-      typeahead_min_width="400px">
-      <template slot-scope="{ item }">
-        <span> {{ item.state }}</span>
-      </template>
-    </dropdown-typeahead>
+    <div class="control-width-1">
+      <dropdown-typeahead
+        incoming_placeholder_text="Enter a State"
+        :incoming_choices="states"
+        @update_item_chosen="add_item_1($event)"
+        :incoming_filter_fn="filter_fn_1">
+        <template slot-scope="{ item }">
+          <span> {{ item.state }}</span>
+        </template>
+      </dropdown-typeahead>
+    </div>
 
     <div class="typeahead-1-selections">
       <h3> Chosen from Typeahead: </h3>
@@ -20,15 +21,17 @@
 
     <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { first_name:
       string, last_name: string } objects and uses a scoped slot</b></p>
-    <dropdown-typeahead
-      incoming_placeholder_text="Enter a Character"
-      :incoming_choices="strangers"
-      @update_item_chosen="add_item_2($event)"
-      :incoming_filter_fn="stranger_things_filter_fn">
-      <template slot-scope="{ item }">
-        <span> {{ item.first_name }} {{item.last_name}}</span>
-      </template>
-    </dropdown-typeahead>
+    <div class="control-width-2">
+      <dropdown-typeahead
+        incoming_placeholder_text="Enter a Character"
+        :incoming_choices="strangers"
+        @update_item_chosen="add_item_2($event)"
+        :incoming_filter_fn="stranger_things_filter_fn">
+        <template slot-scope="{ item }">
+          <span> {{ item.first_name }} {{item.last_name}}</span>
+        </template>
+      </dropdown-typeahead>
+    </div>
 
     <div class="typeahead-2-selections">
       <h3> Chosen from Typeahead: </h3>
@@ -37,13 +40,14 @@
 
     <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with string objects
       and uses the default scoped-slot styling </b></p>
-    <dropdown-typeahead
-      incoming_placeholder_text="Enter a Season"
-      :incoming_choices="seasons"
-      @update_item_chosen="add_item_3($event)"
-      :incoming_filter_fn="seasons_filter_fn"
-      typeahead_max_width="155px">
-    </dropdown-typeahead>
+    <div class="control-width-3">
+      <dropdown-typeahead
+        incoming_placeholder_text="Enter a Season"
+        :incoming_choices="seasons"
+        @update_item_chosen="add_item_3($event)"
+        :incoming_filter_fn="seasons_filter_fn">
+      </dropdown-typeahead>
+    </div>
 
     <div class="typeahead-3-selections">
       <h3> Chosen from Typeahead: </h3>
@@ -63,7 +67,7 @@
   })
   export default class ModalDemo extends Vue {
 
-    states = [ {state: "Missouri"},
+    states = [ {state: "MissouriMissouriMissouriMissouriMissouri"},
                {state: "Mississippi"},
                {state: "Minnesota"},
                {state: "Massachusetts"},
@@ -104,7 +108,7 @@
       this.chosen_items_2.push(item);
     }
 
-    seasons = [ "Fall",
+    seasons = [ "FallFallFallFallFallFallFallFallFallFallFallFallFallFallFallFall",
                 "Winter",
                 "Spring",
                 "Summer"
@@ -126,7 +130,7 @@
 <style scoped lang="scss">
 
 .typeahead-1-selections, .typeahead-2-selections, .typeahead-3-selections{
-  margin: 30px 0 75px 0;
+  margin: 30px 0 150px 0;
   padding: 30px;
   display: inline-block;
 }
@@ -153,6 +157,20 @@ h3 {
 
 p {
   margin: 10px 0;
+}
+
+.control-width-1 {
+  width: 306.5px;
+}
+
+.control-width-2 {
+  width: 50%;
+  min-width: 300px;
+}
+
+.control-width-3 {
+  width: 20%;
+  min-width: 200px;
 }
 
 </style>

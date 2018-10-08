@@ -55,9 +55,6 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
         expect(dropdown_typeahead.filter_fn).toBeDefined();
-
-        let search_field = wrapper.find('#search-field');
-        expect(search_field.element.style.minWidth).toEqual("200px");
     });
 
     test('Different values of "filter_text" produce different filtered_choices',
@@ -95,9 +92,6 @@ describe('DropdownTypeahead.vue', () => {
         let wrapper = mount(WrapperComponent);
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
-
-        let search_field = wrapper.find('#search-field');
-        expect(search_field.element.style.maxWidth).toEqual("400px");
 
         search_bar.trigger("click");
 
