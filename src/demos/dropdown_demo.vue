@@ -154,7 +154,7 @@
 @import '@/styles/colors.scss';
 
 .tabindex-explanation {
-  font-size: 14px;
+  font-size: 15px;
   width: 600px;
 }
 
@@ -171,7 +171,7 @@
 }
 
 .header-button {
-  background-color: mediumpurple;
+  background-color: black;
   border: none;
   border-radius: 5px;
   color: white;
@@ -214,8 +214,6 @@
 
 .row-content-2 {
   width: 125px;
-  color: purple;
-  background-color: lightslategrey;
 }
 
 .food {

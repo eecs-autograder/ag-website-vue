@@ -64,7 +64,7 @@ describe('Dropdown.vue', () => {
 
         let dropdown_component = wrapper.find({ref: 'dropdown_example_2'});
 
-        let dropdown_menu_content = dropdown_component.find(".dropdown-content");
+        let dropdown_menu_content = dropdown_component.find("#dropdown-content");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
@@ -149,7 +149,7 @@ describe('Dropdown.vue', () => {
 
         let dropdown_component = wrapper.find({ref: 'dropdown_example_2'});
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu_content = wrapper.find("#dropdown-content");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
@@ -214,7 +214,7 @@ describe('Dropdown.vue', () => {
 
         let dropdown_component = wrapper.find({ref: 'dropdown_example_2'});
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu_content = wrapper.find("#dropdown-content");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
@@ -286,7 +286,7 @@ describe('Dropdown.vue', () => {
 
         let dropdown_menu = wrapper.find({ref: 'dropdown_on_a_button'});
 
-        let dropdown_menu_content = dropdown_menu.find('.dropdown-content');
+        let dropdown_menu_content = dropdown_menu.find('#dropdown-content');
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
@@ -348,7 +348,7 @@ describe('Dropdown.vue', () => {
 
         const wrapper = mount(WrapperComponent);
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu_content = wrapper.find("#dropdown-content");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
@@ -403,7 +403,7 @@ describe('Dropdown.vue', () => {
 
         const wrapper = mount(WrapperComponent);
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu_content = wrapper.find("#dropdown-content");
 
         let dropdown_header = wrapper.find({ref: 'dropdown_header'});
 
@@ -477,7 +477,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown.is_open).toBe(true);
         expect(dropdown.$data.highlighted_index).toBe(0);
 
-        let content = wrapper.find('.dropdown-content');
+        let content = wrapper.find('#dropdown-content');
         content.trigger('keydown', { code: 'ArrowUp'});
         expect(dropdown.$data.highlighted_index).toBe(0);
 
@@ -513,12 +513,12 @@ describe('Dropdown.vue', () => {
         expect(dropdown.is_open).toBe(true);
 
         dropdown.hide_the_dropdown_menu();
-        let content = wrapper.find('.dropdown-content');
+        let content = wrapper.find('#dropdown-content');
         content.trigger('keydown', { code: 'A'});
         expect(dropdown.is_open).toBe(false);
     });
 
-    test("Dropdown contents can change and the highlighted index adjusts appropriately ",
+    test("Dropdown contents can change and the highlighted index adjusts appropriately",
          async () => {
         @Component({
             template: `<div>
@@ -565,7 +565,7 @@ describe('Dropdown.vue', () => {
 
         header.trigger("click");
 
-        let dropdown_menu_content = wrapper.find(".dropdown-content");
+        let dropdown_menu_content = wrapper.find("#dropdown-content");
         expect(dropdown_menu_content.element.children.length).toEqual(3);
 
         expect(dropdown_menu_content.text()).toContain("Boxer");

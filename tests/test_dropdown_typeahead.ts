@@ -95,7 +95,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('.dropdown-content');
+        let dropdown_menu_content = wrapper.find('#dropdown-content');
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(8);
         expect(dropdown_menu_content.text()).toContain("Missouri");
@@ -198,7 +198,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('.dropdown-content');
+        let dropdown_menu_content = wrapper.find('#dropdown-content');
 
         dropdown_typeahead.filter_text = "an";
         await dropdown_typeahead.$nextTick();
@@ -266,7 +266,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('.dropdown-content');
+        let dropdown_menu_content = wrapper.find('#dropdown-content');
 
         dropdown_typeahead.filter_text = "y";
         await dropdown_typeahead.$nextTick();
@@ -358,7 +358,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('.dropdown-content');
+        let dropdown_menu_content = wrapper.find('#dropdown-content');
 
         dropdown_typeahead.filter_text = "y";
         await dropdown_typeahead.$nextTick();
@@ -438,7 +438,7 @@ describe('DropdownTypeahead.vue', () => {
 
         // console.log(dropdown_entries.html());
 
-        let dropdown_menu_content = wrapper.find('.dropdown-content');
+        let dropdown_menu_content = wrapper.find('#dropdown-content');
         let dropdown_entries = dropdown_menu_content.findAll('.dropdown-row');
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(3);
