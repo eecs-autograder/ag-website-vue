@@ -1,9 +1,4 @@
 import { SafeMap } from '@/safe_map';
-import { config } from '@vue/test-utils';
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('SafeMap', () => {
 
@@ -24,7 +19,7 @@ describe('SafeMap', () => {
             map.get('tofu');
         }
         catch (error_in) {
-            expect(error_in.message).toBe("Key: tofu, is not in the map!");
+            expect(error_in.message).toBe('Key Error: "tofu" not found in map');
         }
     });
 
@@ -56,7 +51,7 @@ describe('SafeMap', () => {
             safer_map.get('Yellow');
         }
         catch (error_in) {
-            expect(error_in.message).toBe("Key: Yellow, is not in the map!");
+            expect(error_in.message).toBe('Key Error: "Yellow" not found in map');
         }
     });
 
@@ -76,7 +71,7 @@ describe('SafeMap', () => {
 
         safer_map.for_each(print_key_and_value);
 
-        expect(val_collab).toContain('JaySubmarineSea');
+        expect(val_collab).toEqual('JaySubmarineSea');
 
     });
 
@@ -141,8 +136,6 @@ describe('SafeMap', () => {
         expect(idk.done).toEqual(false);
         expect(iter.next().value).toEqual(7);
         expect(iter.next().value).toEqual(3);
-
-        // expect(iter.next().value).toThrow(); nope -> but value is undefined so?
     });
 
     test('SafeMap size', () => {
@@ -177,8 +170,8 @@ describe('SafeMap', () => {
             val_collab += val;
         }
 
-        expect(key_collab).toContain('BlueYellowRed');
-        expect(val_collab).toContain('2173');
+        expect(key_collab).toEqual('BlueYellowRed');
+        expect(val_collab).toEqual('2173');
 
     });
 });
