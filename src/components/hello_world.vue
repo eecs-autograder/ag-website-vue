@@ -8,7 +8,7 @@
     <ModalDemo></ModalDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
     <TabsDemo></TabsDemo>
-    <TooltipDemo></TooltipDemo>s
+    <TooltipDemo></TooltipDemo>
     <ToggleDemo></ToggleDemo>
     <ViewFileDemo></ViewFileDemo>
   </div>
