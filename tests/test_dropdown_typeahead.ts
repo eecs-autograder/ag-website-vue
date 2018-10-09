@@ -1,19 +1,13 @@
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import { prependListener } from 'cluster';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { config, mount } from '@vue/test-utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
-
-interface Group {
-    partner1: string;
-    partner2: string;
-}
 
 describe('DropdownTypeahead.vue', () => {
 
@@ -169,15 +163,16 @@ describe('DropdownTypeahead.vue', () => {
             },
         })
         class WrapperComponent extends Vue {
-            states = [ {state: "Missouri"},
-                       {state: "Mississippi"},
-                       {state: "Minnesota"},
-                       {state: "Massachusetts"},
-                       {state: "Maine"},
-                       {state: "Montana"},
-                       {state: "Michigan"},
-                       {state: "Maryland"}
-                     ];
+            states = [
+                {state: "Missouri"},
+                {state: "Mississippi"},
+                {state: "Minnesota"},
+                {state: "Massachusetts"},
+                {state: "Maine"},
+                {state: "Montana"},
+                {state: "Michigan"},
+                {state: "Maryland"}
+            ];
 
             states_filter_fn(item: {state: string}, filter_text: string) {
                 return item.state.indexOf(filter_text) >= 0;
@@ -236,13 +231,14 @@ describe('DropdownTypeahead.vue', () => {
                 },
             })
         class WrapperComponent extends Vue {
-            strangers = [ {first_name: "Joyce", last_name: "Byers"},
-                          {first_name: "Will", last_name: "Byers"},
-                          {first_name: "Jonathan", last_name: "Byers"},
-                          {first_name: "Nancy", last_name: "Wheeler"},
-                          {first_name: "Mike", last_name: "Wheeler"},
-                          {first_name: "Steve", last_name: "Harrington"},
-                          {first_name: "Jim", last_name: "Hopper"}
+            strangers = [
+                {first_name: "Joyce", last_name: "Byers"},
+                {first_name: "Will", last_name: "Byers"},
+                {first_name: "Jonathan", last_name: "Byers"},
+                {first_name: "Nancy", last_name: "Wheeler"},
+                {first_name: "Mike", last_name: "Wheeler"},
+                {first_name: "Steve", last_name: "Harrington"},
+                {first_name: "Jim", last_name: "Hopper"}
             ];
 
             stranger_things_filter_fn(item: {first_name: string, last_name: string},
@@ -328,13 +324,14 @@ describe('DropdownTypeahead.vue', () => {
             },
         })
         class WrapperComponent extends Vue {
-            strangers = [ {first_name: "Joyce", last_name: "Byers"},
-                          {first_name: "Will", last_name: "Byers"},
-                          {first_name: "Jonathan", last_name: "Byers"},
-                          {first_name: "Nancy", last_name: "Wheeler"},
-                          {first_name: "Mike", last_name: "Wheeler"},
-                          {first_name: "Steve", last_name: "Harrington"},
-                          {first_name: "Jim", last_name: "Hopper"}
+            strangers = [
+                {first_name: "Joyce", last_name: "Byers"},
+                {first_name: "Will", last_name: "Byers"},
+                {first_name: "Jonathan", last_name: "Byers"},
+                {first_name: "Nancy", last_name: "Wheeler"},
+                {first_name: "Mike", last_name: "Wheeler"},
+                {first_name: "Steve", last_name: "Harrington"},
+                {first_name: "Jim", last_name: "Hopper"}
             ];
 
             stranger_things_filter_fn(item: {first_name: string, last_name: string},
@@ -403,13 +400,14 @@ describe('DropdownTypeahead.vue', () => {
             },
         })
         class WrapperComponent extends Vue {
-            strangers = [ {first_name: "Joyce", last_name: "Byers"},
-                          {first_name: "Will", last_name: "Byers"},
-                          {first_name: "Jonathan", last_name: "Byers"},
-                          {first_name: "Nancy", last_name: "Wheeler"},
-                          {first_name: "Mike", last_name: "Wheeler"},
-                          {first_name: "Steve", last_name: "Harrington"},
-                          {first_name: "Jim", last_name: "Hopper"}
+            strangers = [
+                {first_name: "Joyce", last_name: "Byers"},
+                {first_name: "Will", last_name: "Byers"},
+                {first_name: "Jonathan", last_name: "Byers"},
+                {first_name: "Nancy", last_name: "Wheeler"},
+                {first_name: "Mike", last_name: "Wheeler"},
+                {first_name: "Steve", last_name: "Harrington"},
+                {first_name: "Jim", last_name: "Hopper"}
             ];
 
             stranger_things_filter_fn(item: {first_name: string, last_name: string},
@@ -433,8 +431,6 @@ describe('DropdownTypeahead.vue', () => {
 
         dropdown_typeahead.filter_text = "J";
         await dropdown_typeahead.$nextTick();
-
-        // console.log(dropdown_entries.html());
 
         let dropdown_menu_content = wrapper.find('#dropdown-content');
         let dropdown_entries = dropdown_menu_content.findAll('.dropdown-row');

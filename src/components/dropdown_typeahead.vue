@@ -24,52 +24,51 @@
 </template>
 
 <script lang="ts">
+import Dropdown from '@/components/dropdown.vue';
 
-  import Dropdown from '@/components/dropdown.vue';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+@Component({
+  components: { Dropdown }
+})
+export default class DropdownTypeahead extends Vue {
 
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-  @Component({
-    components: { Dropdown }
-  })
-  export default class DropdownTypeahead extends Vue {
+  @Prop({required: true, type: Array})
+  incoming_choices!: object[];
 
-    @Prop({required: true, type: Array})
-    incoming_choices!: object[];
+  @Prop({required: true, type: String})
+  placeholder_text!: string;
 
-    @Prop({required: true, type: String})
-    placeholder_text!: string;
+  @Prop({required: true, type: Function})
+  filter_fn!: (item: object, filter: string) => boolean;
 
-    @Prop({required: true, type: Function})
-    filter_fn!: (item: object, filter: string) => boolean;
+  choices: object[] = [];
+  filter_text: string = "";
+  private _filtered_choices: object[] = [];
 
-    choices: object[] = [];
-    filter_text: string = "";
-    private _filtered_choices: object[] = [];
-
-    created() {
-      this.choices = this.incoming_choices;
-    }
-
-    resume_search(key: KeyboardEvent) {
-      let dropdown = <Dropdown> this.$refs.dropdown_component;
-      if (!dropdown.is_open) {
-        // don't want to automatically select what was previously selected
-        if (key.code !== "Enter") {
-          dropdown.show_the_dropdown_menu();
-        }
-      }
-    }
-
-    get filtered_choices() {
-      if (this.filter_text === "") {
-        return this.choices;
-      }
-      this._filtered_choices = this.choices.filter(
-        (item) => this.filter_fn(item, this.filter_text));
-      return this._filtered_choices;
-    }
-
+  created() {
+    this.choices = this.incoming_choices;
   }
+
+  resume_search(key: KeyboardEvent) {
+    let dropdown = <Dropdown> this.$refs.dropdown_component;
+    if (!dropdown.is_open) {
+      // don't want to automatically select what was previously selected
+      if (key.code !== "Enter") {
+        dropdown.show_the_dropdown_menu();
+      }
+    }
+  }
+
+  get filtered_choices() {
+    if (this.filter_text === "") {
+      return this.choices;
+    }
+    this._filtered_choices = this.choices.filter(
+      (item) => this.filter_fn(item, this.filter_text));
+    return this._filtered_choices;
+  }
+
+}
 </script>
 
 <style scoped lang="scss">

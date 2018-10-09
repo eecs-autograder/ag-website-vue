@@ -58,76 +58,76 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-  import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 
-  @Component({
-    components: { DropdownTypeahead }
-  })
-  export default class ModalDemo extends Vue {
+@Component({
+  components: { DropdownTypeahead }
+})
+export default class ModalDemo extends Vue {
 
-    states = [
-      {state: "MissouriMissouriMissouriMissouriMissouri"},
-      {state: "Mississippi"},
-      {state: "Minnesota"},
-      {state: "Massachusetts"},
-      {state: "Maine"},
-      {state: "Montana"},
-      {state: "Michigan"},
-      {state: "Maryland"}
-    ];
+  states = [
+    {state: "MissouriMissouriMissouriMissouriMissouri"},
+    {state: "Mississippi"},
+    {state: "Minnesota"},
+    {state: "Massachusetts"},
+    {state: "Maine"},
+    {state: "Montana"},
+    {state: "Michigan"},
+    {state: "Maryland"}
+  ];
 
-    add_item_1(item: object) {
-      this.chosen_items_1.push(item);
-    }
-
-    chosen_items_1: object[] = [];
-
-    filter_fn_1(item: {state: string}, filter_text: string) {
-      return item.state.indexOf(filter_text) >= 0;
-    }
-
-    strangers = [
-      {first_name: "Joyce", last_name: "Byers"},
-      {first_name: "Will", last_name: "Byers"},
-      {first_name: "Jonathan", last_name: "Byers"},
-      {first_name: "Nancy", last_name: "Wheeler"},
-      {first_name: "Mike", last_name: "Wheeler"},
-      {first_name: "Steve", last_name: "Harrington"},
-      {first_name: "Jim", last_name: "Hopper"}
-    ];
-
-    stranger_things_filter_fn(item: {first_name: string, last_name: string},
-                              filter_text: string) {
-      let full_name: string = item.first_name + " " + item.last_name;
-      return full_name.indexOf(filter_text) >= 0;
-    }
-
-    chosen_items_2: object[] = [];
-
-    add_item_2(item: object) {
-      this.chosen_items_2.push(item);
-    }
-
-    seasons = [
-      "FallFallFallFallFallFallFallFallFallFallFallFallFallFallFallFall",
-      "Winter",
-      "Spring",
-      "Summer"
-    ];
-
-    seasons_filter_fn(item: string, filter_text: string) {
-      return item.indexOf(filter_text) >= 0;
-    }
-
-    chosen_items_3: object[] = [];
-
-    add_item_3(item: object) {
-      this.chosen_items_3.push(item);
-    }
-
+  add_item_1(item: object) {
+    this.chosen_items_1.push(item);
   }
+
+  chosen_items_1: object[] = [];
+
+  filter_fn_1(item: {state: string}, filter_text: string) {
+    return item.state.indexOf(filter_text) >= 0;
+  }
+
+  strangers = [
+    {first_name: "Joyce", last_name: "Byers"},
+    {first_name: "Will", last_name: "Byers"},
+    {first_name: "Jonathan", last_name: "Byers"},
+    {first_name: "Nancy", last_name: "Wheeler"},
+    {first_name: "Mike", last_name: "Wheeler"},
+    {first_name: "Steve", last_name: "Harrington"},
+    {first_name: "Jim", last_name: "Hopper"}
+  ];
+
+  stranger_things_filter_fn(item: {first_name: string, last_name: string},
+                            filter_text: string) {
+    let full_name: string = item.first_name + " " + item.last_name;
+    return full_name.indexOf(filter_text) >= 0;
+  }
+
+  chosen_items_2: object[] = [];
+
+  add_item_2(item: object) {
+    this.chosen_items_2.push(item);
+  }
+
+  seasons = [
+    "FallFallFallFallFallFallFallFallFallFallFallFallFallFallFallFall",
+    "Winter",
+    "Spring",
+    "Summer"
+  ];
+
+  seasons_filter_fn(item: string, filter_text: string) {
+    return item.indexOf(filter_text) >= 0;
+  }
+
+  chosen_items_3: object[] = [];
+
+  add_item_3(item: object) {
+    this.chosen_items_3.push(item);
+  }
+
+}
 </script>
 
 <style scoped lang="scss">
