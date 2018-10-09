@@ -2,18 +2,20 @@
   <div class="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :incoming_items="filtered_choices"
-              @update_item_selected="choose_item($event)">
+              @update_item_selected="$emit('update_item_chosen', $event)">
       <template slot="header">
         <input id="search-field"
                type=text
                :placeholder="placeholder_text"
-               name="some_word_stuff"
+               name="filtered_search"
                v-model="filter_text"
                @keydown="resume_search($event)">
       </template>
       <template slot-scope="{item}">
         <slot v-bind:item="item">
-          {{item}}
+          <div class="content-row">
+            {{item}}
+          </div>
         </slot>
       </template>
 
@@ -55,10 +57,6 @@
       this.filter_fn = this.incoming_filter_fn;
     }
 
-    choose_item(chosen_item: object) {
-      this.$emit("update_item_chosen", chosen_item);
-    }
-
     resume_search(key: KeyboardEvent) {
       let dropdown = <Dropdown> this.$refs.dropdown_component;
       if (!dropdown.is_open) {
@@ -86,8 +84,8 @@
 
 #search-field {
   border-radius: 5px;
-  background-color: hsl(210, 13%, 95%);
-  border: 2px solid hsl(210, 13%, 95%);
+  background-color: $pebble-light;
+  border: 2px solid $pebble-light;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   color: black;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
@@ -99,8 +97,8 @@
 }
 
 #search-field:hover {
-  background-color: hsl(210, 12%, 93%);
-  border-color: hsl(210, 12%, 93%);
+  background-color: $pebble-medium;
+  border-color: $pebble-medium;
   color: black;
 }
 
