@@ -41,39 +41,38 @@
 </template>
 
 <script lang="ts">
+import MultiFileViewer from '@/components/multi_file_viewer.vue';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import MultiFileViewer from '@/components/multi_file_viewer.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+@Component({
+  components: { MultiFileViewer }
+})
+export default class MultiFileViewerDemo extends Vue {
 
-  @Component({
-    components: { MultiFileViewer }
-  })
-  export default class MultiFileViewerDemo extends Vue {
+  files_and_content = new Map<string, string>([
+      ['A', 'Aurora\nAurora'],
+      ['B', 'Belle'],
+      ['C', 'Cinderella\nCinderella\nCinderella'],
+      ['Apple', 'Apples:\n\tRed\n\tGreen\n\tYellow'],
+      ['Banana', 'Beetlejuice\nBeetlejuice\nBeetlejuice'],
+      ['Cantaloupe', 'Cantaloupe'],
+      ['Dragonfruit', 'Dragonfruit\nDragonfruit\nDragonfruit\nDragonfruit'],
+      ['Grapes', 'Green Grapes\nPurple Grapes']
+  ]);
 
-    files_and_content = new Map<string, string>([
-        ['A', 'Aurora\nAurora'],
-        ['B', 'Belle'],
-        ['C', 'Cinderella\nCinderella\nCinderella'],
-        ['Apple', 'Apples:\n\tRed\n\tGreen\n\tYellow'],
-        ['Banana', 'Beetlejuice\nBeetlejuice\nBeetlejuice'],
-        ['Cantaloupe', 'Cantaloupe'],
-        ['Dragonfruit', 'Dragonfruit\nDragonfruit\nDragonfruit\nDragonfruit'],
-        ['Grapes', 'Green Grapes\nPurple Grapes']
-    ]);
-
-    open_file(file_in: string) {
-      let mfv = <MultiFileViewer> this.$refs.multi_file;
-      mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
-    }
-
-    open_file2(file_in: string) {
-      let mfv = <MultiFileViewer> this.$refs.multi_file2;
-      mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
-    }
-
-    height_of_view_file = "350px";
-
+  open_file(file_in: string) {
+    let mfv = <MultiFileViewer> this.$refs.multi_file;
+    mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
   }
+
+  open_file2(file_in: string) {
+    let mfv = <MultiFileViewer> this.$refs.multi_file2;
+    mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
+  }
+
+  height_of_view_file = "350px";
+
+}
 </script>
 
 <style scoped lang="scss">
