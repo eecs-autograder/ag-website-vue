@@ -85,7 +85,6 @@
     chosen_items_1: object[] = [];
 
     filter_fn_1(item: {state: string}, filter_text: string) {
-      // let field_name = "state";
       return item.state.indexOf(filter_text) >= 0;
     }
 
