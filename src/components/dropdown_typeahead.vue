@@ -37,24 +37,17 @@
     incoming_choices!: object[];
 
     @Prop({required: true, type: String})
-    incoming_placeholder_text!: string;
+    placeholder_text!: string;
 
     @Prop({required: true, type: Function})
-    incoming_filter_fn!: (item: object, filter: string) => boolean;
-
-    filter_fn = function(item: object, filter: string) {
-      return true;
-    };
+    filter_fn!: (item: object, filter: string) => boolean;
 
     choices: object[] = [];
     filter_text: string = "";
-    placeholder_text = "";
     private _filtered_choices: object[] = [];
 
     created() {
-      this.placeholder_text = this.incoming_placeholder_text;
       this.choices = this.incoming_choices;
-      this.filter_fn = this.incoming_filter_fn;
     }
 
     resume_search(key: KeyboardEvent) {

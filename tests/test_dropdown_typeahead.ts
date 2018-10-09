@@ -22,10 +22,9 @@ describe('DropdownTypeahead.vue', () => {
         @Component({
             template: `<div>
               <dropdown-typeahead ref="dropdown_typeahead"
-                  incoming_placeholder_text="Enter a State"
+                  placeholder_text="Enter a State"
                   :incoming_choices="states"
-                  :incoming_filter_fn="states_filter_fn"
-                  typeahead_min_width="200px"
+                  :filter_fn="states_filter_fn"
                   @update_item_chosen="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
@@ -62,11 +61,10 @@ describe('DropdownTypeahead.vue', () => {
         @Component({
             template: `<div>
               <dropdown-typeahead ref="dropdown_typeahead"
-                  incoming_placeholder_text="Enter a State"
+                  placeholder_text="Enter a State"
                   :incoming_choices="states"
-                  :incoming_filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)"
-                  typeahead_max_width="400px">
+                  :filter_fn="states_filter_fn"
+                  @update_item_chosen="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -153,9 +151,9 @@ describe('DropdownTypeahead.vue', () => {
         @Component({
             template: `<div>
           <dropdown-typeahead ref="dropdown_typeahead"
-              incoming_placeholder_text="Enter a State"
+              placeholder_text="Enter a State"
               :incoming_choices="states"
-              :incoming_filter_fn="states_filter_fn"
+              :filter_fn="states_filter_fn"
               @update_item_chosen="add_item($event)">
               <template slot-scope="{ item }">
                 <span> {{ item.state }}</span>
@@ -220,9 +218,9 @@ describe('DropdownTypeahead.vue', () => {
         @Component({
                 template: `<div>
           <dropdown-typeahead ref="dropdown_typeahead"
-                              incoming_placeholder_text="Enter a Name"
+                              placeholder_text="Enter a Name"
                               :incoming_choices="strangers"
-                              :incoming_filter_fn="stranger_things_filter_fn"
+                              :filter_fn="stranger_things_filter_fn"
                               @update_item_chosen="add_item($event)">
               <template slot-scope="{ item }">
                 <span> {{ item.first_name }} {{ item.last_name}}</span>
@@ -312,9 +310,9 @@ describe('DropdownTypeahead.vue', () => {
         @Component({
             template: `<div>
       <dropdown-typeahead ref="dropdown_typeahead"
-                          incoming_placeholder_text="Enter a Name"
+                          placeholder_text="Enter a Name"
                           :incoming_choices="strangers"
-                          :incoming_filter_fn="stranger_things_filter_fn"
+                          :filter_fn="stranger_things_filter_fn"
                           @update_item_chosen="add_item($event)">
           <template slot-scope="{ item }">
             <span> {{ item.first_name }} {{ item.last_name}}</span>
@@ -394,9 +392,9 @@ describe('DropdownTypeahead.vue', () => {
         @Component({
             template: `<div>
                         <dropdown-typeahead ref="dropdown_typeahead"
-                          incoming_placeholder_text="Enter a Name"
+                          placeholder_text="Enter a Name"
                           :incoming_choices="strangers"
-                          :incoming_filter_fn="stranger_things_filter_fn"
+                          :filter_fn="stranger_things_filter_fn"
                           @update_item_chosen="add_item($event)">
                         </dropdown-typeahead>
                       </div>`,

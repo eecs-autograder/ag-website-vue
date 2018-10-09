@@ -4,12 +4,12 @@
       objects and uses a scoped slot </b></p>
     <div class="control-width-1">
       <dropdown-typeahead
-        incoming_placeholder_text="Enter a State"
+        placeholder_text="Enter a State"
         :incoming_choices="states"
         @update_item_chosen="add_item_1($event)"
-        :incoming_filter_fn="filter_fn_1">
-        <template slot-scope="{ item }">
-          <span> {{ item.state }}</span>
+        :filter_fn="filter_fn_1">
+        <template slot-scope="{item}">
+          <span> {{item.state}}</span>
         </template>
       </dropdown-typeahead>
     </div>
@@ -23,12 +23,12 @@
       string, last_name: string } objects and uses a scoped slot</b></p>
     <div class="control-width-2">
       <dropdown-typeahead
-        incoming_placeholder_text="Enter a Character"
+        placeholder_text="Enter a Character"
         :incoming_choices="strangers"
         @update_item_chosen="add_item_2($event)"
-        :incoming_filter_fn="stranger_things_filter_fn">
-        <template slot-scope="{ item }">
-          <span> {{ item.first_name }} {{item.last_name}}</span>
+        :filter_fn="stranger_things_filter_fn">
+        <template slot-scope="{item}">
+          <span> {{item.first_name}} {{item.last_name}}</span>
         </template>
       </dropdown-typeahead>
     </div>
@@ -42,10 +42,10 @@
       and uses the default scoped-slot styling </b></p>
     <div class="control-width-3">
       <dropdown-typeahead
-        incoming_placeholder_text="Enter a Season"
+        placeholder_text="Enter a Season"
         :incoming_choices="seasons"
         @update_item_chosen="add_item_3($event)"
-        :incoming_filter_fn="seasons_filter_fn">
+        :filter_fn="seasons_filter_fn">
       </dropdown-typeahead>
     </div>
 
@@ -67,14 +67,16 @@
   })
   export default class ModalDemo extends Vue {
 
-    states = [ {state: "MissouriMissouriMissouriMissouriMissouri"},
-               {state: "Mississippi"},
-               {state: "Minnesota"},
-               {state: "Massachusetts"},
-               {state: "Maine"},
-               {state: "Montana"},
-               {state: "Michigan"},
-               {state: "Maryland"}];
+    states = [
+      {state: "MissouriMissouriMissouriMissouriMissouri"},
+      {state: "Mississippi"},
+      {state: "Minnesota"},
+      {state: "Massachusetts"},
+      {state: "Maine"},
+      {state: "Montana"},
+      {state: "Michigan"},
+      {state: "Maryland"}
+    ];
 
     add_item_1(item: object) {
       this.chosen_items_1.push(item);
@@ -87,13 +89,14 @@
       return item.state.indexOf(filter_text) >= 0;
     }
 
-    strangers = [ {first_name: "Joyce", last_name: "Byers"},
-                  {first_name: "Will", last_name: "Byers"},
-                  {first_name: "Jonathan", last_name: "Byers"},
-                  {first_name: "Nancy", last_name: "Wheeler"},
-                  {first_name: "Mike", last_name: "Wheeler"},
-                  {first_name: "Steve", last_name: "Harrington"},
-                  {first_name: "Jim", last_name: "Hopper"}
+    strangers = [
+      {first_name: "Joyce", last_name: "Byers"},
+      {first_name: "Will", last_name: "Byers"},
+      {first_name: "Jonathan", last_name: "Byers"},
+      {first_name: "Nancy", last_name: "Wheeler"},
+      {first_name: "Mike", last_name: "Wheeler"},
+      {first_name: "Steve", last_name: "Harrington"},
+      {first_name: "Jim", last_name: "Hopper"}
     ];
 
     stranger_things_filter_fn(item: {first_name: string, last_name: string},
@@ -108,10 +111,11 @@
       this.chosen_items_2.push(item);
     }
 
-    seasons = [ "FallFallFallFallFallFallFallFallFallFallFallFallFallFallFallFall",
-                "Winter",
-                "Spring",
-                "Summer"
+    seasons = [
+      "FallFallFallFallFallFallFallFallFallFallFallFallFallFallFallFall",
+      "Winter",
+      "Spring",
+      "Summer"
     ];
 
     seasons_filter_fn(item: string, filter_text: string) {
