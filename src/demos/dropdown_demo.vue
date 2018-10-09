@@ -103,30 +103,33 @@
 
     some_word = "";
 
-    menu_items = [{ option: "1 Passenger" },
-                  { option: "2 Passengers" },
-                  { option: "3 Passengers" },
-                  { option: "4 Passengers" },
-                  { option: "5 Passengers" },
-                  { option: "6 Passengers" },
-                  { option: "7 Passengers" },
-                  { option: "8 Passengers" },
-                  { option: "9 Passengers" }
-                 ];
+    menu_items = [
+      { option: "1 Passenger" },
+      { option: "2 Passengers" },
+      { option: "3 Passengers" },
+      { option: "4 Passengers" },
+      { option: "5 Passengers" },
+      { option: "6 Passengers" },
+      { option: "7 Passengers" },
+      { option: "8 Passengers" },
+      { option: "9 Passengers" }
+    ];
 
     selected_menu_item = { option: "2 Passengers" };
 
-    names = [{ first_name: "Elora", last_name: "Blue"},
-             { first_name: "Brittany", last_name: "Cost"},
-             { first_name: "Sam", last_name: "Sanchez"},
-             { first_name: "Jordan", last_name: "Johnson"},
-             { first_name: "Michelle", last_name: "Brandt"}
-            ];
+    names = [
+      { first_name: "Elora", last_name: "Blue"},
+      { first_name: "Brittany", last_name: "Cost"},
+      { first_name: "Sam", last_name: "Sanchez"},
+      { first_name: "Jordan", last_name: "Johnson"},
+      { first_name: "Michelle", last_name: "Brandt"}
+    ];
 
-    food_menu_items = ["Cheeseburger",
-                       "Fries",
-                       "Shake"
-                      ];
+    food_menu_items = [
+      "Cheeseburger",
+      "Fries",
+      "Shake"
+    ];
 
     contact_methods = [{contact: "By Phone"}, {contact: "By Email"}];
 
@@ -217,9 +220,9 @@
 }
 
 .food {
-  width: 190px;
   margin: 0;
   padding-top: 2px;
+  width: 190px;
 }
 
 .contact {

@@ -38,7 +38,7 @@
     is_open_ = false;
 
     @Watch('incoming_items')
-    on_filter_text_changed(new_val: object[], old_val: object[]) {
+    on_items_changed(new_val: object[], old_val: object[]) {
       this.items = new_val;
       if (this.highlighted_index >= this.items.length && this.items.length > 0) {
         this.highlighted_index = this.items.length - 1;
