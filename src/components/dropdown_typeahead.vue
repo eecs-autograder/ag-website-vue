@@ -1,5 +1,5 @@
 <template>
-  <div class="dropdown-typeahead-container">
+  <div id="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :incoming_items="filtered_choices"
               @update_item_selected="$emit('update_item_chosen', $event)">

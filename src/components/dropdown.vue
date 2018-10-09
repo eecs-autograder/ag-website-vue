@@ -1,18 +1,18 @@
 <template>
-  <div class="outermost-dropdown-container">
-    <div class="dropdown-container"
+  <div id="outermost-dropdown-container">
+    <div id="dropdown-container"
          @keydown="move_highlighted($event)">
 
-      <div class="header-container">
+      <div id="header-container">
         <slot name="header"> </slot>
       </div>
 
-      <div class="dropdown-content"
+      <div id="dropdown-content"
            :style="[{display: is_open ? 'block' : 'none'}]">
         <div class="dropdown-row" v-for="(item, index) of items"
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
-             :id="index === highlighted_index ? 'highlight' : ''">
+             :id ="index === highlighted_index ? 'highlight': ''">
           <slot v-bind:item="item"> </slot>
         </div>
       </div>
@@ -125,12 +125,12 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
-.dropdown-container {
+#dropdown-container {
   display: block;
   position: relative;
 }
 
-.dropdown-content {
+#dropdown-content {
   background-color: white;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   display: block;
@@ -140,7 +140,7 @@
 }
 
 .dropdown-row {
-  border-top: 1px solid $pebble-dark;
+  border-top: 1px solid $pebble-medium;
   color: black;
   cursor: pointer;
   display: block;
