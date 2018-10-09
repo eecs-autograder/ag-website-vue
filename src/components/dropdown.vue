@@ -17,7 +17,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -157,19 +156,15 @@
 }
 
 .dropdown-row:hover {
-  background-color: hsl(210, 13%, 95%);
+  background-color: $pebble-light;
 }
 
 #highlight:hover {
-  background-color: hsl(210, 13%, 80%);
+  background-color: $pebble-dark;
 }
 
 #highlight {
-  background-color: hsl(210, 13%, 80%);
-}
-
-.chosen {
-  background-color: #ace7c9;
+  background-color: $pebble-dark;
 }
 
 </style>

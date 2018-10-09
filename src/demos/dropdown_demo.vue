@@ -82,7 +82,7 @@
           </div>
         </template>
         <template slot-scope="{item}">
-          <p class="food"> {{item.contact}}</p>
+          <p class="contact"> {{item.contact}}</p>
         </template>
       </dropdown>
     </div>
@@ -158,11 +158,6 @@
   width: 600px;
 }
 
-.food {
-  margin: 0;
-  padding-top: 2px;
-}
-
 .header-para {
   background-color: cornflowerblue;
   border: none;
@@ -219,5 +214,19 @@
 
 .row-content-2 {
   width: 125px;
+  color: purple;
+  background-color: lightslategrey;
 }
+
+.food {
+  width: 190px;
+  margin: 0;
+  padding-top: 2px;
+}
+
+.contact {
+  margin: 0;
+  padding-top: 2px;
+}
+
 </style>
