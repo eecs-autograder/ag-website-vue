@@ -42,6 +42,7 @@
 
 <script lang="ts">
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
+import { SafeMap } from "@/safe_map";
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component({
@@ -49,7 +50,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 })
 export default class MultiFileViewerDemo extends Vue {
 
-  files_and_content = new Map<string, string>([
+  files_and_content = new SafeMap<string, string>([
       ['A', 'Aurora\nAurora'],
       ['B', 'Belle'],
       ['C', 'Cinderella\nCinderella\nCinderella'],

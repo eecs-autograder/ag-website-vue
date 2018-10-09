@@ -2,6 +2,12 @@ import { SafeMap } from '@/safe_map';
 
 describe('SafeMap', () => {
 
+    test('Construct from iterable', async () => {
+        let map = new SafeMap<string, number>([['spam', 42], ['egg', 43]]);
+        expect(map.get('spam')).toBe(42);
+        expect(map.get('egg')).toBe(43);
+    });
+
     test('SafeMap get and set', () => {
         let map = new SafeMap<string, number>();
         map.set('spam', 44);
