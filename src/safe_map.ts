@@ -1,8 +1,19 @@
 export class SafeMapError extends Error {}
 
 export class SafeMap<K, V>  {
+    // The type declarations for map we've seen don't actually accept
+    // all iterables, so we implement this ourselves.
+    constructor(iterable?: Iterable<[K, V]>) {
+        this._map = new Map<K, V>();
 
-    private _map = new Map<K, V>();
+        if (iterable !== undefined) {
+            for (let [key, val] of iterable) {
+                this._map.set(key, val);
+            }
+        }
+    }
+
+    private _map: Map<K, V>;
 
     get size() {
         return this._map.size;
