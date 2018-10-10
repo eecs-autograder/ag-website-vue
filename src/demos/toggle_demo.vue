@@ -8,7 +8,7 @@
     </p>
     <div id="toggle-ex-1">
       <Toggle v-model="toggle_ex_1_value"
-              :incoming_active_background_color="toggle_ex_1_active_color">
+              :active_background_color="toggle_ex_1_active_color">
         <div slot="on">
           <p class="toggle-ex-1-side"><i class="fas fa-lightbulb lightbulb-on"></i></p>
         </div>
@@ -60,7 +60,7 @@
 
     toggle_ex_1_value = true;
 
-    toggle_ex_1_active_color = { 'backgroundColor': 'hsl(46, 100%, 66%)' };
+    toggle_ex_1_active_color = 'hsl(46, 100%, 66%)';
 
     toggle_ex_2_value = false;
 
