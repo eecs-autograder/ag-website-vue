@@ -19,12 +19,12 @@
     @Prop({default: "small", type: String})
     width!: string;
 
-    tooltip_width = "";
-    tooltip_placement = "";
+    d_width = "";
+    d_placement = "";
 
     created() {
-      this.tooltip_width = this.width;
-      this.tooltip_placement = this.placement;
+      this.d_width = this.width;
+      this.d_placement = this.placement;
     }
 
     mounted() {
@@ -55,24 +55,24 @@
     }
 
     set_tooltip_width(tooltip: HTMLElement) {
-      if (this.tooltip_width === "small") {
+      if (this.d_width === "small") {
         tooltip.classList.add('small-text-area');
       }
-      else if (this.tooltip_width === "medium") {
+      else if (this.d_width === "medium") {
         tooltip.classList.add('medium-text-area');
       }
-      else if (this.tooltip_width === "large") {
+      else if (this.d_width === "large") {
         tooltip.classList.add('large-text-area');
       }
       else {
-        throw new Error(`Invalid tooltip width: "${this.tooltip_width}"`);
+        throw new Error(`Invalid tooltip width: "${this.d_width}"`);
       }
     }
 
     set_tooltip_placement(tooltip: HTMLElement) {
       let height_of_tooltip = tooltip.clientHeight;
 
-      if (this.tooltip_placement === "left" || this.tooltip_placement === "right") {
+      if (this.d_placement === "left" || this.d_placement === "right") {
         let half_height_of_tooltip = (height_of_tooltip - 20) / 2;
         half_height_of_tooltip = -half_height_of_tooltip;
         half_height_of_tooltip -= 1;
@@ -80,33 +80,33 @@
         top_num += "px";
         tooltip.style.top = top_num;
 
-        if (this.tooltip_placement === "left") {
+        if (this.d_placement === "left") {
           tooltip.className += " placement-left";
-          if (this.tooltip_width === "medium") {
+          if (this.d_width === "medium") {
             tooltip.style.marginLeft = "-120px";
           }
-          else if (this.tooltip_width === "large") {
+          else if (this.d_width === "large") {
             tooltip.style.marginLeft = "-220px";
           }
         }
         else {
           tooltip.className += " placement-right";
-          if (this.tooltip_width === "medium") {
+          if (this.d_width === "medium") {
             tooltip.style.marginRight = "-120px";
           }
-          else if (this.tooltip_width === "large") {
+          else if (this.d_width === "large") {
             tooltip.style.marginRight = "-220px";
           }
         }
       }
-      else if (this.tooltip_placement === "top" || this.tooltip_placement === "bottom") {
+      else if (this.d_placement === "top" || this.d_placement === "bottom") {
 
         let space_away_from_parent = height_of_tooltip + 15;
         space_away_from_parent = -space_away_from_parent;
         let positioning_to_apply = space_away_from_parent.toString();
         positioning_to_apply += "px";
 
-        if (this.tooltip_placement === "bottom") {
+        if (this.d_placement === "bottom") {
           tooltip.className += " placement-bottom";
           tooltip.style.bottom = positioning_to_apply;
         }
@@ -115,18 +115,18 @@
           tooltip.style.top = positioning_to_apply;
         }
 
-        if (this.tooltip_width === "small") {
+        if (this.d_width === "small") {
           tooltip.style.marginLeft = "-60px";
         }
-        else if (this.tooltip_width === "medium") {
+        else if (this.d_width === "medium") {
           tooltip.style.marginLeft = "-120px";
         }
-        else if (this.tooltip_width === "large") {
+        else if (this.d_width === "large") {
           tooltip.style.marginLeft = "-170px";
         }
       }
       else {
-        throw new Error(`Invalid tooltip placement: "${this.tooltip_placement}"`);
+        throw new Error(`Invalid tooltip placement: "${this.d_placement}"`);
       }
     }
   }
