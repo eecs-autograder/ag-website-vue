@@ -16,8 +16,8 @@ describe('Tooltip.vue', () => {
         };
         const wrapper = mount(component);
         let tooltip = wrapper.find({ref: 'tooltip'});
-        expect(tooltip.vm.$data.tooltip_width).toBe('small');
-        expect(tooltip.vm.$data.tooltip_placement).toBe('top');
+        expect(tooltip.vm.$data.d_width).toBe('small');
+        expect(tooltip.vm.$data.d_placement).toBe('top');
     });
 
     test('Non-default placement and width', () => {
@@ -43,85 +43,85 @@ describe('Tooltip.vue', () => {
         const wrapper = mount(component);
 
         let small_top = wrapper.find({ref: 'small_top'});
-        expect(small_top.vm.$data.tooltip_width).toBe('small');
-        expect(small_top.vm.$data.tooltip_placement).toBe('top');
+        expect(small_top.vm.$data.d_width).toBe('small');
+        expect(small_top.vm.$data.d_placement).toBe('top');
         expect(small_top.text()).toContain('Small top');
         expect(small_top.find('#tooltip').classes()).toContain('small-text-area');
         expect(small_top.find('#tooltip').classes()).toContain('placement-top');
 
         let small_bottom = wrapper.find({ref: 'small_bottom'});
-        expect(small_bottom.vm.$data.tooltip_width).toBe('small');
-        expect(small_bottom.vm.$data.tooltip_placement).toBe('bottom');
+        expect(small_bottom.vm.$data.d_width).toBe('small');
+        expect(small_bottom.vm.$data.d_placement).toBe('bottom');
         expect(small_bottom.text()).toContain('Small bottom');
         expect(small_bottom.find('#tooltip').classes()).toContain('small-text-area');
         expect(small_bottom.find('#tooltip').classes()).toContain('placement-bottom');
 
         let small_left = wrapper.find({ref: 'small_left'});
-        expect(small_left.vm.$data.tooltip_width).toBe('small');
-        expect(small_left.vm.$data.tooltip_placement).toBe('left');
+        expect(small_left.vm.$data.d_width).toBe('small');
+        expect(small_left.vm.$data.d_placement).toBe('left');
         expect(small_left.text()).toContain('Small left');
         expect(small_left.find('#tooltip').classes()).toContain('small-text-area');
         expect(small_left.find('#tooltip').classes()).toContain('placement-left');
 
         let small_right = wrapper.find({ref: 'small_right'});
-        expect(small_right.vm.$data.tooltip_width).toBe('small');
-        expect(small_right.vm.$data.tooltip_placement).toBe('right');
+        expect(small_right.vm.$data.d_width).toBe('small');
+        expect(small_right.vm.$data.d_placement).toBe('right');
         expect(small_right.text()).toContain('Small right');
         expect(small_right.find('#tooltip').classes()).toContain('small-text-area');
         expect(small_right.find('#tooltip').classes()).toContain('placement-right');
 
         let medium_top = wrapper.find({ref: 'medium_top'});
-        expect(medium_top.vm.$data.tooltip_width).toBe('medium');
-        expect(medium_top.vm.$data.tooltip_placement).toBe('top');
+        expect(medium_top.vm.$data.d_width).toBe('medium');
+        expect(medium_top.vm.$data.d_placement).toBe('top');
         expect(medium_top.text()).toContain('Medium top');
         expect(medium_top.find('#tooltip').classes()).toContain('medium-text-area');
         expect(medium_top.find('#tooltip').classes()).toContain('placement-top');
 
         let medium_bottom = wrapper.find({ref: 'medium_bottom'});
-        expect(medium_bottom.vm.$data.tooltip_width).toBe('medium');
-        expect(medium_bottom.vm.$data.tooltip_placement).toBe('bottom');
+        expect(medium_bottom.vm.$data.d_width).toBe('medium');
+        expect(medium_bottom.vm.$data.d_placement).toBe('bottom');
         expect(medium_bottom.text()).toContain('Medium bottom');
         expect(medium_bottom.find('#tooltip').classes()).toContain('medium-text-area');
         expect(medium_bottom.find('#tooltip').classes()).toContain('placement-bottom');
 
         let medium_left = wrapper.find({ref: 'medium_left'});
-        expect(medium_left.vm.$data.tooltip_width).toBe('medium');
-        expect(medium_left.vm.$data.tooltip_placement).toBe('left');
+        expect(medium_left.vm.$data.d_width).toBe('medium');
+        expect(medium_left.vm.$data.d_placement).toBe('left');
         expect(medium_left.text()).toContain('Medium left');
         expect(medium_left.find('#tooltip').classes()).toContain('medium-text-area');
         expect(medium_left.find('#tooltip').classes()).toContain('placement-left');
 
         let medium_right = wrapper.find({ref: 'medium_right'});
-        expect(medium_right.vm.$data.tooltip_width).toBe('medium');
-        expect(medium_right.vm.$data.tooltip_placement).toBe('right');
+        expect(medium_right.vm.$data.d_width).toBe('medium');
+        expect(medium_right.vm.$data.d_placement).toBe('right');
         expect(medium_right.text()).toContain('Medium right');
         expect(medium_right.find('#tooltip').classes()).toContain('medium-text-area');
         expect(medium_right.find('#tooltip').classes()).toContain('placement-right');
 
         let large_top = wrapper.find({ref: 'large_top'});
-        expect(large_top.vm.$data.tooltip_width).toBe('large');
-        expect(large_top.vm.$data.tooltip_placement).toBe('top');
+        expect(large_top.vm.$data.d_width).toBe('large');
+        expect(large_top.vm.$data.d_placement).toBe('top');
         expect(large_top.text()).toContain('Large top');
         expect(large_top.find('#tooltip').classes()).toContain('large-text-area');
         expect(large_top.find('#tooltip').classes()).toContain('placement-top');
 
         let large_bottom = wrapper.find({ref: 'large_bottom'});
-        expect(large_bottom.vm.$data.tooltip_width).toBe('large');
-        expect(large_bottom.vm.$data.tooltip_placement).toBe('bottom');
+        expect(large_bottom.vm.$data.d_width).toBe('large');
+        expect(large_bottom.vm.$data.d_placement).toBe('bottom');
         expect(large_bottom.text()).toContain('Large bottom');
         expect(large_bottom.find('#tooltip').classes()).toContain('large-text-area');
         expect(large_bottom.find('#tooltip').classes()).toContain('placement-bottom');
 
         let large_left = wrapper.find({ref: 'large_left'});
-        expect(large_left.vm.$data.tooltip_width).toBe('large');
-        expect(large_left.vm.$data.tooltip_placement).toBe('left');
+        expect(large_left.vm.$data.d_width).toBe('large');
+        expect(large_left.vm.$data.d_placement).toBe('left');
         expect(large_left.text()).toContain('Large left');
         expect(large_left.find('#tooltip').classes()).toContain('large-text-area');
         expect(large_left.find('#tooltip').classes()).toContain('placement-left');
 
         let large_right = wrapper.find({ref: 'large_right'});
-        expect(large_right.vm.$data.tooltip_width).toBe('large');
-        expect(large_right.vm.$data.tooltip_placement).toBe('right');
+        expect(large_right.vm.$data.d_width).toBe('large');
+        expect(large_right.vm.$data.d_placement).toBe('right');
         expect(large_right.text()).toContain('Large right');
         expect(large_right.find('#tooltip').classes()).toContain('large-text-area');
         expect(large_right.find('#tooltip').classes()).toContain('placement-right');
