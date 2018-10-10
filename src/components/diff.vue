@@ -37,7 +37,7 @@
     </div>
 
     <div class="toggle-container">
-      <toggle v-model="show_whitespace_" :incoming_active_background_color="toggle_color">
+      <toggle v-model="show_whitespace_" :active_background_color="toggle_color">
         <template slot="on">
           <p>Show Whitespace</p>
         </template>
@@ -86,9 +86,7 @@ export default class Diff extends Vue {
   left: DiffCell[] = [];
   right: DiffCell[] = [];
 
-  toggle_color = {
-    "backgroundColor": "slategray"
-  };
+  toggle_color = "slategray";
 
   show_whitespace_: boolean = false;
 

@@ -1,6 +1,7 @@
 <template>
   <div id="toggle-button-space">
-    <div v-if="is_on" class="active-option-style on-border" :style="active_background_color">
+    <div v-if="is_on" class="active-option-style on-border"
+         :style="[{backgroundColor: active_background_color}]">
       <slot name="on"> </slot>
     </div>
     <div v-else @click="_toggle()" class="inactive-option-style on-border cursor-pointer">
@@ -10,7 +11,8 @@
     <div v-if="is_on" @click="_toggle()" class="inactive-option-style off-border">
       <slot name="off"> </slot>
     </div>
-    <div v-else class="active-option-style off-border" :style="active_background_color">
+    <div v-else class="active-option-style off-border"
+         :style="[{backgroundColor: active_background_color}]">
       <slot name="off"> </slot>
     </div>
 
@@ -31,15 +33,13 @@ export default class Toggle extends Vue {
     this.is_on = new_value;
   }
 
-  @Prop({default: () => ({ 'backgroundColor': 'hsl(208, 59%, 49%)' }), type: Object})
-  incoming_active_background_color!: object;
+  @Prop({default: 'hsl(208, 59%, 49%)', type: String})
+  active_background_color!: string;
 
   is_on: boolean = false;
-  active_background_color = { };
 
   created() {
     this.is_on = this.value;
-    this.active_background_color = this.incoming_active_background_color;
   }
 
   private _toggle() {
