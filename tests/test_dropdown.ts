@@ -13,7 +13,7 @@ describe('Dropdown.vue', () => {
          () => {
 
         @Component({
-            template: `<dropdown :incoming_items="food" ref="dropdown_example_1">
+            template: `<dropdown :items="food" ref="dropdown_example_1">
                  <template slot="header">
                   <p ref="dropdown_header"> Pick A Food Item </p>
                  </template>
@@ -28,7 +28,7 @@ describe('Dropdown.vue', () => {
 
         const wrapper = mount(WrapperComponent);
         let dropdown_menu_container = wrapper.find({ref: 'dropdown_example_1'});
-        expect(dropdown_menu_container.vm.$data.items).toEqual(wrapper.vm.$data.food);
+        expect(dropdown_menu_container.vm.$data.d_items).toEqual(wrapper.vm.$data.food);
         expect(dropdown_menu_container.element.style.minWidth).toEqual("");
         expect(dropdown_menu_container.element.style.maxWidth).toEqual("");
     });
@@ -36,7 +36,7 @@ describe('Dropdown.vue', () => {
     test('Pressing the up and down keys changes the highlighted item', () => {
 
         @Component({
-            template: `<dropdown :incoming_items="states" ref="dropdown_example_2">
+            template: `<dropdown :items="states" ref="dropdown_example_2">
                  <template slot="header">
                   <p ref="dropdown_header"> States that Start with M </p>
                  </template>
@@ -83,7 +83,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Michigan");
         expect(dropdown_menu_content.text()).toContain("Maryland");
 
-        expect(dropdown_component.vm.$data.highlighted_index).toEqual(0);
+        expect(dropdown_component.vm.$data.d_highlighted_index).toEqual(0);
         expect(dropdown_menu_content.element.style.display).toEqual("block");
 
         let highlighted_item = wrapper.find("#highlight");
@@ -117,7 +117,7 @@ describe('Dropdown.vue', () => {
 
         @Component({
             template: `<div>
-                 <dropdown :incoming_items="states"
+                 <dropdown :items="states"
                                  ref="dropdown_example_2"
                                  @update_item_selected="add_item($event)">
                     <template slot="header">
@@ -164,7 +164,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Missouri");
         expect(dropdown_menu_content.text()).toContain("Mississippi");
 
-        expect(dropdown_component.vm.$data.highlighted_index).toEqual(0);
+        expect(dropdown_component.vm.$data.d_highlighted_index).toEqual(0);
         expect(dropdown_menu_content.element.style.display).toEqual("block");
 
         let highlighted_item = wrapper.find("#highlight");
@@ -182,7 +182,7 @@ describe('Dropdown.vue', () => {
 
         @Component({
             template: `<div>
-                    <dropdown :incoming_items="states"
+                    <dropdown :items="states"
                               ref="dropdown_example_2"
                               @update_item_selected="add_item($event)">
                     <template slot="header">
@@ -229,7 +229,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Missouri");
         expect(dropdown_menu_content.text()).toContain("Mississippi");
 
-        expect(dropdown_component.vm.$data.highlighted_index).toEqual(0);
+        expect(dropdown_component.vm.$data.d_highlighted_index).toEqual(0);
         expect(dropdown_menu_content.element.style.display).toEqual("block");
 
         dropdown_menu_content.trigger('keydown', { code: 'ArrowDown'});
@@ -249,7 +249,7 @@ describe('Dropdown.vue', () => {
         @Component({
             template: `<div class="surround-2">
                         <dropdown ref="dropdown_on_a_button"
-                                  :incoming_items="employees"
+                                  :items="employees"
                                   @update_item_selected="update_employee($event)">
                           <template slot="header">
                             <button ref="dropdown_header"
@@ -295,7 +295,7 @@ describe('Dropdown.vue', () => {
         let highlighted_item = wrapper.find("#highlight");
         expect(highlighted_item.text()).toContain("Blue");
 
-        expect(dropdown_menu.vm.$data.highlighted_index).toEqual(0);
+        expect(dropdown_menu.vm.$data.d_highlighted_index).toEqual(0);
 
         expect(dropdown_menu_content.text()).toContain("Blue");
         expect(dropdown_menu_content.text()).toContain("Cost");
@@ -304,7 +304,7 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Smith");
 
         dropdown_menu_content.trigger('keydown', { code: 'ArrowDown' });
-        expect(dropdown_menu.vm.$data.highlighted_index).toEqual(1);
+        expect(dropdown_menu.vm.$data.d_highlighted_index).toEqual(1);
         dropdown_menu_content.trigger('keydown', { code: 'Enter' });
 
         expect(dropdown_menu_content.element.style.display).toEqual("none");
@@ -320,7 +320,7 @@ describe('Dropdown.vue', () => {
         @Component({
             template: `<div>
                         <dropdown ref="dropdown_with_colors"
-                                  :incoming_items="colors">
+                                  :items="colors">
                           <template slot="header">
                             <p ref="dropdown_header"
                                class="header-button">
@@ -374,7 +374,7 @@ describe('Dropdown.vue', () => {
         @Component({
             template: `<div>
                         <dropdown ref="dropdown_with_colors"
-                                  :incoming_items="colors">
+                                  :items="colors">
                           <template slot="header">
                             <p ref="dropdown_header"
                                class="header-button">
@@ -435,7 +435,7 @@ describe('Dropdown.vue', () => {
     test('Public show and hide dropdown functions', () => {
         const component = {
             template: `
-<dropdown :incoming_items="[1, 2, 3]" ref="dropdown">
+<dropdown :items="[1, 2, 3]" ref="dropdown">
     <template slot="header">
         <p>Hello</p>
     </template>
@@ -459,7 +459,7 @@ describe('Dropdown.vue', () => {
     test("Arrow key navigation doesn't go off the end", async () => {
         const component = {
             template: `
-<dropdown :incoming_items="[1, 2]" ref="dropdown">
+<dropdown :items="[1, 2]" ref="dropdown">
     <template slot="header">
         <p ref="header">Hello</p>
     </template>
@@ -475,27 +475,27 @@ describe('Dropdown.vue', () => {
 
         header.trigger('click');
         expect(dropdown.is_open).toBe(true);
-        expect(dropdown.$data.highlighted_index).toBe(0);
+        expect(dropdown.$data.d_highlighted_index).toBe(0);
 
         let content = wrapper.find('#dropdown-content');
         content.trigger('keydown', { code: 'ArrowUp'});
-        expect(dropdown.$data.highlighted_index).toBe(0);
+        expect(dropdown.$data.d_highlighted_index).toBe(0);
 
         content.trigger('keydown', { code: 'ArrowDown'});
-        expect(dropdown.$data.highlighted_index).toBe(1);
+        expect(dropdown.$data.d_highlighted_index).toBe(1);
         content.trigger('keydown', { code: 'ArrowDown'});
-        expect(dropdown.$data.highlighted_index).toBe(1);
+        expect(dropdown.$data.d_highlighted_index).toBe(1);
 
         content.trigger('keydown', { code: 'ArrowUp'});
-        expect(dropdown.$data.highlighted_index).toBe(0);
+        expect(dropdown.$data.d_highlighted_index).toBe(0);
         content.trigger('keydown', { code: 'ArrowUp'});
-        expect(dropdown.$data.highlighted_index).toBe(0);
+        expect(dropdown.$data.d_highlighted_index).toBe(0);
     });
 
     test("Other keys don't open menu", async () => {
         const component = {
             template: `
-<dropdown :incoming_items="[1, 2]" ref="dropdown">
+<dropdown :items="[1, 2]" ref="dropdown">
     <template slot="header">
         <p ref="header">Hello</p>
     </template>
@@ -525,7 +525,7 @@ describe('Dropdown.vue', () => {
                           <p class="change-breed-button" @click="change_breeds()"> Change Breeds!
                           </p>
                           <dropdown ref="dropdown_component"
-                            :incoming_items="dog_breeds"
+                            :items="dog_breeds"
                             @update_item_selected="add_breed($event)">
                               <template slot="header">
                                 <p ref="header" tabindex="1" class="header-para">
@@ -572,13 +572,13 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Siberian Husky");
         expect(dropdown_menu_content.text()).toContain("Border Collie");
 
-        expect(dropdown.highlighted_index).toEqual(0);
+        expect(dropdown.d_highlighted_index).toEqual(0);
 
         dropdown_menu_content.trigger("keydown", { code: "ArrowDown" });
 
         dropdown_menu_content.trigger("keydown", { code: "ArrowDown" });
 
-        expect(dropdown.highlighted_index).toEqual(2);
+        expect(dropdown.d_highlighted_index).toEqual(2);
 
         let changer_button = wrapper.find('.change-breed-button');
         changer_button.trigger("click");
@@ -588,6 +588,6 @@ describe('Dropdown.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Tonkinese");
         expect(dropdown_menu_content.text()).toContain("Maine Coon");
 
-        expect(dropdown.highlighted_index).toEqual(1);
+        expect(dropdown.d_highlighted_index).toEqual(1);
     });
 });
