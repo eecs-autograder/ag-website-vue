@@ -32,7 +32,6 @@
     @Prop({default: 0, type: Number})
     highlighted_index!: number;
 
-    chosen_item: object = {};
     d_highlighted_index = 0;
     d_items: object[] = [];
     is_open_ = false;
@@ -76,7 +75,6 @@
 
     choose_item_from_dropdown_menu(item_selected: object, index: number) {
       if (item_selected !== undefined) {
-        this.chosen_item = item_selected;
         this.d_highlighted_index = index;
         this.$emit("update_item_selected", item_selected);
       }
