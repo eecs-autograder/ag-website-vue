@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="tabs-demo">
 
     <div class="outside">
       <button type="button" @click="add_tab()">Add tab</button>

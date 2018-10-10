@@ -35,6 +35,7 @@ describe('Diff tests', () => {
         });
 
         let body_wrapper = wrapper.find('#diff-body-wrapper');
+        expect(body_wrapper.element.style.height).toEqual("100px");
         expect(body_wrapper.element.scrollHeight).toBeGreaterThan(100);
     });
 
