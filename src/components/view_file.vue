@@ -30,7 +30,7 @@
     view_file_height!: string;
 
     @Watch('file_contents')
-    on_file_content_change(new_content: string, old_content: string) {
+    on_file_contents_change(new_content: string, old_content: string) {
       this.d_file_contents = new_content;
     }
 
