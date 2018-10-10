@@ -7,8 +7,8 @@
           element so that it can receive focus and blur.
       </p>
       <dropdown ref="dropdown_menu_ex_1"
-                :incoming_items="menu_items"
-                :highlighted_index_in="1"
+                :items="menu_items"
+                :highlighted_index="5"
                 @update_item_selected="add_item_1($event)">
         <template slot="header">
           <p tabindex="1" class="header-para">
@@ -26,7 +26,7 @@
 
     <div class="surround-2">
       <dropdown ref="dropdown_menu_ex_2"
-                :incoming_items="names"
+                :items="names"
                 @update_item_selected="add_item_2($event)">
         <template slot="header">
           <button class="header-button">
@@ -46,7 +46,7 @@
     <div class="surround-3">
       <p> {{some_word}}</p>
       <dropdown ref="dropdown_menu_ex_3"
-                :incoming_items="names"
+                :items="names"
                 @update_item_selected="add_item_3($event)">
         <template slot="header">
           <input type=text
@@ -64,7 +64,7 @@
     <div class="web-menu">
       <div class="menu-option"> <p> Home </p> </div>
       <dropdown ref="dropdown_menu_ex_4"
-          :incoming_items="food_menu_items">
+          :items="food_menu_items">
         <template slot="header">
           <div tabindex="1" class="menu-option navy-tile">
             <p> Products </p>
@@ -75,7 +75,7 @@
         </template>
       </dropdown>
       <dropdown ref="dropdown_menu_ex_5"
-                :incoming_items="contact_methods">
+                :items="contact_methods">
         <template slot="header">
           <div tabindex="1" class="menu-option">
             <p> Contact </p>

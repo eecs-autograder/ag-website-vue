@@ -9,10 +9,10 @@
 
       <div id="dropdown-content"
            :style="[{display: is_open ? 'block' : 'none'}]">
-        <div class="dropdown-row" v-for="(item, index) of items"
+        <div class="dropdown-row" v-for="(item, index) of d_items"
              @mousedown="$event.preventDefault()"
              @click="choose_item_from_dropdown_menu(item, index)"
-             :id ="index === highlighted_index ? 'highlight': ''">
+             :id ="index === d_highlighted_index ? 'highlight': ''">
           <slot v-bind:item="item"> </slot>
         </div>
       </div>
@@ -27,27 +27,27 @@
   export default class Dropdown extends Vue {
 
     @Prop({required: true, type: Array})
-    incoming_items!: object[];
+    items!: object[];
 
     @Prop({default: 0, type: Number})
-    highlighted_index_in!: number;
+    highlighted_index!: number;
 
     chosen_item: object = {};
-    highlighted_index = 0;
-    items: object[] = [];
+    d_highlighted_index = 0;
+    d_items: object[] = [];
     is_open_ = false;
 
-    @Watch('incoming_items')
+    @Watch('items')
     on_items_changed(new_val: object[], old_val: object[]) {
-      this.items = new_val;
-      if (this.highlighted_index >= this.items.length && this.items.length > 0) {
-        this.highlighted_index = this.items.length - 1;
+      this.d_items = new_val;
+      if (this.d_highlighted_index >= this.d_items.length && this.d_items.length > 0) {
+        this.d_highlighted_index = this.d_items.length - 1;
       }
     }
 
     created() {
-      this.items = this.incoming_items;
-      this.highlighted_index = this.highlighted_index_in;
+      this.d_items = this.items;
+      this.d_highlighted_index = this.highlighted_index;
     }
 
     mounted() {
@@ -77,7 +77,7 @@
     choose_item_from_dropdown_menu(item_selected: object, index: number) {
       if (item_selected !== undefined) {
         this.chosen_item = item_selected;
-        this.highlighted_index = index;
+        this.d_highlighted_index = index;
         this.$emit("update_item_selected", item_selected);
       }
       this.hide_the_dropdown_menu();
@@ -88,11 +88,11 @@
     }
 
     move_highlighted(event: KeyboardEvent) {
-      if (event.code === "Enter" && this.is_open && this.items.length > 0) {
+      if (event.code === "Enter" && this.is_open && this.d_items.length > 0) {
         event.preventDefault();
         event.stopPropagation();
         this.choose_item_from_dropdown_menu(
-          this.items[this.highlighted_index], this.highlighted_index
+          this.d_items[this.d_highlighted_index], this.d_highlighted_index
         );
       }
       else if (event.code === 'ArrowDown') {
@@ -101,8 +101,8 @@
 
         this.show_the_dropdown_menu();
 
-        if (this.highlighted_index < this.items.length - 1) {
-          this.highlighted_index += 1;
+        if (this.d_highlighted_index < this.d_items.length - 1) {
+          this.d_highlighted_index += 1;
         }
       }
       else if (event.code === 'ArrowUp') {
@@ -111,8 +111,8 @@
 
         this.show_the_dropdown_menu();
 
-        if (this.highlighted_index > 0) {
-          this.highlighted_index -= 1;
+        if (this.d_highlighted_index > 0) {
+          this.d_highlighted_index -= 1;
         }
       }
       else if (event.code === 'Escape') {
