@@ -21,8 +21,8 @@
 
              <view-file
                ref="view_file_component"
-               :incoming_filename="open_file.name"
-               :incoming_file_contents="open_file.content"
+               :filename="open_file.name"
+               :file_contents="open_file.content"
                :view_file_height="height_of_view_file">
              </view-file>
 

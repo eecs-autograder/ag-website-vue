@@ -2,12 +2,12 @@
   <div id="viewing-container">
     <div id="scrollable-container" :style="[{height: view_file_height}]">
       <div class="line-numbers-container">
-        <div v-for="(line, index) of file_contents.split('\n')" class="line-number">
+        <div v-for="(line, index) of d_file_contents.split('\n')" class="line-number">
           {{index + 1}}
         </div>
       </div>
       <div class="file-content-container">
-        <pre v-for="(line) of file_contents.split('\n')"
+        <pre v-for="(line) of d_file_contents.split('\n')"
              class="line-of-file-content">{{line === "" ? "\n" : line}}</pre>
       </div>
     </div>
@@ -21,25 +21,25 @@
   export default class ViewFile extends Vue {
 
     @Prop({required: true, type: String})
-    incoming_filename!: string;
+    filename!: string;
 
     @Prop({required: true, type: String})
-    incoming_file_contents!: string;
+    file_contents!: string;
 
     @Prop({default: "", type: String})
     view_file_height!: string;
 
-    @Watch('incoming_file_contents')
+    @Watch('file_contents')
     on_file_content_change(new_content: string, old_content: string) {
-      this.file_contents = new_content;
+      this.d_file_contents = new_content;
     }
 
-    filename: string = "";
-    file_contents: string = "";
+    d_filename: string = "";
+    d_file_contents: string = "";
 
     created() {
-      this.file_contents = this.incoming_file_contents;
-      this.filename = this.incoming_filename;
+      this.d_file_contents = this.file_contents;
+      this.d_filename = this.filename;
     }
   }
 </script>
