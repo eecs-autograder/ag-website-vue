@@ -5,7 +5,7 @@
     <div class="control-width-1">
       <dropdown-typeahead
         placeholder_text="Enter a State"
-        :incoming_choices="states"
+        :choices="states"
         @update_item_chosen="add_item_1($event)"
         :filter_fn="filter_fn_1">
         <template slot-scope="{item}">
@@ -27,7 +27,7 @@
     <div class="control-width-2">
       <dropdown-typeahead
         placeholder_text="Enter a Character"
-        :incoming_choices="strangers"
+        :choices="strangers"
         @update_item_chosen="add_item_2($event)"
         :filter_fn="stranger_things_filter_fn">
         <template  slot-scope="{item}">
@@ -51,7 +51,7 @@
     <div class="control-width-3">
       <dropdown-typeahead
         placeholder_text="Enter a Season"
-        :incoming_choices="seasons"
+        :choices="seasons"
         @update_item_chosen="add_item_3($event)"
         :filter_fn="seasons_filter_fn">
         <template slot="no_matching_results">

@@ -38,7 +38,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 export default class DropdownTypeahead extends Vue {
 
   @Prop({required: true, type: Array})
-  incoming_choices!: object[];
+  choices!: object[];
 
   @Prop({required: true, type: String})
   placeholder_text!: string;
@@ -46,12 +46,12 @@ export default class DropdownTypeahead extends Vue {
   @Prop({required: true, type: Function})
   filter_fn!: (item: object, filter: string) => boolean;
 
-  choices: object[] = [];
+  d_choices: object[] = [];
   filter_text: string = "";
   private _filtered_choices: object[] = [];
 
   created() {
-    this.choices = this.incoming_choices;
+    this.d_choices = this.choices;
   }
 
   resume_search(key: KeyboardEvent) {
@@ -66,9 +66,9 @@ export default class DropdownTypeahead extends Vue {
 
   get filtered_choices() {
     if (this.filter_text === "") {
-      return this.choices;
+      return this.d_choices;
     }
-    this._filtered_choices = this.choices.filter(
+    this._filtered_choices = this.d_choices.filter(
       (item) => this.filter_fn(item, this.filter_text));
     return this._filtered_choices;
   }
