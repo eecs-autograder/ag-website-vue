@@ -14,21 +14,21 @@ describe('ViewFile.vue', () => {
         const content = 'blah\nblah\nblah';
         const wrapper = mount(ViewFile, {
             propsData: {
-                incoming_filename: filename,
-                incoming_file_contents: content
+                filename: filename,
+                file_contents: content
             }
         });
 
         const vm = wrapper.vm;
-        expect(vm.$data.filename).toBe(filename);
-        expect(vm.$data.file_contents).toBe(content);
+        expect(vm.$data.d_filename).toBe(filename);
+        expect(vm.$data.d_file_contents).toBe(content);
     });
 
     test('File content and line numbers displayed in order', () => {
         const wrapper = mount(ViewFile, {
             propsData: {
-                incoming_filename: 'filename',
-                incoming_file_contents: 'line one\nline two'
+                filename: 'filename',
+                file_contents: 'line one\nline two'
             }
         });
 
@@ -47,8 +47,8 @@ describe('ViewFile.vue', () => {
 
         @Component({
             template:  `<view_file ref='view_file'
-                          incoming_filename='filename'
-                          incoming_file_contents='line one\nline two'
+                          filename='filename'
+                          file_contents='line one\nline two'
                           :view_file_height="height_of_view_file_in">
                         </view_file>`,
             components: {
@@ -86,8 +86,8 @@ describe('ViewFile.vue', () => {
                                Change Contents
                             </button>
                             <view_file ref='view_file'
-                              :incoming_filename="filename_3"
-                              :incoming_file_contents="file_contents_3">
+                              :filename="filename_3"
+                              :file_contents="file_contents_3">
                             </view_file>
                         </div>`,
             components: {

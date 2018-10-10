@@ -3,16 +3,16 @@
     <div class="view-file-ex-1">
       <p> <b> View File allows for horizontal scrolling when the text is longer than
         the width of the display. </b></p>
-      <view-file :incoming_filename="filename_1"
-                 :incoming_file_contents="file_contents_1">
+      <view-file :filename="filename_1"
+                 :file_contents="file_contents_1">
       </view-file>
     </div>
     <div class="view-file-ex-2">
       <p> <b> View File allows for vertical scrolling when there are more lines than can
         fit in the height of the display. </b></p>
       <div class="border-box">
-        <view-file :incoming_filename="filename_2"
-                   :incoming_file_contents="file_contents_2"
+        <view-file :filename="filename_2"
+                   :file_contents="file_contents_2"
                    :view_file_height="height_in">
         </view-file>
       </div>
@@ -25,8 +25,8 @@
         Change Contents (once)
       </button>
       <div class="border-box">
-        <view-file :incoming_filename="filename_3"
-                   :incoming_file_contents="file_contents_3"
+        <view-file :filename="filename_3"
+                   :file_contents="file_contents_3"
                    view_file_height="200px">
         </view-file>
       </div>
