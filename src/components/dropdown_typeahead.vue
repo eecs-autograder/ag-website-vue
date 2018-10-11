@@ -13,13 +13,13 @@
       </template>
       <template slot-scope="{item}">
         <slot v-bind:item="item">
-          <div class="content-row">
             {{item}}
-          </div>
         </slot>
       </template>
-
     </Dropdown>
+    <div id="no-matching-results" v-if="filtered_choices.length === 0 && dropdown_is_open()">
+      <div id="no-matching-results-row"> We couldn't find any results containing: '{{filter_text}}'</div>
+    </div>
   </div>
 </template>
 
@@ -47,6 +47,11 @@ export default class DropdownTypeahead extends Vue {
 
   created() {
     this.choices = this.incoming_choices;
+  }
+
+  dropdown_is_open() {
+    let dropdown = <Dropdown> this.$refs.dropdown_component;
+    return dropdown.is_open;
   }
 
   resume_search(key: KeyboardEvent) {
@@ -96,6 +101,25 @@ export default class DropdownTypeahead extends Vue {
 
 #search-field:focus {
   outline-color: $ocean-blue;
+}
+
+#no-matching-results {
+  background-color: white;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  display: block;
+  margin-top: 0.5px;
+  position: absolute;
+  z-index: 1;
+}
+
+#no-matching-results-row {
+  border-top: 1px solid $pebble-medium;
+  color: black;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  margin: 0;
+  min-height: 13px;
+  padding: 10px 15px;
+  text-decoration: none;
 }
 
 </style>

@@ -1,16 +1,16 @@
 <template>
   <div>
-    <ButtonDemo></ButtonDemo>
-    <ColorPaletteDemo></ColorPaletteDemo>
-    <DiffDemo></DiffDemo>
-    <DropdownDemo></DropdownDemo>
+    <!--<ButtonDemo></ButtonDemo>-->
+    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
+    <!--<DiffDemo></DiffDemo>-->
+    <!--<DropdownDemo></DropdownDemo>-->
     <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
-    <ModalDemo></ModalDemo>
-    <MultiFileViewerDemo></MultiFileViewerDemo>
-    <TabsDemo></TabsDemo>
-    <TooltipDemo></TooltipDemo>
-    <ToggleDemo></ToggleDemo>
-    <ViewFileDemo></ViewFileDemo>
+    <!--<ModalDemo></ModalDemo>-->
+    <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
+    <!--<TabsDemo></TabsDemo>-->
+    <!--<TooltipDemo></TooltipDemo>-->
+    <!--<ToggleDemo></ToggleDemo>-->
+    <!--<ViewFileDemo></ViewFileDemo>-->
   </div>
 </template>
 
