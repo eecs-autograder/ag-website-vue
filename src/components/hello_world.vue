@@ -1,16 +1,17 @@
 <template>
   <div>
-    <ButtonDemo></ButtonDemo>
-    <ColorPaletteDemo></ColorPaletteDemo>
-    <DiffDemo></DiffDemo>
-    <DropdownDemo></DropdownDemo>
-    <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
-    <ModalDemo></ModalDemo>
-    <MultiFileViewerDemo></MultiFileViewerDemo>
-    <TabsDemo></TabsDemo>
-    <TooltipDemo></TooltipDemo>
-    <ToggleDemo></ToggleDemo>
-    <ViewFileDemo></ViewFileDemo>
+    <!--<ButtonDemo></ButtonDemo>-->
+    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
+    <ContextMenuDemo></ContextMenuDemo>
+    <!--<DiffDemo></DiffDemo>-->
+    <!--<DropdownDemo></DropdownDemo>-->
+    <!--<DropdownTypeaheadDemo></DropdownTypeaheadDemo>-->
+    <!--<ModalDemo></ModalDemo>-->
+    <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
+    <!--<TabsDemo></TabsDemo>-->
+    <!--<TooltipDemo></TooltipDemo>-->
+    <!--<ToggleDemo></ToggleDemo>-->
+    <!--<ViewFileDemo></ViewFileDemo>-->
   </div>
 </template>
 
@@ -25,6 +26,7 @@ import ViewFile from '@/components/view_file.vue';
 
 import ButtonDemo from '@/demos/button_demo.vue';
 import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
+import ContextMenuDemo from '@/demos/context_menu_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
 import DropdownTypeaheadDemo from '@/demos/dropdown_typeahead_demo.vue';
@@ -39,6 +41,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
   components: {
     ButtonDemo,
     ColorPaletteDemo,
+    ContextMenuDemo,
     DiffDemo,
     Dropdown,
     DropdownDemo,
