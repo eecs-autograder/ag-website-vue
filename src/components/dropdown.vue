@@ -124,6 +124,7 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/components/dropdown_styles.scss';
 
 #dropdown-container {
   display: block;
@@ -131,24 +132,12 @@
 }
 
 #dropdown-content {
-  background-color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  display: block;
-  margin-top: 0.5px;
-  position: absolute;
-  z-index: 1;
+  @extend %dropdown-content;
 }
 
 .dropdown-row {
-  border-top: 1px solid $pebble-medium;
-  color: black;
+  @extend %dropdown-row;
   cursor: pointer;
-  display: block;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
-  margin: 0;
-  min-height: 13px;
-  padding: 10px 15px;
-  text-decoration: none;
 }
 
 .dropdown-row:first-child {

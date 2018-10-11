@@ -443,4 +443,113 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_entries.at(0).text()).toContain("\"Joyce\"");
         expect(dropdown_entries.at(0).text()).toContain("\"Byers\"");
     });
+
+    test("If there are no matching search results and a template for the " +
+         "'no_matching_results' slot is not provided, the default no matching results message " +
+         "is applied",
+         async () => {
+        @Component({
+            template: `<div>
+                    <dropdown-typeahead ref="dropdown_typeahead"
+                      placeholder_text="Enter a Name"
+                      :incoming_choices="strangers"
+                      :filter_fn="stranger_things_filter_fn"
+                      @update_item_chosen="add_item($event)">
+                    </dropdown-typeahead>
+                  </div>`,
+            components: {
+                'dropdown-typeahead': DropdownTypeahead
+            },
+        })
+        class WrapperComponent extends Vue {
+            strangers = [
+                {first_name: "Joyce", last_name: "Byers"},
+                {first_name: "Will", last_name: "Byers"},
+                {first_name: "Jonathan", last_name: "Byers"},
+                {first_name: "Nancy", last_name: "Wheeler"},
+                {first_name: "Mike", last_name: "Wheeler"},
+                {first_name: "Steve", last_name: "Harrington"},
+                {first_name: "Jim", last_name: "Hopper"}
+            ];
+
+            stranger_things_filter_fn(item: {first_name: string, last_name: string},
+                                      filter_text: string) {
+                let full_name: string = item.first_name + " " + item.last_name;
+                return full_name.indexOf(filter_text) >= 0;
+            }
+
+            add_item(item: object) {
+                this.chosen_items.push(item);
+            }
+
+            chosen_items: object[] = [];
+        }
+
+        let wrapper = mount(WrapperComponent);
+        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let search_bar = wrapper.find('input');
+
+        search_bar.trigger("click");
+
+        dropdown_typeahead.filter_text = "q";
+        await dropdown_typeahead.$nextTick();
+
+        let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(dropdown_no_matches_message.text()).toContain(
+            "We couldn't find any results containing: 'q'"
+        );
+    });
+
+    test("If there are no matching search results and a template for the " +
+         "'no_matching_results' slot IS provided, the custom slot content is applied",
+         async () => {
+        @Component({
+            template: `<div class="control-width-3">
+                          <dropdown-typeahead ref="dropdown_typeahead"
+                            placeholder_text="Enter a Season"
+                            :incoming_choices="seasons"
+                            @update_item_chosen="add_item_3($event)"
+                            :filter_fn="seasons_filter_fn">
+                            <template slot="no_matching_results">
+                              No Matching Results
+                            </template>
+                          </dropdown-typeahead>
+                       </div>`,
+            components: {
+                'dropdown-typeahead': DropdownTypeahead
+            },
+        })
+        class WrapperComponent extends Vue {
+            seasons = [
+                "Fall",
+                "Winter",
+                "Spring",
+                "Summer"
+            ];
+
+            seasons_filter_fn(item: string, filter_text: string) {
+                return item.indexOf(filter_text) >= 0;
+            }
+
+            add_item_3(item: object) {
+                console.log(item);
+            }
+        }
+
+        let wrapper = mount(WrapperComponent);
+        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let search_bar = wrapper.find('input');
+
+        search_bar.trigger("click");
+
+        dropdown_typeahead.filter_text = "y";
+        await dropdown_typeahead.$nextTick();
+
+        let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(dropdown_no_matches_message.text()).toContain(
+            "No Matching Results"
+        );
+    });
 });
