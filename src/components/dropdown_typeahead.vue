@@ -17,8 +17,13 @@
         </slot>
       </template>
     </Dropdown>
-    <div id="no-matching-results" v-if="filtered_choices.length === 0 && dropdown_is_open()">
-      <div id="no-matching-results-row"> We couldn't find any results containing: '{{filter_text}}'</div>
+    <div v-if="filtered_choices.length === 0 && $refs.dropdown_component.is_open"
+         id="no-matching-results">
+      <div id="no-matching-results-row">
+        <slot name="no_matching_results" v-bind:filter_text="filter_text">
+          We couldn't find any results containing: '{{filter_text}}'
+        </slot>
+      </div>
     </div>
   </div>
 </template>
@@ -49,11 +54,6 @@ export default class DropdownTypeahead extends Vue {
     this.choices = this.incoming_choices;
   }
 
-  dropdown_is_open() {
-    let dropdown = <Dropdown> this.$refs.dropdown_component;
-    return dropdown.is_open;
-  }
-
   resume_search(key: KeyboardEvent) {
     let dropdown = <Dropdown> this.$refs.dropdown_component;
     if (!dropdown.is_open) {
@@ -78,6 +78,7 @@ export default class DropdownTypeahead extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/components/dropdown_styles.scss';
 
 #search-field {
   border-radius: 5px;
@@ -104,22 +105,11 @@ export default class DropdownTypeahead extends Vue {
 }
 
 #no-matching-results {
-  background-color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  display: block;
-  margin-top: 0.5px;
-  position: absolute;
-  z-index: 1;
+  @extend %dropdown-content;
 }
 
 #no-matching-results-row {
-  border-top: 1px solid $pebble-medium;
-  color: black;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
-  margin: 0;
-  min-height: 13px;
-  padding: 10px 15px;
-  text-decoration: none;
+  @extend %dropdown-row;
 }
 
 </style>

@@ -11,6 +11,9 @@
         <template slot-scope="{item}">
           <span> {{item.state}}</span>
         </template>
+        <template slot="no_matching_results" slot-scope="{filter_text}">
+          We couldn't find any states that contain: '{{filter_text}}'
+        </template>
       </dropdown-typeahead>
     </div>
 
@@ -19,27 +22,24 @@
       <p v-for="item of chosen_items_1"> {{item.state}} </p>
     </div>
 
-    <!--<p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { first_name:-->
-      <!--string, last_name: string } objects and uses a scoped slot</b></p>-->
-    <!--<div class="control-width-2">-->
-      <!--<dropdown-typeahead-->
-        <!--placeholder_text="Enter a Character"-->
-        <!--:incoming_choices="strangers"-->
-        <!--@update_item_chosen="add_item_2($event)"-->
-        <!--:filter_fn="stranger_things_filter_fn">-->
-        <!--<template slot="no_results_row" slot-scope="{item}">-->
-          <!--<span> No Results Row </span>-->
-        <!--</template>-->
-        <!--<template slot="typeahead_row" slot-scope="{item}">-->
-          <!--<span> Typeahead Row </span>-->
-        <!--</template>-->
-      <!--</dropdown-typeahead>-->
-    <!--</div>-->
+    <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { first_name:
+      string, last_name: string } objects and uses a scoped slot</b></p>
+    <div class="control-width-2">
+      <dropdown-typeahead
+        placeholder_text="Enter a Character"
+        :incoming_choices="strangers"
+        @update_item_chosen="add_item_2($event)"
+        :filter_fn="stranger_things_filter_fn">
+        <template  slot-scope="{item}">
+          <span> {{item.first_name}} {{item.last_name}}</span>
+        </template>
+      </dropdown-typeahead>
+    </div>
 
-    <!--<div class="typeahead-2-selections">-->
-      <!--<h3> Chosen from Typeahead: </h3>-->
-      <!--<p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>-->
-    <!--</div>-->
+    <div class="typeahead-2-selections">
+      <h3> Chosen from Typeahead: </h3>
+      <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>
+    </div>
 
     <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with string objects
       and uses the default scoped-slot styling </b></p>
@@ -49,6 +49,9 @@
         :incoming_choices="seasons"
         @update_item_chosen="add_item_3($event)"
         :filter_fn="seasons_filter_fn">
+        <template slot="no_matching_results">
+          No Matching Results
+        </template>
       </dropdown-typeahead>
     </div>
 
