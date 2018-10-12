@@ -1,8 +1,7 @@
 <template>
   <div tabindex="1"
     id="context-menu-container"
-    :style="[{display: is_open ? 'block' : 'none'}]"
-    @focusout="hide_context_menu">
+    @blur="hide_context_menu">
     <slot name="context_menu_items"> </slot>
   </div>
 </template>
@@ -24,22 +23,22 @@
     }
 
     show_context_menu() {
+      this.$el.style.display = "block";
       this.is_open = true;
     }
 
     hide_context_menu() {
+      this.$el.style.display = "none";
       this.is_open = false;
     }
 
     update_x_and_y_coords(event: MouseEvent) {
-      console.log("Context Menu Clicked");
       this.x_coordinate = event.offsetX;
       this.y_coordinate = event.offsetY;
       this.$el.style.left = this.x_coordinate + "px";
       this.$el.style.top = this.y_coordinate + "px";
       this.show_context_menu();
       this.$el.focus();
-      console.log(document.activeElement);
     }
   }
 </script>
@@ -53,14 +52,15 @@
   border: 1px solid $pebble-light;
   border-radius: 5px;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  display: block;
+  display: none;
   margin-top: 0.5px;
   position: absolute;
   z-index: 1;
 }
 
 #context-menu-container:focus {
-  outline: 2px solid mediumpurple;
+  /*outline: 2px solid mediumpurple;*/
+  outline: none;
 }
 
 </style>
