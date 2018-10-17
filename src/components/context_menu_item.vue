@@ -1,6 +1,10 @@
 <template>
   <div class="context-menu-option"
-      :class="[{'hoverable-item': !disabled, 'first-child': first_child, 'last-child': last_child}]"
+      :class="[{
+        'hoverable-item': !disabled,
+        'first-child': first_child,
+        'last-child': last_child
+      }]"
       @click="check_if_valid_click($event)">
     <slot name="label"> </slot>
   </div>
@@ -22,6 +26,16 @@
     @Prop({default: false, type: Boolean})
     last_child!: boolean;
 
+    d_disabled = false;
+    d_first_child = false;
+    d_last_child = false;
+
+    created() {
+      this.d_disabled = this.disabled;
+      this.d_first_child = this.first_child;
+      this.d_last_child = this.last_child;
+    }
+
     check_if_valid_click(event: KeyboardEvent) {
       event.stopPropagation();
       let parent = <ContextMenu> this.$parent;
@@ -40,7 +54,7 @@
 
   .context-menu-option {
     color: black;
-    padding: 5px 15px;
+    padding: 6px 15px;
   }
 
   .first-child {
@@ -54,7 +68,7 @@
   }
 
   .hoverable-item:hover {
-    background-color: $pebble-light;
+    background-color: $pebble-medium;
     cursor: pointer;
   }
 
