@@ -27,5 +27,13 @@ module.exports = {
     testURL: 'http://localhost/',
 
     collectCoverage: true,
-    collectCoverageFrom: ["<rootDir>/src/**/*.{ts,vue}", "!<rootDir>/src/demos/**"]
+    collectCoverageFrom: ["<rootDir>/src/**/*.{ts,vue}", "!<rootDir>/src/demos/**"],
+    coverageThreshold: {
+        global: {
+            branches: 95,
+            functions: 100,
+            lines: 100,
+            statements: 100
+        }
+    }
 }

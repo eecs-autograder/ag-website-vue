@@ -41,8 +41,13 @@
       <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>
     </div>
 
-    <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with string objects
-      and uses the default scoped-slot styling </b></p>
+    <p class="typeahead-label">
+      <b>
+        This Dropdown Typeahead instance deals with string objects
+        and uses the default scoped-slot styling. <br>
+        It also has a custom "No results" message.
+      </b>
+    </p>
     <div class="control-width-3">
       <dropdown-typeahead
         placeholder_text="Enter a Season"
