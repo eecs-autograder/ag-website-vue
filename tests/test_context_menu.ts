@@ -15,7 +15,6 @@ import Component from 'vue-class-component';
                     <context-menu ref="context_menu">
                       <template slot="context_menu_items">
                           <context-menu-item ref="item_1"
-                            :first_child="true"
                             @context_menu_item_clicked="change_greeting_color('orange')">
                             <template slot="label">
                               One
@@ -28,7 +27,6 @@ import Component from 'vue-class-component';
                             </template>
                           </context-menu-item>
                           <context-menu-item ref="item_3"
-                            :last_child="true"
                             @context_menu_item_clicked="change_greeting_text('Boo!')">
                             <template slot="label">
                               Three
@@ -79,7 +77,6 @@ describe('ContextMenu.vue', () => {
                 <context-menu ref="context_menu">
                   <template slot="context_menu_items">
                       <context-menu-item ref="item_1"
-                        :first_child="true"
                         @context_menu_item_clicked="fun('one')">
                         <template slot="label">
                           One
@@ -92,7 +89,6 @@ describe('ContextMenu.vue', () => {
                         </template>
                       </context-menu-item>
                       <context-menu-item ref="item_3"
-                        :last_child="true"
                         @context_menu_item_clicked="fun('three')">
                         <template slot="label">
                           Three
@@ -123,17 +119,11 @@ describe('ContextMenu.vue', () => {
          let context_menu_item_2 = <ContextMenuItem> wrapper.find({ref: 'item_2'}).vm;
          let context_menu_item_3 = <ContextMenuItem> wrapper.find({ref: 'item_3'}).vm;
 
-         expect(context_menu_item_1.disabled).toBe(false);
-         expect(context_menu_item_2.disabled).toBe(true);
-         expect(context_menu_item_3.disabled).toBe(false);
-
-         expect(context_menu_item_1.first_child).toBe(true);
-         expect(context_menu_item_2.first_child).toBe(false);
-         expect(context_menu_item_3.first_child).toBe(false);
-
-         expect(context_menu_item_1.last_child).toBe(false);
-         expect(context_menu_item_2.last_child).toBe(false);
-         expect(context_menu_item_3.last_child).toBe(true);
+         expect(context_menu_item_1.$el.classList).toContain('hoverable-item');
+         expect(context_menu_item_2.$el.classList).toContain('disabled-item');
+         expect(context_menu_item_3.$el.classList).toContain('hoverable-item');
+         expect(context_menu_item_1.$el.classList).toContain('first-child');
+         expect(context_menu_item_3.$el.classList).toContain('last-child');
     });
 
 
@@ -199,9 +189,9 @@ describe('ContextMenu.vue', () => {
         expect(greeting.text()).toBe('Boo!');
     });
 
-    test.only("Clicking inside the context menu area makes the menu visible, and clicking" +
+    test("Clicking inside the context menu area makes the menu visible, and clicking" +
          "outside the context menu area hides it",
-              async () => {
+         async () => {
         let wrapper = mount(WrapperComponent);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
         let context_menu_area = wrapper.find('.context-menu-area');
@@ -221,5 +211,120 @@ describe('ContextMenu.vue', () => {
         console.log(outside_input.html());
 
         expect(context_menu.$el.style.visibility).toBe("hidden");
+    });
+
+    test("toggle disabled property on context menu item",
+         async () => {
+        @Component({
+            template: `<div>
+            <div class="context-menu-area"
+                 @click="$refs.context_menu.update_x_and_y_coords($event)">
+            </div>
+            <context-menu ref="context_menu">
+              <template slot="context_menu_items">
+                  <context-menu-item ref="item_1"
+                    :disabled="is_disabled"
+                    @context_menu_item_clicked="print_label('One')">
+                    <template slot="label">
+                      One
+                    </template>
+                  </context-menu-item>
+                  <context-menu-item ref="item_2"
+                    @context_menu_item_clicked="change_value_of_disabled()">
+                    <template slot="label">
+                      One
+                    </template>
+                  </context-menu-item>
+              </template>
+            </context-menu>
+          </div>`,
+            components: {
+                'context-menu': ContextMenu,
+                'context-menu-item': ContextMenuItem
+            }
+        })
+        class WrapperComponent2 extends Vue {
+            is_disabled = true;
+
+            print_label(label: string) {
+                console.log(label);
+            }
+
+            change_value_of_disabled() {
+                this.is_disabled = !this.is_disabled;
+            }
+        }
+        let wrapper = mount(WrapperComponent2);
+        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu_area = wrapper.find('.context-menu-area');
+        context_menu_area.trigger('click');
+        await context_menu.$nextTick();
+
+        let context_menu_item_1 = <ContextMenuItem> wrapper.find({ref: 'item_1'}).vm;
+        let context_menu_item_2 = wrapper.find({ref: 'item_2'});
+
+        expect(context_menu_item_1.d_disabled).toBe(true);
+
+        context_menu_item_2.trigger('click');
+        await context_menu.$nextTick();
+
+        context_menu_area.trigger('click');
+        await context_menu.$nextTick();
+
+        expect(context_menu_item_1.d_disabled).toBe(false);
+    });
+
+    test("parent component is not notified when disabled context menu items are clicked",
+         async () => {
+        @Component({
+            template: `<div>
+        <div class="context-menu-area"
+             @click="$refs.context_menu.update_x_and_y_coords($event)">
+          <p class="greeting" :style="[{color: 'black'}]"> Hello </p>
+        </div>
+        <context-menu ref="context_menu">
+          <template slot="context_menu_items">
+              <context-menu-item ref="item_1"
+                :disabled="true"
+                @context_menu_item_clicked="change_greeting_color('red')">
+                <template slot="label">
+                  One
+                </template>
+              </context-menu-item>
+          </template>
+        </context-menu>
+      </div>`,
+            components: {
+                'context-menu': ContextMenu,
+                'context-menu-item': ContextMenuItem
+            }
+        })
+        class WrapperComponent2 extends Vue {
+
+            change_greeting_color(color_in: string) {
+                let greeting = <HTMLElement> this.$el.getElementsByClassName(
+                    'greeting'
+                )[0];
+                greeting.style.color = color_in;
+            }
+
+        }
+        let wrapper = mount(WrapperComponent2);
+        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu_area = wrapper.find('.context-menu-area');
+        let greeting = wrapper.find('.greeting');
+
+        expect(greeting.element.style.color).toBe("black");
+
+        context_menu_area.trigger('click');
+        await context_menu.$nextTick();
+
+        let context_menu_item_1 = wrapper.find({ref: 'item_1'});
+        expect(context_menu_item_1.vm.$data.d_disabled).toBe(true);
+
+        context_menu_item_1.trigger('click');
+        await context_menu.$nextTick();
+
+        expect(greeting.element.style.color).toBe("black");
     });
 });
