@@ -171,8 +171,8 @@
                 "leadingUnderscore": "forbid", "trailingUnderscore": "forbid"},
             {"type": "enumMember", "format": "snake_case"},
 
-            // Readonly members can be upper case.
-            {"type": "member", "modifiers": ["readonly"], "format": ["snake_case", "UPPER_CASE"]},
+            // Static readonly members can be upper case.
+            {"type": "member", "modifiers": ["static", "readonly"], "format": ["UPPER_CASE"]},
 
             // Global constants should be upper case.
             {"type": "variable", "modifiers": ["global", "const"], "format": ["UPPER_CASE"]},

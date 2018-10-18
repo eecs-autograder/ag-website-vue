@@ -27,11 +27,60 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
     - Indent using 4 spaces in .json, .js, .ts, and .md files.
         - Note that npm will overwrite the formatting to 2 spaces on package.json when you use `npm install --save <package>`. Don't bother trying to format package.json yourself.
     - Since .vue files have typescript, html, and css in them, we will use 2 spaces for all of their contents. HTML benefits the most from 2-space indentation.
-- Use [Stroustroup](https://en.wikipedia.org/wiki/Indentation_style#Variant:_Stroustrup) style curly braces.
+- Use Java/Egyptian style curly braces. (Opening braces are on the same line as the class/function/loop/conditional/try-catch they start, closing braces are on their own line):
+    ```
+    class Spam {
+
+    }
+
+    function egg() {
+
+    }
+
+    if (true) {
+
+    }
+    else {
+
+    }
+
+    while (true) {
+
+    }
+    ```
+    - Note: eslint and tslint-eslint-rules incorrectly refer to this brace style as "Stroustroup".
 - Lines of code should be no longer than 100 characters.
 - Names:
     - Use `snake_case` for variable, function, method, and file names.
     - Start non-public names with a single leading underscore.
+    - Start Vue "data" members (declared as default-initialized member variables in Typescript component classes) with a leading "d_".
+        - Rejected alternatives:
+            - Leading underscore: Vue reserves names starting with a leading "_" for its implementation.
+            - $data.\<member_name\>: Accessing data members through $data loses type information.
+            - Trailing underscore: A single trailing underscore is to easy to miss visually.
+        - These members should only be accessed by the component itself and the test cases for that specific component. If possible, add a property getter and make the data member private.
+        ```
+        @Component
+        class MyComponent {
+            // Input to the component
+            @Prop({default: True, type: Boolean})
+            is_on!: boolean;
+
+            // Use this in the component and test cases (we have an input
+            // called is_on, so we can't add a property getter).
+            d_is_on = false;
+
+            // Since there's no input with this name, we can use a property
+            // getter.
+            get gettable_property() {
+                return this.d_gettable_property;
+            }
+
+            // Since we have a property getter, we can make this private.
+            private d_gettable_property: string = '';
+        }
+        ```
+        - If you're writing a component to use **only** for testing (and the component is defined in the same file as the test cases), you may ignore this convention.
     - Use `PascalCase` for class, enum, and type names.
     ```
     class SpamEgg {}
