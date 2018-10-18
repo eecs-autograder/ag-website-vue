@@ -9,11 +9,11 @@
 
       <div id="dropdown-content"
            :style="[{display: is_open ? 'block' : 'none'}]">
-        <div class="dropdown-row" v-for="(item, index) of d_items"
+        <div :class="['dropdown-row', {'highlight': index === d_highlighted_index}]"
+             v-for="(item, index) of d_items"
              @mousedown="$event.preventDefault()"
-             @click="choose_item_from_dropdown_menu(item, index)"
-             :id ="index === d_highlighted_index ? 'highlight': ''">
-          <slot v-bind:item="item"> </slot>
+             @click="choose_item_from_dropdown_menu(item, index)">
+          <slot v-bind:item="item">{{item}}</slot>
         </div>
       </div>
     </div>
@@ -21,103 +21,103 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  @Component
-  export default class Dropdown extends Vue {
+@Component
+export default class Dropdown extends Vue {
 
-    @Prop({required: true, type: Array})
-    items!: object[];
+  @Prop({required: true, type: Array})
+  items!: object[];
 
-    @Prop({default: 0, type: Number})
-    highlighted_index!: number;
+  @Prop({default: 0, type: Number})
+  initial_highlighted_index!: number;
 
-    d_highlighted_index = 0;
-    d_items: object[] = [];
-    is_open_ = false;
+  private d_highlighted_index = 0;
+  private d_items: object[] = [];
+  private d_is_open = false;
 
-    @Watch('items')
-    on_items_changed(new_val: object[], old_val: object[]) {
-      this.d_items = new_val;
-      if (this.d_highlighted_index >= this.d_items.length && this.d_items.length > 0) {
-        this.d_highlighted_index = this.d_items.length - 1;
-      }
+  created() {
+    this.d_items = this.items;
+    this.d_highlighted_index = this.initial_highlighted_index;
+  }
+
+  mounted() {
+    if (this.$slots.header === undefined) {
+      throw Error('Missing required slot: "header"');
     }
 
-    created() {
-      this.d_items = this.items;
-      this.d_highlighted_index = this.highlighted_index;
-    }
-
-    mounted() {
-      let dropdown_container = <HTMLElement> this.$el.childNodes[0];
-      let header_container = <HTMLElement> dropdown_container.childNodes[0];
-      let header_slot_content = <HTMLElement> header_container.childNodes[0];
-      header_slot_content.addEventListener("blur", () => {
-        this.hide_the_dropdown_menu();
-      });
-      header_slot_content.addEventListener("click", () => {
-        this.toggle_the_dropdown_menu();
-      });
-    }
-
-    get is_open() {
-      return this.is_open_;
-    }
-
-    show_the_dropdown_menu() {
-      this.is_open_ = true;
-    }
-
-    hide_the_dropdown_menu() {
-      this.is_open_ = false;
-    }
-
-    choose_item_from_dropdown_menu(item_selected: object, index: number) {
-      if (item_selected !== undefined) {
-        this.d_highlighted_index = index;
-        this.$emit("update_item_selected", item_selected);
-      }
+    let header_slot_content = this.$slots.header[0].elm!;
+    header_slot_content.addEventListener("blur", () => {
       this.hide_the_dropdown_menu();
-    }
+    });
+    header_slot_content.addEventListener("click", () => {
+      this.d_is_open = !this.d_is_open;
+    });
+  }
 
-    toggle_the_dropdown_menu() {
-      this.is_open_ = !this.is_open_;
-    }
+  get current_highlighted_index() {
+    return this.d_highlighted_index;
+  }
 
-    move_highlighted(event: KeyboardEvent) {
-      if (event.code === "Enter" && this.is_open && this.d_items.length > 0) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.choose_item_from_dropdown_menu(
-          this.d_items[this.d_highlighted_index], this.d_highlighted_index
-        );
-      }
-      else if (event.code === 'ArrowDown') {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.show_the_dropdown_menu();
-
-        if (this.d_highlighted_index < this.d_items.length - 1) {
-          this.d_highlighted_index += 1;
-        }
-      }
-      else if (event.code === 'ArrowUp') {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.show_the_dropdown_menu();
-
-        if (this.d_highlighted_index > 0) {
-          this.d_highlighted_index -= 1;
-        }
-      }
-      else if (event.code === 'Escape') {
-        this.hide_the_dropdown_menu();
-      }
+  @Watch('items')
+  on_items_changed(new_val: object[], old_val: object[]) {
+    this.d_items = new_val;
+    if (this.d_highlighted_index >= this.d_items.length && this.d_items.length > 0) {
+      this.d_highlighted_index = this.d_items.length - 1;
     }
   }
+
+  get is_open() {
+    return this.d_is_open;
+  }
+
+  show_the_dropdown_menu() {
+    this.d_is_open = true;
+  }
+
+  hide_the_dropdown_menu() {
+    this.d_is_open = false;
+  }
+
+  choose_item_from_dropdown_menu(item_selected: object, index: number) {
+    this.d_highlighted_index = index;
+    this.$emit("update_item_selected", item_selected);
+    this.hide_the_dropdown_menu();
+  }
+
+  move_highlighted(event: KeyboardEvent) {
+    if (event.code === "Enter" && this.is_open && this.d_items.length > 0) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.choose_item_from_dropdown_menu(
+        this.d_items[this.d_highlighted_index], this.d_highlighted_index
+      );
+    }
+    else if (event.code === 'ArrowDown') {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.show_the_dropdown_menu();
+
+      if (this.d_highlighted_index < this.d_items.length - 1) {
+        this.d_highlighted_index += 1;
+      }
+    }
+    else if (event.code === 'ArrowUp') {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.show_the_dropdown_menu();
+
+      if (this.d_highlighted_index > 0) {
+        this.d_highlighted_index -= 1;
+      }
+    }
+    else if (event.code === 'Escape') {
+      this.hide_the_dropdown_menu();
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -146,11 +146,11 @@
   background-color: $pebble-light;
 }
 
-#highlight:hover {
+.highlight:hover {
   background-color: $pebble-dark;
 }
 
-#highlight {
+.highlight {
   background-color: $pebble-dark;
 }
 
