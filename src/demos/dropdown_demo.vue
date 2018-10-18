@@ -8,7 +8,7 @@
       </p>
       <dropdown ref="dropdown_menu_ex_1"
                 :items="menu_items"
-                :highlighted_index="5"
+                :initial_highlighted_index="5"
                 @update_item_selected="add_item_1($event)">
         <template slot="header">
           <p tabindex="1" class="header-para">
@@ -69,9 +69,6 @@
           <div tabindex="1" class="menu-option navy-tile">
             <p> Products </p>
           </div>
-        </template>
-        <template slot-scope="{item}">
-          <p class="food"> {{item}} </p>
         </template>
       </dropdown>
       <dropdown ref="dropdown_menu_ex_5"

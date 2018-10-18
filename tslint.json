@@ -168,7 +168,7 @@
             true,
             // Use snake_case unless otherwise specified.
             {"type": "default", "format": ["snake_case"],
-                "leadingUnderscore": "forbid", "trailingUnderscore": "allow"},
+                "leadingUnderscore": "forbid", "trailingUnderscore": "forbid"},
             {"type": "enumMember", "format": "snake_case"},
 
             // Readonly members can be upper case.
@@ -177,9 +177,9 @@
             // Global constants should be upper case.
             {"type": "variable", "modifiers": ["global", "const"], "format": ["UPPER_CASE"]},
 
-            // Require leading underscores for private properties and methods.
-            {"type": "member", "modifiers": "private", "leadingUnderscore": "require"},
-            {"type": "member", "modifiers": "protected", "leadingUnderscore": "require"},
+            // Allow leading underscores for private properties and methods.
+            {"type": "member", "modifiers": "private", "leadingUnderscore": "allow"},
+            {"type": "member", "modifiers": "protected", "leadingUnderscore": "allow"},
 
             // Whitelist for inherited methods.
             {"type": "method", "filter": "^(toJSON | toString)$", "format": null},
