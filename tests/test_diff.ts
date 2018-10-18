@@ -29,7 +29,6 @@ describe('Diff tests', () => {
         const wrapper = mount(Diff, {
             propsData: {
                 diff_contents: diff,
-                show_whitespace: false,
                 diff_height: '100px'
             }
         });
@@ -43,7 +42,6 @@ describe('Diff tests', () => {
         const wrapper = mount(Diff, {
             propsData: {
                 diff_contents: diff,
-                show_whitespace: false
             }
         });
 
@@ -62,7 +60,7 @@ describe('Diff tests', () => {
             {line_number: 7, prefix: '  ', content: 'four\n'},
             {line_number: 8, prefix: '  ', content: 'five\n'},
         ];
-        expect(wrapper.vm.$data.left).toEqual(expected_left);
+        expect(wrapper.vm.d_left).toEqual(expected_left);
 
         let expected_right = [
             {line_number: 1, prefix: '  ', content: 'one\r\n'},
@@ -76,20 +74,21 @@ describe('Diff tests', () => {
             {line_number: 6, prefix: '  ', content: 'four\n'},
             {line_number: 7, prefix: '  ', content: 'five\n'},
         ];
-        expect(wrapper.vm.$data.right).toEqual(expected_right);
+        expect(wrapper.vm.d_right).toEqual(expected_right);
 
         expect(wrapper.vm.$el).toMatchSnapshot();
     });
 
-    test('Diff rendering with whitespace', () => {
+    test('Diff rendering with whitespace', async () => {
         const wrapper = mount(Diff, {
             propsData: {
                 diff_contents: [
                     '  line one\r\n'
                 ],
-                show_whitespace: true
             }
         });
+        wrapper.setData({d_show_whitespace: true});
+        await wrapper.vm.$nextTick();
 
         let rows = wrapper.findAll('#diff-body tr');
         expect(rows.length).toEqual(1);
@@ -99,15 +98,14 @@ describe('Diff tests', () => {
         expect(cells.at(3).find('.content').text()).toEqual('line\u2219one\\r\r\u21b5');
     });
 
-    test('Diff rendering with whitespace snapshot', () => {
+    test('Diff rendering with whitespace snapshot', async () => {
         const wrapper = mount(Diff, {
             propsData: {
                 diff_contents: diff,
-                show_whitespace: true
             }
         });
-
-        expect(wrapper.vm.$data.show_whitespace_).toEqual(true);
+        wrapper.setData({d_show_whitespace: true});
+        await wrapper.vm.$nextTick();
 
         let rows = wrapper.findAll('#diff-body tr');
         expect(rows.length).toEqual(10);
@@ -121,7 +119,6 @@ describe('Diff test edge cases', () => {
         const wrapper = mount(Diff, {
             propsData: {
                 diff_contents: [],
-                show_whitespace: false
             }
         });
 
@@ -137,14 +134,13 @@ describe('Diff test edge cases', () => {
                     '+ two\n',
                     '+ three\n',
                 ],
-                show_whitespace: false
             }
         });
 
         let rows = wrapper.findAll('#diff-body tr');
         expect(rows.length).toEqual(3);
 
-        expect(wrapper.vm.$data.left).toEqual([
+        expect(wrapper.vm.d_left).toEqual([
             {line_number: null, prefix: null, content: null},
             {line_number: null, prefix: null, content: null},
             {line_number: null, prefix: null, content: null},
@@ -156,7 +152,7 @@ describe('Diff test edge cases', () => {
             {line_number: 3, prefix: '+ ', content: 'three\n'},
 
         ];
-        expect(wrapper.vm.$data.right).toEqual(expected_right);
+        expect(wrapper.vm.d_right).toEqual(expected_right);
     });
 
     test('Left side only', () => {
@@ -166,8 +162,7 @@ describe('Diff test edge cases', () => {
                     '- one\n',
                     '- two\n',
                     '- three\n',
-                ],
-                show_whitespace: false
+                ]
             }
         });
 
@@ -179,9 +174,9 @@ describe('Diff test edge cases', () => {
             {line_number: 2, prefix: '- ', content: 'two\n'},
             {line_number: 3, prefix: '- ', content: 'three\n'},
         ];
-        expect(wrapper.vm.$data.left).toEqual(expected_left);
+        expect(wrapper.vm.d_left).toEqual(expected_left);
 
-        expect(wrapper.vm.$data.right).toEqual([
+        expect(wrapper.vm.d_right).toEqual([
             {line_number: null, prefix: null, content: null},
             {line_number: null, prefix: null, content: null},
             {line_number: null, prefix: null, content: null},
@@ -196,8 +191,7 @@ describe('Diff test edge cases', () => {
                         'spam\n',
                         '- two\n',
                         '- three\n',
-                    ],
-                    show_whitespace: false
+                    ]
                 }
             });
         }).toThrow('Invalid prefix: "sp". Prefixes must be one of: "- ", "+ ", "  "');

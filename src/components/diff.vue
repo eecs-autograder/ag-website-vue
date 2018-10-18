@@ -8,7 +8,7 @@
     <div id="diff-body-wrapper" :style="{'height': diff_height}">
       <table id="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
-          <tr v-for="(left_cell, i) of left">
+          <tr v-for="(left_cell, i) of d_left">
             <td :class="['line-num', line_num_highlighting[left_cell.prefix]]">
               {{left_cell.line_number}}
             </td>
@@ -17,19 +17,21 @@
                    Do NOT add whitespace to these <span> elements.-->
               <span class="prefix">{{left_cell.prefix !== null ? left_cell.prefix[0] : ' '}}</span>
               <span class="content">{{
-                show_whitespace_ ? replace_whitespace(left_cell.content)
-                                   : left_cell.content}}</span>
+                d_show_whitespace
+                    ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
             </td>
 
-            <td :class="['line-num', line_num_highlighting[right[i].prefix], 'code-cell']">
-              {{right[i].line_number}}
+            <td :class="['line-num', line_num_highlighting[d_right[i].prefix], 'code-cell']">
+              {{d_right[i].line_number}}
             </td>
-            <td :class="[content_highlighting[right[i].prefix]]">
+            <td :class="[content_highlighting[d_right[i].prefix]]">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these <span> elements.-->
-              <span class="prefix">{{right[i].prefix !== null ? right[i].prefix[0] : ' '}}</span>
+              <span class="prefix">{{
+                d_right[i].prefix !== null ? d_right[i].prefix[0] : ' '}}</span>
               <span class="content">{{
-                show_whitespace_ ? replace_whitespace(right[i].content) : right[i].content}}</span>
+                d_show_whitespace ? replace_whitespace(d_right[i].content)
+                                  : d_right[i].content}}</span>
             </td>
           </tr>
         </tbody>
@@ -37,7 +39,7 @@
     </div>
 
     <div class="toggle-container">
-      <toggle v-model="show_whitespace_" :active_background_color="toggle_color">
+      <toggle v-model="d_show_whitespace" active_background_color="slategray">
         <template slot="on">
           <p>Show Whitespace</p>
         </template>
@@ -80,37 +82,30 @@ export default class Diff extends Vue {
   @Prop({default: '100%', type: String})
   diff_height!: string;
 
-  @Prop({default: false, type: Boolean})
-  show_whitespace!: boolean;
+  d_left: DiffCell[] = [];
+  d_right: DiffCell[] = [];
 
-  left: DiffCell[] = [];
-  right: DiffCell[] = [];
-
-  toggle_color = "slategray";
-
-  show_whitespace_: boolean = false;
+  d_show_whitespace: boolean = false;
 
   created() {
-    this.show_whitespace_ = this.show_whitespace;
-
     let left_line_number = 1;
     let right_line_number = 1;
     for (let item of this.diff_contents) {
       let prefix = item.substring(0, 2);
       item = item.substring(2);
       if (prefix === "- ") {
-        this.left.push({line_number: left_line_number, prefix: prefix, content: item});
+        this.d_left.push({line_number: left_line_number, prefix: prefix, content: item});
         left_line_number += 1;
       }
       else if (prefix === "+ ") {
-        this.right.push({line_number: right_line_number, prefix: prefix, content: item});
+        this.d_right.push({line_number: right_line_number, prefix: prefix, content: item});
         right_line_number += 1;
       }
       else if (prefix === "  ") {
-        this.pad_if_needed(this.left, this.right);
+        this.pad_if_needed(this.d_left, this.d_right);
 
-        this.left.push({line_number: left_line_number, prefix: prefix, content: item});
-        this.right.push({line_number: right_line_number, prefix: prefix, content: item});
+        this.d_left.push({line_number: left_line_number, prefix: prefix, content: item});
+        this.d_right.push({line_number: right_line_number, prefix: prefix, content: item});
 
         left_line_number += 1;
         right_line_number += 1;
@@ -120,7 +115,7 @@ export default class Diff extends Vue {
           `Invalid prefix: "${prefix}". Prefixes must be one of: "- ", "+ ", "  "`);
       }
     }
-    this.pad_if_needed(this.left, this.right);
+    this.pad_if_needed(this.d_left, this.d_right);
   }
 
   pad_if_needed(left: DiffCell[], right: DiffCell[]) {
