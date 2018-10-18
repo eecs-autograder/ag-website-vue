@@ -54,11 +54,8 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
     - Use `snake_case` for variable, function, method, and file names.
     - Start non-public names with a single leading underscore.
     - Start Vue "data" members (declared as default-initialized member variables in Typescript component classes) with a leading "d_".
-        - Rejected alternatives:
-            - Leading underscore: Vue reserves names starting with a leading "_" for its implementation.
-            - $data.\<member_name\>: Accessing data members through $data loses type information.
-            - Trailing underscore: A single trailing underscore is to easy to miss visually.
-        - These members should only be accessed by the component itself and the test cases for that specific component. If possible, add a property getter and make the data member private.
+        - Note: If a data member is publically accessible and modifiable, you do not need to use this naming convention.
+        - These members that start with "d_" should only be accessed by the component itself and the test cases for that specific component. If possible, add a property getter and make the data member private.
         ```
         @Component
         class MyComponent {
@@ -81,6 +78,10 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
         }
         ```
         - If you're writing a component to use **only** for testing (and the component is defined in the same file as the test cases), you may ignore this convention.
+        - Rejected alternatives:
+            - Leading underscore: Vue reserves names starting with a leading "_" for its implementation.
+            - $data.\<member_name\>: Accessing data members through $data loses type information.
+            - Trailing underscore: A single trailing underscore is to easy to miss visually.
     - Use `PascalCase` for class, enum, and type names.
     ```
     class SpamEgg {}
