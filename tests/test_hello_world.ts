@@ -1,14 +1,8 @@
-import HelloWorld from '@/components/hello_world.vue';
-
 import { Course, Semester } from 'ag-client-typescript';
-import { mount } from '@vue/test-utils';
 
-describe('HelloWorld.vue', () => {
-    test('renders props.msg when passed', () => {
-        let course = new Course('spam', Semester.fall, 2020, '', 0, '');
-        console.log(course);
-        // const msg = 'new message';
-        const wrapper = mount(HelloWorld);
-
-    });
+test('Can import and use classes from typescript client', () => {
+    let course = new Course(
+        {pk: 42, name: 'spam', semester: Semester.fall, year: 2020, subtitle: '',
+         num_late_days: 0, last_modified: ''});
+    console.log(course);
 });
