@@ -3,7 +3,7 @@ A re-implementation of autograder-website using Vue.
 
 ## Setup
 ```
-git clone https://github.com/eecs-autograder/ag-website-vue.git
+git clone --recursive https://github.com/eecs-autograder/ag-website-vue.git
 cd ag-website-vue
 npm install
 ```

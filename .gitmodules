@@ -1,0 +1,3 @@
+[submodule "ag-client-typescript"]
+	path = ag-client-typescript
+	url = git@github.com:eecs-autograder/ag-client-typescript.git
