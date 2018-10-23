@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--<ButtonDemo></ButtonDemo>-->
-    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
+    <ColorPaletteDemo></ColorPaletteDemo>
     <ContextMenuDemo></ContextMenuDemo>
     <!--<DiffDemo></DiffDemo>-->
     <!--<DropdownDemo></DropdownDemo>-->

@@ -2,7 +2,7 @@
   <div class="context-menu-demo-outer">
     <div class="context-menu-demo-1">
       <div class="area-of-focus-1"
-           @click="$refs.context_menu_1.update_x_and_y_coords($event)">
+           @click="$refs.context_menu_1.show_context_menu($event.pageX, $event.pageY)">
         As Harry and a severely weakened Dumbledore flee the cave where Dumbledore drank the
         potion of despair to obtain what he thought was one of Voldemort’s Horcruxes, Harry
         pleads for the headmaster to remain calm. His plea prompts this touching display of
@@ -25,9 +25,6 @@
         for Lily Potter. “Snape is all grey,” Rowling tweeted in 2015. “You can’t make him a
         saint: he was vindictive & bullying. You can’t make him a devil: he died to save the
         wizarding world.”
-        <div class="too-far-right-square" @click="something($event)"> </div>
-        <div class="too-far-down-square" @click="something($event)"> </div>
-        <div class="static-square" @click="something($event)"> </div>
       </div>
     </div>
     <context-menu ref="context_menu_1">
@@ -49,7 +46,7 @@
         <context-menu-item
           @context_menu_item_clicked="change_color('red')">
           <template slot="label">
-            <span> Red Fish </span>
+            <p :style="[{width: '160px', height: '20px'}]"> Red Fish </p>
             <i class="fas fa-fish red-fish"></i>
           </template>
         </context-menu-item>
@@ -62,7 +59,7 @@
 
     <div class="context-menu-demo-2">
       <div class="area-of-focus-2"
-           @click="$refs.context_menu_2.update_x_and_y_coords($event)">
+           @click="$refs.context_menu_2.show_context_menu($event.pageX, $event.pageY)">
         Today is Toby Flenderson's last day.
         I couldn't sleep last night.
         I came in extra early.
@@ -97,7 +94,7 @@
     </div>
     <context-menu ref="context_menu_2">
       <template slot="context_menu_items">
-        <context-menu-item v-for="(item, index) of items"
+        <context-menu-item v-for="item of items"
                            :disabled="item.disabled"
                            @context_menu_item_clicked="choice_alert(item.name)">
           <template slot="label">
@@ -119,10 +116,6 @@
   })
   export default class ContextMenuDemo extends Vue {
 
-    omg() {
-
-    }
-
     changing_value = false;
 
     choice_alert(word: string) {
@@ -133,10 +126,6 @@
       let text = <HTMLElement> this.$el.getElementsByClassName('area-of-focus-1')[0];
       text.style.color = word;
       this.changing_value = !this.changing_value;
-    }
-
-    something(event: MouseEvent) {
-      // event.stopPropagation();
     }
 
     items = [
@@ -155,21 +144,18 @@
 @import '@/styles/context_menu_styles.scss';
 
 .context-menu-demo-1{
-  font-family: "Helvetica";
-  /*overflow: scroll;*/
-}
-
-.context-menu-demo-2{
-  font-family: "Helvetica";
-  width: 600px;
+  overflow: scroll;
+  height: 1000px;
 }
 
 .area-of-focus-1 {
-  height: 1200px;
+  height: 2500px;
   padding: 20px;
   position: relative;
-  /*width: 1000px;*/
-  background-color: gray;
+}
+
+.context-menu-demo-2{
+  width: 600px;
 }
 
 .area-of-focus-2 {
@@ -190,34 +176,6 @@
 .blue-fish {
   color: cornflowerblue;
   padding-left: 10px;
-}
-
-.too-far-right-square {
-  position: absolute;
-  left: 940px;
-  background-color: purple;
-  top: 100px;
-  height: 100px;
-  width: 100px;
-  pointer-events: none;
-}
-
-.too-far-down-square {
-  position: absolute;
-  left: 0px;
-  background-color: dodgerblue;
-  top: 740px;
-  height: 100px;
-  width: 100px;
-  /*pointer-events: none;*/
-}
-
-.static-square {
-  background-color: hotpink;
-  height: 100px;
-  width: 100px;
-  position: static;
-  /*pointer-events: none;*/
 }
 
 </style>

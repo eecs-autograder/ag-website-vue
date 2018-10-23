@@ -13,23 +13,44 @@
   @Component
   export default class ContextMenu extends Vue {
 
-    is_open = false;
-    height_of_menu = 0;
-    width_of_menu = 0;
-    height_of_parent = 0;
-    width_of_parent = 0;
-    x_coordinate = 0;
-    y_coordinate = 0;
+    private d_is_open = false;
+    private d_height_of_menu = 0;
+    private d_width_of_menu = 0;
 
     mounted() {
-      this.$el.style.left = this.x_coordinate + "px";
-      this.$el.style.top = this.y_coordinate + "px";
-      this.height_of_menu = this.$el.clientHeight;
-      this.width_of_menu = this.$el.clientWidth;
+      this.$el.style.left = "0px";
+      this.$el.style.top = "0px";
+      this.d_height_of_menu = this.$el.clientHeight ? this.$el.clientHeight : 5;
+      this.d_width_of_menu = this.$el.clientWidth ? this.$el.clientWidth : 5;
 
       let parent_element = <HTMLElement> this.$el.parentElement;
-      this.height_of_parent = parent_element.clientHeight;
-      this.width_of_parent = parent_element.clientWidth;
+      parent_element.addEventListener('wheel', (event: Event) => {
+        console.log("Wheel1");
+        if (this.menu_is_open) {
+          event.preventDefault();
+        }
+      });
+
+      // parent_element.addEventListener('scroll', (event: Event) => {
+      //   console.log("Scroll1");
+      //   if (this.menu_is_open) {
+      //     event.preventDefault();
+      //   }
+      // });
+
+      window.addEventListener('wheel', (event: Event) => {
+        console.log("Wheel2");
+        if (this.menu_is_open) {
+          event.preventDefault();
+        }
+      });
+
+      // document.body.addEventListener('scroll', (event: Event) => {
+      //   console.log("Scroll2");
+      //   if (this.menu_is_open) {
+      //     event.preventDefault();
+      //   }
+      // });
 
       let children = this.$el.getElementsByClassName('context-menu-option');
       if (children.length > 0) {
@@ -38,48 +59,67 @@
         let last_child = <HTMLElement> children[children.length - 1];
         last_child.classList.add('last-child');
       }
+
+      this.hide_context_menu();
     }
 
-    show_context_menu() {
-      this.$el.style.visibility = "visible";
-      this.is_open = true;
-      let body = <HTMLElement> document.getElementsByTagName('body')[0];
-      body.style.overflow = "hidden";
-    }
+    // handleWheel(event: Event) {
+    //   if (this.menu_is_open) {
+    //     event.preventDefault();
+    //   }
+    // }
 
-    menu_is_open() {
-      return this.is_open;
+    get menu_is_open() {
+      return this.d_is_open;
     }
 
     hide_context_menu() {
       this.$el.style.visibility = "hidden";
-      this.is_open = false;
-      let body = <HTMLElement> document.getElementsByTagName('body')[0];
-      body.style.overflow = "visible";
+      this.d_is_open = false;
     }
 
-    update_x_and_y_coords(event: MouseEvent) {
+    show_context_menu(x_coordinate: number, y_coordinate: number) {
 
-      this.x_coordinate = event.pageX;
-      this.y_coordinate = event.pageY;
+      // console.log("PageX: " + x_coordinate);
+      // console.log("PageY: " + y_coordinate);
 
-      let right_edge: number = this.x_coordinate + this.width_of_menu;
-      let bottom_edge: number = this.y_coordinate + this.height_of_menu;
+      let right_edge: number = x_coordinate + this.d_width_of_menu;
+      let bottom_edge: number = y_coordinate + this.d_height_of_menu;
 
-      if ((right_edge) > this.width_of_parent) {
+      // console.log("Client Width of menu: " + this.d_width_of_menu);
+      // console.log("Client Height of menu: " + this.d_height_of_menu);
+      //
+      // console.log("Width of menu: " + this.$el.style.width);
+      // console.log("Height of menu: " + this.$el.style.height);
+      //
+      // console.log("Right Edge: " + right_edge);
+      // console.log("Bottom Edge: " + bottom_edge);
+      //
+      // console.log("Body Width: " + document.body.clientWidth);
+      // console.log("Body Height: " + document.body.clientHeight);
+
+      if ((right_edge) > document.body.clientWidth) {
         console.log("Too Far Right");
-        this.x_coordinate = (this.width_of_parent - this.width_of_menu) - 5;
+        x_coordinate = (x_coordinate - this.d_width_of_menu) - 5;
       }
 
-      if ((bottom_edge) > this.height_of_parent) {
+      if ((bottom_edge) > document.body.clientHeight) {
         console.log("Too Far Down");
-        this.y_coordinate = (this.height_of_parent - this.height_of_menu) - 5;
+        y_coordinate = (y_coordinate - this.d_height_of_menu) - 5;
       }
 
-      this.$el.style.left = this.x_coordinate + "px";
-      this.$el.style.top = this.y_coordinate + "px";
+      this.$el.style.left = x_coordinate + "px";
+      this.$el.style.top = y_coordinate + "px";
 
-      this.show_context_menu();
+      // console.log("Offset Width: " + this.$el.offsetWidth);
+      // console.log("Offset Height: " + this.$el.offsetHeight);
+      //
+      // console.log("New Left: " + this.$el.style.left);
+      // console.log("New Top: " + this.$el.style.top);
+
+      this.$el.style.visibility = "visible";
+      this.d_is_open = true;
+
       // focus must be applied after the element is visible
       this.$el.focus();
     }
@@ -92,11 +132,12 @@
 .context-menu-container {
   background-color: white;
   border-radius: 5px;
-  border: 1px solid $pebble-light;
+  padding: 1px solid $pebble-light;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   margin-top: 0.5px;
+  min-width: 5px;
+  min-height: 5px;
   position: absolute;
-  visibility: hidden;
   z-index: 1;
 }
 

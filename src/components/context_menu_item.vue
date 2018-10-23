@@ -1,9 +1,6 @@
 <template>
   <div class="context-menu-option"
-      :class="[{
-        'hoverable-item': !d_disabled,
-        'disabled-item': d_disabled,
-      }]"
+      :class="[{'hoverable-item': !d_disabled, 'disabled-item': d_disabled}]"
       @click="check_if_valid_click($event)">
     <slot name="label"> </slot>
   </div>
