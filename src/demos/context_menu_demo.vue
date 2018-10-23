@@ -103,6 +103,17 @@
         </context-menu-item>
       </template>
     </context-menu>
+
+    <br>
+    <div @click="$refs.empty_context_menu.show_context_menu($event.pageX, $event.pageY)">
+      This context menu is empty <br> <br>
+
+      EmptymenuEmptymenuEmptymenuEmptymenuEmptymenuEm
+      ptymenuEmptymenuEmptymenuEmptymenuEmptymenuEmptymenu
+      EmptymenuEmptymenuEmptymenuEmptymenuEmptymenuEmptymenu
+      EmptymenuEmptymenuEmptymenuEmptymenuEmptymenu
+    </div>
+    <context-menu ref="empty_context_menu"></context-menu>
   </div>
 </template>
 
