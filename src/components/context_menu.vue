@@ -99,8 +99,8 @@
 
 #context-menu-container {
   background-color: white;
-  border-radius: 5px;
   border: 2px solid lighten($baking-pan, 50%);
+  border-radius: 5px;
   box-shadow: 0 0 15px opacify(lighten($baking-pan, 50%), .2);
   margin-top: 0.5px;
   position: absolute;
