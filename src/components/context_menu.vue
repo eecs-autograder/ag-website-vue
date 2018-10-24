@@ -4,7 +4,9 @@
     @blur="hide_context_menu">
     <slot name="context_menu_items">
       <context-menu-item>
-        <div style="width: 100px; height: 20px"></div>
+        <template slot="label">
+          <div style="width: 100px; height: 20px"> </div>
+        </template>
       </context-menu-item>
     </slot>
   </div>
@@ -12,8 +14,8 @@
 
 <script lang="ts">
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
   import ContextMenuItem from '@/components/context_menu_item.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -26,7 +28,7 @@
     private d_height_of_menu = 0;
     private d_width_of_menu = 0;
 
-    private wheel_event_handler: (event: Event) => void;
+    private wheel_event_handler!: (event: Event) => void;
 
     mounted() {
       this.$el.style.left = "0px";
@@ -43,12 +45,14 @@
       window.addEventListener('wheel', this.wheel_event_handler, true);
 
       let children = this.$el.getElementsByClassName('context-menu-option');
-      if (children.length > 0) {
-        let first_child = <HTMLElement> children[0];
-        first_child.classList.add('first-child');
-        let last_child = <HTMLElement> children[children.length - 1];
-        last_child.classList.add('last-child');
+      console.log(children.length);
+      if (children.length === 0) {
+        throw new Error('Context Menus must contain at least one Context Menu Item');
       }
+      let first_child = <HTMLElement> children[0];
+      first_child.classList.add('first-child');
+      let last_child = <HTMLElement> children[children.length - 1];
+      last_child.classList.add('last-child');
 
       this.hide_context_menu();
     }
