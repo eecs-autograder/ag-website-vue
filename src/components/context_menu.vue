@@ -1,7 +1,8 @@
 <template>
   <div tabindex="1"
-    class="context-menu-container"
-    @blur="hide_context_menu">
+    id="context-menu-container"
+    @blur="hide_context_menu"
+    @keyup.esc="hide_context_menu">
     <slot name="context_menu_items">
       <context-menu-item>
         <template slot="label">
@@ -96,7 +97,7 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
-.context-menu-container {
+#context-menu-container {
   background-color: white;
   border-radius: 5px;
   border: 2px solid lighten($baking-pan, 50%);
@@ -106,7 +107,7 @@
   z-index: 1;
 }
 
-.context-menu-container:focus {
+#context-menu-container:focus {
   outline: none;
 }
 
