@@ -35,8 +35,7 @@
           </template>
         </context-menu-item>
         <div class="context-menu-divider"> </div>
-        <context-menu-item :disabled="changing_value"
-                           @context_menu_item_clicked="choice_alert('Two Fish!')">
+        <context-menu-item @context_menu_item_clicked="choice_alert('Two Fish!')">
           <template slot="label"> Two Fish
             <i class="fas fa-fish fish"></i>
             <i class="fas fa-fish fish"></i>
@@ -46,8 +45,7 @@
         <context-menu-item
           @context_menu_item_clicked="change_color('red')">
           <template slot="label">
-            <p :style="[{width: '160px', height: '20px'}]"> Red Fish </p>
-            <i class="fas fa-fish red-fish"></i>
+            Red Fish <i class="fas fa-fish red-fish"></i>
           </template>
         </context-menu-item>
         <div class="context-menu-divider"> </div>
@@ -127,8 +125,6 @@
   })
   export default class ContextMenuDemo extends Vue {
 
-    changing_value = false;
-
     choice_alert(word: string) {
       alert('You have clicked on: ' + word);
     }
@@ -136,7 +132,6 @@
     change_color(word: string) {
       let text = <HTMLElement> this.$el.getElementsByClassName('area-of-focus-1')[0];
       text.style.color = word;
-      this.changing_value = !this.changing_value;
     }
 
     items = [

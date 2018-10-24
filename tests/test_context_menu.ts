@@ -264,13 +264,11 @@ describe('ContextMenu.vue', () => {
         await context_menu.$nextTick();
 
         let context_menu_item_1 = wrapper.find({ref: 'item_1'});
-
         context_menu_item_1.trigger('click');
 
         expect(context_menu_item_1.emitted('context_menu_item_clicked')).not.toBeTruthy();
 
         wrapper.vm.$data.is_disabled = false;
-
         context_menu_item_1.trigger('click');
 
         expect(context_menu_item_1.emitted().context_menu_item_clicked.length).toBe(1);
@@ -338,20 +336,14 @@ describe('ContextMenu.vue', () => {
         @Component({
             template: `<div>
                          <div class="too-far-right-square"
-                              @click="$refs.context_menu.show_context_menu($event)"
-                              :style="[{height: '500px',
-                                       width: '800px',
-                                       backgroundColor: 'blue'}]">
+                              @click="$refs.context_menu.show_context_menu($event)">
                          </div>
                         <context-menu ref="context_menu">
                           <template slot="context_menu_items">
                               <context-menu-item ref="item_1"
                                 @context_menu_item_clicked="change_greeting_color('red')">
                                 <template slot="label">
-                                <p :style="[{width: '200px',
-                                             height: '20px'}]">
-                                             One
-                                </p>
+                                 One
                                 </template>
                               </context-menu-item>
                               <context-menu-item ref="item_2"
@@ -380,8 +372,6 @@ describe('ContextMenu.vue', () => {
 
         let wrapper = mount(WrapperComponent2);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
-        let menu = wrapper.find({ref: 'context_menu'});
-        let far_right_square = wrapper.find('.too-far-right-square');
 
         let fake_body = {
             clientWidth: 800,
@@ -412,31 +402,21 @@ describe('ContextMenu.vue', () => {
          async () => {
         @Component({
             template: `<div>
-                     <div :style="[{height: '1000px', width: '300px'}]"> </div>
                      <div class="too-far-right-square"
-                          @click="$refs.context_menu.show_context_menu($event)"
-                          :style="[{height: '500px',
-                                   width: '800px',
-                                   backgroundColor: 'blue'}]">
+                          @click="$refs.context_menu.show_context_menu($event)">
                      </div>
                     <context-menu ref="context_menu">
                       <template slot="context_menu_items">
                           <context-menu-item ref="item_1"
-                            :style="[{width: '200px', height: '200px'}]"
                             @context_menu_item_clicked="change_greeting_color('red')">
                             <template slot="label">
-                            <p :style="[{width: '200px',
-                                         height: '20px'}]">
-                                         One
-                            </p>
+                              One
                             </template>
                           </context-menu-item>
                           <context-menu-item ref="item_2"
                             @context_menu_item_clicked="change_greeting_color('blue')">
                             <template slot="label">
-                            <div :style="[{width: '200px', height: '200px'}]">
                               Two
-                            </div>
                             </template>
                           </context-menu-item>
                       </template>
@@ -523,8 +503,6 @@ describe('ContextMenu.vue', () => {
     test("Scrolling via wheel event is disallowed while the context menu is open",
          () => {
         let wrapper = mount(WrapperComponent, {attachToDocument: true});
-        let context_menu_wrapper = wrapper.find({ref: 'context_menu'});
-        let context_menu = <ContextMenu> context_menu_wrapper.vm;
 
         let context_menu_area = wrapper.find('.context-menu-area');
 
@@ -542,6 +520,25 @@ describe('ContextMenu.vue', () => {
 
         context_menu_area.trigger('wheel');
         expect(num_wheel_events).toEqual(1);
+
+        wrapper.vm.$destroy();
+    });
+
+    test("Pressing esc closes the context menu", async () => {
+        let wrapper = mount(WrapperComponent);
+
+        let context_menu_area = wrapper.find('.context-menu-area');
+        let context_menu_wrapper = wrapper.find('#context-menu-container');
+        let context_menu_component = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+
+        context_menu_area.trigger('click');
+
+        expect(context_menu_component.menu_is_open).toBe(true);
+
+        context_menu_wrapper.trigger('keyup.esc');
+        await context_menu_component.$nextTick();
+
+        expect(context_menu_component.menu_is_open).toBe(false);
 
         wrapper.vm.$destroy();
     });
