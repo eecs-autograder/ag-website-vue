@@ -45,7 +45,6 @@
       window.addEventListener('wheel', this.wheel_event_handler, true);
 
       let children = this.$el.getElementsByClassName('context-menu-option');
-      console.log(children.length);
       if (children.length === 0) {
         throw new Error('Context Menus must contain at least one Context Menu Item');
       }
