@@ -315,14 +315,12 @@ describe('ContextMenu.vue', () => {
             }
         })
         class WrapperComponent2 extends Vue {
-
             change_greeting_color(color_in: string) {
                 let greeting = <HTMLElement> this.$el.getElementsByClassName(
                     'greeting'
                 )[0];
                 greeting.style.color = color_in;
             }
-
         }
         let wrapper = mount(WrapperComponent2);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
@@ -347,7 +345,7 @@ describe('ContextMenu.vue', () => {
 
     test("When a user clicks too near to the right edge, the positioning of the " +
               "context menu is adjusted",
-          () => {
+         async () => {
         @Component({
             template: `<div>
                          <div class="too-far-right-square"
@@ -422,7 +420,7 @@ describe('ContextMenu.vue', () => {
 
     test("When a user clicks too near to the bottom edge, the positioning of the " +
               "context menu is adjusted",
-              async () => {
+         async () => {
         @Component({
             template: `<div>
                      <div :style="[{height: '1000px', width: '300px'}]"> </div>
@@ -513,6 +511,24 @@ describe('ContextMenu.vue', () => {
 
 
         wrapper.vm.$destroy();
+    });
+
+    test('Invalid Context Menu Content', () => {
+        const component = {
+            template:  `<context_menu ref="context_menu">
+                          <template slot="context_menu_items">
+                            <div>Hello</div>
+                          </template>
+                        </context_menu>`,
+            components: {
+                'context_menu': ContextMenu,
+            }
+        };
+
+        // let wrapper = mount(component);
+        expect(
+            () => mount(component)
+        ).toThrow("Context Menus must contain at least one Context Menu Item");
     });
 
     test("Scrolling via wheel event is disallowed while the context menu is open",
