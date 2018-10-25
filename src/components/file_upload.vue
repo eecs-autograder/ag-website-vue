@@ -38,7 +38,9 @@
         </tr>
       </tbody>
     </table>
-    <button class="">{{submit_button_text}}</button>
+    <button class="submit-files-button" @click="attempt_to_submit()">
+      {{submit_button_text}}
+    </button>
   </div>
 </template>
 
@@ -46,7 +48,11 @@
 
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  @Component
+  import Modal from '@/components/modal.vue';
+
+  @Component({
+    components: { Modal }
+  })
   export default class FileUpload extends Vue {
 
     @Prop({default: "Submit", type: String})
@@ -62,9 +68,6 @@
       this.d_submit_button_text = this.submit_button_text;
       this.d_file_list_label = this.file_list_label;
     }
-
-    // @Output()
-    // submit_click: EventEmitter<any> = new EventEmitter();
 
     // @ViewChild('empty_file_found_in_submission_attempt')
     // public empty_file_found_in_submission_attempt: ModalDirective;
@@ -86,6 +89,7 @@
     }
 
     add_files_from_button(event: Event) {
+      console.log(event.target);
       // for (let file of event.target.files) {
       //   this.check_for_emptiness(file);
       //   this.files.push(file);
@@ -94,47 +98,47 @@
     }
 
     add_dropped_files(event: Event) {
-      // event.stopPropagation();
-      // event.preventDefault();
-      // for (let file of event.dataTransfer.files) {
-      //   this.check_for_emptiness(file);
-      //   this.files.push(file);
+      event.stopPropagation();
+      event.preventDefault();
+      // for (let file of event.dataTransfer.files) {  // what is data transfer?
+        // this.check_for_emptiness(file);
+        // this.files.push(file);
       // }
-      // this.files_dragged_over = false;
-      // event.target.value = '';
+      this.files_dragged_over = false;
+      // event.target.value = ''; // can you set value of target????
     }
 
     remove_file_from_submission(filename: string, file_index: number) {
-      // console.log(`removing file: ${filename}`);
-      // this.files.splice(file_index, 1);
-      // if (this.empty_files.has(filename)) {
-      //   this.empty_files.delete(filename);
-      // }
+      console.log(`removing file: ${filename}`);
+      this.files.splice(file_index, 1);
+      if (this.empty_files.has(filename)) {
+        this.empty_files.delete(filename);
+      }
     }
 
     attempt_to_submit() {
-      // if (this.empty_files.size !== 0) {
-      //   this.empty_file_found_in_submission_attempt.show();
-      // }
-      // else {
-      //   this.submit_click.emit(this.files);
-      // }
+      if (this.empty_files.size !== 0) {
+        // this.empty_file_found_in_submission_attempt.show(); MODAL
+      }
+      else {
+        this.$emit('submit_click', this.files);
+      }
     }
 
     continue_with_submission_despite_empty_files() {
-      // this.submit_click.emit(this.files);
+      this.$emit('submit_click', this.files);
     }
 
     check_for_emptiness(file: File) {
-      // if (file.size === 0 && !this.empty_files.has(file.name)) {
-      //   this.empty_files.add(file.name);
-      // }
+      if (file.size === 0 && !this.empty_files.has(file.name)) {
+        this.empty_files.add(file.name);
+      }
     }
 
     on_file_hover(event: Event) {
-      // event.stopPropagation();
-      // event.preventDefault();
-      // event.dataTransfer.dropEffect = 'copy';
+      event.stopPropagation();
+      event.preventDefault();
+      // event.dataTransfer.dropEffect = 'copy'; // what is data transfer?
     }
 
     clear_files() {
