@@ -1,6 +1,9 @@
 <template>
   <div>
-    <FileUpload></FileUpload>
+    <FileUpload
+      @submit_click="print_message($event)">
+
+    </FileUpload>
   </div>
 </template>
 
@@ -13,7 +16,9 @@
     components: {FileUpload}
   })
   export default class FileUploadDemo extends Vue {
-
+    print_message(word: String) {
+      console.log("Something was emitted");
+    }
   }
 
 </script>
