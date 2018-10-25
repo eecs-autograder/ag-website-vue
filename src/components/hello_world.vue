@@ -7,11 +7,12 @@
     <DropdownDemo></DropdownDemo>
     <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
     <ModalDemo></ModalDemo>
-    <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
-    <!--<TabsDemo></TabsDemo>-->
-    <!--<TooltipDemo></TooltipDemo>-->
-    <!--<ToggleDemo></ToggleDemo>-->
-    <!--<ViewFileDemo></ViewFileDemo>-->
+    <FileUploadDemo></FileUploadDemo>
+    <MultiFileViewerDemo></MultiFileViewerDemo>
+    <TabsDemo></TabsDemo>
+    <TooltipDemo></TooltipDemo>
+    <ToggleDemo></ToggleDemo>
+    <ViewFileDemo></ViewFileDemo>
   </div>
 </template>
 

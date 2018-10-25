@@ -6,41 +6,77 @@
            @change="add_files_from_button($event)"
            multiple>
     <div id="drag-and-drop"
-      @dragenter="files_dragged_over = true"
-      @dragleave="files_dragged_over = false"
-      @dragover="on_file_hover($event)"
-      @drop="add_dropped_files($event)">
+         :class="{'drag-and-drop-hover': d_files_dragged_over}"
+         @dragenter="d_files_dragged_over = true"
+         @dragleave="d_files_dragged_over = false"
+         @dragover="on_file_hover($event)"
+         @drop="add_dropped_files($event)">
       <div id="drag-and-drop-body">
         
         <div id="drop-here">Drop files here</div>
         <div style="font-size: medium">- or -</div>
-        <button id="add-files" class="gray-button">
+        <button id="add-files"
+                class="gray-button"
+                @click="$refs.file_input.click()">
           <div>Upload from your computer</div>
         </button>
         
       </div>
     </div>
 
-    <table class="table student-files-uploaded-table">
+    <table class="student-files-uploaded-table">
       <thead>
         <tr>
-          <th class="name-of-file-label">{{file_list_label}}</th>
+          <th class="name-of-file-label">{{d_file_list_label}}</th>
           <th class="size-of-file-label">Size</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(file, index) of files">
+        <tr v-for="(file, index) of d_files" :class="table_row_styling(file, index)">
           <td class="name-of-file">{{file.name}}</td>
           <td class="size-of-file">{{file.size}} Bytes</td>
           <td class="remove-file-button">
-            <button></button>
+            <i class="fas fa-times" @click="remove_file_from_submission(file.name, index)"
+                    :class="file.size === 0 ? 'remove-button-icon-empty-file' :
+                                              'remove-button-icon-non-empty-file'">
+
+            </i>
           </td>
         </tr>
       </tbody>
     </table>
-    <button class="submit-files-button" @click="attempt_to_submit()">
-      {{submit_button_text}}
+    <button class="submit-files-button green-button" @click="attempt_to_submit()">
+      {{d_submit_button_text}}
     </button>
+
+    <modal ref="empty_file_found_in_submission_attempt"
+           :size="'large'"
+           :include_closing_x="false">
+      <h2>You submission contains empty files!!!</h2>
+      <hr>
+      <div class="modal-body">
+        <p class="empty-file-list-label">
+          The following files in your submission are empty:
+        </p>
+        <ul class="list-of-empty-file-names">
+          <li v-for="empty_file of Array.from(d_empty_files)">
+            <i class="fas fa-exclamation-triangle empty-warning-symbol"></i>
+            {{empty_file}}
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="submit-despite-empty-files-button gray-button"
+                @click="continue_with_submission_despite_empty_files()">
+          Submit Anyway
+        </button>
+        <button class="cancel-submission-process-button red-button"
+                @click="$refs.empty_file_found_in_submission_attempt.close()">
+          Cancel
+        </button>
+      </div>
+    </modal>
+
   </div>
 </template>
 
@@ -63,20 +99,14 @@
 
     d_submit_button_text = "";
     d_file_list_label = "";
+    d_files: File[] = [];
+    d_files_dragged_over = false;
+    d_empty_files = new Set();
 
     created() {
       this.d_submit_button_text = this.submit_button_text;
       this.d_file_list_label = this.file_list_label;
     }
-
-    // @ViewChild('empty_file_found_in_submission_attempt')
-    // public empty_file_found_in_submission_attempt: ModalDirective;
-
-    files: File[] = [];
-
-    files_dragged_over = false;
-
-    empty_files = new Set();
 
     table_row_styling(file_in: File, row_index: number): string {
       if (file_in.size === 0) {
@@ -89,61 +119,63 @@
     }
 
     add_files_from_button(event: Event) {
-      console.log(event.target);
-      // for (let file of event.target.files) {
-      //   this.check_for_emptiness(file);
-      //   this.files.push(file);
-      // }
-      // event.target.value = '';
+      console.log("Adding file from button");
+      for (let file of event.target.files) {
+        this.check_for_emptiness(file);
+        this.d_files.push(file);
+      }
+      event.target.value = '';
     }
 
     add_dropped_files(event: Event) {
+      console.log("Adding dropped file");
       event.stopPropagation();
       event.preventDefault();
-      // for (let file of event.dataTransfer.files) {  // what is data transfer?
-        // this.check_for_emptiness(file);
-        // this.files.push(file);
-      // }
-      this.files_dragged_over = false;
-      // event.target.value = ''; // can you set value of target????
+      for (let file of event.dataTransfer.files) {  // what is data transfer?
+        this.check_for_emptiness(file);
+        this.d_files.push(file);
+      }
+      this.d_files_dragged_over = false;
+      event.target.value = ''; // can you set value of target????
     }
 
     remove_file_from_submission(filename: string, file_index: number) {
       console.log(`removing file: ${filename}`);
-      this.files.splice(file_index, 1);
-      if (this.empty_files.has(filename)) {
-        this.empty_files.delete(filename);
+      this.d_files.splice(file_index, 1);
+      if (this.d_empty_files.has(filename)) {
+        this.d_empty_files.delete(filename);
       }
     }
 
     attempt_to_submit() {
-      if (this.empty_files.size !== 0) {
-        // this.empty_file_found_in_submission_attempt.show(); MODAL
+      if (this.d_empty_files.size !== 0) {
+        this.$refs.empty_file_found_in_submission_attempt.open();
       }
       else {
-        this.$emit('submit_click', this.files);
+        this.$emit('submit_click', this.d_files);
       }
     }
 
     continue_with_submission_despite_empty_files() {
-      this.$emit('submit_click', this.files);
+      this.$emit('submit_click', this.d_files);
+      this.$refs.empty_file_found_in_submission_attempt.close();
     }
 
     check_for_emptiness(file: File) {
-      if (file.size === 0 && !this.empty_files.has(file.name)) {
-        this.empty_files.add(file.name);
+      if (file.size === 0 && !this.d_empty_files.has(file.name)) {
+        this.d_empty_files.add(file.name);
       }
     }
 
     on_file_hover(event: Event) {
       event.stopPropagation();
       event.preventDefault();
-      // event.dataTransfer.dropEffect = 'copy'; // what is data transfer?
+      event.dataTransfer.dropEffect = 'copy'; // what is data transfer?
     }
 
     clear_files() {
-      this.files = [];
-      this.empty_files.clear();
+      this.d_files = [];
+      this.d_empty_files.clear();
     }
   }
 </script>
@@ -152,13 +184,12 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
-#add-files {
-  border: none;
-  font-size: large;
-}
-
 #file-upload-container {
   font-family: Helvetica;
+}
+
+#submit {
+  display: none;
 }
 
 #drag-and-drop {
@@ -173,25 +204,33 @@
   width: 100%;
 }
 
-/*#drag-and-drop:hover {*/
-  /*background-color: hotpink;*/
-/*}*/
+.drag-and-drop-hover {
+  background-color: $pebble-light;
+}
 
 #drop-here {
   font-size: x-large;
 }
 
-#submit {
-  /*display: none;*/
+#add-files {
+  border: none;
+  font-size: large;
+  color: white;
 }
 
-.hover {
-  background-color: lightgray;
-}
+// TABLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE START
 
 .student-files-uploaded-table {
+  border-collapse: collapse;
   margin-top: 10px;
   margin-bottom: 10px;
+  width: 100%;
+}
+
+.student-files-uploaded-table td {
+  padding: 10px;
+  border-right: 0;
+  border-left: 0;
 }
 
 .name-of-file, .size-of-file {
@@ -201,6 +240,36 @@
 .name-of-file-label, .size-of-file-label {
   border-bottom: none;
   font-size: 18px;
+  text-align: left;
+  padding: 10px;
+}
+
+.file-empty-row, .file-not-empty-row-even, .file-not-empty-row-odd {
+  border-top: 0;
+  border-bottom: 5px solid white;
+}
+
+.file-empty-row {
+  background-color: $warning-red;
+  color: white;
+  border-radius: 10px;
+}
+
+.file-not-empty-row-odd {
+  background-color: $pebble-light;
+}
+
+.file-not-empty-row-even {
+  background-color: $pebble-medium;
+}
+
+table tbody tr td {
+  border-top: 0;
+}
+
+.remove-button-icon-empty-file, .remove-button-icon-non-empty-file {
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 .remove-button-icon-non-empty-file {
@@ -211,64 +280,32 @@
   color: white;
 }
 
-.submit-files-button {
-  background-color: $save-green;
-  color: white;
-}
+// TABLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE END
 
-.file-empty-row {
-  background-color: $warning-red;
-  color: white;
-}
 
-.file-not-empty-row-odd {
-  background-color: $pebble-medium;
-}
-
-.file-not-empty-row-even {
-  background-color: $pebble-light;
-}
-
-.file-empty-row, .file-not-empty-row-even, .file-not-empty-row-odd {
-  border-top: 0px;
-  border-bottom: 5px solid white;
-}
-
-table tbody tr td {
-  border-top: 0px;
-}
+// MODAL --------------------------------------- START
 
 .modal-title {
   text-align: left;
 }
 
 .submit-despite-empty-files-button {
-  background-color: $baking-pan;
   margin-right: 15px;
 }
 
-.cancel-submission-process-button {
-  background-color: $warning-red;
-}
-
-.submit-despite-empty-files-button, .cancel-submission-process-button {
-  color: white;
-  border-radius: 4px;
+.submit-despite-empty-files-button, .cancel-submission-process-button, .submit-files-button {
   padding: 10px 15px;
   border: 0px;
 }
 
 .list-of-empty-file-names {
-  padding: 0px;
+  padding: 0;
   margin-bottom: 0px;
 }
 
-.list-of-empty-file-names li:before {
-  font-family: 'FontAwesome';
-  font-size: 13px;
-  margin-right: 8px;
-  content: '\f071';
+.empty-warning-symbol {
   color: orange;
+  padding-right: 10px;
 }
 
 .list-of-empty-file-names li {
@@ -279,8 +316,14 @@ table tbody tr td {
   color: black;
 }
 
+.list-of-empty-file-names li:last-child {
+  margin-bottom: 15px;
+}
+
 .empty-file-list-label {
   margin-bottom: 15px;
 }
+
+// MODAL --------------------------------------- END
 
 </style>
