@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="file-upload-demo">
     <FileUpload
       @submit_click="print_message($event)">
 
@@ -24,5 +24,10 @@
 </script>
 
 <style scoped lang="scss">
+
+#file-upload-demo {
+  margin-top: 100px;
+  margin-bottom: 100px;
+}
 
 </style>
