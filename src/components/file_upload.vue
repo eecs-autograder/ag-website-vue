@@ -3,6 +3,7 @@
     <input ref="file_input"
            id="submit"
            type="file"
+           @click="madewell()"
            @change="add_files_from_button($event)"
            multiple>
     <div id="drag-and-drop"
@@ -14,10 +15,10 @@
       <div id="drag-and-drop-body">
         
         <div id="drop-here">Drop files here</div>
-        <div style="font-size: medium">- or -</div>
+        <div id="or">- or -</div>
         <button id="add-files"
                 class="gray-button"
-                @click="$refs.file_input.click()">
+                @click="fun(); $refs.file_input.click()">
           <div>Upload from your computer</div>
         </button>
         
@@ -35,11 +36,11 @@
         <tr v-for="(file, index) of d_files" :class="table_row_styling(file, index)">
           <td class="name-of-file">{{file.name}}</td>
           <td class="size-of-file">{{file.size}} Bytes</td>
-          <td class="remove-file-button">
-            <i class="fas fa-times" @click="remove_file_from_submission(file.name, index)"
-                    :class="file.size === 0 ? 'remove-button-icon-empty-file' :
-                                              'remove-button-icon-non-empty-file'">
-
+          <td>
+            <i class="fas fa-times remove-file-button"
+               @click="remove_file_from_submission(file.name, index)"
+               :class="file.size === 0 ? 'remove-button-icon-empty-file' :
+                                         'remove-button-icon-non-empty-file'">
             </i>
           </td>
         </tr>
@@ -59,7 +60,7 @@
           The following files in your submission are empty:
         </p>
         <ul class="list-of-empty-file-names">
-          <li v-for="empty_file of Array.from(d_empty_files)">
+          <li v-for="empty_file of Array.from(d_empty_filenames)">
             <i class="fas fa-exclamation-triangle empty-warning-symbol"></i>
             {{empty_file}}
           </li>
@@ -86,6 +87,10 @@
 
   import Modal from '@/components/modal.vue';
 
+  interface HTMLInputEvent extends Event {
+    target: HTMLInputElement & EventTarget;
+  }
+
   @Component({
     components: { Modal }
   })
@@ -101,11 +106,19 @@
     d_file_list_label = "";
     d_files: File[] = [];
     d_files_dragged_over = false;
-    d_empty_files = new Set();
+    d_empty_filenames = new Set();
 
     created() {
       this.d_submit_button_text = this.submit_button_text;
       this.d_file_list_label = this.file_list_label;
+    }
+
+    madewell() {
+      console.log("input has been clicked on");
+    }
+
+    fun() {
+      console.log("Add-files button got clicked on");
     }
 
     table_row_styling(file_in: File, row_index: number): string {
@@ -118,38 +131,49 @@
       return "file-not-empty-row-even";
     }
 
-    add_files_from_button(event: Event) {
-      console.log("Adding file from button");
+    add_files_from_button(event: HTMLInputEvent) {
+      console.log('add files from button');
+      console.log(event.target);
+      console.log(event.target.files);
+      if (event.target === null) {
+        throw new Error("Why am I null???");
+      }
+      if (event.target.files === null) {
+        throw new Error("Why don't I have files?");
+      }
       for (let file of event.target.files) {
+        console.log("Ayyyyyyyyyyyyyyyyyyyyyy");
         this.check_for_emptiness(file);
         this.d_files.push(file);
       }
       event.target.value = '';
     }
 
-    add_dropped_files(event: Event) {
-      console.log("Adding dropped file");
+    add_dropped_files(event: DragEvent) {
       event.stopPropagation();
       event.preventDefault();
-      for (let file of event.dataTransfer.files) {  // what is data transfer?
+      if (event.target === null) {
+        throw new Error("Why am I null???");
+      }
+      for (let file of event.dataTransfer.files) {
         this.check_for_emptiness(file);
         this.d_files.push(file);
       }
       this.d_files_dragged_over = false;
-      event.target.value = ''; // can you set value of target????
     }
 
     remove_file_from_submission(filename: string, file_index: number) {
-      console.log(`removing file: ${filename}`);
+      console.log("Removing: " + filename);
       this.d_files.splice(file_index, 1);
-      if (this.d_empty_files.has(filename)) {
-        this.d_empty_files.delete(filename);
+      if (this.d_empty_filenames.has(filename)) {
+        this.d_empty_filenames.delete(filename);
       }
     }
 
     attempt_to_submit() {
-      if (this.d_empty_files.size !== 0) {
-        this.$refs.empty_file_found_in_submission_attempt.open();
+      if (this.d_empty_filenames.size !== 0) {
+        let empty_files_modal = <Modal> this.$refs.empty_file_found_in_submission_attempt;
+        empty_files_modal.open();
       }
       else {
         this.$emit('submit_click', this.d_files);
@@ -158,24 +182,25 @@
 
     continue_with_submission_despite_empty_files() {
       this.$emit('submit_click', this.d_files);
-      this.$refs.empty_file_found_in_submission_attempt.close();
+      let empty_files_modal = <Modal> this.$refs.empty_file_found_in_submission_attempt;
+      empty_files_modal.close();
     }
 
     check_for_emptiness(file: File) {
-      if (file.size === 0 && !this.d_empty_files.has(file.name)) {
-        this.d_empty_files.add(file.name);
+      if (file.size === 0 && !this.d_empty_filenames.has(file.name)) {
+        this.d_empty_filenames.add(file.name);
       }
     }
 
-    on_file_hover(event: Event) {
+    on_file_hover(event: DragEvent) {
       event.stopPropagation();
       event.preventDefault();
-      event.dataTransfer.dropEffect = 'copy'; // what is data transfer?
+      event.dataTransfer.dropEffect = 'copy';
     }
 
     clear_files() {
       this.d_files = [];
-      this.d_empty_files.clear();
+      this.d_empty_filenames.clear();
     }
   }
 </script>
@@ -210,6 +235,11 @@
 
 #drop-here {
   font-size: x-large;
+}
+
+#or {
+  font-size: medium;
+  padding: 0 0 5px 0;
 }
 
 #add-files {
