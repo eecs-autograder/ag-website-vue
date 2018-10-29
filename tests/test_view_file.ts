@@ -77,7 +77,7 @@ describe('ViewFile.vue', () => {
         expect(content_lines.at(1).text()).toContain('line two');
     });
 
-    test.only('The contents of a ViewFile Component can change', async () => {
+    test('The contents of a ViewFile Component can change', async () => {
 
         @Component({
             template:  `<div>
