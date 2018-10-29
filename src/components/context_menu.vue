@@ -4,7 +4,7 @@
     @blur="hide_context_menu"
     @keyup.esc="hide_context_menu">
     <slot name="context_menu_items">
-      <context-menu-item>
+      <context-menu-item :disabled="true">
         <template slot="label">
           <div style="width: 100px; height: 20px"> </div>
         </template>
