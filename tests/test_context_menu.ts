@@ -494,7 +494,6 @@ describe('ContextMenu.vue', () => {
             }
         };
 
-        // let wrapper = mount(component);
         expect(
             () => mount(component)
         ).toThrow("Context Menus must contain at least one Context Menu Item");
