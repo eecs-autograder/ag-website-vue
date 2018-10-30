@@ -3,7 +3,6 @@
     <input ref="file_input"
            id="submit"
            type="file"
-           @click="madewell()"
            @change="add_files_from_button($event)"
            multiple>
     <div id="drag-and-drop"
@@ -18,7 +17,7 @@
         <div id="or">- or -</div>
         <button id="add-files"
                 class="gray-button"
-                @click="fun(); $refs.file_input.click()">
+                @click="$refs.file_input.click()">
           <div>Upload from your computer</div>
         </button>
         
@@ -113,14 +112,6 @@
       this.d_file_list_label = this.file_list_label;
     }
 
-    madewell() {
-      console.log("input has been clicked on");
-    }
-
-    fun() {
-      console.log("Add-files button got clicked on");
-    }
-
     table_row_styling(file_in: File, row_index: number): string {
       if (file_in.size === 0) {
         return "file-empty-row";
@@ -132,17 +123,13 @@
     }
 
     add_files_from_button(event: HTMLInputEvent) {
-      console.log('add files from button');
-      console.log(event.target);
-      console.log(event.target.files);
       if (event.target === null) {
-        throw new Error("Why am I null???");
+        throw new Error("Target is null");
       }
       if (event.target.files === null) {
-        throw new Error("Why don't I have files?");
+        throw new Error("Files property of event target is unexpectedly null");
       }
       for (let file of event.target.files) {
-        console.log("Ayyyyyyyyyyyyyyyyyyyyyy");
         this.check_for_emptiness(file);
         this.d_files.push(file);
       }
@@ -153,7 +140,7 @@
       event.stopPropagation();
       event.preventDefault();
       if (event.target === null) {
-        throw new Error("Why am I null???");
+        throw new Error("Target is null");
       }
       for (let file of event.dataTransfer.files) {
         this.check_for_emptiness(file);
@@ -163,7 +150,6 @@
     }
 
     remove_file_from_submission(filename: string, file_index: number) {
-      console.log("Removing: " + filename);
       this.d_files.splice(file_index, 1);
       if (this.d_empty_filenames.has(filename)) {
         this.d_empty_filenames.delete(filename);

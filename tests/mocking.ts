@@ -1,3 +1,4 @@
+import { Wrapper } from '@vue/test-utils';
 import Vue from "vue";
 
 export function patch_object_prototype(obj: object, new_prototype: object, body: () => void) {
@@ -12,7 +13,7 @@ export function patch_object_prototype(obj: object, new_prototype: object, body:
 }
 
 export function patch_component_data_member(
-    component_instance: Vue, member_name: string, new_value: unknown, body: () => void) {
+        component_instance: Vue, member_name: string, new_value: unknown, body: () => void) {
     let original_value = component_instance.$data[member_name];
     try {
         component_instance.$data[member_name] = new_value;
@@ -20,5 +21,18 @@ export function patch_component_data_member(
     }
     finally {
         component_instance.$data[member_name] = original_value;
+    }
+}
+
+export function patch_component_method(
+        component_wrapper: Wrapper<Vue>, method_name: string,
+        new_method: (...args: unknown[]) => unknown | void, body: () => void) {
+    let original_method = component_wrapper.vm.$options.methods![method_name];
+    try {
+        component_wrapper.setMethods({[method_name]: new_method});
+        body();
+    }
+    finally {
+        component_wrapper.setMethods({[method_name]: original_method});
     }
 }
