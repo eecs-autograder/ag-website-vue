@@ -54,11 +54,11 @@ describe('File Upload tests', () => {
         ).vm;
         rows1 = ['ham', 'hashbrowns', 'eggs'];
         fake_file_1 = new File([rows1.join('\n')], 'fake_file_1.cpp',  {
-            lastModified: new Date(2015, 2, 14)
+            lastModified: 1426305600000
         });
         rows2 = [''];
         fake_file_2 = new File([rows2.join('\n')], 'fake_file_2.cpp', {
-            lastModified: new Date(2012, 8, 6)
+            lastModified: 1346904000000
         });
     });
 
@@ -68,6 +68,8 @@ describe('File Upload tests', () => {
     });
 
     test('empty files are identified on upload', () => {
+
+        console.log(fake_file_2.lastModified);
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
         file_upload_component.check_for_emptiness(fake_file_1);
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
@@ -139,7 +141,7 @@ describe('File Upload tests', () => {
 
         let rows3 = ['toast', 'jam'];
         let fake_file_3 = new File([rows3.join('\n')], 'fake_file_1.cpp', {
-            lastModified: new Date(2014, 7, 21)
+            lastModified: 1408593600000
         });
         let mock_event = {
             target: {
