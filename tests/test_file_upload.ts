@@ -41,8 +41,12 @@ describe('File Upload tests', () => {
     let empty_files_present_modal: Modal;
     let rows1: string[];
     let rows2: string[];
+    let rows3: string[];
+    let rows4: string[];
     let fake_file_1: File;
     let fake_file_2: File;
+    let fake_file_3: File;
+    let fake_file_4: File;
 
     beforeEach(() => {
         wrapper = mount(FileUpload, {
@@ -63,6 +67,12 @@ describe('File Upload tests', () => {
         rows2 = [''];
         fake_file_2 = new File([rows2.join('\n')], 'fake_file_2.cpp', {
             lastModified: 1346904000000
+        });
+        rows3 = ['oatmeal', 'toast', 'jam'];
+        fake_file_3 = new File([rows3.join('\n')], 'fake_file_1.cpp');
+        rows4 = ['witch', 'ghost'];
+        fake_file_4 = new File([rows4.join('\n')], 'fake_file_2.cpp', {
+            lastModified: 336542400000
         });
     });
 
@@ -136,15 +146,6 @@ describe('File Upload tests', () => {
          'submission, then the previously uploaded file of the same name is replaced by the ' +
          'new file',
          () => {
-        let rows3 = ['toast', 'jam'];
-        let fake_file_3 = new File([rows3.join('\n')], 'fake_file_1.cpp', {
-            lastModified: 1408593600000
-        });
-
-        let rows4 = ['witch', 'ghost'];
-        let fake_file_4 = new File([rows4.join('\n')], 'fake_file_2.cpp', {
-            lastModified: 336542400000
-        });
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_event = <HTMLInputEvent> <unknown> {
             target: {
@@ -264,9 +265,6 @@ describe('File Upload tests', () => {
     });
 
     test('Users can successfully submit files when all files are non-empty', () => {
-        let rows3 = ['oatmeal', 'toast', 'jam'];
-        let fake_file_3 = new File([rows3.join('\n')], 'fake_file_3.cpp');
-
         let final_submit_button = wrapper.find('.submit-files-button');
 
         file_upload_component.d_files.push(fake_file_1);
