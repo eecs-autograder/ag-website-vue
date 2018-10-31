@@ -12,7 +12,7 @@
          @dragover="on_file_hover($event)"
          @drop="add_dropped_files($event)">
       <div id="drag-and-drop-body">
-        
+
         <div id="drop-here">Drop files here</div>
         <div id="or">- or -</div>
         <button id="add-files"
@@ -20,7 +20,7 @@
                 @click="$refs.file_input.click()">
           <div>Upload from your computer</div>
         </button>
-        
+
       </div>
     </div>
 
@@ -52,7 +52,7 @@
     <modal ref="empty_file_found_in_submission_attempt"
            :size="'large'"
            :include_closing_x="false">
-      <h2>You submission contains empty files!!!</h2>
+      <h2>Your submission contains empty files!!!</h2>
       <hr>
       <div class="modal-body">
         <p class="empty-file-list-label">
@@ -81,20 +81,15 @@
 </template>
 
 <script lang="ts">
-
   import { Component, Prop, Vue } from 'vue-property-decorator';
-
   import Modal from '@/components/modal.vue';
-
   interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
   }
-
   @Component({
     components: { Modal }
   })
   export default class FileUpload extends Vue {
-
     @Prop({default: "Submit", type: String})
     submit_button_text!: string;
 
@@ -130,8 +125,8 @@
         throw new Error("Files property of event target is unexpectedly null");
       }
       for (let file of event.target.files) {
+        this.check_for_previous_existence_of_file(file);
         this.check_for_emptiness(file);
-        this.d_files.push(file);
       }
       event.target.value = '';
     }
@@ -143,8 +138,8 @@
         throw new Error("Target is null");
       }
       for (let file of event.dataTransfer.files) {
+        this.check_for_previous_existence_of_file(file);
         this.check_for_emptiness(file);
-        this.d_files.push(file);
       }
       this.d_files_dragged_over = false;
     }
@@ -170,6 +165,18 @@
       this.$emit('submit_click', this.d_files);
       let empty_files_modal = <Modal> this.$refs.empty_file_found_in_submission_attempt;
       empty_files_modal.close();
+    }
+
+    check_for_previous_existence_of_file(uploaded_file: File) {
+      let index = 0;
+      for (; index < this.d_files.length; ++index) {
+        if (this.d_files[index].name === uploaded_file.name) {
+          console.log("Already Had this file, replacing!");
+          this.remove_file_from_submission(uploaded_file.name, index);
+          break;
+        }
+      }
+      this.d_files.push(uploaded_file);
     }
 
     check_for_emptiness(file: File) {
@@ -234,8 +241,6 @@
   color: white;
 }
 
-// TABLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE START
-
 .student-files-uploaded-table {
   border-collapse: collapse;
   margin-top: 10px;
@@ -296,11 +301,6 @@ table tbody tr td {
   color: white;
 }
 
-// TABLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE END
-
-
-// MODAL --------------------------------------- START
-
 .modal-title {
   text-align: left;
 }
@@ -311,12 +311,12 @@ table tbody tr td {
 
 .submit-despite-empty-files-button, .cancel-submission-process-button, .submit-files-button {
   padding: 10px 15px;
-  border: 0px;
+  border: 0;
 }
 
 .list-of-empty-file-names {
   padding: 0;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .empty-warning-symbol {
@@ -339,7 +339,5 @@ table tbody tr td {
 .empty-file-list-label {
   margin-bottom: 15px;
 }
-
-// MODAL --------------------------------------- END
 
 </style>
