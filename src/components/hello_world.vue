@@ -1,18 +1,18 @@
 <template>
   <div>
-    <ButtonDemo></ButtonDemo>
-    <ColorPaletteDemo></ColorPaletteDemo>
-    <ContextMenuDemo></ContextMenuDemo>
-    <DiffDemo></DiffDemo>
-    <DropdownDemo></DropdownDemo>
-    <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
-    <ModalDemo></ModalDemo>
+    <!--<ButtonDemo></ButtonDemo>-->
+    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
+    <!--<ContextMenuDemo></ContextMenuDemo>-->
+    <!--<DiffDemo></DiffDemo>-->
+    <!--<DropdownDemo></DropdownDemo>-->
+    <!--<DropdownTypeaheadDemo></DropdownTypeaheadDemo>-->
+    <!--<ModalDemo></ModalDemo>-->
     <FileUploadDemo></FileUploadDemo>
-    <MultiFileViewerDemo></MultiFileViewerDemo>
-    <TabsDemo></TabsDemo>
-    <TooltipDemo></TooltipDemo>
-    <ToggleDemo></ToggleDemo>
-    <ViewFileDemo></ViewFileDemo>
+    <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
+    <!--<TabsDemo></TabsDemo>-->
+    <!--<TooltipDemo></TooltipDemo>-->
+    <!--<ToggleDemo></ToggleDemo>-->
+    <!--<ViewFileDemo></ViewFileDemo>-->
   </div>
 </template>
 
