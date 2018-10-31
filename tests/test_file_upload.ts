@@ -9,6 +9,10 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+interface HTMLInputEvent extends Event {
+    target: HTMLInputElement & EventTarget;
+}
+
 class MockFileList implements FileList {
     mock_files: File[];
 
@@ -111,8 +115,8 @@ describe('File Upload tests', () => {
 
     test('Dragging and dropping file over drop area uploads the file', () => {
         let drag_drop_zone = wrapper.find('#drag-and-drop');
-
-        let other: DataTransfer = <DataTransfer> {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let other: DataTransfer = <DataTransfer> <unknown> {
             files: new MockFileList([fake_file_1, fake_file_2])
         };
 
@@ -141,14 +145,12 @@ describe('File Upload tests', () => {
         let fake_file_4 = new File([rows4.join('\n')], 'fake_file_2.cpp', {
             lastModified: 336542400000
         });
-
-        let mock_event = {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let mock_event = <HTMLInputEvent> <unknown> {
             target: {
                 files: new MockFileList([fake_file_3, fake_file_4])
             }
         };
-
-        console.log(fake_file_4.lastModified);
 
         expect(fake_file_1.name).toEqual(fake_file_3.name);
         expect(fake_file_1.lastModified).not.toEqual(fake_file_3.lastModified);
@@ -176,7 +178,8 @@ describe('File Upload tests', () => {
     test('Clicking the add file button allows you to upload one or more files', () => {
         let file_input_element = wrapper.find({ref: 'file_input'});
         let mock_add_files = jest.fn();
-        let mock_event = {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let mock_event = <HTMLInputEvent> <unknown> {
             target: {
                 files: new MockFileList([fake_file_1, fake_file_2])
             }
@@ -201,14 +204,10 @@ describe('File Upload tests', () => {
     });
 
     test('add_files_from_button throws error when event.target is null', () => {
-        let mock_event = {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let mock_event = <HTMLInputEvent> <unknown> {
             target: null
         };
-
-        // bubbles: true,
-        // cancelBubble: false,
-        // cancelable: true,
-        // composed: true
 
         expect(() => file_upload_component.add_files_from_button(mock_event)).toThrow(
             'Target is null'
@@ -216,7 +215,8 @@ describe('File Upload tests', () => {
     });
 
     test('add_files_from_button throws an error when event.target.files is null', () => {
-        let mock_event = {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let mock_event = <HTMLInputEvent> {
             target: {
                 files: null,
             }
@@ -228,7 +228,8 @@ describe('File Upload tests', () => {
     });
 
     test('add_dropped_files throws an error when event.target is null', () => {
-        let mock_event = {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let mock_event = <DragEvent> {
             target: null,
             preventDefault: () => {},
             stopPropagation: () => {}
