@@ -82,10 +82,13 @@
 
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import Modal from '@/components/modal.vue';
+
   interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
   }
+
   @Component({
     components: { Modal }
   })
@@ -171,8 +174,11 @@
       let index = 0;
       for (; index < this.d_files.length; ++index) {
         if (this.d_files[index].name === uploaded_file.name) {
-          this.remove_file_from_submission(uploaded_file.name, index);
-          break;
+          Vue.set(this.d_files, index, uploaded_file);
+          if (this.d_empty_filenames.has(uploaded_file.name)) {
+            this.d_empty_filenames.delete(uploaded_file.name);
+          }
+          return;
         }
       }
       this.d_files.push(uploaded_file);

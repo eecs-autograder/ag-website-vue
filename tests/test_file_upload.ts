@@ -68,8 +68,6 @@ describe('File Upload tests', () => {
     });
 
     test('empty files are identified on upload', () => {
-
-        console.log(fake_file_2.lastModified);
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
         file_upload_component.check_for_emptiness(fake_file_1);
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
@@ -98,7 +96,6 @@ describe('File Upload tests', () => {
     test('Dragging a file over the drag and drop area causes the area to become ' +
         'highlighted',
          () => {
-
         let drag_drop_zone = wrapper.find('#drag-and-drop');
 
         drag_drop_zone.trigger('dragenter');
@@ -113,13 +110,10 @@ describe('File Upload tests', () => {
     });
 
     test('Dragging and dropping file over drop area uploads the file', () => {
-
         let drag_drop_zone = wrapper.find('#drag-and-drop');
 
         let other: DataTransfer = <DataTransfer> {
-            files: new MockFileList([fake_file_1, fake_file_2]),
-            dropEffect: "copy",
-            effectAllowed: "all"
+            files: new MockFileList([fake_file_1, fake_file_2])
         };
 
         drag_drop_zone.trigger('dragover', {
@@ -138,33 +132,48 @@ describe('File Upload tests', () => {
          'submission, then the previously uploaded file of the same name is replaced by the ' +
          'new file',
          () => {
-
         let rows3 = ['toast', 'jam'];
         let fake_file_3 = new File([rows3.join('\n')], 'fake_file_1.cpp', {
             lastModified: 1408593600000
         });
+
+        let rows4 = ['witch', 'ghost'];
+        let fake_file_4 = new File([rows4.join('\n')], 'fake_file_2.cpp', {
+            lastModified: 336542400000
+        });
+
         let mock_event = {
             target: {
-                files: new MockFileList([fake_file_3])
+                files: new MockFileList([fake_file_3, fake_file_4])
             }
         };
 
-        expect(fake_file_3.name).toEqual(fake_file_1.name);
-        expect(fake_file_3.lastModified).not.toEqual(fake_file_1.lastModified);
+        console.log(fake_file_4.lastModified);
+
+        expect(fake_file_1.name).toEqual(fake_file_3.name);
+        expect(fake_file_1.lastModified).not.toEqual(fake_file_3.lastModified);
+        expect(fake_file_2.name).toEqual(fake_file_4.name);
+        expect(fake_file_2.lastModified).not.toEqual(fake_file_4.lastModified);
 
         file_upload_component.d_files.push(fake_file_1);
+        file_upload_component.d_files.push(fake_file_2);
+        file_upload_component.check_for_emptiness(fake_file_1);
+        file_upload_component.check_for_emptiness(fake_file_2);
 
-        expect(file_upload_component.d_files.length).toEqual(1);
+        expect(file_upload_component.d_files.length).toEqual(2);
+        expect(file_upload_component.d_empty_filenames.size).toEqual(1);
         expect(file_upload_component.d_files[0].lastModified).toEqual(fake_file_1.lastModified);
+        expect(file_upload_component.d_files[1].lastModified).toEqual(fake_file_2.lastModified);
 
         file_upload_component.add_files_from_button(mock_event);
 
-        expect(file_upload_component.d_files.length).toEqual(1);
+        expect(file_upload_component.d_files.length).toEqual(2);
+        expect(file_upload_component.d_empty_filenames.size).toEqual(0);
         expect(file_upload_component.d_files[0].lastModified).toEqual(fake_file_3.lastModified);
+        expect(file_upload_component.d_files[1].lastModified).toEqual(fake_file_4.lastModified);
     });
 
     test('Clicking the add file button allows you to upload one or more files', () => {
-
         let file_input_element = wrapper.find({ref: 'file_input'});
         let mock_add_files = jest.fn();
         let mock_event = {
@@ -193,9 +202,13 @@ describe('File Upload tests', () => {
 
     test('add_files_from_button throws error when event.target is null', () => {
         let mock_event = {
-            target: null,
-            bubbles: true
+            target: null
         };
+
+        // bubbles: true,
+        // cancelBubble: false,
+        // cancelable: true,
+        // composed: true
 
         expect(() => file_upload_component.add_files_from_button(mock_event)).toThrow(
             'Target is null'
@@ -227,7 +240,6 @@ describe('File Upload tests', () => {
     });
 
     test("Users can delete files after they've been updated", () => {
-
         file_upload_component.d_files.push(fake_file_1);
         file_upload_component.d_files.push(fake_file_2);
 
@@ -280,7 +292,6 @@ describe("Concerning the 'empty files present in submission' modal", () => {
     let fake_file_2: File;
 
     beforeEach(() => {
-
         wrapper = mount(FileUpload);
         file_upload_component = wrapper.vm;
         final_submit_button = wrapper.find('.submit-files-button');
