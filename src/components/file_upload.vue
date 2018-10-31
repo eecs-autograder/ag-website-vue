@@ -50,7 +50,7 @@
     </button>
 
     <modal ref="empty_file_found_in_submission_attempt"
-           :size="'large'"
+           size="large"
            :include_closing_x="false">
       <h2>Your submission contains empty files!!!</h2>
       <hr>
@@ -171,7 +171,6 @@
       let index = 0;
       for (; index < this.d_files.length; ++index) {
         if (this.d_files[index].name === uploaded_file.name) {
-          console.log("Already Had this file, replacing!");
           this.remove_file_from_submission(uploaded_file.name, index);
           break;
         }
