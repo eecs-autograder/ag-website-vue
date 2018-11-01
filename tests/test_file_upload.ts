@@ -35,7 +35,7 @@ class MockFileList implements FileList {
     [index: number]: File;
 }
 
-describe('File Upload tests', () => {
+describe('File Upload tests not involving nested modal component', () => {
     let wrapper: Wrapper<FileUpload>;
     let file_upload_component: FileUpload;
     let empty_files_present_modal: Modal;
@@ -280,7 +280,7 @@ describe('File Upload tests', () => {
     });
 });
 
-describe("Concerning the 'empty files present in submission' modal", () => {
+describe("File Upload tests concerning the nested modal", () => {
     let wrapper: Wrapper<FileUpload>;
     let file_upload_component: FileUpload;
     let final_submit_button: Wrapper<Vue>;
