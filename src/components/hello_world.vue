@@ -2,6 +2,7 @@
   <div>
     <ButtonDemo></ButtonDemo>
     <ColorPaletteDemo></ColorPaletteDemo>
+    <CourseListDemo></CourseListDemo>
     <ContextMenuDemo></ContextMenuDemo>
     <DiffDemo></DiffDemo>
     <DropdownDemo></DropdownDemo>
@@ -28,6 +29,7 @@ import ViewFile from '@/components/view_file.vue';
 import ButtonDemo from '@/demos/button_demo.vue';
 import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
 import ContextMenuDemo from '@/demos/context_menu_demo.vue';
+import CourseListDemo from '@/demos/course_list_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
 import DropdownTypeaheadDemo from '@/demos/dropdown_typeahead_demo.vue';
@@ -44,6 +46,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     ButtonDemo,
     ColorPaletteDemo,
     ContextMenuDemo,
+    CourseListDemo,
     DiffDemo,
     Dropdown,
     DropdownDemo,
