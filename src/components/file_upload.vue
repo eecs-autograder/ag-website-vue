@@ -1,7 +1,7 @@
 <template>
   <div id="file-upload-container">
     <input ref="file_input"
-           id="upload"
+           id="file-input"
            type="file"
            @change="add_files_from_button($event)"
            multiple>
@@ -56,10 +56,10 @@
       <hr>
       <div class="modal-body">
         <p class="empty-file-list-label">
-          The following files in your upload are empty:
+          The following files are empty:
         </p>
         <ul class="list-of-empty-file-names">
-          <li v-for="empty_file of Array.from(d_empty_filenames)">
+          <li v-for="empty_file of d_empty_filenames">
             <i class="fas fa-exclamation-triangle empty-warning-symbol"></i>
             {{empty_file}}
           </li>
@@ -81,9 +81,10 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Vue } from 'vue-property-decorator';
 
   import Modal from '@/components/modal.vue';
+  import { array_add_unique, array_remove_unique } from '@/utils';
 
   interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
@@ -94,10 +95,9 @@
   })
   export default class FileUpload extends Vue {
 
-    d_file_list_label = "";
     d_files: File[] = [];
     d_files_dragged_over = false;
-    d_empty_filenames = new Set();
+    d_empty_filenames: string[] = [];
 
     table_row_styling(file_in: File, row_index: number): string {
       if (file_in.size === 0) {
@@ -117,7 +117,7 @@
         throw new Error("Files property of event target is unexpectedly null");
       }
       for (let file of event.target.files) {
-        this.check_for_previous_existence_of_file(file);
+        this.add_or_update_file(file);
         this.check_for_emptiness(file);
       }
       event.target.value = '';
@@ -130,7 +130,7 @@
         throw new Error("Target is null");
       }
       for (let file of event.dataTransfer.files) {
-        this.check_for_previous_existence_of_file(file);
+        this.add_or_update_file(file);
         this.check_for_emptiness(file);
       }
       this.d_files_dragged_over = false;
@@ -138,35 +138,30 @@
 
     remove_file_from_upload(filename: string, file_index: number) {
       this.d_files.splice(file_index, 1);
-      if (this.d_empty_filenames.has(filename)) {
-        this.d_empty_filenames.delete(filename);
-      }
+      array_remove_unique(this.d_empty_filenames, filename);
     }
 
     attempt_to_upload() {
-      if (this.d_empty_filenames.size !== 0) {
+      if (this.d_empty_filenames.length !== 0) {
         let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
         empty_files_modal.open();
       }
       else {
-        this.$emit('upload_click', this.d_files);
+        this.$emit('upload_files', this.d_files);
       }
     }
 
     continue_with_upload_despite_empty_files() {
-      this.$emit('upload_click', this.d_files);
+      this.$emit('upload_files', this.d_files);
       let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
       empty_files_modal.close();
     }
 
-    check_for_previous_existence_of_file(uploaded_file: File) {
-      let index = 0;
-      for (; index < this.d_files.length; ++index) {
+    add_or_update_file(uploaded_file: File) {
+      for (let index = 0; index < this.d_files.length; ++index) {
         if (this.d_files[index].name === uploaded_file.name) {
           Vue.set(this.d_files, index, uploaded_file);
-          if (this.d_empty_filenames.has(uploaded_file.name)) {
-            this.d_empty_filenames.delete(uploaded_file.name);
-          }
+          array_remove_unique(this.d_empty_filenames, uploaded_file.name);
           return;
         }
       }
@@ -174,8 +169,8 @@
     }
 
     check_for_emptiness(file: File) {
-      if (file.size === 0 && !this.d_empty_filenames.has(file.name)) {
-        this.d_empty_filenames.add(file.name);
+      if (file.size === 0) {
+        array_add_unique(this.d_empty_filenames, file.name);
       }
     }
 
@@ -187,7 +182,7 @@
 
     clear_files() {
       this.d_files = [];
-      this.d_empty_filenames.clear();
+      this.d_empty_filenames = [];
     }
   }
 </script>
@@ -200,7 +195,7 @@
   font-family: Helvetica;
 }
 
-#upload {
+#file-input {
   display: none;
 }
 
@@ -209,7 +204,7 @@
   border-radius: 5px;
   border: 2px solid $ocean-blue;
   display: flex;
-  height: 200px;
+  height: 250px;
   justify-content: center;
   position: relative;
   text-align: center;

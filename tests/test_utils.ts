@@ -1,4 +1,5 @@
-import { safe_assign, zip } from '@/utils';
+import { array_add_unique, array_has_unique, array_remove_unique,
+         safe_assign, zip } from '@/utils';
 
 
 test('Safe assign', () => {
@@ -9,49 +10,117 @@ test('Safe assign', () => {
     expect(assign_to.egg).toBe(43);
 });
 
+describe('zip function tests', () => {
+    test('Zip iterables of equal length', () => {
+        let zipped = zip([1, 2, 3], [4, 5, 6]);
 
-test('Zip iterables of equal length', () => {
-    let zipped = zip([1, 2, 3], [4, 5, 6]);
+        expect(zipped.next().value).toEqual([1, 4]);
+        expect(zipped.next().value).toEqual([2, 5]);
+        expect(zipped.next().value).toEqual([3, 6]);
 
-    expect(zipped.next().value).toEqual([1, 4]);
-    expect(zipped.next().value).toEqual([2, 5]);
-    expect(zipped.next().value).toEqual([3, 6]);
+        expect(zipped.next().done).toBe(true);
+    });
 
-    expect(zipped.next().done).toBe(true);
+    test('Zip first iterable shorter', () => {
+        let zipped = zip([1, 2], [3, 4, 5]);
+
+        expect(zipped.next().value).toEqual([1, 3]);
+        expect(zipped.next().value).toEqual([2, 4]);
+
+        expect(zipped.next().done).toBe(true);
+    });
+
+    test('Zip second iterable shorter', () => {
+        let zipped = zip([1, 2, 3], [4, 5]);
+
+        expect(zipped.next().value).toEqual([1, 4]);
+        expect(zipped.next().value).toEqual([2, 5]);
+
+        expect(zipped.next().done).toBe(true);
+    });
+
+    test('Zip iterables that are themselves iterators', () => {
+        let zipped = zip([1, 2][Symbol.iterator](), [3, 4][Symbol.iterator]());
+
+        expect(zipped.next().value).toEqual([1, 3]);
+        expect(zipped.next().value).toEqual([2, 4]);
+
+        expect(zipped.next().done).toBe(true);
+    });
+
+    test('Zip preserves type info', () => {
+        let zipped = zip([{spam: 42}, {spam: 42}], [{egg: 43}, {egg: 43}]);
+
+        for (let [spam, egg] of zipped) {
+            expect(spam.spam).toEqual(42);
+            expect(egg.egg).toEqual(43);
+        }
+    });
 });
 
-test('Zip first iterable shorter', () => {
-    let zipped = zip([1, 2], [3, 4, 5]);
+describe('array_XXX_unique function tests', () => {
+    type CustomType = {id: number};
+    let custom_type_eq_func = (first: CustomType, second: CustomType) => {
+        return first.id === second.id;
+    };
 
-    expect(zipped.next().value).toEqual([1, 3]);
-    expect(zipped.next().value).toEqual([2, 4]);
+    test('array_add_unique default equality func', () => {
+        let array: string[] = [];
 
-    expect(zipped.next().done).toBe(true);
-});
+        array_add_unique(array, "spam");
+        expect(array).toEqual(["spam"]);
 
-test('Zip second iterable shorter', () => {
-    let zipped = zip([1, 2, 3], [4, 5]);
+        array_add_unique(array, "egg");
+        expect(array).toEqual(["spam", "egg"]);
 
-    expect(zipped.next().value).toEqual([1, 4]);
-    expect(zipped.next().value).toEqual([2, 5]);
+        array_add_unique(array, "egg");
+        expect(array).toEqual(["spam", "egg"]);
+    });
 
-    expect(zipped.next().done).toBe(true);
-});
+    test('array_add_unique custom equality func', () => {
+        let array: CustomType[] = [];
+        array_add_unique(array, {id: 1}, custom_type_eq_func);
+        expect(array).toEqual([{id: 1}]);
 
-test('Zip iterables that are themselves iterators', () => {
-    let zipped = zip([1, 2][Symbol.iterator](), [3, 4][Symbol.iterator]());
+        array_add_unique(array, {id: 2}, custom_type_eq_func);
+        expect(array).toEqual([{id: 1}, {id: 2}]);
 
-    expect(zipped.next().value).toEqual([1, 3]);
-    expect(zipped.next().value).toEqual([2, 4]);
+        array_add_unique(array, {id: 1}, custom_type_eq_func);
+        expect(array).toEqual([{id: 1}, {id: 2}]);
+    });
 
-    expect(zipped.next().done).toBe(true);
-});
+    test('array_has_unique default equality func', () => {
+        let array: number[] = [1, 2, 3, 4, 5];
+        expect(array_has_unique(array, 3)).toBe(true);
+        expect(array_has_unique(array, 10)).toBe(false);
+    });
 
-test('Zip preserves type info', () => {
-    let zipped = zip([{spam: 42}, {spam: 42}], [{egg: 43}, {egg: 43}]);
+    test('array_has_unique custom equality func', () => {
+        let array: CustomType[] = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
+        expect(array_has_unique(array, {id: 2}, custom_type_eq_func)).toBe(true);
+        expect(array_has_unique(array, {id: 5}, custom_type_eq_func)).toBe(false);
+    });
 
-    for (let [spam, egg] of zipped) {
-        expect(spam.spam).toEqual(42);
-        expect(egg.egg).toEqual(43);
-    }
+    test('array_remove_unique custom default func', () => {
+        let array: number[] = [1, 2, 3, 4, 5];
+        let removed = array_remove_unique(array, 3);
+        expect(removed).toBe(true);
+        expect(array).toEqual([1, 2, 4, 5]);
+
+        removed = array_remove_unique(array, 10);
+        expect(removed).toBe(false);
+        expect(array).toEqual([1, 2, 4, 5]);
+    });
+
+
+    test('array_remove_unique custom equality func', () => {
+        let array: CustomType[] = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
+        let removed = array_remove_unique(array, {id: 1}, custom_type_eq_func);
+        expect(removed).toBe(true);
+        expect(array).toEqual([{id: 2}, {id: 3}, {id: 4}]);
+
+        removed = array_remove_unique(array, {id: 1}, custom_type_eq_func);
+        expect(removed).toBe(false);
+        expect(array).toEqual([{id: 2}, {id: 3}, {id: 4}]);
+    });
 });
