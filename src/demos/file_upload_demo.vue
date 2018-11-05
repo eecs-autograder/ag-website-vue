@@ -2,14 +2,14 @@
   <div id="file-upload-demo">
     <p> This File Upload Instance uses default values for its slots. </p>
     <FileUpload ref="file_upload_1"
-                @upload_click="print_upload_files($event)">
+                @upload_files="print_upload_files($event)">
     </FileUpload>
 
     <div class="spacer"> </div>
 
     <p> This File Upload Instance uses custom values for its slots. </p>
     <FileUpload ref="file_upload_2"
-                @upload_click="print_upload_files($event)">
+                @upload_files="print_upload_files($event)">
     <template slot="file_list_label"> Files You've Uploaded </template>
     <template slot="upload_button_text"> Submit your files </template>
     </FileUpload>
