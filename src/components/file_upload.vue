@@ -1,7 +1,7 @@
 <template>
   <div id="file-upload-container">
     <input ref="file_input"
-           id="submit"
+           id="upload"
            type="file"
            @change="add_files_from_button($event)"
            multiple>
@@ -27,7 +27,7 @@
     <table class="student-files-uploaded-table">
       <thead>
         <tr>
-          <th class="name-of-file-label">{{d_file_list_label}}</th>
+          <th class="name-of-file-label"><slot name="file_list_label">Files to Upload</slot></th>
           <th class="size-of-file-label">Size</th>
         </tr>
       </thead>
@@ -37,7 +37,7 @@
           <td class="size-of-file">{{file.size}} Bytes</td>
           <td>
             <i class="fas fa-times remove-file-button"
-               @click="remove_file_from_submission(file.name, index)"
+               @click="remove_file_from_upload(file.name, index)"
                :class="file.size === 0 ? 'remove-button-icon-empty-file' :
                                          'remove-button-icon-non-empty-file'">
             </i>
@@ -45,18 +45,18 @@
         </tr>
       </tbody>
     </table>
-    <button class="submit-files-button green-button" @click="attempt_to_submit()">
-      {{d_submit_button_text}}
+    <button class="upload-files-button green-button" @click="attempt_to_upload()">
+      <slot name="upload_button_text">Upload</slot>
     </button>
 
-    <modal ref="empty_file_found_in_submission_attempt"
+    <modal ref="empty_file_found_in_upload_attempt"
            size="large"
            :include_closing_x="false">
-      <h2>Your submission contains empty files!!!</h2>
+      <h2>Empty Files detected</h2>
       <hr>
       <div class="modal-body">
         <p class="empty-file-list-label">
-          The following files in your submission are empty:
+          The following files in your upload are empty:
         </p>
         <ul class="list-of-empty-file-names">
           <li v-for="empty_file of Array.from(d_empty_filenames)">
@@ -66,12 +66,12 @@
         </ul>
       </div>
       <div class="modal-footer">
-        <button class="submit-despite-empty-files-button gray-button"
-                @click="continue_with_submission_despite_empty_files()">
-          Submit Anyway
+        <button class="upload-despite-empty-files-button gray-button"
+                @click="continue_with_upload_despite_empty_files()">
+          Upload Anyway
         </button>
-        <button class="cancel-submission-process-button red-button"
-                @click="$refs.empty_file_found_in_submission_attempt.close()">
+        <button class="cancel-upload-process-button red-button"
+                @click="$refs.empty_file_found_in_upload_attempt.close()">
           Cancel
         </button>
       </div>
@@ -93,22 +93,11 @@
     components: { Modal }
   })
   export default class FileUpload extends Vue {
-    @Prop({default: "Submit", type: String})
-    submit_button_text!: string;
 
-    @Prop({default: "Files to Submit", type: String})
-    file_list_label!: string;
-
-    d_submit_button_text = "";
     d_file_list_label = "";
     d_files: File[] = [];
     d_files_dragged_over = false;
     d_empty_filenames = new Set();
-
-    created() {
-      this.d_submit_button_text = this.submit_button_text;
-      this.d_file_list_label = this.file_list_label;
-    }
 
     table_row_styling(file_in: File, row_index: number): string {
       if (file_in.size === 0) {
@@ -147,26 +136,26 @@
       this.d_files_dragged_over = false;
     }
 
-    remove_file_from_submission(filename: string, file_index: number) {
+    remove_file_from_upload(filename: string, file_index: number) {
       this.d_files.splice(file_index, 1);
       if (this.d_empty_filenames.has(filename)) {
         this.d_empty_filenames.delete(filename);
       }
     }
 
-    attempt_to_submit() {
+    attempt_to_upload() {
       if (this.d_empty_filenames.size !== 0) {
-        let empty_files_modal = <Modal> this.$refs.empty_file_found_in_submission_attempt;
+        let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
         empty_files_modal.open();
       }
       else {
-        this.$emit('submit_click', this.d_files);
+        this.$emit('upload_click', this.d_files);
       }
     }
 
-    continue_with_submission_despite_empty_files() {
-      this.$emit('submit_click', this.d_files);
-      let empty_files_modal = <Modal> this.$refs.empty_file_found_in_submission_attempt;
+    continue_with_upload_despite_empty_files() {
+      this.$emit('upload_click', this.d_files);
+      let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
       empty_files_modal.close();
     }
 
@@ -211,7 +200,7 @@
   font-family: Helvetica;
 }
 
-#submit {
+#upload {
   display: none;
 }
 
@@ -310,11 +299,11 @@ table tbody tr td {
   text-align: left;
 }
 
-.submit-despite-empty-files-button {
+.upload-despite-empty-files-button {
   margin-right: 15px;
 }
 
-.submit-despite-empty-files-button, .cancel-submission-process-button, .submit-files-button {
+.upload-despite-empty-files-button, .cancel-upload-process-button, .upload-files-button {
   padding: 10px 15px;
   border: 0;
 }

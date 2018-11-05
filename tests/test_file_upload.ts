@@ -39,64 +39,43 @@ describe('File Upload tests not involving nested modal component', () => {
     let wrapper: Wrapper<FileUpload>;
     let file_upload_component: FileUpload;
     let empty_files_present_modal: Modal;
-    let rows1: string[];
-    let rows2: string[];
-    let rows3: string[];
-    let rows4: string[];
-    let fake_file_1: File;
-    let fake_file_2: File;
-    let fake_file_3: File;
-    let fake_file_4: File;
+    let file_1: File;
+    let file_2: File;
+    let file_3: File;
+    let file_4: File;
 
     beforeEach(() => {
-        wrapper = mount(FileUpload, {
-            propsData: {
-                submit_button_text: "Submit Your Files!",
-                file_list_label: "Your Files:"
-            }
-        });
+        wrapper = mount(FileUpload);
 
         file_upload_component = wrapper.vm;
-        empty_files_present_modal = <Modal> wrapper.find(
-            {ref: 'empty_file_found_in_submission_attempt'}
-        ).vm;
-        rows1 = ['ham', 'hashbrowns', 'eggs'];
-        fake_file_1 = new File([rows1.join('\n')], 'fake_file_1.cpp',  {
+        file_1 = new File([['ham', 'hashbrowns', 'eggs'].join('\n')], 'fake_file_1.cpp',  {
             lastModified: 1426305600000
         });
-        rows2 = [''];
-        fake_file_2 = new File([rows2.join('\n')], 'fake_file_2.cpp', {
+        file_2 = new File([[''].join('\n')], 'fake_file_2.cpp', {
             lastModified: 1346904000000
         });
-        rows3 = ['oatmeal', 'toast', 'jam'];
-        fake_file_3 = new File([rows3.join('\n')], 'fake_file_1.cpp');
-        rows4 = ['witch', 'ghost'];
-        fake_file_4 = new File([rows4.join('\n')], 'fake_file_2.cpp', {
+        file_3 = new File([['oatmeal', 'toast', 'jam'].join('\n')], 'fake_file_1.cpp');
+        file_4 = new File([['witch', 'ghost'].join('\n')], 'fake_file_2.cpp', {
             lastModified: 336542400000
         });
     });
 
-    test('File Upload props are set to values passed in', () => {
-        expect(file_upload_component.d_submit_button_text).toEqual("Submit Your Files!");
-        expect(file_upload_component.d_file_list_label).toEqual("Your Files:");
-    });
-
     test('empty files are identified on upload', () => {
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
-        file_upload_component.check_for_emptiness(fake_file_1);
+        file_upload_component.check_for_emptiness(file_1);
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
-        file_upload_component.check_for_emptiness(fake_file_2);
+        file_upload_component.check_for_emptiness(file_2);
         expect(file_upload_component.d_empty_filenames.size).toEqual(1);
     });
 
     test('Calling clear_files() on the file upload component erases all files (empty ' +
         'and non-empty)',
          () => {
-        file_upload_component.d_files.push(fake_file_1);
-        file_upload_component.d_files.push(fake_file_2);
+        file_upload_component.d_files.push(file_1);
+        file_upload_component.d_files.push(file_2);
 
-        file_upload_component.check_for_emptiness(fake_file_1);
-        file_upload_component.check_for_emptiness(fake_file_2);
+        file_upload_component.check_for_emptiness(file_1);
+        file_upload_component.check_for_emptiness(file_2);
 
         expect(file_upload_component.d_files.length).toEqual(2);
         expect(file_upload_component.d_empty_filenames.size).toEqual(1);
@@ -127,7 +106,7 @@ describe('File Upload tests not involving nested modal component', () => {
         let drag_drop_zone = wrapper.find('#drag-and-drop');
         // tslint:disable-next-line:no-object-literal-type-assertion
         let other: DataTransfer = <DataTransfer> <unknown> {
-            files: new MockFileList([fake_file_1, fake_file_2])
+            files: new MockFileList([file_1, file_2])
         };
 
         drag_drop_zone.trigger('dragover', {
@@ -143,37 +122,37 @@ describe('File Upload tests not involving nested modal component', () => {
     });
 
     test('If a user uploads a file that has the same name of a file already in the ' +
-         'submission, then the previously uploaded file of the same name is replaced by the ' +
+         'upload, then the previously uploaded file of the same name is replaced by the ' +
          'new file',
          () => {
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_event = <HTMLInputEvent> <unknown> {
             target: {
-                files: new MockFileList([fake_file_3, fake_file_4])
+                files: new MockFileList([file_3, file_4])
             }
         };
 
-        expect(fake_file_1.name).toEqual(fake_file_3.name);
-        expect(fake_file_1.lastModified).not.toEqual(fake_file_3.lastModified);
-        expect(fake_file_2.name).toEqual(fake_file_4.name);
-        expect(fake_file_2.lastModified).not.toEqual(fake_file_4.lastModified);
+        expect(file_1.name).toEqual(file_3.name);
+        expect(file_1.lastModified).not.toEqual(file_3.lastModified);
+        expect(file_2.name).toEqual(file_4.name);
+        expect(file_2.lastModified).not.toEqual(file_4.lastModified);
 
-        file_upload_component.d_files.push(fake_file_1);
-        file_upload_component.d_files.push(fake_file_2);
-        file_upload_component.check_for_emptiness(fake_file_1);
-        file_upload_component.check_for_emptiness(fake_file_2);
+        file_upload_component.d_files.push(file_1);
+        file_upload_component.d_files.push(file_2);
+        file_upload_component.check_for_emptiness(file_1);
+        file_upload_component.check_for_emptiness(file_2);
 
         expect(file_upload_component.d_files.length).toEqual(2);
         expect(file_upload_component.d_empty_filenames.size).toEqual(1);
-        expect(file_upload_component.d_files[0].lastModified).toEqual(fake_file_1.lastModified);
-        expect(file_upload_component.d_files[1].lastModified).toEqual(fake_file_2.lastModified);
+        expect(file_upload_component.d_files[0].lastModified).toEqual(file_1.lastModified);
+        expect(file_upload_component.d_files[1].lastModified).toEqual(file_2.lastModified);
 
         file_upload_component.add_files_from_button(mock_event);
 
         expect(file_upload_component.d_files.length).toEqual(2);
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
-        expect(file_upload_component.d_files[0].lastModified).toEqual(fake_file_3.lastModified);
-        expect(file_upload_component.d_files[1].lastModified).toEqual(fake_file_4.lastModified);
+        expect(file_upload_component.d_files[0].lastModified).toEqual(file_3.lastModified);
+        expect(file_upload_component.d_files[1].lastModified).toEqual(file_4.lastModified);
     });
 
     test('Clicking the add file button allows you to upload one or more files', () => {
@@ -182,7 +161,7 @@ describe('File Upload tests not involving nested modal component', () => {
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_event = <HTMLInputEvent> <unknown> {
             target: {
-                files: new MockFileList([fake_file_1, fake_file_2])
+                files: new MockFileList([file_1, file_2])
             }
         };
 
@@ -198,10 +177,10 @@ describe('File Upload tests not involving nested modal component', () => {
         file_upload_component.add_files_from_button(mock_event);
 
         expect(file_upload_component.d_files.length).toEqual(2);
-        expect(file_upload_component.d_files[0].name).toEqual(fake_file_1.name);
-        expect(file_upload_component.d_files[0].lastModified).toEqual(fake_file_1.lastModified);
-        expect(file_upload_component.d_files[1].name).toEqual(fake_file_2.name);
-        expect(file_upload_component.d_files[1].lastModified).toEqual(fake_file_2.lastModified);
+        expect(file_upload_component.d_files[0].name).toEqual(file_1.name);
+        expect(file_upload_component.d_files[0].lastModified).toEqual(file_1.lastModified);
+        expect(file_upload_component.d_files[1].name).toEqual(file_2.name);
+        expect(file_upload_component.d_files[1].lastModified).toEqual(file_2.lastModified);
     });
 
     test('add_files_from_button throws error when event.target is null', () => {
@@ -242,11 +221,11 @@ describe('File Upload tests not involving nested modal component', () => {
     });
 
     test("Users can delete files after they've been updated", () => {
-        file_upload_component.d_files.push(fake_file_1);
-        file_upload_component.d_files.push(fake_file_2);
+        file_upload_component.d_files.push(file_1);
+        file_upload_component.d_files.push(file_2);
 
-        file_upload_component.check_for_emptiness(fake_file_1);
-        file_upload_component.check_for_emptiness(fake_file_2);
+        file_upload_component.check_for_emptiness(file_1);
+        file_upload_component.check_for_emptiness(file_2);
 
         expect(file_upload_component.d_files.length).toEqual(2);
         expect(file_upload_component.d_empty_filenames.size).toEqual(1);
@@ -255,7 +234,7 @@ describe('File Upload tests not involving nested modal component', () => {
         file_delete_buttons.at(0).trigger('click');
 
         expect(file_upload_component.d_files.length).toEqual(1);
-        expect(file_upload_component.d_empty_filenames.has(fake_file_2.name)).toBe(true);
+        expect(file_upload_component.d_empty_filenames.has(file_2.name)).toBe(true);
 
         file_delete_buttons = wrapper.findAll('.remove-file-button');
         file_delete_buttons.at(0).trigger('click');
@@ -264,18 +243,21 @@ describe('File Upload tests not involving nested modal component', () => {
         expect(file_upload_component.d_empty_filenames.size).toEqual(0);
     });
 
-    test('Users can successfully submit files when all files are non-empty', () => {
-        let final_submit_button = wrapper.find('.submit-files-button');
+    test('Users can successfully upload files when all files are non-empty', () => {
+        let final_upload_button = wrapper.find('.upload-files-button');
+        empty_files_present_modal = <Modal> wrapper.find(
+            {ref: 'empty_file_found_in_upload_attempt'}
+        ).vm;
 
-        file_upload_component.d_files.push(fake_file_1);
-        file_upload_component.d_files.push(fake_file_3);
+        file_upload_component.d_files.push(file_1);
+        file_upload_component.d_files.push(file_3);
 
-        file_upload_component.check_for_emptiness(fake_file_1);
-        file_upload_component.check_for_emptiness(fake_file_3);
+        file_upload_component.check_for_emptiness(file_1);
+        file_upload_component.check_for_emptiness(file_3);
 
-        final_submit_button.trigger('click');
+        final_upload_button.trigger('click');
 
-        expect(wrapper.emitted().submit_click.length).toBe(1);
+        expect(wrapper.emitted().upload_click.length).toBe(1);
         expect(empty_files_present_modal.is_open).toBe(false);
     });
 });
@@ -283,64 +265,60 @@ describe('File Upload tests not involving nested modal component', () => {
 describe("File Upload tests concerning the nested modal", () => {
     let wrapper: Wrapper<FileUpload>;
     let file_upload_component: FileUpload;
-    let final_submit_button: Wrapper<Vue>;
+    let final_upload_button: Wrapper<Vue>;
     let empty_files_present_modal: Modal;
-    let rows1: string[];
-    let rows2: string[];
-    let fake_file_1: File;
-    let fake_file_2: File;
+    let file_1: File;
+    let file_2: File;
 
     beforeEach(() => {
         wrapper = mount(FileUpload);
         file_upload_component = wrapper.vm;
-        final_submit_button = wrapper.find('.submit-files-button');
+        final_upload_button = wrapper.find('.upload-files-button');
 
-        rows1 = ['ham', 'hashbrowns', 'eggs'];
-        fake_file_1 = new File([rows1.join('\n')], 'fake_file_1.cpp');
+        file_1 = new File([['ham', 'hashbrowns', 'eggs'].join('\n')], 'fake_file_1.cpp');
 
-        rows2 = [];
-        fake_file_2 = new File([rows2.join('\n')], 'fake_file_2.cpp');
+        file_2 = new File([[''].join('\n')], 'fake_file_2.cpp');
 
-        file_upload_component.d_files.push(fake_file_1);
-        file_upload_component.d_files.push(fake_file_2);
+        file_upload_component.d_files.push(file_1);
+        file_upload_component.d_files.push(file_2);
 
-        file_upload_component.check_for_emptiness(fake_file_1);
-        file_upload_component.check_for_emptiness(fake_file_2);
+        file_upload_component.check_for_emptiness(file_1);
+        file_upload_component.check_for_emptiness(file_2);
 
         expect(file_upload_component.d_empty_filenames.size).toBeGreaterThan(0);
 
         empty_files_present_modal = <Modal> wrapper.find(
-            {ref: 'empty_file_found_in_submission_attempt'}
+            {ref: 'empty_file_found_in_upload_attempt'}
         ).vm;
 
         expect(empty_files_present_modal.is_open).toBe(false);
 
-        final_submit_button.trigger('click');
+        final_upload_button.trigger('click');
 
         expect(empty_files_present_modal.is_open).toBe(true);
     });
 
-    test('You can choose to submit despite having one or more empty files', () => {
-        let submit_despite_empty_files_button = wrapper.find(
-            '.submit-despite-empty-files-button'
+    test('You can choose to upload despite having one or more empty files', () => {
+        let upload_despite_empty_files_button = wrapper.find(
+            '.upload-despite-empty-files-button'
         );
 
-        submit_despite_empty_files_button.trigger('click');
+        upload_despite_empty_files_button.trigger('click');
 
-        expect(wrapper.emitted().submit_click.length).toBe(1);
+        expect(wrapper.emitted().upload_click.length).toBe(1);
         expect(empty_files_present_modal.is_open).toBe(false);
     });
 
-    test('You can choose not to submit after receiving the warning modal concerning ' +
-         'empty files in your submission',
+    test('You can choose not to upload after receiving the warning modal concerning ' +
+         'empty files in your upload',
          () => {
-        let cancel_submission_button = wrapper.find(
-              '.cancel-submission-process-button'
+        let cancel_upload_button = wrapper.find(
+              '.cancel-upload-process-button'
         );
 
-        cancel_submission_button.trigger('click');
+        cancel_upload_button.trigger('click');
 
-        expect(wrapper.emitted('submit_click')).not.toBeTruthy();
+        expect(wrapper.emitted('upload_click')).not.toBeTruthy();
         expect(empty_files_present_modal.is_open).toBe(false);
     });
 });

@@ -1,25 +1,23 @@
 <template>
   <div id="file-upload-demo">
-    <p> This File Upload Instance uses default values for its props. </p>
-    <FileUpload
-      ref="file_upload_1"
-      @submit_click="print_message($event)">
+    <p> This File Upload Instance uses default values for its slots. </p>
+    <FileUpload ref="file_upload_1"
+                @upload_click="print_upload_files($event)">
     </FileUpload>
 
     <div class="spacer"> </div>
 
-    <p> This File Upload Instance uses custom values for its props. </p>
-    <FileUpload
-      ref="file_upload_2"
-      file_list_label="Files you've uploaded:"
-      submit_button_text="Submit your files!"
-      @submit_click="print_message($event)">
+    <p> This File Upload Instance uses custom values for its slots. </p>
+    <FileUpload ref="file_upload_2"
+                @upload_click="print_upload_files($event)">
+    <template slot="file_list_label"> Files You've Uploaded </template>
+    <template slot="upload_button_text"> Submit your files </template>
     </FileUpload>
   </div>
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Vue } from 'vue-property-decorator';
 
   import FileUpload from '@/components/file_upload.vue';
 
@@ -27,8 +25,8 @@
     components: {FileUpload}
   })
   export default class FileUploadDemo extends Vue {
-    print_message(word: string) {
-      console.log("Something was emitted");
+    print_upload_files(files: File[]) {
+      console.log(files);
     }
   }
 
