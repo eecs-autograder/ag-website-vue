@@ -1,40 +1,24 @@
-import { Course, Semester } from 'ag-client-typescript';
-
+import {Semester} from "ag-client-typescript";
+import {Semester} from "ag-client-typescript";
 <template>
   <div ref="course_list" id="course-list">
-    <p id="login-info"> Hi, Ashley! (ashberg@umich.edu) </p>
-    <p id="log-button"> Sign Out </p>
     <p id="course-announcement"> Courses </p>
-    <div v-if="any_courses" class="role-container">
-      <div v-if="is_admin"
-           class="role-panel">
-        <p class="course-role"> Admin </p>
-        <div v-for="(course, index) of admin_courses">
-          <p :class="course.year === 2018 && course.semester === 'Fall'
-                ? 'active-course' : 'inactive-course'">{{course.name}}
-          </p>
-          <p :class="course.year === 2018 && course.semester === 'Fall'
-                ? 'active-edit-cog' : 'inactive-edit-cog'"><i class="fas fa-cog"></i></p>
-        </div>
-      </div>
 
-      <div v-if="is_staff"
-           class="role-panel">
-        <p class="course-role"> Staff </p>
-        <div v-for="(course, index) of staff_courses">
-          <p :class="course.year === 2018 && course.semester === 'Fall'
-                ? 'active-course' : 'inactive-course'">{{course.name}}
-          </p>
-        </div>
-      </div>
-
-      <div v-if="is_student"
-           class="role-panel student">
-        <p class="course-role"> Student </p>
-        <div v-for="(course, index) of student_courses">
-          <p :class="course.year === 2018 && course.semester === 'Fall'
-                ? 'active-course' : 'inactive-course'">{{course.name}}
-          </p>
+    <div id="all-semesters">
+      <div class="single-semester-container">
+        <p class="semester-name"> Fall 2018 </p>
+        <div class="courses-in-semester">
+          <div v-for="course of courses">
+            <div class="course">
+              <p class="course-name"> {{course.name}} </p>
+              <p class="semester-year"> {{course.semester}} {{course.year}} </p>
+              <div class="edit-admin-settings">
+                <p class="edit-settings-label"> Edit Settings
+                  <i class="fas fa-cog cog"></i>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -48,35 +32,129 @@ import { Course, Semester } from 'ag-client-typescript';
 
 <script lang="ts">
 
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Course, Semester } from 'ag-client-typescript';
+  import { Component, Vue } from 'vue-property-decorator';
+
+  interface Term {
+    semester: Semester | null;
+    year: number | null;
+  }
+
+  interface TermCourses {
+    term: Term;
+    course_list: Course[];
+
+  }
 
   @Component
   export default class CourseList extends Vue {
-    is_admin = true;
-    is_staff = true;
-    is_student = true;
-    no_files = false;
-    any_courses = true;
 
-    admin_courses = [{name: "EECS 484 Fall 2018", semester: "Fall", year: 2018},
-      {name: "EECS 280 Fall 2018", semester: "Fall", year: 2018},
-      {name: "EECS 183 Winter 2018", semester: "Winter", year: 2018}];
+    courses_by_term: TermCourses[];
 
-    staff_courses = [{name: "EECS 281 Fall 2018", semester: "Fall", year: 2018},
-      {name: "EECS 370 Fall 2017", semester: "Fall", year: 2017},
-      {name: "EECS 370 Winter 2017", semester: "Winter", year: 2017},
-      {name: "EECS 281 Fall 2016", semester: "Fall", year: 2016},
-      {name: "EECS 183 Spring 2016", semester: "Spring", year: 2016}];
-    student_courses = [
-      {name: "EECS 493 Fall 2018", semester: "Fall", year: 2018},
-      {name: "EECS 484 Fall 2017", semester: "Fall", year: 2017},
-      {name: "EECS 280 Winter 2017", semester: "Winter", year: 2017},
-      {name: "EECS 370 Fall 2016", semester: "Fall", year: 2016},
-      {name: "EECS 485 Fall 2016", semester: "Fall", year: 2016},
-      {name: "EECS 281 Spring 2016", semester: "Spring", year: 2016},
-      {name: "EECS 280 Winter 2016", semester: "Winter", year: 2016},
-      {name: "EECS 183 Fall 2015", semester: "Fall", year: 2015},
-      {name: "EECS 183 Winter 2014", semester: "Winter", year: 2014}];
+    first_course = new Course(
+      {pk: 42, name: 'EECS 183', semester: Semester.winter, year: 2014, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    second_course = new Course(
+      {pk: 42, name: 'EECS 183', semester: Semester.fall, year: 2015, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    third_course = new Course(
+      {pk: 42, name: 'EECS 280', semester: Semester.winter, year: 2016, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    fourth_course = new Course(
+      {pk: 42, name: 'EECS 281', semester: Semester.spring, year: 2016, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    fifth_course = new Course(
+      {pk: 42, name: 'EECS 485', semester: Semester.fall, year: 2016, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    sixth_course = new Course(
+      {pk: 42, name: 'EECS 370', semester: Semester.fall, year: 2016, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    seventh_course = new Course(
+      {pk: 42, name: 'EECS 280', semester: Semester.winter, year: 2017, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    eighth_course = new Course(
+      {pk: 42, name: 'EECS 484', semester: Semester.fall, year: 2017, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    ninth_course = new Course(
+      {pk: 42, name: 'EECS 388', semester: Semester.fall, year: 2017, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    tenth_course = new Course(
+      {pk: 42, name: 'EECS 280', semester: Semester.fall, year: 2017, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    eleventh_course = new Course(
+      {pk: 42, name: 'EECS 280', semester: Semester.fall, year: 2017, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    twelfth_course = new Course(
+      {pk: 42, name: 'EECS 280', semester: Semester.winter, year: 2018, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    thirteenth_course = new Course(
+      {pk: 42, name: 'EECS 280', semester: Semester.spring, year: 2018, subtitle: '',
+        num_late_days: 0, last_modified: ''});
+
+    courses: Course[] = [this.first_course, this.second_course, this.third_course,
+      this.fourth_course, this.fifth_course, this.sixth_course, this.seventh_course,
+      this.eighth_course, this.ninth_course, this.tenth_course, this.eleventh_course,
+      this.twelfth_course, this.thirteenth_course];
+
+    compareTerms(term_a: TermCourses, term_b: TermCourses) {
+      if (term_a.term.year > term_b.term.year) {
+        return  -1;
+      }
+      else if (term_a.term.year === term_b.term.year) {
+        // everything is less than fall
+        if (term_a.term.semester === Semester.fall) {
+          return -1;
+        }
+        else if (term_a.term.semester === Semester.spring) {
+          if (term_b.term.semester === Semester.fall) {
+            return 1;
+          }
+          // b must be winter
+          return -1;
+        }
+        // a = winter, everything is greater than winter
+        return 1;
+      }
+      return 1;
+    }
+
+    compareCourseNames(course_a: Course, course_b: Course) {
+      return course_a.name < course_b.name;
+    }
+
+    sort_into_terms() {
+      for (let i = 0; i < this.courses.length; ++i) {
+        let current_course: Course = this.courses[i];
+        let temp_term: Term = { semester: current_course.semester, year: current_course.year };
+          // if the term wasn't already in the courses by term array
+          let courses_in_term: TermCourses = { term: temp_term, course_list: [current_course] };
+          this.courses_by_term.push(courses_in_term);
+
+          // if the term was already in the courses array, add the course to the assoc. course_list
+
+      }
+      // sort by year desc
+      // sort terms by Fall spring winter desc
+      this.courses_by_term.sort(this.compareTerms);
+    }
+
+    sort_the_courses_in_each_term() {
+      for (let i = 0; i < this.courses_by_term.length; ++i) {
+        this.courses_by_term[i].course_list.sort(this.compareCourseNames);
+      }
+    }
 
     created() {
       document.body.style.margin = "0";
@@ -86,124 +164,173 @@ import { Course, Semester } from 'ag-client-typescript';
 </script>
 
 <style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 
+.cog {
+  margin-left: 5px;
+}
+
 #course-list {
-  font-family: "Helvetica Neue"
-}
-
-// height is 110
-#course-announcement {
-  font-size: 60px;
-  margin: 0;
-  padding: 20px;
-}
-
-.course-role {
-  margin: 0;
-  display: inline-block;
-  font-size: 26px;
-  padding: 15px;
-  /*text-align: center;*/
-}
-
-.role-panel {
-  margin-right: 55px;
-  vertical-align: top;
-  padding: 20px;
-  display: inline-block;
-}
-
-.active-course {
-  border-radius: 5px;
-  font-size: 20px;
-  padding: 15px;
-  background-color: $sky-blue;
-  display: inline-block;
-  margin: 5px 0;
-  width: 190px;
-  cursor: pointer;
-}
-
-.inactive-course {
-  border-radius: 5px;
-  font-size: 20px;
-  padding: 15px;
-  background-color: $pebble-light;
-  display: inline-block;
-  margin: 5px 0;
-  width: 190px;
-  cursor: pointer;
+  font-family: "Poppins";
 }
 
 #not-enrolled-panel {
-  padding: 10px 25px;
+  padding: 20px;
+  text-align: center;
 }
 
-.active-course:hover {
-  background-color: darken($sky-blue, 10);
+#course-announcement {
+  font-size: 40px;
+  text-align: center;
+  padding: 20px;
+  margin: 0 0 20px 0;
+  background-color: black;
+  color: white;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
 }
 
-.inactive-course:hover {
-  background-color: darken($pebble-light, 10);
+#all-semesters {
+  width: 100%;
 }
 
-#not-enrolled-panel p {
-  border-radius: 5px;
+.single-semester-container {
+  width: 80%;
+  margin-left: 10%;
+  margin-right: 10%;
   display: inline-block;
-  padding: 10px;
-  background-color: $sky-blue;
-  font-size: 20px;
+  vertical-align: top;
+  min-width: 150px;
+}
+
+.semester-name {
+  text-align: center;
+  font-size: 24px;
+  margin: 15px;
+  color: lighten(black, 22);
+}
+
+.courses-in-semester {
   margin: 0;
 }
 
-.active-edit-cog {
+.edit-settings-label {
+  margin: 0;
+  font-size: 16px;
+}
+
+.edit-admin-settings {
   background-color: white;
-  font-size: 20px;
-  display: inline-block;
-  border-radius: 5px;
-  margin: 0;
-  padding: 15px;
-  margin-left: 5px;
-  cursor: pointer;
-  color: black;
-}
-
-.active-edit-cog:hover {
-  background-color: $sky-blue;
-}
-
-.inactive-edit-cog:hover {
-  background-color: $pebble-light;
-}
-
-.inactive-edit-cog {
-  background-color: white;
-  font-size: 20px;
-  display: inline-block;
-  border-radius: 5px;
-  margin: 0;
-  padding: 15px;
-  margin-left: 5px;
-  cursor: pointer;
-  color: black;
-}
-
-#login-info {
-  font-size: 18px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.15);
   position: absolute;
-  right: 18px;
-  top: 4px;
+  right: 15px;
+  bottom: 15px;
+  padding: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
 }
 
-#log-button {
-  font-size: 18px;
-  position: absolute;
-  right: 18px;
-  top: 36px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: $pebble-medium;
+.edit-admin-settings:hover {
+  background-color: black;
+  color: white;
+}
+
+.edit-admin-settings:hover .cog  {
+  transition-duration: 1s;
+  transform: rotate(365deg);
+}
+
+.course {
+  color: black;
+  min-width: 300px;
+  margin: 0 0 15px 0;
+  padding: 20px 15px;
+  font-size: 23px;
+  background-color: darken(lavender, 8);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
+}
+
+.course-name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.course:hover {
+  background-color: darken(lavender, 10);
+}
+
+.semester-year {
+  color: black;
+  margin: 0;
+  font-size: 16px;
+}
+
+//*****************************************************************************
+// Now
+@media only screen and (min-width: 481px) {
+
+  #course-announcement {
+    font-size: 40px;
+    font-weight: 900;
+    text-align: left;
+    margin: 0 0 50px 0;
+    padding: 25px 35px;
+  }
+
+  #all-semesters {
+    width: 100%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+
+  #all-semesters {
+    width: 100%;
+  }
+
+  .single-semester-container {
+    width: 44%;
+    margin: 3%;
+    display: inline-block;
+    vertical-align: top;
+    min-width: 150px;
+  }
+}
+
+@media only screen and (min-width: 1025px) {
+  #all-semesters {
+    width: 100%;
+    /*border: 2px solid black;*/
+  }
+
+  .single-semester-container {
+    width: 28%;
+    margin: 2.5%;
+    display: inline-block;
+    vertical-align: top;
+  }
+}
+
+
+@media only screen and (min-width: 1281px) {
+  #all-semesters {
+    width: 100%;
+    /*border: 2px solid yellow;*/
+  }
+
+  .single-semester-container {
+    width: 29%;
+    margin: 2%;
+    display: inline-block;
+    vertical-align: top;
+    min-width: 150px;
+    /*border: 2px solid red;*/
+  }
+
 }
 
 </style>
