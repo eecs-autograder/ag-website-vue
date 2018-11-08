@@ -31,7 +31,8 @@ export function* zip<T1, T2>(iterable1: IterableType<T1>,
 // array. This is a workaround until Vue implementes reactivity for
 // Sets. These functions have linear complexity.
 
-type EqualityFunctionType<T> = (first: T, second: T) => boolean;
+type EqualityFunctionType<ItemType, SentinelType>
+    = (item: ItemType, sentinel: SentinelType) => boolean;
 
 function items_equal<T>(first: T, second: T) {
     return first === second;
@@ -39,8 +40,9 @@ function items_equal<T>(first: T, second: T) {
 
 // Adds value to the given array if value is not already in array,
 // using the given equality comparison function.
-export function array_add_unique<T>(array: T[], value: T,
-                                    eq_func: EqualityFunctionType<T> = items_equal) {
+export function array_add_unique<ItemType>(
+        array: ItemType[], value: ItemType,
+        eq_func: EqualityFunctionType<ItemType, ItemType> = items_equal) {
     if (!array_has_unique(array, value, eq_func)) {
         array.push(value);
     }
@@ -48,18 +50,36 @@ export function array_add_unique<T>(array: T[], value: T,
 
 // Returns true if the given value is in array using the given equality
 // comparison function.
-export function array_has_unique<T>(array: T[], value: T,
-                                    eq_func: EqualityFunctionType<T> = items_equal) {
-    return array.find((item: T) => eq_func(item, value)) !== undefined;
+export function array_has_unique<ItemType, SentinelType>(
+        array: ItemType[], value: SentinelType,
+        eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
+    return array.find((item: ItemType) => eq_func(item, value)) !== undefined;
+}
+
+// Finds and returns the item with the given value from array.
+// Throws Error if item does not exist.
+export function array_get_unique<ItemType, SentinelType>(
+        array: ItemType[], value: SentinelType,
+        eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
+    let item = array.find((item: ItemType) => eq_func(item, value));
+    if (item === undefined) {
+        throw new UniqueArrayError(`Item not found in array: ${value}`);
+    }
+    return item;
 }
 
 // Removes value from array. Returns true if value existed in array and was
 // removed, false otherwise.
-export function array_remove_unique<T>(array: T[], value: T,
-                                       eq_func: EqualityFunctionType<T> = items_equal) {
-    let index = array.findIndex((item: T) => eq_func(item, value));
+export function array_remove_unique<ItemType, SentinelType>(
+        array: ItemType[], value: SentinelType,
+        eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
+    let index = array.findIndex((item: ItemType) => eq_func(item, value));
     if (index !== -1) {
         array.splice(index, 1);
     }
     return index !== -1;
+}
+
+export class UniqueArrayError extends Error {
+
 }

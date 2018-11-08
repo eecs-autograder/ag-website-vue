@@ -1,5 +1,7 @@
-import { array_add_unique, array_has_unique, array_remove_unique,
-         safe_assign, zip } from '@/utils';
+import {
+    array_add_unique, array_get_unique, array_has_unique, array_remove_unique,
+    safe_assign, UniqueArrayError, zip
+} from '@/utils';
 
 
 test('Safe assign', () => {
@@ -99,6 +101,34 @@ describe('array_XXX_unique function tests', () => {
         let array: CustomType[] = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
         expect(array_has_unique(array, {id: 2}, custom_type_eq_func)).toBe(true);
         expect(array_has_unique(array, {id: 5}, custom_type_eq_func)).toBe(false);
+    });
+
+    test('array get unique item found default equality func', () => {
+       let array: number[] = [1, 2, 3];
+       expect(array_get_unique(array, 3)).toEqual(3);
+    });
+
+    test('array get unique item not found default equality func', () => {
+       let array: number[] = [4, 5, 6];
+       expect(() => {
+           array_get_unique(array, 3);
+       }).toThrow("Item not found in array: 3");
+    });
+
+    test('array get unique item found custom equality func', () => {
+        let array: CustomType[] = [{id: 7}];
+        expect(array_get_unique(array, {id: 7}, custom_type_eq_func)).toEqual({id: 7});
+        expect(array_get_unique(array, 7, (item: CustomType , id: number) => {
+            return item.id === id;
+        })).toEqual(array[0]);
+
+    });
+
+    test('array_get_unique item not found custom equality func', () => {
+        let array: CustomType[] = [{id: 7}];
+        expect(() => {
+            array_get_unique(array, {id: 21}, custom_type_eq_func);
+        }).toThrow(UniqueArrayError);
     });
 
     test('array_remove_unique custom default func', () => {

@@ -1,18 +1,24 @@
-import {Semester} from "ag-client-typescript";
-import {Semester} from "ag-client-typescript";
 <template>
   <div ref="course_list" id="course-list">
-    <p id="course-announcement"> Courses </p>
-
-    <div id="all-semesters">
-      <div class="single-semester-container">
-        <p class="semester-name"> Fall 2018 </p>
+    <div v-if="courses_by_term.length === 0"
+         id="not-enrolled-panel">
+      <p> You are not enrolled in any courses. </p>
+    </div>
+    <div v-else id="all-semesters">
+      <div v-for="(current_term, term_index) of courses_by_term"
+           class="single-semester-container">
+        <p class="semester-name"> {{current_term.term.semester}} {{current_term.term.year}}</p>
         <div class="courses-in-semester">
-          <div v-for="course of courses">
-            <div class="course">
+          <div v-for="(course, course_index) of current_term.course_list">
+            <div :class="['course',
+                  {'course-last-child': course_index === current_term.course_list.length - 1},
+                   {'inactive-course': term_index != 0}]"
+                 @click="course_clicked(course)">
               <p class="course-name"> {{course.name}} </p>
               <p class="semester-year"> {{course.semester}} {{course.year}} </p>
-              <div class="edit-admin-settings">
+              <div v-if="array_has_unique(admin_courses, course_in, courses_are_equal)"
+                   class="edit-admin-settings"
+                   @click="$event.stopPropagation(); edit_admin_settings(course)">
                 <p class="edit-settings-label"> Edit Settings
                   <i class="fas fa-cog cog"></i>
                 </p>
@@ -22,18 +28,20 @@ import {Semester} from "ag-client-typescript";
         </div>
       </div>
     </div>
-
-    <div v-if="no_files"
-         id="not-enrolled-panel">
-      <p> You are not enrolled in any courses. </p>
-    </div>
   </div>
 </template>
 
 <script lang="ts">
 
-  import { Course, Semester } from 'ag-client-typescript';
+  import { AllCourses, Model } from '@/model';
+  import { Course, HttpClient, Semester, User } from 'ag-client-typescript';
+
+  // import { ObserverComponent } from '@/observer_component';
+  import { array_add_unique, array_get_unique, UniqueArrayError } from '@/utils';
+
   import { Component, Vue } from 'vue-property-decorator';
+
+  import { array_has_unique } from '@/utils';
 
   interface Term {
     semester: Semester | null;
@@ -43,122 +51,101 @@ import {Semester} from "ag-client-typescript";
   interface TermCourses {
     term: Term;
     course_list: Course[];
-
   }
 
   @Component
   export default class CourseList extends Vue {
 
-    courses_by_term: TermCourses[];
+    all_courses: AllCourses | null = null;
+    courses_by_term: TermCourses[] = [];
+    // most_recent_term: Term;
 
-    first_course = new Course(
-      {pk: 42, name: 'EECS 183', semester: Semester.winter, year: 2014, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    second_course = new Course(
-      {pk: 42, name: 'EECS 183', semester: Semester.fall, year: 2015, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    third_course = new Course(
-      {pk: 42, name: 'EECS 280', semester: Semester.winter, year: 2016, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    fourth_course = new Course(
-      {pk: 42, name: 'EECS 281', semester: Semester.spring, year: 2016, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    fifth_course = new Course(
-      {pk: 42, name: 'EECS 485', semester: Semester.fall, year: 2016, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    sixth_course = new Course(
-      {pk: 42, name: 'EECS 370', semester: Semester.fall, year: 2016, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    seventh_course = new Course(
-      {pk: 42, name: 'EECS 280', semester: Semester.winter, year: 2017, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    eighth_course = new Course(
-      {pk: 42, name: 'EECS 484', semester: Semester.fall, year: 2017, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    ninth_course = new Course(
-      {pk: 42, name: 'EECS 388', semester: Semester.fall, year: 2017, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    tenth_course = new Course(
-      {pk: 42, name: 'EECS 280', semester: Semester.fall, year: 2017, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    eleventh_course = new Course(
-      {pk: 42, name: 'EECS 280', semester: Semester.fall, year: 2017, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    twelfth_course = new Course(
-      {pk: 42, name: 'EECS 280', semester: Semester.winter, year: 2018, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    thirteenth_course = new Course(
-      {pk: 42, name: 'EECS 280', semester: Semester.spring, year: 2018, subtitle: '',
-        num_late_days: 0, last_modified: ''});
-
-    courses: Course[] = [this.first_course, this.second_course, this.third_course,
-      this.fourth_course, this.fifth_course, this.sixth_course, this.seventh_course,
-      this.eighth_course, this.ninth_course, this.tenth_course, this.eleventh_course,
-      this.twelfth_course, this.thirteenth_course];
-
-    compareTerms(term_a: TermCourses, term_b: TermCourses) {
-      if (term_a.term.year > term_b.term.year) {
-        return  -1;
+    async created() {
+      let user = await User.get_current();
+      this.all_courses = await Model.get_instance().get_courses_for_user(user);
+      console.log('qweaskjdflkasjdf')
+      for (let value of Object.entries(this.all_courses)) {
+        this.sort_into_terms(value);
       }
-      else if (term_a.term.year === term_b.term.year) {
-        // everything is less than fall
-        if (term_a.term.semester === Semester.fall) {
-          return -1;
-        }
-        else if (term_a.term.semester === Semester.spring) {
-          if (term_b.term.semester === Semester.fall) {
-            return 1;
-          }
-          // b must be winter
-          return -1;
-        }
-        // a = winter, everything is greater than winter
+      this.courses_by_term.sort(term_descending);
+      this.sort_the_courses_in_each_term();
+    }
+
+    course_clicked(selected_course: Course) {
+      console.log("A course was clicked on!");
+    }
+
+    edit_admin_settings(course: Course) {
+      console.log("Editing Admin Settings");
+    }
+
+    course_name_less_than(course_a: Course, course_b: Course) {
+      if (course_a.name >= course_b.name) {
         return 1;
       }
-      return 1;
+      return -1;
     }
 
-    compareCourseNames(course_a: Course, course_b: Course) {
-      return course_a.name < course_b.name;
-    }
-
-    sort_into_terms() {
-      for (let i = 0; i < this.courses.length; ++i) {
-        let current_course: Course = this.courses[i];
-        let temp_term: Term = { semester: current_course.semester, year: current_course.year };
-          // if the term wasn't already in the courses by term array
-          let courses_in_term: TermCourses = { term: temp_term, course_list: [current_course] };
-          this.courses_by_term.push(courses_in_term);
-
-          // if the term was already in the courses array, add the course to the assoc. course_list
-
+    sort_into_terms(courses: Course[]) {
+      for (let course of courses) {
+        let current_term: Term = { semester: course.semester, year: course.year };
+        let term_exists = array_has_unique(
+          this.courses_by_term, current_term,
+          (item: TermCourses, term: Term) => { return terms_equal(item.term, term); }
+        );
+        if (term_exists) {
+          let term_courses: TermCourses = array_get_unique(
+            this.courses_by_term, current_term,
+            (item: TermCourses, term: Term) => { return terms_equal(item.term, term); }
+          );
+        }
+        else {
+          array_add_unique(
+            this.courses_by_term,
+            {term: current_term, course_list: [course]},
+            (first: TermCourses, second: TermCourses) => {
+              return terms_equal(first.term, second.term);
+            }
+          );
+        }
       }
-      // sort by year desc
-      // sort terms by Fall spring winter desc
-      this.courses_by_term.sort(this.compareTerms);
     }
 
     sort_the_courses_in_each_term() {
       for (let i = 0; i < this.courses_by_term.length; ++i) {
-        this.courses_by_term[i].course_list.sort(this.compareCourseNames);
+        this.courses_by_term[i].course_list.sort((course_a: Course, course_b: Course) => {
+           if (course_a.name >= course_b.name) {
+             return 1;
+           }
+           return -1;
+        });
       }
     }
+  }
 
-    created() {
-      document.body.style.margin = "0";
+  function terms_equal(first: Term, second: Term) {
+    return first.year === second.year && first.semester === second.semester;
+  }
+
+  function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourses) {
+    let semester_ordering = {
+      [Semester.winter]: 1,
+      [Semester.spring]: 2,
+      [Semester.summer]: 3,
+      [Semester.fall]: 4
+    };
+
+    if (term_courses_a.term.year === term_courses_b.term.year) {
+      let semester_a = term_courses_a.term.semester === null
+        ? 0 : semester_ordering[term_courses_a.term.semester];
+      let semester_b = term_courses_b.term.semester === null
+        ? 0 : semester_ordering[term_courses_b.term.semester];
+      return semester_a - semester_b;
     }
+
+    let year_a = term_courses_a.term.year === null ? 0 : term_courses_a.term.year;
+    let year_b = term_courses_b.term.year === null ? 0 : term_courses_b.term.year;
+    return year_a - year_b;
   }
 
 </script>
@@ -254,14 +241,27 @@ import {Semester} from "ag-client-typescript";
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
 }
 
+.course:hover {
+  background-color: darken(lavender, 11);
+}
+
+.inactive-course {
+  background-color: $pebble-dark;
+}
+
+.inactive-course:hover {
+  background-color: darken($pebble-dark, 10);
+}
+
+.course-last-child {
+  margin-bottom: 100px;
+}
+
 .course-name {
   margin: 0;
   font-weight: 600;
 }
 
-.course:hover {
-  background-color: darken(lavender, 10);
-}
 
 .semester-year {
   color: black;
@@ -330,7 +330,6 @@ import {Semester} from "ag-client-typescript";
     min-width: 150px;
     /*border: 2px solid red;*/
   }
-
 }
 
 </style>
