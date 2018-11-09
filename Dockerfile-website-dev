@@ -1,0 +1,23 @@
+FROM ubuntu:xenial
+
+RUN mkdir -p /usr/src/app/src
+RUN apt-get update --fix-missing
+
+WORKDIR /usr/src/app
+
+RUN apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN apt-get install -y nodejs
+
+COPY package.json .
+COPY package-lock.json .
+COPY .browserslistrc .
+COPY .postcssrc.js .
+COPY vue.config.js .
+COPY tsconfig.json .
+
+# HACK: For some reason, npm install exits nonzero the first time,
+# even though the packages installed successfully. The second time,
+# it succeeds. This may just be due to running out of memory when
+# running in a VM.
+RUN bash -c 'npm install || npm install'

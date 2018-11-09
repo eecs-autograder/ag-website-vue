@@ -1,0 +1,3 @@
+[submodule "autograder-server"]
+	path = autograder-server
+	url = git@github.com:eecs-autograder/autograder-server.git
