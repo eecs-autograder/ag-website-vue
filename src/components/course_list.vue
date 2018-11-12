@@ -1,27 +1,32 @@
 <template>
-  <div ref="course_list" id="course-list">
-    <div v-if="courses_by_term.length === 0"
-         id="not-enrolled-panel">
-      <p> You are not enrolled in any courses. </p>
-    </div>
-    <div v-else id="all-semesters">
-      <div v-for="(current_term, term_index) of courses_by_term"
-           class="single-semester-container">
-        <p class="semester-name"> {{current_term.term.semester}} {{current_term.term.year}}</p>
-        <div class="courses-in-semester">
-          <div v-for="(course, course_index) of current_term.course_list">
-            <div :class="['course',
-                  {'course-last-child': course_index === current_term.course_list.length - 1},
-                   {'inactive-course': term_index != 0}]"
-                 @click="course_clicked(course)">
-              <p class="course-name"> {{course.name}} </p>
-              <p class="semester-year"> {{course.semester}} {{course.year}} </p>
-              <div v-if="array_has_unique(admin_courses, course_in, courses_are_equal)"
-                   class="edit-admin-settings"
-                   @click="$event.stopPropagation(); edit_admin_settings(course)">
-                <p class="edit-settings-label"> Edit Settings
-                  <i class="fas fa-cog cog"></i>
-                </p>
+  <div ref="course_list">
+    <h1 id="course-announcement"> Courses </h1>
+    <div id="course-list">
+      <div v-if="courses_by_term.length === 0"
+           id="not-enrolled-panel">
+        <p> You are not enrolled in any courses. </p>
+      </div>
+      <div v-else id="all-semesters">
+        <div v-for="(current_term, term_index) of courses_by_term"
+             class="single-semester-container">
+          <p class="semester-name">
+            {{current_term.term.semester}}
+            {{current_term.term.year}}</p>
+          <div class="courses-in-semester">
+            <div v-for="(course, course_index) of current_term.course_list">
+              <div :class="['course',
+                    {'course-last-child': course_index === current_term.course_list.length - 1},
+                     {'inactive-course': term_index != 0}]"
+                   @click="course_clicked(course)">
+                <p class="course-name"> {{course.name}} </p>
+                <p class="semester-year"> {{course.semester}} {{course.year}} </p>
+                <div v-if="is_admin(course)"
+                     class="edit-admin-settings"
+                     @click="$event.stopPropagation(); edit_admin_settings(course)">
+                  <p class="edit-settings-label"> Edit Settings
+                    <i class="fas fa-cog cog"></i>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -37,11 +42,9 @@
   import { Course, HttpClient, Semester, User } from 'ag-client-typescript';
 
   // import { ObserverComponent } from '@/observer_component';
-  import { array_add_unique, array_get_unique, UniqueArrayError } from '@/utils';
+  import { array_add_unique, array_get_unique, array_has_unique, UniqueArrayError } from '@/utils';
 
   import { Component, Vue } from 'vue-property-decorator';
-
-  import { array_has_unique } from '@/utils';
 
   interface Term {
     semester: Semester | null;
@@ -58,14 +61,12 @@
 
     all_courses: AllCourses | null = null;
     courses_by_term: TermCourses[] = [];
-    // most_recent_term: Term;
 
     async created() {
       let user = await User.get_current();
       this.all_courses = await Model.get_instance().get_courses_for_user(user);
-      console.log('qweaskjdflkasjdf')
-      for (let value of Object.entries(this.all_courses)) {
-        this.sort_into_terms(value);
+      for (let [role, courses] of Object.entries(this.all_courses)) {
+        this.sort_into_terms(courses);
       }
       this.courses_by_term.sort(term_descending);
       this.sort_the_courses_in_each_term();
@@ -79,15 +80,19 @@
       console.log("Editing Admin Settings");
     }
 
-    course_name_less_than(course_a: Course, course_b: Course) {
-      if (course_a.name >= course_b.name) {
-        return 1;
-      }
-      return -1;
+    is_admin(course: Course) {
+      return array_has_unique(this.all_courses.courses_is_admin_for, course,
+        (course_a: Course, course_b: Course) => {
+          return course_a.name === course_b.name
+                 && course_a.semester === course_b.semester
+                 && course_a.year === course_b.year;
+      });
     }
 
     sort_into_terms(courses: Course[]) {
       for (let course of courses) {
+        console.log("Semester: " + course.semester);
+        console.log("Year: " + course.year);
         let current_term: Term = { semester: course.semester, year: course.year };
         let term_exists = array_has_unique(
           this.courses_by_term, current_term,
@@ -98,6 +103,7 @@
             this.courses_by_term, current_term,
             (item: TermCourses, term: Term) => { return terms_equal(item.term, term); }
           );
+          term_courses.course_list.push(course);
         }
         else {
           array_add_unique(
@@ -140,12 +146,12 @@
         ? 0 : semester_ordering[term_courses_a.term.semester];
       let semester_b = term_courses_b.term.semester === null
         ? 0 : semester_ordering[term_courses_b.term.semester];
-      return semester_a - semester_b;
+      return semester_b - semester_a;
     }
 
     let year_a = term_courses_a.term.year === null ? 0 : term_courses_a.term.year;
     let year_b = term_courses_b.term.year === null ? 0 : term_courses_b.term.year;
-    return year_a - year_b;
+    return year_b - year_a;
   }
 
 </script>
@@ -159,8 +165,16 @@
   margin-left: 5px;
 }
 
+#all-semesters {
+  margin-top: 40px;
+}
+
 #course-list {
   font-family: "Poppins";
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  border-radius: 10px;
 }
 
 #not-enrolled-panel {
@@ -169,7 +183,8 @@
 }
 
 #course-announcement {
-  font-size: 40px;
+  font-family: "Poppins";
+  font-size: 50px;
   text-align: center;
   padding: 20px;
   margin: 0 0 20px 0;
@@ -178,24 +193,17 @@
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
 }
 
-#all-semesters {
-  width: 100%;
-}
-
 .single-semester-container {
-  width: 80%;
-  margin-left: 10%;
-  margin-right: 10%;
-  display: inline-block;
   vertical-align: top;
-  min-width: 150px;
+  min-width: 320px;
 }
 
 .semester-name {
   text-align: center;
   font-size: 24px;
-  margin: 15px;
-  color: lighten(black, 22);
+  margin: 15px 15px 25px 15px;
+  color: lighten(black, 0);
+  min-height: 35px;
 }
 
 .courses-in-semester {
@@ -213,14 +221,20 @@
   position: absolute;
   right: 15px;
   bottom: 15px;
-  padding: 5px;
   padding: 5px 10px;
   border-radius: 6px;
+  transition: box-shadow 1s;
 }
 
 .edit-admin-settings:hover {
   background-color: black;
   color: white;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3);
+}
+
+.edit-admin-settings .cog {
+  transition-duration: 1s;
+  transform: rotate(0deg);
 }
 
 .edit-admin-settings:hover .cog  {
@@ -230,48 +244,61 @@
 
 .course {
   color: black;
-  min-width: 300px;
+  /*min-height: 95px;*/
   margin: 0 0 15px 0;
-  padding: 20px 15px;
+  padding: 15px;
   font-size: 23px;
   background-color: darken(lavender, 8);
   border-radius: 10px;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.15);
+  transition: box-shadow 1s;
 }
 
 .course:hover {
   background-color: darken(lavender, 11);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3);
 }
 
 .inactive-course {
-  background-color: $pebble-dark;
+  background-color: darken(lavender, 8);
 }
 
 .inactive-course:hover {
-  background-color: darken($pebble-dark, 10);
+  background-color: darken(lavender, 11);
 }
 
 .course-last-child {
-  margin-bottom: 100px;
+  margin-bottom: 50px;
 }
 
 .course-name {
   margin: 0;
+  padding-bottom: 0px;
   font-weight: 600;
+  font-size: 26px;
+  line-height: 1.2;
 }
-
 
 .semester-year {
   color: black;
   margin: 0;
+  padding-bottom: 15px;
+  min-height: 25px;
   font-size: 16px;
+  position: relative;
 }
 
 //*****************************************************************************
-// Now
+
 @media only screen and (min-width: 481px) {
+
+  #course-list {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+  }
 
   #course-announcement {
     font-size: 40px;
@@ -281,15 +308,14 @@
     padding: 25px 35px;
   }
 
-  #all-semesters {
-    width: 100%;
-  }
 }
 
 @media only screen and (min-width: 768px) {
 
-  #all-semesters {
-    width: 100%;
+  #course-list {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
   }
 
   .single-semester-container {
@@ -302,24 +328,27 @@
 }
 
 @media only screen and (min-width: 1025px) {
-  #all-semesters {
-    width: 100%;
-    /*border: 2px solid black;*/
+
+  #course-list {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
   }
 
   .single-semester-container {
-    width: 28%;
+    width: 45%;
     margin: 2.5%;
     display: inline-block;
     vertical-align: top;
   }
 }
 
-
 @media only screen and (min-width: 1281px) {
-  #all-semesters {
-    width: 100%;
-    /*border: 2px solid yellow;*/
+
+  #course-list {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
   }
 
   .single-semester-container {
@@ -328,7 +357,6 @@
     display: inline-block;
     vertical-align: top;
     min-width: 150px;
-    /*border: 2px solid red;*/
   }
 }
 
