@@ -195,7 +195,7 @@
 
 .single-semester-container {
   vertical-align: top;
-  min-width: 320px;
+  /*min-width: 320px;*/
 }
 
 .semester-name {
@@ -217,7 +217,7 @@
 
 .edit-admin-settings {
   background-color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.15);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   position: absolute;
   right: 15px;
   bottom: 15px;
@@ -227,9 +227,9 @@
 }
 
 .edit-admin-settings:hover {
-  background-color: black;
+  background-image: linear-gradient(to top left, black, lighten(black, 5));
   color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4);
 }
 
 .edit-admin-settings .cog {
@@ -248,25 +248,29 @@
   margin: 0 0 15px 0;
   padding: 15px;
   font-size: 23px;
-  background-color: darken(lavender, 8);
-  border-radius: 10px;
+  background-image: linear-gradient(to top left, darken(lavender, 15), darken(lavender, 8));
+  /*background-color: darken(lavender, 8);*/
+  border-radius: 2px;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.15);
+  box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.1);
   transition: box-shadow 1s;
 }
 
 .course:hover {
-  background-color: darken(lavender, 11);
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3);
+  background-image: linear-gradient(to top left, darken(lavender, 20), darken(lavender, 10));
+  /*box-shadow: 4px 4px 15px 1px lighten(gray, 38);*/
+  box-shadow: 0px 5px 9px 0px rgba(0,0,0,0.2);
 }
 
 .inactive-course {
-  background-color: darken(lavender, 8);
+  /*background-color: lighten(#6ECEB2, 10);*/
+  background-image: linear-gradient(to top left, darken(lavender, 15), darken(lavender, 8));
+  /*background-color: pink;*/
 }
 
 .inactive-course:hover {
-  background-color: darken(lavender, 11);
+  background-image: linear-gradient(to top left, darken(lavender, 20), darken(lavender, 10));
 }
 
 .course-last-child {
