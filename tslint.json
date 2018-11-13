@@ -168,7 +168,7 @@
             true,
             // Use snake_case unless otherwise specified.
             {"type": "default", "format": ["snake_case"],
-                "leadingUnderscore": "forbid", "trailingUnderscore": "forbid"},
+                "leadingUnderscore": "forbid", "trailingUnderscore": "allow"},
             {"type": "enumMember", "format": "snake_case"},
 
             // Static readonly members can be upper case.
@@ -180,6 +180,7 @@
             // Allow leading underscores for private properties and methods.
             {"type": "member", "modifiers": "private", "leadingUnderscore": "allow"},
             {"type": "member", "modifiers": "protected", "leadingUnderscore": "allow"},
+            {"type": "member", "trailingUnderscore": "forbid"},
 
             // Whitelist for inherited methods.
             {"type": "method", "filter": "^(toJSON | toString)$", "format": null},

@@ -36,3 +36,19 @@ export function patch_component_method(
         component_wrapper.setMethods({[method_name]: original_method});
     }
 }
+
+export async function patch_async_class_method(
+        /* tslint:disable-next-line:no-any */
+        class_: {prototype: any},
+        method_name: string,
+        new_method: (...args: unknown[]) => Promise<unknown | void>,
+        body: () => Promise<void>) {
+    let original_method = class_.prototype[method_name];
+    try {
+        class_.prototype[method_name] = new_method;
+        await body();
+    }
+    finally {
+        class_.prototype[method_name] = original_method;
+    }
+}
