@@ -152,9 +152,9 @@
 
 #course-list {
   font-family: "Poppins";
-  width: 90%;
   margin-left: 5%;
   margin-right: 5%;
+  width: 90%;
 }
 
 #not-enrolled-message {
@@ -162,27 +162,16 @@
   text-align: center;
 }
 
-#course-announcement {
-  font-family: "Poppins";
-  font-size: 50px;
-  text-align: center;
-  padding: 20px;
-  margin: 0 0 20px 0;
-  background-color: black;
-  color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
-}
-
 .single-semester-container {
   vertical-align: top;
 }
 
 .semester-name {
-  text-align: center;
+  color: black;
   font-size: 24px;
   margin: 15px 15px 25px 15px;
-  color: lighten(black, 0);
   min-height: 35px;
+  text-align: center;
 }
 
 .courses-in-semester {
@@ -190,53 +179,52 @@
 }
 
 .edit-settings-label {
-  margin: 0;
   font-size: 16px;
-}
-
-.edit-admin-settings {
-  background-color: white;
-  position: absolute;
-  right: 15px;
-  bottom: 15px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  transition: box-shadow 1s;
-}
-
-.edit-admin-settings:hover {
-  background-color: $stormy-gray-dark;
-  color: black;
+  margin: 0;
 }
 
 .cog {
   margin-left: 5px;
-  transition-duration: 1s;
   transform: rotate(0deg);
+  transition-duration: 1s;
+}
+
+.edit-admin-settings {
+  background-color: white;
+  border-radius: 6px;
+  bottom: 15px;
+  padding: 5px 10px;
+  position: absolute;
+  right: 15px;
+  transition: box-shadow 1s;
+}
+
+.edit-admin-settings:hover {
+  background-color: $pebble-medium;
 }
 
 .edit-admin-settings:hover .cog  {
-  transition-duration: 1s;
   transform: rotate(365deg);
+  transition-duration: 1s;
 }
 
 .course {
-  color: black;
-  min-height: 75px;
-  margin: 0 0 15px 0;
-  padding: 15px;
-  font-size: 23px;
   background-color: darken(lavender, 8);
   border-radius: 2px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
+  color: black;
   cursor: pointer;
+  font-size: 23px;
+  margin: 0 0 15px 0;
+  min-height: 75px;
+  padding: 15px;
   position: relative;
-  box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.1);
   transition: box-shadow 1s;
 }
 
 .course:hover {
   background-color: darken(lavender, 11);
-  box-shadow: 0px 5px 9px 0px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 9px 0 rgba(0,0,0,0.2);
 }
 
 .last-course-in-semester {
@@ -244,88 +232,72 @@
 }
 
 .course-name {
-  margin: 0;
-  padding-bottom: 0px;
-  font-weight: 600;
   font-size: 26px;
+  font-weight: 600;
   line-height: 1.2;
+  margin: 0;
 }
 
 .course-semester-year {
   color: black;
-  margin: 0;
-  padding-bottom: 15px;
-  min-height: 25px;
   font-size: 16px;
+  margin: 0;
+  min-height: 25px;
+  padding-bottom: 15px;
   position: relative;
 }
 
 //*****************************************************************************
 
 @media only screen and (min-width: 481px) {
-
   #course-list {
-    width: 80%;
     margin-left: 10%;
     margin-right: 10%;
-  }
-
-  #course-announcement {
-    font-size: 40px;
-    font-weight: 900;
-    text-align: left;
-    margin: 0 0 50px 0;
-    padding: 25px 35px;
+    width: 80%;
   }
 }
 
 @media only screen and (min-width: 768px) {
-
   #course-list {
-    width: 80%;
     margin-left: 10%;
     margin-right: 10%;
+    width: 80%;
   }
 
   .single-semester-container {
-    width: 44%;
-    margin: 3%;
     display: inline-block;
-    vertical-align: top;
-    min-width: 150px;
+    margin: 3%;
+    /*min-width: 150px;*/
+    width: 44%;
   }
 }
 
 @media only screen and (min-width: 1025px) {
-
   #course-list {
-    width: 80%;
     margin-left: 10%;
     margin-right: 10%;
+    width: 80%;
   }
 
   .single-semester-container {
-    width: 45%;
-    margin: 2.5%;
     display: inline-block;
-    vertical-align: top;
+    margin: 2.5%;
+    width: 45%;
   }
 }
 
 @media only screen and (min-width: 1281px) {
-
   #course-list {
-    width: 80%;
     margin-left: 10%;
     margin-right: 10%;
+    width: 80%;
   }
 
   .single-semester-container {
-    width: 29%;
-    margin: 2%;
     display: inline-block;
-    vertical-align: top;
-    min-width: 150px;
+    margin: 2%;
+    /*min-width: 150px;*/
+    width: 29%;
   }
 }
 
