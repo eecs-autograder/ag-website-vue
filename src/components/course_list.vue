@@ -267,7 +267,6 @@
   .single-semester-container {
     display: inline-block;
     margin: 3%;
-    /*min-width: 150px;*/
     width: 44%;
   }
 }
@@ -296,7 +295,6 @@
   .single-semester-container {
     display: inline-block;
     margin: 2%;
-    /*min-width: 150px;*/
     width: 29%;
   }
 }
