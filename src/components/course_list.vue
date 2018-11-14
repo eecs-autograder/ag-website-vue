@@ -1,28 +1,23 @@
 <template>
-  <div ref="course_list">
-    <h1 id="course-announcement"> Courses </h1>
+  <div ref="course_list_component">
     <div id="course-list">
       <div v-if="courses_by_term.length === 0"
-           id="not-enrolled-panel">
+           id="not-enrolled-message">
         <p> You are not enrolled in any courses. </p>
       </div>
       <div v-else id="all-semesters">
-        <div v-for="(current_term, term_index) of courses_by_term"
+        <div v-for="current_term of courses_by_term"
              class="single-semester-container">
-          <p class="semester-name">
-            {{current_term.term.semester}}
-            {{current_term.term.year}}</p>
+          <p class="semester-name">{{current_term.term.semester}} {{current_term.term.year}}</p>
           <div class="courses-in-semester">
             <div v-for="(course, course_index) of current_term.course_list">
               <div :class="['course',
-                    {'course-last-child': course_index === current_term.course_list.length - 1},
-                     {'inactive-course': term_index != 0}]"
-                   @click="course_clicked(course)">
-                <p class="course-name"> {{course.name}} </p>
-                <p class="semester-year"> {{course.semester}} {{course.year}} </p>
+                   {'last-course-in-semester':
+                   course_index === current_term.course_list.length - 1}]">
+                <p class="course-name">{{course.name}}</p>
+                <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
                 <div v-if="is_admin(course)"
-                     class="edit-admin-settings"
-                     @click="$event.stopPropagation(); edit_admin_settings(course)">
+                     class="edit-admin-settings">
                   <p class="edit-settings-label"> Edit Settings
                     <i class="fas fa-cog cog"></i>
                   </p>
@@ -39,10 +34,10 @@
 <script lang="ts">
 
   import { AllCourses, Model } from '@/model';
-  import { Course, HttpClient, Semester, User } from 'ag-client-typescript';
+  import { Course, Semester, User } from 'ag-client-typescript';
 
   // import { ObserverComponent } from '@/observer_component';
-  import { array_add_unique, array_get_unique, array_has_unique, UniqueArrayError } from '@/utils';
+  import { array_add_unique, array_get_unique, array_has_unique } from '@/utils';
 
   import { Component, Vue } from 'vue-property-decorator';
 
@@ -72,17 +67,10 @@
       this.sort_the_courses_in_each_term();
     }
 
-    course_clicked(selected_course: Course) {
-      console.log("A course was clicked on!");
-    }
-
-    edit_admin_settings(course: Course) {
-      console.log("Editing Admin Settings");
-    }
-
     is_admin(course: Course) {
-      return array_has_unique(this.all_courses.courses_is_admin_for, course,
-        (course_a: Course, course_b: Course) => {
+      return array_has_unique(this.all_courses!.courses_is_admin_for,
+                              course,
+                              (course_a: Course, course_b: Course) => {
           return course_a.name === course_b.name
                  && course_a.semester === course_b.semester
                  && course_a.year === course_b.year;
@@ -91,17 +79,15 @@
 
     sort_into_terms(courses: Course[]) {
       for (let course of courses) {
-        console.log("Semester: " + course.semester);
-        console.log("Year: " + course.year);
         let current_term: Term = { semester: course.semester, year: course.year };
         let term_exists = array_has_unique(
           this.courses_by_term, current_term,
-          (item: TermCourses, term: Term) => { return terms_equal(item.term, term); }
+          (item: TermCourses, term: Term) => terms_equal(item.term, term)
         );
         if (term_exists) {
           let term_courses: TermCourses = array_get_unique(
             this.courses_by_term, current_term,
-            (item: TermCourses, term: Term) => { return terms_equal(item.term, term); }
+            (item: TermCourses, term: Term) => terms_equal(item.term, term)
           );
           term_courses.course_list.push(course);
         }
@@ -157,13 +143,8 @@
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
 @import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
-
-.cog {
-  margin-left: 5px;
-}
 
 #all-semesters {
   margin-top: 40px;
@@ -174,10 +155,9 @@
   width: 90%;
   margin-left: 5%;
   margin-right: 5%;
-  border-radius: 10px;
 }
 
-#not-enrolled-panel {
+#not-enrolled-message {
   padding: 20px;
   text-align: center;
 }
@@ -195,7 +175,6 @@
 
 .single-semester-container {
   vertical-align: top;
-  /*min-width: 320px;*/
 }
 
 .semester-name {
@@ -217,7 +196,6 @@
 
 .edit-admin-settings {
   background-color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   position: absolute;
   right: 15px;
   bottom: 15px;
@@ -227,12 +205,12 @@
 }
 
 .edit-admin-settings:hover {
-  background-image: linear-gradient(to top left, black, lighten(black, 5));
-  color: white;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4);
+  background-color: $stormy-gray-dark;
+  color: black;
 }
 
-.edit-admin-settings .cog {
+.cog {
+  margin-left: 5px;
   transition-duration: 1s;
   transform: rotate(0deg);
 }
@@ -244,12 +222,11 @@
 
 .course {
   color: black;
-  /*min-height: 95px;*/
+  min-height: 75px;
   margin: 0 0 15px 0;
   padding: 15px;
   font-size: 23px;
-  background-image: linear-gradient(to top left, darken(lavender, 15), darken(lavender, 8));
-  /*background-color: darken(lavender, 8);*/
+  background-color: darken(lavender, 8);
   border-radius: 2px;
   cursor: pointer;
   position: relative;
@@ -258,22 +235,11 @@
 }
 
 .course:hover {
-  background-image: linear-gradient(to top left, darken(lavender, 20), darken(lavender, 10));
-  /*box-shadow: 4px 4px 15px 1px lighten(gray, 38);*/
+  background-color: darken(lavender, 11);
   box-shadow: 0px 5px 9px 0px rgba(0,0,0,0.2);
 }
 
-.inactive-course {
-  /*background-color: lighten(#6ECEB2, 10);*/
-  background-image: linear-gradient(to top left, darken(lavender, 15), darken(lavender, 8));
-  /*background-color: pink;*/
-}
-
-.inactive-course:hover {
-  background-image: linear-gradient(to top left, darken(lavender, 20), darken(lavender, 10));
-}
-
-.course-last-child {
+.last-course-in-semester {
   margin-bottom: 50px;
 }
 
@@ -285,7 +251,7 @@
   line-height: 1.2;
 }
 
-.semester-year {
+.course-semester-year {
   color: black;
   margin: 0;
   padding-bottom: 15px;
@@ -311,7 +277,6 @@
     margin: 0 0 50px 0;
     padding: 25px 35px;
   }
-
 }
 
 @media only screen and (min-width: 768px) {
