@@ -20,7 +20,6 @@ export class Model {
     }
 
     async get_courses_for_user(user: User): Promise<AllCourses> {
-        console.log("Do Not Call Me");
         let [admin_courses,
              staff_courses,
              student_courses,
