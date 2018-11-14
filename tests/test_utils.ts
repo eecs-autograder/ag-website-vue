@@ -126,9 +126,13 @@ describe('array_XXX_unique function tests', () => {
 
     test('array_get_unique item not found custom equality func', () => {
         let array: CustomType[] = [{id: 7}];
-        expect(() => {
+        try {
             array_get_unique(array, {id: 21}, custom_type_eq_func);
-        }).toThrow(UniqueArrayError);
+        }
+        catch (e) {
+            expect(e instanceof UniqueArrayError);
+            expect(e.message).toEqual("Item not found in array: [object Object]");
+        }
     });
 
     test('array_remove_unique custom default func', () => {
