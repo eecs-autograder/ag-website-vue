@@ -46,17 +46,56 @@ describe('Tabs tests', () => {
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.exists()).toEqual(true);
 
-        console.log(tabs.html());
         expect(tabs.find({ref: 'tab_1'}).isEmpty()).toEqual(true);
         expect(tabs.find({ref: 'active-tab-body'}).isEmpty()).toEqual(true);
     });
 
     test('Tab header has bare text', () => {
-       fail();
+        const component = {
+            template:  `<tabs ref="tabs">
+                            <tab>
+                                <tab-header ref="text_tab_header">
+                                    Spam
+                                </tab-header>
+                                <template slot="body">
+                                    Body
+                                </template>
+                            </tab>
+                        </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(tabs.find({ref: 'text_tab_header'}).text()).toEqual('Spam');
     });
 
     test('Tab header has html', () => {
-       fail();
+        const component = {
+            template:  `<tabs ref="tabs">
+                          <tab>
+                            <tab-header ref="text_tab_header">
+                              <div>Spam</div>
+                            </tab-header>
+                            <template slot="body">
+                              Body
+                            </template>
+                          </tab>
+                        </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(tabs.find({ref: 'text_tab_header'}).text()).toEqual('Spam');
     });
 
     // --------------------------------------------------------------------------------------------
