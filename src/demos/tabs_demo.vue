@@ -10,15 +10,12 @@
         <tabs ref="tabs" v-model="current_tab_index"
               tab_active_class="no-border-active"
               tab_inactive_class="no-border-inactive">
-          <tab ref="tabby" v-on:click="log_event"
-               v-for="(tab_val, index) in tab_labels" :key="tab_val">
-            <template slot="header">
-              <div class="tab-label">
-                <p class="tab-heading"> Tab {{tab_val}} </p>
-                <i class="fas fa-times close_x"
-                   @click="$event.stopPropagation(); remove_tab(index)"></i>
-              </div>
-            </template>
+          <tab v-for="(tab_val, index) in tab_labels" :key="tab_val">
+            <tab-header v-on:click="log_event">
+              <span class="tab-heading"> Tab {{tab_val}} </span>
+              <i class="fas fa-times close_x"
+                  @click="$event.stopPropagation(); remove_tab(index)"></i>
+            </tab-header>
             <template slot="body">
               <div class="tab-body">
                 {{tab_val}}
@@ -27,26 +24,21 @@
           </tab>
         </tabs>
 
-        <tabs ref="tabs2"
-              tab_active_class="white-theme-active"
-              tab_inactive_class="white-theme-inactive">
-          <tab ref="tabby" v-on:click="log_event">
-            <template slot="header">
-              <div class="tab-label">
-                <p class="tab-heading"> Cat Tab </p>
-              </div>
-            </template>
+        <!-- This one uses the default styling -->
+        <tabs ref="tabs2">
+          <tab>
+            <tab-header v-on:click="log_event">
+              <p class="tab-heading"> Cat Tab </p>
+            </tab-header>
             <template slot="body">
               <div class="tab-body2">
               </div>
             </template>
           </tab>
-          <tab ref="tabby" v-on:click="log_event">
-            <template slot="header">
-              <div class="tab-label">
-                <p class="tab-heading"> Dog Tab </p>
-              </div>
-            </template>
+          <tab>
+            <tab-header v-on:click="log_event">
+              <p class="tab-heading"> Dog Tab </p>
+            </tab-header>
             <template slot="body">
               <div class="tab-body2">
                 Bye 2
@@ -64,11 +56,12 @@
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import Tab from '@/components/tabs/tab.vue';
+  import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
   import ViewFile from '@/components/view_file.vue';
 
   @Component({
-    components: {Tabs, Tab, ViewFile}
+    components: {Tabs, TabHeader, Tab, ViewFile}
   })
   export default class TabsDemo extends Vue {
     log_event(e: Event) {
@@ -121,14 +114,9 @@
     z-index: 15;
   }
 
-  .tab-label {
-    margin: 0;
-  }
-
   .tab-heading {
     margin: 0;
     padding-right: 15px;
-    display: inline-block;
     font-family: "Helvetica Neue", Helvetica;
   }
 
