@@ -7,41 +7,51 @@
       <br> <br>
       <div class="shrink-tabs">
         <p> Current Tab Index = {{current_tab_index}}</p>
-        <tabs ref="tabs" v-model="current_tab_index"
-              tab_active_class="no-border-active"
-              tab_inactive_class="no-border-inactive">
-          <tab v-for="(tab_val, index) in tab_labels" :key="tab_val">
-            <tab-header v-on:click="log_event">
-              <span class="tab-heading"> Tab {{tab_val}} </span>
-              <i class="fas fa-times close_x"
-                  @click="$event.stopPropagation(); remove_tab(index)"></i>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body">
-                {{tab_val}}
-              </div>
-            </template>
-          </tab>
-        </tabs>
+        <!--<tabs ref="tabs" v-model="current_tab_index"-->
+              <!--tab_active_class="no-border-active"-->
+              <!--tab_inactive_class="no-border-inactive">-->
+          <!--<tab v-for="(tab_val, index) in tab_labels" :key="tab_val">-->
+            <!--<tab-header v-on:click="log_event">-->
+              <!--<span class="tab-heading"> Tab {{tab_val}} </span>-->
+              <!--<i class="fas fa-times close_x"-->
+                  <!--@click="$event.stopPropagation(); remove_tab(index)"></i>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body">-->
+                <!--{{tab_val}}-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+        <!--</tabs>-->
 
         <!-- This one uses the default styling -->
         <tabs ref="tabs2">
+          <!--<tab>-->
+            <!--<tab-header v-on:click="log_event">-->
+              <!--<p class="tab-heading"> Cat Tab </p>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body2">-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
           <tab>
-            <tab-header v-on:click="log_event">
-              <p class="tab-heading"> Cat Tab </p>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body2">
-              </div>
-            </template>
-          </tab>
-          <tab>
-            <tab-header v-on:click="log_event">
+            <tab-header v-on:click.native="log_event">
               <p class="tab-heading"> Dog Tab </p>
             </tab-header>
             <template slot="body">
               <div class="tab-body2">
                 Bye 2
+              </div>
+            </template>
+          </tab>
+          <tab>
+            <tab-header @click.native="log_event">
+              Bare Text Tab
+            </tab-header>
+            <template slot="body">
+              <div class="tab-body2">
+                The tab header has just text
               </div>
             </template>
           </tab>

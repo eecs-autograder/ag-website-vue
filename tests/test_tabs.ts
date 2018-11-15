@@ -30,9 +30,9 @@ describe('Tabs tests', () => {
     test('Empty tab header and body', () => {
         const component = {
             template:  `<tabs ref="tabs">
-  <tab ref="tab_1">
-    <template slot="header">
-    </template>
+  <tab>
+    <tab-header ref="tab_1">
+    </tab-header>
     <template slot="body">
     </template>
   </tab>
@@ -51,23 +51,31 @@ describe('Tabs tests', () => {
         expect(tabs.find({ref: 'active-tab-body'}).isEmpty()).toEqual(true);
     });
 
+    test('Tab header has bare text', () => {
+       fail();
+    });
+
+    test('Tab header has html', () => {
+       fail();
+    });
+
     // --------------------------------------------------------------------------------------------
 
     test('First tab selected by default', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
@@ -100,17 +108,17 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs" v-model="selected_tab">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
@@ -148,25 +156,25 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
-  <tab ref="tab_2">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_2">
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
   </tab>
-  <tab ref="tab_3">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_3">
         Tab 3
-    </template>
+    </tab-header>
     <template slot="body">
         Tab 3 body
     </template>
@@ -206,17 +214,17 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
-  <tab ref="tab_2" @click="datum += 1">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_2" @click.native="datum += 1">
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
@@ -259,18 +267,18 @@ describe('Tabs tests', () => {
     test('Tab v-model binding', () => {
         const component = {
             template:  `<tabs ref="tabs" v-model="current_tab">
-  <tab ref="tab_1">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_1">
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
@@ -316,18 +324,18 @@ describe('Tabs tests', () => {
     test('Active index off end selects last tab', () => {
         const component = {
             template:  `<tabs ref="tabs" v-model="current_tab">
-  <tab ref="tab_1">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_1">
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
-  <tab ref="tab_2">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_2">
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 2 body
     </template>
@@ -360,9 +368,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <template slot="header">
+    <tab-header>
       Tab {{val}}
-    </template>
+    </tab-header>
     <template slot="body">
      Tab {{val}} body
     </template>
@@ -397,9 +405,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs" :value="1">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <template slot="header">
+    <tab-header>
       Tab {{val}}
-    </template>
+    </tab-header>
     <template slot="body">
      Tab {{val}} body
     </template>
@@ -434,9 +442,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs" :value="2">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <template slot="header">
+    <tab-header>
       Tab {{val}}
-    </template>
+    </tab-header>
     <template slot="body">
      Tab {{val}} body
     </template>
@@ -471,9 +479,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <template slot="header">
+    <tab-header>
       Tab {{val}}
-    </template>
+    </tab-header>
     <template slot="body">
      Tab {{val}} body
     </template>
@@ -509,9 +517,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <template slot="header">
+    <tab-header>
       Tab {{val}}
-    </template>
+    </tab-header>
     <template slot="body">
      Tab {{val}} body
     </template>
@@ -547,9 +555,9 @@ describe('Tabs tests', () => {
         @Component({
             template:  `<tabs ref="tabs" v-model="current_tab">
   <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <template slot="header">
+    <tab-header>
       Tab {{val}}
-    </template>
+    </tab-header>
     <template slot="body">
      Tab {{val}} body
     </template>
@@ -588,10 +596,10 @@ describe('Tabs tests', () => {
     test('Non <tab> tag in <tabs> is discarded', () => {
         const component = {
             template:  `<tabs ref="tabs">
-  <tab ref="real_tab">
-    <template slot="header">
+  <tab>
+    <tab-header ref="real_tab">
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
@@ -617,9 +625,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 1 body
     </template>
@@ -647,9 +655,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
-      <div id="tab_header">Tab 1</div>
-    </template>
+    <tab-header id="tab_header">
+      Tab 1
+    </tab-header>
     <template slot="body">
       Tab 1 body
     </template>
@@ -664,10 +672,10 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
+
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find('#tab_header').exists()).toEqual(true);
-        expect(tabs.find('#tab_header').text()).toContain('Tab 1');
         expect(tabs.find('#extra').exists()).toEqual(false);
     });
 
@@ -687,7 +695,7 @@ describe('Tabs tests', () => {
 
         expect(
             () => mount(component)
-        ).toThrow('Make sure <tab> elements have "header" and "body" slots');
+        ).toThrow('Make sure <tab> elements have <tab-header> element and "body" slot');
     });
 
     // --------------------------------------------------------------------------------------------
@@ -709,7 +717,7 @@ describe('Tabs tests', () => {
 
         expect(
             () => mount(component)
-        ).toThrow('Make sure <tab> elements have "header" and "body" slots');
+        ).toThrow('Make sure <tab> elements have <tab-header> element and "body" slot');
     });
 
     // --------------------------------------------------------------------------------------------
@@ -733,7 +741,7 @@ describe('Tabs tests', () => {
 
         expect(
             () => mount(component)
-        ).toThrow('Missing "header" slot in <tab>.');
+        ).toThrow('Missing "<tab-header>" tag in <tab>.');
     });
 
     // --------------------------------------------------------------------------------------------
@@ -758,7 +766,7 @@ describe('Tabs tests', () => {
 
         expect(
             () => mount(component)
-        ).toThrow('"header" slot must be a <template> tag.');
+        ).toThrow('Missing "<tab-header>" tag in <tab>.');
     });
 
     // --------------------------------------------------------------------------------------------
@@ -767,9 +775,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <div>Extra</div>
   </tab>
 </tabs>`,
@@ -790,9 +798,9 @@ describe('Tabs tests', () => {
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
-    <template slot="header">
+    <tab-header>
       Tab 1
-    </template>
+    </tab-header>
     <div slot="body">
       Tab 1 body
     </div>
@@ -816,18 +824,18 @@ describe('Tabs tests', () => {
             template:  `<tabs ref="tabs"
     tab_active_class="blue-theme-active"
     tab_inactive_class="blue-theme-inactive">
-  <tab ref="tab_1">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_1">
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
-  <tab ref="tab_2">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_2">
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
@@ -872,18 +880,18 @@ describe('Tabs tests', () => {
     test('Tab style resorts to default settings if no inputs are supplied', () => {
         const component = {
             template:  `<tabs ref="tabs">
-  <tab ref="tab_1">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_1">
       Tab 1
-    </template>
+    </tab-header>
     <template slot="body">
      Tab 1 body
     </template>
   </tab>
-  <tab ref="tab_2">
-    <template slot="header">
+  <tab>
+    <tab-header ref="tab_2">
       Tab 2
-    </template>
+    </tab-header>
     <template slot="body">
       Tab 2 body
     </template>
