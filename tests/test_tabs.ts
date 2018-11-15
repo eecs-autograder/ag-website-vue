@@ -92,11 +92,11 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.active_tab_index).toEqual(0);
 
-        let active_headers = tabs.findAll(tabs.vm.tab_active_class);
+        let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
         expect(active_headers.at(0).text()).toEqual('Tab 1');
 
-        expect(tabs.findAll(tabs.vm.tab_inactive_class).length).toBe(1);
+        expect(tabs.findAll('.' + tabs.vm.tab_inactive_class).length).toBe(1);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -140,11 +140,11 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.active_tab_index).toEqual(1);
 
-        let active_headers = tabs.findAll(tabs.vm.tab_active_class);
+        let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
         expect(active_headers.at(0).text()).toEqual('Tab 2');
 
-        expect(tabs.findAll(tabs.vm.tab_inactive_class).length).toBe(1);
+        expect(tabs.findAll('.' + tabs.vm.tab_inactive_class).length).toBe(1);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 2 body');
@@ -199,11 +199,11 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.active_tab_index).toEqual(1);
 
-        let active_headers = tabs.findAll(tabs.vm.tab_active_class);
+        let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
         expect(active_headers.at(0).text()).toEqual('Tab 2');
 
-        expect(tabs.findAll(tabs.vm.tab_inactive_class).length).toBe(2);
+        expect(tabs.findAll('.' + tabs.vm.tab_inactive_class).length).toBe(2);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });
@@ -676,6 +676,7 @@ describe('Tabs tests', () => {
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find('#tab_header').exists()).toEqual(true);
+        expect(tabs.text()).toContain('Tab 1');
         expect(tabs.find('#extra').exists()).toEqual(false);
     });
 
