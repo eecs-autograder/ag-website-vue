@@ -1,6 +1,6 @@
 <script lang="ts">
 
-import { CreateElement, VNode } from 'vue';
+import { CreateElement, VNode, VNodeData } from 'vue';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import Tab from '@/components/tabs/tab.vue';
@@ -71,11 +71,15 @@ export default class Tabs extends Vue {
 
   private _find_header(tab_children: VNode[]) {
     let header = tab_children.find(
-      (vnode: VNode) => {
-        return vnode !== undefined
-               && vnode.componentOptions !== undefined
-               && vnode.componentOptions.tag === 'tab-header';
-      });
+      (vnode: VNode) =>  {
+        if (vnode === undefined) {
+          return false;
+        }
+        return vnode.tag === 'tab-header'
+               || (vnode.componentOptions !== undefined
+                    && vnode.componentOptions.tag === 'tab-header');
+      }
+    );
     if (header === undefined) {
       throw new TabsError(`Missing "<tab-header>" tag in <tab>.`);
     }
@@ -83,119 +87,50 @@ export default class Tabs extends Vue {
   }
 
   private _extract_body(tab_children: VNode[]) {
-    let header = tab_children.find(
+    let body = tab_children.find(
       (vnode: VNode) => vnode.data !== undefined && vnode.data.slot === 'body');
-    if (header === undefined) {
+    if (body === undefined) {
       throw new TabsError('Missing "body" slot in <tab>.');
     }
-    if (header.tag !== 'template') {
+    if (body.tag !== 'template') {
       throw new TabsError('"body" slot must be a <template> tag.');
     }
-    return header;
+    return body;
   }
 
   private _render_tab_headers(create_element: CreateElement, tab_data: ExtractedTabData[]) {
     let header_elts = tab_data.map(
       ({header}, index) => {
-        console.log(header);
-        // console.log(header.data);
+        let element_data = header.data !== undefined ? {...header.data} : {};
 
-        // if (header.data === undefined) {
-        //   header.data = {};
-        // }
+        if (element_data.class === undefined) {
+          element_data.class = [];
+        }
+        else if (!Array.isArray(element_data.class)) {
+          element_data.class = [element_data.class];
+        }
 
-        // console.log(header.context);
-        // for (let key in header) {
-        //   console.log(key);
-        // }
-        console.log(header['elm']);
-        // console.log(header.componentOptions);
-        // console.log(header.data);
-        // if (header.componentInstance === undefined) {
-        //   return header;
-        //   // throw Error('Tab header componentInstance unexpectedly undefined');
-        // }
+        element_data.class.push(
+          index === this.active_tab_index ? this.tab_active_class : this.tab_inactive_class,
+          index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
+        );
 
-        // if (!(header.componentInstance instanceof TabHeader)) {
-        //   return header;
-        //   // throw Error('Tab header componentInstance not instance of TabHeader');
-        // }
+        if (element_data.nativeOn === undefined) {
+          element_data.nativeOn = {click: []};
+        }
+        if (element_data.nativeOn.click === undefined) {
+            element_data.nativeOn.click = [];
+        }
+        else if (!Array.isArray(element_data.nativeOn.click)) {
+          element_data.nativeOn.click = [element_data.nativeOn.click];
+        }
 
-        // header.componentInstance.d_is_active = index === this.active_tab_index;
+        element_data.nativeOn.click.push(() => this._set_active_tab(index));
 
-        // header.componentInstance.d_active_tab_class = this.tab_active_class;
-        // header.componentInstance.d_inactive_tab_class = this.tab_inactive_class;
-        // header.componentInstance.d_on_click_fn = () => this._set_active_tab(index);
-
-        // if (header.data === undefined) {
-        //   header.data = {};
-        // }
-        // if (header.data.on === undefined) {
-        //   header.data.on = {click: []};
-        // }
-        // if (header.data.on.click === undefined) {
-        //   header.data.on.click = [];
-        // }
-        // if (!Array.isArray(header.data.on.click)) {
-        //   header.data.on.click = [header.data.on.click];
-        // }
-
-        // header.data.on.click.push(() => {
-        //   this._set_active_tab(index);
-        // });
-
-        // if (header.data.class === undefined) {
-        //   header.data.class = [];
-        // }
-        // if (!Array.isArray(header.data.class)) {
-        //   header.data.class = [header.data.class];
-        // }
-
-        // header.data.class.push('tab-header');
-        // console.log(this.active_tab_index);
-        // if (index !== this.active_tab_index) {
-        //   header.data.class.push('inactive-tab-header');
-        //   header.data.class.push(this.tab_inactive_class);
-        // }
-        // else {
-        //   header.data.class.push(this.tab_active_class);
-        // }
-
-        return header;
-
-        // let event_listeners: { [key: string]: EventListener | EventListener[] } = {};
-        // safe_assign(event_listeners, listeners);
-
-        // if (event_listeners.click === undefined) {
-        //   event_listeners.click = [];
-        // }
-        // if (!Array.isArray(event_listeners.click)) {
-        //   event_listeners.click = [event_listeners.click];
-        // }
-        // event_listeners.click.push(() => {
-        //   this._set_active_tab(index);
-        // });
-
-        // console.log(header);
-        // if (header !== undefined && header.children !== undefined && header.children.length === 1) {
-        //   let child = header.children[0];
-        //   console.log(child);
-        //   console.log(child!.elm);
-        // }
-
-        // return create_element(
-        //   'div',
-        //   {
-        //     ref: ref,
-        //     class: [
-        //       'tab-header',
-        //       index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
-        //       index === this.active_tab_index ? this.tab_active_theme : this.tab_inactive_theme
-        //     ],
-        //     on: event_listeners
-        //   },
-        //   header.children
-        // );
+        return create_element(
+          'tab-header',
+          element_data,
+          header.componentOptions === undefined ? [] : header.componentOptions.children);
       }
     );
 
