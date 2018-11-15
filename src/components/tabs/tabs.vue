@@ -1,6 +1,6 @@
 <script lang="ts">
 
-import { CreateElement, VNode, VNodeData } from 'vue';
+import { CreateElement, VNode, VNodeData, VNodeChildren } from 'vue';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import Tab from '@/components/tabs/tab.vue';
@@ -127,10 +127,16 @@ export default class Tabs extends Vue {
 
         element_data.nativeOn.click.push(() => this._set_active_tab(index));
 
-        return create_element(
-          'tab-header',
-          element_data,
-          header.componentOptions === undefined ? [] : header.componentOptions.children);
+        let children: VNode[] | VNodeChildren = [];
+        if (header.children !== undefined) {
+          children = header.children;
+        }
+        else if (header.componentOptions !== undefined
+                 && header.componentOptions.children !== undefined) {
+          children = header.componentOptions.children;
+        }
+
+        return create_element('tab-header', element_data, children);
       }
     );
 
