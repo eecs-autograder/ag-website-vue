@@ -4,13 +4,14 @@ import { CreateElement, VNode } from 'vue';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
 
 import { safe_assign } from '@/utils';
 
 export class TabsError extends Error {}
 
 @Component({
-  components: {Tab}
+  components: {Tab, TabHeader}
 })
 export default class Tabs extends Vue {
 
@@ -29,13 +30,9 @@ export default class Tabs extends Vue {
   }
 
   active_tab_index: number = 0;
-  tab_active_theme = '';
-  tab_inactive_theme = '';
 
   created() {
     this.active_tab_index = this.value;
-    this.tab_active_theme = this.tab_active_class;
-    this.tab_inactive_theme = this.tab_inactive_class;
   }
 
   render(create_element: CreateElement) {
@@ -45,29 +42,24 @@ export default class Tabs extends Vue {
       return undefined;
     }
 
-    for (let slot of this.$slots.default) {
+    for (let tab of this.$slots.default) {
       // Skip any tags or content that isn't a <tab>
-      if (slot.componentOptions === undefined
-          || slot.componentOptions.tag !== 'tab') {
+      if (tab.componentOptions === undefined
+          || tab.componentOptions.tag !== 'tab') {
         continue;
       }
 
-      if (slot.componentOptions.children === undefined
-          || !Array.isArray(slot.componentOptions.children)
-          || slot.componentOptions.children.length < 2) {
-        throw new TabsError('Make sure <tab> elements have "header" and "body" slots');
+      if (tab.componentOptions.children === undefined
+          || !Array.isArray(tab.componentOptions.children)
+          || tab.componentOptions.children.length < 2) {
+        throw new TabsError('Make sure <tab> elements have <tab-header> element and "body" slot');
       }
 
-      let tab_children = <VNode[]> slot.componentOptions.children;
-      let header = this._extract_slot(tab_children, 'header');
-      let body = this._extract_slot(tab_children, 'body');
+      let tab_children = <VNode[]> tab.componentOptions.children;
+      let header = this._find_header(tab_children);
+      let body = this._extract_body(tab_children);
 
-      let ref;
-      if (slot.data !== undefined) {
-        ref = slot.data.ref;
-      }
-      tab_data.push({ref: ref, listeners: slot.componentOptions.listeners,
-                     header: header, body: body});
+      tab_data.push({header: header, body: body});
     }
 
     return create_element(
@@ -77,47 +69,133 @@ export default class Tabs extends Vue {
     );
   }
 
-  private _extract_slot(tab_children: VNode[], slot_name: 'header' | 'body') {
+  private _find_header(tab_children: VNode[]) {
     let header = tab_children.find(
-      (vnode: VNode) => vnode.data !== undefined && vnode.data.slot === slot_name);
+      (vnode: VNode) => {
+        return vnode !== undefined
+               && vnode.componentOptions !== undefined
+               && vnode.componentOptions.tag === 'tab-header';
+      });
     if (header === undefined) {
-      throw new TabsError(`Missing "${slot_name}" slot in <tab>.`);
+      throw new TabsError(`Missing "<tab-header>" tag in <tab>.`);
+    }
+    return header;
+  }
+
+  private _extract_body(tab_children: VNode[]) {
+    let header = tab_children.find(
+      (vnode: VNode) => vnode.data !== undefined && vnode.data.slot === 'body');
+    if (header === undefined) {
+      throw new TabsError('Missing "body" slot in <tab>.');
     }
     if (header.tag !== 'template') {
-      throw new TabsError(`"${slot_name}" slot must be a <template> tag.`);
+      throw new TabsError('"body" slot must be a <template> tag.');
     }
     return header;
   }
 
   private _render_tab_headers(create_element: CreateElement, tab_data: ExtractedTabData[]) {
     let header_elts = tab_data.map(
-      ({header, ref, listeners}, index) => {
-        let event_listeners: { [key: string]: EventListener | EventListener[] } = {};
-        safe_assign(event_listeners, listeners);
+      ({header}, index) => {
+        console.log(header);
+        // console.log(header.data);
 
-        if (event_listeners.click === undefined) {
-          event_listeners.click = [];
-        }
-        if (!Array.isArray(event_listeners.click)) {
-          event_listeners.click = [event_listeners.click];
-        }
-        event_listeners.click.push(() => {
-          this._set_active_tab(index);
-        });
+        // if (header.data === undefined) {
+        //   header.data = {};
+        // }
 
-        return create_element(
-          'div',
-          {
-            ref: ref,
-            class: [
-              'tab-header',
-              index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
-              index === this.active_tab_index ? this.tab_active_theme : this.tab_inactive_theme
-            ],
-            on: event_listeners
-          },
-          header.children
-        );
+        // console.log(header.context);
+        // for (let key in header) {
+        //   console.log(key);
+        // }
+        console.log(header['elm']);
+        // console.log(header.componentOptions);
+        // console.log(header.data);
+        // if (header.componentInstance === undefined) {
+        //   return header;
+        //   // throw Error('Tab header componentInstance unexpectedly undefined');
+        // }
+
+        // if (!(header.componentInstance instanceof TabHeader)) {
+        //   return header;
+        //   // throw Error('Tab header componentInstance not instance of TabHeader');
+        // }
+
+        // header.componentInstance.d_is_active = index === this.active_tab_index;
+
+        // header.componentInstance.d_active_tab_class = this.tab_active_class;
+        // header.componentInstance.d_inactive_tab_class = this.tab_inactive_class;
+        // header.componentInstance.d_on_click_fn = () => this._set_active_tab(index);
+
+        // if (header.data === undefined) {
+        //   header.data = {};
+        // }
+        // if (header.data.on === undefined) {
+        //   header.data.on = {click: []};
+        // }
+        // if (header.data.on.click === undefined) {
+        //   header.data.on.click = [];
+        // }
+        // if (!Array.isArray(header.data.on.click)) {
+        //   header.data.on.click = [header.data.on.click];
+        // }
+
+        // header.data.on.click.push(() => {
+        //   this._set_active_tab(index);
+        // });
+
+        // if (header.data.class === undefined) {
+        //   header.data.class = [];
+        // }
+        // if (!Array.isArray(header.data.class)) {
+        //   header.data.class = [header.data.class];
+        // }
+
+        // header.data.class.push('tab-header');
+        // console.log(this.active_tab_index);
+        // if (index !== this.active_tab_index) {
+        //   header.data.class.push('inactive-tab-header');
+        //   header.data.class.push(this.tab_inactive_class);
+        // }
+        // else {
+        //   header.data.class.push(this.tab_active_class);
+        // }
+
+        return header;
+
+        // let event_listeners: { [key: string]: EventListener | EventListener[] } = {};
+        // safe_assign(event_listeners, listeners);
+
+        // if (event_listeners.click === undefined) {
+        //   event_listeners.click = [];
+        // }
+        // if (!Array.isArray(event_listeners.click)) {
+        //   event_listeners.click = [event_listeners.click];
+        // }
+        // event_listeners.click.push(() => {
+        //   this._set_active_tab(index);
+        // });
+
+        // console.log(header);
+        // if (header !== undefined && header.children !== undefined && header.children.length === 1) {
+        //   let child = header.children[0];
+        //   console.log(child);
+        //   console.log(child!.elm);
+        // }
+
+        // return create_element(
+        //   'div',
+        //   {
+        //     ref: ref,
+        //     class: [
+        //       'tab-header',
+        //       index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
+        //       index === this.active_tab_index ? this.tab_active_theme : this.tab_inactive_theme
+        //     ],
+        //     on: event_listeners
+        //   },
+        //   header.children
+        // );
       }
     );
 
@@ -145,8 +223,6 @@ export default class Tabs extends Vue {
 }
 
 interface ExtractedTabData {
-  ref?: string;
-  listeners?: object;
   header: VNode;
   body: VNode;
 }
@@ -154,28 +230,5 @@ interface ExtractedTabData {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/components/tab_styles.scss';
-
-.tab-header {
-  display: inline-block;
-}
-
-.active-tab-header {
-  border-radius: 10px 10px 0 0;
-  margin-right: 2px;
-  margin-top: 4px;
-  padding: 10px 15px;
-}
-
-.inactive-tab-header {
-  border-radius: 10px 10px 0 0;
-  margin-right: 2px;
-  margin-top: 4px;
-  padding: 10px 15px;
-}
-
-.inactive-tab-header:hover {
-  cursor: pointer;
-}
 
 </style>

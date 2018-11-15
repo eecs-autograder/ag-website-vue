@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { config, mount } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 import Component from 'vue-class-component';
 
 import Tab from '@/components/tabs/tab.vue';
@@ -21,7 +21,7 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.isEmpty()).toEqual(true);
     });
 
@@ -43,7 +43,7 @@ describe('Tabs tests', () => {
             }
         };
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.exists()).toEqual(true);
 
         console.log(tabs.html());
@@ -80,15 +80,15 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
-        let active_headers = tabs.findAll('.active-tab-header');
+        let active_headers = tabs.findAll(tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
         expect(active_headers.at(0).text()).toEqual('Tab 1');
 
-        expect(tabs.findAll('.inactive-tab-header').length).toBe(1);
+        expect(tabs.findAll(tabs.vm.tab_inactive_class).length).toBe(1);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -128,15 +128,15 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
 
-        let active_headers = tabs.findAll('.active-tab-header');
+        let active_headers = tabs.findAll(tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
         expect(active_headers.at(0).text()).toEqual('Tab 2');
 
-        expect(tabs.findAll('.inactive-tab-header').length).toBe(1);
+        expect(tabs.findAll(tabs.vm.tab_inactive_class).length).toBe(1);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 2 body');
@@ -179,9 +179,9 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -189,13 +189,13 @@ describe('Tabs tests', () => {
         let tab_2 = tabs.find({ref: 'tab_2'});
         tab_2.trigger('click');
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
 
-        let active_headers = tabs.findAll('.active-tab-header');
+        let active_headers = tabs.findAll(tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
         expect(active_headers.at(0).text()).toEqual('Tab 2');
 
-        expect(tabs.findAll('.inactive-tab-header').length).toBe(2);
+        expect(tabs.findAll(tabs.vm.tab_inactive_class).length).toBe(2);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });
@@ -234,10 +234,10 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(wrapper.vm.$data.datum).toEqual(0);
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -246,7 +246,7 @@ describe('Tabs tests', () => {
         tab_2.trigger('click');
 
         expect(wrapper.vm.$data.datum).toEqual(1);
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
 
@@ -288,9 +288,9 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -298,7 +298,7 @@ describe('Tabs tests', () => {
         // Set current_tab, active tab should change
         wrapper.setData({current_tab: 1});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
 
@@ -307,7 +307,7 @@ describe('Tabs tests', () => {
         tab_1.trigger('click');
 
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
         expect(wrapper.vm.$data.current_tab).toEqual(0);
     });
 
@@ -345,9 +345,9 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
         expect(wrapper.vm.$data.current_tab).toEqual(1);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
@@ -380,14 +380,14 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
 
         wrapper.vm.$data.tab_vals.splice(0, 1);
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
@@ -417,14 +417,14 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 2 body');
 
         wrapper.vm.$data.tab_vals.splice(1, 1);
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
         expect(active_body.text()).toEqual('Tab 3 body');
     });
 
@@ -454,14 +454,14 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(2);
+        expect(tabs.vm.active_tab_index).toEqual(2);
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 3 body');
 
         wrapper.vm.$data.tab_vals.splice(2, 1);
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
@@ -491,16 +491,16 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         wrapper.vm.$data.tab_vals.splice(1, 1);
 
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
     });
 
     // --------------------------------------------------------------------------------------------
@@ -529,16 +529,16 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         wrapper.vm.$data.tab_vals.push(4);
 
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
     });
 
     // --------------------------------------------------------------------------------------------
@@ -571,16 +571,16 @@ describe('Tabs tests', () => {
         }
 
         const wrapper = mount(WrapperComponent);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         wrapper.vm.add_tab();
 
         expect(active_body.text()).toEqual('Tab 4 body');
-        expect(tabs.vm.$data.active_tab_index).toEqual(3);
+        expect(tabs.vm.active_tab_index).toEqual(3);
     });
 
     // --------------------------------------------------------------------------------------------
@@ -606,7 +606,7 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.find({ref: 'real_tab'}).exists()).toEqual(true);
         expect(tabs.find('#bad').exists()).toEqual(false);
     });
@@ -634,7 +634,7 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.text()).toContain('Tab 1');
         expect(tabs.text()).toContain('Tab 1 body');
@@ -664,7 +664,7 @@ describe('Tabs tests', () => {
         };
 
         const wrapper = mount(component);
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find('#tab_header').exists()).toEqual(true);
         expect(tabs.find('#tab_header').text()).toContain('Tab 1');
@@ -841,13 +841,13 @@ describe('Tabs tests', () => {
 
         const wrapper = mount(component);
 
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.$data.tab_active_theme).toBe("blue-theme-active");
+        expect(tabs.vm.tab_active_class).toBe("blue-theme-active");
 
-        expect(tabs.vm.$data.tab_inactive_theme).toBe("blue-theme-inactive");
+        expect(tabs.vm.tab_inactive_class).toBe("blue-theme-inactive");
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -862,7 +862,7 @@ describe('Tabs tests', () => {
         expect(tab_2.classes()).toContain("blue-theme-active");
         expect(tab_1.classes()).toContain("blue-theme-inactive");
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });
@@ -897,15 +897,15 @@ describe('Tabs tests', () => {
 
         const wrapper = mount(component);
 
-        const tabs = wrapper.find({ref: 'tabs'});
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         console.log(tabs.html());
 
-        expect(tabs.vm.$data.tab_active_theme).toBe("white-theme-active");
+        expect(tabs.vm.tab_active_class).toBe("white-theme-active");
 
-        expect(tabs.vm.$data.tab_inactive_theme).toBe("white-theme-inactive");
+        expect(tabs.vm.tab_inactive_class).toBe("white-theme-inactive");
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(0);
+        expect(tabs.vm.active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -920,7 +920,7 @@ describe('Tabs tests', () => {
         expect(tab_2.classes()).toContain("white-theme-active");
         expect(tab_1.classes()).toContain("white-theme-inactive");
 
-        expect(tabs.vm.$data.active_tab_index).toEqual(1);
+        expect(tabs.vm.active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });
