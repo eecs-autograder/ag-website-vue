@@ -4,17 +4,14 @@
           v-model="active_tab_index"
           tab_active_class="gray-white-theme-active"
           tab_inactive_class="gray-white-theme-inactive">
-       <tab ref="single-tab"
-            v-for="(open_file, index) of files_currently_viewing"
-            @click="active_tab_index = index">
-
-         <template slot="header">
+       <tab v-for="(open_file, index) of files_currently_viewing">
+         <tab-header @click.native="active_tab_index = index">
            <div class="tab-header">
              <p class="tab-label"> {{ open_file.name }} </p>
              <i class="fas fa-times close-x"
                 @click="$event.stopPropagation(); remove_from_viewing(index)"></i>
            </div>
-         </template>
+         </tab-header>
 
          <template slot="body">
            <div class="tab-body">
@@ -38,6 +35,7 @@
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import Tab from '@/components/tabs/tab.vue';
+  import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
   import ViewFile from '@/components/view_file.vue';
 
