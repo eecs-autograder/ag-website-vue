@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <ButtonDemo></ButtonDemo>
+    <ButtonDemo></ButtonDemo>
     <ColorPaletteDemo></ColorPaletteDemo>
     <ContextMenuDemo></ContextMenuDemo>
     <CourseListDemo></CourseListDemo>
@@ -9,11 +9,11 @@
     <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
     <ModalDemo></ModalDemo>
     <FileUploadDemo></FileUploadDemo>
-    <MultiFileViewerDemo></MultiFileViewerDemo> -->
+    <MultiFileViewerDemo></MultiFileViewerDemo>
     <TabsDemo></TabsDemo>
-    <!-- <TooltipDemo></TooltipDemo>
+    <TooltipDemo></TooltipDemo>
     <ToggleDemo></ToggleDemo>
-    <ViewFileDemo></ViewFileDemo> -->
+    <ViewFileDemo></ViewFileDemo>
   </div>
 </template>
 
