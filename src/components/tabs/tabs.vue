@@ -1,6 +1,6 @@
 <script lang="ts">
 
-import { CreateElement, VNode, VNodeData, VNodeChildren } from 'vue';
+import { CreateElement, VNode, VNodeChildren } from 'vue';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import Tab from '@/components/tabs/tab.vue';
@@ -72,9 +72,6 @@ export default class Tabs extends Vue {
   private _find_header(tab_children: VNode[]) {
     let header = tab_children.find(
       (vnode: VNode) =>  {
-        if (vnode === undefined) {
-          return false;
-        }
         return vnode.tag === 'tab-header'
                || (vnode.componentOptions !== undefined
                     && vnode.componentOptions.tag === 'tab-header');
@@ -127,6 +124,14 @@ export default class Tabs extends Vue {
 
         element_data.nativeOn.click.push(() => this._set_active_tab(index));
 
+        // If TabHeader is explicitly registered with the parent
+        // component, children will be available at header.componentOptions.children.
+        // Otherwise, children will be available at header.children.
+        // At time of writing, this was determined by examining the
+        // Vue source code at:
+        //    https://github.com/vuejs/vue/blob/dev/src/core/vdom/create-element.js#L107
+        //    and
+        //    https://github.com/vuejs/vue/blob/dev/src/core/vdom/create-element.js#L112
         let children: VNode[] | VNodeChildren = [];
         if (header.children !== undefined) {
           children = header.children;

@@ -4,6 +4,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 import Component from 'vue-class-component';
 
 import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 
 beforeAll(() => {
@@ -50,18 +51,21 @@ describe('Tabs tests', () => {
         expect(tabs.find({ref: 'active-tab-body'}).isEmpty()).toEqual(true);
     });
 
+    // --------------------------------------------------------------------------------------------
+
     test('Tab header has bare text', () => {
         const component = {
-            template:  `<tabs ref="tabs">
-                            <tab>
-                                <tab-header ref="text_tab_header">
-                                    Spam
-                                </tab-header>
-                                <template slot="body">
-                                    Body
-                                </template>
-                            </tab>
-                        </tabs>`,
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="text_tab_header">
+                      Spam
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
             components: {
                 'tab': Tab,
                 'tabs': Tabs
@@ -74,18 +78,21 @@ describe('Tabs tests', () => {
         expect(tabs.find({ref: 'text_tab_header'}).text()).toEqual('Spam');
     });
 
+    // --------------------------------------------------------------------------------------------
+
     test('Tab header has html', () => {
         const component = {
-            template:  `<tabs ref="tabs">
-                          <tab>
-                            <tab-header ref="text_tab_header">
-                              <div>Spam</div>
-                            </tab-header>
-                            <template slot="body">
-                              Body
-                            </template>
-                          </tab>
-                        </tabs>`,
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="html_text_header">
+                      <div>Spam</div>
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
             components: {
                 'tab': Tab,
                 'tabs': Tabs
@@ -95,7 +102,174 @@ describe('Tabs tests', () => {
         const wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.find({ref: 'text_tab_header'}).text()).toEqual('Spam');
+        expect(tabs.find({ref: 'html_text_header'}).text()).toEqual('Spam');
+    });
+
+    // --------------------------------------------------------------------------------------------
+
+    test('tab-header given string class', async () => {
+        const component = {
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="header" class="spam">
+                      <div>Spam</div>
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        let header = tabs.find({ref: 'header'});
+        expect(header.classes()).toContain('spam');
+    });
+
+    test('tab-header given object class info', async () => {
+        const component = {
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="header" :class="{spam: true}">
+                      Header
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        let header = tabs.find({ref: 'header'});
+        expect(header.classes()).toContain('spam');
+    });
+
+    test('tab-header given class array', async () => {
+        const component = {
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="header" :class="['spam']">
+                      Header
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        let header = tabs.find({ref: 'header'});
+        expect(header.classes()).toContain('spam');
+    });
+
+    test('tab-header has non-click event handler', async () => {
+        const component = {
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="header" @hover.native="hovered = true">
+                      Header
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs,
+                'tab-header': TabHeader
+            },
+            data: () => {
+                return {
+                    hovered: false
+                };
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(wrapper.vm.$data.hovered).toBe(false);
+
+        let header = tabs.find({ref: 'header'});
+        header.trigger('hover');
+
+        expect(wrapper.vm.$data.hovered).toBe(true);
+    });
+
+    test('tab-header explicitly registered in parent', async () => {
+        const component = {
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="header">
+                      Spam
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
+            components: {
+                'tab': Tab,
+                'tab-header': TabHeader,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(tabs.find({ref: 'header'}).text()).toEqual('Spam');
+    });
+
+    test('tab-header not-explicitly registered in parent', async () => {
+        const component = {
+            template:  `
+                <tabs ref="tabs">
+                  <tab>
+                    <tab-header ref="header">
+                      Spam
+                    </tab-header>
+                    <template slot="body">
+                      Body
+                    </template>
+                  </tab>
+                </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        const wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(tabs.find({ref: 'header'}).text()).toEqual('Spam');
     });
 
     // --------------------------------------------------------------------------------------------
