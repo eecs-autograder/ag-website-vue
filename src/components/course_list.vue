@@ -36,7 +36,7 @@
   import { AllCourses, Model } from '@/model';
   import { Course, Semester, User } from 'ag-client-typescript';
 
-  // import { ObserverComponent } from '@/observer_component';
+  import { ObserverComponent } from '@/observer_component';
   import { array_add_unique, array_get_unique, array_has_unique } from '@/utils';
 
   import { Component, Vue } from 'vue-property-decorator';
@@ -52,12 +52,17 @@
   }
 
   @Component
-  export default class CourseList extends Vue {
+  export default class CourseList extends ObserverComponent {
 
     all_courses: AllCourses | null = null;
     courses_by_term: TermCourses[] = [];
 
+    beforeDestroy() {
+      super.beforeDestroy();
+    }
+
     async created() {
+      super.created();
       let user = await User.get_current();
       this.all_courses = await Model.get_instance().get_courses_for_user(user);
       for (let [role, courses] of Object.entries(this.all_courses)) {

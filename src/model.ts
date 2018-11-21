@@ -19,22 +19,10 @@ export class Model {
         this._subscribers.delete(observer);
     }
 
+    // use function from course.ts
+    // mock this method instead
     async get_courses_for_user(user: User): Promise<AllCourses> {
-        let [admin_courses,
-             staff_courses,
-             student_courses,
-             handgrader_courses] = await Promise.all([
-                 user.courses_is_admin_for(),
-                 user.courses_is_staff_for(),
-                 user.courses_is_student_in(),
-                 user.courses_is_handgrader_for()
-        ]);
-        return {
-            courses_is_admin_for: admin_courses,
-            courses_is_staff_for: staff_courses,
-            courses_is_student_in: student_courses,
-            courses_is_handgrader_for: handgrader_courses,
-        };
+        return Course.get_courses_for_user(user);
     }
 }
 

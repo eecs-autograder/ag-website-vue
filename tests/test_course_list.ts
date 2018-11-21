@@ -64,6 +64,13 @@ describe('Course_List tests', () => {
              num_late_days: 0, last_modified: ''});
     });
 
+    afterEach(() => {
+        if (wrapper.exists()) {
+            console.log("wrapper exists");
+            wrapper.destroy();
+        }
+    });
+
     test("The semester, year, and name of a course get displayed", async () => {
 
         all_courses = {
@@ -77,8 +84,8 @@ describe('Course_List tests', () => {
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_class_method(
-                Model, 'get_courses_for_user',
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
@@ -112,9 +119,9 @@ describe('Course_List tests', () => {
               User, 'get_current',
               () => Promise.resolve(user), async () => {
 
-             await patch_async_class_method(
-                 Model, 'get_courses_for_user',
-                 () =>  Promise.resolve(all_courses), async () => {
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
 
                  let mock_result = await Model.get_instance().get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
@@ -147,9 +154,9 @@ describe('Course_List tests', () => {
         User, 'get_current',
         () => Promise.resolve(user), async () => {
 
-            await patch_async_class_method(
-            Model, 'get_courses_for_user',
-            () =>  Promise.resolve(all_courses), async () => {
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
@@ -207,9 +214,9 @@ describe('Course_List tests', () => {
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-             await patch_async_class_method(
-                 Model, 'get_courses_for_user',
-                 () =>  Promise.resolve(all_courses), async () => {
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
 
                  let mock_result = await Model.get_instance().get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
@@ -243,8 +250,8 @@ describe('Course_List tests', () => {
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_class_method(
-                Model, 'get_courses_for_user',
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
@@ -281,8 +288,8 @@ describe('Course_List tests', () => {
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_class_method(
-                Model, 'get_courses_for_user',
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
@@ -316,8 +323,8 @@ describe('Course_List tests', () => {
         await patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
-            await patch_async_class_method(
-                Model, 'get_courses_for_user',
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
@@ -360,8 +367,8 @@ describe('Course_List tests', () => {
         await patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
-            await patch_async_class_method(
-                Model, 'get_courses_for_user',
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
