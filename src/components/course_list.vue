@@ -57,6 +57,7 @@
     all_courses: AllCourses | null = null;
     courses_by_term: TermCourses[] = [];
 
+    // tslint:disable-next-line:naming-convention
     beforeDestroy() {
       super.beforeDestroy();
     }
