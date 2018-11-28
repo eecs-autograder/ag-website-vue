@@ -70,7 +70,12 @@
         this.sort_into_terms(courses);
       }
       this.courses_by_term.sort(term_descending);
-      this.sort_the_courses_in_each_term();
+
+      for (let term_courses of this.courses_by_term) {
+        term_courses.course_list.sort((course_a: Course, course_b: Course) => {
+           return (course_a.name >= course_b.name) ? 1 : -1;
+        });
+      }
     }
 
     is_admin(course: Course) {
@@ -106,17 +111,6 @@
             }
           );
         }
-      }
-    }
-
-    sort_the_courses_in_each_term() {
-      for (let i = 0; i < this.courses_by_term.length; ++i) {
-        this.courses_by_term[i].course_list.sort((course_a: Course, course_b: Course) => {
-           if (course_a.name >= course_b.name) {
-             return 1;
-           }
-           return -1;
-        });
       }
     }
   }
