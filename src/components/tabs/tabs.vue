@@ -200,4 +200,6 @@ interface ExtractedTabData {
 
 <style scoped lang="scss">
 
+/* index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header'*/
+
 </style>

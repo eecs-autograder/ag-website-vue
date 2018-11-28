@@ -3,13 +3,13 @@
     <ButtonDemo></ButtonDemo>
     <ColorPaletteDemo></ColorPaletteDemo>
     <ContextMenuDemo></ContextMenuDemo>
+    <CourseAdminDemo></CourseAdminDemo>
     <CourseListDemo></CourseListDemo>
     <DiffDemo></DiffDemo>
     <DropdownDemo></DropdownDemo>
     <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
-    <ModalDemo></ModalDemo>
     <FileUploadDemo></FileUploadDemo>
-    <LoadingIconDemo></LoadingIconDemo>
+    <ModalDemo></ModalDemo>
     <MultiFileViewerDemo></MultiFileViewerDemo>
     <TabsDemo></TabsDemo>
     <TooltipDemo></TooltipDemo>
@@ -32,6 +32,7 @@ import ViewFile from '@/components/view_file.vue';
 import ButtonDemo from '@/demos/button_demo.vue';
 import ColorPaletteDemo from '@/demos/color_palette_demo.vue';
 import ContextMenuDemo from '@/demos/context_menu_demo.vue';
+import CourseAdminDemo from '@/demos/course_admin_demo.vue';
 import CourseListDemo from '@/demos/course_list_demo.vue';
 import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
@@ -53,6 +54,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     ColorPaletteDemo,
     ContextMenuDemo,
     CourseListDemo,
+    CourseAdminDemo,
     DiffDemo,
     Dropdown,
     DropdownDemo,

@@ -76,10 +76,12 @@ export default class Dropdown extends Vue {
   }
 
   show_the_dropdown_menu() {
+    // console.log("Showing the dropdown Menu");
     this.d_is_open = true;
   }
 
   hide_the_dropdown_menu() {
+    // console.log("Hiding the dropdown Menu");
     this.d_is_open = false;
   }
 
