@@ -1,6 +1,7 @@
 <template>
   <div class="course-admin-component"
-       ref="course_admin_component">
+       ref="course_admin_component"
+       v-if="course != null">
     <div>
       <tabs ref="tabs2"
             tab_active_class="gray-theme-active"
@@ -16,59 +17,66 @@
             <div class="tab-body">
               <div id="settings-container">
                 <div id="settings-container-inputs">
-                  <div class="settings-single-input-container">
-                    <label class="settings-input-label"> Course name: </label>
-                    <input type="text"
-                           name="name"
-                           id="input-course-name"
-                           class="settings-input"
-                           v-model="course.name">
-                  </div>
-                  <div class="settings-single-input-container">
-                    <label class="settings-input-label"> Semester: </label>
-                    <div class="semester-dropdown-wrapper">
-                      <dropdown ref="semester_dropdown"
-                                    :items="semesters"
-                                    @update_item_selected="update_semester($event)">
-                      <template slot="header">
-                        <input type=text
-                               name="semester"
-                               id="input-course-semester"
-                               class="settings-input"
-                               v-model="course.semester">
-                      </template>
-                      <div slot-scope="{item}">
-                        <span>{{item}}</span>
-                      </div>
-                    </dropdown>
+                  <form id="course-settings-form" @submit.prevent="save_course_settings">
+                    <div class="settings-single-input-container">
+                      <label class="settings-input-label"> Course name: </label>
+                      <input type="text"
+                             name="name"
+                             id="input-course-name"
+                             class="settings-input"
+                             v-model="course.name">
                     </div>
-                  </div>
-                  <div class="settings-single-input-container">
-                    <label class="settings-input-label"> Year: </label>
-                    <input type="text"
-                           name="year"
-                           id="input-course-year"
-                           class="settings-input"
-                           v-model="course.year">
-                  </div>
-                  <div class="settings-single-input-container">
-                    <label class="settings-input-label"> Late days per student: </label>
-                    <input type="tel"
-                           name="num_late_days"
-                           id="input-course-late-days"
-                           class="settings-input"
-                           min="0"
-                           v-model="course.num_late_days">
-                  </div>
-                  <div class="settings-save-button"> Save Updates </div>
+                    <div class="settings-single-input-container">
+                      <label class="settings-input-label"> Semester: </label>
+                      <div class="semester-dropdown-wrapper">
+                        <dropdown ref="semester_dropdown"
+                                  :items="semesters"
+                                  @update_item_selected="course.semester = $event">
+                        <template slot="header">
+                          <div tabindex="1" class="input-wrapper">
+                            <input type=text
+                                   name="semester"
+                                   id="input-course-semester"
+                                   class="settings-input"
+                                   v-model="course.semester"
+                                   @blur="close_dropdown_menu"/>
+                            <i class="fas fa-caret-down dropdown-caret"></i>
+                          </div>
+                        </template>
+                        <div slot-scope="{item}">
+                          <span class="semester-item">{{item}}</span>
+                        </div>
+                      </dropdown>
+                      </div>
+                    </div>
+                    <div class="settings-single-input-container">
+                      <label class="settings-input-label"> Year: </label>
+                      <input type="text"
+                             name="year"
+                             id="input-course-year"
+                             class="settings-input"
+                             v-model="course.year">
+                    </div>
+                    <div class="settings-single-input-container">
+                      <label class="settings-input-label"> Late days per student: </label>
+                      <input type="tel"
+                             name="num_late_days"
+                             id="input-course-late-days"
+                             class="settings-input"
+                             min="0"
+                             v-model="course.num_late_days">
+                    </div>
 
-                  <div v-if="!saving"
-                       class="last-saved-timestamp">
-                    <span> Last Saved: </span>{{course.last_modified}}
-                  </div>
-                  <div v-else class="last-saved-spinner">
-                    <i class="fa fa-spinner fa-pulse"></i>
-                  </div>
+                    <input type="submit" class="settings-save-button" value="Save Updates">
+
+                    <div v-if="!saving"
+                         class="last-saved-timestamp">
+                      <span> Last Saved: </span> {{Date(course.last_modified)}}
+                    </div>
+                    <div v-else class="last-saved-spinner">
+                      <i class="fa fa-spinner fa-pulse"></i>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -110,7 +118,8 @@
                         </tooltip>
                       </i>
                     </label>
-                    <textarea ref="new_admin_list"> </textarea>
+                    <textarea ref="new_admin_list"
+                              v-model="new_admins_list"> </textarea>
                   <p class="add-enrollees-button" @click="add_admins"> Add to Roster </p>
                   </div>
 
@@ -119,14 +128,14 @@
                       <div class="roster-column">
                         <table class="roster-table">
                           <tr>
-                            <th> Email </th>
+                            <th> Username </th>
                             <th> First Name </th>
                             <th> Last Name </th>
                             <th></th>
                           </tr>
                           <tr v-for="(admin, index) in admins"
                               :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{admin.email}}</td>
+                            <td>{{admin.username}}</td>
                             <td>{{admin.first_name}}</td>
                             <td>{{admin.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
@@ -149,7 +158,8 @@
                         </tooltip>
                       </i>
                     </label>
-                    <textarea ref="new_staff_list"> </textarea>
+                    <textarea ref="new_staff_list"
+                              v-model="new_staff_list"> </textarea>
                     <p class="add-enrollees-button" @click="add_staff"> Add to Roster </p>
                   </div>
 
@@ -158,14 +168,14 @@
                       <div class="roster-column">
                         <table class="roster-table">
                           <tr>
-                            <th> Email </th>
+                            <th> Username </th>
                             <th> First Name </th>
                             <th> Last Name </th>
                             <th></th>
                           </tr>
                           <tr v-for="(staff_member, index) in staff"
                               :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{staff_member.email}}</td>
+                            <td>{{staff_member.username}}</td>
                             <td>{{staff_member.first_name}}</td>
                             <td>{{staff_member.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
@@ -187,7 +197,8 @@
                         </tooltip>
                       </i>
                     </label>
-                    <textarea ref="new_student_list"> </textarea>
+                    <textarea ref="new_student_list"
+                              v-model="new_students_list"> </textarea>
                     <p class="add-enrollees-button" @click="add_students"> Add to Roster </p>
                   </div>
 
@@ -196,14 +207,14 @@
                       <div class="roster-column">
                         <table class="roster-table">
                           <tr>
-                            <th> Email </th>
+                            <th> Username </th>
                             <th> First Name </th>
                             <th> Last Name </th>
                             <th></th>
                           </tr>
                           <tr v-for="(student, index) in students"
                               :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{student.email}}</td>
+                            <td>{{student.username}}</td>
                             <td>{{student.first_name}}</td>
                             <td>{{student.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
@@ -225,7 +236,8 @@
                         </tooltip>
                       </i>
                     </label>
-                    <textarea ref="new_handgrader_list"> </textarea>
+                    <textarea ref="new_handgrader_list"
+                              v-model="new_handgraders_list"> </textarea>
                     <p class="add-enrollees-button" @click="add_handgraders"> Add to Roster </p>
                   </div>
 
@@ -234,14 +246,14 @@
                       <div class="roster-column">
                         <table class="roster-table">
                           <tr>
-                            <th> Email </th>
+                            <th> Username </th>
                             <th> First Name </th>
                             <th> Last Name </th>
                             <th></th>
                           </tr>
                           <tr v-for="(handgrader, index) in handgraders"
                               :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{handgrader.email}}</td>
+                            <td>{{handgrader.username}}</td>
                             <td>{{handgrader.first_name}}</td>
                             <td>{{handgrader.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
@@ -269,15 +281,17 @@
 
                 <div id="new-project-side">
                   <div id="new-project-space">
-                    <p id="new-project-label"> Create a New Project</p>
-                    <input type="text"
-                           id="new-project-input"
-                           ref="new_project_input"
-                           placeholder="New Project Name">
-                    <div class="create-new-project-button"
-                         @click="add_project()">
-                      Add Project
-                    </div>
+                    <form id="new-project-form" @submit.prevent="add_project">
+                      <p id="new-project-label"> Create a New Project</p>
+                      <input type="text"
+                             id="new-project-input"
+                             ref="new_project_input"
+                             v-model="new_project_name"
+                             placeholder="New Project Name">
+                      <input type="submit"
+                             class="create-new-project-button"
+                             value="Add Project">
+                    </form>
                   </div>
                 </div>
 
@@ -330,18 +344,22 @@
     saving = false;
 
     // settings
-    course: Course = new Course({pk: 1, name: 'EECS 721', semester: Semester.fall, year: 2018,
-                                 subtitle: '', num_late_days: 0, last_modified: '2:23:22'});
+    course: Course | null = null;
 
     // permissions
-    // all_users_in_course: AllUsersInCourse;
     admins: User[] = [];
     staff: User[] = [];
     students: User[] = [];
     handgraders: User[] = [];
 
+    new_admins_list = "";
+    new_staff_list = "";
+    new_students_list = "";
+    new_handgraders_list = "";
+
     // projects
     projects: Project[] = [];
+    new_project_name = "";
 
     roles = ["admin", "staff", "student", "handgraders"];
 
@@ -352,22 +370,48 @@
       document.body.style.margin = "0";
 
       // get course_pk
-      let course_pk = 1;
-      this.course = await Course.get_by_pk(course_pk);
+      this.course = await Course.get_by_pk(this.$route.params.courseId);
+
+      console.log(this.course.last_modified);
+      let date = new Date(this.course.last_modified);
       this.admins = await this.course.get_admins();
       this.staff = await this.course.get_staff();
       this.students = await this.course.get_students();
       this.handgraders = await this.course.get_handgraders();
-      this.projects = await Project.get_all_from_course(course_pk);
+      this.projects = await Project.get_all_from_course(this.course.pk);
 
-      // for (let users_in_role of this.all_users_in_course) {
-      //   users_in_role.sort((user_a: User, user_b: User) => {
-      //     if (user_a.email <= user_b.email) {
-      //       return -1;
-      //     }
-      //     return 1;
-      //   });
-      // }
+      this.admins.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
+
+      this.staff.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
+
+      this.students.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
+
+      this.handgraders.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
+    }
+
+    close_dropdown_menu() {
+      let grading_policy_dropdown = <Dropdown> this.$refs.semester_dropdown;
+      grading_policy_dropdown.hide_the_dropdown_menu();
     }
 
     show_dropdown(event: Event) {
@@ -384,44 +428,76 @@
       this.role_selected = role_in;
     }
 
+    async save_course_settings() {
+      console.log("Save course settings got called");
+      await this.course.save();
+    }
+
     async add_admins() {
-      let add_admins_textarea = <HTMLInputElement> this.$refs.new_admin_list;
-      this.course.add_admins(add_admins_textarea.value.trim().split(this.whitespace_regex));
-      console.log(add_admins_textarea.value);
-      add_admins_textarea.value = '';
+      this.course.add_admins(this.new_admins_list.trim().split(this.whitespace_regex));
+      console.log(this.new_admins_list);
+      this.new_admins_list = "";
+      this.admins = await this.course.get_admins();
+      this.admins.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
     }
 
     async add_staff() {
-      let add_staff_textarea = <HTMLInputElement> this.$refs.new_staff_list;
-      this.course.add_admins(add_staff_textarea.value.trim().split(this.whitespace_regex));
-      console.log(add_staff_textarea.value);
-      add_staff_textarea.value = '';
+      this.course.add_admins(this.new_staff_list.trim().split(this.whitespace_regex));
+      console.log(this.new_staff_list);
+      this.new_staff_list = '';
+      this.staff = await this.course.get_staff();
+      this.staff.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
     }
 
     async add_students() {
-      let add_students_textarea = <HTMLInputElement> this.$refs.new_student_list;
-      this.course.add_students(
-        add_students_textarea.value.trim().split(this.whitespace_regex)
-      );
-      console.log(add_students_textarea.value);
-      add_students_textarea.value = '';
+      this.course.add_students(this.new_students_list.trim().split(this.whitespace_regex));
+      console.log(this.new_students_list);
+      this.new_students_list = '';
+      this.students = await this.course.get_students();
+      this.students.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
     }
 
     async add_handgraders() {
-      let add_handgraders_textarea = <HTMLInputElement> this.$refs.new_handgrader_list;
-      this.course.add_handgraders(
-        add_handgraders_textarea.value.trim().split(this.whitespace_regex)
-      );
-      console.log(add_handgraders_textarea.value);
-      add_handgraders_textarea.value = '';
+      this.course.add_handgraders(this.new_handgraders_list.trim().split(this.whitespace_regex));
+      console.log(this.new_handgraders_list);
+      this.new_handgraders_list = '';
+      this.handgraders = await this.course.get_handgraders();
+      this.handgraders.sort((user_a: User, user_b: User) => {
+        if (user_a.username <= user_b.username) {
+          return -1;
+        }
+        return 1;
+      });
     }
 
+    // Add the ability to enter and add the project
     async add_project() {
-      let new_project_input = <HTMLInputElement> this.$refs.new_project_input;
-      console.log(new_project_input.value);
-      let project_to_add = new NewProjectData(new_project_input.value, this.course.pk);
-      await Project.create(project_to_add);
-      new_project_input.value = "";
+      console.log(this.new_project_name);
+      let new_project: Project = await Project.create({name: this.new_project_name, course: this.course.pk});
+      console.log(new_project);
+      this.new_project_name = "";
+      this.projects.push(new_project);
+      this.projects.sort((project_a: Project, project_b: Project) => {
+        if (project_a.name <= project_b.name) {
+          return -1;
+        }
+        return 1;
+      });
     }
 
     get whitespace_regex() {
@@ -540,7 +616,11 @@ $current-lang-choice: "Montserrat";
 }
 
 #input-course-semester {
-  width: 71px;
+  width: 120px;
+}
+
+.semester-item {
+  font-size: 18px;
 }
 
 #input-course-year {
@@ -569,6 +649,21 @@ $current-lang-choice: "Montserrat";
   margin-left: 24px;
   display: inline-block;
 }
+
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 0px;
+}
+
+.dropdown-caret {
+  position: absolute;
+  right: 18px;
+  top: 4px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
 
 /* ---------------- Permissions Styling ---------------- */
 
@@ -692,7 +787,7 @@ textarea {
 
 #new-project-label {
   font-size: 20px;
-  margin: 0 0 20px 0;
+  margin: 0 0 12px 0;
   padding: 6px 0 0 0;
   font-weight: 800;
 }
@@ -709,7 +804,7 @@ textarea {
 }
 
 #new-project-input::placeholder {
-  color: darken($sky-blue, 10);
+  color: darken($sky-blue, 50);
   opacity: 0.3;
 }
 
@@ -793,7 +888,7 @@ textarea {
   }
 
   #settings-container-inputs {
-    width: 400px;
+    width: 450px;
     margin: 10px 0 0 50px;
     border-radius: 5px;
   }
@@ -858,7 +953,7 @@ textarea {
 
   .existing-projects-label {
     font-size: 20px;
-    margin: 0 0 20px 0;
+    margin: 0 0 12px 0;
     padding: 6px 0 0 0;
     text-align: left;
   }

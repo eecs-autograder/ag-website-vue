@@ -24,24 +24,6 @@ export class Model {
     async get_courses_for_user(user: User): Promise<AllCourses> {
         return Course.get_courses_for_user(user);
     }
-
-    async get_users_for_course(course: Course): Promise<AllUsersInCourse> {
-        let [course_admins,
-             course_staff,
-             course_students,
-             course_handgraders] = await Promise.all([
-                 course.get_admins(),
-                 course.get_staff(),
-                 course.get_students(),
-                 course.get_handgraders()
-        ]);
-        return {
-            course_admins: course_admins,
-            course_staff: course_staff,
-            course_students: course_students,
-            course_handgraders: course_handgraders
-        };
-    }
 }
 
 export interface AllCourses {
