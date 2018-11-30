@@ -71,7 +71,7 @@
 
                     <div v-if="!saving"
                          class="last-saved-timestamp">
-                      <span> Last Saved: </span> {{Date(course.last_modified)}}
+                      <span> Last Saved: </span>{{Date(course.last_modified)}}
                     </div>
                     <div v-else class="last-saved-spinner">
                       <i class="fa fa-spinner fa-pulse"></i>
@@ -119,8 +119,7 @@
                           </tooltip>
                         </i>
                       </label>
-                      <textarea ref="new_admin_list"
-                                v-model="new_admins_list"> </textarea>
+                      <textarea ref="new_admin_list" v-model="new_admins_list"></textarea>
                       <input type="submit" class="add-enrollees-button" value="Add to Roster">
                     </form>
                   </div>
@@ -161,8 +160,7 @@
                           </tooltip>
                         </i>
                       </label>
-                      <textarea ref="new_staff_list"
-                                v-model="new_staff_list"> </textarea>
+                      <textarea ref="new_staff_list" v-model="new_staff_list"></textarea>
                       <input type="submit" class="add-enrollees-button" value="Add to Roster">
                     </form>
                   </div>
@@ -202,8 +200,7 @@
                           </tooltip>
                         </i>
                       </label>
-                      <textarea ref="new_student_list"
-                                v-model="new_students_list"> </textarea>
+                      <textarea ref="new_student_list" v-model="new_students_list"></textarea>
                       <input type="submit" class="add-enrollees-button" value="Add to Roster">
                     </form>
                   </div>
@@ -243,8 +240,7 @@
                           </tooltip>
                         </i>
                       </label>
-                      <textarea ref="new_handgrader_list"
-                                v-model="new_handgraders_list"> </textarea>
+                      <textarea ref="new_handgrader_list" v-model="new_handgraders_list"></textarea>
                       <input type="submit" class="add-enrollees-button" value="Add to Roster">
                     </form>
                   </div>
@@ -313,18 +309,18 @@
                     <tr v-for="(project, index) of projects"
                         :class="index % 2 ? 'odd-row' : 'even-row'">
                       <td class="project-name">
-                        <div>
-                          {{project.name}}
-                        </div>
-                      </td>
-                      <td class="edit-project">
-                        <router-link class="edit-project-inner"
-                                     tag="div"
+                        <router-link tag="div"
                                      :to="`/web/project/${project.pk}`">
                           <a>
-                            <div class="edit-project-link">
-                              Edit Project
-                            </div>
+                            <div class="project-link">{{project.name}}</div>
+                          </a>
+                        </router-link>
+                      </td>
+                      <td class="edit-project">
+                        <router-link tag="div"
+                                     :to="`/web/project_admin/${project.pk}`">
+                          <a>
+                            <div class="edit-project-link"> Edit Project </div>
                           </a>
                         </router-link>
                       </td>
@@ -831,7 +827,6 @@ textarea {
 }
 
 .project-name {
-  padding: 15px 60px 15px 20px;
   font-size: 17px;
 }
 
@@ -864,6 +859,10 @@ textarea {
   padding: 15px 20px;
   width: 110px;
   text-align: center;
+}
+
+.project-link {
+  padding: 15px 20px;
 }
 
 a {
