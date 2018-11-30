@@ -111,16 +111,18 @@
               <div v-if="role_selected === 'admin'">
                 <div class="class-roster-body">
                   <div class="adding-container">
-                    <label class="enrollment-add-label"> Add admins
-                      <i class="far fa-question-circle enrollment-tooltip">
-                        <tooltip width="large" placement="top">
-                          Enter a comma-separated list of email addresses.
-                        </tooltip>
-                      </i>
-                    </label>
-                    <textarea ref="new_admin_list"
-                              v-model="new_admins_list"> </textarea>
-                  <p class="add-enrollees-button" @click="add_admins"> Add to Roster </p>
+                    <form id="add-admins-form" @submit.prevent="add_admins">
+                      <label class="enrollment-add-label"> Add admins
+                        <i class="far fa-question-circle enrollment-tooltip">
+                          <tooltip width="large" placement="top">
+                            Enter a comma-separated list of email addresses.
+                          </tooltip>
+                        </i>
+                      </label>
+                      <textarea ref="new_admin_list"
+                                v-model="new_admins_list"> </textarea>
+                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                    </form>
                   </div>
 
                   <div class="enrolled-container">
@@ -139,7 +141,7 @@
                             <td>{{admin.first_name}}</td>
                             <td>{{admin.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
-                                    @click="course.remove_admins([admin])"></i> </td>
+                                    @click="remove_admins([admin], index)"></i> </td>
                           </tr>
                         </table>
                       </div>
@@ -151,16 +153,18 @@
               <div v-else-if="role_selected === 'staff'">
                 <div class="class-roster-body">
                   <div class="adding-container">
-                    <label class="enrollment-add-label"> Add staff members:
-                      <i class="far fa-question-circle enrollment-tooltip">
-                        <tooltip width="large" placement="top">
-                          Enter a comma-separated list of email addresses.
-                        </tooltip>
-                      </i>
-                    </label>
-                    <textarea ref="new_staff_list"
-                              v-model="new_staff_list"> </textarea>
-                    <p class="add-enrollees-button" @click="add_staff"> Add to Roster </p>
+                    <form id="add-staff-form" @submit.prevent="add_staff">
+                      <label class="enrollment-add-label"> Add staff members:
+                        <i class="far fa-question-circle enrollment-tooltip">
+                          <tooltip width="large" placement="top">
+                            Enter a comma-separated list of email addresses.
+                          </tooltip>
+                        </i>
+                      </label>
+                      <textarea ref="new_staff_list"
+                                v-model="new_staff_list"> </textarea>
+                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                    </form>
                   </div>
 
                   <div class="enrolled-container">
@@ -179,7 +183,7 @@
                             <td>{{staff_member.first_name}}</td>
                             <td>{{staff_member.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
-                                    @click="course.remove_staff([staff])"></i> </td>
+                                    @click="remove_staff([staff_member], index)"></i> </td>
                           </tr>
                         </table>
                       </div>
@@ -190,16 +194,18 @@
               <div v-else-if="role_selected === 'student'">
                 <div class="class-roster-body">
                   <div class="adding-container">
-                    <label class="enrollment-add-label"> Add students:
-                      <i class="far fa-question-circle enrollment-tooltip">
-                        <tooltip width="large" placement="top">
-                          Enter a comma-separated list of email addresses.
-                        </tooltip>
-                      </i>
-                    </label>
-                    <textarea ref="new_student_list"
-                              v-model="new_students_list"> </textarea>
-                    <p class="add-enrollees-button" @click="add_students"> Add to Roster </p>
+                    <form id="add-students-form" @submit.prevent="add_students">
+                      <label class="enrollment-add-label"> Add students:
+                        <i class="far fa-question-circle enrollment-tooltip">
+                          <tooltip width="large" placement="top">
+                            Enter a comma-separated list of email addresses.
+                          </tooltip>
+                        </i>
+                      </label>
+                      <textarea ref="new_student_list"
+                                v-model="new_students_list"> </textarea>
+                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                    </form>
                   </div>
 
                   <div class="enrolled-container">
@@ -218,7 +224,7 @@
                             <td>{{student.first_name}}</td>
                             <td>{{student.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
-                                    @click="course.remove_students([student])"></i> </td>
+                                    @click="remove_students([student], index)"></i> </td>
                           </tr>
                         </table>
                       </div>
@@ -229,16 +235,18 @@
               <div v-else>
                 <div class="class-roster-body">
                   <div class="adding-container">
-                    <label class="enrollment-add-label"> Add handgraders:
-                      <i class="far fa-question-circle enrollment-tooltip">
-                        <tooltip width="large" placement="top">
-                          Enter a comma-separated list of email addresses.
-                        </tooltip>
-                      </i>
-                    </label>
-                    <textarea ref="new_handgrader_list"
-                              v-model="new_handgraders_list"> </textarea>
-                    <p class="add-enrollees-button" @click="add_handgraders"> Add to Roster </p>
+                    <form id="add-handgraders-form" @submit.prevent="add_handgraders">
+                      <label class="enrollment-add-label"> Add handgraders:
+                        <i class="far fa-question-circle enrollment-tooltip">
+                          <tooltip width="large" placement="top">
+                            Enter a comma-separated list of email addresses.
+                          </tooltip>
+                        </i>
+                      </label>
+                      <textarea ref="new_handgrader_list"
+                                v-model="new_handgraders_list"> </textarea>
+                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                    </form>
                   </div>
 
                   <div class="enrolled-container">
@@ -257,7 +265,7 @@
                             <td>{{handgrader.first_name}}</td>
                             <td>{{handgrader.last_name}}</td>
                             <td> <i class="fas fa-times delete-enrollee"
-                                    @click="course.remove_handgraders([handgrader])"></i> </td>
+                                    @click="remove_handgraders([handgrader], index)"></i> </td>
                           </tr>
                         </table>
                       </div>
@@ -304,10 +312,21 @@
                     </tr>
                     <tr v-for="(project, index) of projects"
                         :class="index % 2 ? 'odd-row' : 'even-row'">
-                      <td class="project-name">{{project.name}}</td>
-                      <td class="edit-project"
-                        @click="edit_project_function(project)">
-                        Edit Project
+                      <td class="project-name">
+                        <div>
+                          {{project.name}}
+                        </div>
+                      </td>
+                      <td class="edit-project">
+                        <router-link class="edit-project-inner"
+                                     tag="div"
+                                     :to="`/web/project/${project.pk}`">
+                          <a>
+                            <div class="edit-project-link">
+                              Edit Project
+                            </div>
+                          </a>
+                        </router-link>
                       </td>
                     </tr>
                   </table>
@@ -330,83 +349,43 @@
   import Tooltip from '@/components/tooltip.vue';
   import { Component, Vue } from 'vue-property-decorator';
 
-  import { Course, NewProjectData, Project, Semester, User } from 'ag-client-typescript';
-
-  import { AllUsersInCourse, Model } from "../model";
+  import { Course, Project, Semester, User } from 'ag-client-typescript';
 
   @Component({
     components: { Dropdown, Tab, Tabs, Tooltip }
   })
   export default class CourseAdmin extends Vue {
-
     role_selected: string = "admin";
     loading = true;
     saving = false;
-
-    // settings
     course: Course | null = null;
-
-    // permissions
     admins: User[] = [];
     staff: User[] = [];
     students: User[] = [];
     handgraders: User[] = [];
-
     new_admins_list = "";
     new_staff_list = "";
     new_students_list = "";
     new_handgraders_list = "";
-
-    // projects
     projects: Project[] = [];
     new_project_name = "";
-
     roles = ["admin", "staff", "student", "handgraders"];
-
     semester_chosen = "Fall";
     semesters = ["Fall", "Winter", "Spring", "Summer"];
 
     async created() {
       document.body.style.margin = "0";
 
-      // get course_pk
       this.course = await Course.get_by_pk(this.$route.params.courseId);
-
-      console.log(this.course.last_modified);
-      let date = new Date(this.course.last_modified);
       this.admins = await this.course.get_admins();
       this.staff = await this.course.get_staff();
       this.students = await this.course.get_students();
       this.handgraders = await this.course.get_handgraders();
       this.projects = await Project.get_all_from_course(this.course.pk);
-
-      this.admins.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
-
-      this.staff.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
-
-      this.students.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
-
-      this.handgraders.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
+      this.sort_users(this.admins);
+      this.sort_users(this.staff);
+      this.sort_users(this.students);
+      this.sort_users(this.handgraders);
     }
 
     close_dropdown_menu() {
@@ -420,76 +399,92 @@
       event.stopPropagation();
     }
 
-    edit_project_function(project: Project) {
-      console.log("Editing " + project.name);
-    }
-
     update_role(role_in: string) {
       this.role_selected = role_in;
     }
 
     async save_course_settings() {
-      console.log("Save course settings got called");
       await this.course.save();
     }
 
-    async add_admins() {
-      this.course.add_admins(this.new_admins_list.trim().split(this.whitespace_regex));
-      console.log(this.new_admins_list);
-      this.new_admins_list = "";
-      this.admins = await this.course.get_admins();
-      this.admins.sort((user_a: User, user_b: User) => {
+    sort_users(users: User[]) {
+      users.sort((user_a: User, user_b: User) => {
         if (user_a.username <= user_b.username) {
           return -1;
         }
         return 1;
       });
+    }
+
+    async add_admins() {
+      let new_admins = this.new_admins_list.split(',');
+      for (let i = 0; i < new_admins.length; ++i) {
+        new_admins[i] = new_admins[i].trim();
+      }
+      await this.course.add_admins(new_admins);
+      this.new_admins_list = "";
+      this.admins = await this.course.get_admins();
+      this.sort_users(this.admins);
     }
 
     async add_staff() {
-      this.course.add_admins(this.new_staff_list.trim().split(this.whitespace_regex));
-      console.log(this.new_staff_list);
-      this.new_staff_list = '';
+      let new_staff = this.new_staff_list.split(',');
+      for (let i = 0; i < new_staff.length; ++i) {
+        new_staff[i] = new_staff[i].trim();
+      }
+      await this.course.add_staff(new_staff);
+      this.new_staff_list = "";
       this.staff = await this.course.get_staff();
-      this.staff.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
+      this.sort_users(this.staff);
     }
 
     async add_students() {
-      this.course.add_students(this.new_students_list.trim().split(this.whitespace_regex));
-      console.log(this.new_students_list);
-      this.new_students_list = '';
+      let new_students = this.new_students_list.split(',');
+      for (let i = 0; i < new_students.length; ++i) {
+        new_students[i] = new_students[i].trim();
+      }
+      await this.course.add_students(new_students);
+      this.new_students_list = "";
       this.students = await this.course.get_students();
-      this.students.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
+      for (let student of this.students) {
+        console.log(student.username);
+      }
+      this.sort_users(this.students);
     }
 
     async add_handgraders() {
-      this.course.add_handgraders(this.new_handgraders_list.trim().split(this.whitespace_regex));
-      console.log(this.new_handgraders_list);
-      this.new_handgraders_list = '';
+      let new_handgraders = this.new_handgraders_list.split(',');
+      for (let i = 0; i < new_handgraders.length; ++i) {
+        new_handgraders[i] = new_handgraders[i].trim();
+      }
+      await this.course.add_handgraders(new_handgraders);
+      this.new_handgraders_list = "";
       this.handgraders = await this.course.get_handgraders();
-      this.handgraders.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
+      this.sort_users(this.handgraders);
     }
 
-    // Add the ability to enter and add the project
+    remove_admins(admins_to_delete: User[], index: number) {
+      this.course.remove_admins(admins_to_delete);
+      this.admins.splice(index, 1);
+    }
+
+    remove_staff(staff_to_delete: User[], index: number) {
+      this.course.remove_staff(staff_to_delete);
+      this.staff.splice(index, 1);
+    }
+
+    remove_students(students_to_delete: User[], index: number) {
+      this.course.remove_students(students_to_delete);
+      this.students.splice(index, 1);
+    }
+
+    remove_handgraders(handgraders_to_delete: User[], index: number) {
+      this.course.remove_handgraders(handgraders_to_delete);
+      this.handgraders.splice(index, 1);
+    }
+
     async add_project() {
-      console.log(this.new_project_name);
       let new_project: Project = await Project.create({name: this.new_project_name, course: this.course.pk});
-      console.log(new_project);
       this.new_project_name = "";
       this.projects.push(new_project);
       this.projects.sort((project_a: Project, project_b: Project) => {
@@ -500,9 +495,9 @@
       });
     }
 
-    get whitespace_regex() {
-      return new RegExp('\\s+');
-    }
+    // whitespace_regex() {
+    //   return new RegExp('\\s+');
+    // }
 
     update_semester(semester: string) {
       this.semester_chosen = semester;
@@ -570,7 +565,7 @@ $current-lang-choice: "Montserrat";
   display: block;
   font-family: $current-lang-choice;
   font-size: 18px;
-  padding: 20px 0;
+  padding: 20px 15px;
   margin: 10px 0 20px 0;
 }
 
@@ -688,7 +683,7 @@ $current-lang-choice: "Montserrat";
   font-family: $current-lang-choice;
   font-size: 18px;
   margin: 18px 0 0 0;
-  padding: 20px 0;
+  padding: 20px 15px;
   text-align: center;
 }
 
@@ -814,7 +809,7 @@ textarea {
   font-family: $current-lang-choice;
   font-size: 18px;
   margin-top: 20px;
-  padding: 20px 0;
+  padding: 20px 15px;
   text-align: center;
 }
 
@@ -847,9 +842,8 @@ textarea {
 
 .edit-project {
   width: 110px;
-  text-align: center;
+  padding:0;
   background-color: lighten($sky-blue, 5);
-  padding: 15px 20px;
   cursor: pointer;
   color: black;
 }
@@ -864,6 +858,17 @@ textarea {
 
 .project-table tr {
   border-bottom: 4px solid white;
+}
+
+.edit-project-link {
+  padding: 15px 20px;
+  width: 110px;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+  color: black;
 }
 
 @media only screen and (min-width: 481px) {
