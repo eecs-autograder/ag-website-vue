@@ -5,7 +5,8 @@
     <div>
       <tabs ref="tabs2"
             tab_active_class="gray-theme-active"
-            tab_inactive_class="gray-theme-inactive">
+            tab_inactive_class="gray-theme-inactive"
+            v-if="!loading">
 <!--GENERAL TAB-->
         <tab>
           <template slot="header">
@@ -39,7 +40,7 @@
                                    id="input-course-semester"
                                    class="settings-input"
                                    v-model="course.semester"
-                                   @blur="close_dropdown_menu"/>
+                                   @blur="close_course_semester_dropdown_menu"/>
                             <i class="fas fa-caret-down dropdown-caret"></i>
                           </div>
                         </template>
@@ -88,12 +89,12 @@
 
               <dropdown ref="roster_dropdown"
                         :items="roles"
-                        @update_item_selected="update_role($event)">
+                        @update_item_selected="role_selected = $event">
                 <template slot="header">
                   <div class="tab-label" tabindex="1">
                     <p class="tab-header"
                        ref="edit_roster_tab"
-                       @click="show_dropdown"> Permissions ({{role_selected}})</p>
+                       @click="show_permissions_tab_dropdown_menu"> Permissions ({{role_selected}})</p>
                   </div>
                 </template>
                 <div slot-scope="{item}">
@@ -351,10 +352,14 @@
     components: { Dropdown, Tab, Tabs, Tooltip }
   })
   export default class CourseAdmin extends Vue {
-    role_selected: string = "admin";
     loading = true;
     saving = false;
+
+    role_selected = "admin";
+    roles = ["admin", "staff", "student", "handgraders"];
     course: Course | null = null;
+    semesters = ["Fall", "Winter", "Spring", "Summer"];
+
     admins: User[] = [];
     staff: User[] = [];
     students: User[] = [];
@@ -363,15 +368,11 @@
     new_staff_list = "";
     new_students_list = "";
     new_handgraders_list = "";
+
     projects: Project[] = [];
     new_project_name = "";
-    roles = ["admin", "staff", "student", "handgraders"];
-    semester_chosen = "Fall";
-    semesters = ["Fall", "Winter", "Spring", "Summer"];
 
     async created() {
-      document.body.style.margin = "0";
-
       this.course = await Course.get_by_pk(this.$route.params.courseId);
       this.admins = await this.course.get_admins();
       this.staff = await this.course.get_staff();
@@ -382,25 +383,28 @@
       this.sort_users(this.staff);
       this.sort_users(this.students);
       this.sort_users(this.handgraders);
+      this.loading = false;
     }
 
-    close_dropdown_menu() {
+    close_course_semester_dropdown_menu() {
       let grading_policy_dropdown = <Dropdown> this.$refs.semester_dropdown;
       grading_policy_dropdown.hide_the_dropdown_menu();
     }
 
-    show_dropdown(event: Event) {
+    show_permissions_tab_dropdown_menu(event: Event) {
       let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
       roster_dropdown.show_the_dropdown_menu();
       event.stopPropagation();
     }
 
-    update_role(role_in: string) {
-      this.role_selected = role_in;
-    }
-
     async save_course_settings() {
-      await this.course.save();
+      this.saving = true;
+      try {
+        await this.course.save();
+      }
+      finally {
+        this.saving = false;
+      }
     }
 
     sort_users(users: User[]) {
@@ -490,37 +494,13 @@
         return 1;
       });
     }
-
-    // whitespace_regex() {
-    //   return new RegExp('\\s+');
-    // }
-
-    update_semester(semester: string) {
-      this.semester_chosen = semester;
-    }
-
   }
 </script>
 
 <style scoped lang="scss">
-  @import url('https://fonts.googleapis.com/css?family=Muli');
-  @import '@/styles/colors.scss';
-  @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Quicksand');
-  @import url('https://fonts.googleapis.com/css?family=Ropa+Sans');
-  @import url('https://fonts.googleapis.com/css?family=Varela');
-  @import url('https://fonts.googleapis.com/css?family=Molengo');
-  @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
-
-  @import url('https://fonts.googleapis.com/css?family=Oxygen');
-  @import url('https://fonts.googleapis.com/css?family=Libre+Franklin');
-  @import url('https://fonts.googleapis.com/css?family=Karla');
-  @import url('https://fonts.googleapis.com/css?family=Lato');
-  @import url('https://fonts.googleapis.com/css?family=Archivo');
-
-  @import url('https://fonts.googleapis.com/css?family=PT+Sans');
-  @import url('https://fonts.googleapis.com/css?family=Montserrat');
-
+@import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
 
 $current-lang-choice: "Montserrat";
 
@@ -737,7 +717,6 @@ $current-lang-choice: "Montserrat";
 }
 
 .roster-column {
-  // should a max height be applied here?
   overflow: scroll;
 }
 
