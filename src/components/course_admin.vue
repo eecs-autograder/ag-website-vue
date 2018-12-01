@@ -94,7 +94,9 @@
                   <div class="tab-label" tabindex="1">
                     <p class="tab-header"
                        ref="edit_roster_tab"
-                       @click="show_permissions_tab_dropdown_menu"> Permissions ({{role_selected}})</p>
+                       @click="show_permissions_tab_dropdown_menu">
+                      Permissions ({{role_selected}})
+                    </p>
                   </div>
                 </template>
                 <div slot-scope="{item}">
@@ -241,7 +243,8 @@
                           </tooltip>
                         </i>
                       </label>
-                      <textarea ref="new_handgrader_list" v-model="new_handgraders_list"></textarea>
+                      <textarea ref="new_handgrader_list" v-model="new_handgraders_list">
+                      </textarea>
                       <input type="submit" class="add-enrollees-button" value="Add to Roster">
                     </form>
                   </div>
@@ -373,7 +376,7 @@
     new_project_name = "";
 
     async created() {
-      this.course = await Course.get_by_pk(this.$route.params.courseId);
+      this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
       this.admins = await this.course.get_admins();
       this.staff = await this.course.get_staff();
       this.students = await this.course.get_students();
@@ -400,7 +403,7 @@
     async save_course_settings() {
       this.saving = true;
       try {
-        await this.course.save();
+        await this.course!.save();
       }
       finally {
         this.saving = false;
@@ -421,9 +424,9 @@
       for (let i = 0; i < new_admins.length; ++i) {
         new_admins[i] = new_admins[i].trim();
       }
-      await this.course.add_admins(new_admins);
+      await this.course!.add_admins(new_admins);
       this.new_admins_list = "";
-      this.admins = await this.course.get_admins();
+      this.admins = await this.course!.get_admins();
       this.sort_users(this.admins);
     }
 
@@ -432,9 +435,9 @@
       for (let i = 0; i < new_staff.length; ++i) {
         new_staff[i] = new_staff[i].trim();
       }
-      await this.course.add_staff(new_staff);
+      await this.course!.add_staff(new_staff);
       this.new_staff_list = "";
-      this.staff = await this.course.get_staff();
+      this.staff = await this.course!.get_staff();
       this.sort_users(this.staff);
     }
 
@@ -443,9 +446,9 @@
       for (let i = 0; i < new_students.length; ++i) {
         new_students[i] = new_students[i].trim();
       }
-      await this.course.add_students(new_students);
+      await this.course!.add_students(new_students);
       this.new_students_list = "";
-      this.students = await this.course.get_students();
+      this.students = await this.course!.get_students();
       for (let student of this.students) {
         console.log(student.username);
       }
@@ -457,34 +460,36 @@
       for (let i = 0; i < new_handgraders.length; ++i) {
         new_handgraders[i] = new_handgraders[i].trim();
       }
-      await this.course.add_handgraders(new_handgraders);
+      await this.course!.add_handgraders(new_handgraders);
       this.new_handgraders_list = "";
-      this.handgraders = await this.course.get_handgraders();
+      this.handgraders = await this.course!.get_handgraders();
       this.sort_users(this.handgraders);
     }
 
     remove_admins(admins_to_delete: User[], index: number) {
-      this.course.remove_admins(admins_to_delete);
+      this.course!.remove_admins(admins_to_delete);
       this.admins.splice(index, 1);
     }
 
     remove_staff(staff_to_delete: User[], index: number) {
-      this.course.remove_staff(staff_to_delete);
+      this.course!.remove_staff(staff_to_delete);
       this.staff.splice(index, 1);
     }
 
     remove_students(students_to_delete: User[], index: number) {
-      this.course.remove_students(students_to_delete);
+      this.course!.remove_students(students_to_delete);
       this.students.splice(index, 1);
     }
 
     remove_handgraders(handgraders_to_delete: User[], index: number) {
-      this.course.remove_handgraders(handgraders_to_delete);
+      this.course!.remove_handgraders(handgraders_to_delete);
       this.handgraders.splice(index, 1);
     }
 
     async add_project() {
-      let new_project: Project = await Project.create({name: this.new_project_name, course: this.course.pk});
+      let new_project: Project = await Project.create(
+        {name: this.new_project_name, course: this.course!.pk}
+      );
       this.new_project_name = "";
       this.projects.push(new_project);
       this.projects.sort((project_a: Project, project_b: Project) => {
