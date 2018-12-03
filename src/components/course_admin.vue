@@ -73,7 +73,9 @@
                     <div v-if="!saving"
                          class="last-saved-timestamp">
                       <span> Last Saved: </span>
-                      {{(new Date(course.last_modified)).toLocaleString('en-US', last_modified_format)}}
+                      {{(new Date(course.last_modified)).toLocaleString(
+                          'en-US', last_modified_format
+                      )}}
                     </div>
                     <div v-else class="last-saved-spinner">
                       <i class="fa fa-spinner fa-pulse"></i>
