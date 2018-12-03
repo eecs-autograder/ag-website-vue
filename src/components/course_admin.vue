@@ -3,7 +3,7 @@
        ref="course_admin_component"
        v-if="course != null">
     <div>
-      <tabs ref="tabs2"
+      <tabs ref="course_admin_tabs"
             tab_active_class="gray-theme-active"
             tab_inactive_class="gray-theme-inactive"
             v-if="!loading">
@@ -72,7 +72,8 @@
 
                     <div v-if="!saving"
                          class="last-saved-timestamp">
-                      <span> Last Saved: </span>{{Date(course.last_modified)}}
+                      <span> Last Saved: </span>
+                      {{(new Date(course.last_modified)).toLocaleString('en-US', last_modified_format)}}
                     </div>
                     <div v-else class="last-saved-spinner">
                       <i class="fa fa-spinner fa-pulse"></i>
@@ -347,7 +348,7 @@
   import Tab from '@/components/tabs/tab.vue';
   import Tabs from '@/components/tabs/tabs.vue';
   import Tooltip from '@/components/tooltip.vue';
-  import { Component, Vue } from 'vue-property-decorator';
+  import { Component, Vue, Watch } from 'vue-property-decorator';
 
   import { Course, Project, Semester, User } from 'ag-client-typescript';
 
@@ -362,6 +363,8 @@
     roles = ["admin", "staff", "student", "handgraders"];
     course: Course | null = null;
     semesters = ["Fall", "Winter", "Spring", "Summer"];
+    last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric'};
 
     admins: User[] = [];
     staff: User[] = [];

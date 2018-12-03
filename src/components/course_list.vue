@@ -37,8 +37,6 @@
 
 <script lang="ts">
 
-  // @click="$router.push(`/web/course_admin/${course.pk}`)
-
   import { AllCourses, Model } from '@/model';
   import { Course, Semester, User } from 'ag-client-typescript';
 
