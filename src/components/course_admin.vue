@@ -366,7 +366,7 @@
     course: Course | null = null;
     semesters = ["Fall", "Winter", "Spring", "Summer"];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-    hour: 'numeric', minute: 'numeric', second: 'numeric'};
+                            hour: 'numeric', minute: 'numeric', second: 'numeric'};
 
     admins: User[] = [];
     staff: User[] = [];
