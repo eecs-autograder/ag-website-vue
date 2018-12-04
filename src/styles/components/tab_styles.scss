@@ -1,156 +1,142 @@
 @import '@/styles/colors.scss';
 
-%behind-the-border {
-    position: relative;
-    top: 2px;
-    z-index: 3;
+%tab-theme {
+    display: inline-block;
+    border-radius: 10px 10px 0 0;
+    margin-right: 2px;
+    margin-top: 4px;
+    padding: 10px 15px;
 }
 
-%in-front-of-the-border {
+@mixin inactive-tab-position($border-width: 2px) {
     position: relative;
-    top: 2px;
-    z-index: 20;
+    top: $border-width;
+}
+
+@mixin active-tab-position($border-width: 2px) {
+    position: relative;
+    top: $border-width;
+    z-index: 1;
+}
+
+@mixin tab-border($border-color, $border-width: 2px) {
+    border: $border-width solid $border-color;
+    border-bottom: $border-width solid transparent;
 }
 
 /* ---------------- Gray ---------------- */
 
 .gray-theme-active {
-    @extend %in-front-of-the-border;
+    @extend %tab-theme;
+    @include active-tab-position();
     background-color: white;
-    border: 2px solid slategrey;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px white;
+    @include tab-border(slategrey);
     color: slategrey;
 };
 
 .gray-theme-inactive {
-    @extend %behind-the-border;
+    @extend %tab-theme;
+    @include inactive-tab-position();
     background-color: $pebble-medium;
-    border: 2px solid $pebble-medium;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px $pebble-medium;
+    @include tab-border($pebble-medium);
     color: slategrey;
 };
 
 .gray-theme-inactive:hover {
-    @extend %behind-the-border;
     background-color: slategrey;
-
-    border: 2px solid slategrey;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px slategrey;
+    @include tab-border(slategray);
     color: white;
 }
 
 /* ---------------- Blue ---------------- */
 
 .blue-theme-active {
-    @extend %in-front-of-the-border;
+    @extend %tab-theme;
+    @include active-tab-position();
     background-color: white;
-    border: 2px solid $ocean-blue;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px white;
+    @include tab-border($ocean-blue);
     color: black;
 }
 
 .blue-theme-inactive {
-    @extend %behind-the-border;
+    @extend %tab-theme;
+    @include inactive-tab-position();
     background-color: hsl(30, 100%, 68%);
-    border: 2px solid hsl(30, 100%, 68%);
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px hsl(30, 100%, 68%);
+    @include tab-border(hsl(30, 100%, 68%));
     color: white;
 }
 
 .blue-theme-inactive:hover  {
-    @extend %behind-the-border;
     background-color: hsl(30, 100%, 60%);
-    border: 2px solid hsl(30, 100%, 60%);
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px hsl(30, 100%, 60%);
-    color: white;
+    @include tab-border(hsl(30, 100%, 60%));
 }
 
 /* ---------------- White ---------------- */
 
 .white-theme-active {
-    @extend %in-front-of-the-border;
+    @extend %tab-theme;
+    @include active-tab-position();
     background-color: white;
-    border: 2px solid $pebble-dark;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px white;
+    @include tab-border($pebble-dark);
     color: black;
 }
 
 .white-theme-inactive {
-    @extend %behind-the-border;
+    @extend %tab-theme;
+    @include inactive-tab-position();
     background-color: white;
-    border: 2px solid white;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px white;
+    @include tab-border(white);
     color: slategrey;
 }
 
 .white-theme-inactive:hover {
-    @extend %behind-the-border;
     background-color: $pebble-dark;
-    border: 2px solid $pebble-dark;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px $pebble-dark;
+    @include tab-border($pebble-dark);
     color: black;
 }
 
-/* -------------- No Border ------------- */
+/* -------------- Gray-white ------------- */
 
 .gray-white-theme-active {
-    @extend %in-front-of-the-border;
+    @extend %tab-theme;
+    @include active-tab-position();
     background-color: white;
-    border: 2px solid hsl(210, 11%, 90%);
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px white;
-    color: black;
-}
-
-.gray-white-theme-inactive:hover {
-    @extend %behind-the-border;
-    background-color: hsl(210, 12%, 93%);
-    border: 2px solid hsl(210, 12%, 93%);
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px hsl(210, 12%, 93%);
+    @include tab-border(hsl(210, 11%, 90%));
     color: black;
 }
 
 .gray-white-theme-inactive {
-    @extend %behind-the-border;
+    @extend %tab-theme;
+    @include inactive-tab-position();
     background-color: hsl(210, 11%, 95%);
-    border: 2px solid hsl(210, 11%, 95%);
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px hsl(210, 11%, 95%);
+    @include tab-border(hsl(210, 11%, 95%));
+    color: black;
+}
+
+.gray-white-theme-inactive:hover {
+    background-color: hsl(210, 12%, 93%);
+    @include tab-border(hsl(210, 12%, 93%));
     color: black;
 }
 
 /* -------------- No Border ------------- */
 
 .no-border-active {
+    @extend %tab-theme;
     background-color: $pebble-dark;
-    border: 2px solid $pebble-dark;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px $pebble-dark;
+    @include tab-border($pebble-dark);
     color: black;
 }
 
 .no-border-inactive {
+    @extend %tab-theme;
     background-color: hsl(184, 5%, 95%);
-    border: 2px solid hsl(184, 5%, 95%);
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px hsl(184, 5%, 95%);
+    @include tab-border(hsl(184, 5%, 95%));
     color: slategrey;
 }
 
 .no-border-inactive:hover {
     background-color: $pebble-medium;
-    border: 2px solid $pebble-medium;
-    border-bottom: none;
-    box-shadow: inset 0 0 0 4px $pebble-medium;
+    @include tab-border($pebble-medium);
     color: black;
 }
