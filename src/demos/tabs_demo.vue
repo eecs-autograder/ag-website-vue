@@ -111,7 +111,6 @@
     height: 500px;
     position: relative;
     bottom: 0;
-    z-index: 15;
   }
 
   .tab-body2 {
@@ -121,7 +120,6 @@
     height: 500px;
     position: relative;
     bottom: 0;
-    z-index: 15;
   }
 
   .tab-heading {
