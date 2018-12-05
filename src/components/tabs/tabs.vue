@@ -108,6 +108,7 @@ export default class Tabs extends Vue {
         }
 
         element_data.class.push(
+          'tab-style',
           index === this.active_tab_index ? this.tab_active_class : this.tab_inactive_class,
           index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
         );
