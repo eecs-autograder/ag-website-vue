@@ -20,7 +20,7 @@
       this.d_loading = new_val;
     }
 
-    @Prop({required: true})
+    @Prop({required: true, type: Boolean})
     loading!: boolean;
 
     @Prop({default: "inherit", type: String})
