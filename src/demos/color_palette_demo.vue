@@ -69,6 +69,15 @@
 
     <div class="color-divider"></div>
 
+    <p class="color-announcement"> Oranges </p>
+
+    <div class="color">
+      <p class="color-name"> orange </p>
+      <p class="color-square orange"></p>
+    </div>
+
+    <div class="color-divider"></div>
+
     <p class="color-announcement"> Yellows </p>
 
     <div class="color">
@@ -90,13 +99,13 @@
     <p class="color-announcement"> Blues </p>
 
     <div class="color">
-      <p class="color-name"> sky-blue </p>
-      <p class="color-square sky-blue"></p>
+      <p class="color-name"> light-blue </p>
+      <p class="color-square light-blue"></p>
     </div>
 
     <div class="color">
-      <p class="color-name"> light-blue </p>
-      <p class="color-square light-blue"></p>
+      <p class="color-name"> sky-blue </p>
+      <p class="color-square sky-blue"></p>
     </div>
 
     <div class="color">
@@ -130,7 +139,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {}
@@ -216,6 +225,10 @@
 
 .coral-pink {
   background-color: $coral-pink;
+}
+
+.orange {
+  background-color: $orange;
 }
 
 .light-yellow {
