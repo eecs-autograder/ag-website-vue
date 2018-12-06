@@ -35,6 +35,18 @@ export default class Tabs extends Vue {
     this.active_tab_index = this.value;
   }
 
+  // get_tab_width() {
+  //   console.log("Calculating tab width");
+  //   let window_width = window.matchMedia("(min-width: 481px)");
+  //   let headers_container:HTMLElement = <HTMLElement> this.$refs.headers_container;
+  //
+  //   let number_of_tabs = headers_container !== undefined ? headers_container.children.length : 1;
+  //
+  //   let width = window_width.matches ? `${100 / number_of_tabs}%` : '100%';
+  //   console.log(width);
+  //   return width;
+  // }
+
   render(create_element: CreateElement) {
     let tab_data: ExtractedTabData[] = [];
 
@@ -96,9 +108,19 @@ export default class Tabs extends Vue {
   }
 
   private _render_tab_headers(create_element: CreateElement, tab_data: ExtractedTabData[]) {
+    console.log("Render tab headers");
+    let window_width = window.matchMedia("(min-width: 481px)");
     let header_elts = tab_data.map(
       ({header}, index) => {
         let element_data = header.data !== undefined ? {...header.data} : {};
+
+        if (element_data.style === undefined) {
+          element_data.style = {};
+        }
+        // (<{width: string}> element_data.style).width =
+        //   window_width.matches ? `${100 / tab_data.length}%` : '100%';
+
+        (<{width: string}> element_data.style).width = `${100 / tab_data.length}%`;
 
         if (element_data.class === undefined) {
           element_data.class = [];
@@ -146,7 +168,7 @@ export default class Tabs extends Vue {
       }
     );
 
-    return create_element('div', {}, header_elts);
+    return create_element('div', { ref: 'headers_container' }, header_elts);
   }
 
   private _render_tab_body(create_element: CreateElement, tab_data: ExtractedTabData[]) {
