@@ -1,356 +1,359 @@
 <template>
-  <div class="course-admin-component"
-       ref="course_admin_component"
-       v-if="course != null">
-    <div>
-      <tabs ref="course_admin_tabs"
-            tab_active_class="gray-theme-active"
-            tab_inactive_class="gray-theme-inactive"
-            v-if="!loading">
-<!--GENERAL TAB-->
-        <tab>
-          <tab-header>
-            <div class="tab-label">
-              <p class="tab-header"> Settings </p>
-            </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-              <div id="settings-container">
-                <div id="settings-container-inputs">
-                  <form id="course-settings-form" @submit.prevent="save_course_settings">
-                    <div class="settings-single-input-container">
-                      <label class="settings-input-label"> Course name: </label>
-                      <input type="text"
-                             name="name"
-                             id="input-course-name"
-                             class="settings-input"
-                             v-model="course.name">
-                    </div>
-                    <div class="settings-single-input-container">
-                      <label class="settings-input-label"> Semester: </label>
-                      <div class="semester-dropdown-wrapper">
-                        <dropdown ref="semester_dropdown"
-                                  :items="semesters"
-                                  @update_item_selected="course.semester = $event">
-                        <template slot="header">
-                          <div tabindex="1" class="input-wrapper">
-                            <input type=text
-                                   name="semester"
-                                   id="input-course-semester"
-                                   class="settings-input"
-                                   v-model="course.semester"
-                                   @blur="close_course_semester_dropdown_menu"/>
-                            <i class="fas fa-caret-down dropdown-caret"></i>
+  <LoadingIcon :loading="course === null">
+    <div class="course-admin-component"
+         ref="course_admin_component">
+      <div>
+        <tabs ref="course_admin_tabs"
+              tab_active_class="gray-theme-active"
+              tab_inactive_class="gray-theme-inactive"
+              v-if="!loading">
+  <!--GENERAL TAB-->
+          <tab>
+            <tab-header>
+              <div class="tab-label">
+                <p class="tab-header"> Settings </p>
+              </div>
+            </tab-header>
+            <template slot="body">
+              <div class="tab-body">
+                <div id="settings-container">
+                  <div id="settings-container-inputs">
+                    <form id="course-settings-form" @submit.prevent="save_course_settings">
+                      <div class="settings-single-input-container">
+                        <label class="settings-input-label"> Course name: </label>
+                        <input type="text"
+                               name="name"
+                               id="input-course-name"
+                               class="settings-input"
+                               v-model="course.name">
+                      </div>
+                      <div class="settings-single-input-container">
+                        <label class="settings-input-label"> Semester: </label>
+                        <div class="semester-dropdown-wrapper">
+                          <dropdown ref="semester_dropdown"
+                                    :items="semesters"
+                                    @update_item_selected="course.semester = $event">
+                          <template slot="header">
+                            <div tabindex="1" class="input-wrapper">
+                              <input type=text
+                                     name="semester"
+                                     id="input-course-semester"
+                                     class="settings-input"
+                                     v-model="course.semester"
+                                     @blur="close_course_semester_dropdown_menu"/>
+                              <i class="fas fa-caret-down dropdown-caret"></i>
+                            </div>
+                          </template>
+                          <div slot-scope="{item}">
+                            <span class="semester-item">{{item}}</span>
                           </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="semester-item">{{item}}</span>
+                        </dropdown>
                         </div>
-                      </dropdown>
                       </div>
-                    </div>
-                    <div class="settings-single-input-container">
-                      <label class="settings-input-label"> Year: </label>
-                      <input type="text"
-                             name="year"
-                             id="input-course-year"
-                             class="settings-input"
-                             v-model="course.year">
-                    </div>
-                    <div class="settings-single-input-container">
-                      <label class="settings-input-label"> Late days per student: </label>
-                      <input type="tel"
-                             name="num_late_days"
-                             id="input-course-late-days"
-                             class="settings-input"
-                             min="0"
-                             v-model="course.num_late_days">
-                    </div>
+                      <div class="settings-single-input-container">
+                        <label class="settings-input-label"> Year: </label>
+                        <input type="text"
+                               name="year"
+                               id="input-course-year"
+                               class="settings-input"
+                               v-model="course.year">
+                      </div>
+                      <div class="settings-single-input-container">
+                        <label class="settings-input-label"> Late days per student: </label>
+                        <input type="tel"
+                               name="num_late_days"
+                               id="input-course-late-days"
+                               class="settings-input"
+                               min="0"
+                               v-model="course.num_late_days">
+                      </div>
 
-                    <input type="submit" class="settings-save-button" value="Save Updates">
+                      <input type="submit" class="settings-save-button" value="Save Updates">
 
-                    <div v-if="!saving"
-                         class="last-saved-timestamp">
-                      <span> Last Saved: </span>
-                      {{(new Date(course.last_modified)).toLocaleString(
-                          'en-US', last_modified_format
-                      )}}
-                    </div>
-                    <div v-else class="last-saved-spinner">
-                      <i class="fa fa-spinner fa-pulse"></i>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </template>
-        </tab>
 
-<!--PERMISSIONS TAB-->
+                      <LoadingIcon :loading="saving"
+                                    class="last-saved-spinner">
+                        <div class="last-saved-timestamp">
+                          <span> Last Saved: </span>
+                          {{(new Date(course.last_modified)).toLocaleString(
+                              'en-US', last_modified_format
+                          )}}
+                        </div>
+                      </LoadingIcon>
 
-        <tab>
-          <tab-header>
-
-              <dropdown ref="roster_dropdown"
-                        :items="roles"
-                        @update_item_selected="role_selected = $event">
-                <template slot="header">
-                  <div class="tab-label" tabindex="1">
-                    <p class="tab-header"
-                       ref="edit_roster_tab"
-                       @click="show_permissions_tab_dropdown_menu">
-                      Permissions ({{role_selected}})
-                    </p>
-                  </div>
-                </template>
-                <div slot-scope="{item}">
-                  <div class="edit-rosters-dropdown-row-content">
-                    <span>{{item}}</span>
-                  </div>
-                </div>
-              </dropdown>
-
-          </tab-header>
-
-          <template slot="body">
-            <div class="tab-body">
-
-              <div v-if="role_selected === 'admin'">
-                <div class="class-roster-body">
-                  <div class="adding-container">
-                    <form id="add-admins-form" @submit.prevent="add_admins">
-                      <label class="enrollment-add-label"> Add admins
-                        <i class="far fa-question-circle enrollment-tooltip">
-                          <tooltip width="large" placement="top">
-                            Enter a comma-separated list of email addresses.
-                          </tooltip>
-                        </i>
-                      </label>
-                      <textarea ref="new_admin_list" v-model="new_admins_list"></textarea>
-                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
                     </form>
-                  </div>
-
-                  <div class="enrolled-container">
-                    <div v-if="admins.length > 0">
-                      <div class="roster-column">
-                        <table class="roster-table">
-                          <tr>
-                            <th> Username </th>
-                            <th> First Name </th>
-                            <th> Last Name </th>
-                            <th></th>
-                          </tr>
-                          <tr v-for="(admin, index) in admins"
-                              :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{admin.username}}</td>
-                            <td>{{admin.first_name}}</td>
-                            <td>{{admin.last_name}}</td>
-                            <td> <i class="fas fa-times delete-enrollee"
-                                    @click="remove_admins([admin], index)"></i> </td>
-                          </tr>
-                        </table>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
+            </template>
+          </tab>
 
-              <div v-else-if="role_selected === 'staff'">
-                <div class="class-roster-body">
-                  <div class="adding-container">
-                    <form id="add-staff-form" @submit.prevent="add_staff">
-                      <label class="enrollment-add-label"> Add staff members:
-                        <i class="far fa-question-circle enrollment-tooltip">
-                          <tooltip width="large" placement="top">
-                            Enter a comma-separated list of email addresses.
-                          </tooltip>
-                        </i>
-                      </label>
-                      <textarea ref="new_staff_list" v-model="new_staff_list"></textarea>
-                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
-                    </form>
+  <!--PERMISSIONS TAB-->
+
+          <tab>
+            <tab-header>
+
+                <dropdown ref="roster_dropdown"
+                          :items="roles"
+                          @update_item_selected="role_selected = $event">
+                  <template slot="header">
+                    <div class="tab-label" tabindex="1">
+                      <p class="tab-header"
+                         ref="edit_roster_tab"
+                         @click="show_permissions_tab_dropdown_menu">
+                        Permissions ({{role_selected}})
+                      </p>
+                    </div>
+                  </template>
+                  <div slot-scope="{item}">
+                    <div class="edit-rosters-dropdown-row-content">
+                      <span>{{item}}</span>
+                    </div>
                   </div>
+                </dropdown>
 
-                  <div class="enrolled-container">
-                    <div v-if="staff.length > 0">
-                      <div class="roster-column">
-                        <table class="roster-table">
-                          <tr>
-                            <th> Username </th>
-                            <th> First Name </th>
-                            <th> Last Name </th>
-                            <th></th>
-                          </tr>
-                          <tr v-for="(staff_member, index) in staff"
-                              :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{staff_member.username}}</td>
-                            <td>{{staff_member.first_name}}</td>
-                            <td>{{staff_member.last_name}}</td>
-                            <td> <i class="fas fa-times delete-enrollee"
-                                    @click="remove_staff([staff_member], index)"></i> </td>
-                          </tr>
-                        </table>
+            </tab-header>
+
+            <template slot="body">
+              <div class="tab-body">
+
+                <div v-if="role_selected === 'admin'">
+                  <div class="class-roster-body">
+                    <div class="adding-container">
+                      <form id="add-admins-form" @submit.prevent="add_admins">
+                        <label class="enrollment-add-label"> Add admins
+                          <i class="far fa-question-circle enrollment-tooltip">
+                            <tooltip width="large" placement="top">
+                              Enter a comma-separated list of email addresses.
+                            </tooltip>
+                          </i>
+                        </label>
+                        <textarea ref="new_admin_list" v-model="new_admins_list"></textarea>
+                        <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                      </form>
+                    </div>
+
+                    <div class="enrolled-container">
+                      <div v-if="admins.length > 0">
+                        <div class="roster-column">
+                          <table class="roster-table">
+                            <tr>
+                              <th> Username </th>
+                              <th> First Name </th>
+                              <th> Last Name </th>
+                              <th></th>
+                            </tr>
+                            <tr v-for="(admin, index) in admins"
+                                :class="index % 2 ? 'odd-row' : 'even-row'">
+                              <td>{{admin.username}}</td>
+                              <td>{{admin.first_name}}</td>
+                              <td>{{admin.last_name}}</td>
+                              <td> <i class="fas fa-times delete-enrollee"
+                                      @click="remove_admins([admin], index)"></i> </td>
+                            </tr>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div v-else-if="role_selected === 'student'">
-                <div class="class-roster-body">
-                  <div class="adding-container">
-                    <form id="add-students-form" @submit.prevent="add_students">
-                      <label class="enrollment-add-label"> Add students:
-                        <i class="far fa-question-circle enrollment-tooltip">
-                          <tooltip width="large" placement="top">
-                            Enter a comma-separated list of email addresses.
-                          </tooltip>
-                        </i>
-                      </label>
-                      <textarea ref="new_student_list" v-model="new_students_list"></textarea>
-                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
-                    </form>
-                  </div>
 
-                  <div class="enrolled-container">
-                    <div v-if="students.length > 0">
-                      <div class="roster-column">
-                        <table class="roster-table">
-                          <tr>
-                            <th> Username </th>
-                            <th> First Name </th>
-                            <th> Last Name </th>
-                            <th></th>
-                          </tr>
-                          <tr v-for="(student, index) in students"
-                              :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{student.username}}</td>
-                            <td>{{student.first_name}}</td>
-                            <td>{{student.last_name}}</td>
-                            <td> <i class="fas fa-times delete-enrollee"
-                                    @click="remove_students([student], index)"></i> </td>
-                          </tr>
-                        </table>
+                <div v-else-if="role_selected === 'staff'">
+                  <div class="class-roster-body">
+                    <div class="adding-container">
+                      <form id="add-staff-form" @submit.prevent="add_staff">
+                        <label class="enrollment-add-label"> Add staff members:
+                          <i class="far fa-question-circle enrollment-tooltip">
+                            <tooltip width="large" placement="top">
+                              Enter a comma-separated list of email addresses.
+                            </tooltip>
+                          </i>
+                        </label>
+                        <textarea ref="new_staff_list" v-model="new_staff_list"></textarea>
+                        <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                      </form>
+                    </div>
+
+                    <div class="enrolled-container">
+                      <div v-if="staff.length > 0">
+                        <div class="roster-column">
+                          <table class="roster-table">
+                            <tr>
+                              <th> Username </th>
+                              <th> First Name </th>
+                              <th> Last Name </th>
+                              <th></th>
+                            </tr>
+                            <tr v-for="(staff_member, index) in staff"
+                                :class="index % 2 ? 'odd-row' : 'even-row'">
+                              <td>{{staff_member.username}}</td>
+                              <td>{{staff_member.first_name}}</td>
+                              <td>{{staff_member.last_name}}</td>
+                              <td> <i class="fas fa-times delete-enrollee"
+                                      @click="remove_staff([staff_member], index)"></i> </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else-if="role_selected === 'student'">
+                  <div class="class-roster-body">
+                    <div class="adding-container">
+                      <form id="add-students-form" @submit.prevent="add_students">
+                        <label class="enrollment-add-label"> Add students:
+                          <i class="far fa-question-circle enrollment-tooltip">
+                            <tooltip width="large" placement="top">
+                              Enter a comma-separated list of email addresses.
+                            </tooltip>
+                          </i>
+                        </label>
+                        <textarea ref="new_student_list" v-model="new_students_list"></textarea>
+                        <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                      </form>
+                    </div>
+
+                    <div class="enrolled-container">
+                      <div v-if="students.length > 0">
+                        <div class="roster-column">
+                          <table class="roster-table">
+                            <tr>
+                              <th> Username </th>
+                              <th> First Name </th>
+                              <th> Last Name </th>
+                              <th></th>
+                            </tr>
+                            <tr v-for="(student, index) in students"
+                                :class="index % 2 ? 'odd-row' : 'even-row'">
+                              <td>{{student.username}}</td>
+                              <td>{{student.first_name}}</td>
+                              <td>{{student.last_name}}</td>
+                              <td> <i class="fas fa-times delete-enrollee"
+                                      @click="remove_students([student], index)"></i> </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                  <div class="class-roster-body">
+                    <div class="adding-container">
+                      <form id="add-handgraders-form" @submit.prevent="add_handgraders">
+                        <label class="enrollment-add-label"> Add handgraders:
+                          <i class="far fa-question-circle enrollment-tooltip">
+                            <tooltip width="large" placement="top">
+                              Enter a comma-separated list of email addresses.
+                            </tooltip>
+                          </i>
+                        </label>
+                        <textarea ref="new_handgrader_list" v-model="new_handgraders_list">
+                        </textarea>
+                        <input type="submit" class="add-enrollees-button" value="Add to Roster">
+                      </form>
+                    </div>
+
+                    <div class="enrolled-container">
+                      <div v-if="handgraders.length > 0">
+                        <div class="roster-column">
+                          <table class="roster-table">
+                            <tr>
+                              <th> Username </th>
+                              <th> First Name </th>
+                              <th> Last Name </th>
+                              <th></th>
+                            </tr>
+                            <tr v-for="(handgrader, index) in handgraders"
+                                :class="index % 2 ? 'odd-row' : 'even-row'">
+                              <td>{{handgrader.username}}</td>
+                              <td>{{handgrader.first_name}}</td>
+                              <td>{{handgrader.last_name}}</td>
+                              <td> <i class="fas fa-times delete-enrollee"
+                                      @click="remove_handgraders([handgrader], index)"></i> </td>
+                            </tr>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div v-else>
-                <div class="class-roster-body">
-                  <div class="adding-container">
-                    <form id="add-handgraders-form" @submit.prevent="add_handgraders">
-                      <label class="enrollment-add-label"> Add handgraders:
-                        <i class="far fa-question-circle enrollment-tooltip">
-                          <tooltip width="large" placement="top">
-                            Enter a comma-separated list of email addresses.
-                          </tooltip>
-                        </i>
-                      </label>
-                      <textarea ref="new_handgrader_list" v-model="new_handgraders_list">
-                      </textarea>
-                      <input type="submit" class="add-enrollees-button" value="Add to Roster">
-                    </form>
-                  </div>
+            </template>
+          </tab>
 
-                  <div class="enrolled-container">
-                    <div v-if="handgraders.length > 0">
-                      <div class="roster-column">
-                        <table class="roster-table">
-                          <tr>
-                            <th> Username </th>
-                            <th> First Name </th>
-                            <th> Last Name </th>
-                            <th></th>
-                          </tr>
-                          <tr v-for="(handgrader, index) in handgraders"
-                              :class="index % 2 ? 'odd-row' : 'even-row'">
-                            <td>{{handgrader.username}}</td>
-                            <td>{{handgrader.first_name}}</td>
-                            <td>{{handgrader.last_name}}</td>
-                            <td> <i class="fas fa-times delete-enrollee"
-                                    @click="remove_handgraders([handgrader], index)"></i> </td>
-                          </tr>
-                        </table>
-                      </div>
+  <!--PROJECTS TAB-->
+
+          <tab>
+            <tab-header>
+              <div class="tab-label">
+                <p class="tab-header"> Projects </p>
+              </div>
+            </tab-header>
+            <template slot="body">
+              <div class="tab-body">
+                <div id="project-body-container">
+
+                  <div id="new-project-side">
+                    <div id="new-project-space">
+                      <form id="new-project-form" @submit.prevent="add_project">
+                        <p id="new-project-label"> Create a New Project</p>
+                        <input type="text"
+                               id="new-project-input"
+                               ref="new_project_input"
+                               v-model="new_project_name"
+                               placeholder="New Project Name">
+                        <input type="submit"
+                               class="create-new-project-button"
+                               value="Add Project">
+                      </form>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </tab>
 
-<!--PROJECTS TAB-->
-
-        <tab>
-          <tab-header>
-            <div class="tab-label">
-              <p class="tab-header"> Projects </p>
-            </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-              <div id="project-body-container">
-
-                <div id="new-project-side">
-                  <div id="new-project-space">
-                    <form id="new-project-form" @submit.prevent="add_project">
-                      <p id="new-project-label"> Create a New Project</p>
-                      <input type="text"
-                             id="new-project-input"
-                             ref="new_project_input"
-                             v-model="new_project_name"
-                             placeholder="New Project Name">
-                      <input type="submit"
-                             class="create-new-project-button"
-                             value="Add Project">
-                    </form>
+                  <div id="existing-projects-side">
+                    <p class="existing-projects-label"> Existing Projects </p>
+                    <table class="project-table">
+                      <tr>
+                        <th class="project-name"></th>
+                        <th class="edit-project"></th>
+                      </tr>
+                      <tr v-for="(project, index) of projects"
+                          :class="index % 2 ? 'odd-row' : 'even-row'">
+                        <td class="project-name">
+                          <router-link tag="div"
+                                       :to="`/web/project/${project.pk}`">
+                            <a>
+                              <div class="project-link">{{project.name}}</div>
+                            </a>
+                          </router-link>
+                        </td>
+                        <td class="edit-project">
+                          <router-link tag="div"
+                                       :to="`/web/project_admin/${project.pk}`">
+                            <a>
+                              <div class="edit-project-link"> Edit Project </div>
+                            </a>
+                          </router-link>
+                        </td>
+                      </tr>
+                    </table>
                   </div>
-                </div>
 
-                <div id="existing-projects-side">
-                  <p class="existing-projects-label"> Existing Projects </p>
-                  <table class="project-table">
-                    <tr>
-                      <th class="project-name"></th>
-                      <th class="edit-project"></th>
-                    </tr>
-                    <tr v-for="(project, index) of projects"
-                        :class="index % 2 ? 'odd-row' : 'even-row'">
-                      <td class="project-name">
-                        <router-link tag="div"
-                                     :to="`/web/project/${project.pk}`">
-                          <a>
-                            <div class="project-link">{{project.name}}</div>
-                          </a>
-                        </router-link>
-                      </td>
-                      <td class="edit-project">
-                        <router-link tag="div"
-                                     :to="`/web/project_admin/${project.pk}`">
-                          <a>
-                            <div class="edit-project-link"> Edit Project </div>
-                          </a>
-                        </router-link>
-                      </td>
-                    </tr>
-                  </table>
                 </div>
-
               </div>
-            </div>
-          </template>
-        </tab>
-      </tabs>
+            </template>
+          </tab>
+        </tabs>
+      </div>
     </div>
-  </div>
+  </LoadingIcon>
 </template>
 
 <script lang="ts">
 
   import Dropdown from '@/components/dropdown.vue';
+  import LoadingIcon from '@/components/loading_icon.vue';
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
@@ -360,7 +363,7 @@
   import { Course, Project, Semester, User } from 'ag-client-typescript';
 
   @Component({
-    components: { Dropdown, Tab, TabHeader, Tabs, Tooltip }
+    components: { Dropdown, LoadingIcon, Tab, TabHeader, Tabs, Tooltip }
   })
   export default class CourseAdmin extends Vue {
     loading = true;
@@ -616,7 +619,7 @@ $current-lang-choice: "Montserrat";
   padding-top: 6px;
   margin: 0;
   font-size: 17px;
-  opacity: 0.4;
+  opacity: 0.7;
 }
 
 .last-saved-timestamp span {
@@ -626,8 +629,6 @@ $current-lang-choice: "Montserrat";
 .last-saved-spinner {
   font-size: 18px;
   color: $stormy-gray-dark;
-  margin-top: 15px;
-  margin-left: 24px;
   display: inline-block;
 }
 
@@ -870,7 +871,7 @@ a {
     padding: 10px 15px;
     font-family: $current-lang-choice;
     font-size: 18px;
-    margin: 12px 0;
+    margin: 12px 15px 12px 0;
     display: inline-block;
   }
 
