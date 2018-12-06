@@ -17,8 +17,20 @@
 }
 
 %mobile-tab {
-    display: block;
+    display: inline-block;
     padding: 18px 20px;
+    box-sizing: border-box;
+
+    //padding: 2% 3%;
+    //width: 94% !important;
+
+    //box-sizing: border-box;
+    //display: inline-block;
+    border-radius: 10px 10px 0 0;
+    margin-top: 4px;
+    //padding: 10px 15px;
+    max-width: 250px;
+    //min-width: 10px;
 }
 
 /* ---------------- Gray ---------------- */
@@ -26,13 +38,13 @@
 .gray-theme-active {
     @extend %mobile-tab;
     background-color: $pebble-dark;
-    width: 10%;
+    //width: 10%;
 }
 
 .gray-theme-inactive {
     @extend %mobile-tab;
     background-color: $pebble-light;
-    width: 10%;
+    //width: 10%;
 }
 
 .gray-theme-inactive:hover {
@@ -125,11 +137,13 @@
 
 @media only screen and (min-width: 481px) {
     %tab-theme {
+        box-sizing: border-box;
         display: inline-block;
         border-radius: 10px 10px 0 0;
-        margin-right: 2px;
         margin-top: 4px;
         padding: 10px 15px;
+        max-width: 250px;
+        min-width: 10px;
     }
 
     /* ---------------- Gray ---------------- */
@@ -156,6 +170,7 @@
     .dark-theme-active {
         @extend %tab-theme;
         color: white;
+        //max-width: 100px;
     }
 
     .dark-theme-inactive {

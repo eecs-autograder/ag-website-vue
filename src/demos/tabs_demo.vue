@@ -28,96 +28,96 @@
         </div>
 
         <br>
-        <p class="tab-styling-theme-label"> DARK THEME </p>
-        <tabs ref="tabs" v-model="current_tab_index"
-              tab_active_class="dark-theme-active"
-              tab_inactive_class="dark-theme-inactive">
-          <tab v-for="(tab_val, index) in tab_labels" :key="tab_val">
-            <tab-header v-on:click="log_event">
-              <span class="tab-heading"> Tab {{tab_val}} </span>
-              <i class="fas fa-times close_x"
-                 @click="$event.stopPropagation(); remove_tab(index)"></i>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body-dark">
-                {{tab_val}}
-              </div>
-            </template>
-          </tab>
-        </tabs>
+        <!--<p class="tab-styling-theme-label"> DARK THEME </p>-->
+        <!--<tabs ref="tabs" v-model="current_tab_index"-->
+              <!--tab_active_class="dark-theme-active"-->
+              <!--tab_inactive_class="dark-theme-inactive">-->
+          <!--<tab v-for="(tab_val, index) in tab_labels" :key="tab_val">-->
+            <!--<tab-header v-on:click="log_event">-->
+              <!--<span class="tab-heading"> Tab {{tab_val}} </span>-->
+              <!--<i class="fas fa-times close_x"-->
+                 <!--@click="$event.stopPropagation(); remove_tab(index)"></i>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body-dark">-->
+                <!--{{tab_val}}-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+        <!--</tabs>-->
 
         <br>
-        <p class="tab-styling-theme-label"> BLUE THEME </p>
-        <tabs ref="tabs" v-model="current_tab_index"
-              tab_active_class="blue-theme-active"
-              tab_inactive_class="blue-theme-inactive">
-          <tab v-for="(tab_val, index) in tab_labels" :key="tab_val">
-            <tab-header v-on:click="log_event">
-              <span class="tab-heading"> Tab {{tab_val}} </span>
-              <i class="fas fa-times close_x"
-                 @click="$event.stopPropagation(); remove_tab(index)"></i>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body-blue">
-                {{tab_val}}
-              </div>
-            </template>
-          </tab>
-        </tabs>
+        <!--<p class="tab-styling-theme-label"> BLUE THEME </p>-->
+        <!--<tabs ref="tabs" v-model="current_tab_index"-->
+              <!--tab_active_class="blue-theme-active"-->
+              <!--tab_inactive_class="blue-theme-inactive">-->
+          <!--<tab v-for="(tab_val, index) in tab_labels" :key="tab_val">-->
+            <!--<tab-header v-on:click="log_event">-->
+              <!--<span class="tab-heading"> Tab {{tab_val}} </span>-->
+              <!--<i class="fas fa-times close_x"-->
+                 <!--@click="$event.stopPropagation(); remove_tab(index)"></i>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body-blue">-->
+                <!--{{tab_val}}-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+        <!--</tabs>-->
 
         <br>
-        <p class="tab-styling-theme-label"> NO BORDER THEME </p>
-        <tabs ref="tabs" v-model="current_tab_index"
-              tab_active_class="no-border-active"
-              tab_inactive_class="no-border-inactive">
-          <tab v-for="(tab_val, index) in tab_labels" :key="tab_val">
-            <tab-header v-on:click="log_event">
-              <span class="tab-heading"> Tab {{tab_val}} </span>
-              <i class="fas fa-times close_x"
-                 @click="$event.stopPropagation(); remove_tab(index)"></i>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body-no-border">
-                {{tab_val}}
-              </div>
-            </template>
-          </tab>
-        </tabs>
+        <!--<p class="tab-styling-theme-label"> NO BORDER THEME </p>-->
+        <!--<tabs ref="tabs" v-model="current_tab_index"-->
+              <!--tab_active_class="no-border-active"-->
+              <!--tab_inactive_class="no-border-inactive">-->
+          <!--<tab v-for="(tab_val, index) in tab_labels" :key="tab_val">-->
+            <!--<tab-header v-on:click="log_event">-->
+              <!--<span class="tab-heading"> Tab {{tab_val}} </span>-->
+              <!--<i class="fas fa-times close_x"-->
+                 <!--@click="$event.stopPropagation(); remove_tab(index)"></i>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body-no-border">-->
+                <!--{{tab_val}}-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+        <!--</tabs>-->
 
         <br>
         <!-- This one uses the default styling -->
-        <p class="tab-styling-theme-label"> WHITE THEME </p>
-        <tabs ref="tabs2">
-          <tab>
-            <tab-header v-on:click="log_event">
-              <p class="tab-heading"> Cat Tab </p>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body-white">
-              </div>
-            </template>
-          </tab>
-          <tab>
-            <tab-header v-on:click.native="log_event">
-              <p class="tab-heading"> Dog Tab </p>
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body-white">
-                Bye 2
-              </div>
-            </template>
-          </tab>
-          <tab>
-            <tab-header @click.native="log_event">
-              Bare Text Tab
-            </tab-header>
-            <template slot="body">
-              <div class="tab-body-white">
-                The tab header has just text
-              </div>
-            </template>
-          </tab>
-        </tabs>
+        <!--<p class="tab-styling-theme-label"> WHITE THEME </p>-->
+        <!--<tabs ref="tabs2">-->
+          <!--<tab>-->
+            <!--<tab-header v-on:click="log_event">-->
+              <!--<p class="tab-heading"> Cat Tab </p>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body-white">-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+          <!--<tab>-->
+            <!--<tab-header v-on:click.native="log_event">-->
+              <!--<p class="tab-heading"> Dog Tab </p>-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body-white">-->
+                <!--Bye 2-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+          <!--<tab>-->
+            <!--<tab-header @click.native="log_event">-->
+              <!--Bare Text Tab-->
+            <!--</tab-header>-->
+            <!--<template slot="body">-->
+              <!--<div class="tab-body-white">-->
+                <!--The tab header has just text-->
+              <!--</div>-->
+            <!--</template>-->
+          <!--</tab>-->
+        <!--</tabs>-->
       </div>
     </div>
   </div>
@@ -167,6 +167,12 @@
     cursor: pointer;
   }
 
+  .close_x {
+    position: absolute;
+    right: 20px;
+    top: 12px;
+  }
+
   .tab-body {
     background-color: white;
     bottom: 0;
@@ -201,7 +207,7 @@
 
   .tab-heading {
     margin: 0;
-    padding-right: 15px;
+    /*padding-right: 15px;*/
     font-family: "Helvetica Neue", Helvetica;
   }
 
@@ -217,9 +223,10 @@
     display: inline-block;
     border: 2px dashed $pebble-dark;
   }
+  /*}*/
 
-  .limit-tabs {
-    width: 300px;
-  }
+  /*.limit-tabs {*/
+    /*width: 300px;*/
+  /*}*/
 
 </style>
