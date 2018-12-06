@@ -9,11 +9,11 @@
             v-if="!loading">
 <!--GENERAL TAB-->
         <tab>
-          <template slot="header">
+          <tab-header>
             <div class="tab-label">
               <p class="tab-header"> Settings </p>
             </div>
-          </template>
+          </tab-header>
           <template slot="body">
             <div class="tab-body">
               <div id="settings-container">
@@ -86,9 +86,11 @@
             </div>
           </template>
         </tab>
+
 <!--PERMISSIONS TAB-->
+
         <tab>
-          <template slot="header">
+          <tab-header>
 
               <dropdown ref="roster_dropdown"
                         :items="roles"
@@ -109,7 +111,7 @@
                 </div>
               </dropdown>
 
-          </template>
+          </tab-header>
 
           <template slot="body">
             <div class="tab-body">
@@ -279,13 +281,15 @@
             </div>
           </template>
         </tab>
+
 <!--PROJECTS TAB-->
+
         <tab>
-          <template slot="header">
+          <tab-header>
             <div class="tab-label">
               <p class="tab-header"> Projects </p>
             </div>
-          </template>
+          </tab-header>
           <template slot="body">
             <div class="tab-body">
               <div id="project-body-container">
@@ -348,6 +352,7 @@
 
   import Dropdown from '@/components/dropdown.vue';
   import Tab from '@/components/tabs/tab.vue';
+  import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
   import Tooltip from '@/components/tooltip.vue';
   import { Component, Vue, Watch } from 'vue-property-decorator';
@@ -355,7 +360,7 @@
   import { Course, Project, Semester, User } from 'ag-client-typescript';
 
   @Component({
-    components: { Dropdown, Tab, Tabs, Tooltip }
+    components: { Dropdown, Tab, TabHeader, Tabs, Tooltip }
   })
   export default class CourseAdmin extends Vue {
     loading = true;
@@ -533,12 +538,7 @@ $current-lang-choice: "Montserrat";
 
 .tab-label {
   outline: none;
-}
-
-.tab-header {
-  padding: 15px 25px;
-  margin: 0;
-  font-size: 20px;
+  /*border: 1px solid purple;*/
 }
 
 /* ---------------- Settings Styling ---------------- */
