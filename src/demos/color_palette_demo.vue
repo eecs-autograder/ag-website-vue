@@ -4,6 +4,11 @@
     <p class="color-announcement"> Grays </p>
 
     <div class="color">
+      <p class="color-name"> pebble-lighter </p>
+      <p class="color-square pebble-lighter"> </p>
+    </div>
+
+    <div class="color">
       <p class="color-name"> pebble-light </p>
       <p class="color-square pebble-light"> </p>
     </div>
@@ -11,6 +16,11 @@
     <div class="color">
       <p class="color-name"> pebble-medium </p>
       <p class="color-square pebble-medium"></p>
+    </div>
+
+    <div class="color">
+      <p class="color-name"> pebble-dim </p>
+      <p class="color-square pebble-dim"> </p>
     </div>
 
     <div class="color">
@@ -177,6 +187,14 @@
   margin: 10px 0;
   height: 1px;
   background-color: $pebble-medium;
+}
+
+.pebble-dim {
+  background-color: $pebble-dim;
+}
+
+.pebble-lighter {
+  background-color: $pebble-lighter;
 }
 
 .pebble-light {

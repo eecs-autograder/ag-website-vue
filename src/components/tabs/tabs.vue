@@ -47,7 +47,27 @@ export default class Tabs extends Vue {
   //   return width;
   // }
 
+  d_width_of_page = 0;
+
+  mounted() {
+    window.addEventListener('resize', () => {
+      this.d_width_of_page = window.outerWidth;
+      console.log("Window Size Changed " + this.d_width_of_page + "px");
+    });
+  }
+
+  beforeDestroy() {
+    window.removeEventListener('resize', () => {
+      this.d_width_of_page = window.outerWidth;
+      console.log("Window Size Changed " + this.d_width_of_page + "px");
+    });
+  }
+
   render(create_element: CreateElement) {
+    // We need this.d_width_of_page to be used in the render function so that when
+    // it changes the page is updated.
+    console.assert(this.d_width_of_page !== undefined);
+
     let tab_data: ExtractedTabData[] = [];
 
     if (this.$slots.default === undefined) {
@@ -117,10 +137,8 @@ export default class Tabs extends Vue {
         if (element_data.style === undefined) {
           element_data.style = {};
         }
-        // (<{width: string}> element_data.style).width =
-        //   window_width.matches ? `${100 / tab_data.length}%` : '100%';
-
-        (<{width: string}> element_data.style).width = `${100 / tab_data.length}%`;
+        (<{width: string}> element_data.style).width =
+          window_width.matches ? `${100 / tab_data.length}%` : '100%';
 
         if (element_data.class === undefined) {
           element_data.class = [];

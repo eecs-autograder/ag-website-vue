@@ -17,37 +17,65 @@
 }
 
 %mobile-tab {
-    display: inline-block;
-    padding: 18px 20px;
+    position: relative;
+    display: block;
     box-sizing: border-box;
-
-    //padding: 2% 3%;
-    //width: 94% !important;
-
-    //box-sizing: border-box;
-    //display: inline-block;
-    border-radius: 10px 10px 0 0;
     margin-top: 4px;
-    //padding: 10px 15px;
-    max-width: 250px;
-    //min-width: 10px;
+    min-width: 10px;
+    padding: 18px 20px;
 }
 
 /* ---------------- Gray ---------------- */
+/* ---------------- & No Border ---------------- */
 
-.gray-theme-active {
+.gray-theme-active, .no-border-active {
     @extend %mobile-tab;
     background-color: $pebble-dark;
-    //width: 10%;
 }
 
-.gray-theme-inactive {
+.gray-theme-inactive, .no-border-inactive {
     @extend %mobile-tab;
     background-color: $pebble-light;
-    //width: 10%;
 }
 
-.gray-theme-inactive:hover {
+.gray-theme-inactive:hover, .no-border-inactive:hover  {
+    background-color: $pebble-medium;
+}
+
+/* ---------------- Gray-No-Padding---------------- */
+
+.gray-theme-active-no-padding {
+    @extend %mobile-tab;
+    background-color: $pebble-dark;
+    padding: 0;
+}
+
+.gray-theme-inactive-no-padding {
+    @extend %mobile-tab;
+    background-color: $pebble-light;
+    padding: 0;
+}
+
+.gray-theme-inactive-no-padding:hover {
+    @include tab-border($pebble-medium);
+}
+
+
+/* -------------- Gray-white ------------- */
+
+.gray-white-theme-active {
+    @extend %mobile-tab;
+    //background-color: darken(lavender, 11);
+    background-color: $ocean-blue;
+    color: white;
+}
+
+.gray-white-theme-inactive {
+    @extend %mobile-tab;
+    background-color: $pebble-lighter;
+}
+
+.gray-white-theme-inactive:hover {
     background-color: $pebble-medium;
 }
 
@@ -62,78 +90,31 @@
 .dark-theme-inactive {
     @extend %mobile-tab;
     color: white;
-    background-color: darken(rgba(119, 136, 153, 0.9), 20);
+    background-color: darken($stormy-gray-dark, 0);
 }
 
 .dark-theme-inactive:hover {
-    background-color: darken($stormy-gray-dark, 15);
-}
-
-/* ---------------- Blue ---------------- */
-
-.blue-theme-active {
-    @extend %mobile-tab;
-    background-color: darken($ocean-blue, 18);
-    color: white;
-}
-
-.blue-theme-inactive {
-    @extend %mobile-tab;
-    background-color: darken($ocean-blue, 11);
-    color: white;
-}
-
-.blue-theme-inactive:hover {
-    background-color: darken($ocean-blue, 13);
+    background-color: darken($stormy-gray-dark, 5);
 }
 
 /* ---------------- White ---------------- */
 
 .white-theme-active {
     @extend %mobile-tab;
-    background-color: darken($pebble-medium, 5);
+    background-color: $pebble-dim;
 }
 
 .white-theme-inactive {
     @extend %mobile-tab;
     background-color: white;
+    border: 2px solid $pebble-light;
 }
 
 .white-theme-inactive:hover {
-    background-color: $pebble-medium;
+    background-color: $pebble-lighter;
 }
 
-/* -------------- No Border ------------- */
-
-.no-border-active {
-    background-color: $pebble-dark;
-    color: black;
-    @extend %mobile-tab;
-}
-
-.no-border-inactive {
-    background-color: hsl(184, 5%, 95%);
-    color: slategrey;
-    @extend %mobile-tab;
-}
-
-.no-border-inactive:hover {
-    background-color: $pebble-medium;
-    color: black;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ---------------- MEDIA QUERY SECTION---------------- */
 
 @media only screen and (min-width: 481px) {
     %tab-theme {
@@ -141,9 +122,9 @@
         display: inline-block;
         border-radius: 10px 10px 0 0;
         margin-top: 4px;
-        padding: 10px 15px;
         max-width: 250px;
         min-width: 10px;
+        padding: 10px 15px;
     }
 
     /* ---------------- Gray ---------------- */
@@ -159,64 +140,33 @@
         @extend %tab-theme;
         @include inactive-tab-position();
         @include tab-border($pebble-light);
+        border-right: 2px solid darken($pebble-light, 2);
     }
 
     .gray-theme-inactive:hover {
         @include tab-border($pebble-medium);
     }
 
-    /* -------------- Dark ------------- */
 
-    .dark-theme-active {
+    /* ---------------- Gray-No-Padding---------------- */
+
+    .gray-theme-active-no-padding {
         @extend %tab-theme;
-        color: white;
-        //max-width: 100px;
-    }
-
-    .dark-theme-inactive {
-        @extend %tab-theme;
-        color: white;
-    }
-
-    /* ---------------- Blue ---------------- */
-
-    .blue-theme-active {
-        @extend %tab-theme;
-        @include active-tab-position();
-        @include tab-border(darken($ocean-blue, 15));
+        @include active-tab-position(4px);
+        @include tab-border($stormy-gray-dark);
         background-color: white;
-        color: black;
+        padding: 0;
     }
 
-    .blue-theme-inactive {
+    .gray-theme-inactive-no-padding {
         @extend %tab-theme;
-        @include inactive-tab-position();
-        @include tab-border(darken($ocean-blue, 8));
-        color: white;
+        @include inactive-tab-position(4px);
+        @include tab-border($pebble-light);
+        border-right: 2px solid darken($pebble-light, 2);
+        padding: 0;
     }
 
-    .blue-theme-inactive:hover {
-        @include tab-border(darken($ocean-blue, 15));
-        background-color: darken($ocean-blue, 15);
-    }
-
-    /* ---------------- White ---------------- */
-
-    .white-theme-active {
-        @extend %tab-theme;
-        @include active-tab-position();
-        @include tab-border($pebble-dark);
-        background-color: white;
-        color: black;
-    }
-
-    .white-theme-inactive {
-        @extend %tab-theme;
-        @include inactive-tab-position();
-        @include tab-border(white);
-    }
-
-    .white-theme-inactive:hover {
+    .gray-theme-inactive-no-padding:hover {
         @include tab-border($pebble-medium);
     }
 
@@ -225,7 +175,7 @@
     .gray-white-theme-active {
         @extend %tab-theme;
         @include active-tab-position();
-        @include tab-border(hsl(210, 11%, 90%));
+        @include tab-border($pebble-dim);
         background-color: white;
         color: black;
     }
@@ -233,14 +183,15 @@
     .gray-white-theme-inactive {
         @extend %tab-theme;
         @include inactive-tab-position();
-        @include tab-border(hsl(210, 11%, 95%));
-        background-color: hsl(210, 11%, 95%);
+        @include tab-border($pebble-lighter);
+        background-color: $pebble-lighter;
         color: black;
+        border-right: 2px solid darken($pebble-lighter, 2);
     }
 
     .gray-white-theme-inactive:hover {
-        @include tab-border(hsl(210, 12%, 93%));
-        background-color: hsl(210, 12%, 93%);
+        @include tab-border($pebble-medium);
+        background-color: $pebble-medium;
         color: black;
     }
 
@@ -248,15 +199,60 @@
 
     .no-border-active {
         @extend %tab-theme;
-        @include tab-border($pebble-dark);
+        background-color: darken($pebble-dark, 50);
+        color: white;
     }
 
     .no-border-inactive {
         @extend %tab-theme;
-        @include tab-border($pebble-light);
+        border-right: 2px solid darken($pebble-light, 2);
     }
 
-    .no-border-inactive:hover {
+    .no-border-inactive:hover {}
+
+    /* -------------- Dark ------------- */
+
+    .dark-theme-active {
+        @extend %tab-theme;
+        @include active-tab-position();
+        @include tab-border(darken($stormy-gray-dark, 25));
+        color: black;
+        background-color: white;
+    }
+
+    .dark-theme-inactive {
+        @include inactive-tab-position();
+        @extend %tab-theme;
+        @include tab-border(darken($stormy-gray-dark, 0));
+        color: white;
+        border-right: 2px solid darken($stormy-gray-dark, 2);
+    }
+
+    .dark-theme-inactive:hover {
+        @include tab-border(darken($stormy-gray-dark, 5));
+    }
+
+    /* ---------------- White ---------------- */
+
+    .white-theme-active {
+        @extend %tab-theme;
+        @include active-tab-position();
+        @include tab-border($pebble-dim);
+        background-color: white;
+        color: black;
+    }
+
+    .white-theme-inactive {
+        @extend %tab-theme;
+        @include inactive-tab-position();
+        @include tab-border($pebble-light);
+        background-color: $pebble-light;
+        border-right: 2px solid darken($pebble-light, 2);
+    }
+
+    .white-theme-inactive:hover {
         @include tab-border($pebble-medium);
+        background-color: $pebble-medium;
+
     }
 }
