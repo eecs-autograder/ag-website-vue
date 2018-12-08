@@ -2,7 +2,7 @@
   <div class="tabs-demo">
 
     <div class="outside">
-      <button type="button" @click="add_tab()">Add tab</button>
+      <button class="add-tab-button" type="button" @click="add_tab()">Add tab</button>
 
       <br> <br>
       <div class="shrink-tabs">
@@ -182,8 +182,13 @@
   })
   export default class TabsDemo extends Vue {
     countries = ["France", "Norway", "Spain"];
-
     country_selected = "France";
+    current_tab_index_1 = 1;
+    current_tab_index_2 = 1;
+    current_tab_index_3 = 1;
+    current_tab_index_4  = 1;
+    current_tab_index_5 = 1;
+    tab_labels = [1, 2, 3];
 
     show_countries_dropdown() {
       let countries_dropdown = <Dropdown> this.$refs.countries_dropdown;
@@ -195,22 +200,14 @@
       console.log(e);
     }
 
-    current_tab_index_1 = 1;
-    current_tab_index_2 = 1;
-    current_tab_index_3 = 1;
-    current_tab_index_4  = 1;
-    current_tab_index_5 = 1;
-
-    tab_labels = [1, 2, 3];
-
     add_tab() {
       this.tab_labels.push(this.tab_labels.length + 1);
-      this.current_tab_index = this.tab_labels.length - 1;
+      this.current_tab_index_1 = this.tab_labels.length - 1;
     }
 
     remove_tab(index: number) {
-      if (index < this.current_tab_index) {
-        this.current_tab_index -= 1;
+      if (index < this.current_tab_index_1) {
+        this.current_tab_index_1 -= 1;
       }
       this.tab_labels.splice(index, 1);
     }
@@ -219,95 +216,112 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
 
-  .tab-label {
-    outline: none;
-  }
+.add-tab-button {
+  border: 2px solid lighten($stormy-gray-dark, 5);
+  background-color: $stormy-gray-dark;
+  border-radius: 5px;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  margin: 10px;
+  outline: none;
+  padding: 10px;
+}
 
-  .close-x:hover {
-    color: $warning-red;
-    cursor: pointer;
-  }
+.add-tab-button:active {
+  background-color: darken($stormy-gray-dark, 10);
+}
 
-  .close-x {
-    position: absolute;
-    right: 10px;
-    top: 7.5px;
-    font-size: 20px;
-    background-color: inherit;
-    padding: 10px 8px;
-  }
+.tab-label {
+  outline: none;
+}
 
-  .tab-body {
-    background-color: white;
-    bottom: 0;
-    height: 500px;
-    padding: 10px;
-    position: relative;
-  }
+.close-x:hover {
+  color: $warning-red;
+  cursor: pointer;
+}
 
-  .tab-body-gray, .tab-body-gray-no-padding {
-    @extend .tab-body;
-    border: 2px solid $stormy-gray-dark;
-  }
+.close-x {
+  background-color: inherit;
+  font-size: 18px;
+  padding: 12px 15px;
+  position: absolute;
+  right: 6px;
+  top: 5.5px;
+}
 
-  .tab-body-gray-white {
-    @extend .tab-body;
-    border: 2px solid $pebble-dim;
-  }
+.tab-body {
+  background-color: white;
+  bottom: 0;
+  height: 500px;
+  padding: 10px;
+  position: relative;
+}
 
-  .tab-body-dark{
-    @extend .tab-body;
-    border: 2px solid darken($stormy-gray-dark, 25);
-  }
+.tab-body-gray, .tab-body-gray-no-padding {
+  @extend .tab-body;
+  border: 2px solid $stormy-gray-dark;
+}
 
-  .tab-body-no-border {
-    @extend .tab-body;
-  }
+.tab-body-gray-white {
+  @extend .tab-body;
+  border: 2px solid $pebble-dim;
+}
 
-  .tab-body-white {
-    @extend .tab-body;
-    border: 2px solid $pebble-dim;
-  }
+.tab-body-dark{
+  @extend .tab-body;
+  border: 2px solid darken($stormy-gray-dark, 25);
+}
 
-  .tab-heading {
-    margin: 0;
-    font-family: "Helvetica Neue", Helvetica;
-    height: 19px;
-    overflow: hidden;
-  }
+.tab-body-no-border {
+  @extend .tab-body;
+}
 
-  .tab-heading-dropdown-tabs {
-    margin: 0;
-    height: 19px;
-    padding: 18px 20px;
-    overflow: hidden;
-  }
+.tab-body-white {
+  @extend .tab-body;
+  border: 2px solid $pebble-dim;
+}
 
-  .shrink-tabs {
-    width: 80%;
-    margin-left: 10%;
-    margin-right: 10%;
-  }
+.tab-heading {
+  height: 19px;
+  margin: 0;
+  overflow: hidden;
+}
 
-  .tab-styling-theme-label {
-    background-color: $pebble-light;
-    padding: 10px;
-    display: inline-block;
-    border: 2px dashed $pebble-dark;
-  }
+.tab-heading-dropdown-tabs {
+  margin: 0;
+  height: 19px;
+  padding: 18px 20px;
+  overflow: hidden;
+}
 
-  @media only screen and (min-width: 481px) {
-      .close-x {
-        padding: 5px;
-        top: 6.5px;
-        font-size: inherit;
-      }
+.shrink-tabs {
+  margin-left: 10%;
+  margin-right: 10%;
+  width: 80%;
+}
 
-      .tab-heading-dropdown-tabs {
-        padding: 10px 15px;
-      }
-  }
+.tab-styling-theme-label {
+  background-color: $pebble-light;
+  border: 2px dashed $pebble-dark;
+  display: inline-block;
+  padding: 10px;
+}
+
+@media only screen and (min-width: 481px) {
+    .close-x {
+      background-color: inherit;
+      font-size: inherit;
+      padding: 3px 5px;
+      right: 6px;
+      top: 8px;
+    }
+
+    .tab-heading-dropdown-tabs {
+      padding: 10px 15px;
+    }
+}
 
 </style>
