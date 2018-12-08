@@ -5,6 +5,11 @@ import Component from 'vue-class-component';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+    Object.defineProperty(window, "matchMedia", {
+        value: jest.fn(() => {
+            return { matches: true };
+        })
+    });
 });
 
 @Component({

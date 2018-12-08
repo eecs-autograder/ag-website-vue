@@ -35,31 +35,18 @@ export default class Tabs extends Vue {
     this.active_tab_index = this.value;
   }
 
-  // get_tab_width() {
-  //   console.log("Calculating tab width");
-  //   let window_width = window.matchMedia("(min-width: 481px)");
-  //   let headers_container:HTMLElement = <HTMLElement> this.$refs.headers_container;
-  //
-  //   let number_of_tabs = headers_container !== undefined ? headers_container.children.length : 1;
-  //
-  //   let width = window_width.matches ? `${100 / number_of_tabs}%` : '100%';
-  //   console.log(width);
-  //   return width;
-  // }
-
   d_width_of_page = 0;
 
   mounted() {
     window.addEventListener('resize', () => {
       this.d_width_of_page = window.outerWidth;
-      console.log("Window Size Changed " + this.d_width_of_page + "px");
     });
   }
 
+  // tslint:disable-next-line:naming-convention
   beforeDestroy() {
     window.removeEventListener('resize', () => {
       this.d_width_of_page = window.outerWidth;
-      console.log("Window Size Changed " + this.d_width_of_page + "px");
     });
   }
 
@@ -128,7 +115,6 @@ export default class Tabs extends Vue {
   }
 
   private _render_tab_headers(create_element: CreateElement, tab_data: ExtractedTabData[]) {
-    console.log("Render tab headers");
     let window_width = window.matchMedia("(min-width: 481px)");
     let header_elts = tab_data.map(
       ({header}, index) => {
