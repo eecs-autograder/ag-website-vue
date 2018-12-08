@@ -40,7 +40,7 @@
                   <div class="tab-label" tabindex="1">
                     <p class="tab-heading-dropdown-tabs"
                        ref="edit_roster_tab"
-                       @click="show_countries_dropdown">
+                       @click.stop="show_countries_dropdown">
                       {{country_selected}}
                     </p>
                   </div>
@@ -80,7 +80,7 @@
             <tab-header v-on:click="log_event">
               <div class="tab-heading"> Tab {{tab_val}} </div>
               <i class="fas fa-times close-x"
-                 @click="$event.stopPropagation(); remove_tab(index)"></i>
+                 @click.stop="remove_tab(index)"></i>
             </tab-header>
             <template slot="body">
               <div class="tab-body-gray-white">
@@ -193,7 +193,6 @@
     show_countries_dropdown() {
       let countries_dropdown = <Dropdown> this.$refs.countries_dropdown;
       countries_dropdown.show_the_dropdown_menu();
-      event.stopPropagation();
     }
 
     log_event(e: Event) {

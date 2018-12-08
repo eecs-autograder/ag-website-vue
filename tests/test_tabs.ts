@@ -1,3 +1,5 @@
+import { Model } from '@/model';
+import { Course } from 'ag-client-typescript';
 import Vue from 'vue';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
@@ -7,11 +9,65 @@ import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 
+import {
+    patch_async_static_method, patch_component_data_member,
+    patch_component_method,
+    patch_object_prototype
+} from './mocking';
+import mock = jest.mock;
+
 beforeAll(() => {
     config.logModifiedComponents = false;
+    Object.defineProperty(window, "matchMedia", {
+        value: jest.fn(() => {
+            return { matches: true };
+        })
+    });
+});
+
+describe('Mocking mounted and beforeDestroy in Tabs', () => {
+
+    let wrapper: Wrapper<Tabs>;
+
+    test('Width Of Page Updates', () => {
+        const component = {
+            template: `<tabs ref="tabs"></tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        wrapper = mount(component);
+        let tabs = <Tabs> wrapper.find({ref: 'tabs'}).vm;
+
+        let mocked_window = {
+            outerWidth: 500
+        };
+
+        patch_object_prototype(window, mocked_window, () => {
+        //     patch_component_method(tabs, 'mounted', () => {
+        //         tabs.d_width_of_page = 500;
+        //     }, () => {
+        //
+        //     });
+
+            expect(tabs.d_width_of_page).toEqual(0);
+        });
+    });
 });
 
 describe('Tabs tests', () => {
+
+    afterEach(() => {
+        if (wrapper.exists()) {
+            console.log("wrapper exists");
+            wrapper.destroy();
+        }
+    });
+
+    let wrapper: Wrapper<Tabs>;
+
     test('Empty tabset', () => {
         const component = {
             template:  `<tabs ref="tabs"></tabs>`,
@@ -21,11 +77,10 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.isEmpty()).toEqual(true);
     });
-
     // --------------------------------------------------------------------------------------------
 
     test('Empty tab header and body', () => {
@@ -43,7 +98,7 @@ describe('Tabs tests', () => {
                 'tabs': Tabs
             }
         };
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.exists()).toEqual(true);
 
@@ -72,7 +127,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find({ref: 'text_tab_header'}).text()).toEqual('Spam');
@@ -99,7 +154,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find({ref: 'html_text_header'}).text()).toEqual('Spam');
@@ -126,7 +181,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let header = tabs.find({ref: 'header'});
@@ -152,7 +207,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let header = tabs.find({ref: 'header'});
@@ -178,7 +233,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let header = tabs.find({ref: 'header'});
@@ -210,7 +265,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(wrapper.vm.$data.hovered).toBe(false);
@@ -241,7 +296,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find({ref: 'header'}).text()).toEqual('Spam');
@@ -266,7 +321,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.find({ref: 'header'}).text()).toEqual('Spam');
@@ -300,7 +355,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(0);
@@ -348,7 +403,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(1);
@@ -399,7 +454,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(0);
@@ -454,7 +509,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(wrapper.vm.$data.datum).toEqual(0);
@@ -508,7 +563,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(0);
@@ -565,7 +620,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(1);
@@ -600,7 +655,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(0);
@@ -637,7 +692,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(1);
@@ -674,7 +729,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.vm.active_tab_index).toEqual(2);
@@ -711,7 +766,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let active_body = tabs.find({ref: 'active-tab-body'});
@@ -749,7 +804,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let active_body = tabs.find({ref: 'active-tab-body'});
@@ -791,7 +846,7 @@ describe('Tabs tests', () => {
             }
         }
 
-        const wrapper = mount(WrapperComponent);
+        wrapper = mount(WrapperComponent);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         let active_body = tabs.find({ref: 'active-tab-body'});
@@ -826,7 +881,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
         expect(tabs.find({ref: 'real_tab'}).exists()).toEqual(true);
         expect(tabs.find('#bad').exists()).toEqual(false);
@@ -854,7 +909,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(tabs.text()).toContain('Tab 1');
@@ -884,7 +939,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
 
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
@@ -1061,7 +1116,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
 
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
@@ -1117,7 +1172,7 @@ describe('Tabs tests', () => {
             }
         };
 
-        const wrapper = mount(component);
+        wrapper = mount(component);
 
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
