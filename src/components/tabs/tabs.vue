@@ -30,24 +30,23 @@ export default class Tabs extends Vue {
   }
 
   active_tab_index: number = 0;
+  d_width_of_page = 0;
+  private resize_event_handler!: () => void;
 
   created() {
     this.active_tab_index = this.value;
   }
 
-  d_width_of_page = 0;
-
   mounted() {
-    window.addEventListener('resize', () => {
+    this.resize_event_handler = () => {
       this.d_width_of_page = window.outerWidth;
-    });
+    };
+    window.addEventListener('resize', this.resize_event_handler, true);
   }
 
   // tslint:disable-next-line:naming-convention
   beforeDestroy() {
-    window.removeEventListener('resize', () => {
-      this.d_width_of_page = window.outerWidth;
-    });
+    window.removeEventListener('resize', this.resize_event_handler, true);
   }
 
   render(create_element: CreateElement) {

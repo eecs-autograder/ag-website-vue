@@ -1,5 +1,3 @@
-import { Model } from '@/model';
-import { Course } from 'ag-client-typescript';
 import Vue from 'vue';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
@@ -9,27 +7,28 @@ import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 
-import {
-    patch_async_static_method, patch_component_data_member,
-    patch_component_method,
-    patch_object_prototype
-} from './mocking';
-import mock = jest.mock;
+describe('Tabs tests', () => {
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-    Object.defineProperty(window, "matchMedia", {
-        value: jest.fn(() => {
-            return { matches: true };
-        })
+    beforeEach(() => {
+        config.logModifiedComponents = false;
+        Object.defineProperty(window, "matchMedia", {
+            value: jest.fn(() => {
+                return { matches: true };
+            })
+        });
     });
-});
 
-describe('Mocking mounted and beforeDestroy in Tabs', () => {
+    afterEach(() => {
+        if (wrapper.exists()) {
+            console.log("wrapper exists");
+            // wrapper.
+            wrapper.destroy();
+        }
+    });
 
     let wrapper: Wrapper<Tabs>;
 
-    test('Width Of Page Updates', () => {
+    test('Width Of Page Updates',  () => {
         const component = {
             template: `<tabs ref="tabs"></tabs>`,
             components: {
@@ -39,34 +38,17 @@ describe('Mocking mounted and beforeDestroy in Tabs', () => {
         };
 
         wrapper = mount(component);
+
         let tabs = <Tabs> wrapper.find({ref: 'tabs'}).vm;
 
-        let mocked_window = {
-            outerWidth: 500
-        };
+        expect(tabs.d_width_of_page).toEqual(0);
 
-        patch_object_prototype(window, mocked_window, () => {
-        //     patch_component_method(tabs, 'mounted', () => {
-        //         tabs.d_width_of_page = 500;
-        //     }, () => {
-        //
-        //     });
+        window.dispatchEvent(new Event('resize')); // this worked for the mountings
 
-            expect(tabs.d_width_of_page).toEqual(0);
-        });
+        expect(tabs.d_width_of_page).toEqual(1024);
+
+        wrapper.vm.$destroy();
     });
-});
-
-describe('Tabs tests', () => {
-
-    afterEach(() => {
-        if (wrapper.exists()) {
-            console.log("wrapper exists");
-            wrapper.destroy();
-        }
-    });
-
-    let wrapper: Wrapper<Tabs>;
 
     test('Empty tabset', () => {
         const component = {
