@@ -6,7 +6,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 
-import { safe_assign } from '@/utils';
 
 export class TabsError extends Error {}
 
@@ -14,7 +13,6 @@ export class TabsError extends Error {}
   components: {Tab, TabHeader}
 })
 export default class Tabs extends Vue {
-
   @Prop({default: 0, type: Number})
   value!: number;
 
@@ -26,33 +24,32 @@ export default class Tabs extends Vue {
 
   @Watch('value')
   on_value_changed(new_value: number, old_value: number) {
-    this.active_tab_index = new_value;
+    this.d_active_tab_index = new_value;
   }
 
-  active_tab_index: number = 0;
-  d_width_of_page = 0;
-  private resize_event_handler!: () => void;
+  d_active_tab_index: number = 0;
+  d_page_width = 0;
+  private _resize_event_handler!: () => void;
 
   created() {
-    this.active_tab_index = this.value;
+    this.d_active_tab_index = this.value;
   }
 
   mounted() {
-    this.resize_event_handler = () => {
-      this.d_width_of_page = window.outerWidth;
+    this._resize_event_handler = () => {
+      this.d_page_width = window.outerWidth;
     };
-    window.addEventListener('resize', this.resize_event_handler, true);
+    window.addEventListener('resize', this._resize_event_handler, true);
   }
 
-  // tslint:disable-next-line:naming-convention
   beforeDestroy() {
-    window.removeEventListener('resize', this.resize_event_handler, true);
+    window.removeEventListener('resize', this._resize_event_handler, true);
   }
 
   render(create_element: CreateElement) {
     // We need this.d_width_of_page to be used in the render function so that when
     // it changes the page is updated.
-    console.assert(this.d_width_of_page !== undefined);
+    if (this.d_page_width !== undefined) {}
 
     let tab_data: ExtractedTabData[] = [];
 
@@ -122,8 +119,8 @@ export default class Tabs extends Vue {
         if (element_data.style === undefined) {
           element_data.style = {};
         }
-        (<{width: string}> element_data.style).width =
-          window_width.matches ? `${100 / tab_data.length}%` : '100%';
+        let element_style = <{width: string}> element_data.style;
+        element_style.width = window_width.matches ? `${100 / tab_data.length}%` : '100%';
 
         if (element_data.class === undefined) {
           element_data.class = [];
@@ -133,9 +130,8 @@ export default class Tabs extends Vue {
         }
 
         element_data.class.push(
-          'tab-style',
-          index === this.active_tab_index ? this.tab_active_class : this.tab_inactive_class,
-          index === this.active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
+          index === this.d_active_tab_index ? this.tab_active_class : this.tab_inactive_class,
+          index === this.d_active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
         );
 
         if (element_data.nativeOn === undefined) {
@@ -171,11 +167,11 @@ export default class Tabs extends Vue {
       }
     );
 
-    return create_element('div', { ref: 'headers_container' }, header_elts);
+    return create_element('div', header_elts);
   }
 
   private _render_tab_body(create_element: CreateElement, tab_data: ExtractedTabData[]) {
-    if (this.active_tab_index >= tab_data.length) {
+    if (this.d_active_tab_index >= tab_data.length) {
       this._set_active_tab(tab_data.length - 1);
     }
 
@@ -184,13 +180,13 @@ export default class Tabs extends Vue {
       {
         ref: 'active-tab-body'
       },
-      tab_data[this.active_tab_index].body.children
+      tab_data[this.d_active_tab_index].body.children
     );
   }
 
   private _set_active_tab(new_active_tab_index: number) {
-    this.active_tab_index = new_active_tab_index;
-    this.$emit('input', this.active_tab_index);
+    this.d_active_tab_index = new_active_tab_index;
+    this.$emit('input', this.d_active_tab_index);
   }
 }
 

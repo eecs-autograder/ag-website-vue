@@ -19,13 +19,21 @@ class WrapperComponent extends Vue {
 }
 
 describe('MultiFileViewer.vue', () => {
+    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
         config.logModifiedComponents = false;
+        original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
             value: jest.fn(() => {
                 return { matches: true };
             })
+        });
+    });
+
+    afterEach(() => {
+        Object.defineProperty(window, "matchMedia", {
+            value: original_match_media
         });
     });
 

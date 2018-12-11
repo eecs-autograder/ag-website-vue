@@ -7,18 +7,25 @@ import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 
+let original_match_media: (query: string) => MediaQueryList;
 
-describe('Tabs Test using WrapperComponent', () => {
-
-    beforeEach(() => {
-        config.logModifiedComponents = false;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return { matches: true };
-            })
-        });
+beforeEach(() => {
+    config.logModifiedComponents = false;
+    original_match_media = window.matchMedia;
+    Object.defineProperty(window, "matchMedia", {
+        value: jest.fn(() => {
+            return { matches: true };
+        })
     });
+});
 
+afterEach(() => {
+    Object.defineProperty(window, "matchMedia", {
+        value: original_match_media
+    });
+});
+
+describe('Newly Added Tabs Test', () => {
     test('Possible to manually select newly added tab', () => {
         @Component({
             template:  `<tabs ref="tabs" v-model="current_tab">
@@ -57,12 +64,12 @@ describe('Tabs Test using WrapperComponent', () => {
 
         console.log(active_body.html());
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs_component.active_tab_index).toEqual(0);
+        expect(tabs_component.d_active_tab_index).toEqual(0);
 
         wrapper.vm.add_tab();
 
         expect(active_body.text()).toEqual('Tab 4 body');
-        expect(tabs_component.active_tab_index).toEqual(3);
+        expect(tabs_component.d_active_tab_index).toEqual(3);
 
         wrapper.destroy();
     });
@@ -71,19 +78,8 @@ describe('Tabs Test using WrapperComponent', () => {
 describe('Tabs tests', () => {
     let wrapper: Wrapper<Tabs>;
 
-    beforeEach(() => {
-        config.logModifiedComponents = false;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return { matches: true };
-            })
-        });
-    });
-
     afterEach(() => {
         if (wrapper.exists()) {
-            console.log("wrapper exists");
-            // wrapper.
             wrapper.destroy();
         }
     });
@@ -98,16 +94,11 @@ describe('Tabs tests', () => {
         };
 
         wrapper = mount(component);
-
         const tabs = <Tabs> wrapper.find({ref: 'tabs'}).vm;
-
-        expect(tabs.d_width_of_page).toEqual(0);
+        expect(tabs.d_page_width).toEqual(0);
 
         window.dispatchEvent(new Event('resize')); // this worked for the mountings
-
-        expect(tabs.d_width_of_page).toEqual(1024);
-
-        wrapper.vm.$destroy();
+        expect(tabs.d_page_width).toEqual(1024);
     });
 
     test('Empty tabset', () => {
@@ -400,7 +391,7 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
@@ -448,7 +439,7 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
 
         let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
@@ -499,7 +490,7 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -507,7 +498,7 @@ describe('Tabs tests', () => {
         let tab_2 = tabs.find({ref: 'tab_2'});
         tab_2.trigger('click');
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
 
         let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
         expect(active_headers.length).toBe(1);
@@ -555,7 +546,7 @@ describe('Tabs tests', () => {
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
         expect(wrapper.vm.$data.datum).toEqual(0);
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -564,7 +555,7 @@ describe('Tabs tests', () => {
         tab_2.trigger('click');
 
         expect(wrapper.vm.$data.datum).toEqual(1);
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
 
@@ -608,7 +599,7 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -616,7 +607,7 @@ describe('Tabs tests', () => {
         // Set current_tab, active tab should change
         wrapper.setData({current_tab: 1});
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
 
@@ -625,7 +616,7 @@ describe('Tabs tests', () => {
         tab_1.trigger('click');
 
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
         expect(wrapper.vm.$data.current_tab).toEqual(0);
     });
 
@@ -665,7 +656,7 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
         expect(wrapper.vm.$data.current_tab).toEqual(1);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
@@ -700,12 +691,12 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
 
         wrapper.vm.$data.tab_vals.splice(0, 1);
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
@@ -737,12 +728,12 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 2 body');
 
         wrapper.vm.$data.tab_vals.splice(1, 1);
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
         expect(active_body.text()).toEqual('Tab 3 body');
     });
 
@@ -774,12 +765,12 @@ describe('Tabs tests', () => {
         wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        expect(tabs.vm.active_tab_index).toEqual(2);
+        expect(tabs.vm.d_active_tab_index).toEqual(2);
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 3 body');
 
         wrapper.vm.$data.tab_vals.splice(2, 1);
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 
@@ -813,12 +804,12 @@ describe('Tabs tests', () => {
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         wrapper.vm.$data.tab_vals.splice(1, 1);
 
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
     });
 
     // --------------------------------------------------------------------------------------------
@@ -851,12 +842,12 @@ describe('Tabs tests', () => {
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         wrapper.vm.$data.tab_vals.push(4);
 
         expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
     });
 
     // --------------------------------------------------------------------------------------------
@@ -1124,7 +1115,7 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.tab_inactive_class).toBe("blue-theme-inactive");
 
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -1139,7 +1130,7 @@ describe('Tabs tests', () => {
         expect(tab_2.classes()).toContain("blue-theme-active");
         expect(tab_1.classes()).toContain("blue-theme-inactive");
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });
@@ -1182,7 +1173,7 @@ describe('Tabs tests', () => {
 
         expect(tabs.vm.tab_inactive_class).toBe("white-theme-inactive");
 
-        expect(tabs.vm.active_tab_index).toEqual(0);
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
 
         let active_body = tabs.find({ref: 'active-tab-body'});
         expect(active_body.text()).toEqual('Tab 1 body');
@@ -1197,7 +1188,7 @@ describe('Tabs tests', () => {
         expect(tab_2.classes()).toContain("white-theme-active");
         expect(tab_1.classes()).toContain("white-theme-inactive");
 
-        expect(tabs.vm.active_tab_index).toEqual(1);
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
     });

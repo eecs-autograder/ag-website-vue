@@ -266,7 +266,7 @@
 
 .tab-body-gray-white {
   @extend .tab-body;
-  border: 2px solid $pebble-dim;
+  border: 2px solid $pebble-medium;
 }
 
 .tab-body-dark{
@@ -280,7 +280,7 @@
 
 .tab-body-white {
   @extend .tab-body;
-  border: 2px solid $pebble-dim;
+  border: 2px solid $pebble-medium;
 }
 
 .tab-heading {
