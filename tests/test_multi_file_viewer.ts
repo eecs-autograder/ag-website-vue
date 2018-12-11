@@ -3,15 +3,6 @@ import { config, mount } from '@vue/test-utils';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-    Object.defineProperty(window, "matchMedia", {
-        value: jest.fn(() => {
-            return { matches: true };
-        })
-    });
-});
-
 @Component({
     template:  `<div>
                   <multi_file_viewer
@@ -28,6 +19,15 @@ class WrapperComponent extends Vue {
 }
 
 describe('MultiFileViewer.vue', () => {
+
+    beforeEach(() => {
+        config.logModifiedComponents = false;
+        Object.defineProperty(window, "matchMedia", {
+            value: jest.fn(() => {
+                return { matches: true };
+            })
+        });
+    });
 
     test('MultiFileViewer data set to values passed in by parent', async () => {
         const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
