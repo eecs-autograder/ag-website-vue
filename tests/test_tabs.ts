@@ -7,7 +7,69 @@ import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 
+
+describe('Tabs Test using WrapperComponent', () => {
+
+    beforeEach(() => {
+        config.logModifiedComponents = false;
+        Object.defineProperty(window, "matchMedia", {
+            value: jest.fn(() => {
+                return { matches: true };
+            })
+        });
+    });
+
+    test('Possible to manually select newly added tab', () => {
+        @Component({
+            template:  `<tabs ref="tabs" v-model="current_tab">
+                          <tab v-for="val in tab_vals" :key="val" ref="tab_1">
+                            <tab-header>
+                              Tab {{val}}
+                            </tab-header>
+                            <template slot="body">
+                             Tab {{val}} body
+                            </template>
+                          </tab>
+                        </tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        })
+        class WrapperComponent extends Vue {
+            tab_vals = [1, 2, 3];
+            current_tab = 0;
+
+            add_tab() {
+                this.tab_vals.push(4);
+                this.current_tab = 3;
+            }
+        }
+
+        let wrapper = mount(WrapperComponent);
+
+        console.log(wrapper.html());
+
+        const tabs = wrapper.find({ref: 'tabs'});
+        let tabs_component = <Tabs> tabs.vm;
+
+        let active_body = tabs.find({ref: 'active-tab-body'});
+
+        console.log(active_body.html());
+        expect(active_body.text()).toEqual('Tab 1 body');
+        expect(tabs_component.active_tab_index).toEqual(0);
+
+        wrapper.vm.add_tab();
+
+        expect(active_body.text()).toEqual('Tab 4 body');
+        expect(tabs_component.active_tab_index).toEqual(3);
+
+        wrapper.destroy();
+    });
+});
+
 describe('Tabs tests', () => {
+    let wrapper: Wrapper<Tabs>;
 
     beforeEach(() => {
         config.logModifiedComponents = false;
@@ -26,8 +88,6 @@ describe('Tabs tests', () => {
         }
     });
 
-    let wrapper: Wrapper<Tabs>;
-
     test('Width Of Page Updates',  () => {
         const component = {
             template: `<tabs ref="tabs"></tabs>`,
@@ -39,7 +99,7 @@ describe('Tabs tests', () => {
 
         wrapper = mount(component);
 
-        let tabs = <Tabs> wrapper.find({ref: 'tabs'}).vm;
+        const tabs = <Tabs> wrapper.find({ref: 'tabs'}).vm;
 
         expect(tabs.d_width_of_page).toEqual(0);
 
@@ -797,48 +857,6 @@ describe('Tabs tests', () => {
 
         expect(active_body.text()).toEqual('Tab 1 body');
         expect(tabs.vm.active_tab_index).toEqual(0);
-    });
-
-    // --------------------------------------------------------------------------------------------
-
-    test('Possible to manually select newly added tab', () => {
-        @Component({
-            template:  `<tabs ref="tabs" v-model="current_tab">
-  <tab v-for="val in tab_vals" :key="val" ref="tab_1">
-    <tab-header>
-      Tab {{val}}
-    </tab-header>
-    <template slot="body">
-     Tab {{val}} body
-    </template>
-  </tab>
-</tabs>`,
-            components: {
-                'tab': Tab,
-                'tabs': Tabs
-            }
-        })
-        class WrapperComponent extends Vue {
-            tab_vals = [1, 2, 3];
-            current_tab = 0;
-
-            add_tab() {
-                this.tab_vals.push(4);
-                this.current_tab = 3;
-            }
-        }
-
-        wrapper = mount(WrapperComponent);
-        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
-
-        let active_body = tabs.find({ref: 'active-tab-body'});
-        expect(active_body.text()).toEqual('Tab 1 body');
-        expect(tabs.vm.active_tab_index).toEqual(0);
-
-        wrapper.vm.add_tab();
-
-        expect(active_body.text()).toEqual('Tab 4 body');
-        expect(tabs.vm.active_tab_index).toEqual(3);
     });
 
     // --------------------------------------------------------------------------------------------
