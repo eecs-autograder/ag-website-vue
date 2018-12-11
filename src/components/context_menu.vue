@@ -29,7 +29,7 @@
     private d_height_of_menu = 0;
     private d_width_of_menu = 0;
 
-    private wheel_event_handler!: (event: Event) => void;
+    private _wheel_event_handler!: (event: Event) => void;
 
     mounted() {
       this.$el.style.left = "0px";
@@ -37,13 +37,13 @@
       this.d_height_of_menu = this.$el.clientHeight;
       this.d_width_of_menu = this.$el.clientWidth;
 
-      this.wheel_event_handler = (event: Event) => {
+      this._wheel_event_handler = (event: Event) => {
         if (this.menu_is_open) {
           event.preventDefault();
           event.stopPropagation();
         }
       };
-      window.addEventListener('wheel', this.wheel_event_handler, true);
+      window.addEventListener('wheel', this._wheel_event_handler, true);
 
       let children = this.$el.getElementsByClassName('context-menu-option');
       if (children.length === 0) {
@@ -58,7 +58,7 @@
     }
 
     destroyed() {
-      window.removeEventListener('wheel', this.wheel_event_handler, true);
+      window.removeEventListener('wheel', this._wheel_event_handler, true);
     }
 
     get menu_is_open() {

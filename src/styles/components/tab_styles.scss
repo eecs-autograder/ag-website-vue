@@ -70,7 +70,7 @@
 
 .gray-white-theme-inactive {
     @extend %mobile-tab;
-    background-color: $pebble-lighter;
+    background-color: $pebble-light;
 }
 
 .gray-white-theme-inactive:hover {
@@ -99,7 +99,7 @@
 
 .white-theme-active {
     @extend %mobile-tab;
-    background-color: $pebble-dim;
+    background-color: $pebble-medium;
 }
 
 .white-theme-inactive {
@@ -109,7 +109,7 @@
 }
 
 .white-theme-inactive:hover {
-    background-color: $pebble-lighter;
+    background-color: $pebble-light;
 }
 
 /* ---------------- MEDIA QUERY SECTION---------------- */
@@ -174,7 +174,7 @@
     .gray-white-theme-active {
         @extend %tab-theme;
         @include active-tab-position();
-        @include tab-border($pebble-dim);
+        @include tab-border($pebble-medium);
         background-color: white;
         color: black;
     }
@@ -182,9 +182,9 @@
     .gray-white-theme-inactive {
         @extend %tab-theme;
         @include inactive-tab-position();
-        @include tab-border($pebble-lighter);
-        background-color: $pebble-lighter;
-        border-right: 2px solid darken($pebble-lighter, 2);
+        @include tab-border($pebble-light);
+        background-color: $pebble-light;
+        border-right: 2px solid darken($pebble-light, 2);
         color: black;
     }
 
@@ -236,7 +236,7 @@
     .white-theme-active {
         @extend %tab-theme;
         @include active-tab-position();
-        @include tab-border($pebble-dim);
+        @include tab-border($pebble-medium);
         background-color: white;
         color: black;
     }

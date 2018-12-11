@@ -166,27 +166,32 @@
         // tslint-consistent-codestyle
         "naming-convention": [
             true,
-            // Use snake_case unless otherwise specified.
-            {"type": "default", "format": ["snake_case"],
+            {"type": "variable", "format": ["snake_case"],
                 "leadingUnderscore": "forbid", "trailingUnderscore": "allow"},
-            {"type": "enumMember", "format": "snake_case"},
-
-            // Static readonly members can be upper case.
-            {"type": "member", "modifiers": ["static", "readonly"], "format": ["UPPER_CASE"]},
+            {"type": "function", "format": ["snake_case"],
+                "leadingUnderscore": "forbid", "trailingUnderscore": "forbid"},
 
             // Global constants should be upper case.
             {"type": "variable", "modifiers": ["global", "const"], "format": ["UPPER_CASE"]},
 
-            // Allow leading underscores for private properties and methods.
-            {"type": "member", "modifiers": "private", "leadingUnderscore": "allow"},
-            {"type": "member", "modifiers": "protected", "leadingUnderscore": "allow"},
+            // Static readonly members can be upper case.
+            {"type": "member", "modifiers": ["static", "readonly"], "format": ["UPPER_CASE"]},
+
+            // Require leading underscores for private methods and non-reactive private properties.
+            {"type": "member", "modifiers": "private", "filter": "^(?!d_)",
+                "leadingUnderscore": "require"},
+            {"type": "member", "modifiers": "protected", "leadingUnderscore": "require"},
             {"type": "member", "trailingUnderscore": "forbid"},
 
             // Whitelist for inherited methods.
-            {"type": "method", "filter": "^(toJSON | toString)$", "format": null},
+            {"type": "method", "filter": "^(toJSON|toString)$", "format": null},
+            {"type": "method", "filter": "^(beforeCreate|beforeMount|beforeUpdate|beforeDestroy)$",
+                "format": null},
 
             // PascalCase for types, classes, interfaces, enums, etc.
-            {"type": "type", "format": "PascalCase"}
+            {"type": "type", "format": "PascalCase"},
+            // snake_case for enum members
+            {"type": "enumMember", "format": "snake_case"}
         ]
     }
 }
