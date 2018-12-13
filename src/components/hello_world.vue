@@ -16,6 +16,7 @@
     <ToggleDemo></ToggleDemo>
     <ViewFileDemo></ViewFileDemo>
     <ValidatedInputDemo></ValidatedInputDemo>
+    <ValidatedFormDemo></ValidatedFormDemo>
   </div>
 </template>
 
@@ -42,6 +43,7 @@ import MultiFileViewerDemo from '@/demos/multi_file_viewer_demo.vue';
 import TabsDemo from '@/demos/tabs_demo.vue';
 import ToggleDemo from '@/demos/toggle_demo.vue';
 import TooltipDemo from '@/demos/tooltip_demo.vue';
+import ValidatedFormDemo from '@/demos/validated_form_demo.vue';
 import ValidatedInputDemo from '@/demos/validated_input_demo.vue';
 import ViewFileDemo from '@/demos/view_file_demo.vue';
 
@@ -65,6 +67,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     Toggle,
     ToggleDemo,
     TooltipDemo,
+    ValidatedFormDemo,
     ValidatedInputDemo,
     ViewFile,
     ViewFileDemo
