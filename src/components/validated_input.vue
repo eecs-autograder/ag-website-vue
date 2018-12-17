@@ -1,16 +1,13 @@
 <template>
   <div>
-    <input id="input"
-           :class="{error : errors.length > 0}"
+    <input class="input"
+           :class="{'error-input' : d_error_msg !== ''}"
            type="text"
-           :value="input_value"
+           :value="d_input_value"
            @input="$e => _change_input($e.target.value)"/>
-    <h4 id="invalid-input-header"
-        v-if="!is_valid()"
-        class="error-text">Invalid input!</h4>
-    <ul>
-      <li v-for="error of errors"
-          class="error-message error-text">{{error}}</li>
+
+    <ul v-if="d_error_msg !== ''" class="error-ul">
+      <li class="error-li error-text">{{d_error_msg}}</li>
     </ul>
   </div>
 </template>
@@ -18,7 +15,11 @@
 <script lang="ts">
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  type ValidatorResponse = [boolean, string];
+  export interface ValidatorResponse {
+    is_valid: boolean;
+    error_msg: string;
+  }
+
   type ValidatorFuncType = (value: string) => ValidatorResponse;
   type FromStringFuncType = (value: string) => unknown;
   type ToStringFuncType = (value: unknown) => string;
@@ -45,8 +46,8 @@
     @Prop({required: false})
     from_string_fn!: FromStringFuncType;
 
-    input_value: string = "";
-    errors: string[] = [];
+    d_input_value: string = "";
+    d_error_msg: string = "";
 
     private _to_string_fn(value: unknown): string {
       return (this.to_string_fn !== undefined) ? this.to_string_fn(value)
@@ -58,43 +59,49 @@
         : default_from_string_func(value);
     }
 
-    // Note: This assumes "value" is valid when passed as prop to this component
+    // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     mounted() {
-      this.input_value = this._to_string_fn(this.value);
+      this._update_and_validate(this._to_string_fn(this.value));
     }
 
     is_valid(): boolean {
-      return this.errors.length === 0;
+      return this.d_error_msg === "";
     }
 
-    // Note: This assumes "value" is valid when updated
+    // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     @Watch('value')
     on_value_change(new_value: unknown, old_value: unknown) {
-      this.input_value = this._to_string_fn(new_value);
+      this._update_and_validate(this._to_string_fn(new_value));
     }
 
     private _change_input(new_value: string) {
-      this.input_value = new_value;
-      this._run_validators(new_value);
+      this._update_and_validate(new_value);
 
-      if (this.errors.length === 0) {
-        const value: unknown = this._from_string_fn(this.input_value);
+      // Only if there are no errors should the value be emitted to the parent component
+      if (this.d_error_msg === "") {
+        const value: unknown = this._from_string_fn(this.d_input_value);
         this.$emit('input', value);
       }
     }
 
     private _run_validators(new_value: string) {
-      // Clear errors
-      this.errors = [];
+      // Clear d_error_msg
+      this.d_error_msg = "";
 
+      // Display error message of first validator that fails
       for (let validator of this.validators) {
         let response: ValidatorResponse = validator(new_value);
 
-        // If it did not pass, add error message to list of errors
-        if (!response[0]) {
-          this.errors.push(response[1]);
+        if (!response.is_valid) {
+          this.d_error_msg = response.error_msg;
+          return;
         }
       }
+    }
+
+    private _update_and_validate(new_value: string) {
+      this.d_input_value = new_value;
+      this._run_validators(new_value);
     }
   }
 </script>
@@ -102,19 +109,68 @@
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
-  .error {
-    border: 2px solid $warning-red;
+  .error-ul {
+    list-style-type: none; /* Remove bullets */
+    padding-left: 0;
+    margin-bottom: 20px;
   }
 
-  .error:focus {
+  .error-li:first-child {
+    margin-top: -10px;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+  }
+
+  .error-li:last-child {
+    margin-bottom: 0;
+    border-bottom-right-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+  }
+
+  .error-ul .error-li {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: -1px;    /* Prevent double borders */
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+  }
+
+  .input.error-input {
+    border: 1px solid $warning-red;
+  }
+
+  .error-input:focus {
     outline: none;
     box-shadow: 0 0 10px $warning-red;
-    border: 2px solid $warning-red;
-    border-radius: 1px;
+    border: 1px solid $warning-red;
+    border-radius: .25rem;
   }
 
-  .error-text {
-    color: $warning-red;
+  .input {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   }
+
+  /*.error-text {
+    color: $warning-red;
+  }*/
+
+  /*.alert-danger {*/
+    /*color: #721c24;*/
+    /*background-color: #f8d7da;*/
+    /*border-color: #f5c6cb;*/
+  /*}*/
 
 </style>

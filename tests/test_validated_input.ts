@@ -12,8 +12,8 @@ const IS_NUMBER = (value: string): [boolean, string] => {
 };
 
 describe('ValidatedInput.vue', () => {
-    test('Validated input uses default string conversion when to_string_fn not present',
-         () => {
+    test.only('Validated input uses default string conversion when to_string_fn not present',
+         async () => {
         const wrapper = mount(ValidatedInput, {
             propsData: {
                 value: 1,
@@ -22,7 +22,7 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        wrapper.vm.$mount();
+        await wrapper.vm.$nextTick();
         const input: HTMLInputElement = <HTMLInputElement> wrapper.find('#input').element;
         expect(input.value).toBe("1");
     });
