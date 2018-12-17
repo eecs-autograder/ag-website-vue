@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div style="padding: 10px;">
     <!--Validated Input #1-->
     <hr/>
     <h1>Validated Input (number)</h1>
     <small>The below input must be a negative, even integer</small>
+    <br/><br/>
     <validated-input ref='vinput_1'
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
@@ -28,6 +29,7 @@
       The below input must be a valid JSON object, with exaclty one field called "field1",
       whose value must be a number.
     </small>
+    <br/><br/>
     <validated-input ref='vinput_2'
                      v-model="custom_obj_input"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
@@ -50,6 +52,7 @@
     <hr/>
     <h1>Validated Input (string)</h1>
     <small>The below string must be either "mario" or "luigi" (case insensitive)</small>
+    <br/><br/>
     <validated-input ref='vinput_3'
                      v-model="mario_character_input"
                      :validators="[is_mario_or_luigi]"/>
@@ -69,7 +72,7 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
-  import ValidatedInput from '@/components/validated_input.vue';
+  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
   @Component({
     components: { ValidatedInput }
@@ -84,54 +87,61 @@
     loading: boolean = true;
 
     /* Validated number functions */
-    is_number(value: string): [boolean, string] {
-      const valid = value !== "" && !isNaN(Number(value));
-      return [valid, "Invalid number!"];
+    is_number(value: string): ValidatorResponse {
+      return {
+        is_valid: value !== "" && !isNaN(Number(value)),
+        error_msg:  "Invalid number!",
+      };
     }
 
-    is_negative(value: string): [boolean, string] {
-      const valid = this.is_number(value)[0] && value[0] === "-";
-      return [valid, "Not negative!"];
+    is_negative(value: string): ValidatorResponse {
+      return {
+        is_valid: this.is_number(value).is_valid && value[0] === "-",
+        error_msg: "Not negative!",
+      };
     }
 
-    is_even(value: string): [boolean, string] {
-      const valid = this.is_number(value)[0] &&                   // Check if valid number
-                    parseFloat(value) === parseInt(value, 10) &&  // Check if integer
-                    parseInt(value, 10) % 2 === 0;                // Check if even
-      return [valid, "Not even!"];
+    is_even(value: string): ValidatorResponse {
+      return {
+        is_valid: this.is_number(value).is_valid &&             // Check if valid number
+                  parseFloat(value) === parseInt(value, 10) &&  // Check if integer
+                  parseInt(value, 10) % 2 === 0,                // Check if even
+        error_msg: "Not even!"
+      }
     }
 
     /* Validated object functions */
-    obj_has_only_field1_and_val_is_a_number(str_obj: string): [boolean, string] {
+    obj_has_only_field1_and_val_is_a_number(str_obj: string): ValidatorResponse {
       const error_msg = "field1 does not exist, or is not the only field, " +
         "or value of field1 is not a number";
 
       let is_valid = false;
 
-      if (this.obj_is_json(str_obj)[0]) {
+      if (this.obj_is_json(str_obj).is_valid) {
         let json = JSON.parse(str_obj);
         let keys = Object.keys(json);
 
-        if (keys.length === 1 && keys[0] === "field1" && this.is_number(json[keys[0]])[0]) {
+        if (keys.length === 1 && keys[0] === "field1" && this.is_number(json[keys[0]]).is_valid) {
           is_valid = true;
         }
       }
 
-      return [is_valid, error_msg];
+      return {
+        is_valid: is_valid,
+        error_msg: error_msg
+      }
     }
 
-    obj_is_json(str_obj: string): [boolean, string] {
+    obj_is_json(str_obj: string): ValidatorResponse {
       const error_msg = "Not valid object (JSON) syntax!";
 
       try {
-        // Will fail if not valid JSON
-        JSON.parse(str_obj);
+        JSON.parse(str_obj);    // Will fail if not valid JSON
+        return { is_valid: true, error_msg: error_msg };
       }
       catch (e) {
-        return [false, error_msg];
+        return { is_valid: false, error_msg: error_msg };
       }
-
-      return [true, error_msg];
     }
 
     obj_to_string(obj: object): string {
@@ -142,9 +152,13 @@
       return JSON.parse(str_obj);
     }
 
-    is_mario_or_luigi(value: string): [boolean, string] {
+    is_mario_or_luigi(value: string): ValidatorResponse {
       value = value.toLowerCase();
-      return [value === "mario" || value === "luigi", "Not Mario or Luigi! Proposterous!"];
+
+      return {
+        is_valid: value === "mario" || value === "luigi",
+        error_msg: "Not Mario or Luigi! Proposterous!"
+      };
     }
 
     mounted() {
