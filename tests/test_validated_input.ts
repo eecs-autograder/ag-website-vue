@@ -186,19 +186,19 @@ describe('ValidatedInput.vue', () => {
 
         const wrapper = mount(component);
 
-        const validated_input = wrapper.find({ref: 'v1'});
-        expect(validated_input.find('#error-text').exists()).toBe(false);
+        const v_input = wrapper.find({ref: 'v1'});
+        expect(v_input.find('#error-text').exists()).toBe(false);
 
         // Change input to pass validator
         const new_obj = {
             new_key: "new_value"
         };
 
-        (<HTMLInputElement> validated_input.find('#input').element).value = JSON.stringify(new_obj);
-        validated_input.find('#input').trigger('input');
+        (<HTMLInputElement> v_input.find('#input').element).value = JSON.stringify(new_obj);
+        v_input.find('#input').trigger('input');
 
-        const validated_input_vm = <ValidatedInput> validated_input.vm;
-        expect(validated_input_vm.d_input_value).toEqual(JSON.stringify(new_obj));
+        const v_input_vm = <ValidatedInput> v_input.vm;
+        expect(v_input_vm.d_input_value).toEqual(JSON.stringify(new_obj));
         expect(wrapper.vm.$data.my_obj).toEqual(new_obj);
     });
 
