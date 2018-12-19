@@ -28,10 +28,12 @@
     <small>
       The below input must be a valid JSON object, with exaclty one field called "field1",
       whose value must be a number.
+      <strong>Notice the custom (although slightly terrible) input style!</strong>
     </small>
     <br/><br/>
     <validated-input ref='vinput_2'
                      v-model="custom_obj_input"
+                     input_style="background-color: lightblue;"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
                      :from_string_fn="string_to_obj"
                      :to_string_fn="obj_to_string"></validated-input>
@@ -51,11 +53,22 @@
     <!--Validated Input #3-->
     <hr/>
     <h1>Validated Input (string)</h1>
-    <small>The below string must be either "mario" or "luigi" (case insensitive)</small>
+    <small>
+      The below string must be either "mario" or "luigi" (case insensitive).
+      <strong>Notice that it uses custom error message styling!</strong>
+    </small>
     <br/><br/>
     <validated-input ref='vinput_3'
                      v-model="mario_character_input"
-                     :validators="[is_mario_or_luigi]"/>
+                     :validators="[is_mario_or_luigi]">
+
+      <!--Adding custom error message styling-->
+      <template slot-scope="slotMessage">
+        <div style="height: 20px; background-color: lightblue">
+          {{ slotMessage.d_error_msg }}
+        </div>
+      </template>
+    </validated-input>
 
     <p>
       is_valid() result:
@@ -66,6 +79,32 @@
       Last emitted value (note: it will not be updated until inputted value is valid):
       <input type="text" v-model="mario_character_input"/>
     </p>
+
+    <br/><br/><br/>
+
+    <!--Validated Input #4-->
+    <hr/>
+    <h1>Validated Input (textarea)</h1>
+    <small>
+      The below input must contain > 30 characters and a new line character
+    </small>
+    <br/><br/>
+    <validated-input ref='vinput_4'
+                     v-model="textarea_input"
+                     num_rows="3"
+                     :validators="[is_30_chars_or_longer, has_newline_char]"></validated-input>
+
+    <p>
+      is_valid() result:
+      <span style="font-weight: bold">{{loading || this.$refs.vinput_4.is_valid()}}</span>
+    </p>
+
+    <p>
+      Last emitted value (note: it will not be updated until inputted value is valid):
+      <textarea rows="3" v-model="textarea_input"/>
+    </p>
+
+    <br/><br/><br/>
   </div>
 </template>
 
@@ -83,6 +122,7 @@
       field1: 12,
     };
     mario_character_input: string = "mario";
+    textarea_input: string = "This needs to be longer!";
 
     loading: boolean = true;
 
@@ -107,7 +147,7 @@
                   parseFloat(value) === parseInt(value, 10) &&  // Check if integer
                   parseInt(value, 10) % 2 === 0,                // Check if even
         error_msg: "Not even!"
-      }
+      };
     }
 
     /* Validated object functions */
@@ -129,7 +169,7 @@
       return {
         is_valid: is_valid,
         error_msg: error_msg
-      }
+      };
     }
 
     obj_is_json(str_obj: string): ValidatorResponse {
@@ -158,6 +198,21 @@
       return {
         is_valid: value === "mario" || value === "luigi",
         error_msg: "Not Mario or Luigi! Proposterous!"
+      };
+    }
+
+    /* Validated textarea functions */
+    is_30_chars_or_longer(value: string): ValidatorResponse {
+      return {
+        is_valid: value.length >= 30,
+        error_msg: "Input must contain 30 characters or more"
+      };
+    }
+
+    has_newline_char(value: string): ValidatorResponse {
+      return {
+        is_valid: (value.match(/\n/g) !== null) && (value.match(/\n/g)).length > 0,
+        error_msg: "No newline character found"
       };
     }
 

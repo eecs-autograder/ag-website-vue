@@ -1,14 +1,32 @@
 <template>
   <div>
-    <input class="input"
-           :class="{'error-input' : d_error_msg !== ''}"
+    <input id="input"
+           v-if="num_rows === 1"
+           :style="input_style"
+           :class="{
+              'input' : input_style === '',
+              'error-input' : input_style === '' && d_error_msg !== ''
+           }"
            type="text"
            :value="d_input_value"
            @input="$e => _change_input($e.target.value)"/>
 
-    <ul v-if="d_error_msg !== ''" class="error-ul">
-      <li class="error-li error-text">{{d_error_msg}}</li>
-    </ul>
+    <textarea id="textarea"
+              v-if="num_rows > 1"
+              :rows="num_rows"
+              :style="input_style"
+              :class="{
+                 'input' : input_style === '',
+                 'error-input' : input_style === '' && d_error_msg !== ''
+              }"
+              :value="d_input_value"
+              @input="$e => _change_input($e.target.value)"></textarea>
+
+    <slot :d_error_msg="d_error_msg" v-if="d_error_msg !== ''">
+      <ul class="error-ul">
+        <li id="error-text" class="error-li">{{d_error_msg}}</li>
+      </ul>
+    </slot>
   </div>
 </template>
 
@@ -46,6 +64,12 @@
     @Prop({required: false})
     from_string_fn!: FromStringFuncType;
 
+    @Prop({required: false, default: 1})
+    num_rows!: number;
+
+    @Prop({required: false, default: ""})
+    input_style!: string;
+
     d_input_value: string = "";
     d_error_msg: string = "";
 
@@ -60,7 +84,7 @@
     }
 
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
-    mounted() {
+    created() {
       this._update_and_validate(this._to_string_fn(this.value));
     }
 
@@ -71,7 +95,11 @@
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     @Watch('value')
     on_value_change(new_value: unknown, old_value: unknown) {
-      this._update_and_validate(this._to_string_fn(new_value));
+      const str_value = this._to_string_fn(new_value);
+
+      if (str_value !== this.d_input_value) {
+        this._update_and_validate(str_value);
+      }
     }
 
     private _change_input(new_value: string) {
@@ -89,7 +117,7 @@
       this.d_error_msg = "";
 
       // Display error message of first validator that fails
-      for (let validator of this.validators) {
+      for (const validator of this.validators) {
         let response: ValidatorResponse = validator(new_value);
 
         if (!response.is_valid) {
@@ -162,15 +190,4 @@
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   }
-
-  /*.error-text {
-    color: $warning-red;
-  }*/
-
-  /*.alert-danger {*/
-    /*color: #721c24;*/
-    /*background-color: #f8d7da;*/
-    /*border-color: #f5c6cb;*/
-  /*}*/
-
 </style>
