@@ -20,7 +20,7 @@
   import { Component, Vue } from 'vue-property-decorator';
 
   import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
+  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
   @Component({
     components: { ValidatedForm, ValidatedInput }
@@ -37,9 +37,11 @@
       console.log("saved!");
     }
 
-    is_number(value: string): [boolean, string] {
-      const valid = value !== "" && !isNaN(Number(value));
-      return [valid, "Invalid number!"];
+    is_number(value: string): ValidatorResponse {
+      return {
+        is_valid: value !== "" && !isNaN(Number(value)),
+        error_msg:  "Invalid number!",
+      };
     }
 
     mounted() {
