@@ -211,7 +211,7 @@
 
     has_newline_char(value: string): ValidatorResponse {
       return {
-        is_valid: (value.match(/\n/g) !== null) && (value.match(/\n/g)).length > 0,
+        is_valid: (value.match(/\n/g) !== null) && (value.match(/\n/g))!.length > 0,
         error_msg: "No newline character found"
       };
     }

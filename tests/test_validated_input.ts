@@ -147,7 +147,7 @@ describe('ValidatedInput.vue', () => {
     });
 
     test('Validated input uses custom to_string_fn and from_string_fn when present',
-              async () => {
+         async () => {
         const component = {
             template:  `<validated-input ref="v1" v-model="my_obj"
                                          :validators="[obj_is_json]"
