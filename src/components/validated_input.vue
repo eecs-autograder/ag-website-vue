@@ -10,7 +10,6 @@
            type="text"
            :value="d_input_value"
            @input="$e => _change_input($e.target.value)"/>
-
     <textarea id="textarea"
               v-if="num_rows > 1"
               :rows="num_rows"
@@ -31,7 +30,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
   export interface ValidatorResponse {
     is_valid: boolean;
@@ -52,6 +51,9 @@
 
   @Component
   export default class ValidatedInput extends Vue {
+    @Inject()
+    register!: (v_input: ValidatedInput) => void;
+
     @Prop({required: true})
     value!: unknown;
 
@@ -85,6 +87,7 @@
 
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     created() {
+      this.register(this);
       this._update_and_validate(this._to_string_fn(this.value));
     }
 

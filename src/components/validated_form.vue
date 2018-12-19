@@ -2,35 +2,30 @@
   <form v-bind="$props">
     <slot></slot>
   </form>
-  <!--<div>-->
-    <!--hello-->
-  <!--</div>-->
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+  import { Component, Provide, Vue } from 'vue-property-decorator';
 
   import ValidatedInput from '@/components/validated_input.vue';
 
   @Component
   export default class ValidatedForm extends Vue {
-    is_valid(): boolean {
-      for (let element of this.$slots.default) {
-        console.log(element);
+    d_validated_inputs: ValidatedInput[] = [];
 
-        if (element.componentInstance !== undefined) {
-          if (!(<ValidatedInput> element.componentInstance).is_valid()) {
-            return false;
-          }
-          // console.log((<ValidatedInput> element.componentInstance).is_valid());
+    @Provide()
+    register = (v_input: ValidatedInput) => {
+      this.d_validated_inputs.push(v_input);
+    }
+
+    is_valid(): boolean {
+      for (const v_input of this.d_validated_inputs) {
+        if (!v_input.is_valid()) {
+          return false;
         }
       }
 
       return true;
-    }
-
-    mounted() {
-      this.is_valid();
     }
   }
 </script>
