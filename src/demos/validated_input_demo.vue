@@ -12,7 +12,7 @@
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_1.is_valid()}}</span>
+      <span style="font-weight: bold">{{loading || this.$refs.vinput_1.is_valid}}</span>
     </p>
 
     <p>
@@ -50,7 +50,7 @@
                      :to_string_fn="obj_to_string"></validated-input>
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_2.is_valid()}}</span>
+      <span style="font-weight: bold">{{loading || this.$refs.vinput_2.is_valid}}</span>
     </p>
 
     <p>
@@ -73,16 +73,16 @@
                      :validators="[is_mario_or_luigi]">
 
       <!--Adding custom error message styling-->
-      <template slot-scope="slotMessage">
+      <template slot-scope="{d_error_msg}">
         <div style="height: 20px; background-color: lightblue">
-          {{ slotMessage.d_error_msg }}
+          {{d_error_msg}}
         </div>
       </template>
     </validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_3.is_valid()}}</span>
+      <span style="font-weight: bold">{{loading || this.$refs.vinput_3.is_valid}}</span>
     </p>
 
     <p>
@@ -106,7 +106,7 @@
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_4.is_valid()}}</span>
+      <span style="font-weight: bold">{{loading || this.$refs.vinput_4.is_valid}}</span>
     </p>
 
     <p>

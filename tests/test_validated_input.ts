@@ -211,23 +211,23 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        expect(wrapper.vm.is_valid()).toBe(true);
+        expect(wrapper.vm.is_valid).toBe(true);
 
         let input = wrapper.find('#input');
         (<HTMLInputElement> input.element).value = '25';
         input.trigger('input');
 
-        expect(wrapper.vm.is_valid()).toBe(true);
+        expect(wrapper.vm.is_valid).toBe(true);
 
         (<HTMLInputElement> input.element).value = 'not a number!';
         input.trigger('input');
 
-        expect(wrapper.vm.is_valid()).toBe(false);
+        expect(wrapper.vm.is_valid).toBe(false);
 
         (<HTMLInputElement> input.element).value = '2';
         input.trigger('input');
 
-        expect(wrapper.vm.is_valid()).toBe(true);
+        expect(wrapper.vm.is_valid).toBe(true);
     });
 
     test('ValidatedInput displays textarea if num_rows prop === 1', () => {

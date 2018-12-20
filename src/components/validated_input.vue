@@ -68,7 +68,7 @@
     num_rows!: number;
 
     @Prop({required: false, default: ""})
-    input_style!: string;
+    input_style!: string | object;
 
     d_input_value: string = "";
     d_error_msg: string = "";
@@ -88,7 +88,7 @@
       this._update_and_validate(this._to_string_fn(this.value));
     }
 
-    is_valid(): boolean {
+    get is_valid(): boolean {
       return this.d_error_msg === "";
     }
 
