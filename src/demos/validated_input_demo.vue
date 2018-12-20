@@ -33,11 +33,21 @@
     <br/><br/>
     <validated-input ref='vinput_2'
                      v-model="custom_obj_input"
-                     input_style="background-color: lightblue;"
+                     input_style="background-color: lightblue; color: green;"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
                      :from_string_fn="string_to_obj"
                      :to_string_fn="obj_to_string"></validated-input>
-
+    <br/>
+    <small>
+      Same one as above except input_style is an object
+    </small>
+    <br/>
+    <validated-input ref='vinput_2'
+                     v-model="custom_obj_input"
+                     :input_style="obj_input_style"
+                     :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
+                     :from_string_fn="string_to_obj"
+                     :to_string_fn="obj_to_string"></validated-input>
     <p>
       is_valid() result:
       <span style="font-weight: bold">{{loading || this.$refs.vinput_2.is_valid()}}</span>
@@ -123,6 +133,10 @@
     };
     mario_character_input: string = "mario";
     textarea_input: string = "This needs to be longer!";
+    obj_input_style = {
+      "background-color": "lightblue",
+      "color": "green"
+    };
 
     loading: boolean = true;
 

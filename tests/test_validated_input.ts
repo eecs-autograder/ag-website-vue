@@ -287,6 +287,23 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.find('#textarea').element.style.backgroundColor).toBe('yellow');
     });
 
+    test('input_style accepts object as prop', () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                input_style: {
+                    backgroundColor: "yellow"
+                },
+                num_rows: 3,
+                value: 1,
+                validators: [IS_NUMBER],
+                from_string_fn: (val: string) => parseInt(val, 10),
+            }
+        });
+
+        expect(wrapper.find('#textarea').exists()).toBe(true);
+        expect(wrapper.find('#textarea').element.style.backgroundColor).toBe('yellow');
+    });
+
     test('Props required values are correct', () => {
         /*
          * v-modal (value): required
