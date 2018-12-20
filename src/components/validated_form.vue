@@ -14,13 +14,13 @@
     d_validated_inputs: ValidatedInput[] = [];
 
     @Provide()
-    register = (v_input: ValidatedInput) => {
+    register = (v_input: ValidatedInput): void => {
       this.d_validated_inputs.push(v_input);
     }
 
-    is_valid(): boolean {
+    get is_valid(): boolean {
       for (const v_input of this.d_validated_inputs) {
-        if (!v_input.is_valid()) {
+        if (!v_input.is_valid) {
           return false;
         }
       }

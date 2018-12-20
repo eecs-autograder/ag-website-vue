@@ -49,9 +49,14 @@
     return value;
   }
 
+  function default_register(value: ValidatedInput): void {
+    // Do nothing
+    return;
+  }
+
   @Component
   export default class ValidatedInput extends Vue {
-    @Inject()
+    @Inject({from: 'register', default: default_register})
     register!: (v_input: ValidatedInput) => void;
 
     @Prop({required: true})
@@ -87,7 +92,11 @@
 
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     created() {
-      this.register(this);
+      // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
+      if (this.register !== undefined) {
+        this.register(this);
+      }
+
       this._update_and_validate(this._to_string_fn(this.value));
     }
 
