@@ -56,7 +56,7 @@
 
   @Component
   export default class ValidatedInput extends Vue {
-    @Inject({from: 'register', default: default_register})
+    @Inject({from: 'register', default: () => default_register})
     register!: (v_input: ValidatedInput) => void;
 
     @Prop({required: true})
@@ -65,10 +65,10 @@
     @Prop({required: true, type: Array})
     validators!: ValidatorFuncType[];
 
-    @Prop({required: false})
+    @Prop({required: false, default: () => default_to_string_func})
     to_string_fn!: ToStringFuncType;
 
-    @Prop({required: false})
+    @Prop({required: false, default: () => default_from_string_func})
     from_string_fn!: FromStringFuncType;
 
     @Prop({required: false, default: 1})
@@ -80,24 +80,11 @@
     d_input_value: string = "";
     d_error_msg: string = "";
 
-    private _to_string_fn(value: unknown): string {
-      return (this.to_string_fn !== undefined) ? this.to_string_fn(value)
-        : default_to_string_func(value);
-    }
-
-    private _from_string_fn(value: string): unknown {
-      return (this.from_string_fn !== undefined) ? this.from_string_fn(value)
-        : default_from_string_func(value);
-    }
-
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     created() {
       // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
-      if (this.register !== undefined) {
-        this.register(this);
-      }
-
-      this._update_and_validate(this._to_string_fn(this.value));
+      this.register(this);
+      this._update_and_validate(this.to_string_fn(this.value));
     }
 
     get is_valid(): boolean {
@@ -107,7 +94,7 @@
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     @Watch('value')
     on_value_change(new_value: unknown, old_value: unknown) {
-      const str_value = this._to_string_fn(new_value);
+      const str_value = this.to_string_fn(new_value);
 
       if (str_value !== this.d_input_value) {
         this._update_and_validate(str_value);
@@ -119,7 +106,7 @@
 
       // Only if there are no errors should the value be emitted to the parent component
       if (this.d_error_msg === "") {
-        const value: unknown = this._from_string_fn(this.d_input_value);
+        const value: unknown = this.from_string_fn(this.d_input_value);
         this.$emit('input', value);
       }
     }
