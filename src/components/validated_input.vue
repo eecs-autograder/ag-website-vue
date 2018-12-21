@@ -49,14 +49,9 @@
     return value;
   }
 
-  function default_register(value: ValidatedInput): void {
-    // Do nothing
-    return;
-  }
-
   @Component
   export default class ValidatedInput extends Vue {
-    @Inject({from: 'register', default: () => default_register})
+    @Inject({from: 'register', default: () => () => {}})
     register!: (v_input: ValidatedInput) => void;
 
     @Prop({required: true})
