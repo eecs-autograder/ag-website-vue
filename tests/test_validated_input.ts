@@ -230,7 +230,7 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.vm.is_valid).toBe(true);
     });
 
-    test('ValidatedInput displays textarea if num_rows prop === 1', () => {
+    test('ValidatedInput displays input if num_rows prop === 1', () => {
         const wrapper = mount(ValidatedInput, {
             propsData: {
                 num_rows: 1,
@@ -244,7 +244,7 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.find('#textarea').exists()).toBe(false);
     });
 
-    test('ValidatedInput displays input if num_rows prop > 1', () => {
+    test('ValidatedInput displays textarea if num_rows prop > 1', () => {
         const wrapper = mount(ValidatedInput, {
             propsData: {
                 num_rows: 2,
