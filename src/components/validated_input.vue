@@ -1,26 +1,29 @@
 <template>
-  <div>
-    <input id="input"
-           v-if="num_rows === 1"
-           :style="input_style"
-           :class="{
-              'input' : input_style === '',
+  <div id="validated-input-component">
+    <div>
+      <input id="input"
+             v-if="num_rows === 1"
+             :style="input_style"
+             class="input"
+             :class="{
               'error-input' : input_style === '' && d_error_msg !== ''
-           }"
-           type="text"
-           :value="d_input_value"
-           @input="$e => _change_input($e.target.value)"/>
-    <textarea id="textarea"
-              v-if="num_rows > 1"
-              :rows="num_rows"
-              :style="input_style"
-              :class="{
-                 'input' : input_style === '',
-                 'error-input' : input_style === '' && d_error_msg !== ''
-              }"
-              :value="d_input_value"
-              @input="$e => _change_input($e.target.value)"></textarea>
+             }"
+             type="text"
+             :value="d_input_value"
+             @input="$e => _change_input($e.target.value)"/>
 
+      <textarea id="textarea"
+                v-if="num_rows > 1"
+                :rows="num_rows"
+                :style="input_style"
+                class="input"
+                :class="{
+                 'error-input' : input_style === '' && d_error_msg !== ''
+                }"
+                :value="d_input_value"
+                @input="$e => _change_input($e.target.value)"></textarea>
+      <slot name="suffix"> </slot>
+    </div>
     <slot :d_error_msg="d_error_msg" v-if="d_error_msg !== ''">
       <ul class="error-ul">
         <li id="error-text" class="error-li">{{d_error_msg}}</li>
@@ -159,9 +162,9 @@
   }
 
   .error-ul .error-li {
+    box-sizing: border-box;
+    word-wrap: break-word;
     position: relative;
-    display: block;
-    width: 100%;
     padding: 10px 15px;
     margin-bottom: -1px;    /* Prevent double borders */
     color: #721c24;
@@ -181,8 +184,9 @@
   }
 
   .input {
+    box-sizing: border-box;
+    display: inline-block;
     position: relative;
-    display: block;
     width: 100%;
     padding: .375rem .75rem;
     font-size: 1rem;
@@ -193,4 +197,11 @@
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   }
+
+  #validated-input-component {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
 </style>
