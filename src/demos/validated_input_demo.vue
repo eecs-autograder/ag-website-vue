@@ -1,6 +1,6 @@
 <template>
   <div style="padding: 10px;">
-    <!--Validated Input #1-->
+    Validated Input #1
     <hr/>
     <h1>Validated Input (number)</h1>
     <small>The below input must be a negative, even integer</small>
@@ -60,7 +60,7 @@
 
     <br/><br/><br/>
 
-    <!--Validated Input #3-->
+    Validated Input #3
     <hr/>
     <h1>Validated Input (string)</h1>
     <small>
@@ -93,7 +93,7 @@
 
     <br/><br/><br/>
 
-    <!--Validated Input #4-->
+    Validated Input #4
     <hr/>
     <h1>Validated Input (textarea)</h1>
     <small>
@@ -116,7 +116,21 @@
       <textarea rows="3" v-model="textarea_input"/>
     </p>
 
-    <br/><br/><br/>
+    <br/><br/>
+    <hr>
+    <p><b>The below input uses the suffix slot.</b></p>
+
+    <div class="my-label"> Enter a number from 1 to 10:</div>
+    <div class="constrict">
+      <validated-input ref='input_5'
+                       v-model="number_input_2"
+                       :num_rows="1"
+                       input_style="width: 45px;"
+                       :validators="[is_number, is_in_range_1_to_10]">
+        <div slot="suffix" class="suffix-element"> books </div>
+      </validated-input>
+    </div>
+    <br> <br><br> <br><br> <br>
   </div>
 </template>
 
@@ -130,6 +144,7 @@
   })
   export default class ValidatedInputDemo extends Vue {
     number_input: number = 12;
+    number_input_2: number = 2;
     custom_obj_input: object = {
       field1: 12,
     };
@@ -171,7 +186,7 @@
     /* Validated object functions */
     obj_has_only_field1_and_val_is_a_number(str_obj: string): ValidatorResponse {
       const error_msg = "field1 does not exist, or is not the only field, " +
-        "or value of field1 is not a number";
+                        "or value of field1 is not a number";
 
       let is_valid = false;
 
@@ -237,4 +252,25 @@
 </script>
 
 <style scoped lang="scss">
+
+  .my-label {
+    display: block;
+    padding-bottom: 8px;
+    font-size: 16px;
+    color: black;
+  }
+
+  .constrict {
+    height: 50px;
+    display: inline-block;
+    position: relative;
+  }
+
+  .suffix-element {
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+
 </style>
