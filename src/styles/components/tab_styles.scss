@@ -19,10 +19,20 @@
 %mobile-tab {
     display: block;
     box-sizing: border-box;
-    margin-top: 4px;
     min-width: 10px;
     padding: 18px 20px;
     position: relative;
+}
+
+@media only screen and (max-width: 481px) {
+    .tab-style {
+        border-top-width: 2px;
+        border-top-style: solid;
+    }
+
+    .tab-style:first-child {
+        border-top-width: 0;
+    }
 }
 
 /* ------------- Gray & No Border -------------- */
@@ -30,11 +40,13 @@
 .gray-theme-active, .no-border-active {
     @extend %mobile-tab;
     background-color: $pebble-dark;
+    border-top-color: $pebble-dark;
 }
 
 .gray-theme-inactive, .no-border-inactive {
     @extend %mobile-tab;
     background-color: $pebble-light;
+    border-top-color: darken($pebble-light, 1);
 }
 
 .gray-theme-inactive:hover, .no-border-inactive:hover  {
@@ -46,12 +58,14 @@
 .gray-theme-active-no-padding {
     @extend %mobile-tab;
     background-color: $pebble-dark;
+    border-top-color: $pebble-dark;
     padding: 0;
 }
 
 .gray-theme-inactive-no-padding {
     @extend %mobile-tab;
     background-color: $pebble-light;
+    border-top-color: darken($pebble-light, 1);
     padding: 0;
 }
 
@@ -59,18 +73,19 @@
     background-color: $pebble-medium;
 }
 
-
 /* -------------- Gray-white ------------- */
 
 .gray-white-theme-active {
     @extend %mobile-tab;
     background-color: $ocean-blue;
+    border-top-color: $ocean-blue;
     color: white;
 }
 
 .gray-white-theme-inactive {
     @extend %mobile-tab;
     background-color: $pebble-light;
+    border-top-color: darken($pebble-light, 1);
 }
 
 .gray-white-theme-inactive:hover {
@@ -82,12 +97,14 @@
 .dark-theme-active {
     @extend %mobile-tab;
     background-color: darken($stormy-gray-dark, 25);
+    border-top-color: darken($stormy-gray-dark, 25);
     color: white;
 }
 
 .dark-theme-inactive {
     @extend %mobile-tab;
-    background-color: darken($stormy-gray-dark, 0);
+    background-color: $stormy-gray-dark;
+    border-top-color: darken($stormy-gray-dark, 1);
     color: white;
 }
 
@@ -99,13 +116,15 @@
 
 .white-theme-active {
     @extend %mobile-tab;
-    background-color: $pebble-medium;
+    background-color: $ocean-blue;
+    border-top-color: $ocean-blue;
+    color: white;
 }
 
 .white-theme-inactive {
     @extend %mobile-tab;
     background-color: white;
-    border: 2px solid $pebble-light;
+    border-top-color: darken(white, 2);
 }
 
 .white-theme-inactive:hover {
@@ -115,6 +134,7 @@
 /* ---------------- MEDIA QUERY SECTION---------------- */
 
 @media only screen and (min-width: 481px) {
+
     %tab-theme {
         border-radius: 10px 10px 0 0;
         box-sizing: border-box;
@@ -206,8 +226,6 @@
         @extend %tab-theme;
         border-right: 2px solid darken($pebble-light, 2);
     }
-
-    .no-border-inactive:hover {}
 
     /* -------------- Dark ------------- */
 

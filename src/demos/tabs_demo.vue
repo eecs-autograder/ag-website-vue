@@ -161,6 +161,16 @@
               </div>
             </template>
           </tab>
+          <tab>
+            <tab-header @click.native="log_event">
+              Bare Text Tab 4
+            </tab-header>
+            <template slot="body">
+              <div class="tab-body-white">
+                The tab header has just text
+              </div>
+            </template>
+          </tab>
         </tabs>
       </div>
     </div>
@@ -297,9 +307,9 @@
 }
 
 .shrink-tabs {
-  margin-left: 10%;
-  margin-right: 10%;
-  width: 80%;
+  /*margin-left: 10%;*/
+  /*margin-right: 10%;*/
+  /*width: 80%;*/
 }
 
 .tab-styling-theme-label {
