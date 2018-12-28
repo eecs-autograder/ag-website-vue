@@ -50,6 +50,7 @@
     </p>
     <div class="control-width-3">
       <dropdown-typeahead
+        typeahead_class="custom-typeahead"
         placeholder_text="Enter a Season"
         :choices="seasons"
         @update_item_chosen="add_item_3($event)"
@@ -141,7 +142,31 @@ export default class ModalDemo extends Vue {
 }
 </script>
 
+<!--globally scoped-->
+<style lang="scss">
+@import '@/styles/colors.scss';
+
+.custom-typeahead {
+  background-color: white;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid plum;
+  width: 200px;
+  color: darken(plum, 50);
+}
+
+.custom-typeahead::placeholder {
+  color: darken(plum, 50);
+}
+
+</style>
+
+
 <style scoped lang="scss">
+
+.typeahead-demo {
+  padding: 0 10px;
+}
 
 .typeahead-1-selections, .typeahead-2-selections, .typeahead-3-selections{
   margin: 30px 0 150px 0;

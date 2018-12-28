@@ -1,11 +1,11 @@
 <template>
   <div>
-    <ButtonDemo></ButtonDemo>
-    <ColorPaletteDemo></ColorPaletteDemo>
-    <ContextMenuDemo></ContextMenuDemo>
-    <CourseListDemo></CourseListDemo>
-    <DiffDemo></DiffDemo>
-    <DropdownDemo></DropdownDemo>
+    <!--<ButtonDemo></ButtonDemo>-->
+    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
+    <!--<ContextMenuDemo></ContextMenuDemo>-->
+    <!--<CourseListDemo></CourseListDemo>-->
+    <!--<DiffDemo></DiffDemo>-->
+    <!--<DropdownDemo></DropdownDemo>-->
     <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
     <ModalDemo></ModalDemo>
     <FileUploadDemo></FileUploadDemo>
