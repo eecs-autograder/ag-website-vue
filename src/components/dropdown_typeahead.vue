@@ -47,7 +47,7 @@ export default class DropdownTypeahead extends Vue {
   filter_fn!: (item: object, filter: string) => boolean;
 
   @Prop({default: "search-field", type: String})
-  typeahead_class: string;
+  typeahead_class!: string;
 
   d_choices: object[] = [];
   filter_text: string = "";
