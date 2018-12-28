@@ -4,7 +4,7 @@
               :items="filtered_choices"
               @update_item_selected="$emit('update_item_chosen', $event)">
       <template slot="header">
-        <input id="search-field"
+        <input :class="typeahead_class"
                type=text
                :placeholder="placeholder_text"
                name="filtered_search"
@@ -46,6 +46,9 @@ export default class DropdownTypeahead extends Vue {
   @Prop({required: true, type: Function})
   filter_fn!: (item: object, filter: string) => boolean;
 
+  @Prop({default: "search-field", type: String})
+  typeahead_class: string;
+
   d_choices: object[] = [];
   filter_text: string = "";
   private _filtered_choices: object[] = [];
@@ -80,27 +83,23 @@ export default class DropdownTypeahead extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/components/dropdown_styles.scss';
 
-#search-field {
-  border-radius: 5px;
-  background-color: $pebble-light;
-  border: 2px solid $pebble-light;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  color: black;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 16px;
-  height: 24px;
-  margin: 0;
-  padding: 6px 10px;
+.search-field {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  color: #495057;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: .375rem .75rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   width: 100%;
 }
 
-#search-field:hover {
-  background-color: $pebble-medium;
-  border-color: $pebble-medium;
-  color: black;
+.search-field:hover {
+  border: 1px solid $ocean-blue;
 }
 
-#search-field:focus {
+.search-field:focus {
   outline-color: $ocean-blue;
 }
 
