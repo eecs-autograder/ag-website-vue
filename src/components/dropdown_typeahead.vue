@@ -84,14 +84,14 @@ export default class DropdownTypeahead extends Vue {
 @import '@/styles/components/dropdown_styles.scss';
 
 .search-field {
-  background-color: #fff;
+  background-color: white;
   border: 1px solid #ced4da;
   border-radius: .25rem;
   color: #495057;
   font-size: 1rem;
   line-height: 1.5;
+  margin: 0;
   padding: .375rem .75rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   width: 100%;
 }
 
