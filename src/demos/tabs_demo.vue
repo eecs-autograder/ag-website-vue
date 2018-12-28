@@ -307,9 +307,9 @@
 }
 
 .shrink-tabs {
-  /*margin-left: 10%;*/
-  /*margin-right: 10%;*/
-  /*width: 80%;*/
+  margin-left: 10%;
+  margin-right: 10%;
+  width: 80%;
 }
 
 .tab-styling-theme-label {
