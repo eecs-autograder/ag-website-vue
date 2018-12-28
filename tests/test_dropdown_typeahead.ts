@@ -11,11 +11,12 @@ beforeAll(() => {
 
 describe('DropdownTypeahead.vue', () => {
 
-    test('DropdownTypeahead data set to values passed in by parent', () => {
+    test.only('DropdownTypeahead data set to values passed in by parent', () => {
 
         @Component({
             template: `<div>
               <dropdown-typeahead ref="dropdown_typeahead"
+                  typeahead_class="custom-style"
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
@@ -48,6 +49,7 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
         expect(dropdown_typeahead.filter_fn).toBeDefined();
+        expect(dropdown_typeahead.typeahead_class).toEqual("custom-style");
     });
 
     test('Different values of "filter_text" produce different filtered_choices',
