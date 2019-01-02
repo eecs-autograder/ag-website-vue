@@ -11,7 +11,7 @@ beforeAll(() => {
 
 describe('DropdownTypeahead.vue', () => {
 
-    test.only('DropdownTypeahead data set to values passed in by parent', () => {
+    test('DropdownTypeahead data set to values passed in by parent', () => {
 
         @Component({
             template: `<div>
