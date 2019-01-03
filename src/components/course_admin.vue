@@ -1,7 +1,7 @@
 <template>
-  <LoadingIcon :loading="course === null">
     <div class="course-admin-component"
-         ref="course_admin_component">
+         ref="course_admin_component"
+         v-if="course != null">
       <div>
         <tabs ref="course_admin_tabs"
               tab_active_class="gray-theme-active"
@@ -70,16 +70,16 @@
 
                       <input type="submit" class="settings-save-button" value="Save Updates">
 
-
-                      <LoadingIcon :loading="saving"
-                                    class="last-saved-spinner">
-                        <div class="last-saved-timestamp">
+                        <div v-if="saving"
+                             class="last-saved-timestamp">
                           <span> Last Saved: </span>
                           {{(new Date(course.last_modified)).toLocaleString(
                               'en-US', last_modified_format
                           )}}
                         </div>
-                      </LoadingIcon>
+                        <div v-else class="last-saved-spinner">
+                          <i class="fa fa-spinner fa-pulse"></i>
+                        </div>
 
                     </form>
                   </div>
@@ -347,13 +347,11 @@
         </tabs>
       </div>
     </div>
-  </LoadingIcon>
 </template>
 
 <script lang="ts">
 
   import Dropdown from '@/components/dropdown.vue';
-  import LoadingIcon from '@/components/loading_icon.vue';
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
@@ -363,7 +361,7 @@
   import { Course, Project, Semester, User } from 'ag-client-typescript';
 
   @Component({
-    components: { Dropdown, LoadingIcon, Tab, TabHeader, Tabs, Tooltip }
+    components: { Dropdown, Tab, TabHeader, Tabs, Tooltip }
   })
   export default class CourseAdmin extends Vue {
     loading = true;
