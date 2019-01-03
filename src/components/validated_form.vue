@@ -5,13 +5,17 @@
 </template>
 
 <script lang="ts">
-  import { Component, Provide, Vue } from 'vue-property-decorator';
+  import { Component, Provide, Vue, Watch } from 'vue-property-decorator';
 
   import ValidatedInput from '@/components/validated_input.vue';
 
   @Component
   export default class ValidatedForm extends Vue {
     d_validated_inputs: ValidatedInput[] = [];
+
+    created() {
+      this.$emit('on_is_valid_change', this.is_valid);
+    }
 
     @Provide()
     register = (v_input: ValidatedInput): void => {
@@ -26,6 +30,11 @@
       }
 
       return true;
+    }
+
+    @Watch('is_valid')
+    on_is_valid_change_watcher(new_value: boolean, old_value: boolean) {
+      this.$emit('on_is_valid_change', new_value);
     }
   }
 </script>
