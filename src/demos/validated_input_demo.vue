@@ -8,11 +8,12 @@
     <validated-input ref='vinput_1'
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
-                     :from_string_fn="(val) => parseInt(val, 10)"></validated-input>
+                     :from_string_fn="(val) => parseInt(val, 10)"
+                     @on_is_valid_change="vinput_1_valid = $event"></validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_1.is_valid}}</span>
+      <span style="font-weight: bold">{{vinput_1_valid}}</span>
     </p>
 
     <p>
@@ -49,8 +50,7 @@
                      :from_string_fn="string_to_obj"
                      :to_string_fn="obj_to_string"></validated-input>
     <p>
-      is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_2.is_valid}}</span>
+      Parent does not track the is_valid() result for this component
     </p>
 
     <p>
@@ -70,7 +70,8 @@
     <br/><br/>
     <validated-input ref='vinput_3'
                      v-model="mario_character_input"
-                     :validators="[is_mario_or_luigi]">
+                     :validators="[is_mario_or_luigi]"
+                     @on_is_valid_change="vinput_3_valid = $event">
 
       <!--Adding custom error message styling-->
       <template slot-scope="{d_error_msg}">
@@ -82,7 +83,7 @@
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_3.is_valid}}</span>
+      <span style="font-weight: bold">{{vinput_3_valid}}</span>
     </p>
 
     <p>
@@ -102,11 +103,12 @@
     <validated-input ref='vinput_4'
                      v-model="textarea_input"
                      num_rows="3"
-                     :validators="[is_30_chars_or_longer, has_newline_char]"></validated-input>
+                     :validators="[is_30_chars_or_longer, has_newline_char]"
+                     @on_is_valid_change="vinput_4_valid = $event"></validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{loading || this.$refs.vinput_4.is_valid}}</span>
+      <span style="font-weight: bold">{{vinput_4_valid}}</span>
     </p>
 
     <p>
@@ -138,7 +140,9 @@
       "color": "green"
     };
 
-    loading: boolean = true;
+    vinput_1_valid = false;
+    vinput_3_valid = false;
+    vinput_4_valid = false;
 
     /* Validated number functions */
     is_number(value: string): ValidatorResponse {
@@ -228,18 +232,6 @@
         is_valid: (value.match(/\n/g) !== null) && (value.match(/\n/g))!.length > 0,
         error_msg: "No newline character found"
       };
-    }
-
-    mounted() {
-      /*
-       * The loading variable is necessary in order to display the value of
-       * this.$refs.my_input.is_valid() on render.
-
-       * For more info, see notice at end of section
-       * "Accessing Child Component Instances & Child Elements" at
-       * https://vuejs.org/v2/guide/components-edge-cases.html
-       */
-      this.loading = false;
     }
   }
 </script>

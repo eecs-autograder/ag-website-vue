@@ -83,6 +83,7 @@
       // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
       this.register(this);
       this._update_and_validate(this.to_string_fn(this.value));
+      this.$emit('on_is_valid_change', this.is_valid);
     }
 
     get is_valid(): boolean {
@@ -127,6 +128,11 @@
     private _update_and_validate(new_value: string) {
       this.d_input_value = new_value;
       this._run_validators(new_value);
+    }
+
+    @Watch('is_valid')
+    on_is_valid_change_watcher(new_value: boolean, old_value: boolean) {
+      this.$emit('on_is_valid_change', new_value);
     }
   }
 </script>

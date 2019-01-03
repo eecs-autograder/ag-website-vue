@@ -198,4 +198,68 @@ describe('ValidatedForm.vue', () => {
         const vinput = <ValidatedInput> wrapper.find({ref: 'vinput_1'}).vm;
         expect(vinput.register).toBeDefined();
     });
+
+    test('on_is_valid_change gets triggered when is_valid changes', async () => {
+        const component = {
+            template:  `<validated-form ref="vform" @on_is_valid_change="update_is_valid">
+                          <validated-input ref="vinput" v-model="value1"
+                                           :validators="[is_number]"/>
+                        </validated-form>`,
+            components: {
+                'validated-form': ValidatedForm,
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    value1: 32,
+                    counter: 0,
+                    form_is_valid: false,
+                };
+            },
+            methods: {
+                is_number: function(value: string): ValidatorResponse {
+                    return {
+                        is_valid: value !== "" && !isNaN(Number(value)),
+                        error_msg: "Invalid number!"
+                    };
+                },
+                update_is_valid: function(value: boolean): void {
+                    this.counter = this.counter + 1;
+                    this.form_is_valid = value;
+                }
+            }
+        };
+
+        let wrapper = mount(component);
+        let vform_vm = <ValidatedForm> wrapper.find({ref: 'vform'}).vm;
+        let vinput = wrapper.find({ref: 'vinput'});
+
+        expect(vform_vm.is_valid).toBe(true);
+        expect(wrapper.vm.$data.form_is_valid).toBe(true);
+        expect(wrapper.vm.$data.counter).toBe(1);
+
+        (<HTMLInputElement> vinput.find('#input').element).value = "42";
+        vinput.find('#input').trigger('input');
+
+        expect(vform_vm.is_valid).toBe(true);
+        expect(wrapper.vm.$data.form_is_valid).toBe(true);
+        expect(wrapper.vm.$data.counter).toBe(1);
+
+        (<HTMLInputElement> vinput.find('#input').element).value = "invalid";
+        vinput.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        expect(vform_vm.is_valid).toBe(false);
+        expect(wrapper.vm.$data.form_is_valid).toBe(false);
+        expect(wrapper.vm.$data.counter).toBe(2);
+
+        // Back to valid
+        (<HTMLInputElement> vinput.find('#input').element).value = "3";
+        vinput.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        expect(vform_vm.is_valid).toBe(true);
+        expect(wrapper.vm.$data.form_is_valid).toBe(true);
+        expect(wrapper.vm.$data.counter).toBe(3);
+    });
 });

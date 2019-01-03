@@ -344,4 +344,56 @@ describe('ValidatedInput.vue', () => {
         expect((<ValidatedInputPropsObj> wrapper.vm.$options.props).input_style.required).toBe(
             false);
     });
+
+    test('on_is_valid_change gets triggered when is_valid changes', async () => {
+        const component = {
+            template:  `<validated-input ref="vinput" v-model="value1" :validators="[is_number]"
+                                         @on_is_valid_change="input_is_valid = $event"/>`,
+            components: {
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    value1: 32,
+                    input_is_valid: false,
+                };
+            },
+            methods: {
+                is_number: function(value: string): ValidatorResponse {
+                    return {
+                        is_valid: value !== "" && !isNaN(Number(value)),
+                        error_msg: "Invalid number!"
+                    };
+                }
+            }
+        };
+
+        let wrapper = mount(component);
+        let vinput = wrapper.find({ref: 'vinput'});
+        let vinput_vm = <ValidatedInput> vinput.vm;
+
+        expect(vinput_vm.is_valid).toBe(true);
+        expect(wrapper.vm.$data.input_is_valid).toBe(true);
+
+        (<HTMLInputElement> vinput.find('#input').element).value = "42";
+        vinput.find('#input').trigger('input');
+
+        expect(vinput_vm.is_valid).toBe(true);
+        expect(wrapper.vm.$data.input_is_valid).toBe(true);
+
+        (<HTMLInputElement> vinput.find('#input').element).value = "invalid";
+        vinput.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        expect(vinput_vm.is_valid).toBe(false);
+        expect(wrapper.vm.$data.input_is_valid).toBe(false);
+
+        // Back to valid
+        (<HTMLInputElement> vinput.find('#input').element).value = "3";
+        vinput.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        expect(vinput_vm.is_valid).toBe(true);
+        expect(wrapper.vm.$data.input_is_valid).toBe(true);
+    });
 });
