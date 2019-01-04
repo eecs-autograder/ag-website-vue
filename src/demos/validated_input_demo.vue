@@ -135,142 +135,151 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-  @Component({
-    components: { ValidatedInput }
-  })
-  export default class ValidatedInputDemo extends Vue {
-    number_input: number = 12;
-    number_input_2: number = 2;
-    custom_obj_input: object = {
-      field1: 12,
+@Component({
+  components: { ValidatedInput }
+})
+export default class ValidatedInputDemo extends Vue {
+  number_input: number = 12;
+  number_input_2: number = 2;
+  custom_obj_input: object = {
+    field1: 12,
+  };
+  mario_character_input: string = "mario";
+  textarea_input: string = "This needs to be longer!";
+  obj_input_style = {
+    "background-color": "lightblue",
+    "color": "green"
+  };
+
+  input_1_valid = false;
+  input_3_valid = false;
+  input_4_valid = false;
+
+  /* Validated number functions */
+  is_number(value: string): ValidatorResponse {
+    return {
+      is_valid: value !== "" && !isNaN(Number(value)),
+      error_msg:  "Invalid number!",
     };
-    mario_character_input: string = "mario";
-    textarea_input: string = "This needs to be longer!";
-    obj_input_style = {
-      "background-color": "lightblue",
-      "color": "green"
+  }
+
+  is_negative(value: string): ValidatorResponse {
+    return {
+      is_valid: this.is_number(value).is_valid && value[0] === "-",
+      error_msg: "Not negative!",
     };
+  }
 
-    input_1_valid = false;
-    input_3_valid = false;
-    input_4_valid = false;
+  is_even(value: string): ValidatorResponse {
+    return {
+      is_valid: this.is_number(value).is_valid &&             // Check if valid number
+                parseFloat(value) === parseInt(value, 10) &&  // Check if integer
+                parseInt(value, 10) % 2 === 0,                // Check if even
+      error_msg: "Not even!"
+    };
+  }
 
-    /* Validated number functions */
-    is_number(value: string): ValidatorResponse {
-      return {
-        is_valid: value !== "" && !isNaN(Number(value)),
-        error_msg:  "Invalid number!",
-      };
-    }
+  /* Validated object functions */
+  obj_has_only_field1_and_val_is_a_number(str_obj: string): ValidatorResponse {
+    const error_msg = "field1 does not exist, or is not the only field, " +
+                      "or value of field1 is not a number";
 
-    is_negative(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid && value[0] === "-",
-        error_msg: "Not negative!",
-      };
-    }
+    let is_valid = false;
 
-    is_even(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid &&             // Check if valid number
-                  parseFloat(value) === parseInt(value, 10) &&  // Check if integer
-                  parseInt(value, 10) % 2 === 0,                // Check if even
-        error_msg: "Not even!"
-      };
-    }
+    if (this.obj_is_json(str_obj).is_valid) {
+      let json = JSON.parse(str_obj);
+      let keys = Object.keys(json);
 
-    /* Validated object functions */
-    obj_has_only_field1_and_val_is_a_number(str_obj: string): ValidatorResponse {
-      const error_msg = "field1 does not exist, or is not the only field, " +
-                        "or value of field1 is not a number";
-
-      let is_valid = false;
-
-      if (this.obj_is_json(str_obj).is_valid) {
-        let json = JSON.parse(str_obj);
-        let keys = Object.keys(json);
-
-        if (keys.length === 1 && keys[0] === "field1" && this.is_number(json[keys[0]]).is_valid) {
-          is_valid = true;
-        }
-      }
-
-      return {
-        is_valid: is_valid,
-        error_msg: error_msg
-      };
-    }
-
-    obj_is_json(str_obj: string): ValidatorResponse {
-      const error_msg = "Not valid object (JSON) syntax!";
-
-      try {
-        JSON.parse(str_obj);    // Will fail if not valid JSON
-        return { is_valid: true, error_msg: error_msg };
-      }
-      catch (e) {
-        return { is_valid: false, error_msg: error_msg };
+      if (keys.length === 1 && keys[0] === "field1" && this.is_number(json[keys[0]]).is_valid) {
+        is_valid = true;
       }
     }
 
-    obj_to_string(obj: object): string {
-      return JSON.stringify(obj);
+    return {
+      is_valid: is_valid,
+      error_msg: error_msg
+    };
+  }
+
+  obj_is_json(str_obj: string): ValidatorResponse {
+    const error_msg = "Not valid object (JSON) syntax!";
+
+    try {
+      JSON.parse(str_obj);    // Will fail if not valid JSON
+      return { is_valid: true, error_msg: error_msg };
     }
-
-    string_to_obj(str_obj: string): object {
-      return JSON.parse(str_obj);
-    }
-
-    is_mario_or_luigi(value: string): ValidatorResponse {
-      value = value.toLowerCase();
-
-      return {
-        is_valid: value === "mario" || value === "luigi",
-        error_msg: "Not Mario or Luigi! Proposterous!"
-      };
-    }
-
-    /* Validated textarea functions */
-    is_30_chars_or_longer(value: string): ValidatorResponse {
-      return {
-        is_valid: value.length >= 30,
-        error_msg: "Input must contain 30 characters or more"
-      };
-    }
-
-    has_newline_char(value: string): ValidatorResponse {
-      return {
-        is_valid: (value.match(/\n/g) !== null) && (value.match(/\n/g))!.length > 0,
-        error_msg: "No newline character found"
-      };
+    catch (e) {
+      return { is_valid: false, error_msg: error_msg };
     }
   }
+
+  obj_to_string(obj: object): string {
+    return JSON.stringify(obj);
+  }
+
+  string_to_obj(str_obj: string): object {
+    return JSON.parse(str_obj);
+  }
+
+  is_mario_or_luigi(value: string): ValidatorResponse {
+    value = value.toLowerCase();
+
+    return {
+      is_valid: value === "mario" || value === "luigi",
+      error_msg: "Not Mario or Luigi! Proposterous!"
+    };
+  }
+
+  /* Validated textarea functions */
+  is_30_chars_or_longer(value: string): ValidatorResponse {
+    return {
+      is_valid: value.length >= 30,
+      error_msg: "Input must contain 30 characters or more"
+    };
+  }
+
+  has_newline_char(value: string): ValidatorResponse {
+    return {
+      is_valid: (value.match(/\n/g) !== null) && (value.match(/\n/g))!.length > 0,
+      error_msg: "No newline character found"
+    };
+  }
+
+  is_in_range_1_to_10(value: string): ValidatorResponse {
+    return {
+      is_valid: this.is_number(value).is_valid
+                && parseInt(value, 10) <= 10
+                && parseInt(value, 10) >= 1,
+      error_msg: "Please enter a number 1 to 10"
+    };
+  }
+}
 </script>
 
 <style scoped lang="scss">
 
-  .my-label {
-    display: block;
-    padding-bottom: 8px;
-    font-size: 16px;
-    color: black;
-  }
+.my-label {
+  display: block;
+  padding-bottom: 8px;
+  font-size: 16px;
+  color: black;
+}
 
-  .constrict {
-    height: 50px;
-    display: inline-block;
-    position: relative;
-  }
+.constrict {
+  height: 50px;
+  display: inline-block;
+  position: relative;
+}
 
-  .suffix-element {
-    display: inline-block;
-    vertical-align: top;
-    padding-top: 10px;
-    padding-left: 10px;
-  }
+.suffix-element {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 10px;
+  padding-left: 10px;
+}
 
 </style>
