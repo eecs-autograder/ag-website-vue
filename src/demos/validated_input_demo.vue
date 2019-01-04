@@ -5,15 +5,15 @@
     <h1>Validated Input (number)</h1>
     <small>The below input must be a negative, even integer</small>
     <br/><br/>
-    <validated-input ref='vinput_1'
+    <validated-input ref='input_1'
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
-                     @on_is_valid_change="vinput_1_valid = $event"></validated-input>
+                     @input_validity_changed="input_1_valid = $event"></validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{vinput_1_valid}}</span>
+      <span style="font-weight: bold">{{input_1_valid}}</span>
     </p>
 
     <p>
@@ -32,7 +32,7 @@
       <strong>Notice the custom (although slightly terrible) input style!</strong>
     </small>
     <br/><br/>
-    <validated-input ref='vinput_2'
+    <validated-input ref='validated_input_2'
                      v-model="custom_obj_input"
                      input_style="background-color: lightblue; color: green;"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
@@ -43,7 +43,7 @@
       Same one as above except input_style is an object
     </small>
     <br/>
-    <validated-input ref='vinput_2'
+    <validated-input ref='validated_input_2'
                      v-model="custom_obj_input"
                      :input_style="obj_input_style"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
@@ -68,10 +68,10 @@
       <strong>Notice that it uses custom error message styling!</strong>
     </small>
     <br/><br/>
-    <validated-input ref='vinput_3'
+    <validated-input ref='validated_input_3'
                      v-model="mario_character_input"
                      :validators="[is_mario_or_luigi]"
-                     @on_is_valid_change="vinput_3_valid = $event">
+                     @input_validity_changed="validated_input_3_valid = $event">
 
       <!--Adding custom error message styling-->
       <template slot-scope="{d_error_msg}">
@@ -83,7 +83,7 @@
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{vinput_3_valid}}</span>
+      <span style="font-weight: bold">{{validated_input_3_valid}}</span>
     </p>
 
     <p>
@@ -100,15 +100,15 @@
       The below input must contain > 30 characters and a new line character
     </small>
     <br/><br/>
-    <validated-input ref='vinput_4'
+    <validated-input ref='validated_input_4'
                      v-model="textarea_input"
                      num_rows="3"
                      :validators="[is_30_chars_or_longer, has_newline_char]"
-                     @on_is_valid_change="vinput_4_valid = $event"></validated-input>
+                     @input_validity_changed="validated_input_4_valid = $event"></validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{vinput_4_valid}}</span>
+      <span style="font-weight: bold">{{validated_input_4_valid}}</span>
     </p>
 
     <p>
@@ -140,9 +140,9 @@
       "color": "green"
     };
 
-    vinput_1_valid = false;
-    vinput_3_valid = false;
-    vinput_4_valid = false;
+    input_1_valid = false;
+    input_3_valid = false;
+    input_4_valid = false;
 
     /* Validated number functions */
     is_number(value: string): ValidatorResponse {

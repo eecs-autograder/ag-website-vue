@@ -2,7 +2,8 @@
   <div style="padding: 10px;">
     <hr/>
     <h1>Validated Form</h1>
-    <validated-form @submit="save_data" ref="form1" @on_is_valid_change="d_form_is_valid = $event">
+    <validated-form @submit="save_data" ref="form1"
+                    @form_validity_changed="d_form_is_valid = $event">
       <h3>Validated Input 1</h3>
       <p>Has to be a number</p>
       <validated-input v-model="d_data.id"

@@ -14,17 +14,17 @@
     d_validated_inputs: ValidatedInput[] = [];
 
     created() {
-      this.$emit('on_is_valid_change', this.is_valid);
+      this.$emit('form_validity_changed', this.is_valid);
     }
 
     @Provide()
-    register = (v_input: ValidatedInput): void => {
-      this.d_validated_inputs.push(v_input);
+    register = (validated_input: ValidatedInput): void => {
+      this.d_validated_inputs.push(validated_input);
     }
 
     get is_valid(): boolean {
-      for (const v_input of this.d_validated_inputs) {
-        if (!v_input.is_valid) {
+      for (const validated_input of this.d_validated_inputs) {
+        if (!validated_input.is_valid) {
           return false;
         }
       }
@@ -33,8 +33,8 @@
     }
 
     @Watch('is_valid')
-    on_is_valid_change_watcher(new_value: boolean, old_value: boolean) {
-      this.$emit('on_is_valid_change', new_value);
+    on_form_validity_changed(new_value: boolean, old_value: boolean) {
+      this.$emit('form_validity_changed', new_value);
     }
   }
 </script>
