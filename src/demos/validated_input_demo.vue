@@ -9,11 +9,11 @@
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
-                     @input_validity_changed="input_1_valid = $event"></validated-input>
+                     @input_validity_changed="validated_input_1_valid = $event"></validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{input_1_valid}}</span>
+      <span style="font-weight: bold">{{validated_input_1_valid}}</span>
     </p>
 
     <p>
@@ -155,9 +155,9 @@ export default class ValidatedInputDemo extends Vue {
     "color": "green"
   };
 
-  input_1_valid = false;
-  input_3_valid = false;
-  input_4_valid = false;
+  validated_input_1_valid = false;
+  validated_input_3_valid = false;
+  validated_input_4_valid = false;
 
   /* Validated number functions */
   is_number(value: string): ValidatorResponse {
