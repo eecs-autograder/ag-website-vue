@@ -30,7 +30,7 @@
         :choices="strangers"
         @update_item_chosen="add_item_2($event)"
         :filter_fn="stranger_things_filter_fn">
-        <template  slot-scope="{item}">
+        <template slot-scope="{item}">
           <span> {{item.first_name}} {{item.last_name}}</span>
         </template>
       </dropdown-typeahead>
@@ -43,8 +43,10 @@
 
     <p class="typeahead-label">
       <b>
-        This Dropdown Typeahead instance deals with string objects
-        and uses the default scoped-slot styling. <br>
+        This Dropdown Typeahead instance deals with string objects <br>
+        It uses a custom, unscoped style class for the typeahead text input.
+          (The font size is intentionally small) <br>
+        It uses the custom styling for dropdown menu items.<br>
         It also has a custom "No results" message.
       </b>
     </p>
@@ -153,6 +155,8 @@ export default class ModalDemo extends Vue {
   border: 1px solid plum;
   width: 200px;
   color: darken(plum, 50);
+
+  font-size: 4px;
 }
 
 .custom-typeahead::placeholder {
