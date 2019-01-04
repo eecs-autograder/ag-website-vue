@@ -201,7 +201,7 @@ describe('ValidatedForm.vue', () => {
 
     test('on_is_valid_change gets triggered when is_valid changes', async () => {
         const component = {
-            template:  `<validated-form ref="vform" @on_is_valid_change="update_is_valid">
+            template:  `<validated-form ref="vform" @on_is_valid_change="form_is_valid = $event">
                           <validated-input ref="vinput" v-model="value1"
                                            :validators="[is_number]"/>
                         </validated-form>`,
@@ -212,7 +212,6 @@ describe('ValidatedForm.vue', () => {
             data: () => {
                 return {
                     value1: 32,
-                    counter: 0,
                     form_is_valid: false,
                 };
             },
@@ -222,10 +221,6 @@ describe('ValidatedForm.vue', () => {
                         is_valid: value !== "" && !isNaN(Number(value)),
                         error_msg: "Invalid number!"
                     };
-                },
-                update_is_valid: function(value: boolean): void {
-                    this.counter = this.counter + 1;
-                    this.form_is_valid = value;
                 }
             }
         };
@@ -236,14 +231,12 @@ describe('ValidatedForm.vue', () => {
 
         expect(vform_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
-        expect(wrapper.vm.$data.counter).toBe(1);
 
         (<HTMLInputElement> vinput.find('#input').element).value = "42";
         vinput.find('#input').trigger('input');
 
         expect(vform_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
-        expect(wrapper.vm.$data.counter).toBe(1);
 
         (<HTMLInputElement> vinput.find('#input').element).value = "invalid";
         vinput.find('#input').trigger('input');
@@ -251,7 +244,6 @@ describe('ValidatedForm.vue', () => {
 
         expect(vform_vm.is_valid).toBe(false);
         expect(wrapper.vm.$data.form_is_valid).toBe(false);
-        expect(wrapper.vm.$data.counter).toBe(2);
 
         // Back to valid
         (<HTMLInputElement> vinput.find('#input').element).value = "3";
@@ -260,6 +252,5 @@ describe('ValidatedForm.vue', () => {
 
         expect(vform_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
-        expect(wrapper.vm.$data.counter).toBe(3);
     });
 });
