@@ -1,11 +1,11 @@
 <template>
     <div class="course-admin-component"
-         ref="course_admin_component"
-         v-if="course != null">
+         ref="course_admin_component">
+         <!--v-if="course != null">-->
       <div>
         <tabs ref="course_admin_tabs"
-              tab_active_class="gray-theme-active"
-              tab_inactive_class="gray-theme-inactive"
+              tab_active_class="gray-theme-active-no-padding"
+              tab_inactive_class="gray-theme-inactive-no-padding"
               v-if="!loading">
   <!--GENERAL TAB-->
           <tab>
@@ -19,14 +19,20 @@
                 <div id="settings-container">
                   <div id="settings-container-inputs">
                     <form id="course-settings-form" @submit.prevent="save_course_settings">
+
                       <div class="settings-single-input-container">
                         <label class="settings-input-label"> Course name: </label>
-                        <input type="text"
-                               name="name"
-                               id="input-course-name"
-                               class="settings-input"
-                               v-model="course.name">
+                        <ValidatedInput
+                          ref="course_name"
+                          v-model="course.name"
+                          :validators="[is_not_empty, name_is_unique]"
+                          :num_rows="1"
+                          id="input-course-name">
+                        </ValidatedInput>
                       </div>
+
+
+                      <!--// This needs to be a div not an input***************************************************-->
                       <div class="settings-single-input-container">
                         <label class="settings-input-label"> Semester: </label>
                         <div class="semester-dropdown-wrapper">
@@ -50,27 +56,32 @@
                         </dropdown>
                         </div>
                       </div>
+
                       <div class="settings-single-input-container">
                         <label class="settings-input-label"> Year: </label>
-                        <input type="text"
-                               name="year"
-                               id="input-course-year"
-                               class="settings-input"
-                               v-model="course.year">
+                        <ValidatedInput
+                          ref="course_year"
+                          v-model="course.year"
+                          :num_rows="1"
+                          id="input-course-year"
+                          :validators="[is_not_empty]">
+                        </ValidatedInput>
                       </div>
+
                       <div class="settings-single-input-container">
                         <label class="settings-input-label"> Late days per student: </label>
-                        <input type="tel"
-                               name="num_late_days"
-                               id="input-course-late-days"
-                               class="settings-input"
-                               min="0"
-                               v-model="course.num_late_days">
+                        <ValidatedInput
+                          ref="course_late_days"
+                          v-model="course.num_late_days"
+                          :num_rows="1"
+                          id="input-course-late-days"
+                          :validators="[]">
+                        </ValidatedInput>
                       </div>
 
                       <input type="submit" class="settings-save-button" value="Save Updates">
-
-                        <div v-if="saving"
+                      <div v-for="error of errors"> {{error}}</div>
+                        <div v-if="!saving"
                              class="last-saved-timestamp">
                           <span> Last Saved: </span>
                           {{(new Date(course.last_modified)).toLocaleString(
@@ -128,7 +139,12 @@
                             </tooltip>
                           </i>
                         </label>
-                        <textarea ref="new_admin_list" v-model="new_admins_list"></textarea>
+                        <ValidatedInput
+                          ref="new_admin_list"
+                          v-model="new_admins_list"
+                          :validators="[]"
+                          :num_rows="5">
+                        </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
                     </div>
@@ -169,7 +185,12 @@
                             </tooltip>
                           </i>
                         </label>
-                        <textarea ref="new_staff_list" v-model="new_staff_list"></textarea>
+                        <ValidatedInput
+                          ref="new_staff_list"
+                          v-model="new_staff_list"
+                          :validators="[]"
+                          :num_rows="5">
+                        </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
                     </div>
@@ -209,7 +230,12 @@
                             </tooltip>
                           </i>
                         </label>
-                        <textarea ref="new_student_list" v-model="new_students_list"></textarea>
+                        <ValidatedInput
+                          ref="new_students_list"
+                          v-model="new_students_list"
+                          :validators="[]"
+                          :num_rows="5">
+                        </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
                     </div>
@@ -249,8 +275,12 @@
                             </tooltip>
                           </i>
                         </label>
-                        <textarea ref="new_handgrader_list" v-model="new_handgraders_list">
-                        </textarea>
+                        <ValidatedInput
+                          ref="new_handgraders_list"
+                          v-model="new_handgraders_list"
+                          :validators="[]"
+                          :num_rows="5">
+                        </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
                     </div>
@@ -299,11 +329,15 @@
                     <div id="new-project-space">
                       <form id="new-project-form" @submit.prevent="add_project">
                         <p id="new-project-label"> Create a New Project</p>
-                        <input type="text"
-                               id="new-project-input"
-                               ref="new_project_input"
-                               v-model="new_project_name"
-                               placeholder="New Project Name">
+
+                        <ValidatedInput
+                          ref="new_project"
+                          v-model="new_project_name"
+                          :validators="[project_name_is_unique]"
+                          :num_rows="1"
+                          id="new-project-input">
+                        </ValidatedInput>
+
                         <input type="submit"
                                class="create-new-project-button"
                                value="Add Project">
@@ -356,12 +390,15 @@
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
   import Tooltip from '@/components/tooltip.vue';
+  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+  import { array_has_unique, handle_400_errors_async } from '@/utils.ts';
+  import { AxiosResponse } from 'axios';
   import { Component, Vue, Watch } from 'vue-property-decorator';
 
   import { Course, Project, Semester, User } from 'ag-client-typescript';
 
   @Component({
-    components: { Dropdown, Tab, TabHeader, Tabs, Tooltip }
+    components: { Dropdown, Tab, TabHeader, Tabs, Tooltip, ValidatedInput }
   })
   export default class CourseAdmin extends Vue {
     loading = true;
@@ -374,6 +411,7 @@
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
 
+    course_names_same_semester: string[] = [];
     admins: User[] = [];
     staff: User[] = [];
     students: User[] = [];
@@ -385,6 +423,8 @@
 
     projects: Project[] = [];
     new_project_name = "";
+
+    errors: string[] = ["some garbage"];
 
     async created() {
       this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
@@ -411,9 +451,11 @@
       event.stopPropagation();
     }
 
+    @handle_400_errors_async(handle_save_course_settings_error)
     async save_course_settings() {
-      this.saving = true;
       try {
+        this.saving = true;
+        this.errors = [];
         await this.course!.save();
       }
       finally {
@@ -497,6 +539,46 @@
       this.handgraders.splice(index, 1);
     }
 
+
+    // How can it be unique?????? name
+    name_is_unique(value: string): ValidatorResponse {
+      return {
+        is_valid: !array_has_unique(this.course_names_same_semester, value),
+        error_msg: `There already exists a course in this semester called ${value}.`
+      };
+    }
+
+    project_name_is_unique(value: string): ValidatorResponse {
+      return {
+        is_valid: !array_has_unique(this.projects, value),
+        error_msg: `There already exists a project in this course called ${value}.`
+      };
+    }
+
+    // is_valid_season(value: string): ValidatorResponse {
+    //   return {
+    //     is_valid: value === "Fall" || value === "Winter"
+    //               || value === "Spring" || value === "Summer",
+    //     error_msg: ""
+    //   };
+    // }
+
+    // name, year
+    is_not_empty(value: string): ValidatorResponse {
+      return {
+        is_valid: value !== "",
+        error_msg: "This field is required"
+      };
+    }
+
+    // name
+    is_not_null(value: string): ValidatorResponse {
+      return {
+        is_valid: value !== null,
+        error_msg: "This field is required"
+      };
+    }
+
     async add_project() {
       let new_project: Project = await Project.create(
         {name: this.new_project_name, course: this.course!.pk}
@@ -509,6 +591,14 @@
         }
         return 1;
       });
+    }
+  }
+
+  function handle_save_course_settings_error(component: CourseAdmin, response: AxiosResponse) {
+    let errors = response.data["__all__"];
+
+    if (errors !== undefined && errors.length > 0) {
+      Vue.set(component, "errors", [errors[0]]);
     }
   }
 </script>
@@ -526,9 +616,9 @@ $current-lang-choice: "Montserrat";
 
 .tab-header {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   padding: 10px 25px 12px 25px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .tab-body {
@@ -539,7 +629,6 @@ $current-lang-choice: "Montserrat";
 
 .tab-label {
   outline: none;
-  /*border: 1px solid purple;*/
 }
 
 /* ---------------- Settings Styling ---------------- */
@@ -572,13 +661,17 @@ $current-lang-choice: "Montserrat";
 }
 
 .settings-input {
-  outline: none;
+  position: relative;
   display: block;
-  border-radius: 3px;
-  border: 2px solid lighten($stormy-gray-dark, 10);
-  padding: 6px 9px;
-  font-family: $current-lang-choice;
-  font-size: 18px;
+  width: 100%;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .settings-input:focus {
@@ -594,7 +687,7 @@ $current-lang-choice: "Montserrat";
 }
 
 #input-course-name {
-  width: 90%;
+  width: 400px;
 }
 
 #input-course-semester {
@@ -772,20 +865,13 @@ textarea {
 }
 
 #new-project-input {
-  outline: none;
-  display: block;
-  border-radius: 3px;
-  border: 2px solid lighten($stormy-gray-dark, 10);
-  padding: 6px 9px;
-  font-family: $current-lang-choice;
-  font-size: 18px;
-  width: 93.5%;
+  width: 70.5%;
 }
 
-#new-project-input::placeholder {
-  color: darken($sky-blue, 50);
-  opacity: 0.3;
-}
+/*#new-project-input::placeholder {*/
+  /*//color: darken($sky-blue, 50);*/
+  /*opacity: 0.3;*/
+/*}*/
 
 .create-new-project-button {
   @extend .green-button;
@@ -859,10 +945,15 @@ a {
 }
 
 @media only screen and (min-width: 481px) {
+
   .tab-body {
     margin-left: 2px;
     margin-right: 2px;
     border-top: 2px solid $pebble-dark;
+  }
+
+  .tab-header {
+    padding: 10px 15px 10px 15px;
   }
 
   .settings-save-button, .add-enrollees-button, .create-new-project-button {
@@ -910,9 +1001,6 @@ a {
   /* ---------------- Projects Styling ---------------- */
 
   #project-body-container {
-    width: 80%;
-    margin-left: 10%;
-    margin-right: 10%;
   }
 
   #new-project-side {
@@ -935,13 +1023,13 @@ a {
     text-align: left;
   }
 
-  #new-project-input {
-    font-size: 17px;
-    padding: 6px 12px;
-    margin: 0 0 10px 0;
-    max-width: 70%;
-    display: block;
-  }
+  /*#new-project-input {*/
+    /*font-size: 17px;*/
+    /*padding: 6px 12px;*/
+    /*margin: 0 0 10px 0;*/
+    /*max-width: 70%;*/
+    /*display: block;*/
+  /*}*/
 
   .existing-projects-label {
     font-size: 20px;

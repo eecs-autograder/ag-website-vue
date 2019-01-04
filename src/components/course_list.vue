@@ -66,8 +66,11 @@
     }
 
     async created() {
+      console.log("Hello");
       super.created();
       let user = await User.get_current();
+      console.log(user);
+      console.log("hi");
       this.all_courses = await Model.get_instance().get_courses_for_user(user);
       for (let [role, courses] of Object.entries(this.all_courses)) {
         this.sort_into_terms(courses);
