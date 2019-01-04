@@ -10,10 +10,10 @@ beforeAll(() => {
 describe('ValidatedForm.vue', () => {
     test('is_valid returns true only if all ValidatedInputs are valid ', () => {
         const component = {
-            template:  `<validated-form ref="vform">
-                          <validated-input ref="vinput_1" v-model="value1"
+            template:  `<validated-form ref="form">
+                          <validated-input ref="validated_input_1" v-model="value1"
                                            :validators="[is_number]"/>
-                          <validated-input ref="vinput_2" v-model="value2"
+                          <validated-input ref="validated_input_2" v-model="value2"
                                            :validators="[is_number]"/>
                         </validated-form>`,
             components: {
@@ -37,25 +37,25 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const vform = wrapper.find({ref: 'vform'});
-        const vform_vm = <ValidatedForm> vform.vm;
+        const form = wrapper.find({ref: 'form'});
+        const form_vm = <ValidatedForm> form.vm;
 
-        expect(vform_vm.d_validated_inputs.length).toBe(2);
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.d_validated_inputs.length).toBe(2);
+        expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value2: 42});
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.is_valid).toBe(true);
 
         wrapper.setData({value1: "invalid"});
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value2: "invalid"});
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.is_valid).toBe(false);
     });
 
     test('is_valid returns true if there are no child ValidatedInputs', () => {
         const component = {
-            template:  `<validated-form ref="vform">
+            template:  `<validated-form ref="form">
                           <div>hello</div>
                         </validated-form>`,
             components: {
@@ -64,17 +64,17 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const vform_vm = <ValidatedForm> wrapper.find({ref: 'vform'}).vm;
+        const form_vm = <ValidatedForm> wrapper.find({ref: 'form'}).vm;
 
-        expect(vform_vm.d_validated_inputs.length).toBe(0);
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.d_validated_inputs.length).toBe(0);
+        expect(form_vm.is_valid).toBe(true);
 
     });
 
     test('is_valid works with a single ValidatedInput child', () => {
         const component = {
-            template:  `<validated-form ref="vform">
-                          <validated-input ref="vinput_1" v-model="value1"
+            template:  `<validated-form ref="form">
+                          <validated-input ref="validated_input_1" v-model="value1"
                                            :validators="[is_number]"/>
                         </validated-form>`,
             components: {
@@ -97,35 +97,35 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const vform = wrapper.find({ref: 'vform'});
-        const vform_vm = <ValidatedForm> vform.vm;
+        const form = wrapper.find({ref: 'form'});
+        const form_vm = <ValidatedForm> form.vm;
 
-        expect(vform_vm.d_validated_inputs.length).toBe(1);
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.d_validated_inputs.length).toBe(1);
+        expect(form_vm.is_valid).toBe(true);
 
-        const vinput = wrapper.find({ref: 'vinput_1'});
-        (<HTMLInputElement> vinput.find('#input').element).value = "invalid";
-        vinput.find('#input').trigger('input');
+        const validated_input = wrapper.find({ref: 'validated_input_1'});
+        (<HTMLInputElement> validated_input.find('#input').element).value = "invalid";
+        validated_input.find('#input').trigger('input');
 
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.is_valid).toBe(false);
 
-        (<HTMLInputElement> vinput.find('#input').element).value = "2001";
-        vinput.find('#input').trigger('input');
-        expect(vform_vm.is_valid).toBe(true);
+        (<HTMLInputElement> validated_input.find('#input').element).value = "2001";
+        validated_input.find('#input').trigger('input');
+        expect(form_vm.is_valid).toBe(true);
     });
 
     test('is_valid works with deeply nested ValidatedInput elements', () => {
         const component = {
-            template:  `<validated-form ref="vform">
+            template:  `<validated-form ref="form">
                           <div>
                             <div>
-                              <validated-input ref="vinput_1" v-model="value1"
+                              <validated-input ref="validated_input_1" v-model="value1"
                                            :validators="[is_number]"/>
                             </div>
-                            <validated-input ref="vinput_2" v-model="value2"
+                            <validated-input ref="validated_input_2" v-model="value2"
                                            :validators="[is_number]"/>
                           </div>
-                          <validated-input ref="vinput_3" v-model="value3"
+                          <validated-input ref="validated_input_3" v-model="value3"
                                            :validators="[is_number]"/>
                         </validated-form>`,
             components: {
@@ -150,29 +150,29 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const vform = wrapper.find({ref: 'vform'});
-        const vform_vm = <ValidatedForm> vform.vm;
+        const form = wrapper.find({ref: 'form'});
+        const form_vm = <ValidatedForm> form.vm;
 
-        expect(vform_vm.d_validated_inputs.length).toBe(3);
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.d_validated_inputs.length).toBe(3);
+        expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value3: 42});
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.is_valid).toBe(true);
 
         wrapper.setData({value1: "invalid"});
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value1: 23});
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.is_valid).toBe(true);
 
         wrapper.setData({value2: "invalid"});
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.is_valid).toBe(false);
     });
 
     test('register is defined and called in nested validated-input elements', () => {
         const component = {
-            template:  `<validated-form ref="vform">
-                          <validated-input ref="vinput_1" v-model="value1"
+            template:  `<validated-form ref="form">
+                          <validated-input ref="validated_input_1" v-model="value1"
                                            :validators="[is_number]"/>
                         </validated-form>`,
             components: {
@@ -195,16 +195,16 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const vinput = <ValidatedInput> wrapper.find({ref: 'vinput_1'}).vm;
-        expect(vinput.register).toBeDefined();
+        const validated_input = <ValidatedInput> wrapper.find({ref: 'validated_input_1'}).vm;
+        expect(validated_input.register).toBeDefined();
     });
 
-    test('on_is_valid_change gets triggered when is_valid changes', async () => {
+    test('form_validity_changed gets triggered when is_valid changes', async () => {
         const component = {
-            template:  `<validated-form ref="vform" @on_is_valid_change="form_is_valid = $event">
-                          <validated-input ref="vinput" v-model="value1"
-                                           :validators="[is_number]"/>
-                        </validated-form>`,
+            template: `<validated-form ref="form" @form_validity_changed="form_is_valid = $event">
+                         <validated-input ref="validated_input" v-model="value1"
+                                          :validators="[is_number]"/>
+                       </validated-form>`,
             components: {
                 'validated-form': ValidatedForm,
                 'validated-input': ValidatedInput
@@ -226,31 +226,31 @@ describe('ValidatedForm.vue', () => {
         };
 
         let wrapper = mount(component);
-        let vform_vm = <ValidatedForm> wrapper.find({ref: 'vform'}).vm;
-        let vinput = wrapper.find({ref: 'vinput'});
+        let form_vm = <ValidatedForm> wrapper.find({ref: 'form'}).vm;
+        let validated_input = wrapper.find({ref: 'validated_input'});
 
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
 
-        (<HTMLInputElement> vinput.find('#input').element).value = "42";
-        vinput.find('#input').trigger('input');
+        (<HTMLInputElement> validated_input.find('#input').element).value = "42";
+        validated_input.find('#input').trigger('input');
 
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
 
-        (<HTMLInputElement> vinput.find('#input').element).value = "invalid";
-        vinput.find('#input').trigger('input');
+        (<HTMLInputElement> validated_input.find('#input').element).value = "invalid";
+        validated_input.find('#input').trigger('input');
         await wrapper.vm.$nextTick();
 
-        expect(vform_vm.is_valid).toBe(false);
+        expect(form_vm.is_valid).toBe(false);
         expect(wrapper.vm.$data.form_is_valid).toBe(false);
 
         // Back to valid
-        (<HTMLInputElement> vinput.find('#input').element).value = "3";
-        vinput.find('#input').trigger('input');
+        (<HTMLInputElement> validated_input.find('#input').element).value = "3";
+        validated_input.find('#input').trigger('input');
         await wrapper.vm.$nextTick();
 
-        expect(vform_vm.is_valid).toBe(true);
+        expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
     });
 });

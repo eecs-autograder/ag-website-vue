@@ -345,10 +345,10 @@ describe('ValidatedInput.vue', () => {
             false);
     });
 
-    test('on_is_valid_change gets triggered when is_valid changes', async () => {
+    test('input_validity_changed gets triggered when is_valid changes', async () => {
         const component = {
             template:  `<validated-input ref="vinput" v-model="value1" :validators="[is_number]"
-                                         @on_is_valid_change="input_is_valid = $event"/>`,
+                                         @input_validity_changed="input_is_valid = $event"/>`,
             components: {
                 'validated-input': ValidatedInput
             },
