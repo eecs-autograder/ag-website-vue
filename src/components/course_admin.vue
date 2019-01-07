@@ -346,7 +346,7 @@
                                         v-model="new_project_name"
                                         :validators="[]"
                                         :num_rows="1"
-                                        input_style="width: 100%; max-width: 500px;">
+                                        input_style="width: 100%; max-width: 400px;">
                         </ValidatedInput>
 
                         <ul class="error-ul">
@@ -357,40 +357,30 @@
                                :disabled="!project_form_is_valid || project_400_error_present"
                                value="Add Project"
                                class="submit-button">
-
-                        <!--<p style="color: purple"> Project form is valid: {{project_form_is_valid}}</p>-->
-                        <!--<p style="color: purple"> Project 400 error present: {{project_400_error_present}}</p>-->
                       </ValidatedForm>
                     </div>
                   </div>
 
                   <div id="existing-projects-side">
                     <p class="existing-projects-label"> Existing Projects </p>
-                    <table class="project-table">
-                      <tr>
-                        <th class="project-name"></th>
-                        <th class="edit-project"></th>
-                      </tr>
-                      <tr v-for="(project, index) of projects"
-                          :class="index % 2 ? 'odd-row' : 'even-row'">
-                        <td class="project-name">
-                          <router-link tag="div"
-                                       :to="`/web/project/${project.pk}`">
-                            <a>
-                              <div class="project-link">{{project.name}}</div>
-                            </a>
-                          </router-link>
-                        </td>
-                        <td class="edit-project">
-                          <router-link tag="div"
-                                       :to="`/web/project_admin/${project.pk}`">
-                            <a>
-                              <div class="edit-project-link"> Edit </div>
-                            </a>
-                          </router-link>
-                        </td>
-                      </tr>
-                    </table>
+
+                    <router-link tag="div"
+                                 :to="`/web/project/${project.pk}`"
+                                 v-for="(project, index) of projects"
+                                 class="project-div">
+                      <a>
+                        <div :class="[index % 2 ? 'odd-row' : 'even-row', 'project-submission-div']">
+                          <p class="project-name"> {{project.name}} </p>
+                        </div>
+                      </a>
+                      <router-link tag="div"
+                                   :to="`/web/project_admin/${project.pk}`"
+                                   class="project-edit-div">
+                        <a>
+                          <div class="edit-project-settings-button"> Edit Project Settings </div>
+                        </a>
+                      </router-link>
+                    </router-link>
                   </div>
 
                 </div>
@@ -469,6 +459,7 @@
       this.sort_users(this.staff);
       this.sort_users(this.students);
       this.sort_users(this.handgraders);
+      // sort projects?
       this.loading = false;
     }
 
@@ -845,13 +836,10 @@ $current-lang-choice: "Montserrat";
   word-wrap: break-word;
   position: relative;
   padding: 10px 15px;
-  margin-bottom: -1px;    /* Prevent double borders */
+  margin-bottom: -1px;
   color: #721c24;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
-
-  /*background-color: #FFA860;*/
-  /*border: 1px solid #FDBB86;*/
 }
 
 .input.error-input {
@@ -984,8 +972,6 @@ textarea {
 
 /* ---------------- Projects Styling ---------------- */
 
-#new-project-side { }
-
 #new-project-space {
   width: 80%;
   margin: 0 10%;
@@ -1014,48 +1000,57 @@ textarea {
   font-weight: 800;
 }
 
-.project-table {
-  border-collapse: collapse;
-  font-size: 18px;
+.project-div {
+  background-color: white;
+  border-radius: 2px;
+  width: 100%;
+  max-width: 590px;
+  display: block;
+  margin: 10px 0;
+}
+
+.project-submission-div {
+  width: 100%;
+  position: relative;
+  border-radius: 2px;
+  display: inline-block;
 }
 
 .project-name {
-  font-size: 17px;
+  padding: 15px;
+  margin: 0;
+  display: inline-block;
 }
 
-.project-name:hover {
-  background-color: lighten($stormy-gray-dark, 30);
-  cursor: pointer;
+.project-edit-div {
+  display: block;
+  vertical-align: top;
+  width: 100%;
+  background-color: white;
 }
 
-.edit-project {
-  width: 110px;
-  padding:0;
-  background-color: lighten($sky-blue, 5);
-  cursor: pointer;
-  color: black;
-}
-
-.edit-project:hover {
-  background-color: $sky-blue;
-}
-
-.project-table tr th {
-  display: none;
-}
-
-.project-table tr {
-  border-bottom: 4px solid white;
-}
-
-.edit-project-link {
-  padding: 15px 20px;
-  width: 110px;
+.edit-project-settings-button {
+  background-color: hotpink;
+  padding: 15px;
   text-align: center;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  color: black;
+  display: none;
+  box-sizing: border-box;
 }
 
-.project-link {
-  padding: 15px 20px;
+.edit-project-settings-button:hover {
+  background-color: darken(hotpink, 4);
+}
+
+.project-div:hover {
+  .edit-project-settings-button {
+    display: block;
+    margin-bottom: 20px;
+  }
+  .project-submission-div {
+  }
 }
 
 a {
@@ -1122,23 +1117,22 @@ a {
 
   /* ---------------- Projects Styling ---------------- */
 
-  #project-body-container {
-  }
+}
 
-  #new-project-side {
-    width: 50%;
-    display: inline-block;
+@media only screen and (min-width: 768px) {
+  /* ---------------- Edit Rosters Styling ---------------- */
+  .roster-column {
+    overflow: visible;
   }
+}
+
+@media only screen and (min-width: 960px) {
 
   #existing-projects-side {
-    width: 50%;
+    width: 60%;
     margin: 0;
     display: inline-block;
     vertical-align: top;
-  }
-
-  .project-table {
-    margin-bottom: 70px;
   }
 
   #new-project-space {
@@ -1151,12 +1145,66 @@ a {
     padding: 6px 0 0 0;
     text-align: left;
   }
-}
 
-@media only screen and (min-width: 768px) {
-  /* ---------------- Edit Rosters Styling ---------------- */
-  .roster-column {
-    overflow: visible;
+  #new-project-side {
+    width: 40%;
+    display: inline-block;
+  }
+
+  .project-div {
+    background-color: white;
+    border-radius: 2px;
+    width: 100%;
+    max-width: 590px;
+    display: block;
+    margin: 5px 0;
+  }
+
+  .project-submission-div {
+    width: 100%;
+    max-width: 350px;
+    position: relative;
+    border-radius: 2px;
+    display: inline-block;
+    border: 2px solid lighten($pebble-dark, 10);
+  }
+
+  .project-name {
+    padding: 15px;
+    margin: 0;
+    display: inline-block;
+  }
+
+  .project-edit-div {
+    display: inline-block;
+    vertical-align: top;
+    width: 220px;
+  }
+
+  .edit-project-settings-button {
+    padding: 15px;
+    margin-left: 15px;
+    border-radius: 3px;
+    color: black;
+    display: none;
+    background-color: white;
+  }
+
+  .edit-project-settings-button:hover {
+    background-color: $pebble-light;
+  }
+
+  .project-div:hover {
+    .edit-project-settings-button {
+      display: block;
+      border: 2px solid hotpink;
+      margin-bottom: 0;
+    }
+    .project-submission-div {
+      background-image: linear-gradient(to right, darken(hotpink, 2), hotpink, darken(hotpink, 2), hotpink);
+      border: 2px solid hotpink;
+      color: white;
+    }
   }
 }
 
