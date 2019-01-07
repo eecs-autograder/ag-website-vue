@@ -71,7 +71,7 @@
     <validated-input ref='validated_input_3'
                      v-model="mario_character_input"
                      :validators="[is_mario_or_luigi]"
-                     @input_validity_changed="validated_input_3_valid = $event">
+                     @input_validity_changed="input_3_valid = $event">
 
       <!--Adding custom error message styling-->
       <template slot-scope="{d_error_msg}">
@@ -83,7 +83,7 @@
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{validated_input_3_valid}}</span>
+      <span style="font-weight: bold">{{input_3_valid}}</span>
     </p>
 
     <p>
@@ -104,11 +104,11 @@
                      v-model="textarea_input"
                      num_rows="3"
                      :validators="[is_30_chars_or_longer, has_newline_char]"
-                     @input_validity_changed="validated_input_4_valid = $event"></validated-input>
+                     @input_validity_changed="input_4_valid = $event"></validated-input>
 
     <p>
       is_valid() result:
-      <span style="font-weight: bold">{{validated_input_4_valid}}</span>
+      <span style="font-weight: bold">{{input_4_valid}}</span>
     </p>
 
     <p>
@@ -125,7 +125,7 @@
       <validated-input ref='input_5'
                        v-model="number_input_2"
                        :num_rows="1"
-                       input_style="width: 45px;"
+                       input_style="width: 20px;"
                        :validators="[is_number, is_in_range_1_to_10]">
         <div slot="suffix" class="suffix-element"> books </div>
       </validated-input>
@@ -163,7 +163,7 @@ export default class ValidatedInputDemo extends Vue {
   is_number(value: string): ValidatorResponse {
     return {
       is_valid: value !== "" && !isNaN(Number(value)),
-      error_msg:  "Invalid number!",
+      error_msg:  "This field is required!",
     };
   }
 

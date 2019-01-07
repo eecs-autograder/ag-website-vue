@@ -18,22 +18,23 @@
               <div class="tab-body">
                 <div id="settings-container">
                   <div id="settings-container-inputs">
-                    <form id="course-settings-form" @submit.prevent="save_course_settings">
+                    <ValidatedForm id="course-settings-form"
+                                   autocomplete="off"
+                                   @submit.native.prevent="save_course_settings"
+                                   @form_validity_changed="settings_form_is_valid = $event">
 
-                      <div class="settings-single-input-container">
+                      <div class="name-container">
                         <label class="settings-input-label"> Course name: </label>
                         <ValidatedInput
                           ref="course_name"
                           v-model="course.name"
-                          :validators="[is_not_empty, name_is_unique]"
-                          :num_rows="1"
-                          id="input-course-name">
+                          input_style="width: 100%; max-width: 500px;"
+                          :validators="[is_not_empty]"
+                          :num_rows="1">
                         </ValidatedInput>
                       </div>
 
-
-                      <!--// This needs to be a div not an input***************************************************-->
-                      <div class="settings-single-input-container">
+                      <div class="semester-container">
                         <label class="settings-input-label"> Semester: </label>
                         <div class="semester-dropdown-wrapper">
                           <dropdown ref="semester_dropdown"
@@ -41,13 +42,11 @@
                                     @update_item_selected="course.semester = $event">
                           <template slot="header">
                             <div tabindex="1" class="input-wrapper">
-                              <input type=text
-                                     name="semester"
-                                     id="input-course-semester"
-                                     class="settings-input"
-                                     v-model="course.semester"
-                                     @blur="close_course_semester_dropdown_menu"/>
-                              <i class="fas fa-caret-down dropdown-caret"></i>
+                              <div id="input-course-semester"
+                                   class="settings-input">
+                                {{course.semester}}
+                                <i class="fas fa-caret-down dropdown-caret"></i>
+                              </div>
                             </div>
                           </template>
                           <div slot-scope="{item}">
@@ -57,30 +56,38 @@
                         </div>
                       </div>
 
-                      <div class="settings-single-input-container">
+                      <div class="year-container">
                         <label class="settings-input-label"> Year: </label>
-                        <ValidatedInput
-                          ref="course_year"
-                          v-model="course.year"
-                          :num_rows="1"
-                          id="input-course-year"
-                          :validators="[is_not_empty]">
+                        <ValidatedInput ref="course_year"
+                                        v-model="course.year"
+                                        :num_rows="1"
+                                        input_style="width: 65px;"
+                                        :validators="[is_not_empty, is_number, is_valid_year]">
                         </ValidatedInput>
                       </div>
 
-                      <div class="settings-single-input-container">
+
+                      <div class="late-days-container">
                         <label class="settings-input-label"> Late days per student: </label>
                         <ValidatedInput
                           ref="course_late_days"
                           v-model="course.num_late_days"
                           :num_rows="1"
-                          id="input-course-late-days"
-                          :validators="[]">
+                          input_style="width: 50px;"
+                          :validators="[is_not_empty, is_number, is_non_negative]">
+                          <div slot="suffix" class="suffix-element">
+                            {{ course.num_late_days === 1 ? 'day' : 'days'}} </div>
                         </ValidatedInput>
                       </div>
 
-                      <input type="submit" class="settings-save-button" value="Save Updates">
-                      <div v-for="error of errors"> {{error}}</div>
+                      <ul class="error-ul">
+                        <li v-for="error of errors" class="error-li">{{error}}</li>
+                      </ul>
+
+                      <input type="submit"
+                             class="submit-button"
+                             value="Save Updates"
+                             :disabled="!settings_form_is_valid || settings_400_error_present">
                         <div v-if="!saving"
                              class="last-saved-timestamp">
                           <span> Last Saved: </span>
@@ -92,7 +99,8 @@
                           <i class="fa fa-spinner fa-pulse"></i>
                         </div>
 
-                    </form>
+                      <!--<p> Settings form is valid: {{settings_form_is_valid}}</p>-->
+                    </ValidatedForm>
                   </div>
                 </div>
               </div>
@@ -143,7 +151,7 @@
                           ref="new_admin_list"
                           v-model="new_admins_list"
                           :validators="[]"
-                          :num_rows="5">
+                          :num_rows="7">
                         </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
@@ -189,7 +197,7 @@
                           ref="new_staff_list"
                           v-model="new_staff_list"
                           :validators="[]"
-                          :num_rows="5">
+                          :num_rows="7">
                         </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
@@ -234,7 +242,7 @@
                           ref="new_students_list"
                           v-model="new_students_list"
                           :validators="[]"
-                          :num_rows="5">
+                          :num_rows="7">
                         </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
@@ -279,7 +287,7 @@
                           ref="new_handgraders_list"
                           v-model="new_handgraders_list"
                           :validators="[]"
-                          :num_rows="5">
+                          :num_rows="7">
                         </ValidatedInput>
                         <input type="submit" class="add-enrollees-button" value="Add to Roster">
                       </form>
@@ -327,21 +335,32 @@
 
                   <div id="new-project-side">
                     <div id="new-project-space">
-                      <form id="new-project-form" @submit.prevent="add_project">
+                      <ValidatedForm id="new-project-form"
+                            @submit.prevent="add_project"
+                            autocomplete="off"
+                            @submit.native.prevent="add_project"
+                            @form_validity_changed="project_form_is_valid = $event">
                         <p id="new-project-label"> Create a New Project</p>
 
-                        <ValidatedInput
-                          ref="new_project"
-                          v-model="new_project_name"
-                          :validators="[project_name_is_unique]"
-                          :num_rows="1"
-                          id="new-project-input">
+                        <ValidatedInput ref="new_project"
+                                        v-model="new_project_name"
+                                        :validators="[]"
+                                        :num_rows="1"
+                                        input_style="width: 100%; max-width: 500px;">
                         </ValidatedInput>
 
+                        <ul class="error-ul">
+                          <li v-for="error of errors" class="error-li">{{error}}</li>
+                        </ul>
+
                         <input type="submit"
-                               class="create-new-project-button"
-                               value="Add Project">
-                      </form>
+                               :disabled="!project_form_is_valid || project_400_error_present"
+                               value="Add Project"
+                               class="submit-button">
+
+                        <!--<p style="color: purple"> Project form is valid: {{project_form_is_valid}}</p>-->
+                        <!--<p style="color: purple"> Project 400 error present: {{project_400_error_present}}</p>-->
+                      </ValidatedForm>
                     </div>
                   </div>
 
@@ -366,7 +385,7 @@
                           <router-link tag="div"
                                        :to="`/web/project_admin/${project.pk}`">
                             <a>
-                              <div class="edit-project-link"> Edit Project </div>
+                              <div class="edit-project-link"> Edit </div>
                             </a>
                           </router-link>
                         </td>
@@ -390,6 +409,7 @@
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
   import Tooltip from '@/components/tooltip.vue';
+  import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
   import { array_has_unique, handle_400_errors_async } from '@/utils.ts';
   import { AxiosResponse } from 'axios';
@@ -398,7 +418,15 @@
   import { Course, Project, Semester, User } from 'ag-client-typescript';
 
   @Component({
-    components: { Dropdown, Tab, TabHeader, Tabs, Tooltip, ValidatedInput }
+    components: {
+      Dropdown,
+      Tab,
+      TabHeader,
+      Tabs,
+      Tooltip,
+      ValidatedForm,
+      ValidatedInput
+    }
   })
   export default class CourseAdmin extends Vue {
     loading = true;
@@ -424,7 +452,11 @@
     projects: Project[] = [];
     new_project_name = "";
 
-    errors: string[] = ["some garbage"];
+    settings_form_is_valid = false;
+    settings_400_error_present = false;
+    project_form_is_valid = false;
+    project_400_error_present = false;
+    errors: string[] = [];
 
     async created() {
       this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
@@ -445,22 +477,35 @@
       grading_policy_dropdown.hide_the_dropdown_menu();
     }
 
+    @Watch('course.name')
+    on_course_name_change(new_name: string, old_name: string) {
+      this.settings_400_error_present = false;
+      this.errors = [];
+    }
+
+    @Watch('course.semester')
+    on_course_semester_change(new_semester: string, old_semester: string) {
+      this.settings_400_error_present = false;
+      this.errors = [];
+    }
+
+    @Watch('course.year')
+    on_course_year_change(new_year: number, old_year: number) {
+      this.settings_400_error_present = false;
+      this.errors = [];
+    }
+
+    @Watch('new_project_name')
+    on_new_project_name_change(new_name: string, old_name: string) {
+      this.project_400_error_present = false;
+      this.project_form_is_valid = true;
+      this.errors = [];
+    }
+
     show_permissions_tab_dropdown_menu(event: Event) {
       let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
       roster_dropdown.show_the_dropdown_menu();
       event.stopPropagation();
-    }
-
-    @handle_400_errors_async(handle_save_course_settings_error)
-    async save_course_settings() {
-      try {
-        this.saving = true;
-        this.errors = [];
-        await this.course!.save();
-      }
-      finally {
-        this.saving = false;
-      }
     }
 
     sort_users(users: User[]) {
@@ -539,15 +584,6 @@
       this.handgraders.splice(index, 1);
     }
 
-
-    // How can it be unique?????? name
-    name_is_unique(value: string): ValidatorResponse {
-      return {
-        is_valid: !array_has_unique(this.course_names_same_semester, value),
-        error_msg: `There already exists a course in this semester called ${value}.`
-      };
-    }
-
     project_name_is_unique(value: string): ValidatorResponse {
       return {
         is_valid: !array_has_unique(this.projects, value),
@@ -555,15 +591,20 @@
       };
     }
 
-    // is_valid_season(value: string): ValidatorResponse {
-    //   return {
-    //     is_valid: value === "Fall" || value === "Winter"
-    //               || value === "Spring" || value === "Summer",
-    //     error_msg: ""
-    //   };
-    // }
+    is_valid_year(value: string): ValidatorResponse {
+      return {
+        is_valid: Number(value) >= 2000,
+        error_msg: "Please enter a valid year"
+      }
+    }
 
-    // name, year
+    is_number(value: string): ValidatorResponse {
+      return {
+        is_valid: value !== "" && !isNaN(Number(value)),
+        error_msg:  "You must enter a number",
+      };
+    }
+
     is_not_empty(value: string): ValidatorResponse {
       return {
         is_valid: value !== "",
@@ -571,7 +612,6 @@
       };
     }
 
-    // name
     is_not_null(value: string): ValidatorResponse {
       return {
         is_valid: value !== null,
@@ -579,18 +619,51 @@
       };
     }
 
+    is_non_negative(value: string): ValidatorResponse {
+      return {
+        is_valid: this.is_number(value).is_valid && value[0] !== "-",
+        error_msg: "The number of late days cannot be negative."
+      };
+    }
+
+    @handle_400_errors_async(handle_save_course_settings_error)
+    async save_course_settings() {
+      try {
+        this.saving = true;
+        this.errors = [];
+        await this.course!.save();
+      }
+      finally {
+        this.saving = false;
+      }
+    }
+
+    @handle_400_errors_async(handle_add_project_error)
     async add_project() {
-      let new_project: Project = await Project.create(
-        {name: this.new_project_name, course: this.course!.pk}
-      );
-      this.new_project_name = "";
-      this.projects.push(new_project);
-      this.projects.sort((project_a: Project, project_b: Project) => {
-        if (project_a.name <= project_b.name) {
-          return -1;
-        }
-        return 1;
-      });
+      if (this.new_project_name === "") {
+        this.errors.push("New project name cannot be an empty string.");
+        this.project_form_is_valid = false;
+        return;
+      }
+      try {
+        console.log("trying");
+        this.saving = true;
+        this.errors = [];
+        let new_project: Project = await Project.create(
+          {name: this.new_project_name, course: this.course!.pk}
+        );
+        this.new_project_name = "";
+        this.projects.push(new_project);
+        this.projects.sort((project_a: Project, project_b: Project) => {
+          if (project_a.name <= project_b.name) {
+            return -1;
+          }
+          return 1;
+        });
+      }
+      finally {
+        this.saving = false;
+      }
     }
   }
 
@@ -598,6 +671,16 @@
     let errors = response.data["__all__"];
 
     if (errors !== undefined && errors.length > 0) {
+      Vue.set(component, "settings_400_error_present", true);
+      Vue.set(component, "errors", [errors[0]]);
+    }
+  }
+
+  function handle_add_project_error(component: CourseAdmin, response: AxiosResponse) {
+    let errors = response.data["__all__"];
+
+    if (errors !== undefined && errors.length > 0) {
+      Vue.set(component, "project_400_error_present", true);
       Vue.set(component, "errors", [errors[0]]);
     }
   }
@@ -635,7 +718,7 @@ $current-lang-choice: "Montserrat";
 
 #settings-container { }
 
-.settings-save-button  {
+.submit-button {
   @extend .green-button;
   text-align: center;
   display: block;
@@ -643,6 +726,21 @@ $current-lang-choice: "Montserrat";
   font-size: 18px;
   padding: 20px 15px;
   margin: 10px 0 20px 0;
+}
+
+.submit-button:disabled {
+  @extend .gray-button;
+  text-align: center;
+  display: block;
+  font-family: $current-lang-choice;
+  font-size: 18px;
+  padding: 20px 15px;
+  margin: 10px 0 20px 0;
+}
+
+.submit-button:disabled:hover {
+  background-color: hsl(210, 13%, 63%);
+  cursor: default;
 }
 
 #settings-container-inputs {
@@ -656,7 +754,7 @@ $current-lang-choice: "Montserrat";
   font-size: 17px;
   margin: 5px 15px 7px 0;
   display: inline-block;
-  color: lighten(black, 10);
+  color: #495057;
   font-weight: 700;
 }
 
@@ -682,12 +780,10 @@ $current-lang-choice: "Montserrat";
   display: block;
 }
 
-.settings-single-input-container {
+.name-container, .year-container, .semester-container, .late-days-container {
   padding-bottom: 16px;
-}
-
-#input-course-name {
-  width: 400px;
+  display: block;
+  max-width: 500px;
 }
 
 #input-course-semester {
@@ -698,23 +794,11 @@ $current-lang-choice: "Montserrat";
   font-size: 18px;
 }
 
-#input-course-year {
-  width: 43px;
-}
-
-#input-course-late-days {
-  width: 43px;
-}
-
 .last-saved-timestamp {
   padding-top: 6px;
   margin: 0;
-  font-size: 17px;
-  opacity: 0.7;
-}
-
-.last-saved-timestamp span {
-  font-weight: 600;
+  font-size: 15px;
+  color: lighten(#495057, 40);
 }
 
 .last-saved-spinner {
@@ -737,6 +821,56 @@ $current-lang-choice: "Montserrat";
   cursor: pointer;
 }
 
+.error-ul {
+  list-style-type: none; /* Remove bullets */
+  padding-left: 0;
+  max-width: 500px;
+  width: 100%
+}
+
+.error-li:first-child {
+  margin-top: -10px;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.error-li:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: .25rem;
+  border-bottom-left-radius: .25rem;
+}
+
+.error-ul .error-li {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  position: relative;
+  padding: 10px 15px;
+  margin-bottom: -1px;    /* Prevent double borders */
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  /*background-color: #FFA860;*/
+  /*border: 1px solid #FDBB86;*/
+}
+
+.input.error-input {
+  border: 1px solid $warning-red;
+}
+
+.error-input:focus {
+  outline: none;
+  box-shadow: 0 0 10px $warning-red;
+  border: 1px solid $warning-red;
+  border-radius: .25rem;
+}
+
+.suffix-element {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 10px;
+  padding-left: 10px;
+}
 
 /* ---------------- Permissions Styling ---------------- */
 
@@ -868,21 +1002,6 @@ textarea {
   width: 70.5%;
 }
 
-/*#new-project-input::placeholder {*/
-  /*//color: darken($sky-blue, 50);*/
-  /*opacity: 0.3;*/
-/*}*/
-
-.create-new-project-button {
-  @extend .green-button;
-  display: block;
-  font-family: $current-lang-choice;
-  font-size: 18px;
-  margin-top: 20px;
-  padding: 20px 15px;
-  text-align: center;
-}
-
 #existing-projects-side {
   width: 80%;
   margin: 0 10% 0 10%;
@@ -956,11 +1075,11 @@ a {
     padding: 10px 15px 10px 15px;
   }
 
-  .settings-save-button, .add-enrollees-button, .create-new-project-button {
+  .submit-button, .submit-button:disabled, .add-enrollees-button {
     padding: 10px 15px;
     font-family: $current-lang-choice;
     font-size: 18px;
-    margin: 12px 15px 12px 0;
+    margin: 0px 15px 12px 0;
     display: inline-block;
   }
 
@@ -971,9 +1090,12 @@ a {
   }
 
   #settings-container-inputs {
-    width: 450px;
     margin: 10px 0 0 50px;
     border-radius: 5px;
+  }
+
+  #input-course-name {
+    width: 400px;
   }
 
   /* ---------------- Permissions Styling ---------------- */
@@ -1022,14 +1144,6 @@ a {
   #new-project-space {
     text-align: left;
   }
-
-  /*#new-project-input {*/
-    /*font-size: 17px;*/
-    /*padding: 6px 12px;*/
-    /*margin: 0 0 10px 0;*/
-    /*max-width: 70%;*/
-    /*display: block;*/
-  /*}*/
 
   .existing-projects-label {
     font-size: 20px;

@@ -1,22 +1,22 @@
 <template>
   <div>
-    <ButtonDemo></ButtonDemo>
-    <ColorPaletteDemo></ColorPaletteDemo>
-    <ContextMenuDemo></ContextMenuDemo>
-    <CourseAdminDemo></CourseAdminDemo>
-    <CourseListDemo></CourseListDemo>
-    <DiffDemo></DiffDemo>
-    <DropdownDemo></DropdownDemo>
-    <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
-    <FileUploadDemo></FileUploadDemo>
-    <ModalDemo></ModalDemo>
-    <MultiFileViewerDemo></MultiFileViewerDemo>
-    <TabsDemo></TabsDemo>
-    <TooltipDemo></TooltipDemo>
-    <ToggleDemo></ToggleDemo>
-    <ViewFileDemo></ViewFileDemo>
-    <ValidatedInputDemo></ValidatedInputDemo>
-    <ValidatedFormDemo></ValidatedFormDemo>
+    <!--<ButtonDemo></ButtonDemo>-->
+    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
+    <!--<ContextMenuDemo></ContextMenuDemo>-->
+    <!--<CourseAdminDemo></CourseAdminDemo>-->
+    <!--<CourseListDemo></CourseListDemo>-->
+    <!--<DiffDemo></DiffDemo>-->
+    <!--<DropdownDemo></DropdownDemo>-->
+    <!--<DropdownTypeaheadDemo></DropdownTypeaheadDemo>-->
+    <!--<FileUploadDemo></FileUploadDemo>-->
+    <!--<ModalDemo></ModalDemo>-->
+    <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
+    <!--<TabsDemo></TabsDemo>-->
+    <!--<TooltipDemo></TooltipDemo>-->
+    <!--<ToggleDemo></ToggleDemo>-->
+    <!--<ViewFileDemo></ViewFileDemo>-->
+    <!--<ValidatedInputDemo></ValidatedInputDemo>-->
+    <!--<ValidatedFormDemo></ValidatedFormDemo>-->
   </div>
 </template>
 
