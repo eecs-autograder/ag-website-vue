@@ -67,16 +67,20 @@
 
     async created() {
       super.created();
+      this.get_and_sort_courses();
+    }
+
+
+    async get_and_sort_courses() {
       let user = await User.get_current();
       this.all_courses = await Model.get_instance().get_courses_for_user(user);
       for (let [role, courses] of Object.entries(this.all_courses)) {
         this.sort_into_terms(courses);
       }
       this.courses_by_term.sort(term_descending);
-
       for (let term_courses of this.courses_by_term) {
         term_courses.course_list.sort((course_a: Course, course_b: Course) => {
-           return (course_a.name >= course_b.name) ? 1 : -1;
+          return (course_a.name >= course_b.name) ? 1 : -1;
         });
       }
     }
