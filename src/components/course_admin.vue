@@ -369,7 +369,8 @@
                                  v-for="(project, index) of projects"
                                  class="project-div">
                       <a>
-                        <div :class="[index % 2 ? 'odd-row' : 'even-row', 'project-submission-div']">
+                        <div :class="[index % 2 ?
+                                      'odd-row' : 'even-row', 'project-submission-div']">
                           <p class="project-name"> {{project.name}} </p>
                         </div>
                       </a>
@@ -584,7 +585,7 @@
       return {
         is_valid: Number(value) >= 2000,
         error_msg: "Please enter a valid year"
-      }
+      };
     }
 
     is_number(value: string): ValidatorResponse {
@@ -1198,7 +1199,9 @@ a {
       margin-bottom: 0;
     }
     .project-submission-div {
-      background-image: linear-gradient(to right, darken(hotpink, 2), hotpink, darken(hotpink, 2), hotpink);
+      background-image: linear-gradient(
+          to right, darken(hotpink, 2), hotpink, darken(hotpink, 2), hotpink
+      );
       border: 2px solid hotpink;
       color: white;
     }

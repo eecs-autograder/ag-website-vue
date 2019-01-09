@@ -43,7 +43,7 @@
   import { ObserverComponent } from '@/observer_component';
   import { array_add_unique, array_get_unique, array_has_unique } from '@/utils';
 
-  import { Component, Vue } from 'vue-property-decorator';
+  import { Component } from 'vue-property-decorator';
 
   interface Term {
     semester: Semester | null;
@@ -66,11 +66,8 @@
     }
 
     async created() {
-      console.log("Hello");
       super.created();
       let user = await User.get_current();
-      console.log(user);
-      console.log("hi");
       this.all_courses = await Model.get_instance().get_courses_for_user(user);
       for (let [role, courses] of Object.entries(this.all_courses)) {
         this.sort_into_terms(courses);
