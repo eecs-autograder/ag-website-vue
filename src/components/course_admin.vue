@@ -509,50 +509,48 @@
     }
 
     async add_admins() {
-      let new_admins = this.new_admins_list.split(',');
-      for (let i = 0; i < new_admins.length; ++i) {
-        new_admins[i] = new_admins[i].trim();
+      if (this.new_admins_list.trim() !== "") {
+        this.new_admins_list = this.new_admins_list.replace(/,/g, ' ');
+        let new_admins = this.new_admins_list.trim().split(/\ +/);
+        await this.course!.add_admins(new_admins);
+        this.new_admins_list = "";
+        this.admins = await this.course!.get_admins();
+        this.sort_users(this.admins);
       }
-      await this.course!.add_admins(new_admins);
-      this.new_admins_list = "";
-      this.admins = await this.course!.get_admins();
-      this.sort_users(this.admins);
     }
 
     async add_staff() {
-      let new_staff = this.new_staff_list.split(',');
-      for (let i = 0; i < new_staff.length; ++i) {
-        new_staff[i] = new_staff[i].trim();
+      if (this.new_staff_list.trim() !== "") {
+        this.new_staff_list = this.new_staff_list.replace(/,/g, ' ');
+        let new_staff = this.new_staff_list.trim().split(/\ +/);
+        await this.course!.add_staff(new_staff);
+        this.new_staff_list = "";
+        this.staff = await this.course!.get_staff();
+        this.sort_users(this.staff);
       }
-      await this.course!.add_staff(new_staff);
-      this.new_staff_list = "";
-      this.staff = await this.course!.get_staff();
-      this.sort_users(this.staff);
     }
 
     async add_students() {
-      let new_students = this.new_students_list.split(',');
-      for (let i = 0; i < new_students.length; ++i) {
-        new_students[i] = new_students[i].trim();
+      if (this.new_students_list.trim() !== "") {
+        this.new_students_list = this.new_students_list.replace(/,/g, ' ');
+        let new_students = this.new_students_list.trim().split(/\ +/);
+        console.log(new_students);
+        await this.course!.add_students(new_students);
+        this.new_students_list = "";
+        this.students = await this.course!.get_students();
+        this.sort_users(this.students);
       }
-      await this.course!.add_students(new_students);
-      this.new_students_list = "";
-      this.students = await this.course!.get_students();
-      for (let student of this.students) {
-        console.log(student.username);
-      }
-      this.sort_users(this.students);
     }
 
     async add_handgraders() {
-      let new_handgraders = this.new_handgraders_list.split(',');
-      for (let i = 0; i < new_handgraders.length; ++i) {
-        new_handgraders[i] = new_handgraders[i].trim();
+      if (this.new_handgraders_list.trim() !== "") {
+        this.new_handgraders_list = this.new_handgraders_list.replace(/,/g, ' ');
+        let new_handgraders = this.new_handgraders_list.trim().split(/\ +/);
+        await this.course!.add_handgraders(new_handgraders);
+        this.new_handgraders_list = "";
+        this.handgraders = await this.course!.get_handgraders();
+        this.sort_users(this.handgraders);
       }
-      await this.course!.add_handgraders(new_handgraders);
-      this.new_handgraders_list = "";
-      this.handgraders = await this.course!.get_handgraders();
-      this.sort_users(this.handgraders);
     }
 
     remove_admins(admins_to_delete: User[], index: number) {
