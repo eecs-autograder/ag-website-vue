@@ -1,7 +1,7 @@
 <template>
     <div class="course-admin-component"
-         ref="course_admin_component">
-         <!--v-if="course != null">-->
+         ref="course_admin_component"
+         v-if="course != null">
       <div>
         <tabs ref="course_admin_tabs"
               tab_active_class="gray-theme-active-no-padding"
@@ -635,7 +635,7 @@
         return;
       }
       try {
-        console.log("trying");
+        this.new_project_name.trim();
         this.saving = true;
         this.errors = [];
         let new_project: Project = await Project.create(
@@ -1084,7 +1084,6 @@ a {
 
   #settings-container-inputs {
     margin: 10px 0 0 50px;
-    border-radius: 5px;
   }
 
   #input-course-name {
