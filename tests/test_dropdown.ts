@@ -50,7 +50,8 @@ describe('Dropdown tests', () => {
     beforeEach(() => {
         wrapper = mount(Dropdown, {
             propsData: {
-                items: item_values
+                items: item_values,
+                dropdown_height: "100px"
             },
             slots: {
                 header: '<div id="dropdown-header">Header</div>'
@@ -73,6 +74,13 @@ describe('Dropdown tests', () => {
         for (let [expected, menu_item] of zip(item_values, menu_items.wrappers)) {
             expect(menu_item.text()).toEqual(expected);
         }
+    });
+
+    test('The height of the dropdown can be customized', () => {
+        expect(dropdown.dropdown_height).toEqual("100px");
+        let dropdown_container = wrapper.find('#dropdown-content');
+        expect(dropdown_container.element.style.height).toEqual("100px");
+        expect(dropdown_container.element.style.overflowY).toEqual('scroll');
     });
 
     test('Clicking on header opens and closes dropdown', () => {
