@@ -21,6 +21,9 @@ describe('CourseAdmin.vue', () => {
     let updated_course: Course;
     let original_match_media: (query: string) => MediaQueryList;
     let course_admins: User[];
+    let course_staff: User[];
+    let course_students: User[];
+    let course_handgraders: User[];
     let user1: User;
     let user2: User;
     let user3: User;
@@ -69,6 +72,11 @@ describe('CourseAdmin.vue', () => {
             email: "worldsbestboss@umich.edu",
             is_superuser: true
         });
+
+        course_admins = [user1, user2, user3];
+        course_staff = [user1, user2, user3];
+        course_students = [user1, user2, user3];
+        course_handgraders = [user1, user2, user3];
 
         // project_1 = new Project({
         //     pk: 1,
@@ -146,8 +154,6 @@ describe('CourseAdmin.vue', () => {
         //     ultimate_submission_policy: UltimateSubmissionPolicy.best,
         //     hide_ultimate_submission_fdbk: false,
         // });
-
-        course_admins = [user1, user2, user3];
 
         config.logModifiedComponents = false;
         original_match_media = window.matchMedia;
@@ -472,8 +478,8 @@ describe('CourseAdmin.vue', () => {
             Course, 'get_by_pk',
             () =>  Promise.resolve(course), async () => {
 
-            let mock_result = await Course.get_by_pk(2);
-            expect(mock_result).toEqual(course);
+            let mock_get_by_pk = await Course.get_by_pk(2);
+            expect(mock_get_by_pk).toEqual(course);
 
             wrapper = mount(CourseAdmin, {
                 mocks: {
@@ -491,8 +497,8 @@ describe('CourseAdmin.vue', () => {
                 () => Promise.resolve(course_admins),
                 async () => {
 
-                let mock_result = await course.get_admins();
-                expect(mock_result).toEqual(course_admins);
+                let mock_get_admins = await course.get_admins();
+                expect(mock_get_admins).toEqual(course_admins);
 
                 // course_admin_component.role_selected = 'admin';
                 // await wrapper.vm.$nextTick();
@@ -503,7 +509,7 @@ describe('CourseAdmin.vue', () => {
                 // expect(course_admin_component.current_tab_index).toEqual(1);
                 // console.log(wrapper.html());
 
-                let outer_tabs = <Tabs> wrapper.find({ref: 'course_admin_tabs'}).vm;
+                // let outer_tabs = <Tabs> wrapper.find({ref: 'course_admin_tabs'}).vm;
 
                 // outer_tabs.d_active_tab_index = 1;
                 // course_admin_component.role_selected = "admin";
@@ -511,11 +517,12 @@ describe('CourseAdmin.vue', () => {
                 // let tab_2 = wrapper.find({ref: 'permissions_tab'});
                 // tab_2.trigger('click');
 
-                // let tabs = wrapper.findAll('.tab-header');
-                // // console.log(permissions_tab.at(1).html());
-                // tabs.at(1).trigger('click');
-                // await wrapper.vm.$nextTick();
+                let tabs = wrapper.findAll('.tab-header');
+                // console.log(permissions_tab.at(1).html());
+                tabs.at(1).trigger('click');
+                await wrapper.vm.$nextTick();
                 console.log(wrapper.html());
+                // display block dropdown content
 
                 // console.log(course_admin_component.role_selected);
                 // console.log(course_admin_page.html()); //settings is still active
@@ -523,13 +530,15 @@ describe('CourseAdmin.vue', () => {
                 // let role_dropdown = <Dropdown> wrapper.find({ref: 'permission_dropdown'}).vm;
                 // // console.log(role_dropdown);
                 //
-                // let dropdown_menu_content = wrapper.find('#dropdown-content');
-                // console.log(dropdown_menu_content.html());
-                //
-                // let dropdown_rows = dropdown_menu_content.findAll('.dropdown-row');
-                // dropdown_rows.at(0).trigger('click');
+                // let permissions_tab = wrapper.find('#permissions-tab');
+                // permissions_tab.trigger('click');
                 // await wrapper.vm.$nextTick();
                 // console.log(wrapper.html());
+                //
+                let dropdown_rows = wrapper.findAll('.dropdown-row');
+                dropdown_rows.at(0).trigger('click');
+                await wrapper.vm.$nextTick();
+                console.log(wrapper.html());
                 //
                 // console.log(wrapper.vm.role_selected);
 

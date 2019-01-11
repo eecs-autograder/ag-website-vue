@@ -123,14 +123,14 @@
                   <template slot="header">
                     <div class="tab-label" tabindex="1">
                       <p class="tab-header"
-                         ref="edit_roster_tab"
+                         ref="edit_permissions_tab"
                          @click="show_permissions_tab_dropdown_menu">
                         Permissions {{ role_selected === "" ? '' : `(${role_selected})`}}
                       </p>
                     </div>
                   </template>
                   <div slot-scope="{item}">
-                    <div class="edit-rosters-dropdown-row-content">
+                    <div class="permissions-row-content">
                       <span>{{item}}</span>
                     </div>
                   </div>
@@ -142,7 +142,7 @@
               <div class="tab-body">
                 <p class="role-selected"> {{role_selected}} </p>
                 <div v-if="role_selected === 'admin'">
-                  <div class="class-roster-body">
+                  <div class="class-permissions-body">
                     <div class="adding-container">
                       <form id="add-admins-form" @submit.prevent="add_admins">
                         <label class="enrollment-add-label"> Add admins
@@ -164,8 +164,8 @@
 
                     <div class="enrolled-container">
                       <div v-if="admins !== null">
-                        <div class="roster-column">
-                          <table class="roster-table">
+                        <div class="permissions-column">
+                          <table class="permissions-table">
                             <tr>
                               <th> Username </th>
                               <th> First Name </th>
@@ -188,7 +188,7 @@
                 </div>
 
                 <div v-else-if="role_selected === 'staff'">
-                  <div class="class-roster-body">
+                  <div class="class-permissions-body">
                     <div class="adding-container">
                       <form id="add-staff-form" @submit.prevent="add_staff">
                         <label class="enrollment-add-label"> Add staff members:
@@ -210,8 +210,8 @@
 
                     <div class="enrolled-container">
                       <div v-if="staff !== null">
-                        <div class="roster-column">
-                          <table class="roster-table">
+                        <div class="permissions-column">
+                          <table class="permissions-table">
                             <tr>
                               <th> Username </th>
                               <th> First Name </th>
@@ -233,7 +233,7 @@
                   </div>
                 </div>
                 <div v-else-if="role_selected === 'student'">
-                  <div class="class-roster-body">
+                  <div class="class-permissions-body">
                     <div class="adding-container">
                       <form id="add-students-form" @submit.prevent="add_students">
                         <label class="enrollment-add-label"> Add students:
@@ -255,8 +255,8 @@
 
                     <div class="enrolled-container">
                       <div v-if="students !== null">
-                        <div class="roster-column">
-                          <table class="roster-table">
+                        <div class="permissions-column">
+                          <table class="permissions-table">
                             <tr>
                               <th> Username </th>
                               <th> First Name </th>
@@ -278,7 +278,7 @@
                   </div>
                 </div>
                 <div v-else>
-                  <div class="class-roster-body">
+                  <div class="class-permissions-body">
                     <div class="adding-container">
                       <form id="add-handgraders-form" @submit.prevent="add_handgraders">
                         <label class="enrollment-add-label"> Add handgraders:
@@ -300,8 +300,8 @@
 
                     <div class="enrolled-container">
                       <div v-if="handgraders !== null">
-                        <div class="roster-column">
-                          <table class="roster-table">
+                        <div class="permissions-column">
+                          <table class="permissions-table">
                             <tr>
                               <th> Username </th>
                               <th> First Name </th>
@@ -409,6 +409,12 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
   import { array_has_unique, handle_400_errors_async } from '@/utils.ts';
+  // import { is_non_negative,
+  //   is_not_empty,
+  //   is_not_null,
+  //   is_number,
+  //   is_valid_year
+  // } from '@/validators.ts';
 
   import { Course, Project, Semester, User } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
@@ -897,7 +903,7 @@ $current-lang-choice: "Montserrat";
 
 /* ---------------- Permissions Styling ---------------- */
 
-.class-roster-body {
+.class-permissions-body {
   margin: 0;
 }
 
@@ -922,7 +928,7 @@ $current-lang-choice: "Montserrat";
   text-align: center;
 }
 
-.edit-rosters-dropdown-row-content {
+.permissions-row-content {
   text-align: left;
   padding: 0 2px;
   font-family: $current-lang-choice;
@@ -943,7 +949,7 @@ $current-lang-choice: "Montserrat";
   font-size: 20px;
 }
 
-.roster-table {
+.permissions-table {
   margin-top: 15px;
   border-collapse: collapse;
   margin-bottom: 100px;
@@ -951,19 +957,19 @@ $current-lang-choice: "Montserrat";
   font-size: 18px;
 }
 
-.roster-table th {
+.permissions-table th {
   background-color: $stormy-gray-dark;
   color: white;
   padding: 10px 25px;
 }
 
-.roster-table td {
+.permissions-table td {
   padding: 10px 25px;
   margin-bottom: 10px;
   position: relative;
 }
 
-.roster-table tr td {
+.permissions-table tr td {
   border-top: 3px solid white;
 }
 
@@ -975,7 +981,7 @@ $current-lang-choice: "Montserrat";
   background-color: lighten($pebble-dark, 10);
 }
 
-.roster-column {
+.permissions-column {
   overflow: scroll;
 }
 
@@ -1133,7 +1139,7 @@ a {
     margin: 0 10%;
   }
 
-  .roster-table {
+  .permissions-table {
     width: 100%;
   }
 
@@ -1145,7 +1151,7 @@ a {
     margin-top: 20px;
   }
 
-  .edit-rosters-dropdown-row-content {
+  .permissions-row-content {
     font-size: 18px;
   }
 
@@ -1154,8 +1160,8 @@ a {
 }
 
 @media only screen and (min-width: 768px) {
-  /* ---------------- Edit Rosters Styling ---------------- */
-  .roster-column {
+  /* ---------------- Edit Permissions Styling ---------------- */
+  .permissions-column {
     overflow: visible;
   }
 }

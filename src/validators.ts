@@ -1,6 +1,6 @@
 import { ValidatorResponse } from '@/components/validated_input.vue';
 
-function is_valid_year(value: string): ValidatorResponse {
+export function is_valid_year(value: string): ValidatorResponse {
     return {
         is_valid: Number(value) >= 2000,
         error_msg: "Please enter a valid year"
