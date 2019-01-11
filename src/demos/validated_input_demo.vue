@@ -9,6 +9,7 @@
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
+                     placeholder="Enter a negative, even integer"
                      @input_validity_changed="validated_input_1_valid = $event"></validated-input>
 
     <p>

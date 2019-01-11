@@ -10,6 +10,7 @@
              }"
              type="text"
              :value="d_input_value"
+             :placeholder="placeholder"
              @input="$e => _change_input($e.target.value)"/>
 
       <textarea id="textarea"
@@ -74,6 +75,9 @@
 
     @Prop({required: false, default: 1})
     num_rows!: number;
+
+    @Prop({required: false, type: String})
+    placeholder!: string;
 
     @Prop({required: false, default: ""})
     input_style!: string | object;
