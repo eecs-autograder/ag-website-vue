@@ -67,7 +67,7 @@
 
     async created() {
       super.created();
-      this.get_and_sort_courses();
+      await this.get_and_sort_courses();
     }
 
 

@@ -1,15 +1,17 @@
 <template>
     <div class="course-admin-component"
          ref="course_admin_component"
-         v-if="course != null">
+         v-if="course !== null">
       <div>
         <tabs ref="course_admin_tabs"
               tab_active_class="gray-theme-active-no-padding"
               tab_inactive_class="gray-theme-inactive-no-padding"
+              v-model="current_tab_index"
               v-if="!loading">
-  <!--GENERAL TAB-->
+  <!--SETTINGS TAB-->
           <tab>
-            <tab-header>
+            <tab-header ref="settings_tab"
+                        @click.native="update_tab_index(0)">
               <div class="tab-label">
                 <p class="tab-header"> Settings </p>
               </div>
@@ -84,7 +86,8 @@
                         <li v-for="error of errors" class="error-li">{{error}}</li>
                       </ul>
 
-                      <input type="submit"
+                      <input id="settings-submit"
+                             type="submit"
                              class="submit-button"
                              value="Save Updates"
                              :disabled="!settings_form_is_valid || settings_400_error_present">
@@ -110,17 +113,19 @@
   <!--PERMISSIONS TAB-->
 
           <tab>
-            <tab-header>
+            <tab-header ref="permissions_tab"
+                        id="permissions-tab"
+                        @click.native="update_tab_index(1)">
 
-                <dropdown ref="roster_dropdown"
+                <dropdown ref="permission_dropdown"
                           :items="roles"
-                          @update_item_selected="role_selected = $event">
+                          @update_item_selected="update_role_selected($event)">
                   <template slot="header">
                     <div class="tab-label" tabindex="1">
                       <p class="tab-header"
                          ref="edit_roster_tab"
                          @click="show_permissions_tab_dropdown_menu">
-                        Permissions ({{role_selected}})
+                        Permissions {{ role_selected === "" ? '' : `(${role_selected})`}}
                       </p>
                     </div>
                   </template>
@@ -135,7 +140,7 @@
 
             <template slot="body">
               <div class="tab-body">
-
+                <p class="role-selected"> {{role_selected}} </p>
                 <div v-if="role_selected === 'admin'">
                   <div class="class-roster-body">
                     <div class="adding-container">
@@ -158,7 +163,7 @@
                     </div>
 
                     <div class="enrolled-container">
-                      <div v-if="admins.length > 0">
+                      <div v-if="admins !== null">
                         <div class="roster-column">
                           <table class="roster-table">
                             <tr>
@@ -204,7 +209,7 @@
                     </div>
 
                     <div class="enrolled-container">
-                      <div v-if="staff.length > 0">
+                      <div v-if="staff !== null">
                         <div class="roster-column">
                           <table class="roster-table">
                             <tr>
@@ -249,7 +254,7 @@
                     </div>
 
                     <div class="enrolled-container">
-                      <div v-if="students.length > 0">
+                      <div v-if="students !== null">
                         <div class="roster-column">
                           <table class="roster-table">
                             <tr>
@@ -294,7 +299,7 @@
                     </div>
 
                     <div class="enrolled-container">
-                      <div v-if="handgraders.length > 0">
+                      <div v-if="handgraders !== null">
                         <div class="roster-column">
                           <table class="roster-table">
                             <tr>
@@ -324,7 +329,8 @@
   <!--PROJECTS TAB-->
 
           <tab>
-            <tab-header>
+            <tab-header ref="projects_tab"
+                        @click.native="update_tab_index(2)">
               <div class="tab-label">
                 <p class="tab-header"> Projects </p>
               </div>
@@ -403,10 +409,10 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
   import { array_has_unique, handle_400_errors_async } from '@/utils.ts';
-  import { AxiosResponse } from 'axios';
-  import { Component, Vue, Watch } from 'vue-property-decorator';
 
   import { Course, Project, Semester, User } from 'ag-client-typescript';
+  import { AxiosResponse } from 'axios';
+  import { Component, Vue, Watch } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -423,24 +429,24 @@
     loading = true;
     saving = false;
 
-    role_selected = "admin";
-    roles = ["admin", "staff", "student", "handgraders"];
+    role_selected = "";
+    roles = ["admin", "staff", "student", "handgrader"];
     course: Course | null = null;
-    semesters = ["Fall", "Winter", "Spring", "Summer"];
+    semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
 
-    course_names_same_semester: string[] = [];
-    admins: User[] = [];
-    staff: User[] = [];
-    students: User[] = [];
-    handgraders: User[] = [];
+    current_tab_index = 0;
+    admins: User[] | null = null;
+    staff: User[] | null = null;
+    students: User[] | null = null;
+    handgraders: User[] | null = null;
     new_admins_list = "";
     new_staff_list = "";
     new_students_list = "";
     new_handgraders_list = "";
 
-    projects: Project[] = [];
+    projects: Project[] | null = null;
     new_project_name = "";
 
     settings_form_is_valid = false;
@@ -449,19 +455,52 @@
     project_400_error_present = false;
     errors: string[] = [];
 
+    course_pk_param: number = 1;
+
     async created() {
-      this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
-      this.admins = await this.course.get_admins();
-      this.staff = await this.course.get_staff();
-      this.students = await this.course.get_students();
-      this.handgraders = await this.course.get_handgraders();
-      this.projects = await Project.get_all_from_course(this.course.pk);
-      this.sort_users(this.admins);
-      this.sort_users(this.staff);
-      this.sort_users(this.students);
-      this.sort_users(this.handgraders);
-      // sort projects?
+      this.course_pk_param = Number(this.$route.params.courseId);
+      this.course = await Course.get_by_pk(this.course_pk_param);
       this.loading = false;
+    }
+
+    async update_tab_index(index: number) {
+      console.log("changing tab from: " + this.current_tab_index + " to " + index);
+      this.current_tab_index = index;
+      if (this.current_tab_index === 0 || this.current_tab_index === 2) {
+        this.role_selected = "";
+      }
+
+      if (this.current_tab_index === 2) {
+        if (this.projects === null) {
+          this.projects = await Project.get_all_from_course(this.course!.pk);
+          console.log("Got all the projects!");
+        }
+      }
+    }
+
+    async update_role_selected(role: string) {
+      console.log("CALL ME");
+      this.role_selected = role;
+      if (this.role_selected === "admin" && this.admins === null) {
+        console.log("Admin stuff!");
+        this.admins = await this.course!.get_admins();
+        this.sort_users(this.admins);
+      }
+      else if (role === "staff" && this.staff === null) {
+        console.log("Staff stuff!");
+        this.staff = await this.course!.get_staff();
+        this.sort_users(this.staff);
+      }
+      else if (role === "student" && this.students === null) {
+        console.log("Student stuff!");
+        this.students = await this.course!.get_students();
+        this.sort_users(this.students);
+      }
+      else if (role === "handgrader" && this.handgraders === null) {
+        console.log("Handgrader stuff!");
+        this.handgraders = await this.course!.get_handgraders();
+        this.sort_users(this.handgraders);
+      }
     }
 
     close_course_semester_dropdown_menu() {
@@ -495,8 +534,8 @@
     }
 
     show_permissions_tab_dropdown_menu(event: Event) {
-      let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
-      roster_dropdown.show_the_dropdown_menu();
+      let permission_dropdown = <Dropdown> this.$refs.permission_dropdown;
+      permission_dropdown.show_the_dropdown_menu();
       event.stopPropagation();
     }
 
@@ -556,29 +595,22 @@
 
     remove_admins(admins_to_delete: User[], index: number) {
       this.course!.remove_admins(admins_to_delete);
-      this.admins.splice(index, 1);
+      this.admins!.splice(index, 1);
     }
 
     remove_staff(staff_to_delete: User[], index: number) {
       this.course!.remove_staff(staff_to_delete);
-      this.staff.splice(index, 1);
+      this.staff!.splice(index, 1);
     }
 
     remove_students(students_to_delete: User[], index: number) {
       this.course!.remove_students(students_to_delete);
-      this.students.splice(index, 1);
+      this.students!.splice(index, 1);
     }
 
     remove_handgraders(handgraders_to_delete: User[], index: number) {
       this.course!.remove_handgraders(handgraders_to_delete);
-      this.handgraders.splice(index, 1);
-    }
-
-    project_name_is_unique(value: string): ValidatorResponse {
-      return {
-        is_valid: !array_has_unique(this.projects, value),
-        error_msg: `There already exists a project in this course called ${value}.`
-      };
+      this.handgraders!.splice(index, 1);
     }
 
     is_valid_year(value: string): ValidatorResponse {
@@ -619,9 +651,12 @@
     @handle_400_errors_async(handle_save_course_settings_error)
     async save_course_settings() {
       try {
+        console.log("Saving course settings");
         this.saving = true;
         this.errors = [];
+        console.log("right before call");
         await this.course!.save();
+        console.log("saving done");
       }
       finally {
         this.saving = false;
@@ -643,8 +678,8 @@
           {name: this.new_project_name, course: this.course!.pk}
         );
         this.new_project_name = "";
-        this.projects.push(new_project);
-        this.projects.sort((project_a: Project, project_b: Project) => {
+        this.projects!.push(new_project);
+        this.projects!.sort((project_a: Project, project_b: Project) => {
           if (project_a.name <= project_b.name) {
             return -1;
           }
@@ -658,6 +693,7 @@
   }
 
   function handle_save_course_settings_error(component: CourseAdmin, response: AxiosResponse) {
+    console.log("Did I even get called - handler");
     let errors = response.data["__all__"];
 
     if (errors !== undefined && errors.length > 0) {

@@ -71,7 +71,7 @@ describe('Course_List tests', () => {
         }
     });
 
-    test("The semester, year, and name of a course get displayed", async () => {
+    test.skip("The semester, year, and name of a course get displayed", async () => {
 
         all_courses = {
             courses_is_admin_for: [],
@@ -94,6 +94,8 @@ describe('Course_List tests', () => {
                 wrapper = mount(CourseList);
 
                 await wrapper.vm.$nextTick();
+
+                console.log(wrapper.html());
 
                 course_list = wrapper.vm;
                 course_list_page = wrapper.find({ref: 'course_list_component'});
