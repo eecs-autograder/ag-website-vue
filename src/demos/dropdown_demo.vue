@@ -9,6 +9,7 @@
       <dropdown ref="dropdown_menu_ex_1"
                 :items="menu_items"
                 :initial_highlighted_index="5"
+                dropdown_height="200px"
                 @update_item_selected="add_item_1($event)">
         <template slot="header">
           <p tabindex="1" class="header-para">
@@ -125,7 +126,10 @@
     food_menu_items = [
       "Cheeseburger",
       "Fries",
-      "Shake"
+      "Shake",
+      "Malt",
+      "Hamburger",
+      "Chicken Sandwich"
     ];
 
     contact_methods = [{contact: "By Phone"}, {contact: "By Email"}];

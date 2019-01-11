@@ -8,7 +8,8 @@
       </div>
 
       <div id="dropdown-content"
-           :style="[{display: is_open ? 'block' : 'none'}]">
+           :style="[{display: is_open ? 'block' : 'none'}, {height: dropdown_height},
+                    {overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none'}]">
         <div :class="['dropdown-row', {'highlight': index === d_highlighted_index}]"
              v-for="(item, index) of d_items"
              @mousedown="$event.preventDefault()"
@@ -31,6 +32,9 @@ export default class Dropdown extends Vue {
 
   @Prop({default: 0, type: Number})
   initial_highlighted_index!: number;
+
+  @Prop({default: "auto", type: String})
+  dropdown_height!: string;
 
   private d_highlighted_index = 0;
   private d_items: object[] = [];
