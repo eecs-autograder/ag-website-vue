@@ -7,7 +7,7 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
-  import CourseAdmin from '@/components/course_admin.vue';
+  import CourseAdmin from '@/components/course_admin/course_admin.vue';
 
   @Component({
     components: { CourseAdmin }

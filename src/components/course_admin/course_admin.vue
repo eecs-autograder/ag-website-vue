@@ -18,94 +18,7 @@
             </tab-header>
             <template slot="body">
               <div class="tab-body">
-                <div id="settings-container">
-                  <div id="settings-container-inputs">
-                    <ValidatedForm id="course-settings-form"
-                                   autocomplete="off"
-                                   @submit.native.prevent="save_course_settings"
-                                   @form_validity_changed="settings_form_is_valid = $event">
-
-                      <div class="name-container">
-                        <label class="settings-input-label"> Course name: </label>
-                        <ValidatedInput
-                          ref="course_name"
-                          v-model="course.name"
-                          input_style="width: 100%; max-width: 500px;"
-                          :validators="[is_not_empty]"
-                          :num_rows="1">
-                        </ValidatedInput>
-                      </div>
-
-                      <div class="semester-container">
-                        <label class="settings-input-label"> Semester: </label>
-                        <div class="semester-dropdown-wrapper">
-                          <dropdown ref="semester_dropdown"
-                                    :items="semesters"
-                                    @update_item_selected="course.semester = $event">
-                          <template slot="header">
-                            <div tabindex="1" class="input-wrapper">
-                              <div id="input-course-semester"
-                                   class="settings-input">
-                                {{course.semester}}
-                                <i class="fas fa-caret-down dropdown-caret"></i>
-                              </div>
-                            </div>
-                          </template>
-                          <div slot-scope="{item}">
-                            <span class="semester-item">{{item}}</span>
-                          </div>
-                        </dropdown>
-                        </div>
-                      </div>
-
-                      <div class="year-container">
-                        <label class="settings-input-label"> Year: </label>
-                        <ValidatedInput ref="course_year"
-                                        v-model="course.year"
-                                        :num_rows="1"
-                                        input_style="width: 65px;"
-                                        :validators="[is_not_empty, is_number, is_valid_year]">
-                        </ValidatedInput>
-                      </div>
-
-
-                      <div class="late-days-container">
-                        <label class="settings-input-label"> Late days per student: </label>
-                        <ValidatedInput
-                          ref="course_late_days"
-                          v-model="course.num_late_days"
-                          :num_rows="1"
-                          input_style="width: 50px;"
-                          :validators="[is_not_empty, is_number, is_non_negative]">
-                          <div slot="suffix" class="suffix-element">
-                            {{ course.num_late_days === 1 ? 'day' : 'days'}} </div>
-                        </ValidatedInput>
-                      </div>
-
-                      <ul class="error-ul">
-                        <li v-for="error of errors" class="error-li">{{error}}</li>
-                      </ul>
-
-                      <input id="settings-submit"
-                             type="submit"
-                             class="submit-button"
-                             value="Save Updates"
-                             :disabled="!settings_form_is_valid || settings_400_error_present">
-                        <div v-if="!saving"
-                             class="last-saved-timestamp">
-                          <span> Last Saved: </span>
-                          {{(new Date(course.last_modified)).toLocaleString(
-                              'en-US', last_modified_format
-                          )}}
-                        </div>
-                        <div v-else class="last-saved-spinner">
-                          <i class="fa fa-spinner fa-pulse"></i>
-                        </div>
-
-                      <!--<p> Settings form is valid: {{settings_form_is_valid}}</p>-->
-                    </ValidatedForm>
-                  </div>
-                </div>
+                <course-settings v-if="course !== null" :course="course"> </course-settings>
               </div>
             </template>
           </tab>
@@ -136,7 +49,7 @@
                   </div>
                 </dropdown>
 
-            </tab-header>
+             </tab-header>
 
             <template slot="body">
               <div class="tab-body">
@@ -336,62 +249,7 @@
               </div>
             </tab-header>
             <template slot="body">
-              <div class="tab-body">
-                <div id="project-body-container">
-
-                  <div id="new-project-side">
-                    <div id="new-project-space">
-                      <ValidatedForm id="new-project-form"
-                            @submit.prevent="add_project"
-                            autocomplete="off"
-                            @submit.native.prevent="add_project"
-                            @form_validity_changed="project_form_is_valid = $event">
-                        <p id="new-project-label"> Create a New Project</p>
-
-                        <ValidatedInput ref="new_project"
-                                        v-model="new_project_name"
-                                        :validators="[]"
-                                        :num_rows="1"
-                                        input_style="width: 100%; max-width: 400px;">
-                        </ValidatedInput>
-
-                        <ul class="error-ul">
-                          <li v-for="error of errors" class="error-li">{{error}}</li>
-                        </ul>
-
-                        <input type="submit"
-                               :disabled="!project_form_is_valid || project_400_error_present"
-                               value="Add Project"
-                               class="submit-button">
-                      </ValidatedForm>
-                    </div>
-                  </div>
-
-                  <div id="existing-projects-side">
-                    <p class="existing-projects-label"> Existing Projects </p>
-
-                    <router-link tag="div"
-                                 :to="`/web/project/${project.pk}`"
-                                 v-for="(project, index) of projects"
-                                 class="project-div">
-                      <a>
-                        <div :class="[index % 2 ?
-                                      'odd-row' : 'even-row', 'project-submission-div']">
-                          <p class="project-name"> {{project.name}} </p>
-                        </div>
-                      </a>
-                      <router-link tag="div"
-                                   :to="`/web/project_admin/${project.pk}`"
-                                   class="project-edit-div">
-                        <a>
-                          <div class="edit-project-settings-button"> Edit Project Settings </div>
-                        </a>
-                      </router-link>
-                    </router-link>
-                  </div>
-
-                </div>
-              </div>
+              <course-projects v-if="course !== null" :course="course"></course-projects>
             </template>
           </tab>
         </tabs>
@@ -400,7 +258,8 @@
 </template>
 
 <script lang="ts">
-
+  import CourseProjects from '@/components/course_admin/course_projects.vue';
+  import CourseSettings from '@/components/course_admin/course_settings.vue';
   import Dropdown from '@/components/dropdown.vue';
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
@@ -409,12 +268,6 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
   import { array_has_unique, handle_400_errors_async } from '@/utils.ts';
-  // import { is_non_negative,
-  //   is_not_empty,
-  //   is_not_null,
-  //   is_number,
-  //   is_valid_year
-  // } from '@/validators.ts';
 
   import { Course, Project, Semester, User } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
@@ -422,6 +275,8 @@
 
   @Component({
     components: {
+      CourseSettings,
+      CourseProjects,
       Dropdown,
       Tab,
       TabHeader,
@@ -438,9 +293,10 @@
     role_selected = "";
     roles = ["admin", "staff", "student", "handgrader"];
     course: Course | null = null;
-    semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
-    last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                            hour: 'numeric', minute: 'numeric', second: 'numeric'};
+    last_modified_format = {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric'
+    };
 
     current_tab_index = 0;
     admins: User[] | null = null;
@@ -451,15 +307,6 @@
     new_staff_list = "";
     new_students_list = "";
     new_handgraders_list = "";
-
-    projects: Project[] | null = null;
-    new_project_name = "";
-
-    settings_form_is_valid = false;
-    settings_400_error_present = false;
-    project_form_is_valid = false;
-    project_400_error_present = false;
-    errors: string[] = [];
 
     course_pk_param: number = 1;
 
@@ -474,13 +321,6 @@
       this.current_tab_index = index;
       if (this.current_tab_index === 0 || this.current_tab_index === 2) {
         this.role_selected = "";
-      }
-
-      if (this.current_tab_index === 2) {
-        if (this.projects === null) {
-          this.projects = await Project.get_all_from_course(this.course!.pk);
-          console.log("Got all the projects!");
-        }
       }
     }
 
@@ -507,36 +347,6 @@
         this.handgraders = await this.course!.get_handgraders();
         this.sort_users(this.handgraders);
       }
-    }
-
-    close_course_semester_dropdown_menu() {
-      let grading_policy_dropdown = <Dropdown> this.$refs.semester_dropdown;
-      grading_policy_dropdown.hide_the_dropdown_menu();
-    }
-
-    @Watch('course.name')
-    on_course_name_change(new_name: string, old_name: string) {
-      this.settings_400_error_present = false;
-      this.errors = [];
-    }
-
-    @Watch('course.semester')
-    on_course_semester_change(new_semester: string, old_semester: string) {
-      this.settings_400_error_present = false;
-      this.errors = [];
-    }
-
-    @Watch('course.year')
-    on_course_year_change(new_year: number, old_year: number) {
-      this.settings_400_error_present = false;
-      this.errors = [];
-    }
-
-    @Watch('new_project_name')
-    on_new_project_name_change(new_name: string, old_name: string) {
-      this.project_400_error_present = false;
-      this.project_form_is_valid = true;
-      this.errors = [];
     }
 
     show_permissions_tab_dropdown_menu(event: Event) {
@@ -629,7 +439,7 @@
     is_number(value: string): ValidatorResponse {
       return {
         is_valid: value !== "" && !isNaN(Number(value)),
-        error_msg:  "You must enter a number",
+        error_msg: "You must enter a number",
       };
     }
 
@@ -652,68 +462,6 @@
         is_valid: this.is_number(value).is_valid && value[0] !== "-",
         error_msg: "The number of late days cannot be negative."
       };
-    }
-
-    @handle_400_errors_async(handle_save_course_settings_error)
-    async save_course_settings() {
-      try {
-        console.log("Saving course settings");
-        this.saving = true;
-        this.errors = [];
-        console.log("right before call");
-        await this.course!.save();
-        console.log("saving done");
-      }
-      finally {
-        this.saving = false;
-      }
-    }
-
-    @handle_400_errors_async(handle_add_project_error)
-    async add_project() {
-      if (this.new_project_name === "") {
-        this.errors.push("New project name cannot be an empty string.");
-        this.project_form_is_valid = false;
-        return;
-      }
-      try {
-        this.new_project_name.trim();
-        this.saving = true;
-        this.errors = [];
-        let new_project: Project = await Project.create(
-          {name: this.new_project_name, course: this.course!.pk}
-        );
-        this.new_project_name = "";
-        this.projects!.push(new_project);
-        this.projects!.sort((project_a: Project, project_b: Project) => {
-          if (project_a.name <= project_b.name) {
-            return -1;
-          }
-          return 1;
-        });
-      }
-      finally {
-        this.saving = false;
-      }
-    }
-  }
-
-  function handle_save_course_settings_error(component: CourseAdmin, response: AxiosResponse) {
-    console.log("Did I even get called - handler");
-    let errors = response.data["__all__"];
-
-    if (errors !== undefined && errors.length > 0) {
-      Vue.set(component, "settings_400_error_present", true);
-      Vue.set(component, "errors", [errors[0]]);
-    }
-  }
-
-  function handle_add_project_error(component: CourseAdmin, response: AxiosResponse) {
-    let errors = response.data["__all__"];
-
-    if (errors !== undefined && errors.length > 0) {
-      Vue.set(component, "project_400_error_present", true);
-      Vue.set(component, "errors", [errors[0]]);
     }
   }
 </script>
@@ -744,161 +492,6 @@ $current-lang-choice: "Montserrat";
 
 .tab-label {
   outline: none;
-}
-
-/* ---------------- Settings Styling ---------------- */
-
-#settings-container { }
-
-.submit-button {
-  @extend .green-button;
-  text-align: center;
-  display: block;
-  font-family: $current-lang-choice;
-  font-size: 18px;
-  padding: 20px 15px;
-  margin: 10px 0 20px 0;
-}
-
-.submit-button:disabled {
-  @extend .gray-button;
-  text-align: center;
-  display: block;
-  font-family: $current-lang-choice;
-  font-size: 18px;
-  padding: 20px 15px;
-  margin: 10px 0 20px 0;
-}
-
-.submit-button:disabled:hover {
-  background-color: hsl(210, 13%, 63%);
-  cursor: default;
-}
-
-#settings-container-inputs {
-  width: 80%;
-  margin-left: 10%;
-  margin-right: 10%;
-}
-
-.settings-input-label {
-  text-align: right;
-  font-size: 17px;
-  margin: 5px 15px 7px 0;
-  display: inline-block;
-  color: #495057;
-  font-weight: 700;
-}
-
-.settings-input {
-  position: relative;
-  display: block;
-  width: 100%;
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.settings-input:focus {
-  border-color: $ocean-blue;
-}
-
-.semester-dropdown-wrapper {
-  display: block;
-}
-
-.name-container, .year-container, .semester-container, .late-days-container {
-  padding-bottom: 16px;
-  display: block;
-  max-width: 500px;
-}
-
-#input-course-semester {
-  width: 120px;
-}
-
-.semester-item {
-  font-size: 18px;
-}
-
-.last-saved-timestamp {
-  padding-top: 6px;
-  margin: 0;
-  font-size: 15px;
-  color: lighten(#495057, 40);
-}
-
-.last-saved-spinner {
-  font-size: 18px;
-  color: $stormy-gray-dark;
-  display: inline-block;
-}
-
-.input-wrapper {
-  position: relative;
-  display: inline-block;
-  margin: 0px;
-}
-
-.dropdown-caret {
-  position: absolute;
-  right: 18px;
-  top: 4px;
-  font-size: 30px;
-  cursor: pointer;
-}
-
-.error-ul {
-  list-style-type: none; /* Remove bullets */
-  padding-left: 0;
-  max-width: 500px;
-  width: 100%
-}
-
-.error-li:first-child {
-  margin-top: -10px;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
-}
-
-.error-li:last-child {
-  margin-bottom: 0;
-  border-bottom-right-radius: .25rem;
-  border-bottom-left-radius: .25rem;
-}
-
-.error-ul .error-li {
-  box-sizing: border-box;
-  word-wrap: break-word;
-  position: relative;
-  padding: 10px 15px;
-  margin-bottom: -1px;
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-}
-
-.input.error-input {
-  border: 1px solid $warning-red;
-}
-
-.error-input:focus {
-  outline: none;
-  box-shadow: 0 0 10px $warning-red;
-  border: 1px solid $warning-red;
-  border-radius: .25rem;
-}
-
-.suffix-element {
-  display: inline-block;
-  vertical-align: top;
-  padding-top: 10px;
-  padding-left: 10px;
 }
 
 /* ---------------- Permissions Styling ---------------- */
@@ -1117,20 +710,6 @@ a {
     font-size: 18px;
     margin: 0px 15px 12px 0;
     display: inline-block;
-  }
-
-  /* ---------------- Settings Styling ---------------- */
-
-  #settings-container {
-    margin: 0;
-  }
-
-  #settings-container-inputs {
-    margin: 10px 0 0 50px;
-  }
-
-  #input-course-name {
-    width: 400px;
   }
 
   /* ---------------- Permissions Styling ---------------- */

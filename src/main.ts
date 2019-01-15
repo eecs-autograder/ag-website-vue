@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-import CourseAdmin from '@/components/course_admin.vue';
+import CourseAdmin from '@/components/course_admin/course_admin.vue';
 import CourseList from '@/components/course_list.vue';
 import VueRouter from 'vue-router';
 
