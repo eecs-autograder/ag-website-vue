@@ -1,4 +1,4 @@
-import CourseProjects from '@/components/course_admin/course_projects.vue';
+import CourseProjects from '@/components/course_admin/manage_projects.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester , UltimateSubmissionPolicy } from 'ag-client-typescript';
@@ -160,32 +160,32 @@ describe('CourseProjects.vue', () => {
         );
     });
 
-    test('New Project name cannot be the empty string', async () => {
-        wrapper = mount(CourseProjects, {
-            propsData: {
-                course: course,
-            }
-        });
-
-        course_projects = wrapper.vm;
-
-        expect(course_projects.new_project_name).toEqual("");
-        const spy = jest.fn();
-
-        await patch_async_static_method(
-            Project, 'create',
-            spy,
-            async () => {
-
-                let new_project_form = wrapper.find('#new-project-form');
-
-                new_project_form.trigger('submit.native');
-                await course_projects.$nextTick();
-
-                expect(spy.mock.calls.length).toBe(0);
-            }
-        );
-    });
+    // test('New Project name cannot be the empty string', async () => {
+    //     wrapper = mount(CourseProjects, {
+    //         propsData: {
+    //             course: course,
+    //         }
+    //     });
+    //
+    //     course_projects = wrapper.vm;
+    //
+    //     expect(course_projects.new_project_name).toEqual("");
+    //     const spy = jest.fn();
+    //
+    //     await patch_async_static_method(
+    //         Project, 'create',
+    //         spy,
+    //         async () => {
+    //
+    //             let new_project_form = wrapper.find('#new-project-form');
+    //
+    //             new_project_form.trigger('submit.native');
+    //             await course_projects.$nextTick();
+    //
+    //             expect(spy.mock.calls.length).toBe(0);
+    //         }
+    //     );
+    // });
 
     test('Preexisting projects get displayed in alphabetical order', async () => {
         await patch_async_static_method(

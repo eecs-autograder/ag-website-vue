@@ -121,6 +121,11 @@ export default class CourseSettings extends Vue {
 
   settings_form_is_valid = false;
   api_errors: string[] = [];
+  d_course!: Course;
+
+  created() {
+    this.d_course = this.course;
+  }
 
   is_valid_year(value: string): ValidatorResponse {
     return {
@@ -326,7 +331,6 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     margin: 0px 15px 12px 0;
     display: inline-block;
   }
-
 
   #settings-container {
     margin: 0;

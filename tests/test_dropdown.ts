@@ -233,7 +233,9 @@ describe('Dropdown tests', () => {
         expect(dropdown.is_open).toBe(false);
     });
 
-    test("Dropdown items can change and the highlighted index adjusts appropriately", async () => {
+    test.only("Dropdown items can change and the highlighted index adjusts " +
+              "appropriately",
+              async () => {
         expect(item_values.length).toEqual(3);
         header_wrapper.trigger("click");
 

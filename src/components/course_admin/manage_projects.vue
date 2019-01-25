@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-body">
+  <div class="projects-container">
     <div id="project-body-container">
 
       <div id="new-project-side">
@@ -77,7 +77,7 @@
      ValidatedInput
    }
   })
-  export default class CourseProjects extends Vue {
+  export default class ManageProjects extends Vue {
 
     @Prop({required: true, type: Course})
     course!: Course;
@@ -90,9 +90,11 @@
     project_form_is_valid = false;
     project_400_error_present = false;
     api_errors: string[] = [];
+    d_course!: Course;
 
     async created() {
       this.projects = await Project.get_all_from_course(this.course.pk);
+      this.d_course = this.course;
     }
 
     @handle_400_errors_async(handle_add_project_error)
@@ -124,7 +126,7 @@
     }
   }
 
-  function handle_add_project_error(component: CourseProjects, response: AxiosResponse) {
+  function handle_add_project_error(component: ManageProjects, response: AxiosResponse) {
     let errors = response.data["__all__"];
 
     if (errors !== undefined && errors.length > 0) {
@@ -142,6 +144,10 @@
   $current-lang-choice: "Montserrat";
 
   /* ---------------- Projects Styling ---------------- */
+
+  #project-body-container {
+    /*margin: 10px 0;*/
+  }
 
   #new-project-space {
     width: 80%;

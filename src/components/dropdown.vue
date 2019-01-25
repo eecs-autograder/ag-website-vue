@@ -54,6 +54,7 @@ export default class Dropdown extends Vue {
     header_slot_content.addEventListener("blur", () => {
       this.hide_the_dropdown_menu();
     });
+
     header_slot_content.addEventListener("click", () => {
       this.d_is_open = !this.d_is_open;
     });
