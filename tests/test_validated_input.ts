@@ -101,7 +101,7 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.vm.$data.my_input).toEqual("hello");
     });
 
-    test('Only first failed validator\'s error message is displayed', () => {
+    test('Only first failed validator\'s error message is displayed', async () => {
         const component = {
             template:  `<validated-input ref="validated_input_1" v-model="my_input"
                                          :validators="[
@@ -123,13 +123,18 @@ describe('ValidatedInput.vue', () => {
             },
             data: () => {
                 return {
-                    my_input: "hello"
+                    my_input: "placeholder"
                 };
             }
         };
 
         const wrapper = mount(component);
         const validated_input = wrapper.find({ref: 'validated_input_1'});
+
+        // Make a change in the input so that error messages are initially displayed
+        (<HTMLInputElement> wrapper.find('#input').element).value = "hello";
+        wrapper.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
 
         // Make sure second error message is displayed
         let error_msg = validated_input.find('#error-text').text();
@@ -395,5 +400,60 @@ describe('ValidatedInput.vue', () => {
 
         expect(vinput_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.input_is_valid).toBe(true);
+    });
+
+    test('Error messages aren\'t displayed by default', async () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: "hey",
+                validators: [IS_NUMBER],
+                from_string_fn: (val: string) => parseInt(val, 10),
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        const vinput_vm = <ValidatedInput> wrapper.vm;
+
+        expect(vinput_vm.is_valid).toBe(false);
+        expect(vinput_vm.d_user_has_typed).toBe(false);
+        expect(wrapper.find('#error-text').exists()).toBe(false);
+
+        (<HTMLInputElement> wrapper.find('#input').element).value = "heyoo";
+        wrapper.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        expect(vinput_vm.is_valid).toBe(false);
+        expect(vinput_vm.d_user_has_typed).toBe(true);
+        expect(wrapper.find('#error-text').exists()).toBe(true);
+    });
+
+    test('Clear method removes error messages and clears input text', async () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: "1",
+                validators: [IS_NUMBER],
+                from_string_fn: (val: string) => parseInt(val, 10),
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        const vinput_vm = <ValidatedInput> wrapper.vm;
+
+        (<HTMLInputElement> wrapper.find('#input').element).value = "invalid value here!";
+        wrapper.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        expect(vinput_vm.is_valid).toBe(false);
+        expect(vinput_vm.d_user_has_typed).toBe(true);
+        expect(wrapper.find('#error-text').exists()).toBe(true);
+
+        vinput_vm.clear();
+        await wrapper.vm.$nextTick();
+
+        // Clear method should set input to be empty and not display error messages
+        expect(vinput_vm.is_valid).toBe(false);
+        expect(vinput_vm.d_user_has_typed).toBe(false);
+        expect(wrapper.find('#error-text').exists()).toBe(false);
+        expect((<HTMLInputElement> wrapper.find('#input').element).value).toBe("");
     });
 });
