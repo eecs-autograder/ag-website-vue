@@ -6,7 +6,7 @@
              :style="input_style"
              class="input"
              :class="{
-              'error-input' : input_style === '' && d_error_msg !== ''
+              'error-input' : input_style === '' && _show_errors()
              }"
              type="text"
              :value="d_input_value"
@@ -18,17 +18,19 @@
                 :style="input_style"
                 class="input"
                 :class="{
-                 'error-input' : input_style === '' && d_error_msg !== ''
+                 'error-input' : input_style === '' && _show_errors()
                 }"
                 :value="d_input_value"
                 @input="$e => _change_input($e.target.value)"></textarea>
       <slot name="suffix"> </slot>
     </div>
-    <slot :d_error_msg="d_error_msg" v-if="d_error_msg !== ''">
-      <ul class="error-ul">
-        <li id="error-text" class="error-li">{{d_error_msg}}</li>
-      </ul>
-    </slot>
+    <transition name="fade">
+      <slot :d_error_msg="d_error_msg" v-if="_show_errors()">
+        <ul class="error-ul">
+            <li id="error-text" class="error-li">{{d_error_msg}}</li>
+        </ul>
+      </slot>
+    </transition>
   </div>
 </template>
 
@@ -80,6 +82,7 @@
 
     d_input_value: string = "";
     d_error_msg: string = "";
+    d_user_has_typed: boolean = false;
 
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     created() {
@@ -93,6 +96,11 @@
       return this.d_error_msg === "";
     }
 
+    clear() {
+      this.d_user_has_typed = false;
+      this.d_input_value = "";
+    }
+
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     @Watch('value')
     on_value_change(new_value: unknown, old_value: unknown) {
@@ -104,6 +112,7 @@
     }
 
     private _change_input(new_value: string) {
+      this.d_user_has_typed = true;
       this._update_and_validate(new_value);
 
       // Only if there are no errors should the value be emitted to the parent component
@@ -131,6 +140,10 @@
     private _update_and_validate(new_value: string) {
       this.d_input_value = new_value;
       this._run_validators(new_value);
+    }
+
+    private _show_errors(): boolean {
+      return this.d_error_msg !== '' && this.d_user_has_typed;
     }
 
     @Watch('is_valid')
@@ -202,6 +215,16 @@
     position: relative;
     display: inline-block;
     width: 100%;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .5s
+  }
+
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0
   }
 
 </style>

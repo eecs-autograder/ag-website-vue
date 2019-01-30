@@ -32,6 +32,12 @@
       return true;
     }
 
+    clear() {
+      for (const validated_input of this.d_validated_inputs) {
+        validated_input.clear();
+      }
+    }
+
     @Watch('is_valid')
     on_form_validity_changed(new_value: boolean, old_value: boolean) {
       this.$emit('form_validity_changed', new_value);

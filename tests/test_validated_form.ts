@@ -253,4 +253,71 @@ describe('ValidatedForm.vue', () => {
         expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
     });
+
+    test('Clear method removes all error messages and clears all input fields ', async () => {
+        const component = {
+            template:  `<validated-form ref="form">
+                          <validated-input ref="validated_input_1" v-model="value1"
+                                           :validators="[is_number]"/>
+                          <validated-input ref="validated_input_2" v-model="value2"
+                                           :validators="[is_number]"/>
+                        </validated-form>`,
+            components: {
+                'validated-form': ValidatedForm,
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    value1: "not a number",
+                    value2: "also not a number"
+                };
+            },
+            methods: {
+                is_number: (value: string): ValidatorResponse => {
+                    return {
+                        is_valid: value !== "" && !isNaN(Number(value)),
+                        error_msg: "Invalid number!"
+                    };
+                }
+            }
+        };
+
+        const wrapper = mount(component);
+        const form_vm = <ValidatedForm> wrapper.find({ref: 'form'}).vm;
+        const vinput1 = wrapper.find({ref: 'validated_input_1'});
+        const vinput1_vm = <ValidatedInput> vinput1.vm;
+        const vinput2 =  wrapper.find({ref: 'validated_input_2'});
+        const vinput2_vm = <ValidatedInput> vinput2.vm;
+
+        expect(form_vm.is_valid).toBe(false);
+        expect(vinput1_vm.d_user_has_typed).toBe(false);
+        expect(vinput2_vm.d_user_has_typed).toBe(false);
+
+        // Change the inputs so that error messages are displayed
+        (<HTMLInputElement> vinput1.find('#input').element).value = "invalid value 1";
+        vinput1.find('#input').trigger('input');
+        (<HTMLInputElement> vinput2.find('#input').element).value = "invalid value 2";
+        vinput2.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
+        // Make sure error messages are displayed
+        expect(vinput1_vm.d_user_has_typed).toBe(true);
+        expect(vinput2_vm.d_user_has_typed).toBe(true);
+        expect(vinput1.find('#error-text').exists()).toBe(true);
+        expect(vinput2.find('#error-text').exists()).toBe(true);
+        expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
+        expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("invalid value 2");
+
+        // Clear
+        form_vm.clear();
+        await wrapper.vm.$nextTick();
+
+        // Make sure error messages are no longer displayed, and that inputs are cleared
+        expect(vinput1_vm.d_user_has_typed).toBe(false);
+        expect(vinput2_vm.d_user_has_typed).toBe(false);
+        expect(vinput1.find('#error-text').exists()).toBe(false);
+        expect(vinput2.find('#error-text').exists()).toBe(false);
+        expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("");
+        expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("");
+    });
 });
