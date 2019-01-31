@@ -37,7 +37,7 @@
 <script lang="ts">
   import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  import debounce from 'lodash.debounce';
+  import { debounce } from 'lodash';
 
   export interface ValidatorResponse {
     is_valid: boolean;
