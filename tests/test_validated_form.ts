@@ -2,6 +2,7 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
 import { config, mount } from '@vue/test-utils';
+import { sleep } from './utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -290,19 +291,20 @@ describe('ValidatedForm.vue', () => {
         const vinput2_vm = <ValidatedInput> vinput2.vm;
 
         expect(form_vm.is_valid).toBe(false);
-        expect(vinput1_vm.d_user_has_typed).toBe(false);
-        expect(vinput2_vm.d_user_has_typed).toBe(false);
+        expect(vinput1_vm.d_show_warnings).toBe(false);
+        expect(vinput2_vm.d_show_warnings).toBe(false);
 
         // Change the inputs so that error messages are displayed
         (<HTMLInputElement> vinput1.find('#input').element).value = "invalid value 1";
         vinput1.find('#input').trigger('input');
         (<HTMLInputElement> vinput2.find('#input').element).value = "invalid value 2";
         vinput2.find('#input').trigger('input');
+        await sleep(0.75);
         await wrapper.vm.$nextTick();
 
         // Make sure error messages are displayed
-        expect(vinput1_vm.d_user_has_typed).toBe(true);
-        expect(vinput2_vm.d_user_has_typed).toBe(true);
+        expect(vinput1_vm.d_show_warnings).toBe(true);
+        expect(vinput2_vm.d_show_warnings).toBe(true);
         expect(vinput1.find('#error-text').exists()).toBe(true);
         expect(vinput2.find('#error-text').exists()).toBe(true);
         expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
@@ -313,8 +315,8 @@ describe('ValidatedForm.vue', () => {
         await wrapper.vm.$nextTick();
 
         // Make sure error messages are no longer displayed, and that inputs are cleared
-        expect(vinput1_vm.d_user_has_typed).toBe(false);
-        expect(vinput2_vm.d_user_has_typed).toBe(false);
+        expect(vinput1_vm.d_show_warnings).toBe(false);
+        expect(vinput2_vm.d_show_warnings).toBe(false);
         expect(vinput1.find('#error-text').exists()).toBe(false);
         expect(vinput2.find('#error-text').exists()).toBe(false);
         expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("");

@@ -1,6 +1,8 @@
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { config, mount } from '@vue/test-utils';
 
+import { sleep } from './utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -136,7 +138,9 @@ describe('ValidatedInput.vue', () => {
         wrapper.find('#input').trigger('input');
         await wrapper.vm.$nextTick();
 
-        // Make sure second error message is displayed
+        // Make sure second error message is displayed after delay
+        await sleep(0.75);
+        await wrapper.vm.$nextTick();
         let error_msg = validated_input.find('#error-text').text();
         let expected_error_msg = 'should always be displayed';
         expect(error_msg).toEqual(expected_error_msg);
@@ -415,15 +419,16 @@ describe('ValidatedInput.vue', () => {
         const vinput_vm = <ValidatedInput> wrapper.vm;
 
         expect(vinput_vm.is_valid).toBe(false);
-        expect(vinput_vm.d_user_has_typed).toBe(false);
+        expect(vinput_vm.d_show_warnings).toBe(false);
         expect(wrapper.find('#error-text').exists()).toBe(false);
 
         (<HTMLInputElement> wrapper.find('#input').element).value = "heyoo";
         wrapper.find('#input').trigger('input');
+        await sleep(0.75);
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(false);
-        expect(vinput_vm.d_user_has_typed).toBe(true);
+        expect(vinput_vm.d_show_warnings).toBe(true);
         expect(wrapper.find('#error-text').exists()).toBe(true);
     });
 
@@ -441,10 +446,11 @@ describe('ValidatedInput.vue', () => {
 
         (<HTMLInputElement> wrapper.find('#input').element).value = "invalid value here!";
         wrapper.find('#input').trigger('input');
+        await sleep(0.75);
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(false);
-        expect(vinput_vm.d_user_has_typed).toBe(true);
+        expect(vinput_vm.d_show_warnings).toBe(true);
         expect(wrapper.find('#error-text').exists()).toBe(true);
 
         vinput_vm.clear();
@@ -452,7 +458,7 @@ describe('ValidatedInput.vue', () => {
 
         // Clear method should set input to be empty and not display error messages
         expect(vinput_vm.is_valid).toBe(false);
-        expect(vinput_vm.d_user_has_typed).toBe(false);
+        expect(vinput_vm.d_show_warnings).toBe(false);
         expect(wrapper.find('#error-text').exists()).toBe(false);
         expect((<HTMLInputElement> wrapper.find('#input').element).value).toBe("");
     });
