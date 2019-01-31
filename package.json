@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
+    "@types/lodash.debounce": "^4.0.4",
     "ag-client-typescript": "0.0.0-dev.4",
+    "lodash.debounce": "^4.0.8",
     "vue": "^2.5.16",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0"
