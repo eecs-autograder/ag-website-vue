@@ -234,8 +234,8 @@ describe('Dropdown tests', () => {
     });
 
     test("Dropdown items can change and the highlighted index adjusts " +
-              "appropriately",
-              async () => {
+         "appropriately",
+         async () => {
         expect(item_values.length).toEqual(3);
         header_wrapper.trigger("click");
 

@@ -54,20 +54,20 @@
             <template slot="body">
               <div class="tab-body">
                 <admin-roster v-if="role_selected === 'admin'
-                                          && course !== null"
-                                          :course="course"></admin-roster>
+                              && course !== null"
+                              :course="course"></admin-roster>
 
                 <staff-roster v-if="role_selected === 'staff'
-                                          && course !== null"
-                                          :course="course"></staff-roster>
+                              && course !== null"
+                              :course="course"></staff-roster>
 
                 <student-roster v-if="role_selected === 'student'
-                                          && course !== null"
-                                          :course="course"></student-roster>
+                                && course !== null"
+                                :course="course"></student-roster>
 
                 <handgrader-roster v-if="role_selected === 'handgrader'
-                                          && course !== null"
-                                          :course="course"></handgrader-roster>
+                                   && course !== null"
+                                   :course="course"></handgrader-roster>
               </div>
             </template>
           </tab>
@@ -82,7 +82,9 @@
               </div>
             </tab-header>
             <template slot="body">
-              <manage-projects v-if="course !== null" :course="course"></manage-projects>
+              <div class="tab-body">
+                <manage-projects v-if="course !== null" :course="course"></manage-projects>
+              </div>
             </template>
           </tab>
         </tabs>
@@ -163,8 +165,9 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import url('https://fonts.googleapis.com/css?family=Montserrat');
+@import url('https://fonts.googleapis.com/css?family=Muli');
 
-$current-lang-choice: "Montserrat";
+$current-lang-choice: "Muli";
 
 .course-admin-component {
   font-family: $current-lang-choice;
@@ -178,7 +181,7 @@ $current-lang-choice: "Montserrat";
 }
 
 .tab-body {
-  padding-top: 30px;
+  padding-top: 20px;
   text-align: left;
   position: relative;
 }

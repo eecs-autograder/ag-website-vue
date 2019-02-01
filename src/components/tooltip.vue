@@ -135,8 +135,11 @@
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
+  $github-black-color: #24292e;
+
+
   #tooltip {
-    background-color: $stormy-gray-dark;
+    background-color: $github-black-color;
     border-radius: 6px;
     color: white;
     display: inline-block;
@@ -180,21 +183,21 @@
   }
 
   .placement-left::after {
-    border-color: transparent transparent transparent $stormy-gray-dark;
+    border-color: transparent transparent transparent $github-black-color;
     left: 100%;
     margin-top: -5px;
     top: 50%;
   }
 
   .placement-right::after {
-    border-color: transparent $stormy-gray-dark transparent transparent;
+    border-color: transparent $github-black-color transparent transparent;
     margin-top: -5px;
     right: 100%;
     top: 50%;
   }
 
   .placement-top::after {
-    border-color: $stormy-gray-dark transparent transparent transparent;
+    border-color: $github-black-color transparent transparent transparent;
     left: 50%;
     margin-left: -5px;
     top: 100%;

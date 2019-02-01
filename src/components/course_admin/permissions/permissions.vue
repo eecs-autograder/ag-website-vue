@@ -8,7 +8,7 @@
                 @submit.native.prevent="add_permissions"
                 @form_validity_changed="permissions_form_is_valid = $event">
 
-            <p> Form is valid: {{permissions_form_is_valid}} </p>
+            <!--<p> Form is valid: {{permissions_form_is_valid}} </p>-->
             <label class="enrollment-add-label"> Add {{role}}
               <i class="far fa-question-circle permission-tooltip">
                 <tooltip width="large" placement="top">
@@ -18,6 +18,7 @@
             </label>
             <ValidatedInput
               id="add-permissions-input"
+              input_style="border-width: 2px"
               v-model="users_to_add"
               :validators="[contains_valid_emails]"
               :num_rows="7">
@@ -40,10 +41,10 @@
                 </tr>
                 <tr v-for="(person, index) in d_roster"
                     :class="index % 2 ? 'odd-row' : 'even-row'">
-                  <td class="email-column">{{person.username}}</td>
+                  <td class="email-column email">{{person.username}}</td>
                   <!--<td class="name-column">{{person.first_name}} {{person.last_name}}</td>-->
-                  <td class="name-column">Savannah  Montgomery</td>
-                  <td class="delete-column"> <i class="fas fa-times delete-permission"
+                  <td class="name-column name"> {{names[index % 10]}}</td>
+                  <td class="delete-column"> <i class="fas fa-user-times delete-permission"
                           @click="remove_person_from_roster([person], index)"></i> </td>
                 </tr>
               </table>
@@ -54,6 +55,8 @@
     </div>
   </div>
 </template>
+
+<!--fas fa-times-->
 
 <script lang="ts">
   import Tooltip from '@/components/tooltip.vue';
@@ -86,8 +89,12 @@
       this.sort_users(this.d_roster);
     }
 
+    names = ["Pam Beesly", "Jim Halpert", "Phyllis Lapin Vance", "Stanley Hudson",
+             "Dwight Shrute", "Angela Martin", "Oscar Martinez", "Kevin Malone", "Michael Scott",
+             "Meredith Palmer"];
+
     saving = false;
-    users_to_add = "";
+    users_to_add = "iceberg@umich.edu";
     d_roster: User[] = [];
 
     async created() {
@@ -158,8 +165,11 @@
   @import '@/styles/button_styles.scss';
   @import url('https://fonts.googleapis.com/css?family=Montserrat');
   @import url('https://fonts.googleapis.com/css?family=Sawarabi+Gothic');
+  @import url('https://fonts.googleapis.com/css?family=Muli');
 
-  $current-lang-choice: "Sawarabi Gothic";
+  $current-lang-choice: "Muli";
+  //$current-lang-choice: "Sawarabi Gothic";
+  $github-black-color: #24292e;
 
   .course-admin-component {
     font-family: $current-lang-choice;
@@ -192,7 +202,7 @@
   }
 
   .invalid-email{
-    color: black;
+    color: $github-black-color;
   }
 
   .error-li:first-child {
@@ -222,12 +232,17 @@
     margin: 0;
   }
 
-  .adding-container, .enrolled-container {
+  .adding-container {
     margin: 0 10%;
   }
 
+  .enrolled-container {
+    margin: 0 10%;
+    padding: 0 0 50px 0;
+  }
+
   .permission-tooltip {
-    color: $ocean-blue;
+    color: #8785a2;
     margin-left: 3px;
     font-size: 20px;
     top: 1px;
@@ -272,6 +287,7 @@
     margin: 0;
     position: relative;
     font-weight: 800;
+    color: $github-black-color;
   }
 
   .number-enrolled-message {
@@ -282,28 +298,34 @@
   .permissions-table {
     margin-top: 15px;
     border-collapse: collapse;
-    margin-bottom: 100px;
     font-size: 18px;
   }
 
   .permissions-table th {
-    color: hsl(200, 1%, 45%);
+    color: $github-black-color;
     padding: 10px 15px 10px 15px;
     border-bottom: 2px solid hsl(200, 1%, 85%);
   }
 
   .email-column {
-    width: 40%;
+    width: 45%;
+  }
+
+  .email {
+    color: $github-black-color;
+  }
+
+  .name {
+    color: lighten($github-black-color, 20);
   }
 
   .name-column {
     width: 50%;
-    word-spacing: 7px;
+    word-spacing: 4px;
   }
 
   .delete-column {
-    width: 10%;
-    min-width: 10px;
+    width: 5%;
   }
 
   .permissions-table td {
@@ -325,6 +347,7 @@
   }
 
   .permissions-column {
+    /*max-width: 300px;*/
     overflow: scroll;
   }
 
@@ -342,16 +365,12 @@
   }
 
   .delete-permission {
-    position: absolute;
-    color: $stormy-gray-dark;
-    right: 18px;
-    top: 17px;
-    font-size: 18px;
     cursor: pointer;
+    color: hsl(200, 1%, 40%);
   }
 
   .delete-permission:hover {
-    color: black;
+    color: $github-black-color;
   }
 
   @media only screen and (min-width: 481px) {
@@ -384,7 +403,7 @@
     }
 
     .enrollment-add-label {
-      padding: 10px 0;
+      padding: 0 0 10px 0;
     }
 
     .add-permissions-button {

@@ -6,14 +6,14 @@
                      @submit.native.prevent="save_course_settings"
                      @form_validity_changed="settings_form_is_valid = $event">
 
-        <p> Settings form is valid: {{settings_form_is_valid}}</p>
+        <!--<p> Settings form is valid: {{settings_form_is_valid}}</p>-->
 
         <div class="name-container">
           <label class="settings-input-label"> Course name: </label>
           <ValidatedInput
             ref="course_name"
             v-model="course.name"
-            input_style="width: 100%; max-width: 500px;"
+            input_style="width: 100%; max-width: 500px; border-width: 2px"
             :validators="[is_not_empty]"
             :num_rows="1">
           </ValidatedInput>
@@ -46,7 +46,7 @@
           <ValidatedInput ref="course_year"
                           v-model="course.year"
                           :num_rows="1"
-                          input_style="width: 65px;"
+                          input_style="width: 65px; border-width: 2px"
                           :validators="[is_not_empty, is_number, is_valid_year]">
           </ValidatedInput>
         </div>
@@ -58,7 +58,7 @@
             ref="course_late_days"
             v-model="course.num_late_days"
             :num_rows="1"
-            input_style="width: 50px;"
+            input_style="width: 50px; border-width: 2px"
             :validators="[is_not_empty, is_number, is_non_negative]">
             <div slot="suffix" class="suffix-element">
               {{ course.num_late_days === 1 ? 'day' : 'days'}} </div>
@@ -169,8 +169,13 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   @import '@/styles/colors.scss';
   @import '@/styles/button_styles.scss';
   @import url('https://fonts.googleapis.com/css?family=Montserrat');
+  @import url('https://fonts.googleapis.com/css?family=Sawarabi+Gothic');
+  @import url('https://fonts.googleapis.com/css?family=Muli');
 
-  $current-lang-choice: "Montserrat";
+  $current-lang-choice: "Muli";
+  //$current-lang-choice: "Sawarabi Gothic";
+  //$current-lang-choice: "Montserrat";
+  $github-black-color: #24292e;
 
   .submit-button {
     @extend .green-button;
@@ -183,14 +188,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   }
 
   .submit-button:disabled {
-    // just change the color
     @extend .gray-button;
-    text-align: center;
-    display: block;
-    font-family: $current-lang-choice;
-    font-size: 18px;
-    padding: 20px 15px;
-    margin: 10px 0 20px 0;
   }
 
   .submit-button:disabled:hover {
@@ -207,10 +205,10 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   .settings-input-label {
     text-align: right;
     font-size: 17px;
+    font-weight: bold;
     margin: 5px 15px 7px 0;
     display: inline-block;
-    color: #495057;
-    font-weight: 700;
+    color: $github-black-color;
   }
 
   .settings-input {
@@ -220,10 +218,11 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     padding: .375rem .75rem;
     font-size: 1rem;
     line-height: 1.5;
-    color: #495057;
+    color: $github-black-color;
     background-color: #fff;
     border: 1px solid #ced4da;
     border-radius: .25rem;
+    border-width: 2px;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   }
 
@@ -258,14 +257,14 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
 
   .last-saved-spinner {
     font-size: 18px;
-    color: $stormy-gray-dark;
+    color: $github-black-color;
     display: inline-block;
   }
 
   .input-wrapper {
     position: relative;
     display: inline-block;
-    margin: 0px;
+    margin: 0;
   }
 
   .dropdown-caret {
@@ -339,7 +338,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   }
 
   #settings-container-inputs {
-    margin: 10px 0 0 50px;
+    margin: 0 0 0 40px;
   }
 
   #input-course-name {

@@ -25,7 +25,7 @@
             <input type="submit"
                    :disabled="!project_form_is_valid || project_400_error_present"
                    value="Add Project"
-                   class="submit-button">
+                   class="add-project-button">
           </ValidatedForm>
         </div>
       </div>
@@ -140,8 +140,10 @@
   @import '@/styles/colors.scss';
   @import '@/styles/button_styles.scss';
   @import url('https://fonts.googleapis.com/css?family=Montserrat');
+  @import url('https://fonts.googleapis.com/css?family=Muli');
 
-  $current-lang-choice: "Montserrat";
+  $current-lang-choice: "Muli";
+  //$current-lang-choice: "Montserrat";
 
   /* ---------------- Projects Styling ---------------- */
 
@@ -157,12 +159,21 @@
   #new-project-label {
     font-size: 20px;
     margin: 0 0 12px 0;
-    padding: 6px 0 0 0;
+    padding: 0 0 0 0;
     font-weight: 800;
   }
 
   #new-project-input {
     width: 70.5%;
+  }
+
+  .add-project-button {
+    @extend .green-button;
+    font-family: $current-lang-choice;
+  }
+
+  .add-project-button:disabled {
+    @extend .gray-button;
   }
 
   #existing-projects-side {
@@ -251,7 +262,7 @@
     .existing-projects-label {
       font-size: 20px;
       margin: 0 0 12px 0;
-      padding: 6px 0 0 0;
+      padding: 0 0 0 0;
       text-align: left;
     }
 
