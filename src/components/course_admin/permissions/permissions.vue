@@ -34,17 +34,16 @@
             <div class="permissions-column">
               <table class="permissions-table">
                 <tr>
-                  <th> Username </th>
-                  <th>  </th>
-                  <th>  </th>
-                  <th>  </th>
+                  <th class="email-column"> Username </th>
+                  <th class="name-column"> Name </th>
+                  <th class="delete-column">  </th>
                 </tr>
                 <tr v-for="(person, index) in d_roster"
                     :class="index % 2 ? 'odd-row' : 'even-row'">
-                  <td class="username">{{person.username}}</td>
-                  <td>{{person.first_name}}</td>
-                  <td>{{person.last_name}}</td>
-                  <td> <i class="fas fa-times delete-permission"
+                  <td class="email-column">{{person.username}}</td>
+                  <!--<td class="name-column">{{person.first_name}} {{person.last_name}}</td>-->
+                  <td class="name-column">Savannah  Montgomery</td>
+                  <td class="delete-column"> <i class="fas fa-times delete-permission"
                           @click="remove_person_from_roster([person], index)"></i> </td>
                 </tr>
               </table>
@@ -133,6 +132,8 @@
         }
       }
     }
+
+    // ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu
 
     add_permissions() {
       // console.log("ADD PERMISSIONS");
@@ -289,6 +290,20 @@
     color: hsl(200, 1%, 45%);
     padding: 10px 15px 10px 15px;
     border-bottom: 2px solid hsl(200, 1%, 85%);
+  }
+
+  .email-column {
+    width: 40%;
+  }
+
+  .name-column {
+    width: 50%;
+    word-spacing: 7px;
+  }
+
+  .delete-column {
+    width: 10%;
+    min-width: 10px;
   }
 
   .permissions-table td {
