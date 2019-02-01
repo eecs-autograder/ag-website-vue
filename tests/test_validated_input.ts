@@ -14,18 +14,18 @@ const IS_NUMBER = (value: string): ValidatorResponse => {
 
 describe('ValidatedInput.vue', () => {
     test('Validated input uses default string conversion when to_string_fn not present',
-        async () => {
-            const wrapper = mount(ValidatedInput, {
-                propsData: {
-                    value: 1,
-                    validators: [IS_NUMBER],
-                    from_string_fn: (val: string) => parseInt(val, 10),
-                }
-            });
+         async () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: 1,
+                validators: [IS_NUMBER],
+                from_string_fn: (val: string) => parseInt(val, 10),
+            }
+        });
 
-            await wrapper.vm.$nextTick();
-            const input: HTMLInputElement = <HTMLInputElement> wrapper.find('#input').element;
-            expect(input.value).toBe("1");
+        await wrapper.vm.$nextTick();
+        const input: HTMLInputElement = <HTMLInputElement> wrapper.find('#input').element;
+        expect(input.value).toBe("1");
     });
 
     test('Validated input uses default when from_string_fn not present', () => {
@@ -147,12 +147,12 @@ describe('ValidatedInput.vue', () => {
     });
 
     test('Validated input uses custom to_string_fn and from_string_fn when present',
-        async () => {
+         async () => {
         const component = {
             template:  `<validated-input ref="v1" v-model="my_obj"
-                                     :validators="[obj_is_json]"
-                                     :to_string_fn="obj_to_string"
-                                     :from_string_fn="string_to_obj"/>`,
+                                 :validators="[obj_is_json]"
+                                 :to_string_fn="obj_to_string"
+                                 :from_string_fn="string_to_obj"/>`,
             components: {
                 'validated-input': ValidatedInput
             },
