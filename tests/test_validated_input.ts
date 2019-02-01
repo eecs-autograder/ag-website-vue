@@ -13,8 +13,7 @@ const IS_NUMBER = (value: string): ValidatorResponse => {
 };
 
 describe('ValidatedInput.vue', () => {
-    test(
-        'Validated input uses default string conversion when to_string_fn not present',
+    test('Validated input uses default string conversion when to_string_fn not present',
         async () => {
             const wrapper = mount(ValidatedInput, {
                 propsData: {
@@ -27,12 +26,11 @@ describe('ValidatedInput.vue', () => {
             await wrapper.vm.$nextTick();
             const input: HTMLInputElement = <HTMLInputElement> wrapper.find('#input').element;
             expect(input.value).toBe("1");
-        }
-    );
+    });
 
     test('Validated input uses default when from_string_fn not present', () => {
         const component = {
-            template: `<validated-input ref="validated_input_1" v-model="my_input"
+            template:  `<validated-input ref="validated_input_1" v-model="my_input"
                                          :validators="[(v) => {
                                            return {
                                               'is_valid': true,
@@ -68,7 +66,7 @@ describe('ValidatedInput.vue', () => {
 
     test('v-modal variable not updated when a validators fails', () => {
         const component = {
-            template: `<validated-input ref="validated_input_1" v-model="my_input"
+            template:  `<validated-input ref="validated_input_1" v-model="my_input"
                                          :validators="[
                                             (val) => {
                                               return {
@@ -105,7 +103,7 @@ describe('ValidatedInput.vue', () => {
 
     test('Only first failed validator\'s error message is displayed', () => {
         const component = {
-            template: `<validated-input ref="validated_input_1" v-model="my_input"
+            template:  `<validated-input ref="validated_input_1" v-model="my_input"
                                          :validators="[
                                             (val) => {
                                               return {
@@ -148,63 +146,61 @@ describe('ValidatedInput.vue', () => {
         expect(error_msg).toEqual(expected_error_msg);
     });
 
-    test(
-        'Validated input uses custom to_string_fn and from_string_fn when present',
+    test('Validated input uses custom to_string_fn and from_string_fn when present',
         async () => {
-            const component = {
-                template: `<validated-input ref="v1" v-model="my_obj"
-                                         :validators="[obj_is_json]"
-                                         :to_string_fn="obj_to_string"
-                                         :from_string_fn="string_to_obj"/>`,
-                components: {
-                    'validated-input': ValidatedInput
-                },
-                data: () => {
-                    return {
-                        my_obj: {
-                            firstOne: "hello"
-                        }
-                    };
-                },
-                methods: {
-                    obj_is_json: (str_obj: string) => {
-                        const msg = "Not valid object (JSON) syntax!";
-
-                        try {
-                            JSON.parse(str_obj);    // Will fail if not valid JSON
-                            return {is_valid: true, error_msg: msg};
-                        }
-                        catch (e) {
-                            return {is_valid: false, error_msg: msg};
-                        }
-                    },
-                    obj_to_string: (obj: object): string => {
-                        return JSON.stringify(obj);
-                    },
-                    string_to_obj: (str_obj: string): object => {
-                        return JSON.parse(str_obj);
+        const component = {
+            template:  `<validated-input ref="v1" v-model="my_obj"
+                                     :validators="[obj_is_json]"
+                                     :to_string_fn="obj_to_string"
+                                     :from_string_fn="string_to_obj"/>`,
+            components: {
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    my_obj: {
+                        firstOne: "hello"
                     }
+                };
+            },
+            methods: {
+                obj_is_json: (str_obj: string) => {
+                    const msg = "Not valid object (JSON) syntax!";
+
+                    try {
+                        JSON.parse(str_obj);    // Will fail if not valid JSON
+                        return {is_valid: true, error_msg: msg};
+                    }
+                    catch (e) {
+                        return {is_valid: false, error_msg: msg};
+                    }
+                },
+                obj_to_string: (obj: object): string => {
+                    return JSON.stringify(obj);
+                },
+                string_to_obj: (str_obj: string): object => {
+                    return JSON.parse(str_obj);
                 }
-            };
+            }
+        };
 
-            const wrapper = mount(component);
+        const wrapper = mount(component);
 
-            const v_input = wrapper.find({ref: 'v1'});
-            expect(v_input.find('#error-text').exists()).toBe(false);
+        const v_input = wrapper.find({ref: 'v1'});
+        expect(v_input.find('#error-text').exists()).toBe(false);
 
-            // Change input to pass validator
-            const new_obj = {
-                new_key: "new_value"
-            };
+        // Change input to pass validator
+        const new_obj = {
+            new_key: "new_value"
+        };
 
-            (<HTMLInputElement> v_input.find('#input').element).value = JSON.stringify(new_obj);
-            v_input.find('#input').trigger('input');
+        (<HTMLInputElement> v_input.find('#input').element).value = JSON.stringify(new_obj);
+        v_input.find('#input').trigger('input');
 
-            const v_input_vm = <ValidatedInput> v_input.vm;
-            expect(v_input_vm.d_input_value).toEqual(JSON.stringify(new_obj));
-            expect(wrapper.vm.$data.my_obj).toEqual(new_obj);
-        }
-    );
+        const v_input_vm = <ValidatedInput> v_input.vm;
+        expect(v_input_vm.d_input_value).toEqual(JSON.stringify(new_obj));
+        expect(wrapper.vm.$data.my_obj).toEqual(new_obj);
+    });
 
     test('is_valid returns correct value on failure/success', () => {
         const wrapper = mount(ValidatedInput, {
@@ -351,7 +347,7 @@ describe('ValidatedInput.vue', () => {
 
     test('input_validity_changed gets triggered when is_valid changes', async () => {
         const component = {
-            template: `<validated-input ref="vinput" v-model="value1" :validators="[is_number]"
+            template:  `<validated-input ref="vinput" v-model="value1" :validators="[is_number]"
                                          @input_validity_changed="input_is_valid = $event"/>`,
             components: {
                 'validated-input': ValidatedInput
