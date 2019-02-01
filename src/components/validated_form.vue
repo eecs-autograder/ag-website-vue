@@ -14,7 +14,7 @@
     d_validated_inputs: ValidatedInput[] = [];
 
     created() {
-      console.log("Form validity is now: " + this.is_valid);
+      // console.log("Form validity is now: " + this.is_valid);
       this.$emit('form_validity_changed', this.is_valid);
     }
 
@@ -41,7 +41,7 @@
 
     @Watch('is_valid')
     on_form_validity_changed(new_value: boolean, old_value: boolean) {
-      console.log("Form validity changed, it is now: " + new_value);
+      // console.log("Form validity changed, it is now: " + new_value);
       this.$emit('form_validity_changed', new_value);
     }
   }

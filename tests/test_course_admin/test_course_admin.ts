@@ -89,12 +89,13 @@ describe('CourseAdmin.vue', () => {
             value: original_match_media
         });
 
-        if (wrapper.exists()) {
-            console.log("wrapper exists");
-            wrapper.destroy();
-        }
+        // if (wrapper.exists()) {
+        //     console.log("wrapper exists");
+        //     wrapper.destroy();
+        // }
     });
 
-    test.skip('hold', async () => {
+    test('hold', async () => {
+        expect(1).toBeTruthy();
     });
 });

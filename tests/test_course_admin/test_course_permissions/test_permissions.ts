@@ -1,4 +1,3 @@
-import AdminRoster from '@/components/course_admin/permissions/admin_roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Project, Semester, User } from 'ag-client-typescript';
@@ -104,7 +103,7 @@ describe('Permissions.vue', () => {
         ).vm;
         permissions_form = wrapper.find('#add-permissions-form');
         validated_input.find('#textarea').trigger('input');
-        expect(permissions_form_component.is_valid).toBe(true);
+        // expect(permissions_form_component.is_valid).toBe(true); -- not true bc of empty string
     });
 
     afterEach(() => {
@@ -171,7 +170,7 @@ describe('Permissions.vue', () => {
     });
 
     test('Usernames that adhere to the valid email regex are valid',
-        async () => {
+         async () => {
         (<HTMLInputElement> validated_input.find(
             '#textarea'
         ).element).value = "ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu";
@@ -205,6 +204,7 @@ describe('Permissions.vue', () => {
             '#textarea'
         ).element).value = "         ";
         validated_input.find('#textarea').trigger('input');
+        expect(validated_input_component.is_valid).toBe(false);
 
         permissions_form.trigger('submit.native');
         await course_permissions.$nextTick();
@@ -214,7 +214,7 @@ describe('Permissions.vue', () => {
 
     // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     test('emails that contain disallowed characters in the local-part are invalid',
-        async () => {
+         async () => {
         (<HTMLInputElement> validated_input.find(
             '#textarea'
         ).element).value = "a*@e.iou";
@@ -260,7 +260,7 @@ describe('Permissions.vue', () => {
     });
 
     test('emails containing invalid characters in the mail server portion are invalid',
-        async () => {
+         async () => {
 
         (<HTMLInputElement> validated_input.find(
             '#textarea'
@@ -294,7 +294,7 @@ describe('Permissions.vue', () => {
     });
 
     test('emails that do not contain the . before the top-level-domain are invalid',
-        async () => {
+         async () => {
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "iceberg@iou";
@@ -307,7 +307,7 @@ describe('Permissions.vue', () => {
     });
 
     test('emails where the top-level-domain is less than 2 characters are invalid',
-        async () => {
+         async () => {
         (<HTMLInputElement> validated_input.find(
             '#textarea'
         ).element).value = "iceberg@ae.";
@@ -330,7 +330,7 @@ describe('Permissions.vue', () => {
     });
 
     test('emails featuring invalid characters in the top-level domain are invalid',
-        async () => {
+         async () => {
 
         (<HTMLInputElement> validated_input.find(
             '#textarea'
@@ -354,7 +354,7 @@ describe('Permissions.vue', () => {
     });
 
     test('When a user is given permission, the parent component is notified',
-              async () => {
+         async () => {
         (<HTMLInputElement> validated_input.find(
             '#textarea'
         ).element).value = "letitsnow@umich.edu  sevenEleven@umich.edu";
@@ -372,7 +372,7 @@ describe('Permissions.vue', () => {
 
     test('Validator function exposes addresses that do not adhere to the format specified ' +
          'in the valid email addresses regex',
-        async () => {
+         async () => {
         (<HTMLInputElement> validated_input.find(
             '#textarea'
         ).element).value = " angela";
@@ -417,7 +417,8 @@ describe('Permissions.vue', () => {
     });
 
     test('Validator function exposes the first invalid email address even when there' +
-         ' may be many', async () => {
+         ' may be many',
+         async () => {
         (<HTMLInputElement> validated_input.find(
             '#textarea'
         ).element).value = " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu" +
@@ -426,13 +427,7 @@ describe('Permissions.vue', () => {
         await wrapper.vm.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
-        // expect(permissions_form_component.is_valid).toBe(false);
-        // expect(course_permissions.permissions_form_is_valid).toBe(false);
-
-        // let invalid_email_error = wrapper.find('.error-li');
-        // expect(invalid_email_error.text()).toEqual(
-        //     "phyllis@@umich.edu is not a valid email."
-        // );
+        expect(course_permissions.first_invalid_email).toEqual("phyllis@@umich.edu");
     });
 
     test('When trying to add permissions invalid usernames entered will prevent ' +
@@ -453,8 +448,13 @@ describe('Permissions.vue', () => {
         await wrapper.vm.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
+        expect(course_permissions.first_invalid_email).toEqual("hollyflax");
+        // expect the button to be disabled?
 
-        // also the button will be disabled maybe?
+        let add_permissions_button = wrapper.find('.add-permissions-button');
+        expect(add_permissions_button.is('[disabled]')).toBe(true);
+        expect(course_permissions.permissions_form_is_valid).toEqual(false);
+
         let permissions_form = wrapper.find('#add-permissions-form');
         permissions_form.trigger('submit.native');
         await course_permissions.$nextTick();
@@ -462,19 +462,17 @@ describe('Permissions.vue', () => {
         expect(wrapper.emitted('add_permissions')).not.toBeTruthy();
     });
 
-    test.only('If the textarea contains all valid emails, the parent component is notified ' +
+    test('If the textarea contains all valid emails, the parent component is notified ' +
          'when the add_permissions button is pressed.',
          async () => {
 
-         // let username_input = "michael@umich.edu\n\nDarryl@umich.edu Bearyl@umich.edu " +
-         //                      "erinH@umich.edu\ngabe@umich.edu\nmeredith@umich.edu " +
-         //                      "dwight@umich.edu\nandy@umich.com\nphyllis@umich.edu" +
-         //                      " pam@umich.edu jim@umich.edu " +
-         //                      "oscar@umich.edu\n angela@umich.edu\n" +
-         //                      "kevin@umich.edu,stanley@umich.edu " +
-         //                      "kelly@umich.edu,\nryan@umich.edu,";
-
-         let username_input = "     kelly@umich.edu,\nryan@umich.edu      ";
+         let username_input = "michael@umich.edu\n\nDarryl@umich.edu Bearyl@umich.edu " +
+                              "erinH@umich.edu\ngabe@umich.edu\nmeredith@umich.edu " +
+                              "dwight@umich.edu\nandy@umich.com\nphyllis@umich.edu" +
+                              " pam@umich.edu jim@umich.edu " +
+                              "oscar@umich.edu\n angela@umich.edu\n" +
+                              "kevin@umich.edu,stanley@umich.edu " +
+                              "kelly@umich.edu,\nryan@umich.edu,";
 
          (<HTMLInputElement> validated_input.find(
              '#textarea'
@@ -483,12 +481,12 @@ describe('Permissions.vue', () => {
          await wrapper.vm.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(true);
+         expect(permissions_form_component.is_valid).toBe(true);
 
-         // let permissions_form = wrapper.find('#add-permissions-form');
-         // permissions_form.trigger('submit.native');
-         // await course_permissions.$nextTick();
+         let permissions_form = wrapper.find('#add-permissions-form');
+         permissions_form.trigger('submit.native');
+         await course_permissions.$nextTick();
 
-         // console.log(wrapper.html());
-         // expect(wrapper.emitted().add_permissions.length).toBe(1);
+         expect(wrapper.emitted().add_permissions.length).toBe(1);
     });
 });

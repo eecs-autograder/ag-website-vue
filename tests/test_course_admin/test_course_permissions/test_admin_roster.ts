@@ -160,7 +160,7 @@ describe('AdminRoster.vue', () => {
                 expect(admin_roster.admins).toEqual(admins);
 
                 let permissions = <Permissions> wrapper.find({ref: 'admin_permissions'}).vm;
-                permissions.new_permissions_list = "letitsnow@umich.edu sevenEleven@umich.edu";
+                permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await wrapper.vm.$nextTick();
 
                 let add_admins_form = wrapper.find('#add-permissions-form');
@@ -234,7 +234,7 @@ describe('AdminRoster.vue', () => {
                 let admin_permissions = wrapper.find(
                 {ref: 'admin_permissions'});
                 let delete_permission_buttons = admin_permissions.findAll(
-                '.delete-enrollee'
+                '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
                 await wrapper.vm.$nextTick();

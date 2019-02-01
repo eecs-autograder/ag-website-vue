@@ -161,7 +161,7 @@ describe('StudentRoster.vue', () => {
             expect(student_roster.students).toEqual(students);
 
             let permissions = <Permissions> wrapper.find({ref: 'student_permissions'}).vm;
-            permissions.new_permissions_list = "letitsnow@umich.edu sevenEleven@umich.edu";
+            permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
             await wrapper.vm.$nextTick();
 
             let add_students_form = wrapper.find('#add-permissions-form');
@@ -232,7 +232,7 @@ describe('StudentRoster.vue', () => {
                 let student_permissions = wrapper.find(
                 {ref: 'student_permissions'});
                 let delete_permission_buttons = student_permissions.findAll(
-                '.delete-enrollee'
+                '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
                 await wrapper.vm.$nextTick();

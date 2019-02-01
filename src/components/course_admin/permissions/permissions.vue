@@ -105,51 +105,44 @@
       });
     }
 
-    /* Validated textarea functions */
     contains_valid_emails(value: string): ValidatorResponse {
-      let split_regex = /[\s,]+/g;
-      let invalid_email: null | string = null;
-      let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-      let usernames = value.trim().split(split_regex);
-      console.log(usernames);
-      if (value.trim() !== "") {
-        for (let username of usernames) {
-          // console.log(username);
-          if (!valid_email_regex.test(username)) {
-            invalid_email = username;
-            break;
-          }
-        }
-        console.log("invalid_email: " + invalid_email);
-      }
+      // console.log("VALIDATOR FUNCTION");
+      this.check_for_invalid_emails(value, []);
       return {
-        is_valid: invalid_email === null,
-        error_msg: invalid_email + " is not a valid email."
+        is_valid: this.first_invalid_email === null,
+        error_msg: this.first_invalid_email + " is not a valid email."
       };
     }
 
-    // make this accept only emails of a certain type
-    add_permissions() {
+    check_for_invalid_emails(string_of_emails: string, valid_usernames: string[]) {
+      this.first_invalid_email = null;
+      string_of_emails = string_of_emails.replace(/,+/g, " ");
       let split_regex = /[\s,]+/g;
       let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-      let usernames = this.users_to_add.trim().split(split_regex);
-      console.log(this.users_to_add);
-      console.log(usernames);
-
-      let valid_usernames: string[] = [];
+      let trimmed_input = string_of_emails.trim();
+      // console.log(trimmed_input);
+      let usernames = trimmed_input.split(split_regex);
+      // console.log(usernames);
       for (let username of usernames) {
         if (valid_email_regex.test(username)) {
-          console.log("valid: " + username);
           valid_usernames.push(username);
         }
         else {
           this.first_invalid_email = username;
-          console.log("Found a bad email: " + username);
           return;
         }
       }
-      this.$emit('add_permissions', valid_usernames);
-      this.users_to_add = "";
+    }
+
+    add_permissions() {
+      // console.log("ADD PERMISSIONS");
+      let valid_usernames: string[] = [];
+      this.check_for_invalid_emails(this.users_to_add, valid_usernames);
+      if (this.first_invalid_email === null) {
+        // console.log("Success");
+        this.$emit('add_permissions', valid_usernames);
+        this.users_to_add = "";
+      }
     }
 
     remove_person_from_roster(person_to_delete: User[], index: number) {
