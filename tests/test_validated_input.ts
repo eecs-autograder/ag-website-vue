@@ -150,9 +150,9 @@ describe('ValidatedInput.vue', () => {
          async () => {
         const component = {
             template:  `<validated-input ref="v1" v-model="my_obj"
-                                 :validators="[obj_is_json]"
-                                 :to_string_fn="obj_to_string"
-                                 :from_string_fn="string_to_obj"/>`,
+                                     :validators="[obj_is_json]"
+                                     :to_string_fn="obj_to_string"
+                                     :from_string_fn="string_to_obj"/>`,
             components: {
                 'validated-input': ValidatedInput
             },
