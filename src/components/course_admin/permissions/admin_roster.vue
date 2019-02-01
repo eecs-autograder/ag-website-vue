@@ -1,10 +1,11 @@
 <template>
   <div class="admin-permissions-container">
     <permissions v-if="admins !== null"
-                        role="admins"
-                        :roster="admins"
-                        @add_permissions="add_admins_to_roster($event)"
-                        @remove_permission="remove_admin_from_roster($event)">
+                 ref="admin_permissions"
+                 role="admins"
+                 :roster="admins"
+                 @add_permissions="add_admins_to_roster($event)"
+                 @remove_permission="remove_admin_from_roster($event)">
     </permissions>
   </div>
 </template>

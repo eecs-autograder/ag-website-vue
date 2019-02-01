@@ -1,10 +1,11 @@
 <template>
   <div class="student-permissions-container">
     <permissions v-if="students !== null"
-                        role="students"
-                        :roster="students"
-                        @add_permissions="add_students_to_roster($event)"
-                        @remove_permission="remove_student_from_roster($event)">
+                 ref="student_permissions"
+                 role="students"
+                 :roster="students"
+                 @add_permissions="add_students_to_roster($event)"
+                 @remove_permission="remove_student_from_roster($event)">
     </permissions>
   </div>
 </template>

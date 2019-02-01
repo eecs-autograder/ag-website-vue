@@ -104,7 +104,7 @@ describe('HandgraderRoster.vue', () => {
         }
     });
 
-    test.skip('course prop is initialized to value passed in.', () => {
+    test('course prop is initialized to value passed in.', () => {
         wrapper = mount(HandgraderRoster, {
             propsData: {
                 course: my_course
@@ -115,7 +115,7 @@ describe('HandgraderRoster.vue', () => {
         expect(handgrader_roster.course).toEqual(my_course);
     });
 
-    test.skip('The created function calls the Course method "get_handgraders"', () => {
+    test('The created function calls the Course method "get_handgraders"', () => {
         handgraders = [user_1, user_2, user_3, user_4];
 
         patch_async_class_method(Course,
@@ -136,165 +136,123 @@ describe('HandgraderRoster.vue', () => {
         });
     });
 
-    test.skip('Clicking the "Add to Roster" button with valid input prompts the Course ' +
-         'add_handgraders method to be called ',
+    test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
+              'add_handgraders method to be called',
          async () => {
-        handgraders = [user_1, user_2, user_3, user_4];
-        let usernames_to_add = "letitsnow@umich.edu  sevenEleven@umich.edu";
+        handgraders = [
+            make_user(0, `user${0}`),
+            make_user(1, `user${1}`),
+            make_user(2, `user${2}`)
+        ];
+        let updated_handgraders = [user_1];
+        let usernames_to_add = ["letitsnow@umich.edu", "sevenEleven@umich.edu"];
 
-        patch_async_class_method(Course,
-                                 'get_handgraders',
-                                 () => Promise.resolve(handgraders),
-                                 async () => {
+
+        return patch_async_class_method(Course,
+                                        'get_handgraders',
+                                        make_fake_get_handgraders_func(),
+                                        async () => {
 
             wrapper = mount(HandgraderRoster, {
                 propsData: {
                     course: my_course
                 }
             });
-
-            await wrapper.vm.$nextTick();
-            handgrader_roster = wrapper.vm;
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
-
-            let handgrader_permissions = <Permissions> wrapper.find(
-                {ref: 'handgrader_permissions'}
-            ).vm;
-            expect(handgrader_permissions.new_permissions_list).toEqual("");
-
-            let validated_input = wrapper.find('#add_permissions_input');
-            (<HTMLInputElement> validated_input.find(
-                '#textarea'
-            ).element).value = usernames_to_add;
-            validated_input.find('#textarea').trigger('input');
-            await wrapper.vm.$nextTick();
-            expect(handgrader_permissions.new_permissions_list).toEqual(usernames_to_add);
 
             const spy = jest.fn();
-            await patch_async_static_method(
-                Course, 'add_handgraders',
-                spy,
-                async () => {
-
-                    let add_handgraders_form = wrapper.find('#add-permissions-form');
-                    add_handgraders_form.trigger('submit');
-                    await handgrader_permissions.$nextTick();
-
-                    expect(spy.mock.calls.length).toBe(1);
-                }
-            );
-        });
-    });
-
-    test.skip('eh',
-         async () => {
-        handgraders = [user_1, user_2, user_3, user_4];
-        let updated_handgraders = [user_1, user_2, user_3, user_4, new_user_2];
-        let usernames_to_add = "sevenEleven@umich.edu";
-
-        patch_async_class_method(Course,
-                                 'get_handgraders',
-                                 () => Promise.resolve(handgraders),
-                                 async () => {
-
-            wrapper = mount(HandgraderRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-
-            await wrapper.vm.$nextTick();
-            handgrader_roster = wrapper.vm;
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
-
-            let handgrader_permissions = <Permissions> wrapper.find(
-            {ref: 'handgrader_permissions'}
-            ).vm;
-            expect(handgrader_permissions.new_permissions_list).toEqual("");
-
-            let validated_input = wrapper.find('#add_permissions_input');
-            (<HTMLInputElement> validated_input.find(
-                '#textarea'
-            ).element).value = usernames_to_add;
-            validated_input.find('#textarea').trigger('input');
-            await wrapper.vm.$nextTick();
-
-            expect(handgrader_permissions.new_permissions_list).toEqual(usernames_to_add);
-
-            await patch_async_static_method(Course,
+            return patch_async_class_method(Course,
                                             'add_handgraders',
-                                            () => Promise.resolve(updated_handgraders),
+                                            spy,
                                             async () => {
-                let mock_result = await handgrader_roster.course.add_handgraders(
-                    usernames_to_add
-                );
-                expect(mock_result).toEqual(updated_handgraders);
+                await wrapper.vm.$nextTick();
+                handgrader_roster = wrapper.vm;
+                expect(handgrader_roster.d_course).toEqual(my_course);
+                expect(handgrader_roster.handgraders).toEqual(handgraders);
+
+                let permissions = <Permissions> wrapper.find({ref: 'handgrader_permissions'}).vm;
+                permissions.new_permissions_list = "letitsnow@umich.edu sevenEleven@umich.edu";
+                await wrapper.vm.$nextTick();
 
                 let add_handgraders_form = wrapper.find('#add-permissions-form');
                 add_handgraders_form.trigger('submit');
-                await handgrader_permissions.$nextTick();
+                await wrapper.vm.$nextTick();
 
-                expect(handgrader_roster.handgraders).toEqual(updated_handgraders);
-            });
-        });
+                handgraders.push(make_user(3, `user${3}`));
+
+                expect(handgrader_roster.handgraders).toEqual(handgraders);
+                expect(spy.mock.calls.length).toBe(1);
+             });
+         });
     });
 
+    function make_fake_get_handgraders_func() {
+        let counter = 0;
+        let handgraders: User[] = [];
+        for (let i = 0; i < 3; ++i) {
+            handgraders.push(make_user(counter, `user${counter}`));
+            counter += 1;
+        }
 
-    test.skip('Deleting a user from the roster causes the Course "remove_handgraders" method to' +
+        return () => {
+            let to_return = handgraders.slice(0);
+            handgraders.push(make_user(counter, `user${counter}`));
+            counter += 1;
+            return Promise.resolve(to_return);
+        };
+    }
+
+    function make_user(pk: number, username: string): User {
+        return new User({
+            pk: pk,
+            username: username,
+            first_name: 'Steve the Llama',
+            last_name: 'Spam',
+            is_superuser: false,
+            email: 'steve@thellama.com'
+        });
+    }
+
+    test('Deleting a user from the roster causes the Course "remove_handgraders" method to' +
          ' be called ',
          async () => {
 
              handgraders = [user_1, user_2, user_3, user_4];
-             let updated_handgraders = [user_1, user_3, user_4];
 
-             patch_async_class_method(
-                 Course,
-                 'get_handgraders',
-                 () => Promise.resolve(handgraders),
-                 async () => {
+             // created calls 'get_handgraders'
+             patch_async_class_method(Course,
+                                      'get_handgraders',
+                                      () => Promise.resolve(handgraders),
+                                      async () => {
 
-                     wrapper = mount(HandgraderRoster, {
-                         propsData: {
-                             course: my_course
-                         }
-                     });
-
-                     await wrapper.vm.$nextTick();
-                     handgrader_roster = wrapper.vm;
-                     expect(handgrader_roster.d_course).toEqual(my_course);
-                     expect(handgrader_roster.handgraders).toEqual(handgraders);
-
-                     patch_async_class_method(
-                         Course,
-                         'remove_handgraders',
-                         () => Promise.resolve(updated_handgraders),
-                         async () => {
-
-                         const spy = jest.fn();
-                         await patch_async_static_method(
-                             Course,
-                             'add_handgraders',
-                             spy,
-                             async () => {
-
-                                 let handgrader_permissions = wrapper.find(
-                                     {ref: 'handgrader_permissions'});
-                                 let delete_permission_buttons = handgrader_permissions.findAll(
-                                     '.delete-enrollee'
-                                 );
-                                 delete_permission_buttons.at(1).trigger('click');
-                                 await wrapper.vm.$nextTick();
-
-                                 expect(spy.mock.calls.length).toBe(1);
-                             }
-                         );
+                 wrapper = mount(HandgraderRoster, {
+                     propsData: {
+                         course: my_course
                      }
-                 );
+                 });
+
+                 await wrapper.vm.$nextTick();
+                 handgrader_roster = wrapper.vm;
+                 expect(handgrader_roster.d_course).toEqual(my_course);
+                 expect(handgrader_roster.handgraders).toEqual(handgraders);
+
+                 // clicking on an x calls remove_handgraders
+                 const spy = jest.fn();
+                 patch_async_class_method(Course,
+                                          'remove_handgraders',
+                                          spy,
+                                          async () => {
+
+                     let handgrader_permissions = wrapper.find(
+                         {ref: 'handgrader_permissions'});
+                     let delete_permission_buttons = handgrader_permissions.findAll(
+                         '.delete-enrollee'
+                     );
+                     delete_permission_buttons.at(1).trigger('click');
+                     await wrapper.vm.$nextTick();
+
+                     expect(spy.mock.calls.length).toBe(1);
+                 });
              }
          );
     });
 });
-
-

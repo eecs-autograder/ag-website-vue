@@ -46,7 +46,7 @@ export async function patch_async_class_method(
     let original_method = class_.prototype[method_name];
     try {
         class_.prototype[method_name] = new_method;
-        await body();
+        return await body();
     }
     finally {
         class_.prototype[method_name] = original_method;
@@ -62,7 +62,7 @@ export async function patch_async_static_method(
     let original_method = class_.prototype.constructor[method_name];
     try {
         class_.prototype.constructor[method_name] = new_method;
-        await body();
+        return await body();
     }
     finally {
         class_.prototype.constructor[method_name] = original_method;

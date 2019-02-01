@@ -6,6 +6,8 @@
                      @submit.native.prevent="save_course_settings"
                      @form_validity_changed="settings_form_is_valid = $event">
 
+        <p> Settings form is valid: {{settings_form_is_valid}}</p>
+
         <div class="name-container">
           <label class="settings-input-label"> Course name: </label>
           <ValidatedInput
