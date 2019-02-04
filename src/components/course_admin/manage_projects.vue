@@ -14,7 +14,9 @@
                             v-model="new_project_name"
                             :validators="[]"
                             :num_rows="1"
-                            input_style="width: 100%; max-width: 400px; border: 2px solid #ced4da;">
+                            input_style="width: 100%;
+                                         max-width: 400px;
+                                         border: 2px solid #ced4da;">
             </ValidatedInput>
 
             <ul class="error-ul">
@@ -193,7 +195,7 @@ $github-black-color: #24292e;
 }
 
 #new-project-label {
-  font-size: 20px;
+  font-size: 17px;
   margin: 0 0 12px 0;
   padding: 6px 0 0 0;
   font-weight: 800;
@@ -210,7 +212,7 @@ $github-black-color: #24292e;
 }
 
 .existing-projects-label {
-  font-size: 20px;
+  font-size: 17px;
   margin: 40px 0 20px 0;
   padding: 6px 0 0 0;
   font-weight: 800;
@@ -223,6 +225,7 @@ $github-black-color: #24292e;
   position: relative;
   margin: 15px 0;
   min-width: 350px;
+  font-size: 16px;
 }
 
 .project-submission-div {
@@ -317,7 +320,7 @@ a {
   font-family: $current-lang-choice;
   text-align: center;
   display: block;
-  font-size: 18px;
+  font-size: 16px;
   padding: 20px 15px;
   margin: 10px 0 20px 0;
 }
@@ -330,8 +333,8 @@ a {
   .add-project-button, .add-project-button:disabled {
     padding: 10px 15px;
     font-family: $current-lang-choice;
-    font-size: 18px;
-    margin: 0px 15px 12px 0;
+    font-size: 16px;
+    margin: 0 15px 12px 0;
     display: inline-block;
   }
 }
@@ -353,7 +356,7 @@ a {
   }
 
   .existing-projects-label {
-    font-size: 20px;
+    font-size: 17px;
     margin: 0 0 12px 0;
     padding: 6px 0 0 0;
     text-align: left;
@@ -401,12 +404,12 @@ a {
   }
 
   .cog {
-    font-size: 28px;
+    font-size: 26px;
     margin-right: 10px;
   }
 
   .copy-icon {
-    font-size: 28px;
+    font-size: 26px;
     margin-right: 10px;
   }
 

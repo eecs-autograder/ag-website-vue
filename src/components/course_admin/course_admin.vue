@@ -27,12 +27,11 @@
 
           <tab>
             <tab-header ref="permissions_tab"
-                        id="permissions-tab"
-                        @click.native="update_tab_index(1)">
+                        id="permissions-tab">
 
                 <dropdown ref="permission_dropdown"
                           :items="roles"
-                          @update_item_selected="role_selected=$event">
+                          @update_item_selected="role_selected = $event; update_tab_index(1)">
                   <template slot="header">
                     <div class="tab-label" tabindex="1">
                       <p class="permissions-tab-header tab-header"
@@ -144,6 +143,7 @@
 
     async update_tab_index(index: number) {
       this.current_tab_index = index;
+      console.log("Hello from tab: " + this.current_tab_index);
       if (this.current_tab_index === 0 || this.current_tab_index === 2) {
         this.role_selected = "";
       }
@@ -184,6 +184,11 @@ $current-lang-choice: "Muli";
 
 .tab-label {
   outline: none;
+}
+
+.permissions-row-content {
+  font-size: 16px;
+  font-family: $current-lang-choice;
 }
 
 @media only screen and (min-width: 481px) {

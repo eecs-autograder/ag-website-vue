@@ -113,7 +113,6 @@ export function handle_400_errors_async(
             }
         };
     }
-
     return decorator;
 }
 

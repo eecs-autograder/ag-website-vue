@@ -4,11 +4,9 @@
       <div class="class-permissions-body">
         <div class="adding-container">
           <validated-form id="add-permissions-form"
-                autocomplete="off"
-                @submit.native.prevent="add_permissions"
-                @form_validity_changed="permissions_form_is_valid = $event">
-
-            <!--<p> Form is valid: {{permissions_form_is_valid}} </p>-->
+                          autocomplete="off"
+                          @submit.native.prevent="add_permissions"
+                          @form_validity_changed="permissions_form_is_valid = $event">
             <label class="enrollment-add-label"> Add {{role}}
               <i class="far fa-question-circle permission-tooltip">
                 <tooltip width="large" placement="top">
@@ -16,12 +14,11 @@
                 </tooltip>
               </i>
             </label>
-            <ValidatedInput
-              id="add-permissions-input"
-              input_style="border-width: 2px"
-              v-model="users_to_add"
-              :validators="[contains_valid_emails]"
-              :num_rows="7">
+            <ValidatedInput id="add-permissions-input"
+                            input_style="border-width: 2px"
+                            v-model="users_to_add"
+                            :validators="[contains_valid_emails]"
+                            :num_rows="7">
             </ValidatedInput>
             <input type="submit"
                    class="add-permissions-button"
@@ -241,7 +238,7 @@
   .permission-tooltip {
     color: #8785a2;
     margin-left: 3px;
-    font-size: 20px;
+    font-size: 18px;
     top: 1px;
   }
 
@@ -249,7 +246,7 @@
     @extend .green-button;
     display: block;
     font-family: $current-lang-choice;
-    font-size: 18px;
+    font-size: 16px;
     margin: 18px 0 0 0;
     padding: 20px 15px;
     text-align: center;
@@ -257,12 +254,6 @@
 
   .add-permissions-button:disabled {
     @extend .gray-button;
-    text-align: center;
-    display: block;
-    font-family: $current-lang-choice;
-    font-size: 18px;
-    padding: 20px 15px;
-    margin: 10px 0 20px 0;
   }
 
   .add-permissions-button:disabled:hover {
@@ -270,16 +261,9 @@
     cursor: default;
   }
 
-  .permissions-row-content {
-    text-align: left;
-    padding: 0 2px;
-    font-family: $current-lang-choice;
-    font-size: 16px;
-  }
-
   .enrollment-add-label {
     display: block;
-    font-size: 20px;
+    font-size: 17px;
     padding: 6px 0 10px 0;
     margin: 0;
     position: relative;
@@ -287,21 +271,16 @@
     color: $github-black-color;
   }
 
-  .number-enrolled-message {
-    margin: 30px 0 12px 0;
-    font-size: 20px;
-  }
-
   .permissions-table {
     margin-top: 15px;
     border-collapse: collapse;
-    font-size: 18px;
   }
 
   .permissions-table th {
     color: $github-black-color;
     padding: 10px 15px 10px 15px;
     border-bottom: 2px solid hsl(200, 1%, 85%);
+    font-size: 16px;
   }
 
   .email-column {
@@ -326,7 +305,7 @@
   }
 
   .permissions-table td {
-    padding: 14px 15px 14px 15px;
+    padding: 10px 15px 10px 15px;
     margin-bottom: 10px;
     position: relative;
   }
@@ -340,7 +319,7 @@
   }
 
   .even-row {
-    background-color: hsl(240, 40%, 95%);
+    background-color: hsl(240, 10%, 96%);
   }
 
   .permissions-column {
@@ -375,7 +354,7 @@
     .add-permissions-button, .add-permissions-button:disabled {
       padding: 10px 15px;
       font-family: $current-lang-choice;
-      font-size: 18px;
+      font-size: 16px;
       display: inline-block;
     }
 
@@ -405,10 +384,6 @@
 
     .add-permissions-button {
       margin-top: 20px;
-    }
-
-    .permissions-row-content {
-      font-size: 18px;
     }
 
     /* ---------------- Projects Styling ---------------- */

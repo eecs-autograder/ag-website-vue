@@ -27,7 +27,7 @@
     <hr/>
     <h1>Validated Input (custom object)</h1>
     <small>
-      The below input must be a valid JSON object, with exaclty one field called "field1",
+      The below input must be a valid JSON object, with exactly one field called "field1",
       whose value must be a number.
       <strong>Notice the custom (although slightly terrible) input style!</strong>
     </small>

@@ -87,6 +87,7 @@ export default class Dropdown extends Vue {
   }
 
   choose_item_from_dropdown_menu(item_selected: object, index: number) {
+    console.log(item_selected + " was selected");
     this.d_highlighted_index = index;
     this.$emit("update_item_selected", item_selected);
     this.hide_the_dropdown_menu();

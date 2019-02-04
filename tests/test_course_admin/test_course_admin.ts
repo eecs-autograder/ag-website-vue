@@ -101,7 +101,45 @@ describe('CourseAdmin.vue', () => {
         });
     });
 
-    test('Changing tabs to permissions tab', async () => {
+    test('Changing tabs to permissions tab by clicking on item in dropdown', async () => {
+        await patch_async_static_method(Course,
+                                        'get_by_pk',
+                                        () =>  Promise.resolve(course),
+                                        async () => {
+
+            let mock_result = await Course.get_by_pk(2);
+            expect(mock_result).toEqual(course);
+
+            wrapper = mount(CourseAdmin, {
+                mocks: {
+                    $route
+                }
+            });
+
+            await wrapper.vm.$nextTick();
+
+            course_admin_component = wrapper.vm;
+            expect(course_admin_component.course).toEqual(course);
+
+            let permissions_tab = wrapper.find('.permissions-tab-header');
+            permissions_tab.trigger('click');
+
+            let permissions_dropdown = <Dropdown> wrapper.find(
+                {ref: 'permission_dropdown'}
+            ).vm;
+
+            let highlighted_item = wrapper.find(".highlight");
+            expect(highlighted_item.text()).toContain("Admin");
+            highlighted_item.trigger('click');
+
+            expect(course_admin_component.role_selected).toEqual("Admin");
+            expect(course_admin_component.current_tab_index).toEqual(1);
+        });
+    });
+
+    test('Changing tabs to permissions tab by pressing enter on item in ' +
+         'dropdown',
+         async () => {
         await patch_async_static_method(Course,
                                         'get_by_pk',
                                         () =>  Promise.resolve(course),
@@ -125,15 +163,13 @@ describe('CourseAdmin.vue', () => {
             permissions_tab.trigger('click');
 
             let permissions_dropdown = <Dropdown> wrapper.find({ref: 'permission_dropdown'}).vm;
-            expect(permissions_dropdown.d_is_open).toBe(true);
-
-            console.log(permissions_dropdown.d_highlighted_index);
 
             let highlighted_item = wrapper.find(".highlight");
             expect(highlighted_item.text()).toContain("Admin");
-            highlighted_item.trigger('click');
+            highlighted_item.trigger("keydown", {code: "Enter" });
 
             expect(course_admin_component.role_selected).toEqual("Admin");
+            expect(course_admin_component.current_tab_index).toEqual(1);
         });
     });
 
@@ -161,7 +197,6 @@ describe('CourseAdmin.vue', () => {
             permissions_tab.trigger('click');
 
             let permissions_dropdown = <Dropdown> wrapper.find({ref: 'permission_dropdown'}).vm;
-            expect(permissions_dropdown.d_is_open).toBe(true);
 
             let highlighted_item = wrapper.find(".highlight");
             expect(highlighted_item.text()).toContain("Admin");

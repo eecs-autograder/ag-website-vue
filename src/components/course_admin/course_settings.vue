@@ -181,7 +181,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     text-align: center;
     display: block;
     font-family: $current-lang-choice;
-    font-size: 18px;
+    font-size: 16px;
     padding: 20px 15px;
     margin: 10px 0 20px 0;
   }
@@ -243,7 +243,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   }
 
   .semester-item {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .last-saved-timestamp {
@@ -326,8 +326,8 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   .submit-button, .submit-button:disabled {
     padding: 10px 15px;
     font-family: $current-lang-choice;
-    font-size: 18px;
-    margin: 0px 15px 12px 0;
+    font-size: 16px;
+    margin: 0 15px 12px 0;
     display: inline-block;
   }
 

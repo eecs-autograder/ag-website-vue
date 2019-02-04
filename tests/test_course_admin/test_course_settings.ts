@@ -251,7 +251,9 @@ describe('CourseSettings.vue', () => {
                 await course_settings.$nextTick();
 
                 expect(course_settings.api_errors.length).toEqual(0);
-                expect(course_settings.course.last_modified).not.toEqual(last_modified_before_change);
+                expect(course_settings.course.last_modified).not.toEqual(
+                    last_modified_before_change
+                );
                 // expect(course_settings.course.name).toEqual(updated_course.name);
             }
         );
