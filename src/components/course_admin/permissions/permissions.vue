@@ -14,7 +14,8 @@
                 </tooltip>
               </i>
             </label>
-            <ValidatedInput id="add-permissions-input"
+            <ValidatedInput ref="permissions_textarea"
+                            id="add-permissions-input"
                             input_style="border-width: 2px"
                             v-model="users_to_add"
                             :validators="[contains_valid_emails]"
@@ -144,6 +145,9 @@
         // console.log("Success");
         this.$emit('add_permissions', valid_usernames);
         this.users_to_add = "";
+        let validated_input = <ValidatedInput> this.$refs.permissions_textarea;
+        validated_input.clear();
+        this.permissions_form_is_valid = false;
       }
     }
 
@@ -267,7 +271,7 @@
     padding: 6px 0 10px 0;
     margin: 0;
     position: relative;
-    font-weight: 800;
+    font-weight: 600;
     color: $github-black-color;
   }
 
@@ -289,6 +293,8 @@
 
   .email {
     color: $github-black-color;
+    //color: $ocean-blue;
+    /*color: darken(lavender, 40);*/
   }
 
   .name {

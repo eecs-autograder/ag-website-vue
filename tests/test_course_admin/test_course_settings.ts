@@ -227,7 +227,8 @@ describe('CourseSettings.vue', () => {
         );
     });
 
-    test.skip('Course must be unique among courses - meets condition', async () => {
+    test('Course must be unique among courses - meets condition', async () => {
+        const spy = jest.fn();
         wrapper = mount(CourseSettings, {
             propsData: {
                 course: course,
@@ -236,26 +237,23 @@ describe('CourseSettings.vue', () => {
 
         course_settings = wrapper.vm;
 
-        return patch_async_class_method(
-            Course, 'save',
-            () => Promise.resolve(() => {
-                course_settings.course.last_modified = updated_course.last_modified;
-            }),
-            async () => {
-                let last_modified_before_change = course_settings.course.last_modified;
+        return patch_async_class_method(Course,
+                                        'save',
+                                        spy,
+                                        async () => {
+            // let last_modified_before_change = course_settings.course.last_modified;
 
-                expect(course_settings.settings_form_is_valid).toBe(true);
-                let settings_form = wrapper.find('#course-settings-form');
+            course_settings.course.name = "EECS 345";
+            await course_settings.$nextTick();
 
-                settings_form.trigger('submit.native');
-                await course_settings.$nextTick();
+            expect(course_settings.settings_form_is_valid).toBe(true);
 
-                expect(course_settings.api_errors.length).toEqual(0);
-                expect(course_settings.course.last_modified).not.toEqual(
-                    last_modified_before_change
-                );
-                // expect(course_settings.course.name).toEqual(updated_course.name);
-            }
-        );
+            let settings_form = wrapper.find('#course-settings-form');
+            settings_form.trigger('submit.native');
+            await course_settings.$nextTick();
+
+            expect(spy.mock.calls.length).toBe(1);
+            expect(course_settings.api_errors.length).toEqual(0);
+        });
     });
 });

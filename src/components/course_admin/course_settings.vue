@@ -158,8 +158,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   let errors = response.data["__all__"];
 
   console.log("handling any errors");
-  // when would this not be true?
-  if (errors.length > 0) {
+  if (errors !== undefined && errors.length > 0) {
     component.api_errors = [errors[0]];
     console.log("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
   }
@@ -204,7 +203,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   .settings-input-label {
     text-align: right;
     font-size: 17px;
-    font-weight: bold;
+    font-weight: 600;
     margin: 5px 15px 7px 0;
     display: inline-block;
     color: $github-black-color;

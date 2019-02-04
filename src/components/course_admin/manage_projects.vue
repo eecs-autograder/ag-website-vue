@@ -198,7 +198,7 @@ $github-black-color: #24292e;
   font-size: 17px;
   margin: 0 0 12px 0;
   padding: 6px 0 0 0;
-  font-weight: 800;
+  font-weight: 600;
   color: $github-black-color;
 }
 
@@ -215,7 +215,7 @@ $github-black-color: #24292e;
   font-size: 17px;
   margin: 40px 0 20px 0;
   padding: 6px 0 0 0;
-  font-weight: 800;
+  font-weight: 600;
   color: $github-black-color;
 }
 

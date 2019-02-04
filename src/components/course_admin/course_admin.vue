@@ -164,6 +164,7 @@
 @import url('https://fonts.googleapis.com/css?family=Muli');
 
 $current-lang-choice: "Muli";
+$github-black-color: #24292e;
 
 .course-admin-component {
   font-family: $current-lang-choice;
@@ -171,9 +172,10 @@ $current-lang-choice: "Muli";
 
 .tab-header {
   margin: 0;
+  color: $github-black-color;
   font-size: 18px;
   padding: 10px 25px 12px 25px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .tab-body {
