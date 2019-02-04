@@ -6,16 +6,13 @@
                      @submit.native.prevent="save_course_settings"
                      @form_validity_changed="settings_form_is_valid = $event">
 
-        <!--<p> Settings form is valid: {{settings_form_is_valid}}</p>-->
-
         <div class="name-container">
           <label class="settings-input-label"> Course name: </label>
-          <ValidatedInput
-            ref="course_name"
-            v-model="course.name"
-            input_style="width: 100%; max-width: 500px; border-width: 2px"
-            :validators="[is_not_empty]"
-            :num_rows="1">
+          <ValidatedInput ref="course_name"
+                          v-model="course.name"
+                          input_style="width: 100%; max-width: 500px; border-width: 2px"
+                          :validators="[is_not_empty]"
+                          :num_rows="1">
           </ValidatedInput>
         </div>
 
@@ -54,12 +51,11 @@
 
         <div class="late-days-container">
           <label class="settings-input-label"> Late days per student: </label>
-          <ValidatedInput
-            ref="course_late_days"
-            v-model="course.num_late_days"
-            :num_rows="1"
-            input_style="width: 50px; border-width: 2px"
-            :validators="[is_not_empty, is_number, is_non_negative]">
+          <ValidatedInput ref="course_late_days"
+                          v-model="course.num_late_days"
+                          :num_rows="1"
+                          input_style="width: 50px; border-width: 2px"
+                          :validators="[is_not_empty, is_number, is_non_negative]">
             <div slot="suffix" class="suffix-element">
               {{ course.num_late_days === 1 ? 'day' : 'days'}} </div>
           </ValidatedInput>
@@ -147,7 +143,8 @@ export default class CourseSettings extends Vue {
       this.saving = true;
       this.api_errors = [];
       console.log("right before call");
-      await this.course.save();
+      let response = await this.course.save();
+      console.log(this.course);
       console.log("saving done");
     }
     finally {
@@ -156,11 +153,15 @@ export default class CourseSettings extends Vue {
   }
 }
 
+// mock the response so last modified timestamp is different
 function handle_save_course_settings_error(component: CourseSettings, response: AxiosResponse) {
   let errors = response.data["__all__"];
 
-  if (errors !== undefined && errors.length > 0) {
+  console.log("handling any errors");
+  // when would this not be true?
+  if (errors.length > 0) {
     component.api_errors = [errors[0]];
+    console.log("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
   }
 }
 </script>
@@ -173,8 +174,6 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   @import url('https://fonts.googleapis.com/css?family=Muli');
 
   $current-lang-choice: "Muli";
-  //$current-lang-choice: "Sawarabi Gothic";
-  //$current-lang-choice: "Montserrat";
   $github-black-color: #24292e;
 
   .submit-button {
@@ -220,9 +219,8 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     line-height: 1.5;
     color: $github-black-color;
     background-color: #fff;
-    border: 1px solid #ced4da;
+    border: 2px solid #ced4da;
     border-radius: .25rem;
-    border-width: 2px;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   }
 

@@ -1,8 +1,8 @@
-import CourseProjects from '@/components/course_admin/manage_projects.vue';
+import ManageProjects from '@/components/course_admin/manage_projects.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester , UltimateSubmissionPolicy } from 'ag-client-typescript';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import Vue from 'vue';
 
 import {
@@ -15,11 +15,10 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('CourseProjects.vue', () => {
-    let wrapper: Wrapper<CourseProjects>;
-    let course_projects: CourseProjects;
+describe('ManageProjects.vue', () => {
+    let wrapper: Wrapper<ManageProjects>;
+    let manage_projects: ManageProjects;
     let course: Course;
-    let updated_course: Course;
     let original_match_media: (query: string) => MediaQueryList;
     let new_project: Project;
     let project_1: Project;
@@ -134,15 +133,15 @@ describe('CourseProjects.vue', () => {
     });
 
     test('New Project name cannot be the empty string', async () => {
-        wrapper = mount(CourseProjects, {
+        wrapper = mount(ManageProjects, {
             propsData: {
                 course: course,
             }
         });
 
-        course_projects = wrapper.vm;
+        manage_projects = wrapper.vm;
 
-        expect(course_projects.new_project_name).toEqual("");
+        expect(manage_projects.new_project_name).toEqual("");
         const spy = jest.fn();
 
         await patch_async_static_method(
@@ -153,46 +152,19 @@ describe('CourseProjects.vue', () => {
                 let new_project_form = wrapper.find('#new-project-form');
 
                 new_project_form.trigger('submit.native');
-                await course_projects.$nextTick();
+                await manage_projects.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(0);
             }
         );
     });
 
-    // test('New Project name cannot be the empty string', async () => {
-    //     wrapper = mount(CourseProjects, {
-    //         propsData: {
-    //             course: course,
-    //         }
-    //     });
-    //
-    //     course_projects = wrapper.vm;
-    //
-    //     expect(course_projects.new_project_name).toEqual("");
-    //     const spy = jest.fn();
-    //
-    //     await patch_async_static_method(
-    //         Project, 'create',
-    //         spy,
-    //         async () => {
-    //
-    //             let new_project_form = wrapper.find('#new-project-form');
-    //
-    //             new_project_form.trigger('submit.native');
-    //             await course_projects.$nextTick();
-    //
-    //             expect(spy.mock.calls.length).toBe(0);
-    //         }
-    //     );
-    // });
-
-    test('Preexisting projects get displayed in alphabetical order', async () => {
+    test('New Project name cannot be the empty string', async () => {
         await patch_async_static_method(
             Project, 'get_all_from_course',
             () => Promise.resolve(projects),
             async () => {
-                wrapper = mount(CourseProjects, {
+                wrapper = mount(ManageProjects, {
                     propsData: {
                         course: course,
                     },
@@ -202,9 +174,37 @@ describe('CourseProjects.vue', () => {
                 });
 
                 await wrapper.vm.$nextTick();
-                course_projects = wrapper.vm;
+                manage_projects = wrapper.vm;
 
-                expect(course_projects.projects).toEqual(projects);
+                expect(manage_projects.new_project_name).toEqual("");
+
+                let new_project_form = wrapper.find('#new-project-form');
+                new_project_form.trigger('submit.native');
+                await manage_projects.$nextTick();
+
+                expect(manage_projects.api_errors.length).toEqual(1);
+            }
+        );
+    });
+
+    test('Preexisting projects get displayed in alphabetical order', async () => {
+        await patch_async_static_method(
+            Project, 'get_all_from_course',
+            () => Promise.resolve(projects),
+            async () => {
+                wrapper = mount(ManageProjects, {
+                    propsData: {
+                        course: course,
+                    },
+                    mocks: {
+                        $route
+                    }
+                });
+
+                await wrapper.vm.$nextTick();
+                manage_projects = wrapper.vm;
+
+                expect(manage_projects.projects).toEqual(projects);
 
                 let preexisting_projects = wrapper.findAll('.project-name');
                 expect(preexisting_projects.length).toEqual(2);
@@ -217,14 +217,14 @@ describe('CourseProjects.vue', () => {
     test('Clicking on the add project button when the new project name is not the empty ' +
          'string calls Project.create',
          async () => {
-        wrapper = mount(CourseProjects, {
+        wrapper = mount(ManageProjects, {
             propsData: {
                 course: course,
             }
         });
 
-        course_projects = wrapper.vm;
-        course_projects.new_project_name = "Project 1";
+        manage_projects = wrapper.vm;
+        manage_projects.new_project_name = "Project 1";
 
         const spy = jest.fn();
 
@@ -236,7 +236,7 @@ describe('CourseProjects.vue', () => {
                 let new_project_form = wrapper.find('#new-project-form');
 
                 new_project_form.trigger('submit.native');
-                await course_projects.$nextTick();
+                await manage_projects.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
             }
@@ -249,7 +249,7 @@ describe('CourseProjects.vue', () => {
             Project, 'get_all_from_course',
             () => Promise.resolve(projects),
             async () => {
-                wrapper = mount(CourseProjects, {
+                wrapper = mount(ManageProjects, {
                     propsData: {
                         course: course,
                     },
@@ -259,16 +259,16 @@ describe('CourseProjects.vue', () => {
                 });
 
                 await wrapper.vm.$nextTick();
-                course_projects = wrapper.vm;
+                manage_projects = wrapper.vm;
 
-                expect(course_projects.projects).toEqual(projects);
+                expect(manage_projects.projects).toEqual(projects);
 
                 let all_projects = wrapper.findAll('.project-name');
                 expect(all_projects.length).toEqual(2);
                 expect(all_projects.at(0).text()).toEqual(project_1.name);
                 expect(all_projects.at(1).text()).toEqual(project_2.name);
 
-                course_projects.new_project_name = "Lab 09 - Functors";
+                manage_projects.new_project_name = "Lab 09 - Functors";
                 let new_project_name = "Lab 09 - Functors";
 
                 await patch_async_static_method(
@@ -283,7 +283,7 @@ describe('CourseProjects.vue', () => {
 
                         let new_project_form = wrapper.find('#new-project-form');
                         new_project_form.trigger('submit.native');
-                        await course_projects.$nextTick();
+                        await manage_projects.$nextTick();
 
                         all_projects = wrapper.findAll('.project-name');
                         expect(all_projects.length).toEqual(3);
@@ -296,14 +296,56 @@ describe('CourseProjects.vue', () => {
         );
     });
 
-    // Skipping until we figure out how to handle the axiosResponse error business
-    test.skip('New project name must be unique among projects in the same course', () => {
-        wrapper = mount(CourseProjects, {
-            propsData: {
-                course: course,
-            }
-        });
+    test('New project name must be unique among projects in the same course', async () => {
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: "Project with this Name and Course already exists."
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
+            },
+            config: {},
+        };
 
-        course_projects = wrapper.vm;
+        await patch_async_static_method(
+            Project, 'get_all_from_course',
+            () => Promise.resolve(projects),
+            async () => {
+                wrapper = mount(ManageProjects, {
+                    propsData: {
+                        course: course,
+                    },
+                    mocks: {
+                        $route
+                    }
+                });
+
+                await wrapper.vm.$nextTick();
+                manage_projects = wrapper.vm;
+
+                return patch_async_static_method(
+                    Project, 'create',
+                    () => Promise.reject(axios_response_instance),
+                    async () => {
+                        manage_projects.new_project_name = "Banana";
+                        expect(manage_projects.project_form_is_valid).toBe(true);
+
+                        let new_project_form = wrapper.find('#new-project-form');
+                        new_project_form.trigger('submit.native');
+                        await manage_projects.$nextTick();
+
+                        // console.log(wrapper.html());
+
+                        expect(manage_projects.api_errors.length).toEqual(1);
+                    }
+                );
+            }
+        );
     });
 });

@@ -1,7 +1,6 @@
 <template>
   <div class="projects-container">
     <div id="project-body-container">
-
       <div id="new-project-side">
         <div id="new-project-space">
           <ValidatedForm id="new-project-form"
@@ -15,7 +14,7 @@
                             v-model="new_project_name"
                             :validators="[]"
                             :num_rows="1"
-                            input_style="width: 100%; max-width: 400px;">
+                            input_style="width: 100%; max-width: 400px; border: 2px solid #ced4da;">
             </ValidatedInput>
 
             <ul class="error-ul">
@@ -32,7 +31,6 @@
 
       <div id="existing-projects-side">
         <p class="existing-projects-label"> Existing Projects </p>
-
         <router-link tag="div"
                      :to="`/web/project/${project.pk}`"
                      v-for="(project, index) of projects"
@@ -46,12 +44,18 @@
                        :to="`/web/project_admin/${project.pk}`"
                        class="project-edit-div">
             <a>
-              <div class="edit-project-settings-button"> Edit Project Settings </div>
+              <div class="editor">
+                <i class="fas fa-cog cog"></i>
+                <span class="icon-label"> Edit </span>
+              </div>
             </a>
           </router-link>
+          <div class="copier">
+            <i class="far fa-copy copy-icon"></i>
+            <span class="icon-label"> Clone </span>
+          </div>
         </router-link>
       </div>
-
     </div>
   </div>
 </template>
@@ -99,7 +103,10 @@
 
     @handle_400_errors_async(handle_add_project_error)
     async add_project() {
+      console.log("Add_project function called");
+      console.log("Trying to add: " + this.new_project_name);
       if (this.new_project_name === "") {
+        console.log("new project name is empty string");
         this.api_errors.push("New project name cannot be an empty string.");
         this.project_form_is_valid = false;
         return;
@@ -108,9 +115,11 @@
         this.new_project_name.trim();
         this.saving = true;
         this.api_errors = [];
+        console.log("API ERRORS: " + this.api_errors);
         let new_project: Project = await Project.create(
           {name: this.new_project_name, course: this.course.pk}
         );
+        console.log("Finished creating");
         this.new_project_name = "";
         this.projects!.push(new_project);
         this.projects!.sort((project_a: Project, project_b: Project) => {
@@ -131,6 +140,7 @@
 
     if (errors !== undefined && errors.length > 0) {
       component.api_errors = [errors[0]];
+      console.log("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
     }
   }
 
@@ -142,66 +152,232 @@
   @import url('https://fonts.googleapis.com/css?family=Montserrat');
   @import url('https://fonts.googleapis.com/css?family=Muli');
 
-  $current-lang-choice: "Muli";
-  //$current-lang-choice: "Montserrat";
+$current-lang-choice: "Muli";
+$github-black-color: #24292e;
 
-  /* ---------------- Projects Styling ---------------- */
+/* ---------------- Projects Styling ---------------- */
 
-  #project-body-container {
-    /*margin: 10px 0;*/
+.error-ul {
+  list-style-type: none; /* Remove bullets */
+  padding-left: 0;
+  max-width: 400px;
+  width: 100%
+}
+
+.error-li:first-child {
+  margin-top: -10px;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.error-li:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: .25rem;
+  border-bottom-left-radius: .25rem;
+}
+
+.error-ul .error-li {
+  box-sizing: border-box;
+  word-wrap: break-word;
+  position: relative;
+  padding: 10px 15px;
+  margin-bottom: -1px;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+#new-project-space {
+  width: 90%;
+  margin: 0 5%;
+}
+
+#new-project-label {
+  font-size: 20px;
+  margin: 0 0 12px 0;
+  padding: 6px 0 0 0;
+  font-weight: 800;
+  color: $github-black-color;
+}
+
+#new-project-input {
+  width: 70.5%;
+}
+
+#existing-projects-side {
+  width: 90%;
+  margin: 0 5% 0 5%;
+}
+
+.existing-projects-label {
+  font-size: 20px;
+  margin: 40px 0 20px 0;
+  padding: 6px 0 0 0;
+  font-weight: 800;
+  color: $github-black-color;
+}
+
+.project-div {
+  width: 100%;
+  display: block;
+  position: relative;
+  margin: 15px 0;
+  min-width: 350px;
+}
+
+.project-submission-div {
+  border: 2px solid lighten($pebble-dark, 10);
+  border-radius: 2px;
+  width: 62%;
+  min-width: 200px;
+  display: inline-block;
+  color: $github-black-color;
+}
+
+.project-name {
+  display: inline-block;
+  margin: 0;
+  padding: 15px;
+}
+
+.project-edit-div {
+  display: inline-block;
+  margin-left: 2%;
+  vertical-align: top;
+}
+
+.cog {
+  font-size: 25px;
+}
+
+.copy-icon {
+  font-size: 25px;
+}
+
+.copier {
+  display: inline-block;
+  padding: 10px 8px;
+  color: $github-black-color;
+  background-color: white;
+  border: 2px solid $pebble-light;
+  margin-left: 2%;
+  vertical-align: top;
+  border-radius: 2px;
+}
+
+.copier:hover {
+  color: white;
+  background-color: $ocean-blue;
+  cursor: pointer;
+}
+
+.editor {
+  background-color: white;
+  border-radius: 2px;
+  border: 2px solid $pebble-light;
+  box-sizing: border-box;
+  color: $github-black-color;
+  display: block;
+  padding: 10px 8px;
+}
+
+.editor:hover {
+  background-color: darken($ocean-blue, 4);
+  color: white;
+}
+
+.project-div:hover {
+  .copier {
+    border: 2px solid $ocean-blue;
+  }
+  .editor {
+    border: 2px solid $ocean-blue;
+  }
+  .project-submission-div {
+    background-image: linear-gradient(
+        to right, darken($ocean-blue, 4), $ocean-blue,
+        darken($ocean-blue, 4), $ocean-blue
+    );
+    border: 2px solid $ocean-blue;
+    color: white;
+  }
+}
+
+.icon-label {
+  display: none;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+.add-project-button {
+  @extend .green-button;
+  font-family: $current-lang-choice;
+  text-align: center;
+  display: block;
+  font-size: 18px;
+  padding: 20px 15px;
+  margin: 10px 0 20px 0;
+}
+
+.add-project-button:disabled {
+  @extend .gray-button;
+}
+
+@media only screen and (min-width: 481px) {
+  .add-project-button, .add-project-button:disabled {
+    padding: 10px 15px;
+    font-family: $current-lang-choice;
+    font-size: 18px;
+    margin: 0px 15px 12px 0;
+    display: inline-block;
+  }
+}
+
+
+@media only screen and (min-width: 960px) {
+  #existing-projects-side {
+    width: 60%;
+    margin: 0;
+    padding-bottom: 50px;
+    display: inline-block;
+    vertical-align: top;
   }
 
   #new-project-space {
-    width: 80%;
-    margin: 0 10%;
-  }
-
-  #new-project-label {
-    font-size: 20px;
-    margin: 0 0 12px 0;
-    padding: 0 0 0 0;
-    font-weight: 800;
-  }
-
-  #new-project-input {
-    width: 70.5%;
-  }
-
-  .add-project-button {
-    @extend .green-button;
-    font-family: $current-lang-choice;
-  }
-
-  .add-project-button:disabled {
-    @extend .gray-button;
-  }
-
-  #existing-projects-side {
+    text-align: left;
     width: 80%;
     margin: 0 10% 0 10%;
   }
 
   .existing-projects-label {
     font-size: 20px;
-    margin: 40px 0 20px 0;
+    margin: 0 0 12px 0;
     padding: 6px 0 0 0;
-    font-weight: 800;
+    text-align: left;
+  }
+
+  #new-project-side {
+    width: 40%;
+    display: inline-block;
   }
 
   .project-div {
     background-color: white;
     border-radius: 2px;
     width: 100%;
-    max-width: 590px;
     display: block;
-    margin: 10px 0;
+    margin: 5px 0;
   }
 
   .project-submission-div {
-    width: 100%;
     position: relative;
     border-radius: 2px;
     display: inline-block;
+    max-width: 50%;
+    border: 2px solid lighten($pebble-dark, 10);
   }
 
   .project-name {
@@ -211,123 +387,40 @@
   }
 
   .project-edit-div {
-    display: block;
+    display: inline-block;
     vertical-align: top;
-    width: 100%;
+    margin: 0 0 0 10px;
+  }
+
+  .editor {
+    color: $github-black-color;
+    display: block;
+    padding: 10px 15px;
     background-color: white;
+    border: 2px solid $pebble-light;
   }
 
-  .edit-project-settings-button {
-    background-color: hotpink;
-    padding: 15px;
-    text-align: center;
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
-    color: black;
-    display: none;
-    box-sizing: border-box;
+  .cog {
+    font-size: 28px;
+    margin-right: 10px;
   }
 
-  .edit-project-settings-button:hover {
-    background-color: darken(hotpink, 4);
+  .copy-icon {
+    font-size: 28px;
+    margin-right: 10px;
   }
 
-  .project-div:hover {
-    .edit-project-settings-button {
-      display: block;
-      margin-bottom: 20px;
-    }
-    .project-submission-div {
-    }
+  .copier {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-left: 10px;
+    border: 2px solid $pebble-light;
+    background-color: white;
+    color: $github-black-color;
   }
 
-  a {
-    text-decoration: none;
-    color: black;
+  .icon-label {
+    display: inline;
   }
-
-  @media only screen and (min-width: 960px) {
-
-    #existing-projects-side {
-      width: 60%;
-      margin: 0;
-      display: inline-block;
-      vertical-align: top;
-    }
-
-    #new-project-space {
-      text-align: left;
-    }
-
-    .existing-projects-label {
-      font-size: 20px;
-      margin: 0 0 12px 0;
-      padding: 0 0 0 0;
-      text-align: left;
-    }
-
-    #new-project-side {
-      width: 40%;
-      display: inline-block;
-    }
-
-    .project-div {
-      background-color: white;
-      border-radius: 2px;
-      width: 100%;
-      max-width: 590px;
-      display: block;
-      margin: 5px 0;
-    }
-
-    .project-submission-div {
-      width: 100%;
-      max-width: 350px;
-      position: relative;
-      border-radius: 2px;
-      display: inline-block;
-      border: 2px solid lighten($pebble-dark, 10);
-    }
-
-    .project-name {
-      padding: 15px;
-      margin: 0;
-      display: inline-block;
-    }
-
-    .project-edit-div {
-      display: inline-block;
-      vertical-align: top;
-      width: 220px;
-    }
-
-    .edit-project-settings-button {
-      padding: 15px;
-      margin-left: 15px;
-      border-radius: 3px;
-      color: black;
-      display: none;
-      background-color: white;
-    }
-
-    .edit-project-settings-button:hover {
-      background-color: $pebble-light;
-    }
-
-    .project-div:hover {
-      .edit-project-settings-button {
-        display: block;
-        border: 2px solid hotpink;
-        margin-bottom: 0;
-      }
-
-      .project-submission-div {
-        background-image: linear-gradient(
-            to right, darken(hotpink, 2), hotpink, darken(hotpink, 2), hotpink
-        );
-        border: 2px solid hotpink;
-        color: white;
-      }
-    }
-  }
+}
 </style>

@@ -42,7 +42,6 @@
                 <tr v-for="(person, index) in d_roster"
                     :class="index % 2 ? 'odd-row' : 'even-row'">
                   <td class="email-column email">{{person.username}}</td>
-                  <!--<td class="name-column">{{person.first_name}} {{person.last_name}}</td>-->
                   <td class="name-column name"> {{names[index % 10]}}</td>
                   <td class="delete-column"> <i class="fas fa-user-times delete-permission"
                           @click="remove_person_from_roster([person], index)"></i> </td>
@@ -55,8 +54,6 @@
     </div>
   </div>
 </template>
-
-<!--fas fa-times-->
 
 <script lang="ts">
   import Tooltip from '@/components/tooltip.vue';
@@ -94,7 +91,7 @@
              "Meredith Palmer"];
 
     saving = false;
-    users_to_add = "iceberg@umich.edu";
+    users_to_add = '';
     d_roster: User[] = [];
 
     async created() {
@@ -123,7 +120,7 @@
     check_for_invalid_emails(string_of_emails: string, valid_usernames: string[]) {
       this.first_invalid_email = null;
       string_of_emails = string_of_emails.replace(/,+/g, " ");
-      let split_regex = /[\s,]+/g;
+      let split_regex = /\s+/g;
       let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
       let trimmed_input = string_of_emails.trim();
       // console.log(trimmed_input);

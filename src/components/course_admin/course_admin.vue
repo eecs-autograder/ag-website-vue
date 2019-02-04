@@ -35,7 +35,7 @@
                           @update_item_selected="role_selected=$event">
                   <template slot="header">
                     <div class="tab-label" tabindex="1">
-                      <p class="tab-header"
+                      <p class="permissions-tab-header tab-header"
                          ref="edit_permissions_tab"
                          @click="show_permissions_tab_dropdown_menu">
                         Permissions {{ role_selected === "" ? '' : `(${role_selected})`}}
@@ -53,19 +53,19 @@
 
             <template slot="body">
               <div class="tab-body">
-                <admin-roster v-if="role_selected === 'admin'
+                <admin-roster v-if="role_selected === 'Admin'
                               && course !== null"
                               :course="course"></admin-roster>
 
-                <staff-roster v-if="role_selected === 'staff'
+                <staff-roster v-if="role_selected === 'Staff'
                               && course !== null"
                               :course="course"></staff-roster>
 
-                <student-roster v-if="role_selected === 'student'
+                <student-roster v-if="role_selected === 'Student'
                                 && course !== null"
                                 :course="course"></student-roster>
 
-                <handgrader-roster v-if="role_selected === 'handgrader'
+                <handgrader-roster v-if="role_selected === 'Handgrader'
                                    && course !== null"
                                    :course="course"></handgrader-roster>
               </div>
@@ -106,8 +106,8 @@
   import Tabs from '@/components/tabs/tabs.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
-  import { Course, Project, Semester, User } from 'ag-client-typescript';
-  import { Component, Vue, Watch } from 'vue-property-decorator';
+  import { Course } from 'ag-client-typescript';
+  import { Component, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -126,23 +126,19 @@
     }
   })
   export default class CourseAdmin extends Vue {
+    current_tab_index = 0;
     loading = true;
     saving = false;
-
     role_selected = "";
-    roles = ["admin", "staff", "student", "handgrader"];
+    roles = ["Admin", "Staff", "Student", "Handgrader"];
     course: Course | null = null;
     last_modified_format = {
       year: 'numeric', month: 'long', day: 'numeric',
       hour: 'numeric', minute: 'numeric', second: 'numeric'
     };
 
-    current_tab_index = 0;
-    course_pk_param: number = 1;
-
     async created() {
-      this.course_pk_param = Number(this.$route.params.courseId);
-      this.course = await Course.get_by_pk(this.course_pk_param);
+      this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
       this.loading = false;
     }
 

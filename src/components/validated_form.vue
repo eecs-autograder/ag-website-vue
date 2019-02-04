@@ -29,7 +29,6 @@
           return false;
         }
       }
-
       return true;
     }
 

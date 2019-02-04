@@ -2,7 +2,7 @@ import CourseSettings from '@/components/course_admin/course_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import Vue from 'vue';
 
 import {
@@ -10,6 +10,7 @@ import {
     patch_async_static_method,
     patch_component_method
 } from '../mocking';
+import { sleep } from '../utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -25,11 +26,11 @@ describe('CourseSettings.vue', () => {
     beforeEach(() => {
         course = new Course({
             pk: 2, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, last_modified: ''
+            num_late_days: 0, last_modified: '2019-02-04T17:53:11.230945Z'
         });
         updated_course = new Course({
             pk: 2, name: 'EECS 281', semester: Semester.fall, year: 2018, subtitle: '',
-            num_late_days: 0, last_modified: ''
+            num_late_days: 0, last_modified: '2019-02-04T18:01:02.478381Z'
         });
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
@@ -65,13 +66,11 @@ describe('CourseSettings.vue', () => {
 
         expect(course_settings.course.name).toEqual(course.name);
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
 
         (<HTMLInputElement> name_input.element).value = "";
         name_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
     });
 
     test('Year must be a number', async () => {
@@ -81,13 +80,11 @@ describe('CourseSettings.vue', () => {
 
         expect(course_settings.course.year).toEqual(2019);
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
 
         (<HTMLInputElement> year_input.element).value = "twenty-nineteen";
         year_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
     });
 
     test('Year must be a valid year (greater >= 2000)', async () => {
@@ -97,19 +94,16 @@ describe('CourseSettings.vue', () => {
 
         expect(course_settings.course.year).toEqual(2019);
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
 
         (<HTMLInputElement> year_input.element).value = "1999";
         year_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
 
         (<HTMLInputElement> year_input.element).value = "2000";
         year_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
     });
 
     test('Year must not be empty', async () => {
@@ -119,13 +113,11 @@ describe('CourseSettings.vue', () => {
 
         expect(course_settings.course.year).toEqual(2019);
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
 
         (<HTMLInputElement> year_input.element).value = "";
         year_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
     });
 
     test('Late days cannot be negative', async () => {
@@ -140,13 +132,11 @@ describe('CourseSettings.vue', () => {
         late_days_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
 
         (<HTMLInputElement> late_days_input.element).value = "1";
         late_days_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
     });
 
     test('Late days must be a number', async () => {
@@ -156,13 +146,11 @@ describe('CourseSettings.vue', () => {
 
         expect(course_settings.course.num_late_days).toEqual(0);
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
 
         (<HTMLInputElement> late_days_input.element).value = "zero";
         late_days_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
     });
 
     test('Late days cannot be empty', async () => {
@@ -172,13 +160,11 @@ describe('CourseSettings.vue', () => {
 
         expect(course_settings.course.num_late_days).toEqual(0);
         expect(validated_input_component.is_valid).toBe(true);
-        expect(wrapper.findAll('.error-li').length).toEqual(0);
 
         (<HTMLInputElement> late_days_input.element).value = "";
         late_days_input.trigger('input');
 
         expect(validated_input_component.is_valid).toBe(false);
-        expect(wrapper.findAll('.error-li').length).toEqual(1);
     });
 
     test('Clicking on the save updates button calls course.save', async () => {
@@ -200,18 +186,22 @@ describe('CourseSettings.vue', () => {
         );
     });
 
-    // 153 155 156
-    test.skip('Course must be unique among courses', async () => {
-        let axios_response_instance: AxiosResponse = {
-            data: {
-                __all__: "A course with this name, semester, and year " +
-                         "already exists."
+    test('Course must be unique among courses - violated condition', async () => {
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: "A course with this name, semester, and year " +
+                             "already exists."
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
             },
-            status: 400,
-            statusText: 'OK',
-            headers: {},
             config: {},
-            request: {}
         };
 
         wrapper = mount(CourseSettings, {
@@ -222,13 +212,37 @@ describe('CourseSettings.vue', () => {
 
         course_settings = wrapper.vm;
 
-        await patch_async_class_method(
+        return patch_async_class_method(
             Course, 'save',
             () => Promise.reject(axios_response_instance),
             async () => {
+                expect(course_settings.settings_form_is_valid).toBe(true);
+                let settings_form = wrapper.find('#course-settings-form');
 
-                let mock_result = await course.save();
-                expect(mock_result).toEqual(axios_response_instance);
+                settings_form.trigger('submit.native');
+                await course_settings.$nextTick();
+
+                expect(course_settings.api_errors.length).toEqual(1);
+            }
+        );
+    });
+
+    test.skip('Course must be unique among courses - meets condition', async () => {
+        wrapper = mount(CourseSettings, {
+            propsData: {
+                course: course,
+            }
+        });
+
+        course_settings = wrapper.vm;
+
+        return patch_async_class_method(
+            Course, 'save',
+            () => Promise.resolve(() => {
+                course_settings.course.last_modified = updated_course.last_modified;
+            }),
+            async () => {
+                let last_modified_before_change = course_settings.course.last_modified;
 
                 expect(course_settings.settings_form_is_valid).toBe(true);
                 let settings_form = wrapper.find('#course-settings-form');
@@ -236,7 +250,9 @@ describe('CourseSettings.vue', () => {
                 settings_form.trigger('submit.native');
                 await course_settings.$nextTick();
 
-                expect(wrapper.findAll('.error-li').length).toEqual(1);
+                expect(course_settings.api_errors.length).toEqual(0);
+                expect(course_settings.course.last_modified).not.toEqual(last_modified_before_change);
+                // expect(course_settings.course.name).toEqual(updated_course.name);
             }
         );
     });
