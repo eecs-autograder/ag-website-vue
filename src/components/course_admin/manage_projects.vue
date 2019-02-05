@@ -4,7 +4,6 @@
       <div id="new-project-side">
         <div id="new-project-space">
           <ValidatedForm id="new-project-form"
-                         @submit.prevent="add_project"
                          autocomplete="off"
                          @submit.native.prevent="add_project"
                          @form_validity_changed="project_form_is_valid = $event">
@@ -12,7 +11,7 @@
 
             <ValidatedInput ref="new_project"
                             v-model="new_project_name"
-                            :validators="[]"
+                            :validators="[is_not_empty]"
                             :num_rows="1"
                             input_style="width: 100%;
                                          max-width: 400px;
@@ -20,11 +19,11 @@
             </ValidatedInput>
 
             <ul class="error-ul">
-              <li v-for="error of api_errors" class="error-li">{{error}}</li>
+              <li v-for="error of new_project_api_errors" class="error-li">{{error}}</li>
             </ul>
 
             <input type="submit"
-                   :disabled="!project_form_is_valid || project_400_error_present"
+                   :disabled="!project_form_is_valid"
                    value="Add Project"
                    class="add-project-button">
           </ValidatedForm>
@@ -52,22 +51,87 @@
               </div>
             </a>
           </router-link>
-          <div class="copier">
+          <div class="copier" @click="clone_project(project)">
             <i class="far fa-copy copy-icon"></i>
             <span class="icon-label"> Clone </span>
           </div>
         </router-link>
+
+        <modal ref="clone_project_modal"
+               size="large"
+               click_outside_to_close>
+
+          <ValidatedForm id="cloning-project-form"
+                         @submit.native.prevent="add_cloned_project"
+                         autocomplete="off"
+                         @form_validity_changed="cloning_project_form_is_valid = $event">
+
+            <h2 v-if="project_to_copy !== null"> Project to clone: {{project_to_copy.name}} </h2>
+            <hr>
+            <div>
+              <div v-if="project_to_copy !== null">
+                <div class="cloned-project-name">
+                  <label class="input-label"> New project name </label>
+                  <validated-input ref="cloned_project_name_input"
+                                   v-model="cloned_project_name"
+                                   :validators="[is_not_empty]"
+                                   :num_rows="1"
+                                   input_style="width: 100%;
+                                         border: 2px solid #ced4da;">
+                  </validated-input>
+                </div>
+
+                <div class="cloned-project-destination">
+                  <label class="input-label"> Clone project to course: </label>
+                  <div class="copy-course-dropdown-wrapper">
+                    <dropdown ref="copy_course_dropdown"
+                              :items="cloning_destinations"
+                              @update_item_selected="course_to_clone_to = $event"
+                              dropdown_height="200px">
+                      <template slot="header">
+                        <div tabindex="1" class="input-wrapper">
+                          <div id="input-course-to-copy-to"
+                               class="settings-input">
+                            {{course_to_clone_to.name}}
+                            <i class="fas fa-caret-down dropdown-caret"></i>
+                          </div>
+                        </div>
+                      </template>
+                      <div slot-scope="{item}">
+                        <span class="course-to-copy-name">
+                          {{item.name}} {{item.semester}} {{item.year}}
+                        </span>
+                      </div>
+                    </dropdown>
+                  </div>
+                </div>
+              </div>
+
+              <ul class="error-ul">
+                <li v-for="error of api_cloning_errors" class="error-li">{{error}}</li>
+              </ul>
+
+              <input type="submit"
+                     class="clone-project-button"
+                     value="Create Project"
+                     :disabled="!cloning_project_form_is_valid">
+            </div>
+
+          </ValidatedForm>
+        </modal>
+
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { Course, Project } from 'ag-client-typescript';
+  import { Course, Project, User } from 'ag-client-typescript';
 
   import { AxiosResponse } from 'axios';
 
   import Dropdown from '@/components/dropdown.vue';
+  import Modal from '@/components/modal.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
@@ -78,6 +142,7 @@
   @Component({
    components: {
      Dropdown,
+     Modal,
      Tooltip,
      ValidatedForm,
      ValidatedInput
@@ -95,33 +160,51 @@
     new_project_name = "";
     project_form_is_valid = false;
     project_400_error_present = false;
-    api_errors: string[] = [];
+    new_project_api_errors: string[] = [];
+    api_cloning_errors: string[] = [];
+
     d_course!: Course;
 
+    project_to_copy: Project | null = null;
+    cloning_destinations: Course[] = [];
+    course_to_clone_to: Course | null = null;
+    cloned_project_name: string = "";
+    cloning_project_form_is_valid = false;
+    cloning_api_error_present = false;
+
+
+    readonly is_not_empty = is_not_empty;
+
     async created() {
+      let user = await User.get_current();
       this.projects = await Project.get_all_from_course(this.course.pk);
       this.d_course = this.course;
+      this.course_to_clone_to = this.d_course;
+      this.cloning_destinations = await user.courses_is_admin_for();
     }
+
+    clone_project(project: Project) {
+      this.project_to_copy = project;
+      let clone_project_modal = <Modal> this.$refs.clone_project_modal;
+      clone_project_modal.open();
+    }
+
 
     @handle_400_errors_async(handle_add_project_error)
     async add_project() {
-      console.log("Add_project function called");
-      console.log("Trying to add: " + this.new_project_name);
+      this.new_project_api_errors = [];
       if (this.new_project_name === "") {
-        console.log("new project name is empty string");
-        this.api_errors.push("New project name cannot be an empty string.");
-        this.project_form_is_valid = false;
+        this.new_project_api_errors.push("New project name cannot be an empty string.");
         return;
       }
       try {
         this.new_project_name.trim();
         this.saving = true;
-        this.api_errors = [];
-        console.log("API ERRORS: " + this.api_errors);
         let new_project: Project = await Project.create(
           {name: this.new_project_name, course: this.course.pk}
         );
-        console.log("Finished creating");
+        let new_project_name_input = <ValidatedInput> this.$refs.new_project;
+        new_project_name_input.clear();
         this.new_project_name = "";
         this.projects!.push(new_project);
         this.projects!.sort((project_a: Project, project_b: Project) => {
@@ -135,14 +218,51 @@
         this.saving = false;
       }
     }
+
+    @handle_400_errors_async(handle_add_cloned_project_error)
+    async add_cloned_project() {
+      this.api_cloning_errors = [];
+      this.cloning_api_error_present = false;
+      if (this.cloned_project_name === "") {
+        this.api_cloning_errors.push("Cloned project name cannot be an empty string.");
+        return;
+      }
+      try {
+        let new_project = await this.project_to_copy!.copy_to_course(
+          this.course_to_clone_to!.pk, this.cloned_project_name
+        );
+        let clone_project_modal = <Modal> this.$refs.clone_project_modal;
+        clone_project_modal.close();
+        let cloned_project_name_input = <ValidatedInput> this.$refs.cloned_project_name_input;
+        cloned_project_name_input.clear();
+        if (this.course_to_clone_to!.pk === this.course!.pk) {
+          this.projects.push(new_project);
+          this.projects.sort((project_a: Project, project_b: Project) => {
+            if (project_a.name <= project_b.name) {
+              return -1;
+            }
+            return 1;
+          });
+        }
+      }
+      finally { }
+    }
   }
 
   function handle_add_project_error(component: ManageProjects, response: AxiosResponse) {
     let errors = response.data["__all__"];
-
     if (errors !== undefined && errors.length > 0) {
-      component.api_errors = [errors[0]];
-      console.log("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+      component.new_project_api_errors = [errors[0]];
+    }
+  }
+
+  function handle_add_cloned_project_error(component: ManageProjects, response: AxiosResponse) {
+    console.log("Errors present");
+    let errors = response.data["__all__"];
+    console.log(errors.length);
+    if (errors !== undefined && errors.length > 0) {
+      component.api_cloning_errors = [errors[0]];
+      component.cloning_api_error_present = true;
     }
   }
 
@@ -158,6 +278,68 @@ $current-lang-choice: "Muli";
 $github-black-color: #24292e;
 
 /* ---------------- Projects Styling ---------------- */
+
+
+.cloned-project-name, .cloned-project-destination  {
+  padding-bottom: 16px;
+  position: relative;
+  display: block;
+  max-width: 500px;
+}
+
+.cloned-project-name {
+  padding-top: 15px;
+}
+
+.dropdown-caret {
+  position: absolute;
+  right: 18px;
+  top: 4px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.settings-input {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.clone-project-name-input {
+  width: 100%;
+}
+
+#input-course-to-copy-to {
+  width: 100%;
+  min-width: 225px;
+}
+
+.settings-input:focus {
+  border-color: $ocean-blue;
+}
+
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+}
+
+.input-label {
+  text-align: right;
+  font-size: 17px;
+  margin: 5px 15px 7px 0;
+  display: inline-block;
+  color: $github-black-color;
+  font-weight: 600;
+}
 
 .error-ul {
   list-style-type: none; /* Remove bullets */
@@ -315,7 +497,7 @@ a {
   color: black;
 }
 
-.add-project-button {
+.add-project-button, .clone-project-button {
   @extend .green-button;
   font-family: $current-lang-choice;
   text-align: center;
@@ -325,12 +507,13 @@ a {
   margin: 10px 0 20px 0;
 }
 
-.add-project-button:disabled {
+.add-project-button:disabled, .clone-project-button:disabled {
   @extend .gray-button;
 }
 
 @media only screen and (min-width: 481px) {
-  .add-project-button, .add-project-button:disabled {
+  .add-project-button, .add-project-button:disabled,
+  .clone-project-button, .clone-project-button:disabled {
     padding: 10px 15px;
     font-family: $current-lang-choice;
     font-size: 16px;

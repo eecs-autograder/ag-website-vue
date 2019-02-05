@@ -239,6 +239,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
 
   #input-course-semester {
     width: 120px;
+    height: 24px;
   }
 
   .semester-item {
