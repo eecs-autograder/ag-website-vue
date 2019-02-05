@@ -143,7 +143,6 @@
 
     async update_tab_index(index: number) {
       this.current_tab_index = index;
-      console.log("Hello from tab: " + this.current_tab_index);
       if (this.current_tab_index === 0 || this.current_tab_index === 2) {
         this.role_selected = "";
       }

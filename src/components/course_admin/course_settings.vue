@@ -61,9 +61,15 @@
           </ValidatedInput>
         </div>
 
-        <ul class="error-ul">
-          <li v-for="error of api_errors" class="error-li">{{error}}</li>
-        </ul>
+        <div v-for="error of api_errors"
+             class="api-error-container">
+            <div class="api-error"> {{error}} </div>
+            <div class="x-box">
+              <span @click="dismiss_settings_api_error" class="dismiss-error"> Dismiss
+                <!--<i class="fas fa-times dismiss-error"></i>-->
+              </span>
+            </div>
+        </div>
 
         <input id="settings-submit"
                type="submit"
@@ -136,16 +142,16 @@ export default class CourseSettings extends Vue {
   readonly is_non_negative = is_non_negative;
   readonly is_number = is_number;
 
+  dismiss_settings_api_error() {
+    this.api_errors = [];
+  }
+
   @handle_400_errors_async(handle_save_course_settings_error)
   async save_course_settings() {
     try {
-      console.log("Saving course settings");
       this.saving = true;
       this.api_errors = [];
-      console.log("right before call");
       let response = await this.course.save();
-      console.log(this.course);
-      console.log("saving done");
     }
     finally {
       this.saving = false;
@@ -156,11 +162,8 @@ export default class CourseSettings extends Vue {
 // mock the response so last modified timestamp is different
 function handle_save_course_settings_error(component: CourseSettings, response: AxiosResponse) {
   let errors = response.data["__all__"];
-
-  console.log("handling any errors");
   if (errors !== undefined && errors.length > 0) {
     component.api_errors = [errors[0]];
-    console.log("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
   }
 }
 </script>
@@ -174,6 +177,30 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
 
   $current-lang-choice: "Muli";
   $github-black-color: #24292e;
+
+  .x-box {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    padding: 4px 10px;
+    background-color: white;
+    border-radius: .25rem;
+    cursor: pointer;
+    border: 1px solid #f5c6cb;
+  }
+
+  .api-error-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 70px 10px 10px;
+    border-radius: .25rem;
+    margin-bottom: 18px;
+  }
 
   .submit-button {
     @extend .green-button;
@@ -235,6 +262,10 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     padding-bottom: 16px;
     display: block;
     max-width: 500px;
+  }
+
+  .late-days-container {
+    margin-bottom: 50px;
   }
 
   #input-course-semester {
@@ -327,7 +358,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     padding: 10px 15px;
     font-family: $current-lang-choice;
     font-size: 16px;
-    margin: 0 15px 12px 0;
+    margin: 0px 15px 12px 0;
     display: inline-block;
   }
 

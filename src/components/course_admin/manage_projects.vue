@@ -18,9 +18,18 @@
                                          border: 2px solid #ced4da;">
             </ValidatedInput>
 
-            <ul class="error-ul">
-              <li v-for="error of new_project_api_errors" class="error-li">{{error}}</li>
-            </ul>
+            <!--the validated input width is off-->
+
+            <div v-for="error of new_project_api_errors"
+                 class="api-error-container">
+              <div class="api-error"> {{error}} </div>
+              <div class="x-box">
+                  <span @click="dismiss_new_project_error"
+                        class="dismiss-error">
+                    Dismiss
+                  </span>
+              </div>
+            </div>
 
             <input type="submit"
                    :disabled="!project_form_is_valid"
@@ -76,8 +85,7 @@
                                    v-model="cloned_project_name"
                                    :validators="[is_not_empty]"
                                    :num_rows="1"
-                                   input_style="width: 100%;
-                                         border: 2px solid #ced4da;">
+                                   input_style="width: 100%; border: 2px solid #ced4da;">
                   </validated-input>
                 </div>
 
@@ -92,14 +100,18 @@
                         <div tabindex="1" class="input-wrapper">
                           <div id="input-course-to-copy-to"
                                class="settings-input">
-                            {{course_to_clone_to.name}}
+                            {{course_to_clone_to.name ? course_to_clone_to.name : ""}}
+                            {{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}
+                            {{course_to_clone_to.year ? course_to_clone_to.year : ""}}
                             <i class="fas fa-caret-down dropdown-caret"></i>
                           </div>
                         </div>
                       </template>
                       <div slot-scope="{item}">
                         <span class="course-to-copy-name">
-                          {{item.name}} {{item.semester}} {{item.year}}
+                          {{item.name ? item.name : ""}}
+                          {{item.semester ? item.semester : ""}}
+                          {{item.year ? item.year : ""}}
                         </span>
                       </div>
                     </dropdown>
@@ -107,9 +119,16 @@
                 </div>
               </div>
 
-              <ul class="error-ul">
-                <li v-for="error of api_cloning_errors" class="error-li">{{error}}</li>
-              </ul>
+              <div v-for="error of api_cloning_errors"
+                   class="api-error-container">
+                <div class="api-error"> {{error}} </div>
+                <div class="x-box">
+                  <span @click="dismiss_cloning_project_error"
+                        class="dismiss-error">
+                    Dismiss
+                  </span>
+                </div>
+              </div>
 
               <input type="submit"
                      class="clone-project-button"
@@ -155,6 +174,7 @@
 
     private readonly _is_not_empty = is_not_empty;
 
+    user: User | null = null;
     saving = false;
     projects: Project[] | null = null;
     new_project_name = "";
@@ -162,7 +182,6 @@
     project_400_error_present = false;
     new_project_api_errors: string[] = [];
     api_cloning_errors: string[] = [];
-
     d_course!: Course;
 
     project_to_copy: Project | null = null;
@@ -176,19 +195,28 @@
     readonly is_not_empty = is_not_empty;
 
     async created() {
-      let user = await User.get_current();
-      this.projects = await Project.get_all_from_course(this.course.pk);
       this.d_course = this.course;
-      this.course_to_clone_to = this.d_course;
-      this.cloning_destinations = await user.courses_is_admin_for();
+      this.projects = await Project.get_all_from_course(this.d_course.pk);
     }
 
-    clone_project(project: Project) {
+    dismiss_new_project_error() {
+      this.new_project_api_errors = [];
+    }
+
+    dismiss_cloning_project_error() {
+      this.api_cloning_errors = [];
+    }
+
+    async clone_project(project: Project) {
       this.project_to_copy = project;
+      if (this.user === null) {
+        this.user = await User.get_current();
+      }
+      this.cloning_destinations = await this.user.courses_is_admin_for();
+      this.course_to_clone_to = this.d_course;
       let clone_project_modal = <Modal> this.$refs.clone_project_modal;
       clone_project_modal.open();
     }
-
 
     @handle_400_errors_async(handle_add_project_error)
     async add_project() {
@@ -257,9 +285,7 @@
   }
 
   function handle_add_cloned_project_error(component: ManageProjects, response: AxiosResponse) {
-    console.log("Errors present");
     let errors = response.data["__all__"];
-    console.log(errors.length);
     if (errors !== undefined && errors.length > 0) {
       component.api_cloning_errors = [errors[0]];
       component.cloning_api_error_present = true;
@@ -279,9 +305,40 @@ $github-black-color: #24292e;
 
 /* ---------------- Projects Styling ---------------- */
 
+  /*if you press the x, you should also get rid of the error - in the modal only*/
 
-.cloned-project-name, .cloned-project-destination  {
+.x-box {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  padding: 4px 10px;
+  background-color: white;
+  border-radius: .25rem;
+  cursor: pointer;
+  border: 1px solid #f5c6cb;
+}
+
+.api-error-container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px 90px 10px 10px;
+  border-radius: .25rem;
+  margin-top: 18px;
+}
+
+.cloned-project-name {
   padding-bottom: 16px;
+  position: relative;
+  display: block;
+  max-width: 500px;
+}
+
+.cloned-project-destination  {
   position: relative;
   display: block;
   max-width: 500px;
@@ -319,7 +376,7 @@ $github-black-color: #24292e;
 
 #input-course-to-copy-to {
   width: 100%;
-  min-width: 225px;
+  min-width: 250px;
 }
 
 .settings-input:focus {
@@ -517,7 +574,7 @@ a {
     padding: 10px 15px;
     font-family: $current-lang-choice;
     font-size: 16px;
-    margin: 0 15px 12px 0;
+    margin: 20px 15px 12px 0;
     display: inline-block;
   }
 }
