@@ -25,6 +25,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
+import InstructorFiles from '@/components/instructor_files.vue';
 import Tab from '@/components/tabs/tab.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import Toggle from '@/components/toggle.vue';
@@ -60,6 +61,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     DropdownDemo,
     DropdownTypeaheadDemo,
     FileUploadDemo,
+    InstructorFiles,
     LoadingIconDemo,
     ManageProjectsDemo,
     ModalDemo,
