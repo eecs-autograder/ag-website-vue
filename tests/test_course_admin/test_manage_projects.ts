@@ -17,7 +17,6 @@ beforeAll(() => {
 
 describe('ManageProjects.vue', () => {
     let wrapper: Wrapper<ManageProjects>;
-    let manage_projects: ManageProjects;
     let course: Course;
     let original_match_media: (query: string) => MediaQueryList;
     let new_project: Project;
@@ -140,7 +139,7 @@ describe('ManageProjects.vue', () => {
             }
         });
 
-        manage_projects = wrapper.vm;
+        let manage_projects = wrapper.vm;
 
         expect(manage_projects.new_project_name).toEqual("");
         const spy = jest.fn();
@@ -176,7 +175,7 @@ describe('ManageProjects.vue', () => {
                 });
 
                 await wrapper.vm.$nextTick();
-                manage_projects = wrapper.vm;
+                let manage_projects = wrapper.vm;
 
                 expect(manage_projects.projects).toEqual(projects);
 
@@ -189,7 +188,7 @@ describe('ManageProjects.vue', () => {
     });
 
 
-    test.skip('Clicking on the add project button when the new project name is not the empty ' +
+    test.only('Clicking on the add project button when the new project name is not the empty ' +
          'string calls Project.create',
          async () => {
         wrapper = mount(ManageProjects, {
@@ -198,7 +197,7 @@ describe('ManageProjects.vue', () => {
             }
         });
 
-        manage_projects = wrapper.vm;
+        let manage_projects = wrapper.vm;
         manage_projects.new_project_name = "Project 1";
 
         let validated_input_component = <ValidatedInput> wrapper.find(
@@ -225,7 +224,7 @@ describe('ManageProjects.vue', () => {
     });
 
 
-    test.only('When a new project is created it gets displayed among the prexisting projects',
+    test.skip('When a new project is created it gets displayed among the prexisting projects',
          async () => {
         return patch_async_static_method(
             Project, 'get_all_from_course',
@@ -244,7 +243,7 @@ describe('ManageProjects.vue', () => {
                 });
 
                 await wrapper.vm.$nextTick();
-                manage_projects = wrapper.vm;
+                let manage_projects = wrapper.vm;
 
                 expect(manage_projects.projects).toEqual(projects);
 
@@ -258,7 +257,7 @@ describe('ManageProjects.vue', () => {
 
                 return patch_async_static_method(
                     Project, 'create',
-                    () => Promise.resolve(new_project),
+                    () => { console.log('spaaaaaam'); Promise.resolve(new_project); },
                     async () => {
 
                         // let mock_result = await Project.create(
@@ -268,8 +267,8 @@ describe('ManageProjects.vue', () => {
 
                         let new_project_form = wrapper.find('#new-project-form');
                         new_project_form.trigger('submit.native');
-                        await manage_projects.$nextTick();
 
+                        console.log(wrapper.html());
                         all_projects = wrapper.findAll('.project-name');
                         expect(all_projects.length).toEqual(3);
                         expect(all_projects.at(0).text()).toEqual(new_project.name);
@@ -312,7 +311,7 @@ describe('ManageProjects.vue', () => {
                 });
 
                 await wrapper.vm.$nextTick();
-                manage_projects = wrapper.vm;
+                let manage_projects = wrapper.vm;
 
                 return patch_async_static_method(
                     Project, 'create',

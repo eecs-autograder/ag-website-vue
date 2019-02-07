@@ -175,7 +175,7 @@
 
     user: User | null = null;
     saving = false;
-    projects: Project[] | null = null;
+    projects: Project[] = [];
     new_project_name = "";
     project_form_is_valid = false;
     new_project_api_errors: string[] = [];
@@ -225,12 +225,12 @@
         this.new_project_name.trim();
         this.saving = true;
         let new_project: Project = await Project.create(
-          {name: this.new_project_name, course: this.course.pk}
+          {name: this.new_project_name, course: this.d_course.pk}
         );
         console.log("Success!");
-        this.projects!.push(new_project);
+        this.projects.push(new_project);
         console.log(this.projects.length);
-        this.projects!.sort((project_a: Project, project_b: Project) => {
+        this.projects.sort((project_a: Project, project_b: Project) => {
           if (project_a.name <= project_b.name) {
             return -1;
           }
@@ -253,25 +253,22 @@
         this.api_cloning_errors.push("Cloned project name cannot be an empty string.");
         return;
       }
-      try {
-        let new_project = await this.project_to_copy!.copy_to_course(
-          this.course_to_clone_to!.pk, this.cloned_project_name
-        );
-        let clone_project_modal = <Modal> this.$refs.clone_project_modal;
-        clone_project_modal.close();
-        let cloned_project_name_input = <ValidatedInput> this.$refs.cloned_project_name_input;
-        cloned_project_name_input.clear();
-        if (this.course_to_clone_to!.pk === this.course!.pk) {
-          this.projects!.push(new_project);
-          this.projects!.sort((project_a: Project, project_b: Project) => {
-            if (project_a.name <= project_b.name) {
-              return -1;
-            }
-            return 1;
-          });
-        }
+      let new_project = await this.project_to_copy!.copy_to_course(
+        this.course_to_clone_to!.pk, this.cloned_project_name
+      );
+      let clone_project_modal = <Modal> this.$refs.clone_project_modal;
+      clone_project_modal.close();
+      let cloned_project_name_input = <ValidatedInput> this.$refs.cloned_project_name_input;
+      cloned_project_name_input.clear();
+      if (this.course_to_clone_to!.pk === this.d_course!.pk) {
+        this.projects.push(new_project);
+        this.projects.sort((project_a: Project, project_b: Project) => {
+          if (project_a.name <= project_b.name) {
+            return -1;
+          }
+          return 1;
+        });
       }
-      finally { }
     }
   }
 
