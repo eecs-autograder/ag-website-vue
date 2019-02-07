@@ -7,7 +7,7 @@
        <tab v-for="(open_file, index) of files_currently_viewing">
          <tab-header @click.native="active_tab_index = index">
            <div class="tab-header">
-             <p class="tab-label">{{ open_file.name }}</p>
+             <p class="tab-label">{{open_file.name}}</p>
              <i class="fas fa-times close-x"
                 @click="$event.stopPropagation(); remove_from_viewing(index)"></i>
            </div>
