@@ -3,9 +3,11 @@
     <div class="view-file-ex-1">
       <p> <b> View File allows for horizontal scrolling when the text is longer than
         the width of the display. </b></p>
-      <view-file :filename="filename_1"
-                 :file_contents="file_contents_1">
-      </view-file>
+      <div class="border-box">
+        <view-file :filename="filename_1"
+                   :file_contents="file_contents_1">
+        </view-file>
+      </div>
     </div>
     <div class="view-file-ex-2">
       <p> <b> View File allows for vertical scrolling when there are more lines than can
@@ -27,7 +29,7 @@
       <div class="border-box">
         <view-file :filename="filename_3"
                    :file_contents="file_contents_3"
-                   view_file_height="200px">
+                   view_file_height="95px">
         </view-file>
       </div>
     </div>
@@ -43,12 +45,12 @@
     components: {ViewFile}
   })
   export default class ViewFileDemo extends Vue {
-    height_in = '200px';
+    height_in = '300px';
     filename_1 = "long_lines.txt";
-    file_contents_1 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
-                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
-                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
-                      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    file_contents_1 = "I watch two episodes of family fued back to back every night. \n" +
+                      "They're supposed to pick the 5 7 or 9 most probable answers from \na " +
+                      "survey \nof 100 people. Like if the show was called 'hey that's " +
+                      "possible' the show \nwould be called Family Feud";
     filename_2 = "many_lines.txt";
     file_contents_2 =
 `#file-container {
@@ -85,7 +87,7 @@
 <style scoped lang="scss">
 
 .view-file-ex-1{
-  width: 700px;
+  width: 50%;
   margin: 20px;
 }
 
