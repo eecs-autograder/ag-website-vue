@@ -159,10 +159,9 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import url('https://fonts.googleapis.com/css?family=Montserrat');
-@import url('https://fonts.googleapis.com/css?family=Muli');
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
 
-$current-lang-choice: "Muli";
+$current-lang-choice: "Quicksand";
 $github-black-color: #24292e;
 
 .course-admin-component {
@@ -185,6 +184,7 @@ $github-black-color: #24292e;
 
 .tab-label {
   outline: none;
+  cursor: pointer;
 }
 
 .permissions-row-content {

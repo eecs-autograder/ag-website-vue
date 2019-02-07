@@ -35,14 +35,17 @@
                 <tr>
                   <th class="email-column"> Username </th>
                   <th class="name-column"> Name </th>
-                  <th class="delete-column">  </th>
+                  <th class="delete-column"> Delete </th>
                 </tr>
                 <tr v-for="(person, index) in d_roster"
                     :class="index % 2 ? 'odd-row' : 'even-row'">
                   <td class="email-column email">{{person.username}}</td>
-                  <td class="name-column name"> {{names[index % 10]}}</td>
-                  <td class="delete-column"> <i class="fas fa-user-times delete-permission"
-                          @click="remove_person_from_roster([person], index)"></i> </td>
+                  <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
+                  <td class="delete-column">
+                    <i class="fas fa-user-times delete-permission"
+                       @click="remove_person_from_roster([person], index)">
+                    </i>
+                  </td>
                 </tr>
               </table>
             </div>
@@ -84,10 +87,6 @@
       this.sort_users(this.d_roster);
     }
 
-    names = ["Pam Beesly", "Jim Halpert", "Phyllis Lapin Vance", "Stanley Hudson",
-             "Dwight Shrute", "Angela Martin", "Oscar Martinez", "Kevin Malone", "Michael Scott",
-             "Meredith Palmer"];
-
     saving = false;
     users_to_add = '';
     d_roster: User[] = [];
@@ -107,7 +106,6 @@
     }
 
     contains_valid_emails(value: string): ValidatorResponse {
-      // console.log("VALIDATOR FUNCTION");
       this.check_for_invalid_emails(value, []);
       return {
         is_valid: this.first_invalid_email === null,
@@ -121,9 +119,7 @@
       let split_regex = /\s+/g;
       let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
       let trimmed_input = string_of_emails.trim();
-      // console.log(trimmed_input);
       let usernames = trimmed_input.split(split_regex);
-      // console.log(usernames);
       for (let username of usernames) {
         if (valid_email_regex.test(username)) {
           valid_usernames.push(username);
@@ -135,14 +131,10 @@
       }
     }
 
-    // ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu
-
     add_permissions() {
-      // console.log("ADD PERMISSIONS");
       let valid_usernames: string[] = [];
       this.check_for_invalid_emails(this.users_to_add, valid_usernames);
       if (this.first_invalid_email === null) {
-        // console.log("Success");
         this.$emit('add_permissions', valid_usernames);
         this.users_to_add = "";
         let validated_input = <ValidatedInput> this.$refs.permissions_textarea;
@@ -161,69 +153,19 @@
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
   @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Montserrat');
-  @import url('https://fonts.googleapis.com/css?family=Sawarabi+Gothic');
-  @import url('https://fonts.googleapis.com/css?family=Muli');
+  @import url('https://fonts.googleapis.com/css?family=Quicksand');
 
-  $current-lang-choice: "Muli";
-  //$current-lang-choice: "Sawarabi Gothic";
+  $current-lang-choice: "Quicksand";
   $github-black-color: #24292e;
 
   .course-admin-component {
     font-family: $current-lang-choice;
   }
 
-  .tab-header {
-    margin: 0;
-    font-size: 18px;
-    padding: 10px 25px 12px 25px;
-    font-weight: 500;
-  }
-
-  .tab-body {
-    padding-top: 30px;
-    text-align: left;
-    position: relative;
-  }
-
-  .tab-label {
-    outline: none;
-  }
-
   /* ---------------- Permissions Styling ---------------- */
-
-  .error-ul {
-    list-style-type: none; /* Remove bullets */
-    padding-left: 0;
-    max-width: 500px;
-    width: 100%
-  }
 
   .invalid-email{
     color: $github-black-color;
-  }
-
-  .error-li:first-child {
-    margin-top: -10px;
-    border-top-left-radius: .25rem;
-    border-top-right-radius: .25rem;
-  }
-
-  .error-li:last-child {
-    margin-bottom: 0;
-    border-bottom-right-radius: .25rem;
-    border-bottom-left-radius: .25rem;
-  }
-
-  .error-ul .error-li {
-    box-sizing: border-box;
-    word-wrap: break-word;
-    position: relative;
-    padding: 10px 15px;
-    margin-bottom: -1px;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
   }
 
   .class-permissions-body {
@@ -235,7 +177,7 @@
   }
 
   .enrolled-container {
-    margin: 0 10%;
+    margin: 15px 10% 0 10%;
     padding: 0 0 50px 0;
   }
 
@@ -251,9 +193,8 @@
     display: block;
     font-family: $current-lang-choice;
     font-size: 16px;
-    margin: 18px 0 0 0;
+    margin: 11px 0 0 0;
     padding: 20px 15px;
-    text-align: center;
   }
 
   .add-permissions-button:disabled {
@@ -293,12 +234,6 @@
 
   .email {
     color: $github-black-color;
-    //color: $ocean-blue;
-    /*color: darken(lavender, 40);*/
-  }
-
-  .name {
-    color: lighten($github-black-color, 20);
   }
 
   .name-column {
@@ -306,8 +241,13 @@
     word-spacing: 4px;
   }
 
+  .name {
+    color: lighten($github-black-color, 20);
+  }
+
   .delete-column {
     width: 5%;
+    text-align: center;
   }
 
   .permissions-table td {
@@ -329,21 +269,7 @@
   }
 
   .permissions-column {
-    /*max-width: 300px;*/
     overflow: scroll;
-  }
-
-  textarea {
-    width: 97%;
-    height: 200px;
-    font-size: 16px;
-    padding: 1%;
-    border-radius: 6px;
-    border: 2px solid $stormy-gray-dark;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-    margin: 0;
-    outline: none;
-    font-family: $current-lang-choice;
   }
 
   .delete-permission {
@@ -355,26 +281,19 @@
     color: $github-black-color;
   }
 
+  ::-webkit-scrollbar {
+    width: 0;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+  }
+
   @media only screen and (min-width: 481px) {
 
     .add-permissions-button, .add-permissions-button:disabled {
       padding: 10px 15px;
       font-family: $current-lang-choice;
       font-size: 16px;
-      display: inline-block;
+      margin: 10px 0 0 0;
     }
-
-    .tab-body {
-      margin-left: 2px;
-      margin-right: 2px;
-      border-top: 2px solid $pebble-dark;
-    }
-
-    .tab-header {
-      padding: 10px 15px 10px 15px;
-    }
-
-    /* ---------------- Permissions Styling ---------------- */
 
     .adding-container, .enrolled-container {
       margin: 0 10%;
@@ -387,17 +306,9 @@
     .enrollment-add-label {
       padding: 0 0 10px 0;
     }
-
-    .add-permissions-button {
-      margin-top: 20px;
-    }
-
-    /* ---------------- Projects Styling ---------------- */
-
   }
 
   @media only screen and (min-width: 768px) {
-    /* ---------------- Edit Permissions Styling ---------------- */
     .permissions-column {
       overflow: visible;
     }

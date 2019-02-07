@@ -145,7 +145,8 @@ describe('ManageProjects.vue', () => {
         const spy = jest.fn();
 
         await patch_async_static_method(
-            Project, 'create',
+            Project,
+            'create',
             spy,
             async () => {
 
@@ -155,34 +156,6 @@ describe('ManageProjects.vue', () => {
                 await manage_projects.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(0);
-            }
-        );
-    });
-
-    test('New Project name cannot be the empty string', async () => {
-        await patch_async_static_method(
-            Project, 'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
-                wrapper = mount(ManageProjects, {
-                    propsData: {
-                        course: course,
-                    },
-                    mocks: {
-                        $route
-                    }
-                });
-
-                await wrapper.vm.$nextTick();
-                manage_projects = wrapper.vm;
-
-                expect(manage_projects.new_project_name).toEqual("");
-
-                let new_project_form = wrapper.find('#new-project-form');
-                new_project_form.trigger('submit.native');
-                await manage_projects.$nextTick();
-
-                expect(manage_projects.api_errors.length).toEqual(1);
             }
         );
     });
@@ -214,7 +187,7 @@ describe('ManageProjects.vue', () => {
         );
     });
 
-    test('Clicking on the add project button when the new project name is not the empty ' +
+    test.only('Clicking on the add project button when the new project name is not the empty ' +
          'string calls Project.create',
          async () => {
         wrapper = mount(ManageProjects, {
@@ -226,15 +199,21 @@ describe('ManageProjects.vue', () => {
         manage_projects = wrapper.vm;
         manage_projects.new_project_name = "Project 1";
 
+        let validated_input_component = <ValidatedInput> wrapper.find(
+            {ref: 'new_project'}
+        ).vm;
+
+        expect(validated_input_component.is_valid).toBe(true);
+
         const spy = jest.fn();
 
         await patch_async_static_method(
-            Project, 'create',
+            Project,
+            'create',
             spy,
             async () => {
 
                 let new_project_form = wrapper.find('#new-project-form');
-
                 new_project_form.trigger('submit.native');
                 await manage_projects.$nextTick();
 
@@ -243,7 +222,7 @@ describe('ManageProjects.vue', () => {
         );
     });
 
-    test('When a new project is created it gets displayed among the prexisting projects',
+    test.skip('When a new project is created it gets displayed among the prexisting projects',
          async () => {
         await patch_async_static_method(
             Project, 'get_all_from_course',
@@ -340,9 +319,7 @@ describe('ManageProjects.vue', () => {
                         new_project_form.trigger('submit.native');
                         await manage_projects.$nextTick();
 
-                        // console.log(wrapper.html());
-
-                        expect(manage_projects.api_errors.length).toEqual(1);
+                        expect(manage_projects.new_project_api_errors.length).toEqual(1);
                     }
                 );
             }

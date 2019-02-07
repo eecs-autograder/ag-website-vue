@@ -65,9 +65,7 @@
              class="api-error-container">
             <div class="api-error"> {{error}} </div>
             <div class="x-box">
-              <span @click="dismiss_settings_api_error" class="dismiss-error"> Dismiss
-                <!--<i class="fas fa-times dismiss-error"></i>-->
-              </span>
+              <span @click="dismiss_settings_api_error" class="dismiss-error"> Dismiss </span>
             </div>
         </div>
 
@@ -93,7 +91,7 @@
 </template>
 
 <script lang="ts">
-import { Course, Semester, User } from 'ag-client-typescript';
+import { Course, Semester } from 'ag-client-typescript';
 import { AxiosResponse } from 'axios';
 
 import Dropdown from '@/components/dropdown.vue';
@@ -114,18 +112,20 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 })
 export default class CourseSettings extends Vue {
 
+  readonly is_not_empty = is_not_empty;
+  readonly is_non_negative = is_non_negative;
+  readonly is_number = is_number;
+
   @Prop({required: true, type: Course})
   course!: Course;
 
-  saving = false;
-
-  semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
-
-  settings_form_is_valid = false;
   api_errors: string[] = [];
   d_course!: Course;
+  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+  saving = false;
+  semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
+  settings_form_is_valid = false;
 
   created() {
     this.d_course = this.course;
@@ -134,13 +134,9 @@ export default class CourseSettings extends Vue {
   is_valid_year(value: string): ValidatorResponse {
     return {
       is_valid: Number(value) >= 2000,
-      error_msg: "Please enter a valid year"
+      error_msg: "Please enter a valid year."
     };
   }
-
-  readonly is_not_empty = is_not_empty;
-  readonly is_non_negative = is_non_negative;
-  readonly is_number = is_number;
 
   dismiss_settings_api_error() {
     this.api_errors = [];
@@ -159,7 +155,6 @@ export default class CourseSettings extends Vue {
   }
 }
 
-// mock the response so last modified timestamp is different
 function handle_save_course_settings_error(component: CourseSettings, response: AxiosResponse) {
   let errors = response.data["__all__"];
   if (errors !== undefined && errors.length > 0) {
@@ -171,12 +166,14 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
   @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Montserrat');
-  @import url('https://fonts.googleapis.com/css?family=Sawarabi+Gothic');
-  @import url('https://fonts.googleapis.com/css?family=Muli');
+  @import url('https://fonts.googleapis.com/css?family=Quicksand');
 
-  $current-lang-choice: "Muli";
+  $current-lang-choice: "Quicksand";
   $github-black-color: #24292e;
+
+  #settings-container {
+    margin: 5px 0;
+  }
 
   .x-box {
     position: absolute;
@@ -199,17 +196,16 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     border: 1px solid #f5c6cb;
     padding: 10px 70px 10px 10px;
     border-radius: .25rem;
-    margin-bottom: 18px;
+    margin-bottom: 11px;
   }
 
   .submit-button {
     @extend .green-button;
-    text-align: center;
     display: block;
     font-family: $current-lang-choice;
     font-size: 16px;
-    padding: 20px 15px;
-    margin: 10px 0 20px 0;
+    padding: 10px 15px;
+    margin: 10px 0;
   }
 
   .submit-button:disabled {
@@ -222,13 +218,11 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
   }
 
   #settings-container-inputs {
-    width: 80%;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin: 0 20px;
   }
 
   .settings-input-label {
-    text-align: right;
+    text-align: left;
     font-size: 17px;
     font-weight: 600;
     margin: 5px 15px 7px 0;
@@ -304,47 +298,6 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     cursor: pointer;
   }
 
-  .error-ul {
-    list-style-type: none; /* Remove bullets */
-    padding-left: 0;
-    max-width: 500px;
-    width: 100%
-  }
-
-  .error-li:first-child {
-    margin-top: -10px;
-    border-top-left-radius: .25rem;
-    border-top-right-radius: .25rem;
-  }
-
-  .error-li:last-child {
-    margin-bottom: 0;
-    border-bottom-right-radius: .25rem;
-    border-bottom-left-radius: .25rem;
-  }
-
-  .error-ul .error-li {
-    box-sizing: border-box;
-    word-wrap: break-word;
-    position: relative;
-    padding: 10px 15px;
-    margin-bottom: -1px;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-  }
-
-  .input.error-input {
-    border: 1px solid $warning-red;
-  }
-
-  .error-input:focus {
-    outline: none;
-    box-shadow: 0 0 10px $warning-red;
-    border: 1px solid $warning-red;
-    border-radius: .25rem;
-  }
-
   .suffix-element {
     display: inline-block;
     vertical-align: top;
@@ -358,7 +311,7 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
     padding: 10px 15px;
     font-family: $current-lang-choice;
     font-size: 16px;
-    margin: 0px 15px 12px 0;
+    margin: 0 15px 12px 0;
     display: inline-block;
   }
 
@@ -368,10 +321,6 @@ function handle_save_course_settings_error(component: CourseSettings, response: 
 
   #settings-container-inputs {
     margin: 0 0 0 40px;
-  }
-
-  #input-course-name {
-    width: 400px;
   }
 }
 </style>

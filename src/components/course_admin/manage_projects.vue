@@ -1,5 +1,5 @@
 <template>
-  <div class="projects-container">
+  <div class="manage-projects-component">
     <div id="project-body-container">
       <div id="new-project-side">
         <div id="new-project-space">
@@ -9,16 +9,16 @@
                          @form_validity_changed="project_form_is_valid = $event">
             <p id="new-project-label"> Create a New Project</p>
 
-            <ValidatedInput ref="new_project"
-                            v-model="new_project_name"
-                            :validators="[is_not_empty]"
-                            :num_rows="1"
-                            input_style="width: 100%;
+            <div class="new-project-validation-wrapper">
+              <ValidatedInput ref="new_project"
+                              v-model="new_project_name"
+                              :validators="[is_not_empty]"
+                              :num_rows="1"
+                              input_style="width: 100%;
                                          max-width: 400px;
                                          border: 2px solid #ced4da;">
-            </ValidatedInput>
-
-            <!--the validated input width is off-->
+              </ValidatedInput>
+            </div>
 
             <div v-for="error of new_project_api_errors"
                  class="api-error-container">
@@ -99,7 +99,7 @@
                       <template slot="header">
                         <div tabindex="1" class="input-wrapper">
                           <div id="input-course-to-copy-to"
-                               class="settings-input">
+                               class="projects-input">
                             {{course_to_clone_to.name ? course_to_clone_to.name : ""}}
                             {{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}
                             {{course_to_clone_to.year ? course_to_clone_to.year : ""}}
@@ -179,7 +179,6 @@
     projects: Project[] | null = null;
     new_project_name = "";
     project_form_is_valid = false;
-    project_400_error_present = false;
     new_project_api_errors: string[] = [];
     api_cloning_errors: string[] = [];
     d_course!: Course;
@@ -220,6 +219,7 @@
 
     @handle_400_errors_async(handle_add_project_error)
     async add_project() {
+      console.log("Adding Project");
       this.new_project_api_errors = [];
       if (this.new_project_name === "") {
         this.new_project_api_errors.push("New project name cannot be an empty string.");
@@ -231,16 +231,19 @@
         let new_project: Project = await Project.create(
           {name: this.new_project_name, course: this.course.pk}
         );
-        let new_project_name_input = <ValidatedInput> this.$refs.new_project;
-        new_project_name_input.clear();
+        console.log("Success!");
         this.new_project_name = "";
         this.projects!.push(new_project);
+        console.log(this.projects.length);
         this.projects!.sort((project_a: Project, project_b: Project) => {
           if (project_a.name <= project_b.name) {
             return -1;
           }
           return 1;
         });
+        let new_project_name_input = <ValidatedInput> this.$refs.new_project;
+        new_project_name_input.clear();
+
       }
       finally {
         this.saving = false;
@@ -264,8 +267,8 @@
         let cloned_project_name_input = <ValidatedInput> this.$refs.cloned_project_name_input;
         cloned_project_name_input.clear();
         if (this.course_to_clone_to!.pk === this.course!.pk) {
-          this.projects.push(new_project);
-          this.projects.sort((project_a: Project, project_b: Project) => {
+          this.projects!.push(new_project);
+          this.projects!.sort((project_a: Project, project_b: Project) => {
             if (project_a.name <= project_b.name) {
               return -1;
             }
@@ -297,15 +300,22 @@
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
   @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Montserrat');
-  @import url('https://fonts.googleapis.com/css?family=Muli');
+  @import url('https://fonts.googleapis.com/css?family=Quicksand');
 
-$current-lang-choice: "Muli";
+$current-lang-choice: "Quicksand";
 $github-black-color: #24292e;
 
 /* ---------------- Projects Styling ---------------- */
 
   /*if you press the x, you should also get rid of the error - in the modal only*/
+
+.manage-projects-component {
+  font-family: $current-lang-choice;
+}
+
+.new-project-validation-wrapper {
+  max-width: 400px;
+}
 
 .x-box {
   position: absolute;
@@ -321,14 +331,14 @@ $github-black-color: #24292e;
 .api-error-container {
   box-sizing: border-box;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   position: relative;
   color: #721c24;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   padding: 10px 90px 10px 10px;
   border-radius: .25rem;
-  margin-top: 18px;
+  margin-top: 11px;
 }
 
 .cloned-project-name {
@@ -356,7 +366,7 @@ $github-black-color: #24292e;
   cursor: pointer;
 }
 
-.settings-input {
+.projects-input {
   box-sizing: border-box;
   position: relative;
   display: block;
@@ -379,7 +389,7 @@ $github-black-color: #24292e;
   min-width: 250px;
 }
 
-.settings-input:focus {
+.projects-input:focus {
   border-color: $ocean-blue;
 }
 
@@ -435,7 +445,15 @@ $github-black-color: #24292e;
 
 #new-project-label {
   font-size: 17px;
-  margin: 0 0 12px 0;
+  margin: 0 0 11px 0;
+  padding: 6px 0 0 0;
+  font-weight: 600;
+  color: $github-black-color;
+}
+
+.existing-projects-label {
+  font-size: 17px;
+  margin: 40px 0 11px 0;
   padding: 6px 0 0 0;
   font-weight: 600;
   color: $github-black-color;
@@ -450,19 +468,11 @@ $github-black-color: #24292e;
   margin: 0 5% 0 5%;
 }
 
-.existing-projects-label {
-  font-size: 17px;
-  margin: 40px 0 20px 0;
-  padding: 6px 0 0 0;
-  font-weight: 600;
-  color: $github-black-color;
-}
-
 .project-div {
   width: 100%;
   display: block;
   position: relative;
-  margin: 15px 0;
+  margin: 11px 0;
   min-width: 350px;
   font-size: 16px;
 }
@@ -498,13 +508,15 @@ $github-black-color: #24292e;
 
 .copier {
   display: inline-block;
-  padding: 10px 8px;
+  padding: 12px 8px;
   color: $github-black-color;
   background-color: white;
   border: 2px solid $pebble-light;
   margin-left: 2%;
   vertical-align: top;
   border-radius: 2px;
+  height: 54px;
+  box-sizing: border-box;
 }
 
 .copier:hover {
@@ -520,7 +532,9 @@ $github-black-color: #24292e;
   box-sizing: border-box;
   color: $github-black-color;
   display: block;
-  padding: 10px 8px;
+  padding: 12px 8px;
+  height: 54px;
+  box-sizing: border-box;
 }
 
 .editor:hover {
@@ -560,7 +574,7 @@ a {
   text-align: center;
   display: block;
   font-size: 16px;
-  padding: 20px 15px;
+  padding: 10px 15px;
   margin: 10px 0 20px 0;
 }
 
@@ -571,10 +585,8 @@ a {
 @media only screen and (min-width: 481px) {
   .add-project-button, .add-project-button:disabled,
   .clone-project-button, .clone-project-button:disabled {
-    padding: 10px 15px;
     font-family: $current-lang-choice;
-    font-size: 16px;
-    margin: 20px 15px 12px 0;
+    margin: 10px 15px 12px 0;
     display: inline-block;
   }
 }
@@ -596,8 +608,7 @@ a {
   }
 
   .existing-projects-label {
-    font-size: 17px;
-    margin: 0 0 12px 0;
+    margin: 0 0 11px 0;
     padding: 6px 0 0 0;
     text-align: left;
   }
@@ -612,7 +623,7 @@ a {
     border-radius: 2px;
     width: 100%;
     display: block;
-    margin: 5px 0;
+    margin: 0 0 8px 0;
   }
 
   .project-submission-div {
@@ -638,7 +649,6 @@ a {
   .editor {
     color: $github-black-color;
     display: block;
-    padding: 10px 15px;
     background-color: white;
     border: 2px solid $pebble-light;
   }
@@ -655,11 +665,8 @@ a {
 
   .copier {
     display: inline-block;
-    padding: 10px 15px;
     margin-left: 10px;
     border: 2px solid $pebble-light;
-    background-color: white;
-    color: $github-black-color;
   }
 
   .icon-label {

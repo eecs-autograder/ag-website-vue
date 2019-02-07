@@ -139,7 +139,7 @@
 
 
   #tooltip {
-    background-color: $github-black-color;
+    background-color: $stormy-gray-dark;
     border-radius: 6px;
     color: white;
     display: inline-block;
@@ -183,21 +183,21 @@
   }
 
   .placement-left::after {
-    border-color: transparent transparent transparent $github-black-color;
+    border-color: transparent transparent transparent $stormy-gray-dark;
     left: 100%;
     margin-top: -5px;
     top: 50%;
   }
 
   .placement-right::after {
-    border-color: transparent $github-black-color transparent transparent;
+    border-color: transparent $stormy-gray-dark transparent transparent;
     margin-top: -5px;
     right: 100%;
     top: 50%;
   }
 
   .placement-top::after {
-    border-color: $github-black-color transparent transparent transparent;
+    border-color: $stormy-gray-dark transparent transparent transparent;
     left: 50%;
     margin-left: -5px;
     top: 100%;

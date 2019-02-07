@@ -3,14 +3,14 @@ import { ValidatorResponse } from '@/components/validated_input.vue';
 export function is_number(value: string): ValidatorResponse {
     return {
         is_valid: value !== "" && !isNaN(Number(value)),
-        error_msg:  "You must enter a number",
+        error_msg:  "You must enter a number.",
     };
 }
 
 export function is_not_empty(value: string): ValidatorResponse {
     return {
         is_valid: value !== "",
-        error_msg: "This field is required"
+        error_msg: "This field is required."
     };
 }
 
