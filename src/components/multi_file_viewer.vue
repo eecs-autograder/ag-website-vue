@@ -7,25 +7,21 @@
        <tab v-for="(open_file, index) of files_currently_viewing">
          <tab-header @click.native="active_tab_index = index">
            <div class="tab-header">
-             <p class="tab-label"> {{ open_file.name }} </p>
+             <p class="tab-label">{{ open_file.name }}</p>
              <i class="fas fa-times close-x"
                 @click="$event.stopPropagation(); remove_from_viewing(index)"></i>
            </div>
          </tab-header>
-
          <template slot="body">
            <div class="tab-body">
-
              <view-file
                ref="view_file_component"
                :filename="open_file.name"
                :file_contents="open_file.content"
                :view_file_height="height_of_view_file">
              </view-file>
-
            </div>
          </template>
-
        </tab>
     </tabs>
   </div>
@@ -45,7 +41,7 @@
   }
 
   @Component({
-    components: { Tab, Tabs, ViewFile }
+    components: { Tab, Tabs, TabHeader, ViewFile }
   })
   export default class MultiFileViewer extends Vue {
 
@@ -78,19 +74,22 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+$current-lang-choice: "Quicksand";
 
 .close-x {
-  color: hsl(0.61, 89%, 71%);
+  background-color: inherit;
+  color: hsl(220, 20%, 85%);
   cursor: pointer;
-  display: inline-block;
-  margin-bottom: 0;
+  font-size: 16px;
+  padding: 12px 15px;
   position: absolute;
-  right: 15px;
-  top: 12px;
+  right: 6px;
+  top: 5.5px;
 }
 
 .close-x:hover {
-  color: hsl(0.61, 85%, 60%);
+  color: hsl(220, 20%, 55%);
 }
 
 .tab-body {
@@ -98,19 +97,33 @@
   border: 2px solid hsl(210, 11%, 90%);
   bottom: 0;
   color: #24292e;
-  min-width: 800px;
   position: relative;
 }
 
 .tab-header {
   margin: 0;
+  background-color: inherit;
 }
 
 .tab-label {
   display: inline-block;
-  font-family: "Helvetica Neue", Helvetica;
+  font-family: $current-lang-choice;
   margin: 0;
   padding-right: 25px;
+}
+
+.tab-header {
+  overflow: hidden;
+}
+
+@media only screen and (min-width: 481px) {
+  .close-x {
+    background-color: inherit;
+    font-size: inherit;
+    padding: 3px 5px;
+    right: 8px;
+    top: 10px;
+  }
 }
 
 </style>

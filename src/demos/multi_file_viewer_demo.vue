@@ -101,7 +101,7 @@ export default class MultiFileViewerDemo extends Vue {
 }
 
 .multi-file-viewer-demo {
-  padding: 20px 0;
+  padding: 20px 15px;
 }
 
 </style>
