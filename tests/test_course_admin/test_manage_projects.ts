@@ -1,6 +1,6 @@
 import ManageProjects from '@/components/course_admin/manage_projects.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { config, mount, RouterLinkStub, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester , UltimateSubmissionPolicy } from 'ag-client-typescript';
 import { AxiosError, AxiosResponse } from 'axios';
 import Vue from 'vue';
@@ -128,6 +128,7 @@ describe('ManageProjects.vue', () => {
 
         if (wrapper.exists()) {
             console.log("wrapper exists");
+            console.log('wrapper: ' + wrapper);
             wrapper.destroy();
         }
     });
@@ -187,7 +188,8 @@ describe('ManageProjects.vue', () => {
         );
     });
 
-    test.only('Clicking on the add project button when the new project name is not the empty ' +
+
+    test.skip('Clicking on the add project button when the new project name is not the empty ' +
          'string calls Project.create',
          async () => {
         wrapper = mount(ManageProjects, {
@@ -207,7 +209,7 @@ describe('ManageProjects.vue', () => {
 
         const spy = jest.fn();
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             Project,
             'create',
             spy,
@@ -222,9 +224,10 @@ describe('ManageProjects.vue', () => {
         );
     });
 
-    test.skip('When a new project is created it gets displayed among the prexisting projects',
+
+    test.only('When a new project is created it gets displayed among the prexisting projects',
          async () => {
-        await patch_async_static_method(
+        return patch_async_static_method(
             Project, 'get_all_from_course',
             () => Promise.resolve(projects),
             async () => {
@@ -234,6 +237,9 @@ describe('ManageProjects.vue', () => {
                     },
                     mocks: {
                         $route
+                    },
+                    stubs: {
+                        RouterLink: RouterLinkStub
                     }
                 });
 
@@ -250,15 +256,15 @@ describe('ManageProjects.vue', () => {
                 manage_projects.new_project_name = "Lab 09 - Functors";
                 let new_project_name = "Lab 09 - Functors";
 
-                await patch_async_static_method(
+                return patch_async_static_method(
                     Project, 'create',
                     () => Promise.resolve(new_project),
                     async () => {
 
-                        let mock_result = await Project.create(
-                            {name: new_project_name, course: 2}
-                        );
-                        expect(mock_result).toEqual(new_project);
+                        // let mock_result = await Project.create(
+                        //     {name: new_project_name, course: 2}
+                        // );
+                        // expect(mock_result).toEqual(new_project);
 
                         let new_project_form = wrapper.find('#new-project-form');
                         new_project_form.trigger('submit.native');

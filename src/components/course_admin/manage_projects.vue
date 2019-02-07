@@ -66,79 +66,78 @@
           </div>
         </router-link>
 
-        <modal ref="clone_project_modal"
-               size="large"
-               click_outside_to_close>
+        <!--<modal ref="clone_project_modal"-->
+               <!--size="large"-->
+               <!--click_outside_to_close>-->
 
-          <ValidatedForm id="cloning-project-form"
-                         @submit.native.prevent="add_cloned_project"
-                         autocomplete="off"
-                         @form_validity_changed="cloning_project_form_is_valid = $event">
+          <!--<ValidatedForm id="cloning-project-form"-->
+                         <!--@submit.native.prevent="add_cloned_project"-->
+                         <!--autocomplete="off"-->
+                         <!--@form_validity_changed="cloning_project_form_is_valid = $event">-->
 
-            <h2 v-if="project_to_copy !== null"> Project to clone: {{project_to_copy.name}} </h2>
-            <hr>
-            <div>
-              <div v-if="project_to_copy !== null">
-                <div class="cloned-project-name">
-                  <label class="input-label"> New project name </label>
-                  <validated-input ref="cloned_project_name_input"
-                                   v-model="cloned_project_name"
-                                   :validators="[is_not_empty]"
-                                   :num_rows="1"
-                                   input_style="width: 100%; border: 2px solid #ced4da;">
-                  </validated-input>
-                </div>
+            <!--<h2 v-if="project_to_copy !== null"> Project to clone: {{project_to_copy.name}} </h2>-->
+            <!--<hr>-->
+            <!--<div>-->
+              <!--<div v-if="project_to_copy !== null">-->
+                <!--<div class="cloned-project-name">-->
+                  <!--<label class="input-label"> New project name </label>-->
+                  <!--<validated-input ref="cloned_project_name_input"-->
+                                   <!--v-model="cloned_project_name"-->
+                                   <!--:validators="[is_not_empty]"-->
+                                   <!--:num_rows="1"-->
+                                   <!--input_style="width: 100%; border: 2px solid #ced4da;">-->
+                  <!--</validated-input>-->
+                <!--</div>-->
 
-                <div class="cloned-project-destination">
-                  <label class="input-label"> Clone project to course: </label>
-                  <div class="copy-course-dropdown-wrapper">
-                    <dropdown ref="copy_course_dropdown"
-                              :items="cloning_destinations"
-                              @update_item_selected="course_to_clone_to = $event"
-                              dropdown_height="200px">
-                      <template slot="header">
-                        <div tabindex="1" class="input-wrapper">
-                          <div id="input-course-to-copy-to"
-                               class="projects-input">
-                            {{course_to_clone_to.name ? course_to_clone_to.name : ""}}
-                            {{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}
-                            {{course_to_clone_to.year ? course_to_clone_to.year : ""}}
-                            <i class="fas fa-caret-down dropdown-caret"></i>
-                          </div>
-                        </div>
-                      </template>
-                      <div slot-scope="{item}">
-                        <span class="course-to-copy-name">
-                          {{item.name ? item.name : ""}}
-                          {{item.semester ? item.semester : ""}}
-                          {{item.year ? item.year : ""}}
-                        </span>
-                      </div>
-                    </dropdown>
-                  </div>
-                </div>
-              </div>
+                <!--<div class="cloned-project-destination">-->
+                  <!--<label class="input-label"> Clone project to course: </label>-->
+                  <!--<div class="copy-course-dropdown-wrapper">-->
+                    <!--<dropdown ref="copy_course_dropdown"-->
+                              <!--:items="cloning_destinations"-->
+                              <!--@update_item_selected="course_to_clone_to = $event"-->
+                              <!--dropdown_height="200px">-->
+                      <!--<template slot="header">-->
+                        <!--<div tabindex="1" class="input-wrapper">-->
+                          <!--<div id="input-course-to-copy-to"-->
+                               <!--class="projects-input">-->
+                            <!--{{course_to_clone_to.name ? course_to_clone_to.name : ""}}-->
+                            <!--{{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}-->
+                            <!--{{course_to_clone_to.year ? course_to_clone_to.year : ""}}-->
+                            <!--<i class="fas fa-caret-down dropdown-caret"></i>-->
+                          <!--</div>-->
+                        <!--</div>-->
+                      <!--</template>-->
+                      <!--<div slot-scope="{item}">-->
+                        <!--<span class="course-to-copy-name">-->
+                          <!--{{item.name ? item.name : ""}}-->
+                          <!--{{item.semester ? item.semester : ""}}-->
+                          <!--{{item.year ? item.year : ""}}-->
+                        <!--</span>-->
+                      <!--</div>-->
+                    <!--</dropdown>-->
+                  <!--</div>-->
+                <!--</div>-->
+              <!--</div>-->
 
-              <div v-for="error of api_cloning_errors"
-                   class="api-error-container">
-                <div class="api-error"> {{error}} </div>
-                <div class="x-box">
-                  <span @click="dismiss_cloning_project_error"
-                        class="dismiss-error">
-                    Dismiss
-                  </span>
-                </div>
-              </div>
+              <!--<div v-for="error of api_cloning_errors"-->
+                   <!--class="api-error-container">-->
+                <!--<div class="api-error"> {{error}} </div>-->
+                <!--<div class="x-box">-->
+                  <!--<span @click="dismiss_cloning_project_error"-->
+                        <!--class="dismiss-error">-->
+                    <!--Dismiss-->
+                  <!--</span>-->
+                <!--</div>-->
+              <!--</div>-->
 
-              <input type="submit"
-                     class="clone-project-button"
-                     value="Create Project"
-                     :disabled="!cloning_project_form_is_valid">
-            </div>
+              <!--<input type="submit"-->
+                     <!--class="clone-project-button"-->
+                     <!--value="Create Project"-->
+                     <!--:disabled="!cloning_project_form_is_valid">-->
+            <!--</div>-->
 
-          </ValidatedForm>
-        </modal>
-
+          <!--</ValidatedForm>-->
+        <!--</modal>-->
       </div>
     </div>
   </div>
@@ -221,10 +220,7 @@
     async add_project() {
       console.log("Adding Project");
       this.new_project_api_errors = [];
-      if (this.new_project_name === "") {
-        this.new_project_api_errors.push("New project name cannot be an empty string.");
-        return;
-      }
+
       try {
         this.new_project_name.trim();
         this.saving = true;
@@ -232,7 +228,6 @@
           {name: this.new_project_name, course: this.course.pk}
         );
         console.log("Success!");
-        this.new_project_name = "";
         this.projects!.push(new_project);
         console.log(this.projects.length);
         this.projects!.sort((project_a: Project, project_b: Project) => {
