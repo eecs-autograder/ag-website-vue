@@ -7,8 +7,8 @@
 
     <div id="viewing-area">
 
+      <p id="file-side-title"> Uploaded Files </p>
       <div id="container-of-files">
-        <p id="file-side-title"> Uploaded Files </p>
         <div v-for="instructor_file of instructor_files"
              @click="view_file(instructor_file)"
              class="file-stuff-container">
@@ -42,6 +42,15 @@
       </div>
 
       <div id="instructor-file-viewer-wrapper">
+        <!--<div v-if="!viewing_any_files"-->
+             <!--class="helpful-message">-->
+          <!--To view the contents of a file, select any rectangle on the left.-->
+        <!--</div>-->
+        <!--<div v-else>-->
+          <!--<MultiFileViewer ref="instructor_files_viewer"-->
+                           <!--height_of_view_file="600px">-->
+          <!--</MultiFileViewer>-->
+        <!--</div>-->
         <MultiFileViewer ref="instructor_files_viewer"
                          height_of_view_file="600px">
         </MultiFileViewer>
@@ -129,6 +138,10 @@
   /*@import url('https://fonts.googleapis.com/css?family=Quicksand');*/
 
   $current_language: "Quicksand";
+  
+.helpful-message {
+  text-align: center;
+}
 
 #instructor-files-component {
   width: 95%;
@@ -202,19 +215,16 @@
 #container-of-files {
   display: inline-block;
   vertical-align: top;
-  height: 600px;
+  height: 623px;
   overflow: scroll;
   border-radius: .25rem;
 }
 
 #instructor-file-viewer-wrapper {
-  height: 600px;
-  /*width: 500px;*/
-  background-color: hsl(220, 40%, 98%);
   position: absolute;
   right: 0;
   left: 360px;
-  top: 0;
+  top: 7px;
   margin-bottom: 100px;
 }
 
