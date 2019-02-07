@@ -5,10 +5,10 @@
                 @upload_files="log_uploaded_files($event)">
     </FileUpload>
 
-    <p id="file-side-title"> Uploaded Files </p>
     <div id="viewing-area">
 
       <div id="container-of-files">
+        <p id="file-side-title"> Uploaded Files </p>
         <div v-for="instructor_file of instructor_files"
              @click="view_file(instructor_file)"
              class="file-stuff-container">
@@ -43,7 +43,7 @@
 
       <div id="instructor-file-viewer-wrapper">
         <MultiFileViewer ref="instructor_files_viewer"
-        height_of_view_file="240px">
+                         height_of_view_file="600px">
         </MultiFileViewer>
       </div>
 
@@ -79,6 +79,7 @@
     instructor_files: string[] = [];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
       hour: 'numeric', minute: 'numeric', second: 'numeric'};
+    counter = 0;
 
     created() {
       // load Files associated with this project
@@ -101,7 +102,8 @@
     view_file(file: string) {
       console.log("Viewing File:");
       // console.log(file);
-      // let instructor_file_viewer = <MultiFileViewer> this.$refs.instructor_file_viewer;
+      let instructor_file_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
+      instructor_file_viewer.add_to_viewing(file, `Hello from file ${this.counter}`);
     }
 
     download_file(file: string) {
@@ -145,11 +147,13 @@
 
 
 .delete-file {
-  color: hsl(220, 20%, 85%);
+  /*color: hsl(220, 20%, 80%);*/
+  color: hsl(220, 20%, 75%);
 }
 
 .delete-file:hover {
-  color: black;
+  /*color: black;*/
+  color: hsl(220, 20%, 55%);
 }
 
 .timestamp {
@@ -191,7 +195,7 @@
 .display-timestamp {
   display: block;
   padding-top: 5px;
-  color: hsl(220, 20%, 70%);
+  color: hsl(220, 20%, 65%);
   font-size: 15px;
 }
 
