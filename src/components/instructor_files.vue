@@ -1,69 +1,65 @@
 <template>
   <div id="instructor-files-component">
 
-    <FileUpload ref="instructor_file_upload"
-                @upload_files="log_uploaded_files($event)">
+
+
+    <FileUpload ref="instructor_files_upload"
+                @upload_files="add_instructor_files($event)">
     </FileUpload>
+
+    <div id="instructor-files-label"> Uploaded Instructor Files
+      <div class="collapse-button"
+           @click="collapsed = !collapsed"> ( {{collapsed? 'Show' : 'Collapse'}} ) </div>
+    </div>
 
     <div id="viewing-area">
 
-      <p id="file-side-title"> Uploaded Files </p>
-      <div id="container-of-files">
+
+      <div id="column-of-files"
+           v-if="!collapsed">
         <div v-for="instructor_file of instructor_files"
              @click="view_file(instructor_file)"
-             class="file-stuff-container">
-
-          <div class="file-div file-name"> {{instructor_file}} </div>
-
+             class="single-file">
+          <div class="file-div file-name">{{instructor_file}}
+            <i class="fas fa-file-download download-file"
+               @click.stop="download_file(instructor_file)"></i>
+          </div>
           <div class="icon-holder">
-            <!--<div @click.stop="download_file(instructor_file)"-->
-            <!--class="file-div">-->
-            <!--<i class="fas fa-file-download download-file" title="Download"></i>-->
-            <!--</div>-->
-
             <div @click.stop="delete_file(instructor_file)"
                  class="file-div">
-              <!--<i class="fas fa-trash delete-file"></i>-->
               <i class="fas fa-times delete-file"></i>
             </div>
           </div>
-
-          <!--<div class="file-div display-timestamp">-->
-          <!--<i class="far fa-clock" title="2019-02-04T17:53:11.230945Z"></i>-->
-          <!--</div>-->
-
           <div class="file-div display-timestamp">
             {{(new Date('2019-02-04T17:53:11.230945Z')).toLocaleString(
-                'en-US', last_modified_format
+            'en-US', last_modified_format
             )}}
-            <!--<i class="far fa-clock"></i>-->
           </div>
         </div>
       </div>
 
-      <div id="instructor-file-viewer-wrapper">
-        <!--<div v-if="!viewing_any_files"-->
-             <!--class="helpful-message">-->
-          <!--To view the contents of a file, select any rectangle on the left.-->
-        <!--</div>-->
-        <!--<div v-else>-->
-          <!--<MultiFileViewer ref="instructor_files_viewer"-->
-                           <!--height_of_view_file="600px">-->
-          <!--</MultiFileViewer>-->
-        <!--</div>-->
+
+      <div id="instructor-file-viewer-wrapper" :style="{left: collapsed ? '0' : '360px'}">
         <MultiFileViewer ref="instructor_files_viewer"
                          height_of_view_file="600px">
         </MultiFileViewer>
+        <div v-if="get_num_files_viewing === 0" class="helpful-message">
+          Click on a file to view its contents.
+        </div>
       </div>
+
 
     </div>
 
 
-    <modal ref="clone_project_modal"
-           size="large"
-           click_outside_to_close>
-        <hr>
-        <div> </div>
+    <modal ref="delete_instructor_file_modal"
+           size="large">
+      <div>Confirm Deletion</div>
+      <hr>
+      <div> Are you sure you want to delete the file <b>{{file_to_delete}}</b>
+        ? This action cannot be undone, and any test cases that rely on this file may have
+        to be updated before they run correctly again.
+      </div>
     </modal>
 
 
@@ -88,106 +84,127 @@
     instructor_files: string[] = [];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
       hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    counter = 0;
+
+    file_to_delete: string = "";
+    collapsed = false;
+
+    get_num_files_viewing() {
+      let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
+      console.log(instructor_files_viewer.files_currently_viewing.length);
+      return 0;
+    }
 
     created() {
-      // load Files associated with this project
-      // sort Files
       this.instructor_files = ["Player.cpp", "Player.h",
-                               "Player_ag_tests.cpp", "unit_test_framework.cpp",
-                               "Card_ag_tests.cpp", "HumanPlayer_ag_tests.cpp",
-                               "Makefile", "euchre_test50.out.correct",
-                               "Card_buggy_impls.cpp", "Card.h"];
+        "Player_ag_tests.cpp", "unit_test_framework.cpp",
+        "Card_ag_tests.cpp", "HumanPlayer_ag_tests.cpp",
+        "Makefile", "euchre_test50.out.correct",
+        "Card_buggy_impls.cpp", "Card.h"];
       this.instructor_files.sort();
       console.log("Created");
     }
 
-    log_uploaded_files(files: string[]) {
-      // make http call --> does it update the files?
-      // sort files again
+    add_instructor_files(files: string[]) {
       console.log(files);
+      let instructor_files_upload = <FileUpload> this.$refs.instructor_files_upload;
+      instructor_files_upload.clear_files();
+      this.instructor_files.sort();
     }
 
     view_file(file: string) {
       console.log("Viewing File:");
-      // console.log(file);
-      let instructor_file_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
-      instructor_file_viewer.add_to_viewing(file, `Hello from file ${this.counter}`);
+      let file_content = `Hello from file: ${file}`;
+      let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
+      console.log(instructor_files_viewer);
+      instructor_files_viewer.add_to_viewing(file, file_content);
     }
 
     download_file(file: string) {
       console.log("Downloading File:");
-      // console.log(file);
     }
 
     delete_file(file: string) {
-      console.log("Deleting File:");
-      // console.log(file);
+      console.log("Clicked on delete");
+      this.file_to_delete = file;
+      let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
+      delete_instructor_file_modal.open();
     }
 
-
-
-
+    confirm_delete_file() {
+      this.file_to_delete = "";
+      // delete the file in the db
+      // delete the file locally using splice.
+    }
   }
 
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
-  /*@import url('https://fonts.googleapis.com/css?family=Fira+Sans');*/
-  /*@import url('https://fonts.googleapis.com/css?family=Quicksand');*/
+@import '@/styles/colors.scss';
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
 
-  $current_language: "Quicksand";
-  
+$current_language: "Quicksand";
+
+.collapse-button {
+  display: inline;
+  padding-left: 5px;
+  color: hsl(220, 30%, 60%);
+  cursor: pointer;
+}
+
+.collapse-button:hover {
+  color: hsl(220, 30%, 35%);
+}
+
 .helpful-message {
   text-align: center;
+  padding: 10px;
+  position: absolute;
+  width: 100%;
+  min-width: 250px;
 }
 
 #instructor-files-component {
+  box-sizing: border-box;
   width: 95%;
   margin-left: 2.5%;
+  margin-right: 2.5%;
   margin-top: 50px;
   font-family: $current_language;
 }
 
-.download-file, .delete-file, .timestamp {
-  //color: $ocean-blue;
-  /*color: black;*/
-  font-size: 16px;
-  padding: 0 5px;
-  /*padding: 4px 10px 2px 10px;*/
-}
-
-
 .delete-file {
-  /*color: hsl(220, 20%, 80%);*/
   color: hsl(220, 20%, 75%);
 }
 
 .delete-file:hover {
-  /*color: black;*/
   color: hsl(220, 20%, 55%);
 }
 
-.timestamp {
-  padding: 0 0 0 5px;
+.download-file {
+  color: hsl(220, 30%, 60%);
+  padding-left: 5px;
 }
 
-.download-file {
-  /*padding: 2px 10px 2px 2px;*/
+.download-file:hover {
+  color: hsl(220, 30%, 35%);
 }
 
 .file-div {
   display: inline-block;
 }
 
-.icon-holder {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+.timestamp {
+  padding: 0 0 0 5px;
 }
 
-.file-stuff-container {
+.icon-holder {
+  position: absolute;
+  top: 7px;
+  right: 12px;
+}
+
+.single-file {
   margin-bottom: 5px;
   cursor: pointer;
   background-color: hsl(220, 40%, 94%);
@@ -201,10 +218,6 @@
   font-size: 16px;
 }
 
-.file-name:hover {
-  color: $ocean-blue;
-}
-
 .display-timestamp {
   display: block;
   padding-top: 5px;
@@ -212,10 +225,10 @@
   font-size: 15px;
 }
 
-#container-of-files {
+#column-of-files {
   display: inline-block;
   vertical-align: top;
-  height: 623px;
+  height: 665px;
   overflow: scroll;
   border-radius: .25rem;
 }
@@ -224,23 +237,24 @@
   position: absolute;
   right: 0;
   left: 360px;
-  top: 7px;
+  top: -7px;
   margin-bottom: 100px;
+  min-width: 50px;
 }
 
 ::-webkit-scrollbar {
-  width: 0;  /* remove scrollbar space */
-  background: transparent;  /* optional: just make scrollbar invisible */
+  width: 0;
+  background: transparent;
 }
 
 #viewing-area {
   position: relative;
 }
 
-#file-side-title {
-  padding-top: 20px;
-  padding-left: 10px;
+#instructor-files-label {
+  padding: 40px 10px 15px 10px;
   font-weight: 600;
+  font-size: 17px;
 }
 
 </style>

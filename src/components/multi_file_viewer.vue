@@ -85,7 +85,6 @@
   right: 6px;
   top: 5.5px;
 }
-
 .close-x:hover {
   color: hsl(220, 20%, 55%);
 }
@@ -108,6 +107,15 @@
   display: inline-block;
   margin: 0;
   padding-right: 25px;
+}
+@media only screen and (min-width: 481px) {
+  .close-x {
+    background-color: inherit;
+    font-size: inherit;
+    padding: 3px 5px;
+    right: 8px;
+    top: 10px;
+  }
 }
 
 @media only screen and (min-width: 481px) {
