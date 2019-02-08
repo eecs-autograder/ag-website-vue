@@ -51,6 +51,14 @@
     files_currently_viewing: OpenFile[] = [];
     active_tab_index = 0;
 
+    created() {
+      console.log("Created MFV");
+    }
+
+    mounted() {
+      console.log("Mounted MFV");
+    }
+
     add_to_viewing(filename: string, file_contents: string) {
       let file_exists = this.files_currently_viewing.find(
         open_file => open_file.name === filename
@@ -61,6 +69,7 @@
 
       this.files_currently_viewing.push({name: filename, content: file_contents});
       this.active_tab_index = this.files_currently_viewing.length - 1;
+      this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
 
     remove_from_viewing(tab_index: number) {
@@ -68,6 +77,8 @@
         this.active_tab_index -= 1;
       }
       this.files_currently_viewing.splice(tab_index, 1);
+      console.log(this.files_currently_viewing.length);
+      this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
   }
 </script>

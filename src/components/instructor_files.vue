@@ -1,11 +1,10 @@
 <template>
   <div id="instructor-files-component">
-
-
-
     <FileUpload ref="instructor_files_upload"
                 @upload_files="add_instructor_files($event)">
     </FileUpload>
+
+    <p> {{collapsed}}</p>
 
     <div id="instructor-files-label"> Uploaded Instructor Files
       <div class="collapse-button"
@@ -13,8 +12,6 @@
     </div>
 
     <div id="viewing-area">
-
-
       <div id="column-of-files"
            v-if="!collapsed">
         <div v-for="instructor_file of instructor_files"
@@ -37,20 +34,17 @@
           </div>
         </div>
       </div>
-
-
       <div id="instructor-file-viewer-wrapper" :style="{left: collapsed ? '0' : '360px'}">
         <MultiFileViewer ref="instructor_files_viewer"
-                         height_of_view_file="600px">
+                         height_of_view_file="600px"
+                         @num_files_viewing_changed="num_files_currently_viewing = $event">
         </MultiFileViewer>
-        <div v-if="get_num_files_viewing === 0" class="helpful-message">
+        <div v-if="num_files_currently_viewing === 0"
+             class="helpful-message">
           Click on a file to view its contents.
         </div>
       </div>
-
-
     </div>
-
 
     <modal ref="delete_instructor_file_modal"
            size="large">
@@ -68,15 +62,14 @@
         <div class="modal-cancel-button"
              @click="cancel_deletion"> Cancel </div>
       </div>
-
     </modal>
-
 
   </div>
 </template>
 
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
+
   import FileUpload from '@/components/file_upload.vue';
   import Modal from '@/components/modal.vue';
   import MultiFileViewer from '@/components/multi_file_viewer.vue';
@@ -92,32 +85,32 @@
 
     instructor_files: string[] = [];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-      hour: 'numeric', minute: 'numeric', second: 'numeric'};
-
+                            hour: 'numeric', minute: 'numeric', second: 'numeric'};
     file_to_delete: string = "";
     collapsed = false;
-
-    get_num_files_viewing() {
-      let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
-      console.log(instructor_files_viewer.files_currently_viewing.length);
-      return 0;
-    }
+    loading = true;
+    num_files_currently_viewing = 0;
 
     created() {
       this.instructor_files = ["Player.cpp", "Player.h",
-        "Player_ag_tests.cpp", "unit_test_framework.cpp",
-        "Card_ag_tests.cpp", "HumanPlayer_ag_tests.cpp",
-        "Makefile", "euchre_test50.out.correct",
-        "Card_buggy_impls.cpp", "Card.h",
-        "Butterfly.cpp", "Spider.cpp", "Ant.cpp"];
+                               "Player_ag_tests.cpp", "unit_test_framework.cpp",
+                               "Card_ag_tests.cpp", "HumanPlayer_ag_tests.cpp",
+                               "Makefile", "euchre_test50.out.correct",
+                               "Card_buggy_impls.cpp", "Card.h",
+                               "Butterfly.cpp", "Spider.cpp", "Ant.cpp"];
       this.instructor_files.sort();
-      console.log("Created");
+      console.log("Created instructor");
+    }
+
+    mounted() {
+      console.log("Mounted instructor");
     }
 
     add_instructor_files(files: string[]) {
       console.log(files);
       let instructor_files_upload = <FileUpload> this.$refs.instructor_files_upload;
       instructor_files_upload.clear_files();
+      // figure out if updating or adding
       this.instructor_files.sort();
     }
 
@@ -131,6 +124,8 @@
 
     download_file(file: string) {
       console.log("Downloading File:");
+      // create url
+      // download file call
     }
 
     delete_file(file: string) {
@@ -209,11 +204,13 @@ $current_language: "Quicksand";
 }
 
 .helpful-message {
+  box-sizing: border-box;
   text-align: center;
   padding: 10px;
   position: absolute;
   width: 100%;
   min-width: 250px;
+  top: 0px;
 }
 
 #instructor-files-component {

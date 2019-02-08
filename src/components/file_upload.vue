@@ -99,6 +99,14 @@
     d_files_dragged_over = false;
     d_empty_filenames: string[] = [];
 
+    created() {
+      console.log("Created File Upload");
+    }
+
+    mounted() {
+      console.log("Mounted File Upload");
+    }
+
     table_row_styling(file_in: File, row_index: number): string {
       if (file_in.size === 0) {
         return "file-empty-row";

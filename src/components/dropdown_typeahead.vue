@@ -55,6 +55,11 @@ export default class DropdownTypeahead extends Vue {
 
   created() {
     this.d_choices = this.choices;
+    console.log("Dropdown TYPEAHEAD created");
+  }
+
+  mounted() {
+    console.log("Dropdown TYPEAHEAD mounted");
   }
 
   resume_search(key: KeyboardEvent) {
