@@ -101,8 +101,9 @@ $current-lang-choice: "Quicksand";
 }
 
 .tab-header {
-  margin: 0;
   background-color: inherit;
+  margin: 0;
+  overflow: hidden;
 }
 
 .tab-label {
@@ -110,10 +111,6 @@ $current-lang-choice: "Quicksand";
   font-family: $current-lang-choice;
   margin: 0;
   padding-right: 25px;
-}
-
-.tab-header {
-  overflow: hidden;
 }
 
 @media only screen and (min-width: 481px) {
