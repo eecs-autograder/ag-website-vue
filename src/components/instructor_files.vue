@@ -54,12 +54,21 @@
 
     <modal ref="delete_instructor_file_modal"
            size="large">
-      <div>Confirm Deletion</div>
+      <div id="modal-header">Confirm Deletion</div>
       <hr>
-      <div> Are you sure you want to delete the file <b>{{file_to_delete}}</b>
-        ? This action cannot be undone, and any test cases that rely on this file may have
-        to be updated before they run correctly again.
+      <div id="modal-body"> Are you sure you want to delete the file
+        <b class="file-to-delete">{{file_to_delete}}</b>? This action cannot be undone,
+        and any test cases that rely on this file may have to be updated before they run
+        correctly again.
       </div>
+
+      <div id="modal-button-container">
+        <div class="modal-delete-button"
+             @click="delete_file_permanently"> Delete </div>
+        <div class="modal-cancel-button"
+             @click="cancel_deletion"> Cancel </div>
+      </div>
+
     </modal>
 
 
@@ -99,7 +108,8 @@
         "Player_ag_tests.cpp", "unit_test_framework.cpp",
         "Card_ag_tests.cpp", "HumanPlayer_ag_tests.cpp",
         "Makefile", "euchre_test50.out.correct",
-        "Card_buggy_impls.cpp", "Card.h"];
+        "Card_buggy_impls.cpp", "Card.h",
+        "Butterfly.cpp", "Spider.cpp", "Ant.cpp"];
       this.instructor_files.sort();
       console.log("Created");
     }
@@ -130,10 +140,15 @@
       delete_instructor_file_modal.open();
     }
 
-    confirm_delete_file() {
+    delete_file_permanently() {
       this.file_to_delete = "";
       // delete the file in the db
       // delete the file locally using splice.
+    }
+
+    cancel_deletion() {
+      let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
+      delete_instructor_file_modal.close();
     }
   }
 
@@ -141,9 +156,46 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 
 $current_language: "Quicksand";
+
+.file-to-delete {
+  background-color: hsl(220, 20%, 85%);
+  letter-spacing: 1px;
+}
+
+#modal-header {
+  padding: 5px 10px;
+  font-family: $current-language;
+}
+
+#modal-body {
+  padding: 10px 10px 20px 10px;
+  font-family: $current-language;
+}
+
+#modal-button-container {
+  text-align: right;
+  padding: 10px;
+}
+
+.modal-cancel-button, .modal-delete-button {
+  border-radius: 2px;
+  font-family: $current-language;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.modal-cancel-button {
+  @extend .gray-button;
+}
+
+.modal-delete-button {
+  @extend .red-button;
+  margin-right: 20px;
+}
 
 .collapse-button {
   display: inline;
