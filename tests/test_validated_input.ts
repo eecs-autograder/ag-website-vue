@@ -30,6 +30,26 @@ describe('ValidatedInput.vue', () => {
         expect(input.value).toBe("1");
     });
 
+    test('If placeholder text is specified, it appears when the input is empty', () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: 1,
+                validators: [IS_NUMBER],
+                placeholder: "Please enter a number",
+                from_string_fn: (val: string) => parseInt(val, 10),
+            }
+        });
+
+        expect(wrapper.vm.is_valid).toBe(true);
+
+        let input = wrapper.find('#input');
+        (<HTMLInputElement> input.element).value = '';
+        input.trigger('input');
+
+        expect(wrapper.vm.is_valid).toBe(false);
+        expect(input.attributes().placeholder).toEqual("Please enter a number");
+    });
+
     test('Validated input uses default when from_string_fn not present', () => {
         const component = {
             template:  `<validated-input ref="validated_input_1" v-model="my_input"
