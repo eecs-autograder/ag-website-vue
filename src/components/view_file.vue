@@ -42,8 +42,6 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
-$github-black-color: #24292e;
-
 #view-file-component {
   overflow-y: scroll;
 }
@@ -65,7 +63,7 @@ $github-black-color: #24292e;
 }
 
 .line-of-file-content {
-  color: $github-black-color;
+  color: black;
   font-size: 14px;
   margin: 0;
   padding: 1px 0;

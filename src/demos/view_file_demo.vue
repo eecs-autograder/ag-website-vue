@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="view-file-ex-1">
-      <p> <b> View File allows for horizontal scrolling when the text is longer than
-        the width of the display. </b></p>
+      <p> <b> View File content wraps when the width of the view file container is less
+        than the length of the content. </b></p>
       <div class="border-box">
         <view-file :filename="filename_1"
                    :file_contents="file_contents_1">
