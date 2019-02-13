@@ -32,10 +32,12 @@
             </span>
             <span v-else>
               {{instructor_file_wrapper.file.name}} {{instructor_file_wrapper.file.pk}}
-              <i class="fas fa-file-download download-file"
-                 @click.stop="download_file(instructor_file_wrapper.file)"></i>
-              <i class="fas fa-pencil-alt edit-file-name"
-                 @click="instructor_file_wrapper.editing = true"></i>
+              <div class="icon-holder">
+                <i class="fas fa-file-download download-file"
+                   @click.stop="download_file(instructor_file_wrapper.file)"></i>
+                <i class="fas fa-pencil-alt edit-file-name"
+                   @click="instructor_file_wrapper.editing = true"></i>
+              </div>
             </span>
           </div>
           <i class="fas fa-times delete-file"
@@ -85,10 +87,10 @@
 
 
 <script lang="ts">
+  import { array_get_unique, array_has_unique } from '@/utils';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import { InstructorFile, Project } from 'ag-client-typescript';
-  import { array_add_unique, array_get_unique, array_has_unique } from '@/utils';
 
   import FileUpload from '@/components/file_upload.vue';
   import Modal from '@/components/modal.vue';
@@ -96,9 +98,9 @@
   import ValidatedInput from '@/components/validated_input.vue';
 
   interface InstructorFileWrapper {
-    file: InstructorFile,
-    new_file_name: string,
-    editing: boolean
+    file: InstructorFile;
+    new_file_name: string;
+    editing: boolean;
   }
 
   @Component({
@@ -116,11 +118,10 @@
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
     file_to_delete_wrapper: InstructorFileWrapper | null = null;
     collapsed = false;
-    loading = true;
     num_files_currently_viewing = 0;
 
-    // @Prop({required: true, type: Project})
-    // project!: Project;
+    @Prop({required: true, type: Project})
+    project!: Project;
 
     async created() {
       let project_files: InstructorFile[] = await InstructorFile.get_all_from_project(2);
@@ -167,13 +168,11 @@
 
     async delete_file_permanently() {
       try {
-        await this.file_to_delete_wrapper.file.delete();
-        this.instructor_file_wrappers.splice(
-          this.instructor_file_wrappers.indexOf(this.file_to_delete_wrapper, 1)
-        );
+        await this.file_to_delete_wrapper!.file.delete();
+        this.instructor_file_wrappers.splice(this.instructor_file_wrappers.indexOf(this.file_to_delete_wrapper), 1);
         this.file_to_delete_wrapper = null;
       }
-      catch(error) {
+      catch (error) {
         console.log(error);
       }
       let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
@@ -202,12 +201,18 @@
             file.name,
             (file_wrapper: InstructorFileWrapper, file_name_to_add: string) =>
               file_name_equal(file_wrapper.file.name, file_name_to_add));
-          // How do I turn updated_content into type blob??????
           console.log(file_wrapper_to_update.file.name);
-          file_wrapper_to_update.file.set_content(file);
+          try {
+            let result = await file_wrapper_to_update.file.set_content(file);
+            console.log(result);
+          }
+          catch (e) {
+            console.log(e);
+          }
         }
         else {
           try {
+            console.log(file.name);
             let file_to_add = await InstructorFile.create(2, file.name, file);
             console.log(file_to_add);
             this.instructor_file_wrappers.push(
@@ -222,7 +227,6 @@
 
       let instructor_files_upload = <FileUpload> this.$refs.instructor_files_upload;
       instructor_files_upload.clear_files();
-
       this.sort_files();
     }
 
@@ -233,9 +237,9 @@
   }
 
   function file_name_equal(file_name_a: string, file_name_b: string) {
-    // console.log("File name A: " + file_name_a);
-    // console.log("File name B: " + file_name_b);
-    // console.log(file_name_a === file_name_b);
+    console.log("File name A: " + file_name_a);
+    console.log("File name B: " + file_name_b);
+    console.log(file_name_a === file_name_b);
     return file_name_a === file_name_b;
   }
 
@@ -247,6 +251,11 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 
 $current_language: "Quicksand";
+
+.icon-holder {
+  display: inline-block;
+  padding-top: 2px;
+}
 
 .validated-input-wrapper {
   display: inline-block;
@@ -356,7 +365,7 @@ $current_language: "Quicksand";
 
 .edit-file-name {
   color: hsl(220, 30%, 60%);
-  padding-left: 5px;
+  padding-left: 8px;
 }
 
 .edit-file-name:hover {
