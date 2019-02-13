@@ -29,6 +29,11 @@
       this.d_file_contents = new_content;
     }
 
+    @Watch('filename')
+    on_filename_change(new_file_name: string, old_file_name: string) {
+      this.d_filename = new_file_name;
+    }
+
     d_filename: string = "";
     d_file_contents: string = "";
 
