@@ -127,6 +127,12 @@
       for (let file of event.target.files) {
         this.add_or_update_file(file);
         this.check_for_emptiness(file);
+        // let reader = new FileReader();
+        // reader.onload = function() {
+        //   console.log(reader.result);
+        // };
+        // reader.readAsText(file);
+        console.log(file);
       }
       event.target.value = '';
     }
