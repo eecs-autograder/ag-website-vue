@@ -32,8 +32,8 @@
       console.log(first_admin_course.pk);
       try {
         // 500 internal server error
-        this.projects = await Project.get_all_from_course(first_admin_course.pk);
-        this.my_project = this.projects[2];
+        this.my_project = await Project.get_by_pk(67);
+        // this.my_project = this.projects[1];
       }
       catch (e) {
         console.log(e);
