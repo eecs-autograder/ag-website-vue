@@ -9,6 +9,7 @@
     <!--<DropdownTypeaheadDemo></DropdownTypeaheadDemo>-->
     <!--<ModalDemo></ModalDemo>-->
     <!--<FileUploadDemo></FileUploadDemo>-->
+    <InstructorFilesDemo></InstructorFilesDemo>
     <!--<LoadingIconDemo></LoadingIconDemo>-->
     <!--<ManageProjectsDemo></ManageProjectsDemo>-->
     <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
@@ -25,7 +26,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
-import InstructorFiles from '@/components/instructor_files.vue';
 import Tab from '@/components/tabs/tab.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import Toggle from '@/components/toggle.vue';
@@ -39,6 +39,7 @@ import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
 import DropdownTypeaheadDemo from '@/demos/dropdown_typeahead_demo.vue';
 import FileUploadDemo from '@/demos/file_upload_demo.vue';
+import InstructorFilesDemo from '@/demos/instructor_files_demo.vue';
 import LoadingIconDemo from '@/demos/loading_icon_demo.vue';
 import ManageProjectsDemo from '@/demos/manage_projects_demo.vue';
 import ModalDemo from '@/demos/modal_demo.vue';
@@ -61,7 +62,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     DropdownDemo,
     DropdownTypeaheadDemo,
     FileUploadDemo,
-    InstructorFiles,
+    InstructorFilesDemo,
     LoadingIconDemo,
     ManageProjectsDemo,
     ModalDemo,

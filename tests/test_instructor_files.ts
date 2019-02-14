@@ -1,4 +1,4 @@
-import InstructorFiles from '@/components/instructor_files.vue';
+import InstructorFiles from '@/components/instructor_files/instructor_files.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import Vue from 'vue';

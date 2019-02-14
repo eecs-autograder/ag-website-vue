@@ -1,5 +1,6 @@
 <template>
   <div style="padding: 10px;">
+<<<<<<< e769faea0846dbc108ec7b0433024250f773dfd0
     Validated Input #1
     <hr/>
     <h1>Validated Input (number)</h1>
@@ -127,7 +128,7 @@
       <validated-input ref='input_5'
                        v-model="number_input_2"
                        :num_rows="1"
-                       input_style="width: 45px;"
+                       input_style="width: 450px;"
                        :validators="[is_number, is_in_range_1_to_10]">
         <div slot="suffix" class="suffix-element"> books </div>
       </validated-input>
@@ -280,6 +281,8 @@ export default class ValidatedInputDemo extends Vue {
 .suffix-element {
   display: inline-block;
   vertical-align: top;
+  width: 300px;
+  background-color: pink;
   padding-top: 10px;
   padding-left: 10px;
 }
