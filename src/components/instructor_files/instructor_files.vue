@@ -12,11 +12,9 @@
     <div id="viewing-area">
       <div id="column-of-files"
            v-if="!collapsed">
-        <div v-for="instructor_file of instructor_files">
+        <div v-for="instructor_file of instructor_files" :key="instructor_file.pk">
           <single-file :file="instructor_file"
-                       @viewing_file="view_file($event)"
-                       @update_file_name="rename_file_in_multi_file_viewer($event)"
-                       @delete_file_clicked="open_delete_file_modal($event)">
+                       @open_file="view_file($event)">
           </single-file>
         </div>
       </div>
@@ -33,34 +31,15 @@
       </div>
     </div>
 
-    <modal ref="delete_instructor_file_modal"
-           size="large"
-           :include_closing_x="false">
-      <div id="modal-header">Confirm Deletion</div>
-      <hr>
-      <div id="modal-body"> Are you sure you want to delete the file
-        <b class="file-to-delete">{{file_to_delete ? file_to_delete.name : ''}}</b>?
-        This action cannot be undone, and any test cases that rely on this file may have
-        to be updated before they run correctly again.
-      </div>
-
-      <div id="modal-button-container">
-        <div class="modal-delete-button"
-             @click="delete_file_permanently"> Delete </div>
-        <div class="modal-cancel-button"
-             @click="cancel_deletion"> Cancel </div>
-      </div>
-    </modal>
-
   </div>
 </template>
 
 
 <script lang="ts">
-  import { array_get_unique, array_has_unique } from '../../utils';
+  import { array_get_unique, array_has_unique, array_remove_unique } from '../../utils';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import { InstructorFile, Project } from 'ag-client-typescript';
+  import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
   import FileUpload from '@/components/file_upload.vue';
   import Modal from '@/components/modal.vue';
@@ -77,22 +56,26 @@
       ValidatedInput
     }
   })
-  export default class InstructorFiles extends Vue {
+  export default class InstructorFiles extends Vue implements InstructorFileObserver {
 
     instructor_files: InstructorFile[] = [];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
     collapsed = false;
     num_files_currently_viewing = 0;
-    file_to_delete: InstructorFile | null = null;
 
     @Prop({required: true, type: Project})
     project!: Project;
 
     async created() {
+      InstructorFile.subscribe(this);
       this.instructor_files = await InstructorFile.get_all_from_project(this.project.pk);
       this.sort_files();
       console.log("Created instructor files");
+    }
+
+    destroyed() {
+      InstructorFile.unsubscribe(this);
     }
 
     rename_file_in_multi_file_viewer(names: string[]) {
@@ -116,27 +99,13 @@
     async view_file(file: InstructorFile) {
       let file_content = await file.get_content();
       let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
-      instructor_files_viewer.add_to_viewing(file.name, file_content);
+      instructor_files_viewer.add_to_viewing(file.name, file_content, file.pk);
     }
 
     open_delete_file_modal(file: InstructorFile) {
       this.file_to_delete = file;
       let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
       delete_instructor_file_modal.open();
-    }
-
-    async delete_file_permanently() {
-      try {
-        await this.file_to_delete.delete();
-        this.instructor_files.splice(this.instructor_files.indexOf(this.file_to_delete), 1);
-        // delete file from the mfv if it's being viewed :/
-        this.file_to_delete = null;
-      }
-      catch (error) {
-        console.log(error);
-      }
-      let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
-      delete_instructor_file_modal.close();
     }
 
     cancel_deletion() {
@@ -185,6 +154,30 @@
       let instructor_files_upload = <FileUpload> this.$refs.instructor_files_upload;
       instructor_files_upload.clear_files();
       this.sort_files();
+    }
+
+    update_instructor_file_content_changed(instructor_file: InstructorFile): void {
+    }
+
+    update_instructor_file_created(instructor_file: InstructorFile): void {
+    }
+
+    update_instructor_file_deleted(instructor_file: InstructorFile): void {
+      array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
+      (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
+    }
+
+    update_instructor_file_renamed(instructor_file: InstructorFile): void {
+      console.log("Here");
+      let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
+      if (index !== -1) {
+        console.log("There");
+        this.instructor_files[index] = instructor_file;
+        (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
+          instructor_file.pk, instructor_file.name
+        );
+        console.log(instructor_file.name);
+      }
     }
   }
 

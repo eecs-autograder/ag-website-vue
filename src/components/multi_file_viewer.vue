@@ -38,6 +38,7 @@
   interface OpenFile {
     name: string;
     content: string;
+    id: number | null;
   }
 
   @Component({
@@ -51,25 +52,27 @@
     files_currently_viewing: OpenFile[] = [];
     active_tab_index = 0;
 
-    add_to_viewing(filename: string, file_contents: string) {
+    add_to_viewing(filename: string, file_contents: string, id: number | null = null) {
       let file_exists = this.files_currently_viewing.find(
         open_file => open_file.name === filename
       ) !== undefined;
       if (file_exists) {
         return;
       }
-
-      this.files_currently_viewing.push({name: filename, content: file_contents});
+      this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
       this.active_tab_index = this.files_currently_viewing.length - 1;
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
 
-    update_name_of_file(new_file_name: string, current_file_name: string) {
-      for (let file of this.files_currently_viewing) {
-        if (file.name === current_file_name) {
-          file.name = new_file_name;
-          return;
-        }
+    rename_file(id: number, new_name: string) {
+      let index = this.files_currently_viewing.findIndex((open_file) => open_file.id === id);
+      console.log(index);
+      if (index !== -1) {
+        Vue.set(this.files_currently_viewing, index, {
+          name: new_name,
+          content: this.files_currently_viewing[index].content,
+          id: id
+        });
       }
     }
 
@@ -80,6 +83,14 @@
       this.files_currently_viewing.splice(tab_index, 1);
       console.log(this.files_currently_viewing.length);
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
+    }
+
+    remove_by_name(name: string) {
+      let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
+      console.log(index);
+      if (index !== -1) {
+        this.remove_from_viewing(index);
+      }
     }
   }
 </script>
