@@ -1,16 +1,11 @@
 <template>
-  <div id="viewing-container">
-    <div id="scrollable-container" :style="[{height: view_file_height}]">
-      <div class="line-numbers-container">
-        <div v-for="(line, index) of d_file_contents.split('\n')" class="line-number">
-          {{index + 1}}
-        </div>
-      </div>
-      <div class="file-content-container">
-        <pre v-for="(line) of d_file_contents.split('\n')"
-             class="line-of-file-content">{{line === "" ? "\n" : line}}</pre>
-      </div>
-    </div>
+  <div id="view-file-component" :style="{height: view_file_height}">
+    <table id="viewing-container">
+      <tr v-for="(line, index) of d_file_contents.split('\n')">
+        <td class="line-number">{{index + 1}}</td>
+        <td class="line-of-file-content">{{line === "" ? "\n" : line}}</td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -47,57 +42,34 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+#view-file-component {
+  overflow-y: scroll;
+}
+
 #viewing-container {
-  border-radius: 0 0 3px 3px;
   font-family: monospace;
   padding: 5px 0 0 0;
   width: 100%;
 }
 
-#scrollable-container {
-  margin: 0;
-  overflow: scroll;
-  padding: 0;
-  position: relative;
-  width: 100%;
-}
-
-.line-numbers-container {
-  position: absolute;
-  vertical-align: top;
-  user-select: none;
-  width: 51px;
-}
-
 .line-number {
   color: $baking-pan;
-  font-size: 13px;
-  padding: 1px 0 1px 0;
+  font-size: 14px;
+  padding: 2px 10px;
   text-align: center;
-  height: 16px;
-  border-bottom: 1px solid transparent;
+  user-select: none;
   vertical-align: top;
-}
-
-.file-content-container {
-  color: black;
-  display: inline-block;
-  margin-left: 51px;
-  position: relative;
-  vertical-align: top;
+  width: 1%;
 }
 
 .line-of-file-content {
-  font-size: 13px;
-  height: 16px;
+  color: black;
+  font-size: 14px;
   margin: 0;
-  padding: 1px 10px 1px 0;
+  padding: 1px 0;
   white-space: pre-wrap;
-  border-bottom: 1px solid transparent;
-}
-
-.line-of-file-content:last-child {
-  padding-bottom: 5px;
+  word-break: break-word;
+  word-wrap: break-word;
 }
 
 </style>

@@ -48,9 +48,9 @@ describe('MultiFileViewer.vue', () => {
         await multi_file_viewer.$nextTick();
 
         let view_file_component = wrapper.find({ref: 'view_file_component'});
-        let scrollable_container = view_file_component.find('#scrollable-container');
+        let view_file_wrapper = view_file_component.find('#view-file-component');
 
-        expect(scrollable_container.element.style.height).toEqual("540px");
+        expect(view_file_wrapper.element.style.height).toEqual("540px");
 
     });
 

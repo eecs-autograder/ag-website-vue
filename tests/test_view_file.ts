@@ -63,8 +63,8 @@ describe('ViewFile.vue', () => {
         const wrapper = mount(WrapperComponent2);
         const view_file_component = wrapper.find({ref: 'view_file'});
 
-        let scrollable_container = view_file_component.find('#scrollable-container');
-        expect(scrollable_container.element.style.height).toEqual('250px');
+        let view_file_wrapper = view_file_component.find('#view-file-component');
+        expect(view_file_wrapper.element.style.height).toEqual('250px');
 
         const line_numbers = wrapper.findAll('.line-number');
         expect(line_numbers.length).toEqual(2);
