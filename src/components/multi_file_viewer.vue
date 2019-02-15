@@ -57,6 +57,9 @@
         open_file => open_file.name === filename
       ) !== undefined;
       if (file_exists) {
+        this.active_tab_index = this.files_currently_viewing.findIndex(
+          (open_file) => open_file.name === filename
+        );
         return;
       }
       this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
@@ -66,7 +69,6 @@
 
     rename_file(id: number, new_name: string) {
       let index = this.files_currently_viewing.findIndex((open_file) => open_file.id === id);
-      console.log(index);
       if (index !== -1) {
         Vue.set(this.files_currently_viewing, index, {
           name: new_name,
@@ -81,13 +83,11 @@
         this.active_tab_index -= 1;
       }
       this.files_currently_viewing.splice(tab_index, 1);
-      console.log(this.files_currently_viewing.length);
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
 
     remove_by_name(name: string) {
       let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
-      console.log(index);
       if (index !== -1) {
         this.remove_from_viewing(index);
       }

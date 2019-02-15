@@ -147,8 +147,9 @@ describe('MultiFileViewer.vue', () => {
         await multi_file_viewer.$nextTick();
 
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(2);
-        expect(multi_file_viewer.$data.active_tab_index).toEqual(1);
-        expect(view_file_component.text()).toContain('Lime Body');
+        // Is this the behavior that we want for all cases?
+        expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
+        expect(view_file_component.text()).toContain('Kiwi Body');
     });
 
     test('When leftmost tab is active & gets deleted, right neighbor becomes active', async () => {

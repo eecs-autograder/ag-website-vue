@@ -1,43 +1,50 @@
 <template>
   <div>
-    <div id="single-file-component"
-         @click="$emit('open_file', file)">
-      <div class="file-div file-name">
-        <span v-if="editing">
+    <div id="single-file-component" @click="$emit('open_file', file)">
+      <div>
+        <div v-if="editing">
           <div @click.stop>
-            <validated-input ref='validated_input_2'
+            <validated-input ref='file_name'
                              spellcheck="false"
+                             autocomplete="off"
                              v-model="new_file_name"
                              :validators="[is_not_empty]"
                              input_style="border-radius: 2px;
                                           border: 0px solid hsl(220, 30%, 72%);
                                           padding: 3px 5px;
-                                          width: 200px;">
-              <div slot="suffix" class="edit-buttons">
-                <div class="update-file-name-button" @click.stop="rename_file"> Update </div>
-                <div class="update-file-name-cancel-button" @click.stop="cancel_renaming_file"> Cancel </div>
+                                          width: 360px;
+                                          margin-right: 10px;
+                                          box-sizing: border-box;">
+              <div slot="suffix" class="edit-name-buttons">
+                <button class="update-file-name-button"
+                        :disabled="new_file_name === file.name"
+                        @click.stop="rename_file"> Update
+                </button>
+                <button class="update-file-name-cancel-button"
+                        @click.stop="cancel_renaming_file"> Cancel
+                </button>
               </div>
-
             </validated-input>
           </div>
-        </span>
-        <span v-else>
-          {{file.name}}
-          <div class="icon-holder">
-            <i class="fas fa-file-download download-file"
-               @click.stop="download_file"></i>
-            <i class="fas fa-pencil-alt edit-file-name"
-               @click.stop="new_file_name = file.name; editing = true;"></i>
+        </div>
+        <div v-else class="not-editing">
+          <div class="file-name"> <span>{{file.name}}</span>
+            <div class="icon-holder">
+              <i class="fas fa-file-download download-file"
+                 @click.stop="download_file"></i>
+              <i class="fas fa-pencil-alt edit-file-name"
+                 @click.stop="new_file_name = file.name; editing = true;"></i>
+            </div>
           </div>
-          <i class="far fa-trash-alt delete-file" @click.stop="$refs.delete_instructor_file_modal.open()"></i>
-        </span>
+          <i class="far fa-trash-alt delete-file"
+             @click.stop="$refs.delete_instructor_file_modal.open()"></i>
+        </div>
       </div>
-      <div class="file-div display-timestamp">
-        {{(new Date(file.last_modified)).toLocaleString(
-            'en-US', last_modified_format
-        )}}
+      <div class="display-timestamp">
+        {{(new Date(file.last_modified)).toLocaleString('en-US', last_modified_format)}}
       </div>
     </div>
+
     <modal ref="delete_instructor_file_modal"
            size="large"
            :include_closing_x="false">
@@ -57,15 +64,16 @@
              @click="$refs.delete_instructor_file_modal.close()"> Cancel </div>
       </div>
     </modal>
+
   </div>
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import { InstructorFile } from 'ag-client-typescript';
-  import Modal from '@/components/modal.vue';
 
+  import Modal from '@/components/modal.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
   @Component({
@@ -80,44 +88,34 @@
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
     new_file_name: string = "";
-    d_file: InstructorFile;
     d_delete_pending = false;
-
-    created() {
-      console.log("Created");
-      this.d_file = this.file;
-    }
 
     is_not_empty(value: string): ValidatorResponse {
       return {
-        is_valid: value !== "",
-        error_msg: "This field is required."
+        is_valid: value.trim() !== "",
+        error_msg: "File name cannot be an empty string."
       };
     }
 
     async rename_file() {
-      if (this.file.name !== this.new_file_name) {
-        let prev_name = this.file.name;
-        // bad if another file already has the new name....
-        await this.file.rename(this.new_file_name);
-        this.editing = false;
-      }
+      console.log("Renaming the file to: " + this.new_file_name);
+      await this.file.rename(this.new_file_name);
+      this.editing = false;
     }
 
     cancel_renaming_file() {
       this.editing = false;
+      console.log(this.file.last_modified);
     }
 
     download_file() {
-
+      console.log("downloading");
     }
 
     async delete_file_permanently() {
       try {
         this.d_delete_pending = true;
         await this.file.delete();
-        // this.instructor_files.splice(this.instructor_files.indexOf(this.file_to_delete), 1);
-        // delete file from the mfv if it's being viewed :/
       }
       finally {
         this.d_delete_pending = false;
@@ -131,43 +129,52 @@
   @import '@/styles/colors.scss';
   @import '@/styles/button_styles.scss';
   @import url('https://fonts.googleapis.com/css?family=Quicksand');
-
   $current_language: "Quicksand";
 
-  .edit-buttons {
-    display: inline-block;
-  }
 
   .icon-holder {
     display: inline-block;
     padding-top: 2px;
   }
 
-  .update-file-name-button {
+  .not-editing {
+    max-width: 250px;
+  }
+
+  .edit-name-buttons {
+    display: block;
+    padding: 9px 0 7px 0;
+  }
+
+  .update-file-name-button, .update-file-name-cancel-button {
     background-color: hsl(220, 30%, 60%);
     border-radius: 2px;
+    border: 0;
     padding: 4px 6px 5px 6px;
     color: white;
-    margin-left: 12px;
     display: inline-block;
+    font-family: $current-language;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .update-file-name-button:disabled, .update-file-name-button:disabled:hover {
+    background-color: hsl(220, 30%, 85%);
+    color: gray;
+    cursor: default;
   }
 
   .update-file-name-cancel-button {
-    background-color: hsl(220, 30%, 60%);
-    border-radius: 2px;
-    padding: 4px 6px 5px 6px;
-    color: white;
-    margin-left: 12px;
-    display: inline-block;
+    margin-left: 10px;
   }
 
-  .update-file-name-button:hover {
+  .update-file-name-button:hover, .update-file-name-cancel-button:hover {
     background-color: hsl(220, 30%, 45%);
   }
 
   .delete-file {
     position: absolute;
-    top: 11px;
+    top: 12px;
     right: 12px;
     color: hsl(220, 20%, 75%);
   }
@@ -178,7 +185,7 @@
 
   .download-file {
     color: hsl(220, 30%, 60%);
-    padding-left: 6px;
+    padding-left: 1px;
   }
 
   .download-file:hover {
@@ -194,29 +201,12 @@
     color: hsl(220, 30%, 35%);
   }
 
-  .save-file-name {
-    color: hsl(220, 30%, 60%);
-    padding-left: 5px;
-  }
-
-  .save-file-name:hover {
-    color: hsl(220, 30%, 35%);
-  }
-
-  .file-div {
-    display: inline-block;
-  }
-
-  .timestamp {
-    padding: 0 0 0 5px;
-  }
-
   #single-file-component {
     margin-bottom: 5px;
     cursor: pointer;
     background-color: hsl(220, 40%, 94%);
     width: 380px;
-    padding: 8px 2px 10px 10px;
+    padding: 9px 11px 7px 11px;
     border-radius: .25rem;
     position: relative;
     box-sizing: border-box;
@@ -225,22 +215,23 @@
   }
 
   .file-name {
+    display: inline-block;
     font-size: 16px;
-    padding-bottom: 1px;
+    padding-bottom: 2px;
+    box-sizing: border-box;
+  }
+
+  .file-name span {
+    padding-right: 8px;
   }
 
   .display-timestamp {
     display: block;
-    padding-top: 5px;
     color: hsl(220, 20%, 65%);
     font-size: 15px;
   }
 
-
-  .file-to-delete {
-    background-color: hsl(220, 20%, 85%);
-    letter-spacing: 1px;
-  }
+  /* ---------------- MODAL ---------------- */
 
   #modal-header {
     padding: 5px 10px;
@@ -250,6 +241,11 @@
   #modal-body {
     padding: 10px 10px 20px 10px;
     font-family: $current-language;
+  }
+
+  .file-to-delete {
+    background-color: hsl(220, 20%, 85%);
+    letter-spacing: 1px;
   }
 
   #modal-button-container {

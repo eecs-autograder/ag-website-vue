@@ -36,24 +36,21 @@
 
 
 <script lang="ts">
-  import { array_get_unique, array_has_unique, array_remove_unique } from '../../utils';
+  import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
+
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
   import FileUpload from '@/components/file_upload.vue';
-  import Modal from '@/components/modal.vue';
-  import MultiFileViewer from '@/components/multi_file_viewer.vue';
   import SingleFile from '@/components/instructor_files/single_file.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
+  import MultiFileViewer from '@/components/multi_file_viewer.vue';
 
   @Component({
     components: {
       FileUpload,
-      Modal,
       MultiFileViewer,
-      SingleFile,
-      ValidatedInput
+      SingleFile
     }
   })
   export default class InstructorFiles extends Vue implements InstructorFileObserver {
@@ -71,17 +68,10 @@
       InstructorFile.subscribe(this);
       this.instructor_files = await InstructorFile.get_all_from_project(this.project.pk);
       this.sort_files();
-      console.log("Created instructor files");
     }
 
     destroyed() {
       InstructorFile.unsubscribe(this);
-    }
-
-    rename_file_in_multi_file_viewer(names: string[]) {
-      let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
-      instructor_files_viewer.update_name_of_file(names[0], names[1]);
-      this.sort_files();
     }
 
     sort_files() {
@@ -100,18 +90,6 @@
       let file_content = await file.get_content();
       let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
       instructor_files_viewer.add_to_viewing(file.name, file_content, file.pk);
-    }
-
-    open_delete_file_modal(file: InstructorFile) {
-      this.file_to_delete = file;
-      let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
-      delete_instructor_file_modal.open();
-    }
-
-    cancel_deletion() {
-      let delete_instructor_file_modal = <Modal> this.$refs.delete_instructor_file_modal;
-      delete_instructor_file_modal.close();
-      this.file_to_delete = null;
     }
 
     async add_instructor_files(files: File[]) {
@@ -133,7 +111,7 @@
           );
           console.log(file_to_update.name);
           try {
-            let result = await file_to_update.set_content(file);
+            await file_to_update.set_content(file);
           }
           catch (e) {
             console.log(e);
@@ -141,7 +119,6 @@
         }
         else {
           try {
-            console.log("New file: " + file.name);
             let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
             this.instructor_files.push(file_to_add);
           }
@@ -150,17 +127,14 @@
           }
         }
       }
-
       let instructor_files_upload = <FileUpload> this.$refs.instructor_files_upload;
       instructor_files_upload.clear_files();
       this.sort_files();
     }
 
-    update_instructor_file_content_changed(instructor_file: InstructorFile): void {
-    }
+    update_instructor_file_content_changed(instructor_file: InstructorFile): void { }
 
-    update_instructor_file_created(instructor_file: InstructorFile): void {
-    }
+    update_instructor_file_created(instructor_file: InstructorFile): void { }
 
     update_instructor_file_deleted(instructor_file: InstructorFile): void {
       array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
@@ -168,16 +142,14 @@
     }
 
     update_instructor_file_renamed(instructor_file: InstructorFile): void {
-      console.log("Here");
       let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
       if (index !== -1) {
-        console.log("There");
-        this.instructor_files[index] = instructor_file;
+        Vue.set(this.instructor_files, index, instructor_file);
         (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
           instructor_file.pk, instructor_file.name
         );
-        console.log(instructor_file.name);
       }
+      this.sort_files();
     }
   }
 
@@ -193,42 +165,6 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 
 $current_language: "Quicksand";
-
-.file-to-delete {
-  background-color: hsl(220, 20%, 85%);
-  letter-spacing: 1px;
-}
-
-#modal-header {
-  padding: 5px 10px;
-  font-family: $current-language;
-}
-
-#modal-body {
-  padding: 10px 10px 20px 10px;
-  font-family: $current-language;
-}
-
-#modal-button-container {
-  text-align: right;
-  padding: 10px;
-}
-
-.modal-cancel-button, .modal-delete-button {
-  border-radius: 2px;
-  font-family: $current-language;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.modal-cancel-button {
-  @extend .gray-button;
-}
-
-.modal-delete-button {
-  @extend .red-button;
-  margin-right: 20px;
-}
 
 .collapse-button {
   display: inline;
@@ -256,7 +192,7 @@ $current_language: "Quicksand";
   width: 95%;
   margin-left: 2.5%;
   margin-right: 2.5%;
-  margin-top: 50px;
+  margin-top: 25px;
   font-family: $current_language;
 }
 
