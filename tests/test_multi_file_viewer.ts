@@ -400,7 +400,8 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Tabs cannot be deleted by their name if the name doesnt occur in the ' +
-         'mfv', async () => {
+         'mfv',
+         async () => {
         const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
         let multi_file_viewer = <MultiFileViewer> wrapper.vm;
 
@@ -473,7 +474,8 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Trying to rename a file whose id doesnt occur in the mfv does ' +
-         'nothing', async () => {
+         'nothing',
+         async () => {
         const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
         let multi_file_viewer = <MultiFileViewer> wrapper.vm;
 
@@ -525,7 +527,8 @@ describe('MultiFileViewer.vue', () => {
     });
 
     test('Trying to update the content of a file whose name doesnt occur in the mfv ' +
-         'does nothing', async () => {
+         'does nothing',
+         async () => {
         const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
         let multi_file_viewer = <MultiFileViewer> wrapper.vm;
 

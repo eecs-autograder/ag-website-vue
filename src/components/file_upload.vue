@@ -110,7 +110,6 @@
     }
 
     add_files_from_button(event: HTMLInputEvent) {
-      console.log("Adding files");
       if (event.target === null) {
         throw new Error("Target is null");
       }
@@ -143,7 +142,6 @@
     }
 
     attempt_to_upload() {
-      console.log("Uploading");
       if (this.d_empty_filenames.length !== 0) {
         let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
         empty_files_modal.open();
@@ -154,7 +152,6 @@
     }
 
     continue_with_upload_despite_empty_files() {
-      console.log("Uploading despite empty");
       this.$emit('upload_files', this.d_files);
       let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
       empty_files_modal.close();

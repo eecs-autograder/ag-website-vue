@@ -5,7 +5,11 @@ import { InstructorFile, Project, UltimateSubmissionPolicy, User } from 'ag-clie
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { patch_async_class_method, patch_async_static_method } from '../mocking';
+import {
+    patch_async_class_method,
+    patch_async_static_method,
+    patch_component_method
+} from '../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -161,7 +165,7 @@ describe('InstructorFiles.vue', () => {
                     {ref: 'file_name'}).vm;
                 let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
 
-                (<HTMLInputElement> file_name_input.element).value = "yellow.cpp";
+                (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
                 file_name_input.trigger('input');
                 await single_file_component.$nextTick();
 
@@ -172,6 +176,7 @@ describe('InstructorFiles.vue', () => {
                 await single_file_component.$nextTick();
 
                 expect(spy.mock.calls.length).toEqual(0);
+                expect(single_file_component.file.name).toEqual(file_1.name);
                 expect(single_file_component.editing).toBe(false);
             }
         );
@@ -246,7 +251,7 @@ describe('InstructorFiles.vue', () => {
          }
     );
 
-    test.only('Users have the ability to delete a file',
+    test('Users have the ability to delete a file',
          async () => {
              const spy = jest.fn();
 
@@ -271,8 +276,6 @@ describe('InstructorFiles.vue', () => {
                      await single_file_component.$nextTick();
 
                      expect(spy.mock.calls.length).toEqual(1);
-
-                     console.log(wrapper.html());
                  }
              );
          }
@@ -308,17 +311,29 @@ describe('InstructorFiles.vue', () => {
          }
     );
 
-    test.skip('Users have the ability to download a file',
-              async () => {
-         const spy = jest.fn();
+    test('Users have the ability to download a file', async () => {
+        const spy = jest.fn();
 
-         wrapper = mount(SingleFile, {
-              propsData: {
-                  file: file_1
-              }
-         });
+        wrapper = mount(SingleFile, {
+            propsData: {
+                file: file_1
+            }
+        });
 
-         single_file_component = wrapper.vm;
+        single_file_component = wrapper.vm;
+        await single_file_component.$nextTick();
 
+        await patch_component_method(
+            wrapper,
+            'download_file',
+            spy,
+            async () => {
+
+                wrapper.find('.download-file').trigger('click');
+                await single_file_component.$nextTick();
+
+                expect(spy.mock.calls.length).toEqual(1);
+            }
+        );
     });
 });

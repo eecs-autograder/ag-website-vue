@@ -92,7 +92,7 @@
     new_file_name: string = "";
     d_delete_pending = false;
 
-    http: HttpClient;
+    // http: HttpClient;
 
     is_not_empty(value: string): ValidatorResponse {
       return {
@@ -102,31 +102,27 @@
     }
 
     async rename_file() {
-      console.log("Renaming the file to: " + this.new_file_name);
       await this.file.rename(this.new_file_name);
       this.editing = false;
     }
 
     cancel_renaming_file() {
       this.editing = false;
-      console.log(this.file.last_modified);
     }
 
     async download_file() {
       let url = `/api/instructor_files/${this.file.pk}/content/`;
       console.log(url);
-      await download_file(this.http, url, this.file.name);
+      // await download_file(this.http, url, this.file.name);
     }
 
     async delete_file_permanently() {
       try {
         this.d_delete_pending = true;
-        console.log("Deleting: " + this.file.name);
         await this.file.delete();
       }
       finally {
         this.d_delete_pending = false;
-        console.log("Done");
       }
     }
 

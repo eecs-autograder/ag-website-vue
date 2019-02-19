@@ -87,12 +87,12 @@
 
     async view_file(file: InstructorFile) {
       let file_content = await file.get_content();
-      let instructor_files_viewer = <MultiFileViewer> this.$refs.instructor_files_viewer;
-      instructor_files_viewer.add_to_viewing(file.name, file_content, file.pk);
+      (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
+        file.name, file_content, file.pk
+      );
     }
 
     async add_instructor_files(files: File[]) {
-      console.log("Upload button got pushed");
       for (let file of files) {
         let file_already_exists = array_has_unique(
           this.instructor_files,
@@ -102,23 +102,20 @@
         );
 
         if (file_already_exists) {
-          console.log("already exists");
           let file_to_update = array_get_unique(
             this.instructor_files,
             file.name,
             (file: InstructorFile, file_name_to_add: string) =>
               file_name_equal(file.name, file_name_to_add)
           );
-          console.log(file_to_update.name);
           try {
             await file_to_update.set_content(file);
           }
-          catch (e) {
-            console.log(e);
+          catch (error) {
+            console.log(error);
           }
         }
         else {
-          console.log("This is a new file!");
           try {
             let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
             this.instructor_files.push(file_to_add);
@@ -128,35 +125,33 @@
           }
         }
       }
-      let instructor_files_upload = <FileUpload> this.$refs.instructor_files_upload;
-      instructor_files_upload.clear_files();
+      (<FileUpload> this.$refs.instructor_files_upload).clear_files();
       this.sort_files();
     }
 
-    async update_instructor_file_content_changed(instructor_file: InstructorFile): void {
-      console.log("Content changed");
+    async update_instructor_file_content_changed(instructor_file: InstructorFile) {
       let file_content = await instructor_file.get_content();
       (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
         instructor_file.name, file_content
       );
     }
 
-    update_instructor_file_created(instructor_file: InstructorFile): void { }
+    update_instructor_file_created(instructor_file: InstructorFile) { }
 
-    update_instructor_file_deleted(instructor_file: InstructorFile): void {
-      console.log("Something got deleted!");
+    update_instructor_file_deleted(instructor_file: InstructorFile) {
       array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
     }
 
-    update_instructor_file_renamed(instructor_file: InstructorFile): void {
+    update_instructor_file_renamed(instructor_file: InstructorFile) {
+      console.log("I received a new name!");
       let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
-      if (index !== -1) {
-        Vue.set(this.instructor_files, index, instructor_file);
-        (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
-          instructor_file.pk, instructor_file.name
-        );
-      }
+      // if (index !== -1) {
+      Vue.set(this.instructor_files, index, instructor_file);
+      (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
+        instructor_file.pk, instructor_file.name
+      );
+      // }
       this.sort_files();
     }
   }
