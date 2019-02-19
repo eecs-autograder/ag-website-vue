@@ -71,7 +71,9 @@
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import { InstructorFile } from 'ag-client-typescript';
+  import { HttpClient, InstructorFile } from 'ag-client-typescript';
+
+  import { download_file } from '@/utils';
 
   import Modal from '@/components/modal.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
@@ -89,6 +91,8 @@
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
     new_file_name: string = "";
     d_delete_pending = false;
+
+    http: HttpClient;
 
     is_not_empty(value: string): ValidatorResponse {
       return {
@@ -108,17 +112,21 @@
       console.log(this.file.last_modified);
     }
 
-    download_file() {
-      console.log("downloading");
+    async download_file() {
+      let url = `/api/instructor_files/${this.file.pk}/content/`;
+      console.log(url);
+      await download_file(this.http, url, this.file.name);
     }
 
     async delete_file_permanently() {
       try {
         this.d_delete_pending = true;
+        console.log("Deleting: " + this.file.name);
         await this.file.delete();
       }
       finally {
         this.d_delete_pending = false;
+        console.log("Done");
       }
     }
 

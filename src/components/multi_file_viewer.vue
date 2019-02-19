@@ -86,6 +86,17 @@
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
 
+    update_contents_by_name(name: string, new_content: string) {
+      let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
+      if (index !== -1) {
+        Vue.set(this.files_currently_viewing, index, {
+          name: name,
+          content: new_content,
+          id: this.files_currently_viewing[index].id
+        });
+      }
+    }
+
     remove_by_name(name: string) {
       let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
       if (index !== -1) {

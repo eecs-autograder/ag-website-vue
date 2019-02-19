@@ -51,7 +51,6 @@ describe('MultiFileViewer.vue', () => {
         let view_file_wrapper = view_file_component.find('#view-file-component');
 
         expect(view_file_wrapper.element.style.height).toEqual("540px");
-
     });
 
     test('When a file is added it becomes the active file/tab ', async () => {
@@ -363,5 +362,188 @@ describe('MultiFileViewer.vue', () => {
         first_tab_close_x = wrapper.findAll('.close-x').at(0);
         first_tab_close_x.trigger('click');
         expect(multi_file_viewer.$data.active_tab_index).toEqual(1);
+    });
+
+    test('Tabs can be deleted by their name', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Kiwi");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Orange', 'Orange Body');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Orange");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.active_tab_index).toEqual(1);
+
+        multi_file_viewer.remove_by_name("Kiwi");
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Orange");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.remove_by_name("Orange");
+        await multi_file_viewer.$nextTick();
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+    });
+
+    test('Tabs cannot be deleted by their name if the name doesnt occur in the ' +
+         'mfv', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Kiwi', 'Kiwi Body');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Kiwi");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Orange', 'Orange Body');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Orange");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.active_tab_index).toEqual(1);
+
+        multi_file_viewer.remove_by_name("Pineapple");
+        await multi_file_viewer.$nextTick();
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.files_currently_viewing[0]).toEqual(
+            {name: "Kiwi", content: "Kiwi Body", id: null}
+        );
+        expect(multi_file_viewer.files_currently_viewing[1]).toEqual(
+            {name: "Orange", content: "Orange Body", id: null}
+        );
+    });
+
+    test('Files can be renamed using their id value', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Grape', 'Grape Body', 7);
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Grape");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Orange', 'Orange Body', 21);
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Orange");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.active_tab_index).toEqual(1);
+
+        multi_file_viewer.rename_file(21, "Orange Juice");
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Orange Juice");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.active_tab_index).toEqual(1);
+
+        multi_file_viewer.rename_file(7, "Grape Juice");
+        await multi_file_viewer.$nextTick();
+
+        wrapper.findAll('.tab-header').at(0).trigger('click');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Grape Juice");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+    });
+
+    test('Trying to rename a file whose id doesnt occur in the mfv does ' +
+         'nothing', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Grape', 'Grape Body', 7);
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Grape");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('Orange', 'Orange Body', 21);
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('.active-tab-header').text()).toContain("Orange");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.active_tab_index).toEqual(1);
+
+        multi_file_viewer.rename_file(22, "Apple Juice");
+        await multi_file_viewer.$nextTick();
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(2);
+        expect(multi_file_viewer.files_currently_viewing[0].name).toEqual("Grape");
+        expect(multi_file_viewer.files_currently_viewing[1].name).toEqual("Orange");
+    });
+
+    test('File content can be updated', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('banana.cpp', 'Old banana');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('#viewing-container').text()).toContain("Old banana");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.update_contents_by_name('banana.cpp', 'New banana');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('#viewing-container').text()).toContain("New banana");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+    });
+
+    test('Trying to update the content of a file whose name doesnt occur in the mfv ' +
+         'does nothing', async () => {
+        const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+        let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.add_to_viewing('banana.cpp', 'Old banana');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('#viewing-container').text()).toContain("Old banana");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+        multi_file_viewer.update_contents_by_name('bananas.cpp', 'New banana');
+        await multi_file_viewer.$nextTick();
+
+        expect(wrapper.find('#viewing-container').text()).toContain("Old banana");
+        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(multi_file_viewer.active_tab_index).toEqual(0);
     });
 });

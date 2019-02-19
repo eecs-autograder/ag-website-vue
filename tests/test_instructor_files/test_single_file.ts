@@ -113,8 +113,8 @@ describe('InstructorFiles.vue', () => {
             spy,
             async () => {
 
-                let validated_input_component = <ValidatedInput> wrapper.find(
-                    {ref: 'file_name'}).vm;
+                // let validated_input_component = <ValidatedInput> wrapper.find(
+                //     {ref: 'file_name'}).vm;
                 let file_name_input = wrapper.find(
                     {ref: 'file_name'}
                 ).find('#input');
@@ -161,7 +161,7 @@ describe('InstructorFiles.vue', () => {
                     {ref: 'file_name'}).vm;
                 let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
 
-                (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
+                (<HTMLInputElement> file_name_input.element).value = "yellow.cpp";
                 file_name_input.trigger('input');
                 await single_file_component.$nextTick();
 
@@ -246,7 +246,7 @@ describe('InstructorFiles.vue', () => {
          }
     );
 
-    test('Users have the ability to delete a file',
+    test.only('Users have the ability to delete a file',
          async () => {
              const spy = jest.fn();
 
@@ -271,6 +271,8 @@ describe('InstructorFiles.vue', () => {
                      await single_file_component.$nextTick();
 
                      expect(spy.mock.calls.length).toEqual(1);
+
+                     console.log(wrapper.html());
                  }
              );
          }
