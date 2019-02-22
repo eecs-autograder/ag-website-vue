@@ -115,12 +115,3 @@ export function get_axios_error_status(error: unknown): [AxiosResponse, number] 
     }
     return [response, response.status];
 }
-
-export async function download_file(http: HttpClient, url: string, filename: string) {
-    // console.log(http);
-    // console.log(url);
-    // console.log(filename);
-    // let response = await axios.get(url, {responseType: "blob"});
-    // console.log(response);
-    // saveAs(response, filename);
-}

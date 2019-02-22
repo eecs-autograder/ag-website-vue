@@ -109,6 +109,7 @@
               file_name_equal(file.name, file_name_to_add)
           );
           try {
+            console.log("You already have a file named: " + file_to_update.name);
             await file_to_update.set_content(file);
           }
           catch (error) {
@@ -144,14 +145,11 @@
     }
 
     update_instructor_file_renamed(instructor_file: InstructorFile) {
-      console.log("I received a new name!");
       let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
-      // if (index !== -1) {
       Vue.set(this.instructor_files, index, instructor_file);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
         instructor_file.pk, instructor_file.name
       );
-      // }
       this.sort_files();
     }
   }

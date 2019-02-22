@@ -73,7 +73,7 @@
 
   import { HttpClient, InstructorFile } from 'ag-client-typescript';
 
-  import { download_file } from '@/utils';
+  import { saveAs } from 'file-saver';
 
   import Modal from '@/components/modal.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
@@ -92,8 +92,6 @@
     new_file_name: string = "";
     d_delete_pending = false;
 
-    // http: HttpClient;
-
     is_not_empty(value: string): ValidatorResponse {
       return {
         is_valid: value.trim() !== "",
@@ -111,8 +109,9 @@
     }
 
     async download_file() {
-      let url = `/api/instructor_files/${this.file.pk}/content/`;
-      console.log(url);
+      // let url = `/api/instructor_files/${this.file.pk}/content/`;
+      // console.log(url);
+      saveAs(await this.file.get_content(), this.file.name);
       // await download_file(this.http, url, this.file.name);
     }
 
