@@ -109,10 +109,8 @@
     }
 
     async download_file() {
-      // let url = `/api/instructor_files/${this.file.pk}/content/`;
-      // console.log(url);
-      saveAs(await this.file.get_content(), this.file.name);
-      // await download_file(this.http, url, this.file.name);
+      let downloadable_file = new File([await this.file.get_content()], this.file.name);
+      saveAs(downloadable_file);
     }
 
     async delete_file_permanently() {
