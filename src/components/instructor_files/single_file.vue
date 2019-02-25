@@ -102,6 +102,7 @@
     async rename_file() {
       console.log("(rename_file) - file.rename - to - " + this.new_file_name);
       await this.file.rename(this.new_file_name);
+      console.log(this.file.name);
       this.editing = false;
     }
 

@@ -113,7 +113,7 @@ describe('InstructorFiles.vue', () => {
         renamed_file_2 = new InstructorFile({
             pk: 3,
             project: 10,
-            name: "ruby.cpp",
+            name: "amber.cpp",
             size: 1,
             last_modified: "2019-02-15T20:44:30.534985Z"
         });
@@ -256,17 +256,25 @@ describe('InstructorFiles.vue', () => {
 
             return patch_async_class_method(
                 InstructorFile,
-                'set_content',
-                () => Promise.resolve(call_notify_content_changed()),
+                'get_content',
+                () => Promise.resolve("Hi"),
                 async () => {
 
-                // add file_same_name_as_1 which has the same name as instructor_file_3
-                console.log("add file_same_name_as_1 which has the same name as instructor_file_1");
-                final_upload_button.trigger('click');
-                await instructor_files_component.$nextTick();
+                    return patch_async_class_method(
+                        InstructorFile,
+                        'set_content',
+                        () => Promise.resolve(call_notify_content_changed()),
+                        async () => {
 
-                expect(instructor_files_component.instructor_files.length).toEqual(3);
-                expect(instructor_files_component.instructor_files[0].size).toEqual(20);
+                            // add file_same_name_as_1 which has the same name as instructor_file_3
+                            console.log("add file_same_name_as_1 which has the same name as instructor_file_1");
+                            final_upload_button.trigger('click');
+                            await instructor_files_component.$nextTick();
+
+                            expect(instructor_files_component.instructor_files.length).toEqual(3);
+                            expect(instructor_files_component.instructor_files[0].size).toEqual(20);
+                        }
+                    );
             });
         });
         console.log("Test 2 done ----------------------------------------------------------");
@@ -345,7 +353,7 @@ describe('InstructorFiles.vue', () => {
         console.log("Test 3 done ----------------------------------------------------------");
     });
 
-    test.skip('4 - Uploading file that doesnt share a name with any preexisting instructor' +
+    test('4 - Uploading file that doesnt share a name with any preexisting instructor' +
          'file triggers a new instructor file to be created',
          async () => {
         await patch_async_static_method(
@@ -382,17 +390,17 @@ describe('InstructorFiles.vue', () => {
                 await instructor_files_component.$nextTick();
 
                 expect(instructor_files_component.instructor_files.length).toEqual(4);
-                expect(instructor_files_component.instructor_files[0]).toEqual(instructor_file_3);
-                expect(instructor_files_component.instructor_files[1]).toEqual(new_uniquely_named_instructor_file);
-                expect(instructor_files_component.instructor_files[2]).toEqual(instructor_file_2);
-                expect(instructor_files_component.instructor_files[3]).toEqual(instructor_file_1);
+                expect(instructor_files_component.instructor_files[0]).toEqual(instructor_file_1); // aqua
+                expect(instructor_files_component.instructor_files[1]).toEqual(new_uniquely_named_instructor_file); // green
+                expect(instructor_files_component.instructor_files[2]).toEqual(instructor_file_2); // red
+                expect(instructor_files_component.instructor_files[3]).toEqual(instructor_file_3); // violet
             });
         });
         console.log("Test 4 done");
     });
 
 
-    test.skip('5 - Viewing a file (adding a file to the multi-file-viewer)', async () => {
+    test('5 - Viewing a file (adding a file to the multi-file-viewer)', async () => {
         await patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -420,14 +428,14 @@ describe('InstructorFiles.vue', () => {
                 let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                 expect(mfv.files_currently_viewing.length).toEqual(1);
-                expect(wrapper.find('.active-tab-header').text()).toEqual(instructor_file_3.name);
-                expect(wrapper.find('#viewing-container').text()).toContain("File Content");
+                expect(wrapper.find('.active-tab-header').text()).toEqual(instructor_file_1.name);
+                expect(wrapper.find('#viewing-container').text()).toContain("Test 5");
             });
         });
-        console.log("Test 5 done");
+        console.log("Test 5 done ----------------------------------------------------------");
     });
 
-    test.skip('6 - clicking on a file that is already being viewed makes it the active tab ' +
+    test('6 - clicking on a file that is already being viewed makes it the active tab ' +
          'in the multi-file-viewer',
          async () => {
          await patch_async_static_method(
@@ -470,14 +478,14 @@ describe('InstructorFiles.vue', () => {
                      expect(instructor_files_component.num_files_currently_viewing).toEqual(2);
                      expect(mfv.files_currently_viewing.length).toEqual(2);
                      expect(wrapper.find('.active-tab-header').text()).toEqual(
-                         instructor_file_3.name
+                         instructor_file_1.name
                  );
              });
          });
-         console.log("Test 6 done");
+         console.log("Test 6 done ----------------------------------------------------------");
     });
 
-    test.skip('7 - Deleting a file removes it from the list of instructor files', async () => {
+    test('7 - Deleting a file removes it from the list of instructor files', async () => {
         await patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -494,9 +502,9 @@ describe('InstructorFiles.vue', () => {
             await instructor_files_component.$nextTick();
 
             let uploaded_files = wrapper.findAll('.file-name');
-            expect(uploaded_files.at(0).text()).toEqual(instructor_file_3.name);
+            expect(uploaded_files.at(0).text()).toEqual(instructor_file_1.name);
             expect(uploaded_files.at(1).text()).toEqual(instructor_file_2.name);
-            expect(uploaded_files.at(2).text()).toEqual(instructor_file_1.name);
+            expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
 
             await patch_async_class_method(
                 InstructorFile,
@@ -504,30 +512,30 @@ describe('InstructorFiles.vue', () => {
                 () => Promise.resolve(call_notify_deleted()),
                 async () => {
 
-                    // Delete instructor_file_3
+                    // Delete instructor_file_1
                     wrapper.findAll('.delete-file').at(0).trigger('click');
                     await instructor_files_component.$nextTick();
 
-                    expect(wrapper.find('.file-to-delete').text()).toContain(instructor_file_3.name);
+                    expect(wrapper.find('.file-to-delete').text()).toContain(instructor_file_1.name);
 
                     wrapper.find('.modal-delete-button').trigger('click');
                     await instructor_files_component.$nextTick();
 
                     uploaded_files = wrapper.findAll('.file-name');
                     expect(uploaded_files.at(0).text()).toEqual(instructor_file_2.name);
-                    expect(uploaded_files.at(1).text()).toEqual(instructor_file_1.name);
+                    expect(uploaded_files.at(1).text()).toEqual(instructor_file_3.name);
                 }
             );
         });
-        console.log("Test 7 done");
+        console.log("Test 7 done ----------------------------------------------------------");
     });
 
     function call_notify_deleted() {
-        InstructorFile.notify_instructor_file_deleted(instructor_file_3);
+        InstructorFile.notify_instructor_file_deleted(instructor_file_1);
         console.log("Notify deleted got called");
     }
 
-    test.skip('8 - File is removed from the multi-file-viewer when it is being viewed ' +
+    test('8 - File is removed from the multi-file-viewer when it is being viewed ' +
          'and gets deleted in the instructor files list',
          async () => {
         await patch_async_static_method(
@@ -548,9 +556,9 @@ describe('InstructorFiles.vue', () => {
             expect(instructor_files_component.instructor_files.length).toEqual(3);
 
             let existing_files = wrapper.findAll('.file-name');
-            expect(existing_files.at(0).text()).toEqual(instructor_file_3.name); // Blue.cpp
+            expect(existing_files.at(0).text()).toEqual(instructor_file_1.name); // Blue.cpp
             expect(existing_files.at(1).text()).toEqual(instructor_file_2.name); // aqua.cpp
-            expect(existing_files.at(2).text()).toEqual(instructor_file_1.name); // purple.cpp
+            expect(existing_files.at(2).text()).toEqual(instructor_file_3.name); // purple.cpp
 
             await patch_async_class_method(
                 InstructorFile,
@@ -567,7 +575,7 @@ describe('InstructorFiles.vue', () => {
                 let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(2);
                 expect(mfv.files_currently_viewing.length).toEqual(2);
-                expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_3.name); // Blue.cpp
+                expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_1.name); // Blue.cpp
                 expect(mfv.files_currently_viewing[1].name).toEqual(instructor_file_2.name); // aqua.cpp
 
                 await patch_async_class_method(
@@ -576,34 +584,35 @@ describe('InstructorFiles.vue', () => {
                     () => Promise.resolve(call_notify_deleted()),
                     async () => {
 
-                    let file_to_delete = wrapper.findAll('#single-file-component').at(0); // Blue.cpp
+                    let file_to_delete = wrapper.findAll('#single-file-component').at(0); // aqua.cpp
                     file_to_delete.find('.delete-file').trigger('click');
                     await instructor_files_component.$nextTick();
 
-                    expect(wrapper.find('.file-to-delete').text()).toContain(instructor_file_3.name);
+                    console.log(instructor_file_1.name + " 5833333333333333333333333333333333333333");
+                    expect(wrapper.find('.file-to-delete').text()).toContain(instructor_file_1.name);
 
                     wrapper.find('.modal-delete-button').trigger('click');
                     await instructor_files_component.$nextTick();
 
                     existing_files = wrapper.findAll('.file-name');
-                    expect(existing_files.at(0).text()).toEqual(instructor_file_2.name); // aqua.cpp
-                    expect(existing_files.at(1).text()).toEqual(instructor_file_1.name); // purple.cpp
+                    expect(existing_files.length).toEqual(2);
+                    expect(existing_files.at(0).text()).toEqual(instructor_file_2.name); // red.cpp
+                    expect(existing_files.at(1).text()).toEqual(instructor_file_3.name); // violet.cpp
                     expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                     expect(mfv.files_currently_viewing.length).toEqual(1);
-                    expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_2.name); // aqua.cpp
+                    expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_2.name);
                 });
             });
         });
-        console.log("Test 8 done");
+        console.log("Test 8 done ----------------------------------------------------------");
     });
 
-    function mock_get_contents(msg: string) {
+    async function mock_get_contents(msg: string) {
         console.log("Getting contents of a file in test: " + msg);
         return msg;
     }
 
-    test.skip('9 - Renaming a file updates the name of the file', async () => {
-
+    test('9 - Renaming a file updates the name of the file', async () => {
         await patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -620,12 +629,15 @@ describe('InstructorFiles.vue', () => {
             await instructor_files_component.$nextTick();
 
             let uploaded_files = wrapper.findAll('.file-name');
-            expect(uploaded_files.at(0).text()).toEqual(instructor_file_3.name);
+            expect(uploaded_files.at(0).text()).toEqual(instructor_file_1.name);
             expect(uploaded_files.at(1).text()).toEqual(instructor_file_2.name);
-            expect(uploaded_files.at(2).text()).toEqual(instructor_file_1.name);
+            expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
 
-            let file_3 = wrapper.findAll('#single-file-component').at(2);
-            file_3.find('.edit-file-name').trigger('click');
+            let file_2 = wrapper.findAll('#single-file-component').at(1);
+
+            expect(file_2.text()).toContain(instructor_file_2.name);
+
+            file_2.find('.edit-file-name').trigger('click');
             await instructor_files_component.$nextTick();
 
             await patch_async_class_method(
@@ -634,11 +646,8 @@ describe('InstructorFiles.vue', () => {
                 () => Promise.resolve(call_notify_renamed()),
                 async () => {
 
-                let file_name_input = wrapper.find(
-                    '#validated-input-component'
-                ).find('#input');
-
-                (<HTMLInputElement> file_name_input.element).value = renamed_file_3.name;
+                let file_name_input = wrapper.find('#validated-input-component').find('#input');
+                (<HTMLInputElement> file_name_input.element).value = renamed_file_2.name;
                 file_name_input.trigger('input');
                 await instructor_files_component.$nextTick();
 
@@ -648,19 +657,20 @@ describe('InstructorFiles.vue', () => {
                 uploaded_files = wrapper.findAll('.file-name');
 
                 expect(uploaded_files.length).toEqual(3);
-                expect(uploaded_files.at(0).text()).toEqual(instructor_file_2.name);
-                expect(uploaded_files.at(1).text()).toEqual(renamed_file_3.name);
-                expect(uploaded_files.at(2).text()).toEqual(instructor_file_1.name);
+                expect(uploaded_files.at(0).text()).toEqual(renamed_file_2.name);
+                expect(uploaded_files.at(1).text()).toEqual(instructor_file_1.name);
+                expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
             });
         });
+        console.log("Test 9 done ----------------------------------------------------------");
     });
 
-    function call_notify_renamed() {
-        instructor_file_3.name = renamed_file_3.name;
-        InstructorFile.notify_instructor_file_renamed(instructor_file_3);
+    async function call_notify_renamed() {
+        instructor_file_2.name = renamed_file_2.name;
+        InstructorFile.notify_instructor_file_renamed(instructor_file_2);
     }
 
-    test.skip('10 - File name is updated in the multi-file-viewer when a file being ' +
+    test('10 - File name is updated in the multi-file-viewer when a file being ' +
          'viewed is renamed',
          async () => {
 
@@ -679,26 +689,29 @@ describe('InstructorFiles.vue', () => {
             instructor_files_component = wrapper.vm;
             await instructor_files_component.$nextTick();
 
-            let uploaded_files = wrapper.findAll('#single-file-component');
-            let first_file = uploaded_files.at(0);
+            let uploaded_files = wrapper.findAll('.file-name');
+            expect(uploaded_files.at(0).text()).toEqual(instructor_file_1.name);
+            expect(uploaded_files.at(1).text()).toEqual(instructor_file_2.name);
+            expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
+
+            let file_2 = wrapper.findAll('#single-file-component').at(1);
+            expect(file_2.text()).toContain(instructor_file_2.name);
 
             await patch_async_class_method(
                 InstructorFile,
                 'get_content',
-                () => Promise.resolve("Content"),
+                () => Promise.resolve(mock_get_contents("Test 10")),
                 async () => {
 
-                expect(instructor_files_component.instructor_files.length).toEqual(3);
-
-                wrapper.findAll('#single-file-component').at(0).trigger('click');
+                wrapper.findAll('#single-file-component').at(1).trigger('click');
                 await instructor_files_component.$nextTick();
 
                 let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                 expect(mfv.files_currently_viewing.length).toEqual(1);
-                expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_3.name);
+                expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_2.name);
 
-                first_file.find('.edit-file-name').trigger('click');
+                file_2.find('.edit-file-name').trigger('click');
                 await instructor_files_component.$nextTick();
 
                 await patch_async_class_method(
@@ -710,24 +723,25 @@ describe('InstructorFiles.vue', () => {
                     let file_name_input = wrapper.find(
                         '#validated-input-component'
                     ).find('#input');
-
-                    (<HTMLInputElement> file_name_input.element).value = renamed_file_3.name;
-                    file_name_input.trigger('input');  // Network error
+                    (<HTMLInputElement> file_name_input.element).value = renamed_file_2.name;
+                    file_name_input.trigger('input');
                     await instructor_files_component.$nextTick();
 
                     wrapper.find('.update-file-name-button').trigger('click');
                     await instructor_files_component.$nextTick();
 
-                    uploaded_files = wrapper.findAll('.file-name');
-
                     expect(uploaded_files.length).toEqual(3);
                     expect(mfv.files_currently_viewing.length).toEqual(1);
-                    expect(mfv.files_currently_viewing[0].name).toEqual(renamed_file_3.name);
-                    expect(uploaded_files.at(0).text()).toEqual(instructor_file_2.name);
-                    expect(uploaded_files.at(1).text()).toEqual(renamed_file_3.name);
-                    expect(uploaded_files.at(2).text()).toEqual(instructor_file_1.name);
+                    expect(mfv.files_currently_viewing[0].name).toEqual(renamed_file_2.name);
+
+                    // aqua, red, violet --> amber(2), aqua(1), violet(3)
+                    uploaded_files = wrapper.findAll('.file-name');
+                    expect(uploaded_files.at(0).text()).toEqual(renamed_file_2.name);
+                    expect(uploaded_files.at(1).text()).toEqual(instructor_file_1.name);
+                    expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
                 });
             });
         });
+        console.log("Test 10 done ----------------------------------------------------------");
     });
 });

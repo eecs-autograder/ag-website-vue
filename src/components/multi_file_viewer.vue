@@ -135,6 +135,7 @@
   background-color: inherit;
   margin: 0;
   overflow: hidden;
+  height: 20px;
 }
 
 .tab-label {

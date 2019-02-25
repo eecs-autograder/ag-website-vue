@@ -143,13 +143,13 @@
     update_instructor_file_created(instructor_file: InstructorFile) { }
 
     update_instructor_file_deleted(instructor_file: InstructorFile) {
-      console.log("Update instructor file deleted");
+      console.log("(Update instructor file deleted)");
       array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
     }
 
     update_instructor_file_renamed(instructor_file: InstructorFile) {
-      console.log("Update instructor file renamed");
+      console.log("(Update instructor file renamed)");
       let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
       Vue.set(this.instructor_files, index, instructor_file);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
