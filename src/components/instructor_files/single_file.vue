@@ -100,6 +100,7 @@
     }
 
     async rename_file() {
+      console.log("(rename_file) - file.rename - to - " + this.new_file_name);
       await this.file.rename(this.new_file_name);
       this.editing = false;
     }
@@ -116,6 +117,7 @@
     async delete_file_permanently() {
       try {
         this.d_delete_pending = true;
+        console.log('(delete_file_permanently) - file.delete - : ' + this.file);
         await this.file.delete();
       }
       finally {
