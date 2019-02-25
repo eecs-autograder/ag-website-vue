@@ -227,7 +227,7 @@
   }
 
   .input::placeholder {
-    color: lighten(#495057, 30);
+    color: $stormy-gray-light;
   }
 
   #validated-input-component {
