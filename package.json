@@ -10,7 +10,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
     "@types/lodash": "^4.14.120",
-    "ag-client-typescript": "0.0.0-dev.4",
+    "ag-client-typescript": "0.0.0-dev.11",
     "lodash": "^4.17.11",
     "vue": "^2.5.16",
     "vue-class-component": "^6.0.0",
