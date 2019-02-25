@@ -5,7 +5,7 @@ import { patch_async_class_method } from "./mocking";
 test('Can import and use classes from typescript client', async () => {
     let course = new Course(
         {pk: 42, name: 'spam', semester: Semester.fall, year: 2020, subtitle: '',
-         num_late_days: 0, last_modified: ''});
+         num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
     console.log(course);
 
     await patch_async_class_method(

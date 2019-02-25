@@ -33,35 +33,35 @@ describe('Course_List tests', () => {
 
         fall18_eecs280 = new Course(
             {pk: 2, name: 'EECS 280', semester: Semester.fall, year: 2018, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs370 = new Course(
             {pk: 3, name: 'EECS 370', semester: Semester.fall, year: 2018, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs441 = new Course(
             {pk: 4, name: 'EECS 441', semester: Semester.fall, year: 2018, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         spring18_eecs281 = new Course(
             {pk: 5, name: 'EECS 281', semester: Semester.spring, year: 2018, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         winter18_eecs280 = new Course(
             {pk: 6, name: 'EECS 280', semester: Semester.winter, year: 2018, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         no_semester_2018_eecs493 = new Course(
             {pk: 7, name: 'EECS 493', semester: null, year: 2018, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         fall17_eecs183 = new Course(
             {pk: 8, name: 'EECS 183', semester: Semester.fall, year: 2017, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         no_year_winter_eecs482 = new Course(
             {pk: 9, name: 'EECS 482', semester: Semester.winter, year: null, subtitle: '',
-             num_late_days: 0, last_modified: ''});
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
     });
 
     afterEach(() => {

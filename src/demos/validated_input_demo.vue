@@ -9,6 +9,7 @@
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
+                     placeholder="Enter a negative, even integer"
                      @input_validity_changed="validated_input_1_valid = $event"></validated-input>
 
     <p>
@@ -103,6 +104,7 @@
     <validated-input ref='validated_input_4'
                      v-model="textarea_input"
                      num_rows="3"
+                     placeholder="Response must contain > 30 characters and a new line character"
                      :validators="[is_30_chars_or_longer, has_newline_char]"
                      @input_validity_changed="validated_input_4_valid = $event"></validated-input>
 
@@ -149,7 +151,7 @@ export default class ValidatedInputDemo extends Vue {
     field1: 12,
   };
   mario_character_input: string = "mario";
-  textarea_input: string = "This needs to be longer!";
+  textarea_input: string = "";
   obj_input_style = {
     "background-color": "lightblue",
     "color": "green"

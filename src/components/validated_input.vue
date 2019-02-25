@@ -10,6 +10,7 @@
              }"
              type="text"
              :value="d_input_value"
+             :placeholder="placeholder"
              @input="$e => _change_input($e.target.value)"/>
 
       <textarea id="textarea"
@@ -21,6 +22,7 @@
                  'error-input' : input_style === '' && _show_errors
                 }"
                 :value="d_input_value"
+                :placeholder="placeholder"
                 @input="$e => _change_input($e.target.value)"></textarea>
       <slot name="suffix"> </slot>
     </div>
@@ -81,6 +83,9 @@
 
     @Prop({required: false, default: ""})
     input_style!: string | object;
+
+    @Prop({required: false, type: String})
+    placeholder!: string;
 
     d_input_value: string = "";
     d_error_msg: string = "";
@@ -219,6 +224,10 @@
     border: 1px solid #ced4da;
     border-radius: .25rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  }
+
+  .input::placeholder {
+    color: $stormy-gray-light;
   }
 
   #validated-input-component {
