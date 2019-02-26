@@ -65,7 +65,7 @@
       }
 
       let content: string;
-      if (typeof file_contents == 'string') {
+      if (typeof file_contents === 'string') {
         content = <string> file_contents;
       }
       else {

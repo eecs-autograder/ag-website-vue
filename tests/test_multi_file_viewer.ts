@@ -549,4 +549,21 @@ describe('MultiFileViewer.vue', () => {
         expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
         expect(multi_file_viewer.active_tab_index).toEqual(0);
     });
+
+
+    test('Calling add_to_viewing with (() => Promise<string>) type for file_contents',
+         async () => {
+         const wrapper = mount(WrapperComponent).find({ref: 'multi_file'});
+         let multi_file_viewer = <MultiFileViewer> wrapper.vm;
+
+         expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+         expect(multi_file_viewer.active_tab_index).toEqual(0);
+
+         multi_file_viewer.add_to_viewing('blink.cpp', () => Promise.resolve("182"));
+         await multi_file_viewer.$nextTick();
+
+         expect(wrapper.find('#viewing-container').text()).toContain("182");
+         expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+         expect(multi_file_viewer.active_tab_index).toEqual(0);
+    });
 });
