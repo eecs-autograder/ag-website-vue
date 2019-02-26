@@ -4,28 +4,30 @@
       <div>
         <div v-if="editing">
           <div @click.stop>
-            <validated-input ref='file_name'
-                             spellcheck="false"
-                             autocomplete="off"
-                             v-model="new_file_name"
-                             :validators="[is_not_empty]"
-                             input_style="border-radius: 2px;
-                                          border: 0px solid hsl(220, 30%, 72%);
-                                          padding: 3px 5px;
-                                          width: 360px;
-                                          margin-right: 10px;
-                                          box-sizing: border-box;"
-                             @input_validity_changed="new_name_is_valid = $event">
-              <div slot="suffix" class="edit-name-buttons">
-                <button class="update-file-name-button"
-                        :disabled="!new_name_is_valid"
-                        @click.stop="rename_file"> Update
-                </button>
-                <button class="update-file-name-cancel-button"
-                        @click.stop="cancel_renaming_file"> Cancel
-                </button>
-              </div>
-            </validated-input>
+            <validated-form autocomplete="off"
+                            spellcheck="false"
+                            @submit.native.prevent>
+              <validated-input ref='file_name'
+                               v-model="new_file_name"
+                               :validators="[is_not_empty]"
+                               input_style="border-radius: 2px;
+                                            border: 0px solid hsl(220, 30%, 72%);
+                                            padding: 3px 5px;
+                                            width: 360px;
+                                            margin-right: 10px;
+                                            box-sizing: border-box;"
+                               @input_validity_changed="new_name_is_valid = $event">
+                <div slot="suffix" class="edit-name-buttons">
+                  <button class="update-file-name-button"
+                          :disabled="!new_name_is_valid"
+                          @click.stop="rename_file"> Update
+                  </button>
+                  <button class="update-file-name-cancel-button"
+                          @click.stop="cancel_renaming_file"> Cancel
+                  </button>
+                </div>
+              </validated-input>
+            </validated-form>
           </div>
         </div>
         <div v-else class="not-editing">
@@ -77,10 +79,11 @@
   import * as FileSaver from 'file-saver';
 
   import Modal from '@/components/modal.vue';
+  import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
   @Component({
-    components: { Modal, ValidatedInput }
+    components: { Modal, ValidatedForm, ValidatedInput }
   })
   export default class SingleFile extends Vue {
 
