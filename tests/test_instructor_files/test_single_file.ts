@@ -7,9 +7,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 
 import {
-    patch_async_class_method,
-    patch_async_static_method,
-    patch_component_method
+    patch_async_class_method
 } from '../mocking';
 
 beforeAll(() => {
@@ -25,6 +23,7 @@ describe('InstructorFiles.vue', () => {
     let wrapper: Wrapper<SingleFile>;
     let single_file_component: SingleFile;
     let original_match_media: (query: string) => MediaQueryList;
+    let validated_input: ValidatedInput;
 
     beforeEach(() => {
         project = new Project({
@@ -74,6 +73,14 @@ describe('InstructorFiles.vue', () => {
                 return {matches: true};
             })
         });
+
+        wrapper = mount(SingleFile, {
+            propsData: {
+                file: file_1
+            }
+        });
+
+        single_file_component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -88,26 +95,11 @@ describe('InstructorFiles.vue', () => {
     });
 
     test('SingleFile data receives a file as input', () => {
-        wrapper = mount(SingleFile, {
-            propsData: {
-                file: file_1
-            }
-        });
-
-        single_file_component = wrapper.vm;
         expect(single_file_component.file).toEqual(file_1);
     });
 
     test('Users have the ability to rename a file', async () => {
         const spy = jest.fn();
-
-        wrapper = mount(SingleFile, {
-            propsData: {
-                file: file_1
-            }
-        });
-
-        single_file_component = wrapper.vm;
         wrapper.find('.edit-file-name').trigger('click');
         await single_file_component.$nextTick();
 
@@ -120,39 +112,25 @@ describe('InstructorFiles.vue', () => {
             spy,
             async () => {
 
-                // let validated_input_component = <ValidatedInput> wrapper.find(
-                //     {ref: 'file_name'}).vm;
-                let file_name_input = wrapper.find(
-                    {ref: 'file_name'}
-                ).find('#input');
+            let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
+            (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
+            file_name_input.trigger('input');
+            await single_file_component.$nextTick();
 
-                (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
-                file_name_input.trigger('input');
-                await single_file_component.$nextTick();
+            expect(single_file_component.new_file_name).toEqual("Jane.cpp");
 
-                expect(single_file_component.new_file_name).toEqual("Jane.cpp");
+            wrapper.find('.update-file-name-button').trigger('click');
+            await single_file_component.$nextTick();
 
-                wrapper.find('.update-file-name-button').trigger('click');
-                await single_file_component.$nextTick();
-
-                expect(spy.mock.calls.length).toEqual(1);
-                expect(single_file_component.editing).toBe(false);
-            }
-        );
+            expect(spy.mock.calls.length).toEqual(1);
+            expect(single_file_component.editing).toBe(false);
+        });
     });
 
     test('Users can choose to cancel the action of renaming a file after entering a ' +
          'different name but before pressing "update"',
          async () => {
         const spy = jest.fn();
-
-        wrapper = mount(SingleFile, {
-            propsData: {
-                file: file_1
-            }
-        });
-
-        single_file_component = wrapper.vm;
         wrapper.find('.edit-file-name').trigger('click');
         await single_file_component.$nextTick();
 
@@ -164,155 +142,95 @@ describe('InstructorFiles.vue', () => {
             'rename',
             spy,
             async () => {
-                let validated_input_component = <ValidatedInput> wrapper.find(
-                    {ref: 'file_name'}).vm;
-                let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
 
-                (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
-                file_name_input.trigger('input');
-                await single_file_component.$nextTick();
+            let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
+            (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
+            file_name_input.trigger('input');
+            validated_input = <ValidatedInput> wrapper.find({ref: 'file_name'}).vm;
+            await single_file_component.$nextTick();
 
-                expect(validated_input_component.is_valid).toBe(true);
-                expect(single_file_component.new_file_name).toEqual("Jane.cpp");
+            expect(validated_input.is_valid).toBe(true);
+            expect(single_file_component.new_file_name).toEqual("Jane.cpp");
 
-                wrapper.find('.update-file-name-cancel-button').trigger('click');
-                await single_file_component.$nextTick();
+            wrapper.find('.update-file-name-cancel-button').trigger('click');
+            await single_file_component.$nextTick();
 
-                expect(spy.mock.calls.length).toEqual(0);
-                expect(single_file_component.file.name).toEqual(file_1.name);
-                expect(single_file_component.editing).toBe(false);
-            }
-        );
+            expect(spy.mock.calls.length).toEqual(0);
+            expect(single_file_component.file.name).toEqual(file_1.name);
+            expect(single_file_component.editing).toBe(false);
+        });
     });
 
-    test('Users can only choose to cancel the action of renaming a file when they have' +
-         'not provided a new file name yet',
+    test('Users can click the update button when renaming a file and havent made any ' +
+         'changes to the name yet',
          async () => {
-             const spy = jest.fn();
+         let prev_filename = single_file_component.file.name;
+         wrapper.find('.edit-file-name').trigger('click');
+         await single_file_component.$nextTick();
 
-             wrapper = mount(SingleFile, {
-                 propsData: {
-                     file: file_1
-                 }
-             });
+         expect(single_file_component.new_file_name).toEqual(single_file_component.file.name);
+         expect(single_file_component.editing).toBe(true);
+         expect(single_file_component.new_name_is_valid).toBe(true);
+         wrapper.find('.update-file-name-button').trigger('click');
+         await single_file_component.$nextTick();
 
-             single_file_component = wrapper.vm;
-             wrapper.find('.edit-file-name').trigger('click');
+         expect(single_file_component.editing).toBe(false);
+         expect(single_file_component.file.name).toEqual(prev_filename);
+    });
+
+    test('Users cannot make an empty string the new name of a file', async () => {
+         wrapper.find('.edit-file-name').trigger('click');
+         await single_file_component.$nextTick();
+
+         expect(single_file_component.new_file_name).toEqual(single_file_component.file.name);
+         expect(single_file_component.editing).toBe(true);
+
+         let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
+         (<HTMLInputElement> file_name_input.element).value = "       ";
+         file_name_input.trigger('input');
+         validated_input = <ValidatedInput> wrapper.find({ref: 'file_name'}).vm;
+         await single_file_component.$nextTick();
+
+         expect(validated_input.is_valid).toBe(false);
+         expect(single_file_component.new_name_is_valid).toBe(false);
+         expect(wrapper.find('.update-file-name-button').is('[disabled]')).toBe(true);
+    });
+
+    test('Users have the ability to delete a file', async () => {
+         const spy = jest.fn();
+         await patch_async_class_method(
+             InstructorFile,
+             'delete',
+             spy,
+             async () => {
+
+             wrapper.find('.delete-file').trigger('click');
              await single_file_component.$nextTick();
 
-             expect(single_file_component.new_file_name).toEqual(single_file_component.file.name);
-             expect(single_file_component.editing).toBe(true);
-
-             expect(wrapper.find(
-                 '.update-file-name-button'
-             ).is('[disabled]')).toBe(true);
-
-             wrapper.find('.update-file-name-button').trigger('click');
+             wrapper.find('.modal-delete-button').trigger('click');
              await single_file_component.$nextTick();
 
-             expect(single_file_component.editing).toBe(true);
+             expect(spy.mock.calls.length).toEqual(1);
+         });
+    });
 
-             wrapper.find('.update-file-name-cancel-button').trigger('click');
+    test('Users have the ability to cancel the process of deleting a file', async () => {
+         const spy = jest.fn();
+         await patch_async_class_method(
+             InstructorFile,
+             'delete',
+             spy,
+             async () => {
+
+             wrapper.find('.delete-file').trigger('click');
              await single_file_component.$nextTick();
 
-             expect(single_file_component.editing).toBe(false);
-         }
-    );
-
-    test('Users cannot make an empty string the new name of a file',
-         async () => {
-             const spy = jest.fn();
-
-             wrapper = mount(SingleFile, {
-                 propsData: {
-                     file: file_1
-                 }
-             });
-
-             single_file_component = wrapper.vm;
-             wrapper.find('.edit-file-name').trigger('click');
+             wrapper.find('.modal-cancel-button').trigger('click');
              await single_file_component.$nextTick();
 
-             expect(single_file_component.new_file_name).toEqual(single_file_component.file.name);
-             expect(single_file_component.editing).toBe(true);
-
-             let validated_input_component = <ValidatedInput> wrapper.find(
-                 {ref: 'file_name'}
-             ).vm;
-             let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
-
-
-             (<HTMLInputElement> file_name_input.element).value = "       ";
-             file_name_input.trigger('input');
-             await single_file_component.$nextTick();
-
-             expect(validated_input_component.is_valid).toBe(false);
-
-             expect(wrapper.find(
-                 '.update-file-name-button'
-             ).is('[disabled]')).toBe(true);
-         }
-    );
-
-    test('Users have the ability to delete a file',
-         async () => {
-             const spy = jest.fn();
-
-             wrapper = mount(SingleFile, {
-                 propsData: {
-                     file: file_1
-                 }
-             });
-
-             single_file_component = wrapper.vm;
-
-             await patch_async_class_method(
-                 InstructorFile,
-                 'delete',
-                 spy,
-                 async () => {
-
-                     wrapper.find('.delete-file').trigger('click');
-                     await single_file_component.$nextTick();
-
-                     wrapper.find('.modal-delete-button').trigger('click');
-                     await single_file_component.$nextTick();
-
-                     expect(spy.mock.calls.length).toEqual(1);
-                 }
-             );
-         }
-    );
-
-    test('Users have the ability to cancel the process of deleting a file',
-         async () => {
-             const spy = jest.fn();
-
-             wrapper = mount(SingleFile, {
-                 propsData: {
-                     file: file_1
-                 }
-             });
-
-             single_file_component = wrapper.vm;
-
-             await patch_async_class_method(
-                 InstructorFile,
-                 'delete',
-                 spy,
-                 async () => {
-
-                     wrapper.find('.delete-file').trigger('click');
-                     await single_file_component.$nextTick();
-
-                     wrapper.find('.modal-cancel-button').trigger('click');
-                     await single_file_component.$nextTick();
-
-                     expect(spy.mock.calls.length).toEqual(0);
-                 }
-             );
-         }
-    );
+             expect(spy.mock.calls.length).toEqual(0);
+         });
+    });
 
     test('Users have the ability to download a file', async () => {
         return patch_async_class_method(
@@ -321,20 +239,13 @@ describe('InstructorFiles.vue', () => {
             () => Promise.resolve("File Contents"),
             async () => {
 
-                wrapper = mount(SingleFile, {
-                    propsData: {
-                        file: file_1
-                    }
-                });
+            single_file_component = wrapper.vm;
+            await single_file_component.$nextTick();
 
-                single_file_component = wrapper.vm;
-                await single_file_component.$nextTick();
+            wrapper.find('.download-file').trigger('click');
+            await single_file_component.$nextTick();
 
-                wrapper.find('.download-file').trigger('click');
-                await single_file_component.$nextTick();
-
-                expect(FileSaver.saveAs).toBeCalled();
-            }
-        );
+            expect(FileSaver.saveAs).toBeCalled();
+        });
     });
 });

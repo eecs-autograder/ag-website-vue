@@ -6,7 +6,7 @@
 
     <div id="instructor-files-label"> Uploaded Instructor Files
       <div class="collapse-button"
-           @click="collapsed = !collapsed"> ( {{collapsed? 'Show' : 'Collapse'}} ) </div>
+           @click="collapsed = !collapsed">( {{collapsed? 'Show' : 'Collapse'}} )</div>
     </div>
 
     <div id="viewing-area">

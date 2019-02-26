@@ -1,8 +1,6 @@
 import FileUpload from '@/components/file_upload.vue';
 import InstructorFiles from '@/components/instructor_files/instructor_files.vue';
-import SingleFile from '@/components/instructor_files/single_file.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { InstructorFile, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import Vue from 'vue';
@@ -32,6 +30,8 @@ describe('InstructorFiles.vue', () => {
     let uniquely_named_file: File;
     let new_uniquely_named_instructor_file: InstructorFile;
     let updated_contents_file_1: InstructorFile;
+    let file_upload_component: FileUpload;
+    let mfv: MultiFileViewer;
 
     beforeEach(() => {
         project = new Project({
@@ -139,7 +139,7 @@ describe('InstructorFiles.vue', () => {
         }
     });
 
-    test('1 - InstructorFiles get fetched and sorted', async () => {
+    test('InstructorFiles get fetched and sorted', async () => {
         return patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -154,6 +154,7 @@ describe('InstructorFiles.vue', () => {
 
             instructor_files_component = wrapper.vm;
             await instructor_files_component.$nextTick();
+
             expect(instructor_files_component.instructor_files.length).toEqual(3);
             expect(instructor_files_component.instructor_files[0]).toEqual(instructor_file_1);
             expect(instructor_files_component.instructor_files[1]).toEqual(instructor_file_2);
@@ -161,8 +162,7 @@ describe('InstructorFiles.vue', () => {
         });
     });
 
-    test('2 - Uploading file with same name as preexisting instructor file',
-         async () => {
+    test('Uploading file with same name as preexisting instructor file', async () => {
         return patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -178,14 +178,10 @@ describe('InstructorFiles.vue', () => {
             instructor_files_component = wrapper.vm;
             await instructor_files_component.$nextTick();
 
-            // 3 instructor files already
             expect(instructor_files_component.instructor_files.length).toEqual(3);
 
-            let file_upload_component = <FileUpload> wrapper.find(
-                {ref: 'instructor_files_upload'}
-            ).vm;
             let final_upload_button = wrapper.find('.upload-files-button');
-            // upload file_same_name_as_1 which has the same name as instructor_file_1
+            file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
             file_upload_component.d_files.push(file_same_name_as_1);
 
             let prev_size = instructor_files_component.instructor_files[0].size;
@@ -196,21 +192,20 @@ describe('InstructorFiles.vue', () => {
                 () => Promise.resolve("Hi"),
                 async () => {
 
-                    return patch_async_class_method(
-                        InstructorFile,
-                        'set_content',
-                        () => Promise.resolve(call_notify_content_changed()),
-                        async () => {
+                return patch_async_class_method(
+                    InstructorFile,
+                    'set_content',
+                    () => Promise.resolve(call_notify_content_changed()),
+                    async () => {
 
-                        final_upload_button.trigger('click');
-                        await instructor_files_component.$nextTick();
+                    final_upload_button.trigger('click');
+                    await instructor_files_component.$nextTick();
 
-                        expect(instructor_files_component.instructor_files.length).toEqual(3);
-                        expect(instructor_files_component.instructor_files[0].size).not.toEqual(
-                            prev_size
-                        );
-                    }
-                );
+                    expect(instructor_files_component.instructor_files.length).toEqual(3);
+                    expect(instructor_files_component.instructor_files[0].size).not.toEqual(
+                        prev_size
+                    );
+                });
             });
         });
     });
@@ -220,44 +215,43 @@ describe('InstructorFiles.vue', () => {
         InstructorFile.notify_instructor_file_content_changed(instructor_file_1);
     }
 
-    test('3 - Uploading file with same name as preexisting instructor file that is' +
+    test('Uploading file with same name as preexisting instructor file that is' +
          ' being viewed in the multi-file-viewer',
          async () => {
         return patch_async_static_method(
-        InstructorFile,
-        'get_all_from_project',
-        () => Promise.resolve(existing_instructor_files),
-        async () => {
-
-        wrapper = mount(InstructorFiles, {
-            propsData: {
-                project: project
-            }
-        });
-
-        instructor_files_component = wrapper.vm;
-        await instructor_files_component.$nextTick();
-
-        expect(instructor_files_component.instructor_files.length).toEqual(3);
-
-        return patch_async_class_method(
             InstructorFile,
-            'get_content',
-            () => Promise.resolve("Hi"),
+            'get_all_from_project',
+            () => Promise.resolve(existing_instructor_files),
             async () => {
+
+            wrapper = mount(InstructorFiles, {
+                propsData: {
+                    project: project
+                }
+            });
+
+            instructor_files_component = wrapper.vm;
+            await instructor_files_component.$nextTick();
+
+            expect(instructor_files_component.instructor_files.length).toEqual(3);
+
+            return patch_async_class_method(
+                InstructorFile,
+                'get_content',
+                () => Promise.resolve("Hi"),
+                async () => {
 
                 wrapper.findAll('#single-file-component').at(0).trigger('click');
                 await instructor_files_component.$nextTick();
 
-                let file_upload_component = <FileUpload> wrapper.find(
+                let prev_size = instructor_files_component.instructor_files[0].size;
+                let final_upload_button = wrapper.find('.upload-files-button');
+                file_upload_component = <FileUpload> wrapper.find(
                     {ref: 'instructor_files_upload'}
                 ).vm;
-                let final_upload_button = wrapper.find('.upload-files-button');
                 file_upload_component.d_files.push(file_same_name_as_1);
 
-                let prev_size = instructor_files_component.instructor_files[0].size;
-
-                let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
+                mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                 expect(mfv.files_currently_viewing.length).toEqual(1);
                 expect(wrapper.find('.active-tab-header').text()).toEqual(instructor_file_1.name);
@@ -280,7 +274,7 @@ describe('InstructorFiles.vue', () => {
         });
     });
 
-    test('4 - Uploading file that doesnt share a name with any preexisting instructor' +
+    test('Uploading file that doesnt share a name with any preexisting instructor' +
          'file triggers a new instructor file to be created',
          async () => {
         return patch_async_static_method(
@@ -300,11 +294,10 @@ describe('InstructorFiles.vue', () => {
 
             expect(instructor_files_component.instructor_files.length).toEqual(3);
 
+            let final_upload_button = wrapper.find('.upload-files-button');
             let file_upload_component = <FileUpload> wrapper.find(
             {ref: 'instructor_files_upload'}
             ).vm;
-            let final_upload_button = wrapper.find('.upload-files-button');
-
             file_upload_component.d_files.push(uniquely_named_file);
 
             return patch_async_static_method(
@@ -329,7 +322,7 @@ describe('InstructorFiles.vue', () => {
     });
 
 
-    test('5 - Viewing a file (adding a file to the multi-file-viewer)', async () => {
+    test('Viewing a file (adding a file to the multi-file-viewer)', async () => {
         return patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -354,7 +347,7 @@ describe('InstructorFiles.vue', () => {
                 wrapper.findAll('#single-file-component').at(0).trigger('click');
                 await instructor_files_component.$nextTick();
 
-                let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
+                mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                 expect(mfv.files_currently_viewing.length).toEqual(1);
                 expect(wrapper.find('.active-tab-header').text()).toEqual(instructor_file_1.name);
@@ -363,7 +356,7 @@ describe('InstructorFiles.vue', () => {
         });
     });
 
-    test('6 - clicking on a file that is already being viewed makes it the active tab ' +
+    test('Clicking on a file that is already being viewed makes it the active tab ' +
          'in the multi-file-viewer',
          async () => {
          return patch_async_static_method(
@@ -393,7 +386,7 @@ describe('InstructorFiles.vue', () => {
                  wrapper.findAll('#single-file-component').at(1).trigger('click');
                  await instructor_files_component.$nextTick();
 
-                 let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
+                 mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                  expect(instructor_files_component.num_files_currently_viewing).toEqual(2);
                  expect(mfv.files_currently_viewing.length).toEqual(2);
                  expect(wrapper.find('.active-tab-header').text()).toEqual(
@@ -412,7 +405,7 @@ describe('InstructorFiles.vue', () => {
          });
     });
 
-    test('7 - Deleting a file removes it from the list of instructor files', async () => {
+    test('Deleting a file removes it from the list of instructor files', async () => {
         return patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -427,11 +420,6 @@ describe('InstructorFiles.vue', () => {
 
             instructor_files_component = wrapper.vm;
             await instructor_files_component.$nextTick();
-
-            let uploaded_files = wrapper.findAll('.file-name');
-            expect(uploaded_files.at(0).text()).toEqual(instructor_file_1.name);
-            expect(uploaded_files.at(1).text()).toEqual(instructor_file_2.name);
-            expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
 
             return patch_async_class_method(
                 InstructorFile,
@@ -449,11 +437,10 @@ describe('InstructorFiles.vue', () => {
                 wrapper.find('.modal-delete-button').trigger('click');
                 await instructor_files_component.$nextTick();
 
-                uploaded_files = wrapper.findAll('.file-name');
+                let uploaded_files = wrapper.findAll('.file-name');
                 expect(uploaded_files.at(0).text()).toEqual(instructor_file_2.name);
                 expect(uploaded_files.at(1).text()).toEqual(instructor_file_3.name);
-                }
-            );
+            });
         });
     });
 
@@ -461,7 +448,7 @@ describe('InstructorFiles.vue', () => {
         InstructorFile.notify_instructor_file_deleted(instructor_file_1);
     }
 
-    test('8 - File is removed from the multi-file-viewer when it is being viewed ' +
+    test('File is removed from the multi-file-viewer when it is being viewed ' +
          'and gets deleted in the instructor files list',
          async () => {
         return patch_async_static_method(
@@ -499,7 +486,7 @@ describe('InstructorFiles.vue', () => {
                 wrapper.findAll('#single-file-component').at(1).trigger('click');
                 await instructor_files_component.$nextTick();
 
-                let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
+                mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(2);
                 expect(mfv.files_currently_viewing.length).toEqual(2);
                 expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_1.name);
@@ -538,7 +525,7 @@ describe('InstructorFiles.vue', () => {
         return msg;
     }
 
-    test('9 - Renaming a file updates the name of the file', async () => {
+    test('Renaming a file updates the name of the file', async () => {
         return patch_async_static_method(
             InstructorFile,
             'get_all_from_project',
@@ -554,13 +541,7 @@ describe('InstructorFiles.vue', () => {
             instructor_files_component = wrapper.vm;
             await instructor_files_component.$nextTick();
 
-            let uploaded_files = wrapper.findAll('.file-name');
-            expect(uploaded_files.at(0).text()).toEqual(instructor_file_1.name);
-            expect(uploaded_files.at(1).text()).toEqual(instructor_file_2.name);
-            expect(uploaded_files.at(2).text()).toEqual(instructor_file_3.name);
-
             let file_2 = wrapper.findAll('#single-file-component').at(1);
-
             expect(file_2.text()).toContain(instructor_file_2.name);
 
             file_2.find('.edit-file-name').trigger('click');
@@ -580,7 +561,7 @@ describe('InstructorFiles.vue', () => {
                 wrapper.find('.update-file-name-button').trigger('click');
                 await instructor_files_component.$nextTick();
 
-                uploaded_files = wrapper.findAll('.file-name');
+                let uploaded_files = wrapper.findAll('.file-name');
 
                 expect(uploaded_files.length).toEqual(3);
                 expect(uploaded_files.at(0).text()).toEqual(renamed_file_2.name);
@@ -595,7 +576,7 @@ describe('InstructorFiles.vue', () => {
         InstructorFile.notify_instructor_file_renamed(instructor_file_2);
     }
 
-    test('10 - File name is updated in the multi-file-viewer when a file being ' +
+    test('File name is updated in the multi-file-viewer when a file being ' +
          'viewed is renamed',
          async () => {
 
@@ -631,7 +612,7 @@ describe('InstructorFiles.vue', () => {
                 wrapper.findAll('#single-file-component').at(1).trigger('click');
                 await instructor_files_component.$nextTick();
 
-                let mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
+                mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                 expect(mfv.files_currently_viewing.length).toEqual(1);
                 expect(mfv.files_currently_viewing[0].name).toEqual(instructor_file_2.name);
@@ -669,7 +650,7 @@ describe('InstructorFiles.vue', () => {
         });
     });
 
-    test('11 - Clicking the collapse/show button toggles the width the multi-file-viewer ' +
+    test('Clicking the collapse/show button toggles the width the multi-file-viewer ' +
          'and the visibility of the uploaded instructor files',
          async () => {
          return patch_async_static_method(
@@ -705,7 +686,7 @@ describe('InstructorFiles.vue', () => {
                  wrapper.findAll('#single-file-component').at(0).trigger('click');
                  await instructor_files_component.$nextTick();
 
-                 let mfv = <MultiFileViewer> wrapper.find(
+                 mfv = <MultiFileViewer> wrapper.find(
                      {ref: 'instructor_files_viewer'}
                  ).vm;
                  expect(instructor_files_component.num_files_currently_viewing).toEqual(1);

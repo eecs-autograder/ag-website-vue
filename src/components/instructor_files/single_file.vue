@@ -14,10 +14,11 @@
                                           padding: 3px 5px;
                                           width: 360px;
                                           margin-right: 10px;
-                                          box-sizing: border-box;">
+                                          box-sizing: border-box;"
+                             @input_validity_changed="new_name_is_valid = $event">
               <div slot="suffix" class="edit-name-buttons">
                 <button class="update-file-name-button"
-                        :disabled="new_file_name === file.name"
+                        :disabled="!new_name_is_valid"
                         @click.stop="rename_file"> Update
                 </button>
                 <button class="update-file-name-cancel-button"
@@ -71,7 +72,7 @@
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import { HttpClient, InstructorFile } from 'ag-client-typescript';
+  import { InstructorFile } from 'ag-client-typescript';
 
   import * as FileSaver from 'file-saver';
 
@@ -92,6 +93,8 @@
     new_file_name: string = "";
     d_delete_pending = false;
 
+    new_name_is_valid = true;
+
     is_not_empty(value: string): ValidatorResponse {
       return {
         is_valid: value.trim() !== "",
@@ -100,7 +103,9 @@
     }
 
     async rename_file() {
-      await this.file.rename(this.new_file_name);
+      if (this.new_file_name !== this.file.name) {
+        await this.file.rename(this.new_file_name);
+      }
       this.editing = false;
     }
 
