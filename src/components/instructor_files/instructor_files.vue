@@ -85,10 +85,8 @@
     }
 
     async view_file(file: InstructorFile) {
-      console.log("(view_file) - get_content called with: " + file.name);
-      let file_content = await file.get_content();
       (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
-        file.name, file_content, file.pk
+        file.name,  () => file.get_content(), file.pk
       );
     }
 
@@ -108,23 +106,11 @@
             (file: InstructorFile, file_name_to_add: string) =>
               file_name_equal(file.name, file_name_to_add)
           );
-          try {
-            console.log("(add_instructor_files) - set_content called with: " + file_to_update.name);
-            await file_to_update.set_content(file);
-          }
-          catch (error) {
-            console.log(error);
-          }
+          await file_to_update.set_content(file);
         }
         else {
-          try {
-            console.log("(add_instructor_files) - create called with: " + file.name);
             let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
             this.instructor_files.push(file_to_add);
-          }
-          catch (error) {
-            console.log(error);
-          }
         }
       }
       (<FileUpload> this.$refs.instructor_files_upload).clear_files();
@@ -132,9 +118,7 @@
     }
 
     async update_instructor_file_content_changed(instructor_file: InstructorFile) {
-      console.log("(update_instructor_file_content_changed) - get_content called with: " + instructor_file.name);
       let file_content = await instructor_file.get_content();
-      console.log("New file content: " + file_content);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
         instructor_file.name, file_content
       );
@@ -143,13 +127,11 @@
     update_instructor_file_created(instructor_file: InstructorFile) { }
 
     update_instructor_file_deleted(instructor_file: InstructorFile) {
-      console.log("(Update instructor file deleted)");
       array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
     }
 
     update_instructor_file_renamed(instructor_file: InstructorFile) {
-      console.log("(Update instructor file renamed)");
       let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
       Vue.set(this.instructor_files, index, instructor_file);
       (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(

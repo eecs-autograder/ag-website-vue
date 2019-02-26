@@ -2,6 +2,7 @@ import SingleFile from '@/components/instructor_files/single_file.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { InstructorFile, Project, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
+import * as FileSaver from 'file-saver';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
@@ -14,6 +15,8 @@ import {
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
+
+jest.mock('file-saver');
 
 describe('InstructorFiles.vue', () => {
     let project: Project;
@@ -312,27 +315,25 @@ describe('InstructorFiles.vue', () => {
     );
 
     test('Users have the ability to download a file', async () => {
-        const spy = jest.fn();
-
-        wrapper = mount(SingleFile, {
-            propsData: {
-                file: file_1
-            }
-        });
-
-        single_file_component = wrapper.vm;
-        await single_file_component.$nextTick();
-
-        await patch_component_method(
-            wrapper,
-            'download_file',
-            spy,
+        return patch_async_class_method(
+            InstructorFile,
+            'get_content',
+            () => Promise.resolve("File Contents"),
             async () => {
+
+                wrapper = mount(SingleFile, {
+                    propsData: {
+                        file: file_1
+                    }
+                });
+
+                single_file_component = wrapper.vm;
+                await single_file_component.$nextTick();
 
                 wrapper.find('.download-file').trigger('click');
                 await single_file_component.$nextTick();
 
-                expect(spy.mock.calls.length).toEqual(1);
+                expect(FileSaver.saveAs).toBeCalled();
             }
         );
     });

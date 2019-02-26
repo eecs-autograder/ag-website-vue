@@ -52,7 +52,8 @@
     files_currently_viewing: OpenFile[] = [];
     active_tab_index = 0;
 
-    add_to_viewing(filename: string, file_contents: string, id: number | null = null) {
+    async add_to_viewing(filename: string, file_contents: string | (() => Promise<string>),
+                         id: number | null = null) {
       let file_exists = this.files_currently_viewing.find(
         open_file => open_file.name === filename
       ) !== undefined;
@@ -62,7 +63,15 @@
         );
         return;
       }
-      this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
+
+      let content: string;
+      if (typeof file_contents == 'string') {
+        content = <string> file_contents;
+      }
+      else {
+        content = await (<() => Promise<string>> file_contents)();
+      }
+      this.files_currently_viewing.push({name: filename, content: content, id: id});
       this.active_tab_index = this.files_currently_viewing.length - 1;
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }

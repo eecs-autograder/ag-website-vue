@@ -73,7 +73,7 @@
 
   import { HttpClient, InstructorFile } from 'ag-client-typescript';
 
-  import { saveAs } from 'file-saver';
+  import * as FileSaver from 'file-saver';
 
   import Modal from '@/components/modal.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
@@ -100,9 +100,7 @@
     }
 
     async rename_file() {
-      console.log("(rename_file) - file.rename - to - " + this.new_file_name);
       await this.file.rename(this.new_file_name);
-      console.log(this.file.name);
       this.editing = false;
     }
 
@@ -111,14 +109,12 @@
     }
 
     async download_file() {
-      let downloadable_file = new File([await this.file.get_content()], this.file.name);
-      saveAs(downloadable_file);
+      FileSaver.saveAs(new File([await this.file.get_content()], this.file.name));
     }
 
     async delete_file_permanently() {
       try {
         this.d_delete_pending = true;
-        console.log('(delete_file_permanently) - file.delete - : ' + this.file);
         await this.file.delete();
       }
       finally {
