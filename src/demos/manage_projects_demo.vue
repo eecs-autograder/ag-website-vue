@@ -7,8 +7,10 @@
 <script lang="ts">
   import { Course, User } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
+
   import { Model } from '@/model';
-  import ManageProjects from '@/components/manage_projects.vue';
+
+  import ManageProjects from '@/components/manage_projects/manage_projects.vue';
 
   @Component({
     components: { ManageProjects }

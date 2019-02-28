@@ -4,6 +4,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { Vue } from 'vue/types/vue';
 
+
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
     Object.assign(to, from);
 }

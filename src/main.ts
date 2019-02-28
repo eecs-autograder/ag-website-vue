@@ -1,6 +1,6 @@
-import Vue from 'vue';
 import ManageProjectsDemo from '@/demos/manage_projects_demo.vue';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import App from './App.vue';

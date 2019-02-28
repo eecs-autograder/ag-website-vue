@@ -10,7 +10,7 @@
     <!--<ModalDemo></ModalDemo>-->
     <!--<FileUploadDemo></FileUploadDemo>-->
     <!--<LoadingIconDemo></LoadingIconDemo>-->
-    <ManageProjectsDemo></ManageProjectsDemo>
+    <!--<ManageProjectsDemo></ManageProjectsDemo>-->
     <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
     <!--<TabsDemo></TabsDemo>-->
     <!--<TooltipDemo></TooltipDemo>-->
