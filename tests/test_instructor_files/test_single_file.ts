@@ -248,4 +248,21 @@ describe('InstructorFiles.vue', () => {
             expect(FileSaver.saveAs).toBeCalled();
         });
     });
+
+    test('Users have the ability to view a file', async () => {
+        return patch_async_class_method(
+            InstructorFile,
+            'get_content',
+            () => Promise.resolve("File Contents"),
+            async () => {
+
+            single_file_component = wrapper.vm;
+            await single_file_component.$nextTick();
+
+            wrapper.find('#single-file-component').trigger('click');
+            await single_file_component.$nextTick();
+
+            expect(wrapper.emitted().open_file.length).toEqual(1);
+        });
+    });
 });

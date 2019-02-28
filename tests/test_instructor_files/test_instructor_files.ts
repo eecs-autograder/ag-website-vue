@@ -255,6 +255,7 @@ describe('InstructorFiles.vue', () => {
                 expect(instructor_files_component.num_files_currently_viewing).toEqual(1);
                 expect(mfv.files_currently_viewing.length).toEqual(1);
                 expect(wrapper.find('.active-tab-header').text()).toEqual(instructor_file_1.name);
+                expect(wrapper.find('#view-file-component').text()).toContain("Hi");
 
                 return patch_async_class_method(
                     InstructorFile,
@@ -269,6 +270,7 @@ describe('InstructorFiles.vue', () => {
                     expect(instructor_files_component.instructor_files[0].size).not.toEqual(
                         prev_size
                     );
+                    expect(wrapper.find('#view-file-component').text()).toContain("New Content");
                 });
             });
         });
