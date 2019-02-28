@@ -212,7 +212,7 @@ describe('InstructorFiles.vue', () => {
 
     async function call_notify_content_changed() {
         instructor_file_1.size = 20;
-        InstructorFile.notify_instructor_file_content_changed(instructor_file_1);
+        InstructorFile.notify_instructor_file_content_changed(instructor_file_1, "New Content");
     }
 
     test('Uploading file with same name as preexisting instructor file that is' +

@@ -117,8 +117,8 @@
       this.sort_files();
     }
 
-    async update_instructor_file_content_changed(instructor_file: InstructorFile) {
-      let file_content = await instructor_file.get_content();
+    update_instructor_file_content_changed(instructor_file: InstructorFile,
+                                           file_content: string) {
       (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
         instructor_file.name, file_content
       );
