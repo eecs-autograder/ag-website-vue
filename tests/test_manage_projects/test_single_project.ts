@@ -1,7 +1,8 @@
-import SingleProject from '@/components/manage_projects/single_project.vue';
+import SingleProject,
+       { handle_add_cloned_project_error } from '@/components/manage_projects/single_project.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { config, mount, RouterLinkStub, Wrapper } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import { AxiosError, AxiosResponse } from 'axios';
 import Vue from 'vue';
@@ -25,11 +26,6 @@ describe('SingleProject.vue', () => {
     let courses: Course[];
     let user: User;
 
-    const $route = {
-        path: '/web/course_admin/:courseId',
-        params: { courseId: '2' }
-    };
-
     beforeEach(() => {
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
@@ -49,7 +45,7 @@ describe('SingleProject.vue', () => {
         });
 
         course_2 = new Course({
-            pk: 2, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
+            pk: 2, name: 'EECS 280', semester: Semester.winter, year: 2020, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
 
@@ -215,11 +211,11 @@ describe('SingleProject.vue', () => {
                 await single_project.$nextTick();
 
                 let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
-                expect(modal.is_open).toBe(true);
-
                 let validated_input = <ValidatedInput> wrapper.find(
-                    {ref: "cloned_project_name"}).vm;
+                    {ref: "cloned_project_name"}
+                ).vm;
 
+                expect(modal.is_open).toBe(true);
                 expect(validated_input.is_valid).toBe(false);
 
                 let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -270,11 +266,10 @@ describe('SingleProject.vue', () => {
                 await single_project.$nextTick();
 
                 let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
-                expect(modal.is_open).toBe(true);
-
                 let validated_input = <ValidatedInput> wrapper.find(
                     {ref: "cloned_project_name"}).vm;
 
+                expect(modal.is_open).toBe(true);
                 expect(validated_input.is_valid).toBe(false);
 
                 let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -337,11 +332,11 @@ describe('SingleProject.vue', () => {
                 await single_project.$nextTick();
 
                 let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
-                expect(modal.is_open).toBe(true);
-
                 let validated_input = <ValidatedInput> wrapper.find(
-                    {ref: "cloned_project_name"}).vm;
+                    {ref: "cloned_project_name"}
+                ).vm;
 
+                expect(modal.is_open).toBe(true);
                 expect(validated_input.is_valid).toBe(false);
 
                 let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -375,7 +370,6 @@ describe('SingleProject.vue', () => {
             });
         });
     });
-
 
     test('Cloned project name must be unique among projects in the same course', async () => {
          let axios_response_instance: AxiosError = {
@@ -422,11 +416,11 @@ describe('SingleProject.vue', () => {
                  await single_project.$nextTick();
 
                  let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
-                 expect(modal.is_open).toBe(true);
-
                  let validated_input = <ValidatedInput> wrapper.find(
-                     {ref: "cloned_project_name"}).vm;
+                     {ref: "cloned_project_name"}
+                 ).vm;
 
+                 expect(modal.is_open).toBe(true);
                  expect(validated_input.is_valid).toBe(false);
 
                  let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -459,7 +453,91 @@ describe('SingleProject.vue', () => {
          });
     });
 
-    test('A cloning project error can be dismissed', async () => {
+    // If this test is uncommented, the compiler will respond with an error that:
+    // "Property 'data' is missing in type 'AxiosError'"
+    // test('If __all__ is not defined in the AxiosResponse when making a request to ' +
+    //      'clone a project, an error will be thrown',
+    //      async () => {
+    //     let axios_response_instance: AxiosError = {
+    //         name: 'AxiosError',
+    //         message: 'u heked up',
+    //         response: {
+    //             data: {},
+    //             status: 400,
+    //             statusText: 'OK',
+    //             headers: {},
+    //             request: {},
+    //             config: {}
+    //         },
+    //         config: {},
+    //     };
+    //
+    //     wrapper = mount(SingleProject, {
+    //         propsData: {
+    //             course: course_1,
+    //             project: project_1,
+    //             existing_projects: projects
+    //         }
+    //     });
+    //
+    //     let single_project = wrapper.vm;
+    //     await single_project.$nextTick();
+    //
+    //     courses = [course_1, course_2];
+    //     return patch_async_static_method(
+    //         User,
+    //         'get_current',
+    //         () => Promise.resolve(user),
+    //         async () => {
+    //
+    //         return patch_async_class_method(
+    //             User,
+    //             'courses_is_admin_for',
+    //             () => Promise.resolve(courses),
+    //             async () => {
+    //
+    //             wrapper.find('.copier').trigger('click');
+    //             await single_project.$nextTick();
+    //
+    //             let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
+    //             expect(modal.is_open).toBe(true);
+    //
+    //             let validated_input = <ValidatedInput> wrapper.find(
+    //                 {ref: "cloned_project_name"}).vm;
+    //
+    //             expect(validated_input.is_valid).toBe(false);
+    //
+    //             let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
+    //             (<HTMLInputElement> clone_name.element).value = project_1.name;
+    //             clone_name.trigger('input');
+    //             await single_project.$nextTick();
+    //
+    //             expect(single_project.course_to_clone_to).toBe(course_1);
+    //             expect(validated_input.is_valid).toBe(true);
+    //             expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
+    //
+    //             return patch_async_class_method(
+    //                 Project,
+    //                 'copy_to_course',
+    //                 () => Promise.reject(axios_response_instance),
+    //                 async () => {
+    //
+    //                 // Throws TypeError: Cannot read property '__all__' of undefined
+    //                 expect(() =>
+    //                        handle_add_cloned_project_error(single_project,
+    //                                                        axios_response_instance)
+    //                 ).toThrow(Error);
+    //
+    //                 if (wrapper.exists()) {
+    //                     console.log("wrapper exists");
+    //                     wrapper.destroy();
+    //                 }
+    //             });
+    //         });
+    //     });
+    // });
+
+    test('A cloning project api error can be dismissed', async () => {
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -504,11 +582,11 @@ describe('SingleProject.vue', () => {
                 await single_project.$nextTick();
 
                 let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
-                expect(modal.is_open).toBe(true);
-
                 let validated_input = <ValidatedInput> wrapper.find(
-                    {ref: "cloned_project_name"}).vm;
+                    {ref: "cloned_project_name"}
+                ).vm;
 
+                expect(modal.is_open).toBe(true);
                 expect(validated_input.is_valid).toBe(false);
 
                 let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -533,7 +611,9 @@ describe('SingleProject.vue', () => {
                     expect(modal.is_open).toBe(true);
                     expect(single_project.cloning_api_error_present).toBe(true);
                     expect(wrapper.findAll('.api-error').length).toBeGreaterThan(0);
+
                     wrapper.findAll('.dismiss-error').at(0).trigger('click');
+
                     expect(wrapper.findAll('.api-error').length).toEqual(0);
 
                     if (wrapper.exists()) {
@@ -567,14 +647,14 @@ describe('SingleProject.vue', () => {
         let wrapper2 = mount(component);
         await wrapper2.vm.$nextTick();
 
-        const single_project = <SingleProject> wrapper2.find({ref: 'single_project'}).vm;
+        const single_project2 = <SingleProject> wrapper2.find({ref: 'single_project'}).vm;
 
-        expect(single_project.d_projects).toEqual([project_1, project_2]);
+        expect(single_project2.d_projects).toEqual([project_1, project_2]);
 
         wrapper2.setData({course_1_projects: [project_1, project_2, newly_cloned_project_1]});
         await wrapper2.vm.$nextTick();
 
-        expect(single_project.d_projects).toEqual([project_1, project_2, newly_cloned_project_1]);
+        expect(single_project2.d_projects).toEqual([project_1, project_2, newly_cloned_project_1]);
 
         if (wrapper2.exists()) {
             console.log("wrapper exists");

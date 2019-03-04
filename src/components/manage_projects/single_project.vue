@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="single-project-component">
     <router-link tag="div"
                  :to="`/web/project/${project.pk}`"
                  class="project-div">
@@ -75,11 +75,11 @@
 
           <div v-for="error of api_errors" class="api-error-container">
             <div class="api-error">{{error}}</div>
-            <div class="x-box">
-              <span @click="dismiss_cloning_project_error"
+            <button class="dismiss-error-button">
+              <span @click="api_errors = []"
                     class="dismiss-error"> Dismiss
               </span>
-            </div>
+            </button>
           </div>
 
           <button @click="add_cloned_project"
@@ -152,52 +152,40 @@
       this.d_projects = this.existing_projects.slice(0);
     }
 
-    dismiss_cloning_project_error() {
-      this.api_errors = [];
-    }
-
     async clone_project() {
       if (this.user === null) {
         this.user = await User.get_current();
       }
+      this.api_errors = [];
+      this.cloned_project_name = "";
+      this.cloning_api_error_present = false;
       this.cloning_destinations = await this.user.courses_is_admin_for();
       this.course_to_clone_to = this.course;
       (<Modal> this.$refs.clone_project_modal).open();
+      console.log("clone api error present: " + this.cloning_api_error_present);
     }
 
     @handle_400_errors_async(handle_add_cloned_project_error)
     async add_cloned_project() {
-      // set api_errors to empty array
       this.api_errors = [];
-      // reset cloning error present to false
       this.cloning_api_error_present = false;
-
-      // create a new project(course to clone to, project clone name)
       let new_project = await this.project.copy_to_course(
         this.course_to_clone_to!.pk, this.cloned_project_name
       );
-      // clear errors on validated input
       (<ValidatedInput> this.$refs.cloned_project_name).clear();
-      // Close the clone modal
       let clone_project_modal = <Modal> this.$refs.clone_project_modal;
       clone_project_modal.close();
-      // if the course we're cloning to is the same course we're in now
-      if (this.course_to_clone_to.pk === this.course.pk) {
-        // add the project to the array
-        console.log("Adding cloned project to this course!");
+      if (this.course_to_clone_to!.pk === this.course.pk) {
         this.$emit('add_cloned_project', new_project);
       }
     }
   }
 
-  function handle_add_cloned_project_error(component: SingleProject, response: AxiosResponse) {
-    // get all errors
+  export function handle_add_cloned_project_error(component: SingleProject,
+                                                  response: AxiosResponse) {
     let errors = response.data["__all__"];
-    // if there are more than 0 errors
-    if (errors !== undefined && errors.length > 0) {
-      // set api_errors = errors array at 0
+    if (errors.length > 0) {
       component.api_errors = [errors[0]];
-      // set that there are cloning errors present
       component.cloning_api_error_present = true;
     }
   }
@@ -211,10 +199,7 @@
   $current-lang-choice: "Quicksand";
   $github-black-color: #24292e;
 
-  /* ---------------- Projects Styling ---------------- */
-  /*if you press the x, you should also get rid of the error - in the modal only*/
-
-  .single-project-component {
+  #single-project-component {
     font-family: $current-lang-choice;
   }
 
@@ -222,7 +207,9 @@
     max-width: 400px;
   }
 
-  .x-box {
+  .dismiss-error-button {
+    font-family: $current-lang-choice;
+    font-size: 15px;
     position: absolute;
     right: 5px;
     top: 5px;
