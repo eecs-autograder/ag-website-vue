@@ -1,3 +1,4 @@
+import CourseSettingsDemo from '@/demos/course_settings_demo.vue';
 import ManageProjectsDemo from '@/demos/manage_projects_demo.vue';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Vue from 'vue';
@@ -9,7 +10,7 @@ Vue.config.productionTip = false;
 Vue.use(VueRouter);
 
 const ROUTES = [
-    { path: '/', component: ManageProjectsDemo }
+    { path: '/', component: CourseSettingsDemo }
 ];
 
 const ROUTER = new VueRouter ({
