@@ -1,10 +1,11 @@
 <template>
   <div id="settings-container">
     <div id="settings-container-inputs">
-      <!--<ValidatedForm id="course-settings-form"-->
-                     <!--autocomplete="off"-->
-                     <!--@submit.native.prevent="save_course_settings"-->
-                     <!--@form_validity_changed="settings_form_is_valid = $event">-->
+      <ValidatedForm id="course-settings-form"
+                     autocomplete="off"
+                     spellcheck="false"
+                     @submit.native.prevent="save_course_settings"
+                     @form_validity_changed="settings_form_is_valid = $event">
 
         <div class="name-container">
           <label class="input-label"> Course name: </label>
@@ -14,8 +15,7 @@
                                        max-width: 500px;
                                        border: 1px solid #ced4da;"
                           :validators="[is_not_empty]"
-                          :num_rows="1"
-                          @input_validity_changed="settings_form_is_valid = $event">
+                          :num_rows="1">
           </ValidatedInput>
         </div>
 
@@ -27,7 +27,8 @@
                       @update_item_selected="d_course.semester = $event">
               <template slot="header">
                 <div tabindex="1" class="dropdown-header-wrapper">
-                  <div id="input-course-semester" class="dropdown-header">{{d_course.semester}}
+                  <div id="input-course-semester" class="dropdown-header">
+                    {{d_course.semester}}
                     <i class="fas fa-caret-down dropdown-caret"></i>
                   </div>
                 </div>
@@ -46,8 +47,7 @@
                           :num_rows="1"
                           input_style="width: 65px;
                                        border: 1px solid #ced4da;"
-                          :validators="[is_not_empty, is_number, is_valid_year]"
-                          @input_validity_changed="settings_form_is_valid = $event">
+                          :validators="[is_not_empty, is_number, is_valid_year]">
           </ValidatedInput>
         </div>
 
@@ -59,26 +59,27 @@
                           :num_rows="1"
                           input_style="width: 50px;
                                        border: 1px solid #ced4da;"
-                          :validators="[is_not_empty, is_number, is_non_negative]"
-                          @input_validity_changed="settings_form_is_valid = $event">
+                          :validators="[is_not_empty, is_number, is_non_negative]">
             <div slot="suffix"
-                 class="suffix-element">{{d_course.num_late_days.toString() === '1' ? 'day' : 'days'}}</div>
+                 class="suffix-element">
+              {{d_course.num_late_days.toString() === '1' ? 'day' : 'days'}}
+            </div>
           </ValidatedInput>
         </div>
 
         <div v-for="error of api_errors"
              class="api-error-container">
           <div class="api-error">{{error}}</div>
-          <button class="dismiss-error-button">
+          <button class="dismiss-error-button"
+                  type="button">
               <span @click="api_errors = []"
                     class="dismiss-error"> Dismiss
               </span>
           </button>
         </div>
 
-        <button id="settings-submit"
-                class="submit-button"
-                @click="save_course_settings"
+        <button id="save-button"
+                type="submit"
                 :disabled="!settings_form_is_valid || saving"> Save Updates </button>
 
         <div v-if="!saving"
@@ -90,7 +91,7 @@
           <i class="fa fa-spinner fa-pulse"></i>
         </div>
 
-      <!--</ValidatedForm>-->
+      </ValidatedForm>
     </div>
   </div>
 </template>
@@ -98,6 +99,7 @@
 <script lang="ts">
   import { Course, Semester } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
+
   import Dropdown from '@/components/dropdown.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
@@ -146,15 +148,15 @@
       };
     }
 
-    created() {
-      this.d_course = this.course;
-    }
-
     is_valid_year(value: string): ValidatorResponse {
       return {
         is_valid: Number(value) >= 2000,
-        error_msg: "Please enter a valid year."
+        error_msg: "Please enter a valid year (2000 and onwards)."
       };
+    }
+
+    created() {
+      this.d_course = this.course;
     }
 
     @handle_400_errors_async(handle_save_course_settings_error)
@@ -162,7 +164,7 @@
       try {
         this.saving = true;
         this.api_errors = [];
-        let response = await this.d_course.save();
+        await this.d_course.save();
       }
       finally {
         this.saving = false;
@@ -187,22 +189,23 @@ $current-lang-choice: "Quicksand";
 
 #settings-container {
   font-family: $current-lang-choice;
+  padding-top: 15px;
 }
 
 .api-error-container {
   max-width: 500px;
 }
 
-.submit-button {
+#save-button {
   @extend .green-button;
 }
 
-.submit-button:disabled {
+#save-button:disabled {
   @extend .gray-button;
   cursor: default;
 }
 
-.submit-button, .submit-button:disabled {
+#save-button, #save-button:disabled {
   display: block;
   font-family: $current-lang-choice;
   font-size: 16px;
@@ -210,7 +213,7 @@ $current-lang-choice: "Quicksand";
   padding: 10px 15px;
 }
 
-.submit-button:disabled:hover {
+#save-button:disabled:hover {
   background-color: hsl(210, 13%, 63%);
 }
 
@@ -249,11 +252,5 @@ $current-lang-choice: "Quicksand";
   padding-left: 10px;
   padding-top: 8px;
   vertical-align: top;
-}
-
-@media only screen and (min-width: 481px) {
-  #settings-container-inputs {
-    margin: 0 0 0 40px;
-  }
 }
 </style>
