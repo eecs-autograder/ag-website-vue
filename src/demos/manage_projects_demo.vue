@@ -1,5 +1,5 @@
 <template>
-  <div id="instructor-files-demo" v-if="my_course !== null">
+  <div id="manage-projects-demo" v-if="my_course !== null">
     <manage-projects :course="my_course"></manage-projects>
   </div>
 </template>

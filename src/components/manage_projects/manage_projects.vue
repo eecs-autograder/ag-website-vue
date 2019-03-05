@@ -4,7 +4,7 @@
       <div id="new-project-side">
         <div id="new-project-space">
 
-            <p id="new-project-label"> Create a New Project</p>
+            <p id="new-project-label"> Create a New Project </p>
 
             <div class="new-project-validation-wrapper">
               <ValidatedForm autocomplete="off"
@@ -14,7 +14,7 @@
                                 :validators="[is_not_empty]"
                                 :num_rows="1"
                                 input_style="width: 100%;
-                                             max-width: 400px;
+                                             max-width: 500px;
                                              border: 1px solid #ced4da;"
                                 @input_validity_changed="new_project_name_is_valid = $event">
                 </ValidatedInput>
@@ -38,7 +38,7 @@
       </div>
 
       <div id="existing-projects-side">
-        <p class="existing-projects-label"> Existing Projects </p>
+        <p id="existing-projects-label"> Existing Projects </p>
         <div  v-for="(project, index) of projects"
               :key="project.pk">
           <single-project ref="single_project"
@@ -142,73 +142,47 @@
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/components/course_admin.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
 $github-black-color: #24292e;
-
-/* ---------------- Projects Styling ---------------- */
-/*if you press the x, you should also get rid of the error - in the modal only*/
 
 .manage-projects-component {
   font-family: $current-lang-choice;
 }
 
 .new-project-validation-wrapper {
-  max-width: 400px;
-}
-
-.dismiss-error-button {
-  font-family: $current-lang-choice;
-  font-size: 15px;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  padding: 4px 10px;
-  background-color: white;
-  border-radius: .25rem;
-  cursor: pointer;
-  border: 1px solid #f5c6cb;
-}
-
-.api-error-container {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 400px;
-  position: relative;
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  padding: 10px 90px 10px 10px;
-  border-radius: .25rem;
-  margin-top: 11px;
+  max-width: 500px;
 }
 
 #new-project-space {
-  width: 90%;
   margin: 0 5%;
+  width: 90%;
+}
+
+.api-error-container {
+  max-width: 500px;
+}
+
+#new-project-label, #existing-projects-label {
+  color: $github-black-color;
+  font-size: 19px;
+  font-weight: 600;
+  padding: 6px 0 0 0;
 }
 
 #new-project-label {
-  font-size: 19px;
   margin: 0 0 11px 0;
-  padding: 6px 0 0 0;
-  font-weight: 600;
-  color: $github-black-color;
 }
 
-.existing-projects-label {
-  font-size: 19px;
+#existing-projects-label {
   margin: 40px 0 11px 0;
-  padding: 6px 0 0 0;
-  font-weight: 600;
-  color: $github-black-color;
 }
 
 #existing-projects-side {
-  width: 90%;
   margin: 0 5% 0 5%;
+  width: 90%;
 }
 
 .add-project-button {
@@ -220,38 +194,37 @@ $github-black-color: #24292e;
 }
 
 .add-project-button, .add-project-button:disabled {
-  font-family: $current-lang-choice;
-  text-align: center;
   display: block;
+  font-family: $current-lang-choice;
   font-size: 16px;
-  padding: 10px 15px;
   margin: 15px 0 20px 0;
+  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 960px) {
   #existing-projects-side {
-    width: 60%;
+    display: inline-block;
     margin: 0;
     padding-bottom: 50px;
-    display: inline-block;
     vertical-align: top;
+    width: 60%;
   }
 
   #new-project-space {
+    margin: 0 10%;
     text-align: left;
     width: 80%;
-    margin: 0 10% 0 10%;
   }
 
-  .existing-projects-label {
+  #existing-projects-label {
     margin: 0 0 11px 0;
     padding: 6px 0 0 0;
     text-align: left;
   }
 
   #new-project-side {
-    width: 40%;
     display: inline-block;
+    width: 40%;
   }
 }
 </style>

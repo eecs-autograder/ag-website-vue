@@ -56,8 +56,8 @@
                         @update_item_selected="course_to_clone_to = $event"
                         dropdown_height="200px">
                 <template slot="header">
-                <div tabindex="1" class="input-wrapper">
-                  <div id="input-course-to-copy-to" class="projects-input">
+                <div tabindex="1" class="dropdown-header-wrapper">
+                  <div id="input-course-to-copy-to" class="dropdown-header">
                     {{course_to_clone_to.name ? course_to_clone_to.name : ""}}
                     {{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}
                     {{course_to_clone_to.year ? course_to_clone_to.year : ""}}
@@ -198,9 +198,9 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/components/course_admin.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
-$github-black-color: #24292e;
 
 #single-project-component {
   font-family: $current-lang-choice;
@@ -211,21 +211,21 @@ $github-black-color: #24292e;
 }
 
 .project-div {
-  width: 100%;
+  font-size: 16px;
   display: block;
-  position: relative;
   margin: 11px 0;
   min-width: 350px;
-  font-size: 16px;
+  position: relative;
+  width: 100%;
 }
 
 .project-submission-div {
   border: 2px solid lighten($pebble-dark, 10);
   border-radius: 2px;
-  width: 62%;
-  min-width: 200px;
+  color: black;
   display: inline-block;
-  color: $github-black-color;
+  min-width: 200px;
+  width: 62%;
 }
 
 .project-name {
@@ -240,42 +240,38 @@ $github-black-color: #24292e;
   vertical-align: top;
 }
 
-.cog {
-  font-size: 25px;
-}
-
-.copy-icon {
+.cog, .copy-icon{
   font-size: 25px;
 }
 
 .copier {
-  display: inline-block;
-  padding: 12px 8px;
-  color: $github-black-color;
   background-color: white;
   border: 2px solid $pebble-light;
-  margin-left: 2%;
-  vertical-align: top;
   border-radius: 2px;
-  height: 54px;
   box-sizing: border-box;
+  color: black;
+  display: inline-block;
+  height: 54px;
+  margin-left: 2%;
+  padding: 12px 8px;
+  vertical-align: top;
 }
 
 .copier:hover {
-  color: white;
   background-color: $ocean-blue;
+  color: white;
   cursor: pointer;
 }
 
 .editor {
   background-color: white;
-  border-radius: 2px;
   border: 2px solid $pebble-light;
+  border-radius: 2px;
   box-sizing: border-box;
-  color: $github-black-color;
+  color: black;
   display: block;
-  padding: 12px 8px;
   height: 54px;
+  padding: 12px 8px;
 }
 
 .editor:hover {
@@ -309,11 +305,15 @@ $github-black-color: #24292e;
 }
 
 a {
-  text-decoration: none;
   color: black;
+  text-decoration: none;
 }
 
 /* ---------------- MODAL ---------------- */
+
+.modal-container {
+  font-family: $current-lang-choice;
+}
 
 .modal-header {
   font-size: 24px;
@@ -329,78 +329,25 @@ a {
 }
 
 .cloned-project-name {
-  padding: 10px 0 15px 0;
-  position: relative;
   display: block;
   max-width: 500px;
+  padding: 10px 0 15px 0;
+  position: relative;
 }
 
 .cloned-project-destination  {
-  position: relative;
   display: block;
   max-width: 800px;
-}
-
-.dropdown-caret {
-  position: absolute;
-  right: 18px;
-  top: 3px;
-  font-size: 30px;
-  cursor: pointer;
-}
-
-.modal-container {
-  font-family: $current-lang-choice;
-}
-
-.input-wrapper {
   position: relative;
-  display: inline-block;
-  margin: 0;
-}
-
-.input-label {
-  text-align: right;
-  font-size: 17px;
-  margin: 5px 15px 7px 0;
-  display: inline-block;
-  color: $github-black-color;
-  font-weight: 600;
-}
-
-.projects-input {
-  box-sizing: border-box;
-  position: relative;
-  display: block;
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.projects-input:focus {
-  border-color: $ocean-blue;
 }
 
 #input-course-to-copy-to {
-  width: 100%;
   min-width: 250px;
+  width: 100%;
 }
 
 .api-error-container {
-  box-sizing: border-box;
   width: 75%;
-  position: relative;
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  padding: 10px 90px 10px 10px;
-  border-radius: .25rem;
-  margin-top: 11px;
 }
 
 .clone-project-button {
@@ -414,21 +361,8 @@ a {
 .clone-project-button, .clone-project-button:disabled {
   font-family: $current-lang-choice;
   font-size: 16px;
-  padding: 10px 15px;
   margin: 32px 0 20px 0;
-}
-
-.dismiss-error-button {
-  font-family: $current-lang-choice;
-  font-size: 15px;
-  position: absolute;
-  right: 5.5px;
-  top: 5.5px;
-  padding: 4px 10px;
-  background-color: white;
-  border-radius: .25rem;
-  cursor: pointer;
-  border: 1px solid #f5c6cb;
+  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 960px) {
@@ -436,52 +370,25 @@ a {
   .project-div {
     background-color: white;
     border-radius: 2px;
-    width: 100%;
-    display: block;
     margin: 0 0 8px 0;
   }
 
   .project-submission-div {
     position: relative;
-    border-radius: 2px;
-    display: inline-block;
     max-width: 50%;
-    border: 2px solid lighten($pebble-dark, 10);
-  }
-
-  .project-name {
-    padding: 15px;
-    margin: 0;
-    display: inline-block;
   }
 
   .project-edit-div {
-    display: inline-block;
-    vertical-align: top;
     margin: 0 0 0 10px;
   }
 
-  .editor {
-    color: $github-black-color;
-    display: block;
-    background-color: white;
-    border: 2px solid $pebble-light;
-  }
-
-  .cog {
-    font-size: 26px;
-    margin-right: 10px;
-  }
-
-  .copy-icon {
+  .cog, .copy-icon {
     font-size: 26px;
     margin-right: 10px;
   }
 
   .copier {
-    display: inline-block;
     margin-left: 10px;
-    border: 2px solid $pebble-light;
   }
 
   .icon-label {
