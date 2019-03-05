@@ -1,4 +1,5 @@
 import CourseSettings from '@/components/course_settings.vue';
+import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester } from 'ag-client-typescript';
@@ -189,10 +190,12 @@ describe('CourseSettings.vue', () => {
             spy,
             async () => {
 
-            expect(course_settings.settings_form_is_valid).toBe(true);
-            let settings_form = wrapper.find('#course-settings-form');
+            let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
 
-            wrapper.find('.submit-button').trigger('click');
+            expect(settings_form.is_valid).toBe(true);
+            expect(course_settings.settings_form_is_valid).toBe(true);
+
+            wrapper.find('#course-settings-form').trigger('submit.native');
             await course_settings.$nextTick();
 
             expect(spy.mock.calls.length).toBe(1);
@@ -229,10 +232,13 @@ describe('CourseSettings.vue', () => {
             Course, 'save',
             () => Promise.reject(axios_response_instance),
             async () => {
-                expect(course_settings.settings_form_is_valid).toBe(true);
-                let settings_form = wrapper.find('#course-settings-form');
 
-                wrapper.find('.submit-button').trigger('click');
+                let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
+
+                expect(settings_form.is_valid).toBe(true);
+                expect(course_settings.settings_form_is_valid).toBe(true);
+
+                wrapper.find('#course-settings-form').trigger('submit.native');
                 await course_settings.$nextTick();
 
                 expect(course_settings.api_errors.length).toEqual(1);
