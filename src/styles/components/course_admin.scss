@@ -28,7 +28,7 @@ $current-lang-choice: "Quicksand";
     border: 1px solid #f5c6cb;
 }
 
-// dropdown related start ************************************************
+// dropdown related ******************************************************
 .dropdown-header-wrapper {
     display: inline-block;
     margin: 0;
@@ -41,6 +41,7 @@ $current-lang-choice: "Quicksand";
     border-radius: .25rem;
     box-sizing: border-box;
     color: #495057;
+    cursor: default;
     display: block;
     font-size: 1rem;
     line-height: 1.5;
