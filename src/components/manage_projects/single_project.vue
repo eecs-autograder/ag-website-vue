@@ -291,13 +291,17 @@ $github-black-color: #24292e;
     border: 2px solid $ocean-blue;
   }
   .project-submission-div {
-    background-image: linear-gradient(
-        to right, darken($ocean-blue, 4), $ocean-blue,
-        darken($ocean-blue, 4), $ocean-blue
-    );
     border: 2px solid $ocean-blue;
-    color: white;
   }
+}
+
+.project-submission-div:hover {
+  background-image: linear-gradient(
+      to right, darken($ocean-blue, 4), $ocean-blue,
+      darken($ocean-blue, 4), $ocean-blue
+  );
+  border: 2px solid $ocean-blue;
+  color: white;
 }
 
 .icon-label {
