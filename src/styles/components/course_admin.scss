@@ -27,22 +27,22 @@
 
 // dropdown related start ************************************************
 .dropdown-header-wrapper {
-    position: relative;
     display: inline-block;
     margin: 0;
+    position: relative;
 }
 
 .dropdown-header {
-    box-sizing: border-box;
-    position: relative;
-    display: block;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #495057;
     background-color: #fff;
     border: 1px solid #ced4da;
     border-radius: .25rem;
+    box-sizing: border-box;
+    color: #495057;
+    display: block;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: .375rem .75rem;
+    position: relative;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
@@ -51,19 +51,19 @@
 }
 
 .dropdown-caret {
+    cursor: pointer;
+    font-size: 30px;
     position: absolute;
     right: 18px;
     top: 3px;
-    font-size: 30px;
-    cursor: pointer;
 }
 
 // input related *********************************************************
 .input-label {
-    text-align: right;
-    font-size: 17px;
-    margin: 5px 15px 7px 0;
-    display: inline-block;
     color: black;
+    display: inline-block;
+    font-size: 17px;
     font-weight: 600;
+    margin: 5px 15px 7px 0;
+    text-align: right;
 }
