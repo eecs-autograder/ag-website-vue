@@ -4,7 +4,6 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester } from 'ag-client-typescript';
 import { AxiosError, AxiosResponse } from 'axios';
-import Vue from 'vue';
 
 import {
     patch_async_class_method
