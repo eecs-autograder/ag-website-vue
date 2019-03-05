@@ -30,8 +30,10 @@
     <modal ref="clone_project_modal"
            size="large"
            click_outside_to_close>
-
-        <h2> Project to clone: {{project.name}}</h2>
+      <span class="modal-container">
+        <p class="modal-header"> Project to clone:
+          <span class="project-to-clone">{{project.name}}</span>
+        </p>
         <hr>
         <div>
           <div class="cloned-project-name">
@@ -40,14 +42,15 @@
                              v-model="cloned_project_name"
                              :validators="[is_not_empty]"
                              :num_rows="1"
-                             input_style="width: 100%; border: 2px solid #ced4da;"
+                             input_style="width: 100%;
+                                          border: 1px solid #ced4da;"
                              @input_validity_changed="cloned_project_name_is_valid = $event">
             </validated-input>
           </div>
 
           <div class="cloned-project-destination">
             <label class="input-label"> Clone project to course: </label>
-            <div class="copy-course-dropdown-wrapper">
+            <div>
               <dropdown ref="copy_course_dropdown"
                         :items="cloning_destinations"
                         @update_item_selected="course_to_clone_to = $event"
@@ -63,7 +66,7 @@
                 </div>
                 </template>
                 <div slot-scope="{item}">
-                  <span class="course-to-copy-name">
+                  <span>
                     {{item.name ? item.name : ""}}
                     {{item.semester ? item.semester : ""}}
                     {{item.year ? item.year : ""}}
@@ -86,6 +89,7 @@
                   class="clone-project-button"
                   :disabled="!cloned_project_name_is_valid">Create Project</button>
         </div>
+      </span>
     </modal>
   </div>
 </template>
@@ -162,7 +166,6 @@
       this.cloning_destinations = await this.user.courses_is_admin_for();
       this.course_to_clone_to = this.course;
       (<Modal> this.$refs.clone_project_modal).open();
-      console.log("clone api error present: " + this.cloning_api_error_present);
     }
 
     @handle_400_errors_async(handle_add_cloned_project_error)
@@ -193,320 +196,292 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
-  @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Quicksand');
-  $current-lang-choice: "Quicksand";
-  $github-black-color: #24292e;
+@import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+$current-lang-choice: "Quicksand";
+$github-black-color: #24292e;
 
-  #single-project-component {
-    font-family: $current-lang-choice;
-  }
+#single-project-component {
+  font-family: $current-lang-choice;
+}
 
-  .new-project-validation-wrapper {
-    max-width: 400px;
-  }
+.new-project-validation-wrapper {
+  max-width: 400px;
+}
 
-  .dismiss-error-button {
-    font-family: $current-lang-choice;
-    font-size: 15px;
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    padding: 4px 10px;
-    background-color: white;
-    border-radius: .25rem;
-    cursor: pointer;
-    border: 1px solid #f5c6cb;
-  }
+.project-div {
+  width: 100%;
+  display: block;
+  position: relative;
+  margin: 11px 0;
+  min-width: 350px;
+  font-size: 16px;
+}
 
-  .api-error-container {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 400px;
-    position: relative;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px 90px 10px 10px;
-    border-radius: .25rem;
-    margin-top: 11px;
-  }
+.project-submission-div {
+  border: 2px solid lighten($pebble-dark, 10);
+  border-radius: 2px;
+  width: 62%;
+  min-width: 200px;
+  display: inline-block;
+  color: $github-black-color;
+}
 
-  .cloned-project-name {
-    padding-bottom: 16px;
-    position: relative;
-    display: block;
-    max-width: 500px;
-  }
+.project-name {
+  display: inline-block;
+  margin: 0;
+  padding: 15px;
+}
 
-  .cloned-project-destination  {
-    position: relative;
-    display: block;
-    max-width: 500px;
-  }
+.project-edit-div {
+  display: inline-block;
+  margin-left: 2%;
+  vertical-align: top;
+}
 
-  .cloned-project-name {
-    padding-top: 15px;
-  }
+.cog {
+  font-size: 25px;
+}
 
-  .dropdown-caret {
-    position: absolute;
-    right: 18px;
-    top: 4px;
-    font-size: 30px;
-    cursor: pointer;
-  }
+.copy-icon {
+  font-size: 25px;
+}
 
-  .projects-input {
-    box-sizing: border-box;
-    position: relative;
-    display: block;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  }
+.copier {
+  display: inline-block;
+  padding: 12px 8px;
+  color: $github-black-color;
+  background-color: white;
+  border: 2px solid $pebble-light;
+  margin-left: 2%;
+  vertical-align: top;
+  border-radius: 2px;
+  height: 54px;
+  box-sizing: border-box;
+}
 
-  .clone-project-name-input {
-    width: 100%;
-  }
+.copier:hover {
+  color: white;
+  background-color: $ocean-blue;
+  cursor: pointer;
+}
 
-  #input-course-to-copy-to {
-    width: 100%;
-    min-width: 250px;
-  }
+.editor {
+  background-color: white;
+  border-radius: 2px;
+  border: 2px solid $pebble-light;
+  box-sizing: border-box;
+  color: $github-black-color;
+  display: block;
+  padding: 12px 8px;
+  height: 54px;
+}
 
-  .projects-input:focus {
-    border-color: $ocean-blue;
-  }
+.editor:hover {
+  background-color: darken($ocean-blue, 4);
+  color: white;
+}
 
-  .input-wrapper {
-    position: relative;
-    display: inline-block;
-    margin: 0;
+.project-div:hover {
+  .copier {
+    border: 2px solid $ocean-blue;
   }
+  .editor {
+    border: 2px solid $ocean-blue;
+  }
+  .project-submission-div {
+    background-image: linear-gradient(
+        to right, darken($ocean-blue, 4), $ocean-blue,
+        darken($ocean-blue, 4), $ocean-blue
+    );
+    border: 2px solid $ocean-blue;
+    color: white;
+  }
+}
 
-  .input-label {
-    text-align: right;
-    font-size: 17px;
-    margin: 5px 15px 7px 0;
-    display: inline-block;
-    color: $github-black-color;
-    font-weight: 600;
-  }
+.icon-label {
+  display: none;
+}
 
-  .error-ul {
-    list-style-type: none; /* Remove bullets */
-    padding-left: 0;
-    max-width: 400px;
-    width: 100%
-  }
+a {
+  text-decoration: none;
+  color: black;
+}
 
-  .error-li:first-child {
-    margin-top: -10px;
-    border-top-left-radius: .25rem;
-    border-top-right-radius: .25rem;
-  }
+/* ---------------- MODAL ---------------- */
 
-  .error-li:last-child {
-    margin-bottom: 0;
-    border-bottom-right-radius: .25rem;
-    border-bottom-left-radius: .25rem;
-  }
+.modal-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  padding: 5px 0;
+}
 
-  .error-ul .error-li {
-    box-sizing: border-box;
-    word-wrap: break-word;
-    position: relative;
-    padding: 10px 15px;
-    margin-bottom: -1px;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-  }
+.project-to-clone {
+  background-color: hsl(220, 20%, 85%);
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
+
+.cloned-project-name {
+  padding: 10px 0 15px 0;
+  position: relative;
+  display: block;
+  max-width: 500px;
+}
+
+.cloned-project-destination  {
+  position: relative;
+  display: block;
+  max-width: 800px;
+}
+
+.dropdown-caret {
+  position: absolute;
+  right: 18px;
+  top: 3px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.modal-container {
+  font-family: $current-lang-choice;
+}
+
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+}
+
+.input-label {
+  text-align: right;
+  font-size: 17px;
+  margin: 5px 15px 7px 0;
+  display: inline-block;
+  color: $github-black-color;
+  font-weight: 600;
+}
+
+.projects-input {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.projects-input:focus {
+  border-color: $ocean-blue;
+}
+
+#input-course-to-copy-to {
+  width: 100%;
+  min-width: 250px;
+}
+
+.api-error-container {
+  box-sizing: border-box;
+  width: 75%;
+  position: relative;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px 90px 10px 10px;
+  border-radius: .25rem;
+  margin-top: 11px;
+}
+
+.clone-project-button {
+  @extend .green-button;
+}
+
+.clone-project-button:disabled {
+  @extend .gray-button;
+}
+
+.clone-project-button, .clone-project-button:disabled {
+  font-family: $current-lang-choice;
+  font-size: 16px;
+  padding: 10px 15px;
+  margin: 32px 0 20px 0;
+}
+
+.dismiss-error-button {
+  font-family: $current-lang-choice;
+  font-size: 15px;
+  position: absolute;
+  right: 5.5px;
+  top: 5.5px;
+  padding: 4px 10px;
+  background-color: white;
+  border-radius: .25rem;
+  cursor: pointer;
+  border: 1px solid #f5c6cb;
+}
+
+@media only screen and (min-width: 960px) {
 
   .project-div {
+    background-color: white;
+    border-radius: 2px;
     width: 100%;
     display: block;
-    position: relative;
-    margin: 11px 0;
-    min-width: 350px;
-    font-size: 16px;
+    margin: 0 0 8px 0;
   }
 
   .project-submission-div {
-    border: 2px solid lighten($pebble-dark, 10);
+    position: relative;
     border-radius: 2px;
-    width: 62%;
-    min-width: 200px;
     display: inline-block;
-    color: $github-black-color;
+    max-width: 50%;
+    border: 2px solid lighten($pebble-dark, 10);
   }
 
   .project-name {
-    display: inline-block;
-    margin: 0;
     padding: 15px;
+    margin: 0;
+    display: inline-block;
   }
 
   .project-edit-div {
     display: inline-block;
-    margin-left: 2%;
     vertical-align: top;
+    margin: 0 0 0 10px;
+  }
+
+  .editor {
+    color: $github-black-color;
+    display: block;
+    background-color: white;
+    border: 2px solid $pebble-light;
   }
 
   .cog {
-    font-size: 25px;
+    font-size: 26px;
+    margin-right: 10px;
   }
 
   .copy-icon {
-    font-size: 25px;
+    font-size: 26px;
+    margin-right: 10px;
   }
 
   .copier {
     display: inline-block;
-    padding: 12px 8px;
-    color: $github-black-color;
-    background-color: white;
+    margin-left: 10px;
     border: 2px solid $pebble-light;
-    margin-left: 2%;
-    vertical-align: top;
-    border-radius: 2px;
-    height: 54px;
-    box-sizing: border-box;
-  }
-
-  .copier:hover {
-    color: white;
-    background-color: $ocean-blue;
-    cursor: pointer;
-  }
-
-  .editor {
-    background-color: white;
-    border-radius: 2px;
-    border: 2px solid $pebble-light;
-    box-sizing: border-box;
-    color: $github-black-color;
-    display: block;
-    padding: 12px 8px;
-    height: 54px;
-  }
-
-  .editor:hover {
-    background-color: darken($ocean-blue, 4);
-    color: white;
-  }
-
-  .project-div:hover {
-    .copier {
-      border: 2px solid $ocean-blue;
-    }
-    .editor {
-      border: 2px solid $ocean-blue;
-    }
-    .project-submission-div {
-      background-image: linear-gradient(
-          to right, darken($ocean-blue, 4), $ocean-blue,
-          darken($ocean-blue, 4), $ocean-blue
-      );
-      border: 2px solid $ocean-blue;
-      color: white;
-    }
   }
 
   .icon-label {
-    display: none;
+    display: inline;
   }
-
-  a {
-    text-decoration: none;
-    color: black;
-  }
-
-  .clone-project-button {
-    @extend .green-button;
-  }
-
-  .clone-project-button:disabled {
-    @extend .gray-button;
-  }
-
-  .clone-project-button, .clone-project-button:disabled {
-    font-family: $current-lang-choice;
-    font-size: 16px;
-    padding: 10px 15px;
-    margin: 20px 0 20px 0;
-  }
-
-  @media only screen and (min-width: 481px) {
-
-    .clone-project-button, .clone-project-button:disabled {
-      display: inline-block;
-    }
-
-  }
-
-  @media only screen and (min-width: 960px) {
-
-    .project-div {
-      background-color: white;
-      border-radius: 2px;
-      width: 100%;
-      display: block;
-      margin: 0 0 8px 0;
-    }
-
-    .project-submission-div {
-      position: relative;
-      border-radius: 2px;
-      display: inline-block;
-      max-width: 50%;
-      border: 2px solid lighten($pebble-dark, 10);
-    }
-
-    .project-name {
-      padding: 15px;
-      margin: 0;
-      display: inline-block;
-    }
-
-    .project-edit-div {
-      display: inline-block;
-      vertical-align: top;
-      margin: 0 0 0 10px;
-    }
-
-    .editor {
-      color: $github-black-color;
-      display: block;
-      background-color: white;
-      border: 2px solid $pebble-light;
-    }
-
-    .cog {
-      font-size: 26px;
-      margin-right: 10px;
-    }
-
-    .copy-icon {
-      font-size: 26px;
-      margin-right: 10px;
-    }
-
-    .copier {
-      display: inline-block;
-      margin-left: 10px;
-      border: 2px solid $pebble-light;
-    }
-
-    .icon-label {
-      display: inline;
-    }
-  }
+}
 </style>

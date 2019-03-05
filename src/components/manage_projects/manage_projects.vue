@@ -7,15 +7,18 @@
             <p id="new-project-label"> Create a New Project</p>
 
             <div class="new-project-validation-wrapper">
-              <ValidatedInput ref="new_project_name"
-                              v-model="new_project_name"
-                              :validators="[is_not_empty]"
-                              :num_rows="1"
-                              input_style="width: 100%;
-                                         max-width: 400px;
-                                         border: 2px solid #ced4da;"
-                              @input_validity_changed="new_project_name_is_valid = $event">
-              </ValidatedInput>
+              <ValidatedForm autocomplete="off"
+                             spellcheck="false">
+                <ValidatedInput ref="new_project_name"
+                                v-model="new_project_name"
+                                :validators="[is_not_empty]"
+                                :num_rows="1"
+                                input_style="width: 100%;
+                                             max-width: 400px;
+                                             border: 1px solid #ced4da;"
+                                @input_validity_changed="new_project_name_is_valid = $event">
+                </ValidatedInput>
+              </ValidatedForm>
             </div>
 
             <div v-for="error of new_project_api_errors"
@@ -188,7 +191,7 @@ $github-black-color: #24292e;
 }
 
 #new-project-label {
-  font-size: 17px;
+  font-size: 19px;
   margin: 0 0 11px 0;
   padding: 6px 0 0 0;
   font-weight: 600;
@@ -196,7 +199,7 @@ $github-black-color: #24292e;
 }
 
 .existing-projects-label {
-  font-size: 17px;
+  font-size: 19px;
   margin: 40px 0 11px 0;
   padding: 6px 0 0 0;
   font-weight: 600;
@@ -222,15 +225,7 @@ $github-black-color: #24292e;
   display: block;
   font-size: 16px;
   padding: 10px 15px;
-  margin: 10px 0 20px 0;
-}
-
-@media only screen and (min-width: 481px) {
-  .add-project-button, .add-project-button:disabled {
-    font-family: $current-lang-choice;
-    margin: 10px 15px 12px 0;
-    display: inline-block;
-  }
+  margin: 15px 0 20px 0;
 }
 
 @media only screen and (min-width: 960px) {
