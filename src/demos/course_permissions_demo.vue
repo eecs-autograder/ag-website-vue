@@ -1,9 +1,9 @@
 <template>
   <div id="course-permissions-demo" v-if="my_course !== null">
     <admin-roster :course="my_course"></admin-roster>
-    <handgrader-roster :course="my_course"></handgrader-roster>
-    <staff-roster :course="my_course"></staff-roster>
-    <student-roster :course="my_course"></student-roster>
+    <!--<handgrader-roster :course="my_course"></handgrader-roster>-->
+    <!--<staff-roster :course="my_course"></staff-roster>-->
+    <!--<student-roster :course="my_course"></student-roster>-->
   </div>
 </template>
 
@@ -24,7 +24,6 @@
   export default class CoursePermissionsDemo extends Vue {
     my_course: Course | null = null;
     user: User | null = null;
-    admin_roster = [];
 
     async created() {
       this.user = await User.get_current();

@@ -1,9 +1,8 @@
+import Permissions from '@/components/permissions/permissions.vue';
 import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { User } from 'ag-client-typescript';
-
-import Permissions from '@/components/permissions/permissions.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

@@ -159,15 +159,14 @@ $current-lang-choice: "Quicksand";
 .class-permissions-body {
   font-family: $current-lang-choice;
   margin: 0;
-  padding-top: 50px;
 }
 
 .adding-container {
-  margin: 0 10%;
+  margin: 0 5%;
 }
 
 .enrolled-container {
-  margin: 15px 10% 0 10%;
+  margin: 15px 5% 0 5%;
   padding: 0 0 50px 0;
 }
 
@@ -277,13 +276,13 @@ $current-lang-choice: "Quicksand";
 }
 
 ::-webkit-scrollbar {
-  background: transparent;  /* optional: just make scrollbar invisible */
-  width: 0;  /* remove scrollbar space */
+  background: transparent;
+  width: 0;
 }
 
 @media only screen and (min-width: 481px) {
   .adding-container, .enrolled-container {
-    margin: 0 10%;
+    margin: 0 2.5%;
   }
 
   .permissions-table {
