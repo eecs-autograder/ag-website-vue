@@ -149,7 +149,7 @@ describe('CourseAdmin.vue', () => {
 
                 expect(course_admin_component.role_selected).toEqual("Admin");
                 expect(course_admin_component.current_tab_index).toEqual(1);
-            })
+            });
         });
     });
 
