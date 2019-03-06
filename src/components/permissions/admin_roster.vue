@@ -26,7 +26,7 @@
     course!: Course;
 
     d_course!: Course;
-    admins: User[] | null = null;
+    admins: User[] = [];
 
     async created() {
       this.d_course = this.course;

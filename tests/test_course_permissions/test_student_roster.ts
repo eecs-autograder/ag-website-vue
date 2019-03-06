@@ -131,8 +131,8 @@ describe('StudentRoster.vue', () => {
     });
 
     test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
-        'add_students method to be called',
-        async () => {
+         'add_students method to be called',
+         async () => {
 
         students = [
             make_user(0, `user${0}`),
