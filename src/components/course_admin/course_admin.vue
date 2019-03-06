@@ -1,3 +1,4 @@
+<!--// if it is loading it should do something-->
 <template>
   <div class="course-admin-component"
        ref="course_admin_component"
@@ -24,7 +25,6 @@
         </tab>
 
         <!--PERMISSIONS TAB-->
-
         <tab>
           <tab-header ref="permissions_tab"
                       id="permissions-tab">
@@ -37,7 +37,7 @@
                   <p class="permissions-tab-header tab-header"
                      ref="edit_permissions_tab"
                      @click="show_permissions_tab_dropdown_menu">
-                    Permissions {{ role_selected === "" ? '' : `(${role_selected})`}}
+                    Permissions {{role_selected === "" ? '' : `(${role_selected})`}}
                   </p>
                 </div>
               </template>
@@ -53,22 +53,25 @@
           <template slot="body">
             <div class="tab-body">
               <admin-roster v-if="role_selected === 'Admin' && course !== null"
-                            :course="course"></admin-roster>
+                            :course="course">
+              </admin-roster>
 
               <handgrader-roster v-if="role_selected === 'Handgrader' && course !== null"
-                                 :course="course"></handgrader-roster>
+                                 :course="course">
+              </handgrader-roster>
 
               <staff-roster v-if="role_selected === 'Staff' && course !== null"
-                            :course="course"></staff-roster>
+                            :course="course">
+              </staff-roster>
 
               <student-roster v-if="role_selected === 'Student' && course !== null"
-                              :course="course"></student-roster>
+                              :course="course">
+              </student-roster>
             </div>
           </template>
         </tab>
 
         <!--PROJECTS TAB-->
-
         <tab>
           <tab-header ref="projects_tab"
                       @click.native="update_tab_index(2)">
@@ -78,7 +81,9 @@
           </tab-header>
           <template slot="body">
             <div class="tab-body">
-              <manage-projects v-if="course !== null" :course="course"></manage-projects>
+              <manage-projects v-if="course !== null"
+                               :course="course">
+              </manage-projects>
             </div>
           </template>
         </tab>
@@ -88,18 +93,16 @@
 </template>
 
 <script lang="ts">
+  import CourseSettings from '@/components/course_admin/course_settings.vue';
+  import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
   import AdminRoster from '@/components/course_admin/permissions/admin_roster.vue';
   import HandgraderRoster from '@/components/course_admin/permissions/handgrader_roster.vue';
   import StaffRoster from '@/components/course_admin/permissions/staff_roster.vue';
   import StudentRoster from '@/components/course_admin/permissions/student_roster.vue';
-  import CourseSettings from '@/components/course_admin/course_settings.vue';
-  import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
   import Dropdown from '@/components/dropdown.vue';
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
   import { Course } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
   @Component({
@@ -114,14 +117,12 @@
       Tab,
       TabHeader,
       Tabs,
-      Tooltip,
-      ValidatedForm
     }
   })
   export default class CourseAdmin extends Vue {
+
     current_tab_index = 0;
     loading = true;
-    saving = false;
     role_selected = "";
     roles = ["Admin", "Staff", "Student", "Handgrader"];
     course: Course | null = null;
@@ -152,10 +153,8 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import '@/styles/button_styles.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Qusicksand";
-$github-black-color: #24292e;
+$current-lang-choice: "Quicksand";
 
 .course-admin-component {
   font-family: $current-lang-choice;
@@ -163,7 +162,7 @@ $github-black-color: #24292e;
 
 .tab-header {
   margin: 0;
-  color: $github-black-color;
+  color: black;
   font-size: 18px;
   padding: 10px 25px 12px 25px;
   font-weight: 600;
@@ -184,11 +183,12 @@ $github-black-color: #24292e;
   font-size: 16px;
   font-family: $current-lang-choice;
 }
+
 @media only screen and (min-width: 481px) {
   .tab-body {
     margin-left: 2px;
     margin-right: 2px;
-    border-top: 2px solid $pebble-dark;
+   // border-top: 2px solid $pebble-dark;
   }
 
   .tab-header {
