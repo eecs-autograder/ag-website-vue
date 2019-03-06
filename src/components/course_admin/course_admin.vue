@@ -1,3 +1,4 @@
+<!--// if it is loading it should do something-->
 <template>
   <div class="course-admin-component"
        ref="course_admin_component">
@@ -52,16 +53,20 @@
           <template slot="body">
             <div class="tab-body">
               <admin-roster v-if="role_selected === 'Admin' && course !== null"
-                            :course="course"></admin-roster>
+                            :course="course">
+              </admin-roster>
 
               <handgrader-roster v-if="role_selected === 'Handgrader' && course !== null"
-                                 :course="course"></handgrader-roster>
+                                 :course="course">
+              </handgrader-roster>
 
               <staff-roster v-if="role_selected === 'Staff' && course !== null"
-                            :course="course"></staff-roster>
+                            :course="course">
+              </staff-roster>
 
               <student-roster v-if="role_selected === 'Student' && course !== null"
-                              :course="course"></student-roster>
+                              :course="course">
+              </student-roster>
             </div>
           </template>
         </tab>
