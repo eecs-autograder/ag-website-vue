@@ -217,7 +217,7 @@ $current-lang-choice: "Quicksand";
 }
 
 .last-saved-spinner {
-  color: black;
+  color: $ocean-blue;
   display: inline-block;
   font-size: 18px;
 }
