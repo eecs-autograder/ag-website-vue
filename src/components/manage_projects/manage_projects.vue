@@ -8,7 +8,8 @@
 
             <div class="new-project-validation-wrapper">
               <ValidatedForm autocomplete="off"
-                             spellcheck="false">
+                             spellcheck="false"
+                             @submit.native.prevent="add_project">
                 <ValidatedInput ref="new_project_name"
                                 v-model="new_project_name"
                                 :validators="[is_not_empty]"
@@ -33,6 +34,7 @@
             </div>
 
             <button @click="add_project"
+                    type="submit"
                     :disabled="!new_project_name_is_valid"
                     class="add-project-button">
               Add Project
