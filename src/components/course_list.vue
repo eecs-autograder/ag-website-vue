@@ -160,6 +160,11 @@
   width: 90%;
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
 #not-enrolled-message {
   padding: 20px;
   text-align: center;
@@ -193,8 +198,9 @@
 }
 
 .edit-admin-settings {
-  background-color: white;
-  border-radius: 6px;
+  background-color: lighten(lavender, 2);
+  border-radius: 4px;
+  border: 1.5px solid darken(lavender, 11);
   bottom: 15px;
   padding: 5px 10px;
   position: absolute;
@@ -203,7 +209,8 @@
 }
 
 .edit-admin-settings:hover {
-  background-color: $pebble-medium;
+  background-color: white;
+  border: 1.5px solid darken(lavender, 5);
 }
 
 .edit-admin-settings:hover .cog  {
