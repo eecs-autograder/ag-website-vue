@@ -3,11 +3,9 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester } from 'ag-client-typescript';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 
-import {
-    patch_async_class_method
-} from './mocking';
+import { patch_async_class_method } from './mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

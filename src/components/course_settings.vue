@@ -181,7 +181,6 @@
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/components/course_admin.scss';
 @import '@/styles/button_styles.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
