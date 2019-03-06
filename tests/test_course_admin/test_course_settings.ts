@@ -5,7 +5,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 
-import { patch_async_class_method } from './mocking';
+import { patch_async_class_method } from '../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

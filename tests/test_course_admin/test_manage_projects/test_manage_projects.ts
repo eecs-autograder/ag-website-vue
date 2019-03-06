@@ -1,3 +1,4 @@
+<<<<<<< 728676604b3c65f8ef23f2d3ed11470b85ef1f1d:tests/test_manage_projects/test_manage_projects.ts
 import ManageProjects from '@/components/manage_projects/manage_projects.vue';
 import SingleProject from '@/components/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -9,7 +10,7 @@ import { AxiosError } from 'axios';
 import {
     patch_async_class_method,
     patch_async_static_method
-} from '../mocking';
+} from '../../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

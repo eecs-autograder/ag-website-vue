@@ -1,17 +1,17 @@
-import AdminRoster from '@/components/course_admin/permissions/admin_roster.vue';
+import HandgraderRoster from '@/components/course_admin/permissions/handgrader_roster.vue';
 import Permissions from '@/components/course_admin/permissions/permissions.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 
-import { patch_async_class_method } from '../mocking';
+import { patch_async_class_method, patch_async_static_method } from '../../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('AdminRoster.vue', () => {
-    let wrapper: Wrapper<AdminRoster>;
-    let admin_roster: AdminRoster;
+describe('HandgraderRoster.vue', () => {
+    let wrapper: Wrapper<HandgraderRoster>;
+    let handgrader_roster: HandgraderRoster;
     let original_match_media: (query: string) => MediaQueryList;
     let user_1: User;
     let user_2: User;
@@ -20,12 +20,12 @@ describe('AdminRoster.vue', () => {
     let new_user_1: User;
     let new_user_2: User;
     let my_course: Course;
-    let admins: User[];
+    let handgraders: User[];
 
     beforeEach(() => {
         my_course = new Course({
-           pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-           num_late_days: 0, allowed_guest_domain: '', last_modified: ''
+            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
+            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
         user_1 = new User({
             pk: 1,
@@ -50,7 +50,7 @@ describe('AdminRoster.vue', () => {
             last_name: "Carell",
             email: "worldsbestbo$$@umich.edu",
             is_superuser: true
-            });
+        });
         user_4 = new User({
             pk: 3,
             username: "freshPrince@umich.edu",
@@ -95,31 +95,33 @@ describe('AdminRoster.vue', () => {
         }
     });
 
-    test('The created function calls the Course method "get_admins"', () => {
-        admins = [user_1, user_2, user_3, user_4];
+    test('The created function calls the Course method "get_handgraders"', () => {
+        handgraders = [user_1, user_2, user_3, user_4];
+
         return patch_async_class_method(
             Course,
-            'get_admins',
-            () => Promise.resolve(admins),
+            'get_handgraders',
+            () => Promise.resolve(handgraders),
             async () => {
 
-            wrapper = mount(AdminRoster, {
+            wrapper = mount(HandgraderRoster, {
                 propsData: {
                     course: my_course
                 }
             });
-            admin_roster = wrapper.vm;
-            await admin_roster.$nextTick();
 
-            expect(admin_roster.d_course).toEqual(my_course);
-            expect(admin_roster.admins).toEqual(admins);
+            handgrader_roster = wrapper.vm;
+            await handgrader_roster.$nextTick();
+
+            expect(handgrader_roster.d_course).toEqual(my_course);
+            expect(handgrader_roster.handgraders).toEqual(handgraders);
         });
     });
 
     test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
-         'add_admins method to be called',
+         'add_handgraders method to be called',
          async () => {
-        admins = [
+        handgraders = [
             make_user(0, `user${0}`),
             make_user(1, `user${1}`),
             make_user(2, `user${2}`)
@@ -127,56 +129,56 @@ describe('AdminRoster.vue', () => {
 
         return patch_async_class_method(
             Course,
-            'get_admins',
-            make_fake_get_admins_func(),
+            'get_handgraders',
+            make_fake_get_handgraders_func(),
             async () => {
 
-            wrapper = mount(AdminRoster, {
+            wrapper = mount(HandgraderRoster, {
                 propsData: {
                     course: my_course
                 }
             });
 
-            admin_roster = wrapper.vm;
-            await admin_roster.$nextTick();
+            handgrader_roster = wrapper.vm;
+            await handgrader_roster.$nextTick();
 
-            expect(admin_roster.d_course).toEqual(my_course);
-            expect(admin_roster.admins).toEqual(admins);
+            expect(handgrader_roster.d_course).toEqual(my_course);
+            expect(handgrader_roster.handgraders).toEqual(handgraders);
 
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
-                'add_admins',
+                'add_handgraders',
                 spy,
                 async () => {
 
-                let permissions = <Permissions> wrapper.find({ref: 'admin_permissions'}).vm;
+                let permissions = <Permissions> wrapper.find({ref: 'handgrader_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await admin_roster.$nextTick();
+                await handgrader_roster.$nextTick();
 
-                let add_admins_form = wrapper.find('#add-permissions-form');
-                add_admins_form.trigger('submit');
-                await admin_roster.$nextTick();
+                let add_handgraders_form = wrapper.find('#add-permissions-form');
+                add_handgraders_form.trigger('submit');
+                await handgrader_roster.$nextTick();
 
-                admins.push(make_user(3, `user${3}`));
+                handgraders.push(make_user(3, `user${3}`));
 
-                expect(admin_roster.admins).toEqual(admins);
+                expect(handgrader_roster.handgraders).toEqual(handgraders);
                 expect(spy.mock.calls.length).toBe(1);
             });
         });
     });
 
-    function make_fake_get_admins_func() {
+    function make_fake_get_handgraders_func() {
         let counter = 0;
-        let admins2: User[] = [];
+        let handgraders2: User[] = [];
         for (let i = 0; i < 3; ++i) {
-            admins2.push(make_user(counter, `user${counter}`));
+            handgraders2.push(make_user(counter, `user${counter}`));
             counter += 1;
         }
 
         return () => {
-            let to_return = admins2.slice(0);
-            admins2.push(make_user(counter, `user${counter}`));
+            let to_return = handgraders2.slice(0);
+            handgraders2.push(make_user(counter, `user${counter}`));
             counter += 1;
             return Promise.resolve(to_return);
         };
@@ -193,44 +195,43 @@ describe('AdminRoster.vue', () => {
         });
     }
 
-    test('Deleting a user from the roster causes the Course "remove_admins" method to' +
-        ' be called ',
+    test('Deleting a user from the roster causes the Course "remove_handgraders" method to' +
+         ' be called ',
          async () => {
 
-        admins = [user_1, user_2, user_3, user_4];
+        handgraders = [user_1, user_2, user_3, user_4];
 
         return patch_async_class_method(
             Course,
-            'get_admins',
-            () => Promise.resolve(admins),
+            'get_handgraders',
+            () => Promise.resolve(handgraders),
             async () => {
 
-            wrapper = mount(AdminRoster, {
+            wrapper = mount(HandgraderRoster, {
                 propsData: {
                     course: my_course
                 }
             });
 
-            admin_roster = wrapper.vm;
-            await admin_roster.$nextTick();
+            handgrader_roster = wrapper.vm;
+            await handgrader_roster.$nextTick();
 
-            expect(admin_roster.d_course).toEqual(my_course);
-            expect(admin_roster.admins).toEqual(admins);
+            expect(handgrader_roster.d_course).toEqual(my_course);
+            expect(handgrader_roster.handgraders).toEqual(handgraders);
 
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
-                'remove_admins',
+                'remove_handgraders',
                 spy,
                 async () => {
 
-                let admin_permissions = wrapper.find(
-                {ref: 'admin_permissions'});
-                let delete_permission_buttons = admin_permissions.findAll(
-                '.delete-permission'
+                let handgrader_permissions = wrapper.find({ref: 'handgrader_permissions'});
+                let delete_permission_buttons = handgrader_permissions.findAll(
+                    '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
-                await admin_roster.$nextTick();
+                await wrapper.vm.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
             });
