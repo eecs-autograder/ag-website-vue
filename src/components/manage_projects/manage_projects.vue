@@ -1,6 +1,6 @@
 <template>
   <div class="manage-projects-component">
-    <div id="project-body-container">
+    <div>
       <div id="new-project-side">
         <div id="new-project-space">
 
@@ -146,7 +146,6 @@
 @import '@/styles/components/course_admin.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
-$github-black-color: #24292e;
 
 .manage-projects-component {
   font-family: $current-lang-choice;
@@ -166,18 +165,16 @@ $github-black-color: #24292e;
 }
 
 #new-project-label, #existing-projects-label {
-  color: $github-black-color;
   font-size: 19px;
   font-weight: 600;
-  padding: 6px 0 0 0;
 }
 
 #new-project-label {
-  margin: 0 0 11px 0;
+  margin: 14px 0 12px 0;
 }
 
 #existing-projects-label {
-  margin: 40px 0 11px 0;
+  margin: 40px 0 12px 0;
 }
 
 #existing-projects-side {
@@ -194,7 +191,6 @@ $github-black-color: #24292e;
 }
 
 .add-project-button, .add-project-button:disabled {
-  display: block;
   font-family: $current-lang-choice;
   font-size: 16px;
   margin: 15px 0 20px 0;
@@ -202,29 +198,21 @@ $github-black-color: #24292e;
 }
 
 @media only screen and (min-width: 960px) {
+
   #existing-projects-side {
     display: inline-block;
     margin: 0;
-    padding-bottom: 50px;
     vertical-align: top;
     width: 60%;
-  }
-
-  #new-project-space {
-    margin: 0 10%;
-    text-align: left;
-    width: 80%;
-  }
-
-  #existing-projects-label {
-    margin: 0 0 11px 0;
-    padding: 6px 0 0 0;
-    text-align: left;
   }
 
   #new-project-side {
     display: inline-block;
     width: 40%;
+  }
+
+  #existing-projects-label {
+    margin: 14px 0 12px 0;
   }
 }
 </style>
