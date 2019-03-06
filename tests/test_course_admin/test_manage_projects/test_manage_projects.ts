@@ -5,6 +5,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 
+
 import {
     patch_async_class_method,
     patch_async_static_method
