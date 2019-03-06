@@ -25,7 +25,7 @@
     course!: Course;
 
     d_course!: Course;
-    handgraders: User[] | null = null;
+    handgraders: User[] = [];
 
     async created() {
       this.d_course = this.course;
