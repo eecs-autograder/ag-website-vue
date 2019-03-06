@@ -10,7 +10,7 @@
 
   import { Model } from '@/model';
 
-  import CourseSettings from '@/components/course_settings.vue';
+  import CourseSettings from '@/components/course_admin/course_settings.vue';
 
   @Component({
     components: { CourseSettings }

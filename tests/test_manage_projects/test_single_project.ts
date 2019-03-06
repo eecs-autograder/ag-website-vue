@@ -1,4 +1,4 @@
-import SingleProject from '@/components/manage_projects/single_project.vue';
+import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
