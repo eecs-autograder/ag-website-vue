@@ -24,7 +24,8 @@
             <div v-for="error of new_project_api_errors"
                  class="api-error-container">
               <div class="api-error">{{error}}</div>
-              <button class="dismiss-error-button">
+              <button class="dismiss-error-button"
+                      type="button">
                   <span @click="new_project_api_errors = []"
                         class="dismiss-error"> Dismiss
                   </span>
@@ -33,7 +34,9 @@
 
             <button @click="add_project"
                     :disabled="!new_project_name_is_valid"
-                    class="add-project-button"> Add Project </button>
+                    class="add-project-button">
+              Add Project
+            </button>
         </div>
       </div>
 
@@ -151,17 +154,13 @@ $current-lang-choice: "Quicksand";
   font-family: $current-lang-choice;
 }
 
-.new-project-validation-wrapper {
-  max-width: 500px;
+.new-project-validation-wrapper, .api-error-container {
+  /*max-width: 500px;*/
 }
 
 #new-project-space {
   margin: 0 5%;
   width: 90%;
-}
-
-.api-error-container {
-  max-width: 500px;
 }
 
 #new-project-label, #existing-projects-label {
@@ -171,15 +170,6 @@ $current-lang-choice: "Quicksand";
 
 #new-project-label {
   margin: 14px 0 12px 0;
-}
-
-#existing-projects-label {
-  margin: 40px 0 12px 0;
-}
-
-#existing-projects-side {
-  margin: 0 5% 0 5%;
-  width: 90%;
 }
 
 .add-project-button {
@@ -197,18 +187,29 @@ $current-lang-choice: "Quicksand";
   padding: 10px 15px;
 }
 
+#existing-projects-side {
+  margin: 0 5%;
+  width: 90%;
+}
+
+#existing-projects-label {
+  margin: 40px 0 12px 0;
+}
+
 @media only screen and (min-width: 960px) {
+  #new-project-side {
+    display: inline-block;
+    width: 40%;
+    max-width: 500px;
+    box-sizing: border-box;
+    padding-right: 10px;
+  }
 
   #existing-projects-side {
     display: inline-block;
     margin: 0;
     vertical-align: top;
     width: 60%;
-  }
-
-  #new-project-side {
-    display: inline-block;
-    width: 40%;
   }
 
   #existing-projects-label {

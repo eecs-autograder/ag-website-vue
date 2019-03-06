@@ -1,11 +1,9 @@
-import SingleProject,
-       { handle_add_cloned_project_error } from '@/components/manage_projects/single_project.vue';
+import SingleProject from '@/components/manage_projects/single_project.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import { AxiosError, AxiosResponse } from 'axios';
-import Vue from 'vue';
 
 import { patch_async_class_method, patch_async_static_method } from '../mocking';
 

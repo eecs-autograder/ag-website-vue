@@ -206,12 +206,7 @@ $current-lang-choice: "Quicksand";
   font-family: $current-lang-choice;
 }
 
-.new-project-validation-wrapper {
-  max-width: 400px;
-}
-
 .project-div {
-  font-size: 16px;
   display: block;
   margin: 11px 0;
   min-width: 350px;
@@ -222,21 +217,21 @@ $current-lang-choice: "Quicksand";
 .project-submission-div {
   border: 2px solid lighten($pebble-dark, 10);
   border-radius: 2px;
-  color: black;
   display: inline-block;
   min-width: 200px;
-  width: 62%;
+  width: 70%;
 }
 
 .project-name {
   display: inline-block;
+  font-size: 17px;
   margin: 0;
   padding: 15px;
 }
 
 .project-edit-div {
   display: inline-block;
-  margin-left: 2%;
+  margin-left: 10px;
   vertical-align: top;
 }
 
@@ -251,8 +246,8 @@ $current-lang-choice: "Quicksand";
   box-sizing: border-box;
   color: black;
   display: inline-block;
-  height: 54px;
-  margin-left: 2%;
+  height: 55px;
+  margin-left: 10px;
   padding: 12px 8px;
   vertical-align: top;
 }
@@ -270,7 +265,7 @@ $current-lang-choice: "Quicksand";
   box-sizing: border-box;
   color: black;
   display: block;
-  height: 54px;
+  height: 55px;
   padding: 12px 8px;
 }
 
@@ -375,11 +370,7 @@ a {
 
   .project-submission-div {
     position: relative;
-    max-width: 50%;
-  }
-
-  .project-edit-div {
-    margin: 0 0 0 10px;
+    max-width: 60%;
   }
 
   .cog, .copy-icon {
