@@ -16,12 +16,16 @@
                    course_index === current_term.course_list.length - 1}]">
                 <p class="course-name">{{course.name}}</p>
                 <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
-                <div v-if="is_admin(course)"
-                     class="edit-admin-settings">
-                  <p class="edit-settings-label"> Edit Settings
-                    <i class="fas fa-cog cog"></i>
-                  </p>
-                </div>
+                <router-link tag="div"
+                             :to="`/web/course_admin/${course.pk}`"
+                             v-if="is_admin(course)"
+                             class="edit-admin-settings">
+                  <a>
+                    <p class="edit-settings-label"> Edit Settings
+                      <i class="fas fa-cog cog"></i>
+                    </p>
+                  </a>
+                </router-link>
               </div>
             </div>
           </div>

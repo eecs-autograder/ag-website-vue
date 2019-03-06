@@ -1,6 +1,7 @@
 import ManageProjects from '@/components/manage_projects/manage_projects.vue';
 import SingleProject from '@/components/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import { AxiosError } from 'axios';

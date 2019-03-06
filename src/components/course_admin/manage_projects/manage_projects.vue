@@ -71,7 +71,7 @@
   import { Course, Project } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
 
-  import SingleProject from '@/components/manage_projects/single_project.vue';
+  import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';

@@ -1,5 +1,5 @@
-import AdminRoster from '@/components/permissions/admin_roster.vue';
-import Permissions from '@/components/permissions/permissions.vue';
+import AdminRoster from '@/components/course_admin/permissions/admin_roster.vue';
+import Permissions from '@/components/course_admin/permissions/permissions.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 
