@@ -1,5 +1,5 @@
 <template>
-  <div class="manage-projects-component">
+  <div id="manage-projects-component">
     <div>
       <div id="new-project-side">
         <div id="new-project-space">
@@ -167,12 +167,12 @@
 }
 
 #new-project-label, #existing-projects-label {
-  font-size: 19px;
+  font-size: $title-size;
   font-weight: 600;
 }
 
 #new-project-label {
-  margin: 14px 0 12px 0;
+  margin: 10px 0 8px 0;
 }
 
 .add-project-button {
@@ -195,16 +195,24 @@
 }
 
 #existing-projects-label {
-  margin: 40px 0 12px 0;
+  margin: 40px 0 8px 0;
 }
 
 @media only screen and (min-width: 960px) {
+  #manage-projects-component {
+    margin: 0 2.5%;
+  }
+
   #new-project-side {
     display: inline-block;
     width: 40%;
     max-width: 500px;
     box-sizing: border-box;
     padding-right: 10px;
+  }
+
+  #new-project-space {
+    margin: 0;
   }
 
   #existing-projects-side {
@@ -215,7 +223,7 @@
   }
 
   #existing-projects-label {
-    margin: 14px 0 12px 0;
+    margin: 10px 0 12px 0;
   }
 }
 </style>

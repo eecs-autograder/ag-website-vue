@@ -175,7 +175,8 @@
 @import '@/styles/button_styles.scss';
 
 #settings-container {
-  padding-top: 15px;
+  padding-top: 5px;
+  margin: 0 5%;
 }
 
 .api-error-container {
@@ -200,10 +201,6 @@
 
 #save-button:disabled:hover {
   background-color: hsl(210, 13%, 63%);
-}
-
-#settings-container-inputs {
-  margin: 0 20px;
 }
 
 .name-container, .year-container, .semester-container, .late-days-container {
@@ -237,5 +234,10 @@
   padding-left: 10px;
   padding-top: 8px;
   vertical-align: top;
+}
+@media only screen and (min-width: 481px) {
+  #settings-container {
+    margin: 0 2.5%;
+  }
 }
 </style>

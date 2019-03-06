@@ -41,7 +41,7 @@
                 </div>
               </template>
               <div slot-scope="{item}">
-                <div class="permissions-row-content">
+                <div class="permissions-dropdown-row">
                   <span>{{item}}</span>
                 </div>
               </div>
@@ -135,7 +135,6 @@
 
     async created() {
       this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
-      // this.course = null;
       if (this.course !== null) {
         this.loading = false;
       }
@@ -161,6 +160,15 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
 
+.loading-spinner {
+  color: $ocean-blue;
+  font-size: 55px;
+  left: 46vw;
+  position: absolute;
+  text-align: center;
+  top: 40vh;
+}
+
 .course-admin-component {
   font-family: $current-lang-choice;
   position: relative;
@@ -176,6 +184,7 @@ $current-lang-choice: "Quicksand";
 .tab-body {
   text-align: left;
   position: relative;
+  padding-top: 10px;
 }
 
 .tab-label {
@@ -183,25 +192,15 @@ $current-lang-choice: "Quicksand";
   cursor: pointer;
 }
 
-.permissions-row-content {
+.permissions-dropdown-row {
   font-size: 16px;
   font-family: $current-lang-choice;
 }
 
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  left: 46vw;
-  position: absolute;
-  text-align: center;
-  top: 40vh;
-}
 
 @media only screen and (min-width: 481px) {
   .tab-body {
-    margin-left: 2px;
-    margin-right: 2px;
-    border-top: 2px solid $pebble-dark;
+    //border-top: 2px solid $pebble-dark;
   }
 
   .tab-header {
