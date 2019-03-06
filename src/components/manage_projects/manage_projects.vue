@@ -42,7 +42,15 @@
 
       <div id="existing-projects-side">
         <p id="existing-projects-label"> Existing Projects </p>
-        <div  v-for="(project, index) of projects"
+        <div v-if="loading"
+             class="loading-projects">
+          <i class="fa fa-spinner fa-pulse"></i>
+        </div>
+        <div v-else-if="!loading && projects.length === 0"
+             class="no-projects-message">
+          This course doesn't have any projects yet.
+        </div>
+        <div v-else v-for="(project, index) of projects"
               :key="project.pk">
           <single-project ref="single_project"
                           :course="course"
@@ -90,7 +98,7 @@
       };
     }
 
-    saving = false;
+    loading = true;
     projects: Project[] = [];
     new_project_name = "";
     new_project_name_is_valid = false;
@@ -100,6 +108,7 @@
     async created() {
       this.d_course = this.course;
       this.projects = await Project.get_all_from_course(this.d_course.pk);
+      this.loading = false;
     }
 
     sort_projects() {
@@ -121,7 +130,6 @@
       this.new_project_api_errors = [];
       try {
         this.new_project_name.trim();
-        this.saving = true;
         let new_project: Project = await Project.create(
           {name: this.new_project_name, course: this.d_course.pk}
         );
@@ -129,9 +137,7 @@
         this.sort_projects();
         (<ValidatedInput> this.$refs.new_project_name).clear();
       }
-      finally {
-        this.saving = false;
-      }
+      finally { }
     }
   }
 
@@ -154,8 +160,14 @@ $current-lang-choice: "Quicksand";
   font-family: $current-lang-choice;
 }
 
-.new-project-validation-wrapper, .api-error-container {
-  /*max-width: 500px;*/
+.no-projects-message {
+  padding: 8px 0;
+}
+
+.loading-projects {
+  padding: 6px 0;
+  font-size: 20px;
+  color: $ocean-blue;
 }
 
 #new-project-space {
