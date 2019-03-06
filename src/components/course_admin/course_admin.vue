@@ -1,4 +1,3 @@
-<!--// if it is loading it should do something-->
 <template>
   <div class="course-admin-component"
        ref="course_admin_component">
@@ -8,6 +7,7 @@
             tab_inactive_class="gray-theme-inactive-no-padding"
             v-model="current_tab_index"
             v-if="!loading">
+
         <!--SETTINGS TAB-->
         <tab>
           <tab-header ref="settings_tab"
@@ -200,7 +200,7 @@ $current-lang-choice: "Quicksand";
 
 @media only screen and (min-width: 481px) {
   .tab-body {
-    //border-top: 2px solid $pebble-dark;
+    border-top: 2px solid $pebble-dark;
   }
 
   .tab-header {
