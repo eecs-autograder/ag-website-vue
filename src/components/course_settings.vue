@@ -228,6 +228,7 @@ $current-lang-choice: "Quicksand";
 
 #input-course-semester {
   width: 140px;
+  height: 39px;
 }
 
 .semester-item {
