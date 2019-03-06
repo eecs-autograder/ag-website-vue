@@ -188,7 +188,7 @@ $current-lang-choice: "Quicksand";
   .tab-body {
     margin-left: 2px;
     margin-right: 2px;
-   // border-top: 2px solid $pebble-dark;
+    border-top: 2px solid $pebble-dark;
   }
 
   .tab-header {
