@@ -1,9 +1,8 @@
 <!--// if it is loading it should do something-->
 <template>
   <div class="course-admin-component"
-       ref="course_admin_component"
-       v-if="course !== null">
-    <div>
+       ref="course_admin_component">
+    <div v-if="!loading">
       <tabs ref="course_admin_tabs"
             tab_active_class="gray-theme-active-no-padding"
             tab_inactive_class="gray-theme-inactive-no-padding"
@@ -89,6 +88,9 @@
         </tab>
       </tabs>
     </div>
+    <div v-else class="loading-spinner">
+        <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
 </template>
 
@@ -133,7 +135,10 @@
 
     async created() {
       this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
-      this.loading = false;
+      // this.course = null;
+      if (this.course !== null) {
+        this.loading = false;
+      }
     }
 
     async update_tab_index(index: number) {
@@ -158,18 +163,17 @@ $current-lang-choice: "Quicksand";
 
 .course-admin-component {
   font-family: $current-lang-choice;
+  position: relative;
 }
 
 .tab-header {
   margin: 0;
-  color: black;
   font-size: 18px;
   padding: 10px 25px 12px 25px;
   font-weight: 600;
 }
 
 .tab-body {
-  padding-top: 20px;
   text-align: left;
   position: relative;
 }
@@ -182,6 +186,15 @@ $current-lang-choice: "Quicksand";
 .permissions-row-content {
   font-size: 16px;
   font-family: $current-lang-choice;
+}
+
+.loading-spinner {
+  color: $ocean-blue;
+  font-size: 55px;
+  left: 46vw;
+  position: absolute;
+  text-align: center;
+  top: 40vh;
 }
 
 @media only screen and (min-width: 481px) {
