@@ -153,6 +153,7 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/components/course_admin.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
 
@@ -201,7 +202,7 @@ $current-lang-choice: "Quicksand";
 .enrollment-add-label {
   color: black;
   display: block;
-  font-size: 17px;
+  font-size: $title-size;
   font-weight: 600;
   margin: 0;
   padding: 10px 0 8px 1px;
