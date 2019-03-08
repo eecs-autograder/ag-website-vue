@@ -164,7 +164,8 @@ describe('SingleProject.vue', () => {
                 course: course_1,
                 project: project_1,
                 existing_projects: projects
-            }
+            },
+            stubs: ['router-link']
         });
         let single_project = wrapper.vm;
         await single_project.$nextTick();
@@ -187,7 +188,8 @@ describe('SingleProject.vue', () => {
                 course: course_1,
                 project: project_1,
                 existing_projects: projects
-            }
+            },
+            stubs: ['router-link']
         });
 
         let single_project = wrapper.vm;
@@ -242,7 +244,8 @@ describe('SingleProject.vue', () => {
                 course: course_1,
                 project: project_1,
                 existing_projects: projects
-            }
+            },
+            stubs: ['router-link']
         });
 
         let single_project = wrapper.vm;
@@ -307,7 +310,8 @@ describe('SingleProject.vue', () => {
                 course: course_1,
                 project: project_1,
                 existing_projects: projects
-            }
+            },
+            stubs: ['router-link']
         });
 
         let single_project = wrapper.vm;
@@ -391,7 +395,8 @@ describe('SingleProject.vue', () => {
                  course: course_1,
                  project: project_1,
                  existing_projects: projects
-             }
+             },
+             stubs: ['router-link']
          });
 
          let single_project = wrapper.vm;
@@ -557,7 +562,8 @@ describe('SingleProject.vue', () => {
                 course: course_1,
                 project: project_1,
                 existing_projects: projects
-            }
+            },
+            stubs: ['router-link']
         });
 
         let single_project = wrapper.vm;
@@ -642,7 +648,9 @@ describe('SingleProject.vue', () => {
             }
         };
 
-        let wrapper2 = mount(component);
+        let wrapper2 = mount(component, {
+            stubs: ['router-link']
+        });
         await wrapper2.vm.$nextTick();
 
         const single_project2 = <SingleProject> wrapper2.find({ref: 'single_project'}).vm;

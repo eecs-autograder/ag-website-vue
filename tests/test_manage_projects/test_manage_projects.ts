@@ -182,7 +182,8 @@ describe('ManageProjects.vue', () => {
             wrapper = mount(ManageProjects, {
                 propsData: {
                     course: current_course
-                }
+                },
+                stubs: ['router-link']
             });
 
             let manage_projects = wrapper.vm;
@@ -205,7 +206,8 @@ describe('ManageProjects.vue', () => {
             wrapper = mount(ManageProjects, {
                 propsData: {
                     course: current_course
-                }
+                },
+                stubs: ['router-link']
             });
 
             let manage_projects = wrapper.vm;
@@ -235,7 +237,8 @@ describe('ManageProjects.vue', () => {
             wrapper = mount(ManageProjects, {
                 propsData: {
                     course: current_course
-                }
+                },
+                stubs: ['router-link']
             });
 
             let manage_projects = wrapper.vm;
@@ -297,7 +300,8 @@ describe('ManageProjects.vue', () => {
             wrapper = mount(ManageProjects, {
                 propsData: {
                     course: current_course
-                }
+                },
+                stubs: ['router-link']
             });
 
             let manage_projects = wrapper.vm;
@@ -357,7 +361,8 @@ describe('ManageProjects.vue', () => {
             wrapper = mount(ManageProjects, {
                 propsData: {
                     course: current_course
-                }
+                },
+                stubs: ['router-link']
             });
 
             let manage_projects = wrapper.vm;
@@ -475,7 +480,8 @@ describe('ManageProjects.vue', () => {
             wrapper = mount(ManageProjects, {
                 propsData: {
                     course: current_course
-                }
+                },
+                stubs: ['router-link']
             });
 
             let manage_projects = wrapper.vm;
