@@ -1,47 +1,45 @@
 <template>
   <div ref="course_list_component">
     <div id="course-list">
+
       <div v-if="courses_by_term.length === 0"
            id="not-enrolled-message">
         <p> You are not enrolled in any courses. </p>
       </div>
+
       <div v-else id="all-semesters">
         <div v-for="current_term of courses_by_term"
              class="single-semester-container">
           <p class="semester-name">{{current_term.term.semester}} {{current_term.term.year}}</p>
           <div class="courses-in-semester">
-            <div v-for="(course, course_index) of current_term.course_list">
-              <div :class="['course',
-                   {'last-course-in-semester':
-                   course_index === current_term.course_list.length - 1}]">
-                <p class="course-name">{{course.name}}</p>
-                <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
-                <router-link tag="div"
-                             :to="`/web/course_admin/${course.pk}`"
-                             v-if="is_admin(course)"
-                             class="edit-admin-settings">
-                  <a>
-                    <p class="edit-settings-label"> Edit Settings
-                      <i class="fas fa-cog cog"></i>
-                    </p>
-                  </a>
-                </router-link>
-              </div>
+            <div v-for="(course, index) of current_term.course_list">
+              <single-course :course="course"
+                             :last_course_in_semester="index
+                                                       === current_term.course_list.length - 1"
+                             :is_admin="is_admin(course)">
+              </single-course>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
 
 <script lang="ts">
 
+  import SingleCourse from '@/components/course_list/single_course.vue';
+
   import { AllCourses, Model } from '@/model';
   import { Course, Semester, User } from 'ag-client-typescript';
 
   import { ObserverComponent } from '@/observer_component';
-  import { array_add_unique, array_get_unique, array_has_unique } from '@/utils';
+  import {
+    array_add_unique,
+    array_get_unique,
+    array_has_unique,
+  } from '@/utils';
 
   import { Component, Vue } from 'vue-property-decorator';
 
@@ -55,7 +53,11 @@
     course_list: Course[];
   }
 
-  @Component
+  @Component({
+    components: {
+      SingleCourse
+    }
+  })
   export default class CourseList extends ObserverComponent {
 
     all_courses: AllCourses | null = null;
@@ -67,16 +69,20 @@
 
     async created() {
       super.created();
+      await this.get_and_sort_courses();
+
+    }
+
+    async get_and_sort_courses() {
       let user = await User.get_current();
       this.all_courses = await Model.get_instance().get_courses_for_user(user);
       for (let [role, courses] of Object.entries(this.all_courses)) {
         this.sort_into_terms(courses);
       }
       this.courses_by_term.sort(term_descending);
-
       for (let term_courses of this.courses_by_term) {
         term_courses.course_list.sort((course_a: Course, course_b: Course) => {
-           return (course_a.name >= course_b.name) ? 1 : -1;
+          return (course_a.name >= course_b.name) ? 1 : -1;
         });
       }
     }
@@ -148,21 +154,23 @@
 <style scoped lang="scss">
 @import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
+@import '@/styles/components/course_admin.scss';
 
-#all-semesters {
-  margin-top: 40px;
-}
+$current-lang-choice: "Poppins";
 
 #course-list {
-  font-family: "Poppins";
+  font-family: $current-lang-choice;
   margin-left: 5%;
   margin-right: 5%;
   width: 90%;
 }
 
-a {
-  text-decoration: none;
-  color: black;
+.semester-name {
+  font-size: 24px;
+  margin: 15px 15px 15px 15px;
+  text-align: left;
+  min-height: 35px;
 }
 
 #not-enrolled-message {
@@ -174,90 +182,13 @@ a {
   vertical-align: top;
 }
 
-.semester-name {
-  color: black;
-  font-size: 24px;
-  margin: 15px 15px 25px 15px;
-  min-height: 35px;
-  text-align: center;
-}
-
 .courses-in-semester {
   margin: 0;
 }
 
-.edit-settings-label {
-  font-size: 16px;
-  margin: 0;
+#all-semesters {
+  margin-top: 40px;
 }
-
-.cog {
-  margin-left: 5px;
-  transform: rotate(0deg);
-  transition-duration: 1s;
-}
-
-.edit-admin-settings {
-  background-color: lighten(lavender, 2);
-  border-radius: 4px;
-  border: 1.5px solid darken(lavender, 11);
-  bottom: 15px;
-  padding: 5px 10px;
-  position: absolute;
-  right: 15px;
-  transition: box-shadow 1s;
-}
-
-.edit-admin-settings:hover {
-  background-color: white;
-  border: 1.5px solid darken(lavender, 5);
-}
-
-.edit-admin-settings:hover .cog  {
-  transform: rotate(365deg);
-  transition-duration: 1s;
-}
-
-.course {
-  background-color: darken(lavender, 8);
-  border-radius: 2px;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
-  color: black;
-  cursor: pointer;
-  font-size: 23px;
-  margin: 0 0 15px 0;
-  min-height: 75px;
-  padding: 15px;
-  position: relative;
-  transition: box-shadow 1s;
-}
-
-.course:hover {
-  background-color: darken(lavender, 11);
-  box-shadow: 0 5px 9px 0 rgba(0,0,0,0.2);
-}
-
-.last-course-in-semester {
-  margin-bottom: 50px;
-}
-
-.course-name {
-  font-size: 26px;
-  font-weight: 600;
-  line-height: 1.2;
-  margin: 0;
-}
-
-.course-semester-year {
-  color: black;
-  font-size: 16px;
-  margin: 0;
-  min-height: 25px;
-  padding-bottom: 15px;
-  position: relative;
-}
-
-//*****************************************************************************
 
 @media only screen and (min-width: 481px) {
   #course-list {
@@ -282,6 +213,7 @@ a {
 }
 
 @media only screen and (min-width: 1025px) {
+
   #course-list {
     margin-left: 10%;
     margin-right: 10%;

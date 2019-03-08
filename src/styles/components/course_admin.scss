@@ -1,9 +1,7 @@
 @import '@/styles/colors.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
-
 $title-size: 17px;
-
 
 // api errors ************************************************************
 .api-error-container {
@@ -65,6 +63,16 @@ $title-size: 17px;
     top: 3px;
 }
 
+.semester-dropdown-header {
+    width: 140px;
+    height: 39px;
+}
+
+.semester-dropdown-item {
+    font-size: 16px;
+    font-family: $current-lang-choice;
+}
+
 // input related *********************************************************
 .input-label {
     color: black;
@@ -74,3 +82,13 @@ $title-size: 17px;
     margin: 5px 15px 7px 0;
     text-align: right;
 }
+
+// button related ********************************************************
+%submission-button {
+    display: block;
+    font-family: $current-lang-choice;
+    font-size: 16px;
+    margin: 15px 0;
+    padding: 10px 15px;
+}
+

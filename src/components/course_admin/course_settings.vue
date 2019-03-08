@@ -27,7 +27,7 @@
                       @update_item_selected="d_course.semester = $event">
               <template slot="header">
                 <div tabindex="1" class="dropdown-header-wrapper">
-                  <div id="input-course-semester" class="dropdown-header">
+                  <div class="dropdown-header semester-dropdown-header">
                     {{d_course.semester}}
                     <i class="fas fa-caret-down dropdown-caret"></i>
                   </div>
@@ -184,11 +184,7 @@ $current-lang-choice: "Quicksand";
 }
 
 #save-button, #save-button:disabled {
-  display: block;
-  font-family: $current-lang-choice;
-  font-size: 16px;
-  margin: 15px 0 15px 0;
-  padding: 10px 15px;
+  @extend %submission-button;
 }
 
 #save-button:disabled:hover {
@@ -199,16 +195,6 @@ $current-lang-choice: "Quicksand";
   display: block;
   max-width: 500px;
   padding-bottom: 16px;
-}
-
-#input-course-semester {
-  width: 140px;
-  height: 39px;
-}
-
-.semester-item {
-  font-size: 16px;
-  font-family: $current-lang-choice;
 }
 
 .last-saved-timestamp {

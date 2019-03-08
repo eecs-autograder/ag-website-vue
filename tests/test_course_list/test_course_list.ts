@@ -1,10 +1,10 @@
-import CourseList from '@/components/course_list.vue';
+import CourseList from '@/components/course_list/course_list.vue';
 import { AllCourses, Model } from '@/model';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 import Vue from 'vue';
 
-import { patch_async_class_method, patch_async_static_method } from './mocking';
+import { patch_async_static_method } from '../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -91,7 +91,9 @@ describe('Course_List tests', () => {
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -126,7 +128,9 @@ describe('Course_List tests', () => {
                  let mock_result = await Model.get_instance().get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
 
-                 wrapper = mount(CourseList);
+                 wrapper = mount(CourseList, {
+                     stubs: ['router-link', 'router-view']
+                 });
 
                  await wrapper.vm.$nextTick();
 
@@ -161,7 +165,9 @@ describe('Course_List tests', () => {
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -221,7 +227,9 @@ describe('Course_List tests', () => {
                  let mock_result = await Model.get_instance().get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
 
-                 wrapper = mount(CourseList);
+                 wrapper = mount(CourseList, {
+                     stubs: ['router-link', 'router-view']
+                 });
 
                  await wrapper.vm.$nextTick();
 
@@ -257,7 +265,9 @@ describe('Course_List tests', () => {
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -295,7 +305,9 @@ describe('Course_List tests', () => {
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -330,7 +342,9 @@ describe('Course_List tests', () => {
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -374,7 +388,9 @@ describe('Course_List tests', () => {
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 

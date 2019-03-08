@@ -1,5 +1,5 @@
 import CourseAdmin from '@/components/course_admin/course_admin.vue';
-import CourseList from '@/components/course_list.vue';
+import CourseList from '@/components/course_list/course_list.vue';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Vue from 'vue';
 import VueRouter from 'vue-router';

@@ -351,10 +351,8 @@ a {
 }
 
 .clone-project-button, .clone-project-button:disabled {
-  font-family: $current-lang-choice;
-  font-size: 16px;
+  @extend %submission-button;
   margin: 32px 0 20px 0;
-  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 960px) {

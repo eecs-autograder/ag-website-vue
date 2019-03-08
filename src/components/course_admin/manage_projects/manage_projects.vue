@@ -190,10 +190,7 @@ $current-lang-choice: "Quicksand";
 }
 
 .add-project-button, .add-project-button:disabled {
-  font-family: $current-lang-choice;
-  font-size: 15px;
-  margin: 15px 0 20px 0;
-  padding: 10px 15px;
+  @extend %submission-button;
 }
 
 #existing-projects-side {
