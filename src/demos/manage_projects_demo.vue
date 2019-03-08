@@ -25,7 +25,7 @@
       let courses = await Model.get_instance().get_courses_for_user(this.user);
       console.log(courses);
       let admin_courses = courses.courses_is_admin_for;
-      this.my_course = admin_courses[0];
+      this.my_course = admin_courses[1];
     }
   }
 </script>

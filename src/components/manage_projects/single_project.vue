@@ -78,9 +78,10 @@
 
           <div v-for="error of api_errors" class="api-error-container">
             <div class="api-error">{{error}}</div>
-            <button class="dismiss-error-button">
-              <span @click="api_errors = []"
-                    class="dismiss-error"> Dismiss
+            <button class="dismiss-error-button"
+                    type="button"
+                    @click="api_errors = []">
+              <span class="dismiss-error"> Dismiss
               </span>
             </button>
           </div>

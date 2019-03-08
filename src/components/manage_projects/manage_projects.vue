@@ -26,9 +26,9 @@
                  class="api-error-container">
               <div class="api-error">{{error}}</div>
               <button class="dismiss-error-button"
-                      type="button">
-                  <span @click="new_project_api_errors = []"
-                        class="dismiss-error"> Dismiss
+                      type="button"
+                      @click="new_project_api_errors = []">
+                  <span class="dismiss-error"> Dismiss
                   </span>
               </button>
             </div>
@@ -110,6 +110,9 @@
     async created() {
       this.d_course = this.course;
       this.projects = await Project.get_all_from_course(this.d_course.pk);
+      // console.log(this.projects.length);
+      console.log(this.course.pk);
+      console.log(this.d_course.pk);
       this.loading = false;
     }
 

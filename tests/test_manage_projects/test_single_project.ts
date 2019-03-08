@@ -3,7 +3,7 @@ import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 
 import { patch_async_class_method, patch_async_static_method } from '../mocking';
 
@@ -13,6 +13,7 @@ beforeAll(() => {
 
 describe('SingleProject.vue', () => {
     let wrapper: Wrapper<SingleProject>;
+    let single_project: SingleProject;
     let course_1: Course;
     let course_2: Course;
     let original_match_media: (query: string) => MediaQueryList;
@@ -167,7 +168,7 @@ describe('SingleProject.vue', () => {
             },
             stubs: ['router-link']
         });
-        let single_project = wrapper.vm;
+        single_project = wrapper.vm;
         await single_project.$nextTick();
 
         expect(single_project.course).toEqual(course_1);
@@ -192,7 +193,7 @@ describe('SingleProject.vue', () => {
             stubs: ['router-link']
         });
 
-        let single_project = wrapper.vm;
+        single_project = wrapper.vm;
         await single_project.$nextTick();
 
         return patch_async_static_method(
@@ -248,7 +249,7 @@ describe('SingleProject.vue', () => {
             stubs: ['router-link']
         });
 
-        let single_project = wrapper.vm;
+        single_project = wrapper.vm;
         await single_project.$nextTick();
 
         return patch_async_static_method(
@@ -314,7 +315,7 @@ describe('SingleProject.vue', () => {
             stubs: ['router-link']
         });
 
-        let single_project = wrapper.vm;
+        single_project = wrapper.vm;
         await single_project.$nextTick();
 
         courses = [course_1, course_2];
@@ -399,7 +400,7 @@ describe('SingleProject.vue', () => {
              stubs: ['router-link']
          });
 
-         let single_project = wrapper.vm;
+         single_project = wrapper.vm;
          await single_project.$nextTick();
 
          courses = [course_1, course_2];
@@ -566,7 +567,7 @@ describe('SingleProject.vue', () => {
             stubs: ['router-link']
         });
 
-        let single_project = wrapper.vm;
+        single_project = wrapper.vm;
         await single_project.$nextTick();
 
         courses = [course_1, course_2];
@@ -616,7 +617,7 @@ describe('SingleProject.vue', () => {
                     expect(single_project.cloning_api_error_present).toBe(true);
                     expect(wrapper.findAll('.api-error').length).toBeGreaterThan(0);
 
-                    wrapper.findAll('.dismiss-error').at(0).trigger('click');
+                    wrapper.findAll('.dismiss-error-button').at(0).trigger('click');
 
                     expect(wrapper.findAll('.api-error').length).toEqual(0);
 

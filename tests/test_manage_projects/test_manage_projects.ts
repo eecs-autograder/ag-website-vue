@@ -1,12 +1,10 @@
-import { handle_add_project_error } from '@/components/manage_projects/manage_projects.vue';
+import ManageProjects from '@/components/manage_projects/manage_projects.vue';
 import SingleProject from '@/components/manage_projects/single_project.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
-import { AxiosError, AxiosResponse } from 'axios';
-import Vue from 'vue';
+import { AxiosError } from 'axios';
 
-import ManageProjects from '../../src/components/manage_projects/manage_projects.vue';
-import ValidatedInput from '../../src/components/validated_input.vue';
 import {
     patch_async_class_method,
     patch_async_static_method
@@ -27,12 +25,6 @@ describe('ManageProjects.vue', () => {
     let project_2: Project;
     let projects: Project[];
     let newly_cloned_project_1: Project;
-
-    const $route = {
-        path: '/web/course_admin/:courseId',
-        params: { courseId: '1' }
-    };
-
 
     beforeEach(() => {
         original_match_media = window.matchMedia;
@@ -394,7 +386,7 @@ describe('ManageProjects.vue', () => {
                 expect(manage_projects.new_project_api_errors.length).toBeGreaterThan(0);
                 expect(manage_projects.projects.length).toEqual(2);
 
-                wrapper.findAll('.dismiss-error').at(0).trigger('click');
+                wrapper.findAll('.dismiss-error-button').at(0).trigger('click');
 
                 expect(wrapper.findAll('.api-error').length).toEqual(0);
             });
