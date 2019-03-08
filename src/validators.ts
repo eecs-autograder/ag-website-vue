@@ -1,9 +1,9 @@
 import { ValidatorResponse } from '@/components/validated_input.vue';
 
-export function is_number(value: string): ValidatorResponse {
+export function is_non_negative(value: string): ValidatorResponse {
     return {
-        is_valid: is_not_empty(value).is_valid && !isNaN(Number(value)),
-        error_msg:  "You must enter a number.",
+        is_valid: is_number(value).is_valid && value[0] !== "-",
+        error_msg: "The number entered must be greater than or equal to zero."
     };
 }
 
@@ -14,10 +14,17 @@ export function is_not_empty(value: string): ValidatorResponse {
     };
 }
 
-export function is_non_negative(value: string): ValidatorResponse {
+export function is_number(value: string): ValidatorResponse {
     return {
-        is_valid: is_number(value).is_valid && value[0] !== "-",
-        error_msg: "The number entered must be greater than or equal to zero."
+        is_valid: is_not_empty(value).is_valid && !isNaN(Number(value)),
+        error_msg:  "You must enter a number.",
+    };
+}
+
+export function is_valid_course_year(value: string): ValidatorResponse {
+    return {
+        is_valid: Number(value) >= 2000 && Number(value) <= 2050,
+        error_msg: "Please enter a year >= 2000 and <= 2050."
     };
 }
 

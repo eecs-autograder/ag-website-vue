@@ -47,7 +47,7 @@
                           :num_rows="1"
                           input_style="width: 65px;
                                        border: 1px solid #ced4da;"
-                          :validators="[is_not_empty, is_number, is_valid_year]">
+                          :validators="[is_not_empty, is_number, is_valid_course_year]">
           </ValidatedInput>
         </div>
 
@@ -71,9 +71,9 @@
              class="api-error-container">
           <div class="api-error">{{error}}</div>
           <button class="dismiss-error-button"
-                  type="button">
-              <span @click="api_errors = []"
-                    class="dismiss-error"> Dismiss
+                  type="button"
+                  @click="api_errors = []">
+              <span class="dismiss-error"> Dismiss
               </span>
           </button>
         </div>
@@ -105,6 +105,7 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
   import { handle_400_errors_async } from '@/utils';
+  import { is_non_negative, is_not_empty, is_number, is_valid_course_year } from '@/validators';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
@@ -127,33 +128,10 @@
     semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
     settings_form_is_valid = true;
 
-    is_number(value: string): ValidatorResponse {
-      return {
-        is_valid: value !== "" && !isNaN(Number(value)),
-        error_msg:  "You must enter a number.",
-      };
-    }
-
-    is_not_empty(value: string): ValidatorResponse {
-      return {
-        is_valid: value.trim() !== "",
-        error_msg: "This field is required."
-      };
-    }
-
-    is_non_negative(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid && value[0] !== "-",
-        error_msg: "The number of late days cannot be negative."
-      };
-    }
-
-    is_valid_year(value: string): ValidatorResponse {
-      return {
-        is_valid: Number(value) >= 2000,
-        error_msg: "Please enter a valid year (2000 and onwards)."
-      };
-    }
+    readonly is_non_negative = is_non_negative;
+    readonly is_not_empty = is_not_empty;
+    readonly is_number = is_number;
+    readonly is_valid_course_year = is_valid_course_year;
 
     created() {
       this.d_course = this.course;
