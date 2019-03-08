@@ -104,8 +104,9 @@
   import Modal from '@/components/modal.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
   import { handle_400_errors_async } from '@/utils';
+  import { is_not_empty } from '@/validators';
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component({
@@ -136,12 +137,7 @@
       this.d_projects = new_list.slice(0);
     }
 
-    is_not_empty(value: string): ValidatorResponse {
-      return {
-        is_valid: value.trim() !== "",
-        error_msg: "This field is required."
-      };
-    }
+    readonly is_not_empty = is_not_empty;
 
     user: User | null = null;
     d_projects: Project[] = [];

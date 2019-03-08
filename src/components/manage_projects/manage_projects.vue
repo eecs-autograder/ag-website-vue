@@ -74,10 +74,10 @@
   import SingleProject from '@/components/manage_projects/single_project.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-
+  import ValidatedInput from '@/components/validated_input.vue';
 
   import { handle_400_errors_async } from '@/utils';
+  import { is_not_empty } from '@/validators';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
@@ -93,12 +93,7 @@
     @Prop({required: true, type: Course})
     course!: Course;
 
-    is_not_empty(value: string): ValidatorResponse {
-      return {
-        is_valid: value.trim() !== "",
-        error_msg: "This field is required."
-      };
-    }
+    readonly is_not_empty = is_not_empty;
 
     loading = true;
     projects: Project[] = [];
@@ -110,9 +105,6 @@
     async created() {
       this.d_course = this.course;
       this.projects = await Project.get_all_from_course(this.d_course.pk);
-      // console.log(this.projects.length);
-      console.log(this.course.pk);
-      console.log(this.d_course.pk);
       this.loading = false;
     }
 

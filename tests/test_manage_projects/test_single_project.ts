@@ -159,7 +159,7 @@ describe('SingleProject.vue', () => {
         });
     });
 
-    test('Data members are initialized correctly the modal', async () => {
+    test('Data members are initialized correctly', async () => {
         wrapper = mount(SingleProject, {
             propsData: {
                 course: course_1,
@@ -374,7 +374,9 @@ describe('SingleProject.vue', () => {
         });
     });
 
-    test('Cloned project name must be unique among projects in the same course', async () => {
+    test('Cloned project name must be unique among projects in the same course - violates ' +
+         'condition',
+         async () => {
          let axios_response_instance: AxiosError = {
              name: 'AxiosError',
              message: 'u heked up',

@@ -219,7 +219,7 @@ describe('ManageProjects.vue', () => {
         });
     });
 
-    test('A project can be created and will be displayed in the list of projects', async () => {
+    test('A project can be created and then displayed in the list of projects', async () => {
         return patch_async_static_method(
             Project,
             'get_all_from_course',
@@ -266,7 +266,9 @@ describe('ManageProjects.vue', () => {
         });
     });
 
-    test('New project name must be unique among projects in the same course', async () => {
+    test('New project name must be unique among projects in the same course - violates ' +
+         'condition',
+         async () => {
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
