@@ -1,8 +1,8 @@
 <template>
   <div ref="single-course-component">
 
-    <div :class="['course', {'last-course-in-semester': last_course_in_semester}]">
-      <p class="course-name">{{course.name}} ({{course.pk}})</p>
+    <div :class="['course', {'last-course-in-semester': d_last_course_in_semester}]">
+      <p class="course-name">{{course.name}} ({{course.pk}}) {{d_last_course_in_semester}}</p>
       <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
       <div v-if="is_admin"
            class="clone-course"
@@ -74,7 +74,7 @@
                             v-model="new_course_year"
                             :num_rows="1"
                             input_style="width: 65px;"
-                            :validators="[is_not_empty, is_number, is_valid_year]"
+                            :validators="[is_not_empty, is_number, is_valid_course_year]"
                             @input_validity_changed="clone_course_form_is_valid = $event">
             </ValidatedInput>
           </div>
@@ -105,12 +105,13 @@
   import Dropdown from '@/components/dropdown.vue';
   import Modal from '@/components/modal.vue';
   import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
   import { ObserverComponent } from '@/observer_component';
   import { handle_400_errors_async } from '@/utils';
+  import { is_not_empty, is_number, is_valid_course_year } from '@/validators';
   import { Course, Semester } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
-  import { Component, Prop } from 'vue-property-decorator';
+  import { Component, Prop, Watch } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -132,6 +133,12 @@
     @Prop({default: false, type: Boolean})
     is_admin!: boolean;
 
+    @Watch('last_course_in_semester')
+    on_course_order_changed(new_status: boolean, old_status: boolean) {
+      console.log("This happened");
+      this.d_last_course_in_semester = new_status;
+    }
+
     new_course_name = "";
     new_course_semester: Semester = Semester.fall;
     new_course_year: number = 2000;
@@ -139,30 +146,15 @@
     api_errors: string[] = [];
     semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
     clone_course_form_is_valid = false;
+    d_last_course_in_semester = false;
+
+    readonly is_not_empty = is_not_empty;
+    readonly is_number = is_number;
+    readonly is_valid_course_year = is_valid_course_year;
 
     created() {
       this.new_course_year = this.course.year ? this.course.year : 2000;
-    }
-
-    is_valid_year(value: string): ValidatorResponse {
-      return {
-        is_valid: Number(value) >= 2000,
-        error_msg: "Please enter a valid year."
-      };
-    }
-
-    is_number(value: string): ValidatorResponse {
-      return {
-        is_valid: value !== "" && !isNaN(Number(value)),
-        error_msg: "You must enter a number.",
-      };
-    }
-
-    is_not_empty(value: string): ValidatorResponse {
-      return {
-        is_valid: value.trim() !== "",
-        error_msg: "This field is required."
-      };
+      this.d_last_course_in_semester = this.last_course_in_semester;
     }
 
     @handle_400_errors_async(handle_add_copied_course_error)
@@ -173,6 +165,7 @@
           this.new_course_name, this.new_course_semester, this.new_course_year
         );
         (<Modal> this.$refs.clone_course_modal).close();
+        console.log("Cloning successful");
         this.new_course_name = "";
         this.new_course_semester = Semester.fall;
         this.new_course_year = this.course.year ? this.course.year : 2000;

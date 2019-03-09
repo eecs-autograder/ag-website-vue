@@ -1,10 +1,13 @@
 import CourseList from '@/components/course_list/course_list.vue';
+import Modal from '@/components/modal.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 import { AllCourses, Model } from '@/model';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
 import Vue from 'vue';
 
-import { patch_async_static_method } from '../mocking';
+import { patch_async_class_method, patch_async_static_method } from '../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -24,12 +27,16 @@ describe('Course_List tests', () => {
     let no_semester_2018_eecs493: Course;
     let fall17_eecs183: Course;
     let no_year_winter_eecs482: Course;
+    let copy_of_course: Course;
 
     beforeEach(() => {
-        user = new User({
-            pk: 1, username: 'ashberg', first_name: 'Ashley',
-            last_name: 'IceBerg', email: 'iceberg@umich.edu',
-            is_superuser: false});
+        user = new User(
+            {pk: 1, username: 'ashberg', first_name: 'Ashley', last_name: 'IceBerg',
+             email: 'iceberg@umich.edu', is_superuser: false});
+
+        copy_of_course = new Course(
+            {pk: 11, name: "Clone", semester: Semester.fall, year: 2048, subtitle: '',
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs280 = new Course(
             {pk: 2, name: 'EECS 280', semester: Semester.fall, year: 2018, subtitle: '',
@@ -69,6 +76,214 @@ describe('Course_List tests', () => {
             console.log("wrapper exists");
             wrapper.destroy();
         }
+    });
+
+    async function call_notify_course_created(name_in: string, year_in: number) {
+        copy_of_course.name = name_in;
+        copy_of_course.year = year_in;
+        Course.notify_course_created(copy_of_course);
+    }
+
+    test('Cloning a course - cloned course causes new term to be created', async () => {
+        all_courses = {
+            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        };
+
+        await patch_async_static_method(
+            User, 'get_current',
+            () => Promise.resolve(user), async () => {
+
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
+
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
+
+                course_list = wrapper.vm;
+                await course_list.$nextTick();
+
+                expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                expect(course_list.courses_by_term.length).toEqual(1);
+
+                let first_course = wrapper.findAll('.course').at(0);
+                first_course.find('.clone-course').trigger('click');
+                await course_list.$nextTick();
+
+                let clone_name_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(0).find('#input');
+                (<HTMLInputElement> clone_name_input.element).value = "EECS 280";
+                clone_name_input.trigger('input');
+                await course_list.$nextTick();
+
+                let clone_year_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(1).find('#input');
+                (<HTMLInputElement> clone_year_input.element).value = "2019";
+                clone_year_input.trigger('input');
+                await course_list.$nextTick();
+
+                return patch_async_class_method(
+                    Course,
+                    'copy',
+                    () => Promise.resolve(call_notify_course_created("EECS 280", 2019)),
+                    async () => {
+
+                    wrapper.find('#clone-course-form').trigger('submit.native');
+                    await course_list.$nextTick();
+
+                    expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(3);
+                    expect(course_list.courses_by_term.length).toEqual(2);
+                    expect(course_list.courses_by_term[0].course_list[0]).toEqual(copy_of_course);
+                    expect(course_list.courses_by_term[1].course_list[0]).toEqual(fall18_eecs280);
+                    expect(course_list.courses_by_term[1].course_list[1]).toEqual(fall18_eecs370);
+                });
+            });
+        });
+    });
+
+    test('Cloning a course - cloned course inserted into existing term', async () => {
+        all_courses = {
+            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        };
+
+        await patch_async_static_method(
+            User, 'get_current',
+            () => Promise.resolve(user), async () => {
+
+            await patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
+
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
+
+                course_list = wrapper.vm;
+                await course_list.$nextTick();
+
+                expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                expect(course_list.courses_by_term.length).toEqual(1);
+
+                let first_course = wrapper.findAll('.course').at(0);
+                first_course.find('.clone-course').trigger('click');
+                await course_list.$nextTick();
+
+                let clone_name_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(0).find('#input');
+                (<HTMLInputElement> clone_name_input.element).value = "EECS 281";
+                clone_name_input.trigger('input');
+                await course_list.$nextTick();
+
+                let clone_year_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(1).find('#input');
+                (<HTMLInputElement> clone_year_input.element).value = "2018";
+                clone_year_input.trigger('input');
+                await course_list.$nextTick();
+
+                return patch_async_class_method(
+                    Course,
+                    'copy',
+                    () => Promise.resolve(call_notify_course_created("EECS 281", 2018)),
+                    async () => {
+
+                    wrapper.find('#clone-course-form').trigger('submit.native');
+                    await course_list.$nextTick();
+
+                    expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(3);
+                    expect(course_list.courses_by_term.length).toEqual(1);
+                    expect(course_list.courses_by_term[0].course_list[0]).toEqual(fall18_eecs280);
+                    expect(course_list.courses_by_term[0].course_list[1]).toEqual(copy_of_course);
+                    expect(course_list.courses_by_term[0].course_list[2]).toEqual(fall18_eecs370);
+                });
+            });
+        });
+    });
+
+    test('If attempt to clone a course is unsuccessful, no new course is added', async () => {
+        all_courses = {
+            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        };
+
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: "A course with this name, semester, and year already exists."
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
+            },
+            config: {},
+        };
+
+        return patch_async_static_method(
+            User, 'get_current',
+            () => Promise.resolve(user), async () => {
+
+            return patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
+
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
+
+                course_list = wrapper.vm;
+                await course_list.$nextTick();
+
+                expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                expect(course_list.courses_by_term.length).toEqual(1);
+
+                let first_course = wrapper.findAll('.course').at(0);
+                first_course.find('.clone-course').trigger('click');
+                await course_list.$nextTick();
+
+                let clone_name_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(0).find('#input');
+                (<HTMLInputElement> clone_name_input.element).value = "EECS 280";
+                clone_name_input.trigger('input');
+                await course_list.$nextTick();
+
+                let clone_year_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(1).find('#input');
+                (<HTMLInputElement> clone_year_input.element).value = "2018";
+                clone_year_input.trigger('input');
+                await course_list.$nextTick();
+
+                return patch_async_class_method(
+                    Course,
+                    'copy',
+                    () => Promise.reject(axios_response_instance),
+                    async () => {
+
+                    wrapper.find('#clone-course-form').trigger('submit.native');
+                    await course_list.$nextTick();
+
+                    expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                    expect(course_list.courses_by_term.length).toEqual(1);
+                });
+            });
+        });
     });
 
     test("The semester, year, and name of a course get displayed", async () => {

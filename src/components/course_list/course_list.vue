@@ -12,7 +12,8 @@
              class="single-semester-container">
           <p class="semester-name">{{current_term.term.semester}} {{current_term.term.year}}</p>
           <div class="courses-in-semester">
-            <div v-for="(course, index) of current_term.course_list">
+            <div v-for="(course, index) of current_term.course_list"
+                 :key="course.id">
               <single-course :course="course"
                              :last_course_in_semester="index
                                                        === current_term.course_list.length - 1"
@@ -32,7 +33,7 @@
   import SingleCourse from '@/components/course_list/single_course.vue';
 
   import { AllCourses, Model } from '@/model';
-  import { Course, Semester, User } from 'ag-client-typescript';
+  import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
   import { ObserverComponent } from '@/observer_component';
   import {
@@ -58,48 +59,37 @@
       SingleCourse
     }
   })
-  export default class CourseList extends ObserverComponent {
+  export default class CourseList extends ObserverComponent implements CourseObserver {
 
     all_courses: AllCourses | null = null;
     courses_by_term: TermCourses[] = [];
 
     beforeDestroy() {
+      Course.unsubscribe(this);
       super.beforeDestroy();
     }
 
     async created() {
+      Course.subscribe(this);
       super.created();
       await this.get_and_sort_courses();
-
-    }
-
-    async get_and_sort_courses() {
-      let user = await User.get_current();
-      this.all_courses = await Model.get_instance().get_courses_for_user(user);
-      for (let [role, courses] of Object.entries(this.all_courses)) {
-        this.sort_into_terms(courses);
-      }
-      this.courses_by_term.sort(term_descending);
-      for (let term_courses of this.courses_by_term) {
-        term_courses.course_list.sort((course_a: Course, course_b: Course) => {
-          return (course_a.name >= course_b.name) ? 1 : -1;
-        });
-      }
     }
 
     is_admin(course: Course) {
-      return array_has_unique(this.all_courses!.courses_is_admin_for,
-                              course,
-                              (course_a: Course, course_b: Course) => {
+      return array_has_unique(
+        this.all_courses!.courses_is_admin_for,
+        course,
+        (course_a: Course, course_b: Course) => {
           return course_a.name === course_b.name
                  && course_a.semester === course_b.semester
                  && course_a.year === course_b.year;
-      });
+        }
+      );
     }
 
     sort_into_terms(courses: Course[]) {
       for (let course of courses) {
-        let current_term: Term = { semester: course.semester, year: course.year };
+        let current_term: Term = {semester: course.semester, year: course.year};
         let term_exists = array_has_unique(
           this.courses_by_term, current_term,
           (item: TermCourses, term: Term) => terms_equal(item.term, term)
@@ -121,6 +111,33 @@
           );
         }
       }
+    }
+
+    async get_and_sort_courses() {
+      let user = await User.get_current();
+      this.all_courses = await Model.get_instance().get_courses_for_user(user);
+      for (let [role, courses] of Object.entries(this.all_courses)) {
+        this.sort_into_terms(courses);
+      }
+      this.courses_by_term.sort(term_descending);
+      for (let term_courses of this.courses_by_term) {
+        term_courses.course_list.sort((course_a: Course, course_b: Course) => {
+          return (course_a.name >= course_b.name) ? 1 : -1;
+        });
+      }
+    }
+
+    update_course_changed(course: Course): void { }
+
+    update_course_created(course: Course): void {
+      this.all_courses!.courses_is_admin_for.push(course);
+      this.sort_into_terms([course]);
+      this.courses_by_term.sort(term_descending);
+      let index = this.courses_by_term.findIndex((term) => term.term.semester === course.semester
+                                                           && term.term.year === course.year);
+      this.courses_by_term[index].course_list.sort((course_a: Course, course_b: Course) => {
+        return (course_a.name >= course_b.name) ? 1 : -1;
+      });
     }
   }
 

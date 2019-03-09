@@ -1,4 +1,3 @@
-<!--// if it is loading it should do something-->
 <template>
   <div class="course-admin-component"
        ref="course_admin_component">
