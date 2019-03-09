@@ -135,12 +135,10 @@
 
     async created() {
       this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
-      if (this.course !== null) {
-        this.loading = false;
-      }
+      this.loading = false;
     }
 
-    async update_tab_index(index: number) {
+    update_tab_index(index: number) {
       this.current_tab_index = index;
       if (this.current_tab_index === 0 || this.current_tab_index === 2) {
         this.role_selected = "";
