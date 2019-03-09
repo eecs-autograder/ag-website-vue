@@ -27,13 +27,11 @@ describe('CourseAdmin.vue', () => {
     };
 
     beforeEach(() => {
-
         course = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '',
             last_modified: '2019-02-04T17:53:11.230945Z'
         });
-
         user1 = new User({
             pk: 1,
             username: "amandaplease@umich.edu",
@@ -42,7 +40,6 @@ describe('CourseAdmin.vue', () => {
             email: "amandaplease@umich.edu",
             is_superuser: true
         });
-
         user2 = new User({
             pk: 2,
             username: "coolmom@umich.edu",
@@ -51,7 +48,6 @@ describe('CourseAdmin.vue', () => {
             email: "coolmom@umich.edu",
             is_superuser: true
         });
-
         user3 = new User({
             pk: 3,
             username: "worldsbestboss@umich.edu",
@@ -60,9 +56,7 @@ describe('CourseAdmin.vue', () => {
             email: "worldsbestboss@umich.edu",
             is_superuser: true
         });
-
         admins = [user1, user2, user3];
-
         projects = [];
 
         config.logModifiedComponents = false;
@@ -72,7 +66,6 @@ describe('CourseAdmin.vue', () => {
                 return { matches: true };
             })
         });
-
     });
 
     afterEach(() => {
@@ -86,8 +79,8 @@ describe('CourseAdmin.vue', () => {
         }
     });
 
-    test('Course Admin loads course', async () => {
-        await patch_async_static_method(
+    test('Course Admin loads existing course successfully', async () => {
+        return patch_async_static_method(
             Course,
             'get_by_pk',
             () =>  Promise.resolve(course),
@@ -102,17 +95,18 @@ describe('CourseAdmin.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
-
             course_admin_component = wrapper.vm;
+            await course_admin_component.$nextTick();
+
             expect(course_admin_component.course).toEqual(course);
             expect(course_admin_component.current_tab_index).toEqual(0);
             expect(course_admin_component.role_selected).toEqual("");
+            expect(course_admin_component.loading).toEqual(false);
         });
     });
 
     test('Changing tabs to permissions tab by clicking on item in dropdown', async () => {
-        await patch_async_static_method(
+        return patch_async_static_method(
             Course,
             'get_by_pk',
             () =>  Promise.resolve(course),
@@ -127,15 +121,14 @@ describe('CourseAdmin.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
-
             course_admin_component = wrapper.vm;
+            await course_admin_component.$nextTick();
+
             expect(course_admin_component.course).toEqual(course);
 
-            let permissions_tab = wrapper.find('.permissions-tab-header');
-            permissions_tab.trigger('click');
+            wrapper.find('.permissions-tab-header').trigger('click');
+            await course_admin_component.$nextTick();
 
-            // mock getting admins
             return patch_async_class_method(
                 Course,
                 'get_admins',
@@ -154,7 +147,7 @@ describe('CourseAdmin.vue', () => {
     });
 
     test('Changing tabs to permissions tab by pressing enter on item in dropdown', async () => {
-        await patch_async_static_method(
+        return patch_async_static_method(
             Course,
             'get_by_pk',
             () =>  Promise.resolve(course),
@@ -169,25 +162,24 @@ describe('CourseAdmin.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
-
             course_admin_component = wrapper.vm;
-            expect(course_admin_component.course).toEqual(course);
-
-            let permissions_tab = wrapper.find('.permissions-tab-header');
-            permissions_tab.trigger('click');
-
-            let highlighted_item = wrapper.find(".highlight");
-            expect(highlighted_item.text()).toContain("Admin");
-            highlighted_item.trigger("keydown", {code: "Enter" });
             await course_admin_component.$nextTick();
 
-            // mock getting admins
+            expect(course_admin_component.course).toEqual(course);
+
+            wrapper.find('.permissions-tab-header').trigger('click');
+            await course_admin_component.$nextTick();
+
             return patch_async_class_method(
                 Course,
                 'get_admins',
                 () => Promise.resolve(admins),
                 async () => {
+
+                let highlighted_item = wrapper.find(".highlight");
+                expect(highlighted_item.text()).toContain("Admin");
+                highlighted_item.trigger("keydown", {code: "Enter" });
+                await course_admin_component.$nextTick();
 
                 expect(course_admin_component.role_selected).toEqual("Admin");
                 expect(course_admin_component.current_tab_index).toEqual(1);
@@ -196,8 +188,7 @@ describe('CourseAdmin.vue', () => {
     });
 
     test('Changing tabs from permissions tab', async () => {
-        // making an http request
-        await patch_async_static_method(
+        return patch_async_static_method(
             Course,
             'get_by_pk',
             () =>  Promise.resolve(course),
@@ -212,16 +203,14 @@ describe('CourseAdmin.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
-
             course_admin_component = wrapper.vm;
-            expect(course_admin_component.course).toEqual(course);
-
-            let permissions_tab = wrapper.find('.permissions-tab-header');
-            permissions_tab.trigger('click');
             await course_admin_component.$nextTick();
 
-            // mock getting admins
+            expect(course_admin_component.course).toEqual(course);
+
+            wrapper.find('.permissions-tab-header').trigger('click');
+            await course_admin_component.$nextTick();
+
             return patch_async_class_method(
                 Course,
                 'get_admins',
@@ -235,7 +224,6 @@ describe('CourseAdmin.vue', () => {
 
                 expect(course_admin_component.role_selected).toEqual("Admin");
 
-                // mock getting projects
                 return patch_async_static_method(
                     Project,
                     'get_all_from_course',
