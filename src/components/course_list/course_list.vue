@@ -15,8 +15,6 @@
             <div v-for="(course, index) of current_term.course_list"
                  :key="course.id">
               <single-course :course="course"
-                             :last_course_in_semester="index
-                                                       === current_term.course_list.length - 1"
                              :is_admin="is_admin(course)">
               </single-course>
             </div>

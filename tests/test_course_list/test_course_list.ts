@@ -92,11 +92,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -155,11 +155,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -295,11 +295,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -332,11 +332,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
               User, 'get_current',
               () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -369,11 +369,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
         User, 'get_current',
         () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -431,11 +431,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -469,11 +469,11 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: [winter18_eecs280]
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -509,11 +509,11 @@ describe('Course_List tests', () => {
             courses_is_student_in: [fall18_eecs370, fall18_eecs441, fall18_eecs280],
             courses_is_handgrader_for: []
         };
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -547,10 +547,10 @@ describe('Course_List tests', () => {
             courses_is_student_in: [fall17_eecs183, no_semester_2018_eecs493],
             courses_is_handgrader_for: [winter18_eecs280]
         };
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
@@ -593,10 +593,10 @@ describe('Course_List tests', () => {
             courses_is_student_in: [fall18_eecs370, fall18_eecs441, fall18_eecs280],
             courses_is_handgrader_for: []
         };
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 

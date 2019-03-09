@@ -1,8 +1,8 @@
 <template>
   <div ref="single-course-component">
 
-    <div :class="['course', {'last-course-in-semester': d_last_course_in_semester}]">
-      <p class="course-name">{{course.name}} ({{course.pk}}) {{d_last_course_in_semester}}</p>
+    <div class="course">
+      <p class="course-name">{{course.name}} ({{course.pk}})</p>
       <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
       <div v-if="is_admin"
            class="clone-course"
@@ -111,7 +111,7 @@
   import { is_not_empty, is_number, is_valid_course_year } from '@/validators';
   import { Course, Semester } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
-  import { Component, Prop, Watch } from 'vue-property-decorator';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -121,23 +121,13 @@
       ValidatedInput
     }
   })
-
-  export default class CourseList extends ObserverComponent {
+  export default class CourseList extends Vue {
 
     @Prop({required: true, type: Course})
     course!: Course;
 
     @Prop({default: false, type: Boolean})
-    last_course_in_semester!: boolean;
-
-    @Prop({default: false, type: Boolean})
     is_admin!: boolean;
-
-    @Watch('last_course_in_semester')
-    on_course_order_changed(new_status: boolean, old_status: boolean) {
-      console.log("This happened");
-      this.d_last_course_in_semester = new_status;
-    }
 
     new_course_name = "";
     new_course_semester: Semester = Semester.fall;
@@ -146,7 +136,6 @@
     api_errors: string[] = [];
     semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
     clone_course_form_is_valid = false;
-    d_last_course_in_semester = false;
 
     readonly is_not_empty = is_not_empty;
     readonly is_number = is_number;
@@ -154,7 +143,6 @@
 
     created() {
       this.new_course_year = this.course.year ? this.course.year : 2000;
-      this.d_last_course_in_semester = this.last_course_in_semester;
     }
 
     @handle_400_errors_async(handle_add_copied_course_error)
@@ -269,10 +257,6 @@ a {
 .course:hover {
   background-color: darken(lavender, 11);
   box-shadow: 0 5px 9px 0 rgba(0,0,0,0.2);
-}
-
-.last-course-in-semester {
-  margin-bottom: 50px;
 }
 
 .course-name {

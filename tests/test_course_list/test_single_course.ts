@@ -58,7 +58,6 @@ describe('SingleCourse.vue', () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
-                last_course_in_semester: true,
                 is_admin: true
             },
             stubs: ['router-link', 'router-view']
@@ -67,7 +66,6 @@ describe('SingleCourse.vue', () => {
         await single_course.$nextTick();
 
         expect(single_course.course).toEqual(course_1);
-        expect(single_course.last_course_in_semester).toBe(true);
         expect(single_course.is_admin).toBe(true);
         expect(single_course.new_course_year).toEqual(single_course.course.year);
         expect(wrapper.findAll('.clone-course').length).toEqual(1);
@@ -119,7 +117,6 @@ describe('SingleCourse.vue', () => {
         await single_course.$nextTick();
 
         expect(single_course.course).toEqual(course_1);
-        expect(single_course.last_course_in_semester).toBe(false);
         expect(single_course.is_admin).toBe(false);
     });
 
@@ -135,7 +132,6 @@ describe('SingleCourse.vue', () => {
          await single_course.$nextTick();
 
          expect(single_course.course).toEqual(course_with_null_values);
-         expect(single_course.last_course_in_semester).toBe(false);
          expect(single_course.is_admin).toBe(false);
          expect(single_course.new_course_semester).toEqual(Semester.fall);
          expect(single_course.new_course_year).toEqual(2000);
@@ -145,7 +141,6 @@ describe('SingleCourse.vue', () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
-                last_course_in_semester: true,
                 is_admin: true
             },
             stubs: ['router-link', 'router-view']
@@ -179,7 +174,6 @@ describe('SingleCourse.vue', () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
-                last_course_in_semester: true,
                 is_admin: true
             },
             stubs: ['router-link', 'router-view']
@@ -214,7 +208,6 @@ describe('SingleCourse.vue', () => {
          wrapper = mount(SingleCourse, {
              propsData: {
                  course: course_1,
-                 last_course_in_semester: true,
                  is_admin: true
              },
              stubs: ['router-link', 'router-view']
@@ -248,7 +241,6 @@ describe('SingleCourse.vue', () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
-                last_course_in_semester: true,
                 is_admin: true
             },
             stubs: ['router-link', 'router-view']
@@ -282,7 +274,6 @@ describe('SingleCourse.vue', () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
-                last_course_in_semester: true,
                 is_admin: true
             },
             stubs: ['router-link', 'router-view']
@@ -332,7 +323,6 @@ describe('SingleCourse.vue', () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
-                last_course_in_semester: true,
                 is_admin: true
             },
             stubs: ['router-link', 'router-view']
@@ -400,7 +390,6 @@ describe('SingleCourse.vue', () => {
          wrapper = mount(SingleCourse, {
              propsData: {
                  course: course_1,
-                 last_course_in_semester: true,
                  is_admin: true
              },
              stubs: ['router-link', 'router-view']
@@ -458,7 +447,6 @@ describe('SingleCourse.vue', () => {
          wrapper = mount(SingleCourse, {
              propsData: {
                  course: course_with_null_values,
-                 last_course_in_semester: true,
                  is_admin: true
              },
              stubs: ['router-link', 'router-view']
@@ -513,7 +501,6 @@ describe('SingleCourse.vue', () => {
              wrapper = mount(SingleCourse, {
                  propsData: {
                      course: course_1,
-                     last_course_in_semester: true,
                      is_admin: true
                  },
                  stubs: ['router-link', 'router-view']
