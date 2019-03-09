@@ -6,7 +6,7 @@ import { Course, Semester, User } from 'ag-client-typescript';
 import { patch_async_class_method } from '../mocking';
 
 beforeAll(() => {
-config.logModifiedComponents = false;
+    config.logModifiedComponents = false;
 });
 
 describe('AdminRoster.vue', () => {
@@ -27,7 +27,6 @@ describe('AdminRoster.vue', () => {
            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
-
         user_1 = new User({
             pk: 1,
             username: "coolmom@umich.edu",
@@ -60,7 +59,6 @@ describe('AdminRoster.vue', () => {
             email: "freshPrince@umich.edu",
             is_superuser: true
         });
-
         new_user_1 = new User({
             pk: 4,
             username: "letitsnow@umich.edu",
@@ -79,7 +77,6 @@ describe('AdminRoster.vue', () => {
         });
 
         original_match_media = window.matchMedia;
-
         Object.defineProperty(window, "matchMedia", {
             value: jest.fn(() => {
                 return {matches: true};
@@ -98,35 +95,24 @@ describe('AdminRoster.vue', () => {
         }
     });
 
-    test('course prop is initialized to value passed in.', () => {
-        wrapper = mount(AdminRoster, {
-            propsData: {
-                course: my_course
-            }
-        });
-
-        admin_roster = wrapper.vm;
-        expect(admin_roster.course).toEqual(my_course);
-    });
-
     test('The created function calls the Course method "get_admins"', () => {
         admins = [user_1, user_2, user_3, user_4];
-        patch_async_class_method(
+        return patch_async_class_method(
             Course,
             'get_admins',
             () => Promise.resolve(admins),
             async () => {
 
-        wrapper = mount(AdminRoster, {
-            propsData: {
-                course: my_course
-            }
-        });
+            wrapper = mount(AdminRoster, {
+                propsData: {
+                    course: my_course
+                }
+            });
+            admin_roster = wrapper.vm;
+            await admin_roster.$nextTick();
 
-        await wrapper.vm.$nextTick();
-        admin_roster = wrapper.vm;
-        expect(admin_roster.d_course).toEqual(my_course);
-        expect(admin_roster.admins).toEqual(admins);
+            expect(admin_roster.d_course).toEqual(my_course);
+            expect(admin_roster.admins).toEqual(admins);
         });
     });
 
@@ -151,6 +137,12 @@ describe('AdminRoster.vue', () => {
                 }
             });
 
+            admin_roster = wrapper.vm;
+            await admin_roster.$nextTick();
+
+            expect(admin_roster.d_course).toEqual(my_course);
+            expect(admin_roster.admins).toEqual(admins);
+
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
@@ -158,18 +150,13 @@ describe('AdminRoster.vue', () => {
                 spy,
                 async () => {
 
-                await wrapper.vm.$nextTick();
-                admin_roster = wrapper.vm;
-                expect(admin_roster.d_course).toEqual(my_course);
-                expect(admin_roster.admins).toEqual(admins);
-
                 let permissions = <Permissions> wrapper.find({ref: 'admin_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await wrapper.vm.$nextTick();
+                await admin_roster.$nextTick();
 
                 let add_admins_form = wrapper.find('#add-permissions-form');
                 add_admins_form.trigger('submit');
-                await wrapper.vm.$nextTick();
+                await admin_roster.$nextTick();
 
                 admins.push(make_user(3, `user${3}`));
 
@@ -181,15 +168,15 @@ describe('AdminRoster.vue', () => {
 
     function make_fake_get_admins_func() {
         let counter = 0;
-        let admins: User[] = [];
+        let admins2: User[] = [];
         for (let i = 0; i < 3; ++i) {
-            admins.push(make_user(counter, `user${counter}`));
+            admins2.push(make_user(counter, `user${counter}`));
             counter += 1;
         }
 
         return () => {
-            let to_return = admins.slice(0);
-            admins.push(make_user(counter, `user${counter}`));
+            let to_return = admins2.slice(0);
+            admins2.push(make_user(counter, `user${counter}`));
             counter += 1;
             return Promise.resolve(to_return);
         };
@@ -212,8 +199,7 @@ describe('AdminRoster.vue', () => {
 
         admins = [user_1, user_2, user_3, user_4];
 
-        // created calls 'get_admins'
-        patch_async_class_method(
+        return patch_async_class_method(
             Course,
             'get_admins',
             () => Promise.resolve(admins),
@@ -225,13 +211,14 @@ describe('AdminRoster.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
             admin_roster = wrapper.vm;
+            await admin_roster.$nextTick();
+
             expect(admin_roster.d_course).toEqual(my_course);
             expect(admin_roster.admins).toEqual(admins);
 
             const spy = jest.fn();
-            patch_async_class_method(
+            return patch_async_class_method(
                 Course,
                 'remove_admins',
                 spy,
@@ -243,7 +230,7 @@ describe('AdminRoster.vue', () => {
                 '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
-                await wrapper.vm.$nextTick();
+                await admin_roster.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
             });

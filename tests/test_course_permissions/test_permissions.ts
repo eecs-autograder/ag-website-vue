@@ -56,7 +56,6 @@ describe('Permissions.vue', () => {
             email: "freshPrince@umich.edu",
             is_superuser: true
         });
-
         new_user_1 = new User({
             pk: 4,
             username: "letitsnow@umich.edu",
@@ -65,7 +64,6 @@ describe('Permissions.vue', () => {
             email: "letitsnow@umich.edu",
             is_superuser: true
         });
-
         new_user_2 = new User({
             pk: 5,
             username: "sevenEleven@umich.edu",
@@ -93,15 +91,10 @@ describe('Permissions.vue', () => {
         expect(course_permissions.d_roster.length).toEqual(4);
 
         validated_input = <Wrapper<ValidatedInput>> wrapper.find('#add-permissions-input');
-        validated_input_component = <ValidatedInput> wrapper.find(
-            '#add-permissions-input'
-        ).vm;
-        permissions_form_component = <ValidatedForm> wrapper.find(
-            '#add-permissions-form'
-        ).vm;
+        validated_input_component = <ValidatedInput> wrapper.find('#add-permissions-input').vm;
+        permissions_form_component = <ValidatedForm> wrapper.find('#add-permissions-form').vm;
         permissions_form = <Wrapper<ValidatedForm>> wrapper.find('#add-permissions-form');
         validated_input.find('#textarea').trigger('input');
-        // expect(permissions_form_component.is_valid).toBe(true); -- not true bc of empty string
     });
 
     afterEach(() => {
@@ -152,6 +145,7 @@ describe('Permissions.vue', () => {
         expect(all_users.at(1).text()).toEqual(user_1.username);
         expect(all_users.at(2).text()).toEqual(user_4.username);
         expect(all_users.at(3).text()).toEqual(user_3.username);
+        expect(course_permissions.d_roster.length).toEqual(4);
 
         wrapper.setProps({roster: [user_1, user_3, user_4, new_user_1, new_user_2, user_2]});
         await course_permissions.$nextTick();
@@ -166,8 +160,7 @@ describe('Permissions.vue', () => {
         expect(all_users.at(5).text()).toEqual(user_3.username);
     });
 
-    test('Usernames that adhere to the valid email regex are valid',
-         async () => {
+    test('Usernames that adhere to the valid email regex are valid', async () => {
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu";
@@ -184,28 +177,22 @@ describe('Permissions.vue', () => {
         expect(permissions_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe('sk8gr8m8@umich.edu');
 
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "a_B-C@d-e-f-g.hi";
+        (<HTMLInputElement> validated_input.find('#textarea').element).value = "a_B-C@d-e-f-g.hi";
         validated_input.find('#textarea').trigger('input');
         expect(permissions_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe('a_B-C@d-e-f-g.hi');
     });
 
-    test('emails whose local-part (before the @ symbol) is empty are invalid',
+    test('Emails whose local-part (before the @ symbol) is empty are invalid',
          async () => {
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "@e.iou";
+        (<HTMLInputElement> validated_input.find('#textarea').element).value = "@e.iou";
         validated_input.find('#textarea').trigger('input');
         expect(permissions_form_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('@e.iou');
     });
 
     test("The empty string cannot be added to a permissions roster", async () => {
-        (<HTMLInputElement> validated_input.find(
-            '#textarea'
-        ).element).value = "         ";
+        (<HTMLInputElement> validated_input.find('#textarea').element).value = "         ";
         validated_input.find('#textarea').trigger('input');
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe("         ");
@@ -223,7 +210,7 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "a*@e.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a*@e.iou');
@@ -239,7 +226,7 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "a?@e.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a?@e.iou');
@@ -248,33 +235,33 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "a(@e.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a(@e.iou');
     });
 
-    test('emails missing the @ character after the local part are invalid',
+    test('Emails missing the @ character after the local part are invalid',
          async () => {
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "iceberg.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(permissions_form_component.is_valid).toBe(false);
         expect(course_permissions.permissions_form_is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg.iou');
     });
 
-    test('emails containing invalid characters in the mail server portion are invalid',
+    test('Emails containing invalid characters in the mail server portion are invalid',
          async () => {
 
         (<HTMLInputElement> validated_input.find(
          '#textarea'
         ).element).value = "iceberg@.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@.iou');
@@ -283,7 +270,7 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@hello_world.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@hello_world.iou');
@@ -292,19 +279,19 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@@hello.iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@@hello.iou');
     });
 
-    test('emails that do not contain the . before the top-level-domain are invalid',
+    test('Emails that do not contain the . before the top-level-domain are invalid',
          async () => {
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "iceberg@iou";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@iou');
@@ -312,13 +299,13 @@ describe('Permissions.vue', () => {
         expect(course_permissions.permissions_form_is_valid).toBe(false);
     });
 
-    test('emails where the top-level-domain is less than 2 characters are invalid',
+    test('Emails where the top-level-domain is less than 2 characters are invalid',
          async () => {
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "iceberg@ae.";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@ae.');
@@ -327,20 +314,20 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "iceberg@ae.i";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@ae.i');
     });
 
-    test('emails featuring invalid characters in the top-level domain are invalid',
+    test('Emails featuring invalid characters in the top-level domain are invalid',
          async () => {
 
         (<HTMLInputElement> validated_input.find(
          '#textarea'
         ).element).value = "iceberg@umich.sk8";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@umich.sk8');
@@ -349,7 +336,7 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@umich.edu?";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@umich.edu?');
@@ -361,7 +348,7 @@ describe('Permissions.vue', () => {
              '#textarea'
          ).element).value = "letitsnow@umich.edu  sevenEleven@umich.edu";
          validated_input.find('#textarea').trigger('input');
-         await wrapper.vm.$nextTick();
+         await course_permissions.$nextTick();
 
          expect(permissions_form_component.is_valid).toBe(true);
          expect(validated_input_component.d_input_value).toBe(
@@ -378,12 +365,9 @@ describe('Permissions.vue', () => {
     test('Validator function exposes addresses that do not adhere to the format specified ' +
          'in the valid email addresses regex',
          async () => {
-         (<HTMLInputElement> validated_input.find(
-             '#textarea'
-         ).element).value = " angela";
-         // validated_input_component.value = ' angela';
+         (<HTMLInputElement> validated_input.find('#textarea').element).value = " angela";
          validated_input.find('#textarea').trigger('input');
-         await wrapper.vm.$nextTick();
+         await course_permissions.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(' angela');
@@ -395,7 +379,7 @@ describe('Permissions.vue', () => {
          ).element).value = " angela@umich";
          validated_input.find('#textarea').trigger('input');
 
-         await wrapper.vm.$nextTick();
+         await course_permissions.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(' angela@umich');
@@ -404,7 +388,7 @@ describe('Permissions.vue', () => {
              '#textarea'
          ).element).value = " angela@umich.edu";
          validated_input.find('#textarea').trigger('input');
-         await wrapper.vm.$nextTick();
+         await course_permissions.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(true);
          expect(validated_input_component.d_input_value).toBe(' angela@umich.edu');
@@ -415,7 +399,7 @@ describe('Permissions.vue', () => {
             '#textarea'
         ).element).value = " roy@anderson.net\nclark@aol.com,pete@nd.edu     meredith@cmu.edu";
         validated_input.find('#textarea').trigger('input');
-        await wrapper.vm.$nextTick();
+        await course_permissions.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe(
@@ -433,7 +417,7 @@ describe('Permissions.vue', () => {
          ).element).value = " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu" +
                             "\nryan@msuedu\ngabe";
          validated_input.find('#textarea').trigger('input');
-         await wrapper.vm.$nextTick();
+         await course_permissions.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(course_permissions.first_invalid_email).toEqual("phyllis@@umich.edu");
@@ -454,7 +438,7 @@ describe('Permissions.vue', () => {
              '#textarea'
          ).element).value = username_input;
          validated_input.find('#textarea').trigger('input');
-         await wrapper.vm.$nextTick();
+         await course_permissions.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(username_input);

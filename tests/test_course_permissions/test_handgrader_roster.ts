@@ -22,11 +22,6 @@ describe('HandgraderRoster.vue', () => {
     let my_course: Course;
     let handgraders: User[];
 
-    const $route = {
-        path: '/web/course_admin/:courseId',
-        params: {courseId: '2'}
-    };
-
     beforeEach(() => {
         my_course = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
@@ -64,7 +59,6 @@ describe('HandgraderRoster.vue', () => {
             email: "freshPrince@umich.edu",
             is_superuser: true
         });
-
         new_user_1 = new User({
             pk: 4,
             username: "letitsnow@umich.edu",
@@ -101,34 +95,24 @@ describe('HandgraderRoster.vue', () => {
         }
     });
 
-    test('course prop is initialized to value passed in.', () => {
-        wrapper = mount(HandgraderRoster, {
-            propsData: {
-                course: my_course
-            }
-        });
-
-        handgrader_roster = wrapper.vm;
-        expect(handgrader_roster.course).toEqual(my_course);
-    });
-
     test('The created function calls the Course method "get_handgraders"', () => {
         handgraders = [user_1, user_2, user_3, user_4];
 
-        patch_async_class_method(
+        return patch_async_class_method(
             Course,
             'get_handgraders',
             () => Promise.resolve(handgraders),
             async () => {
 
             wrapper = mount(HandgraderRoster, {
-            propsData: {
-            course: my_course
-            }
+                propsData: {
+                    course: my_course
+                }
             });
 
-            await wrapper.vm.$nextTick();
             handgrader_roster = wrapper.vm;
+            await handgrader_roster.$nextTick();
+
             expect(handgrader_roster.d_course).toEqual(my_course);
             expect(handgrader_roster.handgraders).toEqual(handgraders);
         });
@@ -142,8 +126,6 @@ describe('HandgraderRoster.vue', () => {
             make_user(1, `user${1}`),
             make_user(2, `user${2}`)
         ];
-        let updated_handgraders = [user_1];
-        let usernames_to_add = ["letitsnow@umich.edu", "sevenEleven@umich.edu"];
 
         return patch_async_class_method(
             Course,
@@ -157,6 +139,12 @@ describe('HandgraderRoster.vue', () => {
                 }
             });
 
+            handgrader_roster = wrapper.vm;
+            await handgrader_roster.$nextTick();
+
+            expect(handgrader_roster.d_course).toEqual(my_course);
+            expect(handgrader_roster.handgraders).toEqual(handgraders);
+
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
@@ -164,18 +152,13 @@ describe('HandgraderRoster.vue', () => {
                 spy,
                 async () => {
 
-                await wrapper.vm.$nextTick();
-                handgrader_roster = wrapper.vm;
-                expect(handgrader_roster.d_course).toEqual(my_course);
-                expect(handgrader_roster.handgraders).toEqual(handgraders);
-
                 let permissions = <Permissions> wrapper.find({ref: 'handgrader_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await wrapper.vm.$nextTick();
+                await handgrader_roster.$nextTick();
 
                 let add_handgraders_form = wrapper.find('#add-permissions-form');
                 add_handgraders_form.trigger('submit');
-                await wrapper.vm.$nextTick();
+                await handgrader_roster.$nextTick();
 
                 handgraders.push(make_user(3, `user${3}`));
 
@@ -187,15 +170,15 @@ describe('HandgraderRoster.vue', () => {
 
     function make_fake_get_handgraders_func() {
         let counter = 0;
-        let handgraders: User[] = [];
+        let handgraders2: User[] = [];
         for (let i = 0; i < 3; ++i) {
-            handgraders.push(make_user(counter, `user${counter}`));
+            handgraders2.push(make_user(counter, `user${counter}`));
             counter += 1;
         }
 
         return () => {
-            let to_return = handgraders.slice(0);
-            handgraders.push(make_user(counter, `user${counter}`));
+            let to_return = handgraders2.slice(0);
+            handgraders2.push(make_user(counter, `user${counter}`));
             counter += 1;
             return Promise.resolve(to_return);
         };
@@ -218,8 +201,7 @@ describe('HandgraderRoster.vue', () => {
 
         handgraders = [user_1, user_2, user_3, user_4];
 
-        // created calls 'get_handgraders'
-        patch_async_class_method(
+        return patch_async_class_method(
             Course,
             'get_handgraders',
             () => Promise.resolve(handgraders),
@@ -231,23 +213,22 @@ describe('HandgraderRoster.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
             handgrader_roster = wrapper.vm;
+            await handgrader_roster.$nextTick();
+
             expect(handgrader_roster.d_course).toEqual(my_course);
             expect(handgrader_roster.handgraders).toEqual(handgraders);
 
-            // clicking on an x calls remove_handgraders
             const spy = jest.fn();
-            patch_async_class_method(
+            return patch_async_class_method(
                 Course,
                 'remove_handgraders',
                 spy,
                 async () => {
 
-                let handgrader_permissions = wrapper.find(
-                {ref: 'handgrader_permissions'});
+                let handgrader_permissions = wrapper.find({ref: 'handgrader_permissions'});
                 let delete_permission_buttons = handgrader_permissions.findAll(
-                '.delete-permission'
+                    '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
                 await wrapper.vm.$nextTick();
