@@ -27,7 +27,6 @@ describe('StudentRoster.vue', () => {
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
-
         user_1 = new User({
             pk: 1,
             username: "coolmom@umich.edu",
@@ -60,7 +59,6 @@ describe('StudentRoster.vue', () => {
             email: "freshPrince@umich.edu",
             is_superuser: true
         });
-
         new_user_1 = new User({
             pk: 5,
             username: "letitsnow@umich.edu",
@@ -97,17 +95,6 @@ describe('StudentRoster.vue', () => {
         }
     });
 
-    test('course prop is initialized to value passed in.', () => {
-        wrapper = mount(StudentRoster, {
-            propsData: {
-                course: my_course
-            }
-        });
-
-        student_roster = wrapper.vm;
-        expect(student_roster.d_course).toEqual(my_course);
-    });
-
     test('The created function calls the Course method "get_students"', () => {
         students = [user_1, user_2, user_3, user_4];
 
@@ -123,8 +110,9 @@ describe('StudentRoster.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
             student_roster = wrapper.vm;
+            await student_roster.$nextTick();
+
             expect(student_roster.d_course).toEqual(my_course);
             expect(student_roster.students).toEqual(students);
         });
@@ -152,6 +140,12 @@ describe('StudentRoster.vue', () => {
                 }
             });
 
+            student_roster = wrapper.vm;
+            await student_roster.$nextTick();
+
+            expect(student_roster.d_course).toEqual(my_course);
+            expect(student_roster.students).toEqual(students);
+
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
@@ -159,18 +153,13 @@ describe('StudentRoster.vue', () => {
                 spy,
                 async () => {
 
-                await wrapper.vm.$nextTick();
-                student_roster = wrapper.vm;
-                expect(student_roster.d_course).toEqual(my_course);
-                expect(student_roster.students).toEqual(students);
-
                 let permissions = <Permissions> wrapper.find({ref: 'student_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await wrapper.vm.$nextTick();
+                await student_roster.$nextTick();
 
                 let add_students_form = wrapper.find('#add-permissions-form');
                 add_students_form.trigger('submit');
-                await wrapper.vm.$nextTick();
+                await student_roster.$nextTick();
 
                 students.push(make_user(3, `user${3}`));
 
@@ -182,15 +171,15 @@ describe('StudentRoster.vue', () => {
 
     function make_fake_get_students_func() {
         let counter = 0;
-        let students: User[] = [];
+        let students2: User[] = [];
         for (let i = 0; i < 3; ++i) {
-            students.push(make_user(counter, `user${counter}`));
+            students2.push(make_user(counter, `user${counter}`));
             counter += 1;
         }
 
         return () => {
-            let to_return = students.slice(0);
-            students.push(make_user(counter, `user${counter}`));
+            let to_return = students2.slice(0);
+            students2.push(make_user(counter, `user${counter}`));
             counter += 1;
             return Promise.resolve(to_return);
         };
@@ -224,8 +213,9 @@ describe('StudentRoster.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
             student_roster = wrapper.vm;
+            await student_roster.$nextTick();
+
             expect(student_roster.d_course).toEqual(my_course);
             expect(student_roster.students).toEqual(students);
 
@@ -241,7 +231,7 @@ describe('StudentRoster.vue', () => {
                 '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
-                await wrapper.vm.$nextTick();
+                await student_roster.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
             });

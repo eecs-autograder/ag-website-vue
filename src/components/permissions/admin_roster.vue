@@ -21,7 +21,6 @@
     }
   })
   export default class AdminRoster extends Vue {
-
     @Prop({required: true, type: Course})
     course!: Course;
 

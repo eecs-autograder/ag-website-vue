@@ -22,17 +22,11 @@ describe('StaffRoster.vue', () => {
     let my_course: Course;
     let staff: User[];
 
-    const $route = {
-        path: '/web/course_admin/:courseId',
-        params: {courseId: '2'}
-    };
-
     beforeEach(() => {
         my_course = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
-
         user_1 = new User({
             pk: 1,
             username: "coolmom@umich.edu",
@@ -65,7 +59,6 @@ describe('StaffRoster.vue', () => {
             email: "freshPrince@umich.edu",
             is_superuser: true
         });
-
         new_user_1 = new User({
             pk: 4,
             username: "letitsnow@umich.edu",
@@ -102,17 +95,6 @@ describe('StaffRoster.vue', () => {
         }
     });
 
-    test('course prop is initialized to value passed in.', () => {
-        wrapper = mount(StaffRoster, {
-            propsData: {
-                course: my_course
-            }
-        });
-
-        staff_roster = wrapper.vm;
-        expect(staff_roster.course).toEqual(my_course);
-    });
-
     test('The created function calls the Course method "get_staff"', () => {
         staff = [user_1, user_2, user_3, user_4];
 
@@ -127,9 +109,9 @@ describe('StaffRoster.vue', () => {
                     course: my_course
                 }
             });
-
-            await wrapper.vm.$nextTick();
             staff_roster = wrapper.vm;
+            await staff_roster.$nextTick();
+
             expect(staff_roster.d_course).toEqual(my_course);
             expect(staff_roster.staff).toEqual(staff);
         });
@@ -156,6 +138,12 @@ describe('StaffRoster.vue', () => {
                 }
             });
 
+            staff_roster = wrapper.vm;
+            await staff_roster.$nextTick();
+
+            expect(staff_roster.d_course).toEqual(my_course);
+            expect(staff_roster.staff).toEqual(staff);
+
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
@@ -163,18 +151,13 @@ describe('StaffRoster.vue', () => {
                 spy,
                 async () => {
 
-                await wrapper.vm.$nextTick();
-                staff_roster = wrapper.vm;
-                expect(staff_roster.d_course).toEqual(my_course);
-                expect(staff_roster.staff).toEqual(staff);
-
                 let permissions = <Permissions> wrapper.find({ref: 'staff_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await wrapper.vm.$nextTick();
+                await staff_roster.$nextTick();
 
                 let add_staff_form = wrapper.find('#add-permissions-form');
                 add_staff_form.trigger('submit');
-                await wrapper.vm.$nextTick();
+                await staff_roster.$nextTick();
 
                 staff.push(make_user(3, `user${3}`));
 
@@ -186,15 +169,15 @@ describe('StaffRoster.vue', () => {
 
     function make_fake_get_staff_func() {
         let counter = 0;
-        let staff: User[] = [];
+        let staff2: User[] = [];
         for (let i = 0; i < 3; ++i) {
-            staff.push(make_user(counter, `user${counter}`));
+            staff2.push(make_user(counter, `user${counter}`));
             counter += 1;
         }
 
         return () => {
-            let to_return = staff.slice(0);
-            staff.push(make_user(counter, `user${counter}`));
+            let to_return = staff2.slice(0);
+            staff2.push(make_user(counter, `user${counter}`));
             counter += 1;
             return Promise.resolve(to_return);
         };
@@ -229,12 +212,12 @@ describe('StaffRoster.vue', () => {
                 }
             });
 
-            await wrapper.vm.$nextTick();
             staff_roster = wrapper.vm;
+            await staff_roster.$nextTick();
+
             expect(staff_roster.d_course).toEqual(my_course);
             expect(staff_roster.staff).toEqual(staff);
 
-            // clicking on an x calls remove_handgraders
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
@@ -248,7 +231,7 @@ describe('StaffRoster.vue', () => {
                 '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
-                await wrapper.vm.$nextTick();
+                await staff_roster.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
             });
