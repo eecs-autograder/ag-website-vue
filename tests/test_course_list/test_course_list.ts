@@ -1,6 +1,4 @@
 import CourseList from '@/components/course_list/course_list.vue';
-import Modal from '@/components/modal.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { AllCourses, Model } from '@/model';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
@@ -13,7 +11,7 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('Course_List tests', () => {
+describe('Course_List.vue', () => {
     let wrapper: Wrapper<CourseList>;
     let course_list: CourseList;
     let course_list_page: Wrapper<Vue>;
@@ -210,7 +208,7 @@ describe('Course_List tests', () => {
         });
     });
 
-    test('If attempt to clone a course is unsuccessful, no new course is added', async () => {
+    test('If attempt to clone a course is unsuccessful, a course is not added', async () => {
         all_courses = {
             courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
             courses_is_staff_for: [],

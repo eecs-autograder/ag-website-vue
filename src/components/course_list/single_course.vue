@@ -1,26 +1,36 @@
 <template>
-  <div ref="single-course-component">
-
+  <div ref="single-course-component" class="single-course-component">
     <div class="course">
-      <p class="course-name">{{course.name}} ({{course.pk}})</p>
-      <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
-      <div v-if="is_admin"
-           class="clone-course"
-           @click="$refs.clone_course_modal.open()">
-        <p class="clone-course-label"> Clone
-          <i class="far fa-copy copy-icon"> </i>
-        </p>
+      <div class="course-info">
+        <p class="course-name">{{course.name}} </p>
+        <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
       </div>
-      <router-link tag="div"
-                   :to="`/web/course_admin/${course.pk}`"
-                   v-if="is_admin"
-                   class="edit-admin-settings">
-        <a>
-          <p class="edit-settings-label"> Edit
-            <i class="fas fa-cog cog"></i>
+
+      <div class="toolbox">
+
+        <div class="clone-course"
+             @click="$refs.clone_course_modal.open()"
+             title="Clone Course"
+             v-if="is_admin">
+          <p class="clone-course-label">
+            <i class="fas fa-copy copier"> </i>
           </p>
-        </a>
-      </router-link>
+        </div>
+
+        <router-link tag="div"
+                     :to="`/web/course_admin/${course.pk}`"
+                     class="edit-admin-settings"
+                     title="Edit Course"
+                     v-if="is_admin">
+          <a>
+            <p class="edit-settings-label">
+              <i class="fas fa-cog cog"></i>
+            </p>
+          </a>
+        </router-link>
+
+      </div>
+
     </div>
 
     <modal ref="clone_course_modal"
@@ -106,12 +116,11 @@
   import Modal from '@/components/modal.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
-  import { ObserverComponent } from '@/observer_component';
   import { handle_400_errors_async } from '@/utils';
   import { is_not_empty, is_number, is_valid_course_year } from '@/validators';
   import { Course, Semester } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -179,24 +188,22 @@
 
 $current-lang-choice: "Poppins";
 
-.course-to-copy {
-  background-color: hsl(220, 20%, 85%);
-  letter-spacing: 1px;
-  margin-left: 5px;
-}
+.single-course-component { }
 
-.copy-icon {
-  margin-left: 5px;
-  color: black;
-}
-
-.copy-icon:hover {
-  color: darken(lavender, 21);
+.toolbox {
+  background-color: hsl(212, 60%, 94%);
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-top: none;
+  text-align: right;
+  padding: 1px 10px;
+  box-sizing: border-box;
+  min-height: 37px;
 }
 
 a {
   text-decoration: none;
-  color: black;
+  color: inherit;
 }
 
 .edit-settings-label, .clone-course-label {
@@ -205,74 +212,71 @@ a {
 }
 
 .cog {
-  margin-left: 5px;
   transform: rotate(0deg);
   transition-duration: 1s;
+  font-size: 18px;
 }
 
-.clone-course {
-  bottom: 15px;
-  position: absolute;
-  right: 100px;
-}
-
-.edit-admin-settings {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
+.copier {
+  transition-duration: 1s;
+  font-size: 18px;
 }
 
 .edit-admin-settings, .clone-course {
-  background-color: lighten(lavender, 2);
-  border-radius: 4px;
-  border: 1.5px solid darken(lavender, 11);
+  color: hsl(212, 50%, 27%);
+  display: inline-block;
   padding: 5px 10px;
-  transition: box-shadow 1s;
 }
 
-.edit-admin-settings:hover, .clone-course:hover {
-  background-color: white;
-  border: 1.5px solid darken(lavender, 5);
+.clone-course {
+  margin-right: 5px;
 }
 
 .edit-admin-settings:hover .cog  {
   transform: rotate(365deg);
   transition-duration: 1s;
+  color: hsl(212, 80%, 57%);
+}
+
+.clone-course:hover .copier {
+  transition-duration: 1s;
+  color: hsl(212, 80%, 57%);
 }
 
 .course {
-  background-color: darken(lavender, 8);
-  border-radius: 2px;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
+  box-sizing: border-box;
   color: black;
   cursor: pointer;
   font-size: 23px;
-  margin: 0 0 15px 0;
+  margin: 0 15px 15px 0;
   min-height: 75px;
-  padding: 15px;
   position: relative;
   transition: box-shadow 1s;
 }
 
-.course:hover {
-  background-color: darken(lavender, 11);
-  box-shadow: 0 5px 9px 0 rgba(0,0,0,0.2);
+.course-info {
+  padding: 15px;
+  background-image: linear-gradient(to bottom right, hsl(212, 100%, 90%), hsl(212, 100%, 85%));
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom: none;
 }
+
+.course:hover { }
 
 .course-name {
   font-size: 26px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.2;
   margin: 0;
+  color: hsl(220, 20%, 17%);
 }
 
 .course-semester-year {
-  color: black;
+  color: hsl(220, 20%, 17%);
   font-size: 16px;
   margin: 0;
   min-height: 25px;
-  padding-bottom: 15px;
-  position: relative;
 }
 
 /**** Modal *******************************************************************/
@@ -307,6 +311,30 @@ a {
 
 #all-semesters {
   margin-top: 40px;
+}
+
+.course-to-copy {
+  background-color: hsl(220, 20%, 85%);
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
+
+@media only screen and (min-width: 681px) {
+  .single-course-component {
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+  }
+}
+
+@media only screen and (min-width: 1081px) {
+  .single-course-component {
+    display: inline-block;
+    width: 40%;
+    min-width: 400px;
+    max-width: 450px;
+    vertical-align: top;
+  }
 }
 
 </style>

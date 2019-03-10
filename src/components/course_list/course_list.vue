@@ -10,14 +10,15 @@
       <div v-else id="all-semesters">
         <div v-for="current_term of courses_by_term"
              class="single-semester-container">
-          <p class="semester-name">{{current_term.term.semester}} {{current_term.term.year}}</p>
+          <p class="semester-name"> {{current_term.term.semester}} {{current_term.term.year}} </p>
           <div class="courses-in-semester">
-            <div v-for="(course, index) of current_term.course_list"
+            <span v-for="(course, index) of current_term.course_list"
                  :key="course.id">
               <single-course :course="course"
-                             :is_admin="is_admin(course)">
+                              :is_admin="index % 2 == 0">
+                                <!--:is_admin="is_admin(course)"-->
               </single-course>
-            </div>
+            </span>
           </div>
         </div>
       </div>
@@ -33,7 +34,6 @@
   import { AllCourses, Model } from '@/model';
   import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
-  import { ObserverComponent } from '@/observer_component';
   import {
     array_add_unique,
     array_get_unique,
@@ -57,19 +57,17 @@
       SingleCourse
     }
   })
-  export default class CourseList extends ObserverComponent implements CourseObserver {
+  export default class CourseList extends Vue implements CourseObserver {
 
     all_courses: AllCourses | null = null;
     courses_by_term: TermCourses[] = [];
 
     beforeDestroy() {
       Course.unsubscribe(this);
-      super.beforeDestroy();
     }
 
     async created() {
       Course.subscribe(this);
-      super.created();
       await this.get_and_sort_courses();
     }
 
@@ -181,20 +179,21 @@ $current-lang-choice: "Poppins";
   width: 90%;
 }
 
+.single-semester-container {
+  display: block;
+}
+
 .semester-name {
   font-size: 24px;
   margin: 15px 15px 15px 15px;
   text-align: left;
   min-height: 35px;
+  font-weight: 600;
 }
 
 #not-enrolled-message {
   padding: 20px;
   text-align: center;
-}
-
-.single-semester-container {
-  vertical-align: top;
 }
 
 .courses-in-semester {
@@ -207,52 +206,8 @@ $current-lang-choice: "Poppins";
 
 @media only screen and (min-width: 481px) {
   #course-list {
-    margin-left: 10%;
-    margin-right: 10%;
-    width: 80%;
-  }
-}
-
-@media only screen and (min-width: 768px) {
-  #course-list {
-    margin-left: 10%;
-    margin-right: 10%;
-    width: 80%;
-  }
-
-  .single-semester-container {
-    display: inline-block;
-    margin: 3%;
-    width: 44%;
-  }
-}
-
-@media only screen and (min-width: 1025px) {
-
-  #course-list {
-    margin-left: 10%;
-    margin-right: 10%;
-    width: 80%;
-  }
-
-  .single-semester-container {
-    display: inline-block;
-    margin: 2.5%;
-    width: 45%;
-  }
-}
-
-@media only screen and (min-width: 1281px) {
-  #course-list {
-    margin-left: 10%;
-    margin-right: 10%;
-    width: 80%;
-  }
-
-  .single-semester-container {
-    display: inline-block;
-    margin: 2%;
-    width: 29%;
+    margin: 0 5%;
+    width: 90%;
   }
 }
 

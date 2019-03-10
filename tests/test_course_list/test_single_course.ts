@@ -57,8 +57,7 @@ describe('SingleCourse.vue', () => {
     test('SingleCourse data members are initialized correctly', async () => {
         wrapper = mount(SingleCourse, {
             propsData: {
-                course: course_1,
-                is_admin: true
+                course: course_1
             },
             stubs: ['router-link', 'router-view']
         });
@@ -66,13 +65,12 @@ describe('SingleCourse.vue', () => {
         await single_course.$nextTick();
 
         expect(single_course.course).toEqual(course_1);
-        expect(single_course.is_admin).toBe(true);
+        expect(single_course.is_admin).toBe(false);
         expect(single_course.new_course_year).toEqual(single_course.course.year);
-        expect(wrapper.findAll('.clone-course').length).toEqual(1);
-        expect(wrapper.findAll('.edit-admin-settings').length).toEqual(1);
     });
 
-    test('If the user is an admin, they can clone or edit a course', async () => {
+    test('If the user is an admin, they have the option to clone or edit a course',
+         async () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
@@ -88,7 +86,8 @@ describe('SingleCourse.vue', () => {
         expect(wrapper.findAll('.edit-admin-settings').length).toEqual(1);
     });
 
-    test("If the user is not an admin, they can't clone or edit a course", async () => {
+    test("If the user is not an admin, they don't have the option to clone or edit a course",
+         async () => {
         wrapper = mount(SingleCourse, {
             propsData: {
                 course: course_1,
@@ -102,22 +101,6 @@ describe('SingleCourse.vue', () => {
         expect(single_course.is_admin).toBe(false);
         expect(wrapper.findAll('.clone-course').length).toEqual(0);
         expect(wrapper.findAll('.edit-admin-settings').length).toEqual(0);
-    });
-
-    test('SingleCourse data members are initialized to default value if they are not ' +
-         'provided',
-         async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1
-            },
-            stubs: ['router-link', 'router-view']
-        });
-        single_course = wrapper.vm;
-        await single_course.$nextTick();
-
-        expect(single_course.course).toEqual(course_1);
-        expect(single_course.is_admin).toBe(false);
     });
 
     test('SingleCourse with a Course as input whose semester and year are null',
@@ -497,53 +480,53 @@ describe('SingleCourse.vue', () => {
          "(course name, year, semester) must be unique - meets condition",
          async () => {
 
-             const spy = jest.fn();
-             wrapper = mount(SingleCourse, {
-                 propsData: {
-                     course: course_1,
-                     is_admin: true
-                 },
-                 stubs: ['router-link', 'router-view']
-             });
+         const spy = jest.fn();
+         wrapper = mount(SingleCourse, {
+             propsData: {
+                 course: course_1,
+                 is_admin: true
+             },
+             stubs: ['router-link', 'router-view']
+         });
 
-             single_course = wrapper.vm;
+         single_course = wrapper.vm;
+         await single_course.$nextTick();
+
+         wrapper.find('.clone-course').trigger('click');
+         await single_course.$nextTick();
+
+         let modal = <Modal> wrapper.find({ref: 'clone_course_modal'}).vm;
+         let clone_name_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_name"}).vm;
+         let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
+
+         expect(modal.is_open).toBe(true);
+
+         let clone_name = wrapper.find({ref: 'copy_of_course_name'}).find('#input');
+         (<HTMLInputElement> clone_name.element).value = "New Course";
+         clone_name.trigger('input');
+         await single_course.$nextTick();
+
+         expect(clone_name_input.is_valid).toBe(true);
+         expect(clone_year_input.is_valid).toBe(true);
+         expect(single_course.new_course_name).toEqual("New Course");
+         expect(single_course.new_course_semester).toEqual(Semester.fall);
+         expect(single_course.new_course_year).toEqual(single_course.course.year);
+         expect(single_course.clone_course_form_is_valid).toBe(true);
+
+         return patch_async_class_method(
+             Course,
+             'copy',
+             spy,
+             async () => {
+
+             wrapper.find('#clone-course-form').trigger('submit.native');
              await single_course.$nextTick();
 
-             wrapper.find('.clone-course').trigger('click');
-             await single_course.$nextTick();
-
-             let modal = <Modal> wrapper.find({ref: 'clone_course_modal'}).vm;
-             let clone_name_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_name"}).vm;
-             let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
-
-             expect(modal.is_open).toBe(true);
-
-             let clone_name = wrapper.find({ref: 'copy_of_course_name'}).find('#input');
-             (<HTMLInputElement> clone_name.element).value = "New Course";
-             clone_name.trigger('input');
-             await single_course.$nextTick();
-
-             expect(clone_name_input.is_valid).toBe(true);
-             expect(clone_year_input.is_valid).toBe(true);
-             expect(single_course.new_course_name).toEqual("New Course");
+             expect(spy.mock.calls.length).toBe(1);
+             expect(modal.is_open).toBe(false);
+             expect(single_course.new_course_name).toEqual("");
              expect(single_course.new_course_semester).toEqual(Semester.fall);
              expect(single_course.new_course_year).toEqual(single_course.course.year);
-             expect(single_course.clone_course_form_is_valid).toBe(true);
-
-             return patch_async_class_method(
-                 Course,
-                 'copy',
-                 spy,
-                 async () => {
-
-                     wrapper.find('#clone-course-form').trigger('submit.native');
-                     await single_course.$nextTick();
-
-                     expect(spy.mock.calls.length).toBe(1);
-                     expect(modal.is_open).toBe(false);
-                     expect(single_course.new_course_name).toEqual("");
-                     expect(single_course.new_course_semester).toEqual(Semester.fall);
-                     expect(single_course.new_course_year).toEqual(single_course.course.year);
-                 });
          });
+     });
 });
