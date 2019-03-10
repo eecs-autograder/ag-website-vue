@@ -12,11 +12,10 @@
              class="single-semester-container">
           <p class="semester-name"> {{current_term.term.semester}} {{current_term.term.year}} </p>
           <div class="courses-in-semester">
-            <span v-for="(course, index) of current_term.course_list"
+            <span v-for="(course) of current_term.course_list"
                  :key="course.id">
               <single-course :course="course"
-                              :is_admin="index % 2 == 0">
-                                <!--:is_admin="is_admin(course)"-->
+                             :is_admin="is_admin(course)">
               </single-course>
             </span>
           </div>
@@ -185,7 +184,7 @@ $current-lang-choice: "Poppins";
 
 .semester-name {
   font-size: 24px;
-  margin: 15px 15px 15px 15px;
+  margin: 25px 15px 15px 15px;
   text-align: left;
   min-height: 35px;
   font-weight: 600;

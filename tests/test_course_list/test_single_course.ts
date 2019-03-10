@@ -328,7 +328,7 @@ describe('SingleCourse.vue', () => {
         clone_name.trigger('input');
         await single_course.$nextTick();
 
-        single_course.new_course_semester = course_1.semester
+        single_course.new_course_semester = course_1.semester !== null
                                             ? course_1.semester : Semester.winter;
 
         expect(clone_name_input.is_valid).toBe(true);
@@ -395,7 +395,7 @@ describe('SingleCourse.vue', () => {
          clone_name.trigger('input');
          await single_course.$nextTick();
 
-         single_course.new_course_semester = course_1.semester
+         single_course.new_course_semester = course_1.semester !== null
              ? course_1.semester : Semester.winter;
 
          expect(clone_name_input.is_valid).toBe(true);

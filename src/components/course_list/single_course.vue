@@ -151,7 +151,7 @@
     readonly is_valid_course_year = is_valid_course_year;
 
     created() {
-      this.new_course_year = this.course.year ? this.course.year : 2000;
+      this.new_course_year = this.course.year !== null ? this.course.year : 2000;
     }
 
     @handle_400_errors_async(handle_add_copied_course_error)
@@ -162,10 +162,9 @@
           this.new_course_name, this.new_course_semester, this.new_course_year
         );
         (<Modal> this.$refs.clone_course_modal).close();
-        console.log("Cloning successful");
         this.new_course_name = "";
         this.new_course_semester = Semester.fall;
-        this.new_course_year = this.course.year ? this.course.year : 2000;
+        this.new_course_year = this.course.year !== null ? this.course.year : 2000;
       }
       finally {}
     }
@@ -313,10 +312,15 @@ a {
   margin-top: 40px;
 }
 
+h2 {
+  font-family: $current-lang-choice;
+}
+
 .course-to-copy {
   background-color: hsl(220, 20%, 85%);
   letter-spacing: 1px;
   margin-left: 5px;
+  font-family: $current-lang-choice;
 }
 
 @media only screen and (min-width: 681px) {
@@ -333,7 +337,6 @@ a {
     width: 40%;
     min-width: 400px;
     max-width: 450px;
-    vertical-align: top;
   }
 }
 
