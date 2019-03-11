@@ -21,6 +21,7 @@ export function is_non_negative(value: string): ValidatorResponse {
     };
 }
 
-export function make_max_value_validator(max_value: number) {
-    return (value: number) => value <= max_value;
-}
+// what is this from?
+// export function make_max_value_validator(max_value: number) {
+//     return (value: number) => value <= max_value;
+// }
