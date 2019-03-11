@@ -351,6 +351,76 @@ describe('SingleCourse.vue', () => {
         });
     });
 
+    // When would this happen?
+    test("When response.data.__all__ is empty - no api error is displayed, but a new " +
+         "course does not get created",
+         async () => {
+
+         let axios_response_instance: AxiosError = {
+             name: 'AxiosError',
+             message: 'u heked up',
+             response: {
+                 data: {
+                     __all__: []
+                 },
+                 status: 400,
+                 statusText: 'OK',
+                 headers: {},
+                 request: {},
+                 config: {}
+             },
+             config: {},
+         };
+
+         wrapper = mount(SingleCourse, {
+             propsData: {
+                 course: course_1,
+                 is_admin: true
+             },
+             stubs: ['router-link', 'router-view']
+         });
+
+         single_course = wrapper.vm;
+         await single_course.$nextTick();
+
+         wrapper.find('.clone-course').trigger('click');
+         await single_course.$nextTick();
+
+         let modal = <Modal> wrapper.find({ ref: 'clone_course_modal'}).vm;
+         let clone_name_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_name"}).vm;
+         let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
+
+         expect(modal.is_open).toBe(true);
+
+         let clone_name = wrapper.find({ref: 'copy_of_course_name'}).find('#input');
+         (<HTMLInputElement> clone_name.element).value = single_course.course.name;
+         clone_name.trigger('input');
+         await single_course.$nextTick();
+
+         single_course.new_course_semester = course_1.semester !== null
+             ? course_1.semester : Semester.winter;
+
+         expect(clone_name_input.is_valid).toBe(true);
+         expect(clone_year_input.is_valid).toBe(true);
+         expect(single_course.new_course_name).toEqual(single_course.course.name);
+         expect(single_course.new_course_semester).toEqual(single_course.course.semester);
+         expect(single_course.new_course_year).toEqual(single_course.course.year);
+
+         return patch_async_class_method(
+             Course,
+             'copy',
+             () => Promise.reject(axios_response_instance),
+             async () => {
+
+             wrapper.find('#clone-course-form').trigger('submit.native');
+             await single_course.$nextTick();
+
+             expect(single_course.api_errors.length).toEqual(0);
+             expect(modal.is_open).toBe(true);
+         });
+    });
+
+
     test("Users can dismiss api_errors that result from an unsuccessful cloning attempt",
          async () => {
 
@@ -359,7 +429,7 @@ describe('SingleCourse.vue', () => {
              message: 'u heked up',
              response: {
                  data: {
-                     __all__: "A course with this name, semester, and year already exists."
+                     __all__: "A course with this name, semester, and year already exists"
                  },
                  status: 400,
                  statusText: 'OK',

@@ -116,9 +116,9 @@
       }
       this.courses_by_term.sort(term_descending);
       for (let term_courses of this.courses_by_term) {
-        term_courses.course_list.sort((course_a: Course, course_b: Course) => {
-          return (course_a.name >= course_b.name) ? 1 : -1;
-        });
+        term_courses.course_list.sort((course_a: Course, course_b: Course) =>
+          course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
+        );
       }
     }
 
@@ -130,9 +130,9 @@
       this.courses_by_term.sort(term_descending);
       let index = this.courses_by_term.findIndex((term) => term.term.semester === course.semester
                                                            && term.term.year === course.year);
-      this.courses_by_term[index].course_list.sort((course_a: Course, course_b: Course) => {
-        return (course_a.name >= course_b.name) ? 1 : -1;
-      });
+      this.courses_by_term[index].course_list.sort((course_a: Course, course_b: Course) =>
+        course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
+      );
     }
   }
 

@@ -23,8 +23,8 @@ export function is_number(value: string): ValidatorResponse {
 
 export function is_valid_course_year(value: string): ValidatorResponse {
     return {
-        is_valid: Number(value) >= 2000 && Number(value) <= 2050,
-        error_msg: "Please enter a year >= 2000 and <= 2050."
+        is_valid: Number(value) >= 2000,
+        error_msg: "Please enter a year >= 2000."
     };
 }
 

@@ -3,24 +3,22 @@
     <div class="course">
       <div class="course-info">
         <p class="course-name">{{course.name}} </p>
-        <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
+        <p class="course-subtitle">{{course.subtitle}}</p>
       </div>
 
       <div class="toolbox">
-
         <div class="clone-course"
              @click="$refs.clone_course_modal.open()"
-             title="Clone Course"
+             :title="'Clone ' + course.name"
              v-if="is_admin">
           <p class="clone-course-label">
             <i class="fas fa-copy copier"> </i>
           </p>
         </div>
-
         <router-link tag="div"
                      :to="`/web/course_admin/${course.pk}`"
                      class="edit-admin-settings"
-                     title="Edit Course"
+                     :title="'Edit ' + course.name"
                      v-if="is_admin">
           <a>
             <p class="edit-settings-label">
@@ -28,9 +26,7 @@
             </p>
           </a>
         </router-link>
-
       </div>
-
     </div>
 
     <modal ref="clone_course_modal"
@@ -38,7 +34,7 @@
            size="large">
       <h2>
         Cloning course:
-        <span class="course-to-copy">{{course.name}} {{course.semester}} {{course.year}}</span>
+        <span class="course-to-copy">{{course.name}} - {{course.semester}} {{course.year}}</span>
       </h2>
       <hr>
       <div id="clone-course-modal">
@@ -191,8 +187,8 @@ $current-lang-choice: "Poppins";
 
 .toolbox {
   background-color: hsl(212, 60%, 94%);
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   border-top: none;
   text-align: right;
   padding: 1px 10px;
@@ -234,12 +230,12 @@ a {
 .edit-admin-settings:hover .cog  {
   transform: rotate(365deg);
   transition-duration: 1s;
-  color: hsl(212, 80%, 57%);
+  color: mediumvioletred;
 }
 
 .clone-course:hover .copier {
   transition-duration: 1s;
-  color: hsl(212, 80%, 57%);
+  color: mediumvioletred;
 }
 
 .course {
@@ -255,9 +251,9 @@ a {
 
 .course-info {
   padding: 15px;
-  background-image: linear-gradient(to bottom right, hsl(212, 100%, 90%), hsl(212, 100%, 85%));
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  background-image: linear-gradient(to bottom right, hsl(212, 70%, 88%), hsl(212, 70%, 85%));
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
   border-bottom: none;
 }
 
@@ -271,11 +267,12 @@ a {
   color: hsl(220, 20%, 17%);
 }
 
-.course-semester-year {
+.course-subtitle {
   color: hsl(220, 20%, 17%);
-  font-size: 16px;
+  font-size: 14px;
   margin: 0;
-  min-height: 25px;
+  padding-top: 2px;
+  min-height: 21px;
 }
 
 /**** Modal *******************************************************************/
@@ -317,9 +314,10 @@ h2 {
 }
 
 .course-to-copy {
-  background-color: hsl(220, 20%, 85%);
+  background-color: hsl(220, 20%, 92%);
   letter-spacing: 1px;
   margin-left: 5px;
+  padding: 0 5px;
   font-family: $current-lang-choice;
 }
 

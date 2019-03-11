@@ -37,8 +37,9 @@ describe('Course_List.vue', () => {
              num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs280 = new Course(
-            {pk: 2, name: 'EECS 280', semester: Semester.fall, year: 2018, subtitle: '',
-             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
+            {pk: 2, name: 'EECS 280', semester: Semester.fall, year: 2018,
+             subtitle: 'Programming and Introductory Data Structures', num_late_days: 0,
+             allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs370 = new Course(
             {pk: 3, name: 'EECS 370', semester: Semester.fall, year: 2018, subtitle: '',
@@ -284,7 +285,7 @@ describe('Course_List.vue', () => {
         });
     });
 
-    test("The semester, year, and name of a course get displayed", async () => {
+    test("The name and subtitle of a course get displayed", async () => {
 
         all_courses = {
             courses_is_admin_for: [],
@@ -314,9 +315,8 @@ describe('Course_List.vue', () => {
                 course_list_page = wrapper.find({ref: 'course_list_component'});
 
                 let course_displayed = course_list_page.find('.course');
-                expect(course_displayed.html()).toContain(fall18_eecs280.semester);
-                expect(course_displayed.html()).toContain(fall18_eecs280.year);
                 expect(course_displayed.html()).toContain(fall18_eecs280.name);
+                expect(course_displayed.html()).toContain(fall18_eecs280.subtitle);
             });
         });
     });
@@ -395,22 +395,16 @@ describe('Course_List.vue', () => {
                 expect(course_list_page.findAll('.edit-admin-settings').length).toEqual(1);
 
                 expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.name);
-                expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.semester);
-                expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.year);
                 expect(all_displayed_courses.at(0).findAll(
                     '.edit-admin-settings').length
                 ).toEqual(1);
 
                 expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.name);
-                expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.semester);
-                expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.year);
                 expect(all_displayed_courses.at(1).findAll(
                     '.edit-admin-settings').length
                 ).toEqual(0);
 
                 expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.name);
-                expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.semester);
-                expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.year);
                 expect(all_displayed_courses.at(2).findAll(
                     '.edit-admin-settings').length
                 ).toEqual(0);
