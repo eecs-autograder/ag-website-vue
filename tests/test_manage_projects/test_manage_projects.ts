@@ -329,6 +329,71 @@ describe('ManageProjects.vue', () => {
         });
     });
 
+
+    test('When attempting to create a project and response.data.__all__ is empty - no api ' +
+         'error is displayed and a new project is not created',
+         async () => {
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: []
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
+            },
+            config: {},
+        };
+
+        return patch_async_static_method(
+            Project,
+            'get_all_from_course',
+            () => Promise.resolve(projects),
+            async () => {
+
+            wrapper = mount(ManageProjects, {
+                propsData: {
+                    course: current_course
+                },
+                stubs: ['router-link']
+            });
+
+            let manage_projects = wrapper.vm;
+            await manage_projects.$nextTick();
+
+            expect(manage_projects.projects.length).toEqual(2);
+
+            let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
+
+            expect(validated_input.is_valid).toBe(false);
+
+            let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
+            (<HTMLInputElement> new_project_name.element).value = project_1.name;
+            new_project_name.trigger('input');
+            await manage_projects.$nextTick();
+
+            expect(validated_input.is_valid).toBe(true);
+            expect(wrapper.findAll('.api-error').length).toEqual(0);
+
+            return patch_async_static_method(
+                Project,
+                'create',
+                () => Promise.reject(axios_response_instance),
+                async () => {
+
+                wrapper.find('.add-project-button').trigger('click');
+                await manage_projects.$nextTick();
+
+                expect(manage_projects.new_project_api_errors.length).toEqual(0);
+                expect(manage_projects.projects.length).toEqual(2);
+            });
+        });
+    });
+
     test('New project api errors can be dismissed', async () => {
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',

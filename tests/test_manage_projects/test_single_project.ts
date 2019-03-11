@@ -459,6 +459,92 @@ describe('SingleProject.vue', () => {
          });
     });
 
+    // Would this ever happen?
+    test('When attempting to copy a project and response.data.__all__ is empty - no api ' +
+         'error is displayed and a new project is not created',
+         async () => {
+         let axios_response_instance: AxiosError = {
+             name: 'AxiosError',
+             message: 'u heked up',
+             response: {
+                 data: {
+                     __all__: []
+                 },
+                 status: 400,
+                 statusText: 'OK',
+                 headers: {},
+                 request: {},
+                 config: {}
+             },
+             config: {},
+         };
+
+         wrapper = mount(SingleProject, {
+             propsData: {
+                 course: course_1,
+                 project: project_1,
+                 existing_projects: projects
+             },
+             stubs: ['router-link']
+         });
+
+         single_project = wrapper.vm;
+         await single_project.$nextTick();
+
+         courses = [course_1, course_2];
+         return patch_async_static_method(
+             User,
+             'get_current',
+             () => Promise.resolve(user),
+             async () => {
+
+             return patch_async_class_method(
+                 User,
+                 'courses_is_admin_for',
+                 () => Promise.resolve(courses),
+                 async () => {
+
+                 wrapper.find('.copier').trigger('click');
+                 await single_project.$nextTick();
+
+                 let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
+                 let validated_input = <ValidatedInput> wrapper.find(
+                     {ref: "cloned_project_name"}
+                 ).vm;
+
+                 expect(modal.is_open).toBe(true);
+                 expect(validated_input.is_valid).toBe(false);
+
+                 let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
+                 (<HTMLInputElement> clone_name.element).value = project_1.name;
+                 clone_name.trigger('input');
+                 await single_project.$nextTick();
+
+                 expect(single_project.course_to_clone_to).toBe(course_1);
+                 expect(validated_input.is_valid).toBe(true);
+                 expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
+
+                 return patch_async_class_method(
+                     Project,
+                     'copy_to_course',
+                     () => Promise.reject(axios_response_instance),
+                     async () => {
+
+                     wrapper.find('.clone-project-button').trigger('click');
+                     await single_project.$nextTick();
+
+                     expect(modal.is_open).toBe(true);
+                     expect(single_project.cloning_api_error_present).toBe(false);
+
+                     if (wrapper.exists()) {
+                         console.log("wrapper exists");
+                         wrapper.destroy();
+                     }
+                 });
+             });
+         });
+     });
+
     // If this test is uncommented, the compiler will respond with an error that:
     // "Property 'data' is missing in type 'AxiosError'"
     // test('If __all__ is not defined in the AxiosResponse when making a request to ' +
