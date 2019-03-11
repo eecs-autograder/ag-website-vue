@@ -1,5 +1,5 @@
 import {
-    is_non_negative, is_not_empty, is_number
+    is_non_negative, is_not_empty, is_number, is_valid_course_year
 } from '@/validators';
 
 describe('Validators.ts', () => {
@@ -33,11 +33,33 @@ describe('Validators.ts', () => {
         expect(is_not_empty("  hello   ").is_valid).toBe(true);
     });
 
-    test('is_number - violates condition', () => {
+    test('is_number - violates condition (spelled out number)', () => {
          expect(is_number("three").is_valid).toBe(false);
     });
 
-    test('is_number - meets condition', () => {
+    test('is_number - meets condition (is a positive number)', () => {
         expect(is_number("3").is_valid).toBe(true);
+    });
+
+    test('is_number - meets condition (is a negative number)', () => {
+        expect(is_number("-3").is_valid).toBe(true);
+    });
+
+    test('is_number - meets condition (negative number with a space between - and ' +
+         'number)',
+         () => {
+        expect(is_number("- 3").is_valid).toBe(false);
+    });
+
+    test('is_valid_course_year - violates condition (year < 2000)', () => {
+        expect(is_valid_course_year("900").is_valid).toBe(false);
+    });
+
+    test('is_valid_course_year - meets condition (year === 2000)', () => {
+        expect(is_valid_course_year("2000").is_valid).toBe(true);
+    });
+
+    test('is_valid_course_year - meets condition (year > 2000)', () => {
+        expect(is_valid_course_year("2002").is_valid).toBe(true);
     });
 });
