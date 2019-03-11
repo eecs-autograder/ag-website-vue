@@ -103,7 +103,7 @@
   import Dropdown from '@/components/dropdown.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
   import { handle_400_errors_async } from '@/utils';
   import { is_non_negative, is_not_empty, is_number, is_valid_course_year } from '@/validators';
   import { Component, Prop, Vue } from 'vue-property-decorator';
