@@ -91,6 +91,7 @@ export class UniqueArrayError extends Error {
 // tslint:disable-next-line:no-any
 type PropertyDescriptorType = TypedPropertyDescriptor<(...args: any[]) => any>;
 
+// istanbul ignore next
 export function handle_400_errors_async(
     // tslint:disable-next-line:no-any
     error_handler_func: (self: any, response: AxiosResponse) => void) {
@@ -117,6 +118,7 @@ export function handle_400_errors_async(
     return decorator;
 }
 
+// istanbul ignore next
 function not_undefined<T>(arg?: T): arg is T {
     if (arg === undefined) {
         throw new Error('Value unexpectedly undefined');
@@ -124,6 +126,7 @@ function not_undefined<T>(arg?: T): arg is T {
     return true;
 }
 
+// istanbul ignore next
 function get_axios_error_status(error: unknown): [AxiosResponse, number] {
     let response = (error as AxiosError).response;
     if (response === undefined) {
