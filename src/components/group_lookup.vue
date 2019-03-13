@@ -2,9 +2,10 @@
   <div id="student-lookup-component">
     <div class="search-bar-label"> Search groups: </div>
     <div class="group-lookup-search-bar">
-      <dropdown-typeahead placeholder_text="Enter a username or name of an individual"
+      <dropdown-typeahead ref="group_typeahead"
+                          placeholder_text="Enter a username or name of an individual"
                           :choices="groups"
-                          @update_item_chosen="group_selected = $event; $emit('update_group_selected', group_selected)"
+                          @update_item_chosen="update_group_chosen($event)"
                           :filter_fn="group_filter_fn">
         <template slot-scope="{item}">
           <span v-for="(member, index) of item.member_names">
@@ -107,32 +108,32 @@
       bonus_submissions_remaining: 0
     };
 
-    group5: Group = {
-      pk: 5,
-      project: 2,
-      member_names: [
-        {username: "acpickles@umich.edu", full_name: "Angelica Pickles"},
-      ],
-      extended_due_date: "no",
-      num_submits_towards_limit: 0,
-      num_submissions: 3,
-      bonus_submissions_remaining: 0
-    };
-
-    group6: Group = {
-      pk: 6,
-      project: 2,
-      member_names: [
-        {username: "otto@umich.edu", full_name: "Otto Rocket"},
-        {username: "reggie@umich.edu", full_name: "Regina Rocket"},
-        {username: "samdull@umich.edu", full_name: "Sam Dullard"},
-        {username: "twister@umich.edu", full_name: "Maurice Rodriguez"}
-      ],
-      extended_due_date: "no",
-      num_submits_towards_limit: 0,
-      num_submissions: 3,
-      bonus_submissions_remaining: 0
-    };
+    // group5: Group = {
+    //   pk: 5,
+    //   project: 2,
+    //   member_names: [
+    //     {username: "acpickles@umich.edu", full_name: "Angelica Pickles"},
+    //   ],
+    //   extended_due_date: "no",
+    //   num_submits_towards_limit: 0,
+    //   num_submissions: 3,
+    //   bonus_submissions_remaining: 0
+    // };
+    //
+    // group6: Group = {
+    //   pk: 6,
+    //   project: 2,
+    //   member_names: [
+    //     {username: "otto@umich.edu", full_name: "Otto Rocket"},
+    //     {username: "reggie@umich.edu", full_name: "Regina Rocket"},
+    //     {username: "samdull@umich.edu", full_name: "Sam Dullard"},
+    //     {username: "twister@umich.edu", full_name: "Maurice Rodriguez"}
+    //   ],
+    //   extended_due_date: "no",
+    //   num_submits_towards_limit: 0,
+    //   num_submissions: 3,
+    //   bonus_submissions_remaining: 0
+    // };
 
     group_selected: Group | null = null;
 
@@ -143,9 +144,9 @@
 
     async created() {
       // await project.get_groups();
-      this.groups = [this.group1, this.group2, this.group3, this.group4, this.group5, this.group6];
       // are the groups going to be sorted by the first member name? Or do I need to do that here?
       // also, are only groups that have submitted showing up here?
+      this.groups = [this.group1, this.group2, this.group3, this.group4];
     }
 
     group_filter_fn(item: Group, filter_text: string) {
@@ -158,13 +159,17 @@
       return false;
     }
 
+    update_group_chosen(group: Group) {
+      this.group_selected = group;
+      this.$emit('update_group_selected', this.group_selected);
+      (<DropdownTypeahead> this.$refs.group_typeahead).clear_filter_text();
+    }
   }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
-
 $current-lang-choice: 'Quicksand';
 
 #student-lookup-component {

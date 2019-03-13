@@ -67,6 +67,10 @@ export default class DropdownTypeahead extends Vue {
     }
   }
 
+  clear_filter_text() {
+    this.filter_text = "";
+  }
+
   get filtered_choices() {
     if (this.filter_text === "") {
       return this.d_choices;
