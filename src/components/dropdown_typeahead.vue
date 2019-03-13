@@ -87,6 +87,7 @@ export default class DropdownTypeahead extends Vue {
   background-color: white;
   border: 1px solid #ced4da;
   border-radius: .25rem;
+  box-sizing: border-box;
   color: #495057;
   font-size: 1rem;
   line-height: 1.5;
