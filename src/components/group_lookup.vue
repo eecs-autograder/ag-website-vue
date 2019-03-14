@@ -21,10 +21,28 @@
     <div v-if="group_selected !== null" class="selected-group">
       <p class="group-members-label"> Group members: </p>
       <div class="group-members">
-        <p v-for="member of group_selected.member_names" class="group-member">
-          <span class="full-name">{{member.full_name}}</span>
-          <span class="username">({{member.username}})</span>
-        </p>
+        <div v-for="member of group_selected.member_names">
+          <div v-if="!editing_group" class="group-member">
+            <span class="full-name">{{member.full_name}}</span>
+            <span class="username">({{member.username}})</span>
+          </div>
+          <div v-else class="group-member-editing">
+            <div class="username-validated-container">
+              <ValidatedInput v-model="member.username"
+                              :validators="[]"
+                              :num_rows="1"
+                              input_style="width: 100%;
+                                           border: 1px solid #ced4da;">
+              </ValidatedInput>
+            </div>
+            <div class="remove-group-member"
+                 :title="`Remove ${member.username} from group`"
+                 @click="remove_group_member(member.username)">
+              <i class="fas fa-times"></i>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -32,6 +50,7 @@
 
 <script lang="ts">
   import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
   import { Project } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
@@ -52,7 +71,8 @@
 
   @Component({
     components: {
-      DropdownTypeahead
+      DropdownTypeahead,
+      ValidatedInput
     }
   })
   export default class StudentLookup extends Vue {
@@ -140,6 +160,9 @@
     @Prop({required: true, type: Project})
     project!: Project;
 
+    @Prop({required: false, default: true})
+    editing_group!: boolean;
+
     groups: Group[] = [];
 
     async created() {
@@ -157,6 +180,11 @@
         }
       }
       return false;
+    }
+
+    remove_group_member(username: string) {
+      console.log(username);
+      // remove member with username from group selected
     }
 
     update_group_chosen(group: Group) {
@@ -204,13 +232,13 @@ $current-lang-choice: 'Quicksand';
   font-size: 16px;
   font-weight: bold;
   margin: 0;
-  padding: 3px 10px 13px 0;
+  padding: 3px 10px 8px 0;
   display: inline-block;
   vertical-align: top;
 }
 
 .group-members {
-  display: inline-block;
+  /*display: inline-block;*/
 }
 
 .group-member {
@@ -218,7 +246,7 @@ $current-lang-choice: 'Quicksand';
   margin: 0 0 10px 0;
   padding: 3px 8px;
   background-color: hsl(212, 70%, 95%);
-  font-weight: bold;
+  display: inline-block;
   border-radius: 5px;
   color: hsl(212, 50%, 20%);
 }
@@ -228,5 +256,20 @@ $current-lang-choice: 'Quicksand';
 }
 
 .username {}
+
+.remove-group-member {
+  color: chocolate;
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 15px;
+}
+
+.username-validated-container {
+  display: inline-block;
+}
+
+.group-member-editing {
+  padding-bottom: 10px;
+}
 
 </style>
