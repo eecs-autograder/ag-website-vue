@@ -54,7 +54,7 @@
               <dropdown ref="copy_course_dropdown"
                         :items="cloning_destinations"
                         @update_item_selected="course_to_clone_to = $event"
-                        dropdown_height="200px">
+                        :initial_highlighted_index="course_index">
                 <template slot="header">
                 <div tabindex="1" class="dropdown-header-wrapper">
                   <div id="input-course-to-copy-to" class="dropdown-header">
@@ -139,7 +139,6 @@
 
     readonly is_not_empty = is_not_empty;
 
-    user: User | null = null;
     d_projects: Project[] = [];
     cloning_destinations: Course[] = [];
     api_errors: string[] = [];
@@ -148,19 +147,22 @@
     cloned_project_name_is_valid = false;
     cloning_api_error_present = false;
 
-    created() {
+    course_index: number = 0;
+
+    async created() {
       this.course_to_clone_to = this.course;
       this.d_projects = this.existing_projects.slice(0);
+
+      let user = await User.get_current();
+      this.cloning_destinations = await user.courses_is_admin_for();
+      this.course_index = this.cloning_destinations.findIndex(
+        course => course.pk === this.course.pk);
     }
 
     async clone_project() {
-      if (this.user === null) {
-        this.user = await User.get_current();
-      }
       this.api_errors = [];
       this.cloned_project_name = "";
       this.cloning_api_error_present = false;
-      this.cloning_destinations = await this.user.courses_is_admin_for();
       this.course_to_clone_to = this.course;
       (<Modal> this.$refs.clone_project_modal).open();
     }
