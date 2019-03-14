@@ -75,8 +75,6 @@ export default class Toggle extends Vue {
 }
 
 .active-option-style p, .inactive-option-style p {
-  font-size: 13px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin: 0;
 }
 

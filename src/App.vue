@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <HelloWorld msg="Hello world!"/>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -18,5 +19,11 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
+  body {
+    margin: 0;
+  }
 
+  body, input {
+    font-family: "Helvetica Neue", Helvetica;
+  }
 </style>

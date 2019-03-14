@@ -10,20 +10,23 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
     "@types/lodash": "^4.14.120",
-    "ag-client-typescript": "0.0.0-dev.11",
+    "ag-client-typescript": "0.0.0-dev.12",
     "lodash": "^4.17.11",
     "vue": "^2.5.16",
     "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0"
+    "vue-property-decorator": "^7.0.0",
+    "vue-router": "^3.0.2"
   },
   "devDependencies": {
     "@types/jest": "^23.1.4",
+    "@types/sinon": "^7.0.10",
     "@vue/cli-plugin-typescript": "^3.0.0-rc.10",
     "@vue/cli-plugin-unit-jest": "^3.0.0-rc.10",
     "@vue/cli-service": "^3.0.0-rc.10",
     "@vue/test-utils": "^1.0.0-beta.20",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
+    "sinon": "^7.2.7",
     "ts-jest": "^23.0.0",
     "tslint-consistent-codestyle": "^1.13.3",
     "tslint-eslint-rules": "^5.3.1",
