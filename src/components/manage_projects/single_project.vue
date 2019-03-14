@@ -123,23 +123,14 @@
     @Prop({required: true, type: Course})
     course!: Course;
 
-    @Prop({required: true, type: Array})
-    existing_projects!: Project[];
-
     @Prop({required: false, default: false})
     odd_index!: boolean;
 
     @Prop({required: true, type: Project})
     project!: Project;
 
-    @Watch('existing_projects')
-    on_existing_projects_changed(new_list: Project[], old_list: Project[]) {
-      this.d_projects = new_list.slice(0);
-    }
-
     readonly is_not_empty = is_not_empty;
 
-    d_projects: Project[] = [];
     cloning_destinations: Course[] = [];
     api_errors: string[] = [];
     course_to_clone_to: Course | null = null;
@@ -151,7 +142,6 @@
 
     async created() {
       this.course_to_clone_to = this.course;
-      this.d_projects = this.existing_projects.slice(0);
 
       let user = await User.get_current();
       this.cloning_destinations = await user.courses_is_admin_for();
