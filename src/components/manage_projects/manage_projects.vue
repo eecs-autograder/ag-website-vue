@@ -150,12 +150,6 @@
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/course_admin.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
-
-.manage-projects-component {
-  font-family: $current-lang-choice;
-}
 
 .no-projects-message {
   padding: 8px 0;
@@ -190,7 +184,6 @@ $current-lang-choice: "Quicksand";
 }
 
 .add-project-button, .add-project-button:disabled {
-  font-family: $current-lang-choice;
   font-size: 16px;
   margin: 15px 0 20px 0;
   padding: 10px 15px;

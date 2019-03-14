@@ -74,8 +74,6 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
 
 .close-x {
   background-color: inherit;
@@ -108,7 +106,6 @@ $current-lang-choice: "Quicksand";
 
 .tab-label {
   display: inline-block;
-  font-family: $current-lang-choice;
   margin: 0;
   padding-right: 25px;
 }

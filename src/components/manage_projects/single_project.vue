@@ -198,12 +198,6 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/course_admin.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
-
-#single-project-component {
-  font-family: $current-lang-choice;
-}
 
 .project-div {
   display: block;
@@ -305,10 +299,6 @@ a {
 
 /* ---------------- MODAL ---------------- */
 
-.modal-container {
-  font-family: $current-lang-choice;
-}
-
 .modal-header {
   font-size: 24px;
   font-weight: bold;
@@ -353,7 +343,6 @@ a {
 }
 
 .clone-project-button, .clone-project-button:disabled {
-  font-family: $current-lang-choice;
   font-size: 16px;
   margin: 32px 0 20px 0;
   padding: 10px 15px;

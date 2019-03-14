@@ -142,7 +142,6 @@
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 
 #all-semesters {
@@ -150,7 +149,6 @@
 }
 
 #course-list {
-  font-family: "Poppins";
   margin-left: 5%;
   margin-right: 5%;
   width: 90%;

@@ -191,10 +191,6 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
-#file-upload-container {
-  font-family: Helvetica;
-}
-
 #file-input {
   display: none;
 }

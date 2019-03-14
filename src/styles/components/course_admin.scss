@@ -1,6 +1,4 @@
 @import '@/styles/colors.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
 
 // api errors ************************************************************
 .api-error-container {
@@ -16,7 +14,6 @@ $current-lang-choice: "Quicksand";
 }
 
 .dismiss-error-button {
-    font-family: $current-lang-choice;
     font-size: 15px;
     position: absolute;
     right: 5px;

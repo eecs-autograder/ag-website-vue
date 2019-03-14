@@ -19,5 +19,11 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
+  body {
+    margin: 0;
+  }
 
+  body, input {
+    font-family: "Helvetica Neue", Helvetica;
+  }
 </style>
