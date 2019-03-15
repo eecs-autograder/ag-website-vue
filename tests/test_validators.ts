@@ -1,5 +1,10 @@
 import {
-    is_non_negative, is_not_empty, is_number, is_valid_course_year
+    is_integer,
+    is_non_negative,
+    is_not_empty,
+    is_number,
+    make_max_value_validator,
+    make_min_value_validator, string_to_num
 } from '@/validators';
 
 describe('Validators.ts', () => {
@@ -51,15 +56,28 @@ describe('Validators.ts', () => {
         expect(is_number("- 3").is_valid).toBe(false);
     });
 
-    test('is_valid_course_year - violates condition (year < 2000)', () => {
-        expect(is_valid_course_year("900").is_valid).toBe(false);
+    test('is_integer', () => {
+        expect(is_integer("42").is_valid).toBe(true);
+        expect(is_integer("1.5").is_valid).toBe(false);
     });
 
-    test('is_valid_course_year - meets condition (year === 2000)', () => {
-        expect(is_valid_course_year("2000").is_valid).toBe(true);
+    test('make_min_value_validator', () => {
+        let min_10 = make_min_value_validator(10);
+        expect(min_10("10").is_valid).toBe(true);
+        expect(min_10("11").is_valid).toBe(true);
+        expect(min_10("9").is_valid).toBe(false);
     });
 
-    test('is_valid_course_year - meets condition (year > 2000)', () => {
-        expect(is_valid_course_year("2002").is_valid).toBe(true);
+    test('make_max_value_validator', () => {
+        let max_4 = make_max_value_validator(4);
+        expect(max_4("4").is_valid).toBe(true);
+        expect(max_4("3").is_valid).toBe(true);
+        expect(max_4("5").is_valid).toBe(false);
+    });
+
+    test('string_to_num', () => {
+        expect(string_to_num('   ')).toBeNaN();
+        expect(string_to_num('  42  ')).toBe(42);
+        expect(string_to_num('spam')).toBeNaN();
     });
 });

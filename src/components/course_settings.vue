@@ -47,7 +47,8 @@
                           :num_rows="1"
                           input_style="width: 65px;
                                        border: 1px solid #ced4da;"
-                          :validators="[is_not_empty, is_number, is_valid_course_year]">
+                          :validators="[is_not_empty, is_number, is_integer, is_valid_course_year]"
+                          :from_string_fn="string_to_num">
           </ValidatedInput>
         </div>
 
@@ -59,7 +60,8 @@
                           :num_rows="1"
                           input_style="width: 50px;
                                        border: 1px solid #ced4da;"
-                          :validators="[is_not_empty, is_number, is_non_negative]">
+                          :validators="[is_not_empty, is_number, is_integer, is_non_negative]"
+                          :from_string_fn="string_to_num">
             <div slot="suffix"
                  class="suffix-element">
               {{d_course.num_late_days.toString() === '1' ? 'day' : 'days'}}
@@ -105,7 +107,14 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
   import { handle_400_errors_async } from '@/utils';
-  import { is_non_negative, is_not_empty, is_number, is_valid_course_year } from '@/validators';
+  import {
+    is_non_negative,
+    is_not_empty,
+    is_number,
+    is_integer,
+    make_min_value_validator,
+    string_to_num
+  } from '@/validators';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
@@ -131,9 +140,12 @@
     readonly is_non_negative = is_non_negative;
     readonly is_not_empty = is_not_empty;
     readonly is_number = is_number;
-    readonly is_valid_course_year = is_valid_course_year;
+    readonly is_integer = is_integer;
+    readonly is_valid_course_year = make_min_value_validator(2000);
+    readonly string_to_num = string_to_num;
 
     created() {
+      console.log('weee');
       this.d_course = this.course;
     }
 
@@ -161,11 +173,8 @@
 <style scoped lang="scss">
 @import '@/styles/components/course_admin.scss';
 @import '@/styles/button_styles.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
 
 #settings-container {
-  font-family: $current-lang-choice;
   padding-top: 15px;
 }
 
@@ -184,7 +193,6 @@ $current-lang-choice: "Quicksand";
 
 #save-button, #save-button:disabled {
   display: block;
-  font-family: $current-lang-choice;
   font-size: 16px;
   margin: 15px 0 15px 0;
   padding: 10px 15px;
@@ -211,7 +219,6 @@ $current-lang-choice: "Quicksand";
 
 .semester-item {
   font-size: 16px;
-  font-family: $current-lang-choice;
 }
 
 .last-saved-timestamp {

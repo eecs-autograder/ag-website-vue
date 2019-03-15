@@ -78,6 +78,19 @@ describe('CourseSettings.vue', () => {
         expect(validated_year_input.is_valid).toBe(false);
     });
 
+    test('Year must be an integer - violates condition', async () => {
+        let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
+        let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
+
+        expect(course_settings.course.year).toEqual(2019);
+        expect(validated_year_input.is_valid).toBe(true);
+
+        (<HTMLInputElement> year_input.element).value = "2020.5";
+        year_input.trigger('input');
+
+        expect(validated_year_input.is_valid).toBe(false);
+    });
+
     test('Year must be a valid year (greater >= 2000) - violates condition', async () => {
         let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
         let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
@@ -154,6 +167,20 @@ describe('CourseSettings.vue', () => {
         expect(validated_late_days_input.is_valid).toBe(true);
 
         (<HTMLInputElement> late_days_input.element).value = "zero";
+        late_days_input.trigger('input');
+
+        expect(validated_late_days_input.is_valid).toBe(false);
+    });
+
+    test('Late days must be an integer - violates condition', async () => {
+        let validated_late_days_input = <ValidatedInput> wrapper.find(
+            {ref: 'course_late_days_input'}).vm;
+        let late_days_input = wrapper.find({ref: 'course_late_days_input'}).find('#input');
+
+        expect(course_settings.course.num_late_days).toEqual(0);
+        expect(validated_late_days_input.is_valid).toBe(true);
+
+        (<HTMLInputElement> late_days_input.element).value = "1.5";
         late_days_input.trigger('input');
 
         expect(validated_late_days_input.is_valid).toBe(false);
