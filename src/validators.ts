@@ -1,9 +1,9 @@
 import { ValidatorResponse } from '@/components/validated_input.vue';
 
-export function is_number(value: string): ValidatorResponse {
+export function is_non_negative(value: string): ValidatorResponse {
     return {
-        is_valid: is_not_empty(value).is_valid && !isNaN(Number(value)),
-        error_msg:  "You must enter a number.",
+        is_valid: is_number(value).is_valid && value[0] !== "-",
+        error_msg: "The number entered must be greater than or equal to zero."
     };
 }
 
@@ -14,14 +14,41 @@ export function is_not_empty(value: string): ValidatorResponse {
     };
 }
 
-export function is_non_negative(value: string): ValidatorResponse {
+export function is_number(value: string): ValidatorResponse {
     return {
-        is_valid: is_number(value).is_valid && value[0] !== "-",
-        error_msg: "The number entered must be greater than or equal to zero."
+        is_valid: !isNaN(string_to_num(value)),
+        error_msg:  "Please enter a number.",
     };
 }
 
-// what is this from?
-// export function make_max_value_validator(max_value: number) {
-//     return (value: number) => value <= max_value;
-// }
+export function is_integer(value: string): ValidatorResponse {
+    return {
+        is_valid: !isNaN(string_to_num(value)) && Number.isInteger(string_to_num(value)),
+        error_msg:  "Please enter an integer.",
+    };
+}
+
+export function make_min_value_validator(min_value: number) {
+    return (value: string) => {
+        return {
+            is_valid: string_to_num(value) >= min_value,
+            error_msg: `Please enter a number >= ${min_value}`
+        };
+    };
+}
+
+export function make_max_value_validator(max_value: number) {
+    return (value: string) => {
+        return {
+            is_valid: string_to_num(value) <= max_value,
+            error_msg: `Please enter a number <= ${max_value}`
+        };
+    };
+}
+
+export function string_to_num(value: string): number {
+    if (value.trim() === '') {
+        return NaN;
+    }
+    return Number(value);
+}
