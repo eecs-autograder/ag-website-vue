@@ -108,10 +108,10 @@
   import ValidatedInput from '@/components/validated_input.vue';
   import { handle_400_errors_async } from '@/utils';
   import {
+    is_integer,
     is_non_negative,
     is_not_empty,
     is_number,
-    is_integer,
     make_min_value_validator,
     string_to_num
   } from '@/validators';
@@ -139,8 +139,8 @@
 
     readonly is_non_negative = is_non_negative;
     readonly is_not_empty = is_not_empty;
-    readonly is_number = is_number;
     readonly is_integer = is_integer;
+    readonly is_number = is_number;
     readonly is_valid_course_year = make_min_value_validator(2000);
     readonly string_to_num = string_to_num;
 
