@@ -6,7 +6,7 @@
                       ref="create_expected_student_file_form"
                       autocomplete="off"
                       spellcheck="false"
-                      @submit.native.prevent
+                      @submit.native.prevent="create_pattern"
                       @form_validity_changed="pattern_is_valid = $event">
 
         <div class="input-wrapper">
@@ -64,14 +64,14 @@
           <div class="api-error">{{error}}</div>
           <button class="dismiss-error-button"
                   type="button"
-                  @click="api_errors = []">
+                  @click="api_errors = []; api_error_present = false">
               <span class="dismiss-error"> Dismiss
               </span>
           </button>
         </div>
 
-        <button class="add-filename-button"
-                @click="create_pattern"
+        <button class="add-file-button"
+                type="submit"
                 :disabled="!pattern_is_valid">
           Add Filename
         </button>
@@ -117,6 +117,7 @@
     pattern_is_valid = false;
     exact_match = true;
     api_errors: string[] = [];
+    api_error_present = false;
 
     wildcard_is_present() {
       if (this.d_new_expected_student_file!.pattern.match('[*?![\\]]') !== null) {
@@ -131,7 +132,9 @@
         this.d_new_expected_student_file!.min_num_matches = 1;
         this.d_new_expected_student_file!.max_num_matches = 1;
       }
+      console.log("here");
       await ExpectedStudentFile.create(this.project.pk, this.d_new_expected_student_file);
+      console.log("Successful create");
       this.d_new_expected_student_file = new CreateExpectedStudentFileData();
       (<ValidatedInput> this.$refs.create_expected_student_file_form).clear();
     }
@@ -150,6 +153,7 @@
     let errors = response.data["__all__"];
     if (errors.length > 0) {
       component.api_errors = [errors[0]];
+      component.api_error_present = true;
     }
   }
 </script>
@@ -212,21 +216,21 @@ $current-language: "Quicksand";
   padding-bottom: 5px;
 }
 
-.add-filename-button {
+.add-file-button {
   @extend .green-button;
 }
 
-.add-filename-button:disabled {
+.add-file-button:disabled {
   @extend .gray-button;
 }
 
-.add-filename-button, .add-filename-button:disabled {
+.add-file-button, .add-file-button:disabled {
   font-family: $current-language;
   font-size: 15px;
   margin-top: 12px;
 }
 
-.add-filename-button:disabled, .add-filename-button:disabled:hover {
+.add-file-button:disabled, .add-file-button:disabled:hover {
   background-color: hsl(220, 30%, 85%);
   border-color: hsl(220, 30%, 80%);
   color: gray;
