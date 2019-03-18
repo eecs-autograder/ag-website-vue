@@ -325,7 +325,10 @@ describe('ManageProjects.vue', () => {
                 await manage_projects.$nextTick();
 
                 let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
-                expect(api_errors.d_api_errors.length).toBe(1);
+                // Note: api_errors.d_api_errors is flagged by the compiler here with error message
+                // "Property 'd_api_errors' does not exist on type 'Vue'." It's unclear why that
+                // is happening, so we'll access it through $data for now.
+                expect(api_errors.$data.d_api_errors.length).toBe(1);
             });
         });
     });
