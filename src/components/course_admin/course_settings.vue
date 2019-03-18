@@ -67,18 +67,9 @@
               {{d_course.num_late_days.toString() === '1' ? 'day' : 'days'}}
             </div>
           </ValidatedInput>
-        </div>
+        </div>k
 
-        <div v-for="error of api_errors"
-             class="api-error-container">
-          <div class="api-error">{{error}}</div>
-          <button class="dismiss-error-button"
-                  type="button"
-                  @click="api_errors = []">
-              <span class="dismiss-error"> Dismiss
-              </span>
-          </button>
-        </div>
+        <APIErrors ref="api_errors"></APIErrors>
 
         <button id="save-button"
                 type="submit"
@@ -102,11 +93,12 @@
   import { Course, Semester } from 'ag-client-typescript';
   import { AxiosResponse } from 'axios';
 
+  import APIErrors from "@/components/api_errors.vue";
   import Dropdown from '@/components/dropdown.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
-  import { handle_400_errors_async } from '@/utils';
+  import { handle_api_errors_async } from '@/utils';
   import {
     is_integer,
     is_non_negative,
@@ -119,6 +111,7 @@
 
   @Component({
     components: {
+      APIErrors,
       Dropdown,
       Tooltip,
       ValidatedForm,
@@ -148,7 +141,7 @@
       this.d_course = this.course;
     }
 
-    @handle_400_errors_async(handle_save_course_settings_error)
+    @handle_api_errors_async(handle_save_course_settings_error)
     async save_course_settings() {
       try {
         this.saving = true;
@@ -161,11 +154,8 @@
     }
   }
 
-  function handle_save_course_settings_error(component: CourseSettings, response: AxiosResponse) {
-    let errors = response.data["__all__"];
-    if (errors.length > 0) {
-      component.api_errors = [errors[0]];
-    }
+  function handle_save_course_settings_error(component: CourseSettings, error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 </script>
 
