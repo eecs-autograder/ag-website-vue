@@ -1,7 +1,7 @@
 <template>
   <div class="student-permissions-container">
     <roster v-if="students !== null"
-            ref="student_permissions"
+            ref="student_roster"
             role="students"
             :roster="students"
             @add_permissions="add_students_to_roster($event)"

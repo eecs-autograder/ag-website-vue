@@ -153,7 +153,7 @@ describe('StudentRoster.vue', () => {
                 spy,
                 async () => {
 
-                let permissions = <Roster> wrapper.find({ref: 'student_permissions'}).vm;
+                let permissions = <Roster> wrapper.find({ref: 'student_roster'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await student_roster.$nextTick();
 
@@ -225,9 +225,9 @@ describe('StudentRoster.vue', () => {
                 'remove_students',
                 spy,
                 async () => {
-                let student_permissions = wrapper.find(
-                {ref: 'student_permissions'});
-                let delete_permission_buttons = student_permissions.findAll(
+                let delete_permission_buttons = wrapper.find(
+                    {ref: 'student_roster'}
+                ).findAll(
                 '.delete-permission'
                 );
                 delete_permission_buttons.at(1).trigger('click');
