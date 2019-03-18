@@ -1,7 +1,7 @@
 <template>
-  <div class="admin-permissions-container">
+  <div class="admin-roster-container">
     <roster v-if="admins !== null"
-            ref="admin_permissions"
+            ref="admin_roster"
             role="admins"
             :roster="admins"
             @add_permissions="add_admins_to_roster($event)"

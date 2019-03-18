@@ -1,7 +1,7 @@
 <template>
-  <div class="handgrader-permissions-container">
+  <div class="handgrader-roster-container">
     <roster v-if="handgraders !== null"
-            ref="handgrader_permissions"
+            ref="handgrader_roster"
             role="handgraders"
             :roster="handgraders"
             @add_permissions="add_handgraders_to_roster($event)"
