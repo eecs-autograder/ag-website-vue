@@ -13,10 +13,10 @@
 
   import { Model } from '@/model';
 
-  import AdminRoster from '@/components/course_admin/permissions/admin_roster.vue';
-  import HandgraderRoster from '@/components/course_admin/permissions/handgrader_roster.vue';
-  import StaffRoster from '@/components/course_admin/permissions/staff_roster.vue';
-  import StudentRoster from '@/components/course_admin/permissions/student_roster.vue';
+  import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
+  import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
+  import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
+  import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 
   @Component({
     components: { AdminRoster, HandgraderRoster, StaffRoster, StudentRoster }

@@ -97,10 +97,10 @@
 <script lang="ts">
   import CourseSettings from '@/components/course_admin/course_settings.vue';
   import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
-  import AdminRoster from '@/components/course_admin/permissions/admin_roster.vue';
-  import HandgraderRoster from '@/components/course_admin/permissions/handgrader_roster.vue';
-  import StaffRoster from '@/components/course_admin/permissions/staff_roster.vue';
-  import StudentRoster from '@/components/course_admin/permissions/student_roster.vue';
+  import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
+  import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
+  import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
+  import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
   import Dropdown from '@/components/dropdown.vue';
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
