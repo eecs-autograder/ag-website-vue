@@ -153,8 +153,8 @@ describe('StudentRoster.vue', () => {
                 spy,
                 async () => {
 
-                let permissions = <Roster> wrapper.find({ref: 'student_roster'}).vm;
-                permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
+                let roster = <Roster> wrapper.find({ref: 'student_roster'}).vm;
+                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await student_roster.$nextTick();
 
                 let add_students_form = wrapper.find('#add-users-form');
@@ -225,12 +225,12 @@ describe('StudentRoster.vue', () => {
                 'remove_students',
                 spy,
                 async () => {
-                let delete_permission_buttons = wrapper.find(
+                let remove_user_buttons = wrapper.find(
                     {ref: 'student_roster'}
                 ).findAll(
                 '.remove-user'
                 );
-                delete_permission_buttons.at(1).trigger('click');
+                remove_user_buttons.at(1).trigger('click');
                 await student_roster.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);

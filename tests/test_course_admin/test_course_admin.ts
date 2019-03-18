@@ -105,7 +105,7 @@ describe('CourseAdmin.vue', () => {
         });
     });
 
-    test('Changing tabs to permissions tab by clicking on item in dropdown', async () => {
+    test('Changing tabs to roster tab by clicking on item in dropdown', async () => {
         return patch_async_static_method(
             Course,
             'get_by_pk',
@@ -126,7 +126,7 @@ describe('CourseAdmin.vue', () => {
 
             expect(course_admin_component.course).toEqual(course);
 
-            wrapper.find('.permissions-tab-header').trigger('click');
+            wrapper.find('.roster-tab-header').trigger('click');
             await course_admin_component.$nextTick();
 
             return patch_async_class_method(
@@ -146,7 +146,7 @@ describe('CourseAdmin.vue', () => {
         });
     });
 
-    test('Changing tabs to permissions tab by pressing enter on item in dropdown', async () => {
+    test('Changing tabs to roster tab by pressing enter on item in dropdown', async () => {
         return patch_async_static_method(
             Course,
             'get_by_pk',
@@ -167,7 +167,7 @@ describe('CourseAdmin.vue', () => {
 
             expect(course_admin_component.course).toEqual(course);
 
-            wrapper.find('.permissions-tab-header').trigger('click');
+            wrapper.find('.roster-tab-header').trigger('click');
             await course_admin_component.$nextTick();
 
             return patch_async_class_method(
@@ -187,7 +187,7 @@ describe('CourseAdmin.vue', () => {
         });
     });
 
-    test('Changing tabs from permissions tab', async () => {
+    test('Changing tabs from roster tab', async () => {
         return patch_async_static_method(
             Course,
             'get_by_pk',
@@ -208,7 +208,7 @@ describe('CourseAdmin.vue', () => {
 
             expect(course_admin_component.course).toEqual(course);
 
-            wrapper.find('.permissions-tab-header').trigger('click');
+            wrapper.find('.roster-tab-header').trigger('click');
             await course_admin_component.$nextTick();
 
             return patch_async_class_method(

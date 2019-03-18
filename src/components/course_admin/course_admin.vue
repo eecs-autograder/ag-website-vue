@@ -23,25 +23,25 @@
           </template>
         </tab>
 
-        <!--PERMISSIONS TAB-->
+        <!--ROSTER TAB-->
         <tab>
-          <tab-header ref="permissions_tab"
-                      id="permissions-tab">
+          <tab-header ref="roster_tab"
+                      id="roster-tab">
 
-            <dropdown ref="permission_dropdown"
+            <dropdown ref="roster_dropdown"
                       :items="roles"
                       @update_item_selected="role_selected = $event; update_tab_index(1)">
               <template slot="header">
                 <div class="tab-label" tabindex="1">
-                  <p class="permissions-tab-header tab-header"
-                     ref="edit_permissions_tab"
-                     @click="show_permissions_tab_dropdown_menu">
+                  <p class="roster-tab-header tab-header"
+                     ref="roster_tab_header"
+                     @click="show_roster_tab_dropdown_menu">
                     Roster {{role_selected === "" ? '' : `(${role_selected})`}}
                   </p>
                 </div>
               </template>
               <div slot-scope="{item}">
-                <div class="permissions-dropdown-row">
+                <div class="roster-dropdown-row">
                   <span>{{item}}</span>
                 </div>
               </div>
@@ -145,9 +145,9 @@
       }
     }
 
-    show_permissions_tab_dropdown_menu(event: Event) {
-      let permission_dropdown = <Dropdown> this.$refs.permission_dropdown;
-      permission_dropdown.show_the_dropdown_menu();
+    show_roster_tab_dropdown_menu(event: Event) {
+      let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
+      roster_dropdown.show_the_dropdown_menu();
       event.stopPropagation();
     }
   }
@@ -190,7 +190,7 @@ $current-lang-choice: "Quicksand";
   cursor: pointer;
 }
 
-.permissions-dropdown-row {
+.roster-dropdown-row {
   font-size: 16px;
   font-family: $current-lang-choice;
 }

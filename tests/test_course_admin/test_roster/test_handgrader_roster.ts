@@ -152,8 +152,8 @@ describe('HandgraderRoster.vue', () => {
                 spy,
                 async () => {
 
-                let permissions = <Roster> wrapper.find({ref: 'handgrader_roster'}).vm;
-                permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
+                let roster = <Roster> wrapper.find({ref: 'handgrader_roster'}).vm;
+                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await handgrader_roster.$nextTick();
 
                 let add_handgraders_form = wrapper.find('#add-users-form');
@@ -226,11 +226,12 @@ describe('HandgraderRoster.vue', () => {
                 spy,
                 async () => {
 
-                let handgrader_roster = wrapper.find({ref: 'handgrader_roster'});
-                let delete_permission_buttons = handgrader_roster.findAll(
+                let remove_user_buttons = wrapper.find(
+                    {ref: 'handgrader_roster'}
+                ).findAll(
                     '.remove-user'
                 );
-                delete_permission_buttons.at(1).trigger('click');
+                remove_user_buttons.at(1).trigger('click');
                 await wrapper.vm.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
