@@ -152,8 +152,6 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/course_admin.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
 
 .roster-container {
   margin: 0;
@@ -190,7 +188,6 @@ $current-lang-choice: "Quicksand";
 
 #add-users-button, #add-users-button:disabled {
   display: block;
-  font-family: $current-lang-choice;
   font-size: 16px;
   margin: 15px 0 15px 0;
   padding: 10px 15px;
