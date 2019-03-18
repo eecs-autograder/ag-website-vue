@@ -1,4 +1,4 @@
-import Permissions from '@/components/course_admin/roster/roster.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
@@ -8,9 +8,9 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('Permissions.vue', () => {
-    let wrapper: Wrapper<Permissions>;
-    let course_permissions: Permissions;
+describe('Roster.vue', () => {
+    let wrapper: Wrapper<Roster>;
+    let course_permissions: Roster;
     let original_match_media: (query: string) => MediaQueryList;
     let user_1: User;
     let user_2: User;
@@ -80,7 +80,7 @@ describe('Permissions.vue', () => {
             })
         });
 
-        wrapper = mount(Permissions, {
+        wrapper = mount(Roster, {
             propsData: {
                 role: "admin",
                 roster: [user_1, user_2, user_3, user_4]

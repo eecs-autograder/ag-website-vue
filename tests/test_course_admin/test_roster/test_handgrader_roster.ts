@@ -1,5 +1,5 @@
 import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
-import Permissions from '@/components/course_admin/roster/roster.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 
@@ -152,7 +152,7 @@ describe('HandgraderRoster.vue', () => {
                 spy,
                 async () => {
 
-                let permissions = <Permissions> wrapper.find({ref: 'handgrader_permissions'}).vm;
+                let permissions = <Roster> wrapper.find({ref: 'handgrader_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await handgrader_roster.$nextTick();
 

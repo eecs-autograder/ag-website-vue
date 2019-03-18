@@ -36,7 +36,7 @@
                   <p class="permissions-tab-header tab-header"
                      ref="edit_permissions_tab"
                      @click="show_permissions_tab_dropdown_menu">
-                    Permissions {{role_selected === "" ? '' : `(${role_selected})`}}
+                    Roster {{role_selected === "" ? '' : `(${role_selected})`}}
                   </p>
                 </div>
               </template>

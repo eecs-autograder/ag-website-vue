@@ -1,5 +1,5 @@
 import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
-import Permissions from '@/components/course_admin/roster/roster.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 
@@ -150,7 +150,7 @@ describe('AdminRoster.vue', () => {
                 spy,
                 async () => {
 
-                let permissions = <Permissions> wrapper.find({ref: 'admin_permissions'}).vm;
+                let permissions = <Roster> wrapper.find({ref: 'admin_permissions'}).vm;
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await admin_roster.$nextTick();
 

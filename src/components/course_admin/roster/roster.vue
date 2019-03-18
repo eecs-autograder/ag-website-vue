@@ -71,7 +71,7 @@
       ValidatedInput
     }
   })
-  export default class Permissions extends Vue {
+  export default class Roster extends Vue {
     @Prop({required: true, type: String})
     role!: string;
 
