@@ -16,12 +16,16 @@
                    course_index === current_term.course_list.length - 1}]">
                 <p class="course-name">{{course.name}}</p>
                 <p class="course-semester-year">{{course.semester}} {{course.year}}</p>
-                <div v-if="is_admin(course)"
-                     class="edit-admin-settings">
-                  <p class="edit-settings-label"> Edit Settings
-                    <i class="fas fa-cog cog"></i>
-                  </p>
-                </div>
+                <router-link tag="div"
+                             :to="`/web/course_admin/${course.pk}`"
+                             v-if="is_admin(course)"
+                             class="edit-admin-settings">
+                  <a>
+                    <p class="edit-settings-label"> Edit Settings
+                      <i class="fas fa-cog cog"></i>
+                    </p>
+                  </a>
+                </router-link>
               </div>
             </div>
           </div>
@@ -154,6 +158,11 @@
   width: 90%;
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
 #not-enrolled-message {
   padding: 20px;
   text-align: center;
@@ -187,8 +196,9 @@
 }
 
 .edit-admin-settings {
-  background-color: white;
-  border-radius: 6px;
+  background-color: lighten(lavender, 2);
+  border-radius: 4px;
+  border: 1.5px solid darken(lavender, 11);
   bottom: 15px;
   padding: 5px 10px;
   position: absolute;
@@ -197,7 +207,8 @@
 }
 
 .edit-admin-settings:hover {
-  background-color: $pebble-medium;
+  background-color: white;
+  border: 1.5px solid darken(lavender, 5);
 }
 
 .edit-admin-settings:hover .cog  {

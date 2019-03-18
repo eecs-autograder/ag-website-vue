@@ -76,15 +76,7 @@
             </div>
           </div>
 
-          <div v-for="error of api_errors" class="api-error-container">
-            <div class="api-error">{{error}}</div>
-            <button class="dismiss-error-button"
-                    type="button"
-                    @click="api_errors = []">
-              <span class="dismiss-error"> Dismiss
-              </span>
-            </button>
-          </div>
+          <APIErrors ref="api_errors"></APIErrors>
 
           <button @click="add_cloned_project"
                   class="clone-project-button"
@@ -96,21 +88,22 @@
 </template>
 
 <script lang="ts">
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import { Course, Project, User } from 'ag-client-typescript';
 
-  import { AxiosResponse } from 'axios';
-
+  import APIErrors from "@/components/api_errors.vue";
   import Dropdown from '@/components/dropdown.vue';
   import Modal from '@/components/modal.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
-  import { handle_400_errors_async } from '@/utils';
+  import { handle_api_errors_async } from '@/utils';
   import { is_not_empty } from '@/validators';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component({
     components: {
+      APIErrors,
       Dropdown,
       Modal,
       Tooltip,
@@ -136,7 +129,6 @@
     course_to_clone_to: Course | null = null;
     cloned_project_name: string = "";
     cloned_project_name_is_valid = false;
-    cloning_api_error_present = false;
 
     course_index: number = 0;
 
@@ -152,15 +144,13 @@
     async clone_project() {
       this.api_errors = [];
       this.cloned_project_name = "";
-      this.cloning_api_error_present = false;
       this.course_to_clone_to = this.course;
       (<Modal> this.$refs.clone_project_modal).open();
     }
 
-    @handle_400_errors_async(handle_add_cloned_project_error)
+    @handle_api_errors_async(handle_add_cloned_project_error)
     async add_cloned_project() {
       this.api_errors = [];
-      this.cloning_api_error_present = false;
       let new_project = await this.project.copy_to_course(
         this.course_to_clone_to!.pk, this.cloned_project_name
       );
@@ -173,13 +163,8 @@
     }
   }
 
-  export function handle_add_cloned_project_error(component: SingleProject,
-                                                  response: AxiosResponse) {
-    let errors = response.data["__all__"];
-    if (errors.length > 0) {
-      component.api_errors = [errors[0]];
-      component.cloning_api_error_present = true;
-    }
+  export function handle_add_cloned_project_error(component: SingleProject, error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 
 </script>

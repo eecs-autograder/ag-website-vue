@@ -84,33 +84,24 @@ export function array_remove_unique<ItemType, SentinelType>(
     return index !== -1;
 }
 
-export class UniqueArrayError extends Error {
-
-}
+export class UniqueArrayError extends Error {}
 
 // tslint:disable-next-line:no-any
 type PropertyDescriptorType = TypedPropertyDescriptor<(...args: any[]) => any>;
 
-// istanbul ignore next
-export function handle_400_errors_async(
+export function handle_api_errors_async(
     // tslint:disable-next-line:no-any
-    error_handler_func: (self: any, response: AxiosResponse) => void) {
+    error_handler_func: (self: any, response: unknown) => void) {
     function decorator(target: object, property_key: string | symbol,
                        property_descriptor: PropertyDescriptorType) {
         return {
             // tslint:disable-next-line:no-any
             value: async function(...args: any[]) {
                 try {
-                    if (not_undefined(property_descriptor.value)) {
-                        return await property_descriptor.value.apply(this, args);
-                    }
+                    return await property_descriptor.value!.apply(this, args);
                 }
                 catch (e) {
-                    let [response, status] = get_axios_error_status(e);
-                    if (status !== 400) {
-                        throw response;
-                    }
-                    error_handler_func(this, response);
+                    error_handler_func(this, e);
                 }
             }
         };
@@ -118,16 +109,7 @@ export function handle_400_errors_async(
     return decorator;
 }
 
-// istanbul ignore next
-function not_undefined<T>(arg?: T): arg is T {
-    if (arg === undefined) {
-        throw new Error('Value unexpectedly undefined');
-    }
-    return true;
-}
-
-// istanbul ignore next
-function get_axios_error_status(error: unknown): [AxiosResponse, number] {
+export function get_axios_error_status(error: unknown): [AxiosResponse, number] {
     let response = (error as AxiosError).response;
     if (response === undefined) {
         throw error;

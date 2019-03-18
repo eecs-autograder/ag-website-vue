@@ -1,5 +1,5 @@
 <template>
-  <div id="course-permissions-demo" v-if="my_course !== null">
+  <div id="roster-demo" v-if="my_course !== null">
     <admin-roster :course="my_course"></admin-roster>
     <!--<handgrader-roster :course="my_course"></handgrader-roster>-->
     <!--<staff-roster :course="my_course"></staff-roster>-->
@@ -13,15 +13,15 @@
 
   import { Model } from '@/model';
 
-  import AdminRoster from '@/components/permissions/admin_roster.vue';
-  import HandgraderRoster from '@/components/permissions/handgrader_roster.vue';
-  import StaffRoster from '@/components/permissions/staff_roster.vue';
-  import StudentRoster from '@/components/permissions/student_roster.vue';
+  import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
+  import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
+  import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
+  import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 
   @Component({
     components: { AdminRoster, HandgraderRoster, StaffRoster, StudentRoster }
   })
-  export default class CoursePermissionsDemo extends Vue {
+  export default class RosterDemo extends Vue {
     my_course: Course | null = null;
     user: User | null = null;
 

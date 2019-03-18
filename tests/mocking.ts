@@ -54,11 +54,11 @@ export async function patch_async_class_method(
 }
 
 export async function patch_async_static_method(
-    /* tslint:disable-next-line:no-any */
-    class_: {prototype: {constructor: any}},
-    method_name: string,
-    new_method: (...args: unknown[]) => Promise<unknown | void>,
-    body: () => Promise<void>) {
+        /* tslint:disable-next-line:no-any */
+        class_: {prototype: {constructor: any}},
+        method_name: string,
+        new_method: (...args: unknown[]) => Promise<unknown | void>,
+        body: () => Promise<void>) {
     let original_method = class_.prototype.constructor[method_name];
     try {
         class_.prototype.constructor[method_name] = new_method;

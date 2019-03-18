@@ -1,5 +1,5 @@
 <template>
-  <div class="manage-projects-component">
+  <div id="manage-projects-component">
     <div>
       <div id="new-project-side">
         <div id="new-project-space">
@@ -22,20 +22,11 @@
               </ValidatedForm>
             </div>
 
-            <div v-for="error of new_project_api_errors"
-                 class="api-error-container">
-              <div class="api-error">{{error}}</div>
-              <button class="dismiss-error-button"
-                      type="button"
-                      @click="new_project_api_errors = []">
-                  <span class="dismiss-error"> Dismiss
-                  </span>
-              </button>
-            </div>
+            <APIErrors ref="api_errors"></APIErrors>
 
             <button @click="add_project"
                     type="submit"
-                    :disabled="!new_project_name_is_valid"
+                    :disabled="!new_project_name_is_valid || d_adding_project"
                     class="add-project-button">
               Add Project
             </button>
@@ -68,20 +59,21 @@
 </template>
 
 <script lang="ts">
-  import { Course, Project } from 'ag-client-typescript';
-  import { AxiosResponse } from 'axios';
-
-  import SingleProject from '@/components/manage_projects/single_project.vue';
+  import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
 
-  import { handle_400_errors_async } from '@/utils';
+  import APIErrors from "@/components/api_errors.vue";
+  import { handle_api_errors_async } from '@/utils';
   import { is_not_empty } from '@/validators';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
+  import { Course, Project } from 'ag-client-typescript';
+
   @Component({
     components: {
+      APIErrors,
       SingleProject,
       Tooltip,
       ValidatedForm,
@@ -99,8 +91,9 @@
     projects: Project[] = [];
     new_project_name = "";
     new_project_name_is_valid = false;
-    new_project_api_errors: string[] = [];
     d_course!: Course;
+
+    d_adding_project = false;
 
     async created() {
       this.d_course = this.course;
@@ -122,10 +115,10 @@
       this.sort_projects();
     }
 
-    @handle_400_errors_async(handle_add_project_error)
+    @handle_api_errors_async(handle_add_project_error)
     async add_project() {
-      this.new_project_api_errors = [];
       try {
+        this.d_adding_project = true;
         this.new_project_name.trim();
         let new_project: Project = await Project.create(
           {name: this.new_project_name, course: this.d_course.pk}
@@ -134,15 +127,14 @@
         this.sort_projects();
         (<ValidatedInput> this.$refs.new_project_name).clear();
       }
-      finally { }
+      finally {
+        this.d_adding_project = false;
+      }
     }
   }
 
-  export function handle_add_project_error(component: ManageProjects, response: AxiosResponse) {
-    let errors = response.data["__all__"];
-    if (errors.length > 0) {
-      component.new_project_api_errors = [errors[0]];
-    }
+  export function handle_add_project_error(component: ManageProjects, error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 
 </script>
@@ -167,12 +159,12 @@
 }
 
 #new-project-label, #existing-projects-label {
-  font-size: 19px;
+  font-size: $title-size;
   font-weight: 600;
 }
 
 #new-project-label {
-  margin: 14px 0 12px 0;
+  margin: 10px 0 8px 0;
 }
 
 .add-project-button {
@@ -195,16 +187,24 @@
 }
 
 #existing-projects-label {
-  margin: 40px 0 12px 0;
+  margin: 40px 0 8px 0;
 }
 
 @media only screen and (min-width: 960px) {
+  #manage-projects-component {
+    margin: 0 2.5%;
+  }
+
   #new-project-side {
     display: inline-block;
     width: 40%;
     max-width: 500px;
     box-sizing: border-box;
     padding-right: 10px;
+  }
+
+  #new-project-space {
+    margin: 0;
   }
 
   #existing-projects-side {
@@ -215,7 +215,7 @@
   }
 
   #existing-projects-label {
-    margin: 14px 0 12px 0;
+    margin: 10px 0 12px 0;
   }
 }
 </style>

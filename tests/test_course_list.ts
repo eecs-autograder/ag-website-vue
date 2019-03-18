@@ -66,7 +66,6 @@ describe('Course_List tests', () => {
 
     afterEach(() => {
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });

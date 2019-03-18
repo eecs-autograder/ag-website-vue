@@ -1,4 +1,4 @@
-import Permissions from '@/components/permissions/permissions.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
@@ -8,9 +8,9 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('Permissions.vue', () => {
-    let wrapper: Wrapper<Permissions>;
-    let course_permissions: Permissions;
+describe('Roster.vue', () => {
+    let wrapper: Wrapper<Roster>;
+    let roster: Roster;
     let original_match_media: (query: string) => MediaQueryList;
     let user_1: User;
     let user_2: User;
@@ -20,8 +20,8 @@ describe('Permissions.vue', () => {
     let new_user_2: User;
     let validated_input: Wrapper<ValidatedInput>;
     let validated_input_component: ValidatedInput;
-    let permissions_form_component: ValidatedForm;
-    let permissions_form: Wrapper<ValidatedForm>;
+    let roster_form_component: ValidatedForm;
+    let roster_form_wrapper: Wrapper<ValidatedForm>;
 
     beforeEach(() => {
         user_1 = new User({
@@ -80,20 +80,20 @@ describe('Permissions.vue', () => {
             })
         });
 
-        wrapper = mount(Permissions, {
+        wrapper = mount(Roster, {
             propsData: {
                 role: "admin",
                 roster: [user_1, user_2, user_3, user_4]
             }
         });
 
-        course_permissions = wrapper.vm;
-        expect(course_permissions.d_roster.length).toEqual(4);
+        roster = wrapper.vm;
+        expect(roster.d_roster.length).toEqual(4);
 
-        validated_input = <Wrapper<ValidatedInput>> wrapper.find('#add-permissions-input');
-        validated_input_component = <ValidatedInput> wrapper.find('#add-permissions-input').vm;
-        permissions_form_component = <ValidatedForm> wrapper.find('#add-permissions-form').vm;
-        permissions_form = <Wrapper<ValidatedForm>> wrapper.find('#add-permissions-form');
+        validated_input = <Wrapper<ValidatedInput>> wrapper.find('#add-users-input');
+        validated_input_component = <ValidatedInput> wrapper.find('#add-users-input').vm;
+        roster_form_component = <ValidatedForm> wrapper.find('#add-users-form').vm;
+        roster_form_wrapper = <Wrapper<ValidatedForm>> wrapper.find('#add-users-form');
         validated_input.find('#textarea').trigger('input');
     });
 
@@ -103,17 +103,16 @@ describe('Permissions.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
 
     test('Usernames are displayed in alphabetical order', () => {
-        expect(course_permissions.role).toEqual("admin");
-        expect(course_permissions.d_roster[0]).toEqual(user_2); // amandaplease
-        expect(course_permissions.d_roster[1]).toEqual(user_1); // coolmom
-        expect(course_permissions.d_roster[2]).toEqual(user_4); // freshPrince
-        expect(course_permissions.d_roster[3]).toEqual(user_3); // worldsbestboss
+        expect(roster.role).toEqual("admin");
+        expect(roster.d_roster[0]).toEqual(user_2); // amandaplease
+        expect(roster.d_roster[1]).toEqual(user_1); // coolmom
+        expect(roster.d_roster[2]).toEqual(user_4); // freshPrince
+        expect(roster.d_roster[3]).toEqual(user_3); // worldsbestboss
 
         let all_users = wrapper.findAll('.email');
 
@@ -123,19 +122,19 @@ describe('Permissions.vue', () => {
         expect(all_users.at(3).text()).toEqual(user_3.username);
     });
 
-    test('When a user is deleted from permissions, the parent component is notified',
+    test('When a user is removed from roster, the parent component is notified',
          async () => {
-        let delete_permission_buttons = wrapper.findAll('.delete-permission');
-        delete_permission_buttons.at(1).trigger('click');
-        await course_permissions.$nextTick();
+        let remove_user_buttons = wrapper.findAll('.remove-user');
+        remove_user_buttons.at(1).trigger('click');
+        await roster.$nextTick();
 
-        expect(course_permissions.d_roster.length).toEqual(3);
+        expect(roster.d_roster.length).toEqual(3);
 
         let all_users = wrapper.findAll('.email');
         expect(all_users.at(0).text()).toEqual(user_2.username);
         expect(all_users.at(1).text()).toEqual(user_4.username);
         expect(all_users.at(2).text()).toEqual(user_3.username);
-        expect(wrapper.emitted().remove_permission.length).toBe(1);
+        expect(wrapper.emitted().remove_user.length).toBe(1);
     });
 
     test('The d_roster is updated when the value of the roster prop changes in the parent',
@@ -145,11 +144,11 @@ describe('Permissions.vue', () => {
         expect(all_users.at(1).text()).toEqual(user_1.username);
         expect(all_users.at(2).text()).toEqual(user_4.username);
         expect(all_users.at(3).text()).toEqual(user_3.username);
-        expect(course_permissions.d_roster.length).toEqual(4);
+        expect(roster.d_roster.length).toEqual(4);
 
         wrapper.setProps({roster: [user_1, user_3, user_4, new_user_1, new_user_2, user_2]});
-        await course_permissions.$nextTick();
-        expect(course_permissions.d_roster.length).toEqual(6);
+        await roster.$nextTick();
+        expect(roster.d_roster.length).toEqual(6);
 
         all_users = wrapper.findAll('.email');
         expect(all_users.at(0).text()).toEqual(user_2.username);
@@ -165,7 +164,7 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu";
         validated_input.find('#textarea').trigger('input');
-        expect(permissions_form_component.is_valid).toBe(true);
+        expect(roster_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe(
         'ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu'
         );
@@ -174,12 +173,12 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "sk8gr8m8@umich.edu";
         validated_input.find('#textarea').trigger('input');
-        expect(permissions_form_component.is_valid).toBe(true);
+        expect(roster_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe('sk8gr8m8@umich.edu');
 
         (<HTMLInputElement> validated_input.find('#textarea').element).value = "a_B-C@d-e-f-g.hi";
         validated_input.find('#textarea').trigger('input');
-        expect(permissions_form_component.is_valid).toBe(true);
+        expect(roster_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe('a_B-C@d-e-f-g.hi');
     });
 
@@ -187,20 +186,20 @@ describe('Permissions.vue', () => {
          async () => {
         (<HTMLInputElement> validated_input.find('#textarea').element).value = "@e.iou";
         validated_input.find('#textarea').trigger('input');
-        expect(permissions_form_component.is_valid).toBe(false);
+        expect(roster_form_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('@e.iou');
     });
 
-    test("The empty string cannot be added to a permissions roster", async () => {
+    test("Empty string cannot be added to a roster", async () => {
         (<HTMLInputElement> validated_input.find('#textarea').element).value = "         ";
         validated_input.find('#textarea').trigger('input');
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe("         ");
 
-        permissions_form.trigger('submit.native');
-        await course_permissions.$nextTick();
+        roster_form_wrapper.trigger('submit.native');
+        await roster.$nextTick();
 
-        expect(wrapper.emitted('add_permissions')).not.toBeTruthy();
+        expect(wrapper.emitted('add_users')).not.toBeTruthy();
     });
 
     // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -210,35 +209,41 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "a*@e.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a*@e.iou');
-        // console.log("Users to add: " + course_permissions.users_to_add);
+        // console.log("Users to add: " + roster.users_to_add);
         // Something about these tests makes it so that the following two assertions
         // fail (only when the input is changed more than once in a test).
         // This behavior has been independently tested as part of the validated form
         // tests.
-        // expect(permissions_form_component.is_valid).toBe(false);
-        // expect(course_permissions.permissions_form_is_valid).toBe(false);
+        expect(roster_form_component.is_valid).toBe(false);
+        expect(roster.add_users_form_is_valid).toBe(false);
 
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "a?@e.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a?@e.iou');
+        // See above comment
+        // expect(roster_form_component.is_valid).toBe(false);
+        // expect(roster.add_users_form_is_valid).toBe(false);
 
         (<HTMLInputElement> validated_input.find(
         '#textarea'
         ).element).value = "a(@e.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a(@e.iou');
+        // See above comment
+        // expect(roster_form_component.is_valid).toBe(false);
+        // expect(roster.add_users_form_is_valid).toBe(false);
     });
 
     test('Emails missing the @ character after the local part are invalid',
@@ -247,10 +252,10 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "iceberg.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
-        expect(permissions_form_component.is_valid).toBe(false);
-        expect(course_permissions.permissions_form_is_valid).toBe(false);
+        expect(roster_form_component.is_valid).toBe(false);
+        expect(roster.add_users_form_is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg.iou');
     });
 
@@ -261,7 +266,7 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@.iou');
@@ -270,7 +275,7 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@hello_world.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@hello_world.iou');
@@ -279,7 +284,7 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@@hello.iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@@hello.iou');
@@ -291,12 +296,12 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "iceberg@iou";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@iou');
-        expect(permissions_form_component.is_valid).toBe(false);
-        expect(course_permissions.permissions_form_is_valid).toBe(false);
+        expect(roster_form_component.is_valid).toBe(false);
+        expect(roster.add_users_form_is_valid).toBe(false);
     });
 
     test('Emails where the top-level-domain is less than 2 characters are invalid',
@@ -305,7 +310,7 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "iceberg@ae.";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@ae.');
@@ -314,7 +319,7 @@ describe('Permissions.vue', () => {
         '#textarea'
         ).element).value = "iceberg@ae.i";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@ae.i');
@@ -327,7 +332,7 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@umich.sk8";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@umich.sk8');
@@ -336,30 +341,30 @@ describe('Permissions.vue', () => {
          '#textarea'
         ).element).value = "iceberg@umich.edu?";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@umich.edu?');
     });
 
-    test('When a user is given permission, the parent component is notified',
+    test('When a user is added, the parent component is notified',
          async () => {
          (<HTMLInputElement> validated_input.find(
              '#textarea'
          ).element).value = "letitsnow@umich.edu  sevenEleven@umich.edu";
          validated_input.find('#textarea').trigger('input');
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
-         expect(permissions_form_component.is_valid).toBe(true);
+         expect(roster_form_component.is_valid).toBe(true);
          expect(validated_input_component.d_input_value).toBe(
              'letitsnow@umich.edu  sevenEleven@umich.edu'
          );
-         expect(course_permissions.permissions_form_is_valid).toBe(true);
+         expect(roster.add_users_form_is_valid).toBe(true);
 
-         permissions_form.trigger('submit.native');
-         await course_permissions.$nextTick();
+         roster_form_wrapper.trigger('submit.native');
+         await roster.$nextTick();
 
-         expect(wrapper.emitted().add_permissions.length).toBe(1);
+         expect(wrapper.emitted().add_users.length).toBe(1);
     });
 
     test('Validator function exposes addresses that do not adhere to the format specified ' +
@@ -367,19 +372,19 @@ describe('Permissions.vue', () => {
          async () => {
          (<HTMLInputElement> validated_input.find('#textarea').element).value = " angela";
          validated_input.find('#textarea').trigger('input');
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(' angela');
-         expect(permissions_form_component.is_valid).toBe(false);
-         expect(course_permissions.permissions_form_is_valid).toBe(false);
+         expect(roster_form_component.is_valid).toBe(false);
+         expect(roster.add_users_form_is_valid).toBe(false);
 
          (<HTMLInputElement> validated_input.find(
              '#textarea'
          ).element).value = " angela@umich";
          validated_input.find('#textarea').trigger('input');
 
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(' angela@umich');
@@ -388,7 +393,7 @@ describe('Permissions.vue', () => {
              '#textarea'
          ).element).value = " angela@umich.edu";
          validated_input.find('#textarea').trigger('input');
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(true);
          expect(validated_input_component.d_input_value).toBe(' angela@umich.edu');
@@ -399,14 +404,14 @@ describe('Permissions.vue', () => {
             '#textarea'
         ).element).value = " roy@anderson.net\nclark@aol.com,pete@nd.edu     meredith@cmu.edu";
         validated_input.find('#textarea').trigger('input');
-        await course_permissions.$nextTick();
+        await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe(
             ' roy@anderson.net\nclark@aol.com,pete@nd.edu     meredith@cmu.edu'
         );
-        expect(permissions_form_component.is_valid).toBe(true);
-        expect(course_permissions.permissions_form_is_valid).toBe(true);
+        expect(roster_form_component.is_valid).toBe(true);
+        expect(roster.add_users_form_is_valid).toBe(true);
     });
 
     test('Validator function exposes the first invalid email address even when there' +
@@ -417,14 +422,13 @@ describe('Permissions.vue', () => {
          ).element).value = " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu" +
                             "\nryan@msuedu\ngabe";
          validated_input.find('#textarea').trigger('input');
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
-         expect(course_permissions.first_invalid_email).toEqual("phyllis@@umich.edu");
+         expect(roster.first_invalid_email).toEqual("phyllis@@umich.edu");
     });
 
-    test('When trying to add permissions invalid usernames entered will prevent ' +
-         'a successful submission',
+    test('Invalid usernames prevent form submission',
          async () => {
          let username_input = "michael@umich.edu\nhollyflax\nDarryl@umich.edu Bearyl@umich.edu " +
                               "erinH@umich.edu\ngabe@umich\nmeredith@umich.edu " +
@@ -438,24 +442,24 @@ describe('Permissions.vue', () => {
              '#textarea'
          ).element).value = username_input;
          validated_input.find('#textarea').trigger('input');
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(username_input);
-         expect(course_permissions.first_invalid_email).toEqual("hollyflax");
+         expect(roster.first_invalid_email).toEqual("hollyflax");
 
-         let add_permissions_button = wrapper.find('#add-permissions-button');
-         expect(add_permissions_button.is('[disabled]')).toBe(true);
-         expect(course_permissions.permissions_form_is_valid).toEqual(false);
+         let add_users_button = wrapper.find('#add-users-button');
+         expect(add_users_button.is('[disabled]')).toBe(true);
+         expect(roster.add_users_form_is_valid).toEqual(false);
 
-         permissions_form.trigger('submit.native');
-         await course_permissions.$nextTick();
+         roster_form_wrapper.trigger('submit.native');
+         await roster.$nextTick();
 
-         expect(wrapper.emitted('add_permissions')).not.toBeTruthy();
+         expect(wrapper.emitted('add_users')).not.toBeTruthy();
     });
 
     test('If the textarea contains all valid emails, the parent component is notified ' +
-         'when the add_permissions button is pressed.',
+         'when the add_users button is pressed.',
          async () => {
 
          let username_input = "michael@umich.edu\n\nDarryl@umich.edu Bearyl@umich.edu " +
@@ -468,15 +472,15 @@ describe('Permissions.vue', () => {
 
          (<HTMLInputElement> validated_input.find('#textarea').element).value = username_input;
          validated_input.find('#textarea').trigger('input');
-         await course_permissions.$nextTick();
+         await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(true);
          expect(validated_input_component.d_input_value).toBe(username_input);
-         expect(permissions_form_component.is_valid).toBe(true);
+         expect(roster_form_component.is_valid).toBe(true);
 
-         permissions_form.trigger('submit.native');
-         await course_permissions.$nextTick();
+         roster_form_wrapper.trigger('submit.native');
+         await roster.$nextTick();
 
-         expect(wrapper.emitted().add_permissions.length).toBe(1);
+         expect(wrapper.emitted().add_users.length).toBe(1);
     });
 });

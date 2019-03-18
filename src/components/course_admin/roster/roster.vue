@@ -1,57 +1,55 @@
 <template>
-  <div class="permissions-container">
-    <div class="class-permissions-body">
-      <div class="adding-container">
-        <validated-form id="add-permissions-form"
-                        autocomplete="off"
-                        @submit.native.prevent="add_permissions"
-                        @form_validity_changed="permissions_form_is_valid = $event">
-          <label class="enrollment-add-label"> Add {{role}}
-            <i class="far fa-question-circle permission-tooltip">
-              <tooltip width="large" placement="top">
-                Enter a comma-separated list of email addresses.
-              </tooltip>
-            </i>
-          </label>
-          <ValidatedInput ref="permissions_textarea"
-                          id="add-permissions-input"
-                          input_style="border-width: 2px"
-                          v-model="users_to_add"
-                          :validators="[contains_valid_emails]"
-                          :num_rows="7">
-          </ValidatedInput>
-          <input type="submit"
-                 id="add-permissions-button"
-                 value="Add to Roster"
-                 :disabled="!permissions_form_is_valid">
-        </validated-form>
-      </div>
+  <div class="roster-container">
+    <div class="adding-container">
+      <validated-form id="add-users-form"
+                      autocomplete="off"
+                      @submit.native.prevent="add_users"
+                      @form_validity_changed="add_users_form_is_valid = $event">
+        <label class="enrollment-add-label"> Add {{role}}
+          <i class="far fa-question-circle add-users-tooltip">
+            <tooltip width="large" placement="top">
+              Enter a comma-separated list of email addresses.
+            </tooltip>
+          </i>
+        </label>
+        <ValidatedInput ref="add_users_textarea"
+                        id="add-users-input"
+                        input_style="border-width: 2px"
+                        v-model="users_to_add"
+                        :validators="[contains_valid_emails]"
+                        :num_rows="7">
+        </ValidatedInput>
+        <input type="submit"
+               id="add-users-button"
+               value="Add to Roster"
+               :disabled="!add_users_form_is_valid">
+      </validated-form>
+    </div>
 
-      <div class="enrolled-container">
-        <div>
-          <div  v-if="d_roster.length !== 0" class="permissions-column">
-            <table class="permissions-table">
-              <tr>
-                <th class="email-column"> Username </th>
-                <th class="name-column"> Name </th>
-                <th class="delete-column"> Delete </th>
-              </tr>
-              <tr v-for="(person, index) in d_roster"
-                  :class="index % 2 ? 'odd-row' : 'even-row'">
-                <td class="email-column email">{{person.username}}</td>
-                <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
-                <td class="delete-column">
-                  <i class="fas fa-user-times delete-permission"
-                     @click="remove_person_from_roster([person], index)">
-                  </i>
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div v-else class="empty-roster-message">
-            The {{role}} roster for this course is currently empty! You can add {{role}}
-            by entering a comma-separated list of their emails in the textarea above!
-          </div>
+    <div class="enrolled-container">
+      <div>
+        <div  v-if="d_roster.length !== 0" class="user-table-wrapper">
+          <table class="user-table">
+            <tr>
+              <th class="email-column"> Username </th>
+              <th class="name-column"> Name </th>
+              <th class="remove-user-column"> Remove </th>
+            </tr>
+            <tr v-for="(person, index) in d_roster"
+                :class="index % 2 ? 'odd-row' : 'even-row'">
+              <td class="email-column email">{{person.username}}</td>
+              <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
+              <td class="remove-user-column">
+                <i class="fas fa-user-times remove-user"
+                   @click="remove_person_from_roster([person], index)">
+                </i>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div v-else class="empty-roster-message">
+          The {{role}} roster for this course is currently empty! You can add {{role}}
+          by entering a comma-separated list of their emails in the textarea above!
         </div>
       </div>
     </div>
@@ -71,7 +69,7 @@
       ValidatedInput
     }
   })
-  export default class Permissions extends Vue {
+  export default class Roster extends Vue {
     @Prop({required: true, type: String})
     role!: string;
 
@@ -79,11 +77,11 @@
     roster!: User[];
 
     first_invalid_email: string | null = null;
-    permissions_form_is_valid = false;
+    add_users_form_is_valid = false;
 
     @Watch('roster')
-    on_roster_change(new_permissions_array: User[], old_permissions_array: User[]) {
-      this.d_roster = new_permissions_array.slice(0);
+    on_roster_change(new_users_array: User[], old_users_array: User[]) {
+      this.d_roster = new_users_array.slice(0);
       this.sort_users(this.d_roster);
     }
 
@@ -131,20 +129,20 @@
       }
     }
 
-    add_permissions() {
+    add_users() {
       let valid_usernames: string[] = [];
       this.check_for_invalid_emails(this.users_to_add, valid_usernames);
       if (this.first_invalid_email === null) {
-        this.$emit('add_permissions', valid_usernames);
+        this.$emit('add_users', valid_usernames);
         this.users_to_add = "";
-        let validated_input = <ValidatedInput> this.$refs.permissions_textarea;
+        let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
         validated_input.clear();
-        this.permissions_form_is_valid = false;
+        this.add_users_form_is_valid = false;
       }
     }
 
     remove_person_from_roster(person_to_delete: User[], index: number) {
-      this.$emit('remove_permission', person_to_delete);
+      this.$emit('remove_user', person_to_delete);
       this.d_roster.splice(index, 1);
     }
   }
@@ -153,11 +151,9 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
+@import '@/styles/components/course_admin.scss';
 
-.class-permissions-body {
-  font-family: $current-lang-choice;
+.roster-container {
   margin: 0;
 }
 
@@ -170,29 +166,23 @@ $current-lang-choice: "Quicksand";
   padding: 0 0 50px 0;
 }
 
-.permission-tooltip {
+.add-users-tooltip {
   color: #8785a2;
   font-size: 18px;
   margin-left: 3px;
   top: 1px;
 }
 
-#add-permissions-button {
+#add-users-button {
   @extend .green-button;
 }
 
-#add-permissions-button:disabled {
+#add-users-button:disabled {
   @extend .gray-button;
 }
 
-#add-permissions-button:disabled:hover {
-  background-color: hsl(210, 13%, 63%);
-  cursor: default;
-}
-
-#add-permissions-button, #add-permissions-button:disabled {
+#add-users-button, #add-users-button:disabled {
   display: block;
-  font-family: $current-lang-choice;
   font-size: 16px;
   margin: 15px 0 15px 0;
   padding: 10px 15px;
@@ -201,19 +191,19 @@ $current-lang-choice: "Quicksand";
 .enrollment-add-label {
   color: black;
   display: block;
-  font-size: 17px;
+  font-size: $title-size;
   font-weight: 600;
   margin: 0;
   padding: 10px 0 8px 1px;
   position: relative;
 }
 
-.permissions-table {
+.user-table {
   border-collapse: collapse;
   margin-top: 15px;
 }
 
-.permissions-table th {
+.user-table th {
   border-bottom: 2px solid hsl(200, 1%, 85%);
   color: black;
   font-size: 16px;
@@ -239,18 +229,18 @@ $current-lang-choice: "Quicksand";
   color: lighten(black, 20);
 }
 
-.delete-column {
+.remove-user-column {
   text-align: center;
   width: 5%;
 }
 
-.permissions-table td {
+.user-table td {
   margin-bottom: 10px;
   padding: 10px 15px 10px 15px;
   position: relative;
 }
 
-.permissions-table tr td {
+.user-table tr td {
   border-bottom: 1px solid hsl(200, 1%, 85%);
 }
 
@@ -262,16 +252,16 @@ $current-lang-choice: "Quicksand";
   background-color: hsl(240, 10%, 96%);
 }
 
-.permissions-column {
+.user-table-wrapper {
   overflow: scroll;
 }
 
-.delete-permission {
+.remove-user {
   color: hsl(200, 1%, 40%);
   cursor: pointer;
 }
 
-.delete-permission:hover {
+.remove-user:hover {
   color: black;
 }
 
@@ -285,13 +275,13 @@ $current-lang-choice: "Quicksand";
     margin: 0 2.5%;
   }
 
-  .permissions-table {
+  .user-table {
     width: 100%;
   }
 }
 
 @media only screen and (min-width: 768px) {
-  .permissions-column {
+  .user-table-wrapper {
     overflow: visible;
   }
 }

@@ -1,17 +1,17 @@
-import HandgraderRoster from '@/components/permissions/handgrader_roster.vue';
-import Permissions from '@/components/permissions/permissions.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
+import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 
-import { patch_async_class_method, patch_async_static_method } from '../mocking';
+import { patch_async_class_method } from '../../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('HandgraderRoster.vue', () => {
-    let wrapper: Wrapper<HandgraderRoster>;
-    let handgrader_roster: HandgraderRoster;
+describe('StudentRoster.vue', () => {
+    let wrapper: Wrapper<StudentRoster>;
+    let student_roster: StudentRoster;
     let original_match_media: (query: string) => MediaQueryList;
     let user_1: User;
     let user_2: User;
@@ -20,7 +20,7 @@ describe('HandgraderRoster.vue', () => {
     let new_user_1: User;
     let new_user_2: User;
     let my_course: Course;
-    let handgraders: User[];
+    let students: User[];
 
     beforeEach(() => {
         my_course = new Course({
@@ -52,7 +52,7 @@ describe('HandgraderRoster.vue', () => {
             is_superuser: true
         });
         user_4 = new User({
-            pk: 3,
+            pk: 4,
             username: "freshPrince@umich.edu",
             first_name: "Will",
             last_name: "Smith",
@@ -60,7 +60,7 @@ describe('HandgraderRoster.vue', () => {
             is_superuser: true
         });
         new_user_1 = new User({
-            pk: 4,
+            pk: 5,
             username: "letitsnow@umich.edu",
             first_name: "Brittany",
             last_name: "Snow",
@@ -68,7 +68,7 @@ describe('HandgraderRoster.vue', () => {
             is_superuser: true
         });
         new_user_2 = new User({
-            pk: 5,
+            pk: 6,
             username: "sevenEleven@umich.edu",
             first_name: "Millie",
             last_name: "Brown",
@@ -90,38 +90,38 @@ describe('HandgraderRoster.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
 
-    test('The created function calls the Course method "get_handgraders"', () => {
-        handgraders = [user_1, user_2, user_3, user_4];
+    test('The created function calls the Course method "get_students"', () => {
+        students = [user_1, user_2, user_3, user_4];
 
         return patch_async_class_method(
             Course,
-            'get_handgraders',
-            () => Promise.resolve(handgraders),
+            'get_students',
+            () => Promise.resolve(students),
             async () => {
 
-            wrapper = mount(HandgraderRoster, {
+            wrapper = mount(StudentRoster, {
                 propsData: {
                     course: my_course
                 }
             });
 
-            handgrader_roster = wrapper.vm;
-            await handgrader_roster.$nextTick();
+            student_roster = wrapper.vm;
+            await student_roster.$nextTick();
 
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
+            expect(student_roster.d_course).toEqual(my_course);
+            expect(student_roster.students).toEqual(students);
         });
     });
 
     test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
-         'add_handgraders method to be called',
+         'add_students method to be called',
          async () => {
-        handgraders = [
+
+        students = [
             make_user(0, `user${0}`),
             make_user(1, `user${1}`),
             make_user(2, `user${2}`)
@@ -129,56 +129,56 @@ describe('HandgraderRoster.vue', () => {
 
         return patch_async_class_method(
             Course,
-            'get_handgraders',
-            make_fake_get_handgraders_func(),
+            'get_students',
+            make_fake_get_students_func(),
             async () => {
 
-            wrapper = mount(HandgraderRoster, {
+            wrapper = mount(StudentRoster, {
                 propsData: {
                     course: my_course
                 }
             });
 
-            handgrader_roster = wrapper.vm;
-            await handgrader_roster.$nextTick();
+            student_roster = wrapper.vm;
+            await student_roster.$nextTick();
 
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
+            expect(student_roster.d_course).toEqual(my_course);
+            expect(student_roster.students).toEqual(students);
 
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
-                'add_handgraders',
+                'add_students',
                 spy,
                 async () => {
 
-                let permissions = <Permissions> wrapper.find({ref: 'handgrader_permissions'}).vm;
-                permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await handgrader_roster.$nextTick();
+                let roster = <Roster> wrapper.find({ref: 'student_roster'}).vm;
+                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
+                await student_roster.$nextTick();
 
-                let add_handgraders_form = wrapper.find('#add-permissions-form');
-                add_handgraders_form.trigger('submit');
-                await handgrader_roster.$nextTick();
+                let add_students_form = wrapper.find('#add-users-form');
+                add_students_form.trigger('submit');
+                await student_roster.$nextTick();
 
-                handgraders.push(make_user(3, `user${3}`));
+                students.push(make_user(3, `user${3}`));
 
-                expect(handgrader_roster.handgraders).toEqual(handgraders);
+                expect(student_roster.students).toEqual(students);
                 expect(spy.mock.calls.length).toBe(1);
             });
         });
     });
 
-    function make_fake_get_handgraders_func() {
+    function make_fake_get_students_func() {
         let counter = 0;
-        let handgraders2: User[] = [];
+        let students2: User[] = [];
         for (let i = 0; i < 3; ++i) {
-            handgraders2.push(make_user(counter, `user${counter}`));
+            students2.push(make_user(counter, `user${counter}`));
             counter += 1;
         }
 
         return () => {
-            let to_return = handgraders2.slice(0);
-            handgraders2.push(make_user(counter, `user${counter}`));
+            let to_return = students2.slice(0);
+            students2.push(make_user(counter, `user${counter}`));
             counter += 1;
             return Promise.resolve(to_return);
         };
@@ -195,43 +195,42 @@ describe('HandgraderRoster.vue', () => {
         });
     }
 
-    test('Deleting a user from the roster causes the Course "remove_handgraders" method to' +
+    test('Deleting a user from the roster causes the Course "remove_students" method to' +
          ' be called ',
          async () => {
 
-        handgraders = [user_1, user_2, user_3, user_4];
-
+        students = [user_1, user_2, user_3, user_4];
         return patch_async_class_method(
             Course,
-            'get_handgraders',
-            () => Promise.resolve(handgraders),
+            'get_students',
+            () => Promise.resolve(students),
             async () => {
 
-            wrapper = mount(HandgraderRoster, {
+            wrapper = mount(StudentRoster, {
                 propsData: {
                     course: my_course
                 }
             });
 
-            handgrader_roster = wrapper.vm;
-            await handgrader_roster.$nextTick();
+            student_roster = wrapper.vm;
+            await student_roster.$nextTick();
 
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
+            expect(student_roster.d_course).toEqual(my_course);
+            expect(student_roster.students).toEqual(students);
 
             const spy = jest.fn();
             return patch_async_class_method(
                 Course,
-                'remove_handgraders',
+                'remove_students',
                 spy,
                 async () => {
-
-                let handgrader_permissions = wrapper.find({ref: 'handgrader_permissions'});
-                let delete_permission_buttons = handgrader_permissions.findAll(
-                    '.delete-permission'
+                let remove_user_buttons = wrapper.find(
+                    {ref: 'student_roster'}
+                ).findAll(
+                '.remove-user'
                 );
-                delete_permission_buttons.at(1).trigger('click');
-                await wrapper.vm.$nextTick();
+                remove_user_buttons.at(1).trigger('click');
+                await student_roster.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);
             });

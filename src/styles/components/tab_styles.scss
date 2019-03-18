@@ -171,15 +171,15 @@
 
     .gray-theme-active-no-padding {
         @extend %tab-theme;
-        @include active-tab-position(4px);
-        @include tab-border($stormy-gray-dark);
+        @include active-tab-position(2px);
+        @include tab-border($pebble-dark);
         background-color: white;
         padding: 0;
     }
 
     .gray-theme-inactive-no-padding {
         @extend %tab-theme;
-        @include inactive-tab-position(4px);
+        @include inactive-tab-position(2px);
         @include tab-border($pebble-light);
         border-right: 2px solid darken($pebble-light, 2);
         padding: 0;

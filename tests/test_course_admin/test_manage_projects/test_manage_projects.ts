@@ -1,6 +1,8 @@
-import ManageProjects from '@/components/manage_projects/manage_projects.vue';
-import SingleProject from '@/components/manage_projects/single_project.vue';
+import APIErrors from '@/componenets/api_errors.vue';
+import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
+import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
@@ -8,7 +10,7 @@ import { AxiosError } from 'axios';
 import {
     patch_async_class_method,
     patch_async_static_method
-} from '../mocking';
+} from '../../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -159,7 +161,6 @@ describe('ManageProjects.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
@@ -323,211 +324,14 @@ describe('ManageProjects.vue', () => {
                 wrapper.find('.add-project-button').trigger('click');
                 await manage_projects.$nextTick();
 
-                expect(manage_projects.new_project_api_errors.length).toBeGreaterThan(0);
-                expect(manage_projects.projects.length).toEqual(2);
+                let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+                // Note: api_errors.d_api_errors is flagged by the compiler here with error message
+                // "Property 'd_api_errors' does not exist on type 'Vue'." It's unclear why that
+                // is happening, so we'll access it through $data for now.
+                expect(api_errors.$data.d_api_errors.length).toBe(1);
             });
         });
     });
-
-
-    test('When attempting to create a project and response.data.__all__ is empty - no api ' +
-         'error is displayed and a new project is not created',
-         async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: []
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
-
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
-
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
-
-            expect(manage_projects.projects.length).toEqual(2);
-
-            let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
-
-            expect(validated_input.is_valid).toBe(false);
-
-            let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-            (<HTMLInputElement> new_project_name.element).value = project_1.name;
-            new_project_name.trigger('input');
-            await manage_projects.$nextTick();
-
-            expect(validated_input.is_valid).toBe(true);
-            expect(wrapper.findAll('.api-error').length).toEqual(0);
-
-            return patch_async_static_method(
-                Project,
-                'create',
-                () => Promise.reject(axios_response_instance),
-                async () => {
-
-                wrapper.find('.add-project-button').trigger('click');
-                await manage_projects.$nextTick();
-
-                expect(manage_projects.new_project_api_errors.length).toEqual(0);
-                expect(manage_projects.projects.length).toEqual(2);
-            });
-        });
-    });
-
-    test('New project api errors can be dismissed', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Project with this Name and Course already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
-
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
-
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
-
-            expect(manage_projects.projects.length).toEqual(2);
-
-            let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
-
-            expect(validated_input.is_valid).toBe(false);
-
-            let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-            (<HTMLInputElement> new_project_name.element).value = project_1.name;
-            new_project_name.trigger('input');
-            await manage_projects.$nextTick();
-
-            expect(validated_input.is_valid).toBe(true);
-            expect(wrapper.findAll('.api-error').length).toEqual(0);
-
-            return patch_async_static_method(
-                Project,
-                'create',
-                () => Promise.reject(axios_response_instance),
-                async () => {
-
-                wrapper.find('.add-project-button').trigger('click');
-                await manage_projects.$nextTick();
-
-                expect(manage_projects.new_project_api_errors.length).toBeGreaterThan(0);
-                expect(manage_projects.projects.length).toEqual(2);
-
-                wrapper.findAll('.dismiss-error-button').at(0).trigger('click');
-
-                expect(wrapper.findAll('.api-error').length).toEqual(0);
-            });
-        });
-    });
-
-    // If this test is uncommented, the compiler will respond with an error that:
-    // "Property 'data' is missing in type 'AxiosError'"
-    // test('If __all__ is not defined in the AxiosResponse when making a request to ' +
-    //      'add a project, an error will be thrown',
-    //      async () => {
-    //     let axios_response_instance: AxiosError = {
-    //         name: 'AxiosError',
-    //         message: 'u heked up',
-    //         response: {
-    //             data: {},
-    //             status: 400,
-    //             statusText: 'OK',
-    //             headers: {},
-    //             request: {},
-    //             config: {}
-    //         },
-    //         config: {},
-    //     };
-    //
-    //     return patch_async_static_method(
-    //         Project,
-    //         'get_all_from_course',
-    //         () => Promise.resolve(projects),
-    //         async () => {
-    //
-    //         wrapper = mount(ManageProjects, {
-    //             propsData: {
-    //                 course: current_course
-    //             }
-    //         });
-    //
-    //         let manage_projects = wrapper.vm;
-    //         await manage_projects.$nextTick();
-    //
-    //         expect(manage_projects.projects.length).toEqual(2);
-    //
-    //         let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
-    //
-    //         expect(validated_input.is_valid).toBe(false);
-    //
-    //         let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-    //         (<HTMLInputElement> new_project_name.element).value = project_1.name;
-    //         new_project_name.trigger('input');
-    //         await manage_projects.$nextTick();
-    //
-    //         expect(validated_input.is_valid).toBe(true);
-    //         expect(wrapper.findAll('.api-error').length).toEqual(0);
-    //
-    //         return patch_async_static_method(
-    //             Project,
-    //             'create',
-    //             () => Promise.reject(axios_response_instance),
-    //             async () => {
-    //
-    //             return patch_async_static_method(
-    //                 Project,
-    //                 'create',
-    //                 () => Promise.reject(axios_response_instance),
-    //                 async () => {
-    //
-    //                 // Throws TypeError: Cannot read property '__all__' of undefined
-    //                 expect(() =>
-    //                            handle_add_project_error(manage_projects, axios_response_instance
-    //                 )).toThrow(Error);
-    //             });
-    //         });
-    //     });
-    // });
 
     test('A project can be cloned to the current course', async () => {
         return patch_async_static_method(

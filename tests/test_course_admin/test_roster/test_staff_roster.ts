@@ -1,9 +1,9 @@
-import Permissions from '@/components/permissions/permissions.vue';
-import StaffRoster from '@/components/permissions/staff_roster.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
+import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 
-import { patch_async_class_method } from '../mocking';
+import { patch_async_class_method } from '../../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -90,7 +90,6 @@ describe('StaffRoster.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
@@ -151,11 +150,11 @@ describe('StaffRoster.vue', () => {
                 spy,
                 async () => {
 
-                let permissions = <Permissions> wrapper.find({ref: 'staff_permissions'}).vm;
-                permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
+                let roster = <Roster> wrapper.find({ref: 'staff_roster'}).vm;
+                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await staff_roster.$nextTick();
 
-                let add_staff_form = wrapper.find('#add-permissions-form');
+                let add_staff_form = wrapper.find('#add-users-form');
                 add_staff_form.trigger('submit');
                 await staff_roster.$nextTick();
 
@@ -225,12 +224,12 @@ describe('StaffRoster.vue', () => {
                 spy,
                 async () => {
 
-                let staff_permissions = wrapper.find(
-                {ref: 'staff_permissions'});
-                let delete_permission_buttons = staff_permissions.findAll(
-                '.delete-permission'
+                let remove_user_buttons = wrapper.find(
+                    {ref: 'staff_roster'}
+                ).findAll(
+                '.remove-user'
                 );
-                delete_permission_buttons.at(1).trigger('click');
+                remove_user_buttons.at(1).trigger('click');
                 await staff_roster.$nextTick();
 
                 expect(spy.mock.calls.length).toBe(1);

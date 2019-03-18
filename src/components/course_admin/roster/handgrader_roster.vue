@@ -1,23 +1,23 @@
 <template>
-  <div class="handgrader-permissions-container">
-    <permissions v-if="handgraders !== null"
-                 ref="handgrader_permissions"
-                 role="handgraders"
-                 :roster="handgraders"
-                 @add_permissions="add_handgraders_to_roster($event)"
-                 @remove_permission="remove_handgrader_from_roster($event)">
-    </permissions>
+  <div class="handgrader-roster-container">
+    <roster v-if="handgraders !== null"
+            ref="handgrader_roster"
+            role="handgraders"
+            :roster="handgraders"
+            @add_users="add_handgraders_to_roster($event)"
+            @remove_user="remove_handgrader_from_roster($event)">
+    </roster>
   </div>
 </template>
 
 <script lang="ts">
-  import Permissions from '@/components/permissions/permissions.vue';
+  import Roster from '@/components/course_admin/roster/roster.vue';
   import { Course, User } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
-      Permissions
+      Roster
     }
   })
   export default class HandgraderRoster extends Vue {
