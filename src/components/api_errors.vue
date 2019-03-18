@@ -17,7 +17,7 @@
 
   import { get_axios_error_status } from '@/utils';
 
-  @Component()
+  @Component({})
   export default class APIErrors extends Vue {
     d_api_errors: string[] = [];
 
@@ -29,7 +29,7 @@
       }
       else if (status === 413) {
         this.d_api_errors.push(
-          'Error: Request too large. If you are uploading files, please reduce their size.')
+          'Error: Request too large. If you are uploading files, please reduce their size.');
       }
       else if (status === 400) {
         for (let [field_name, message] of Object.entries(response.data)) {
@@ -37,7 +37,7 @@
             if (Array.isArray(message)) {
               this.d_api_errors.push(message[0]);
             }
-            else {
+            else if (typeof message === 'string') {
               this.d_api_errors.push(message);
             }
           }
@@ -48,7 +48,7 @@
       }
       else {
         this.d_api_errors.push(
-          `An unexpected error occurred: ${status} ${response.statusText}.`)
+          `An unexpected error occurred: ${status} ${response.statusText}.`);
       }
     }
 

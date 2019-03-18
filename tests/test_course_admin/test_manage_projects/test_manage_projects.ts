@@ -1,3 +1,4 @@
+import APIErrors from '@/componenets/api_errors.vue';
 import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -160,7 +161,6 @@ describe('ManageProjects.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
