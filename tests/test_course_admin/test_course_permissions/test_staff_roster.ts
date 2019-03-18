@@ -1,4 +1,4 @@
-import Permissions from '@/components/course_admin/roster/permissions.vue';
+import Permissions from '@/components/course_admin/roster/roster.vue';
 import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';

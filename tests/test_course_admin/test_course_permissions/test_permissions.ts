@@ -1,4 +1,4 @@
-import Permissions from '@/components/course_admin/roster/permissions.vue';
+import Permissions from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';

@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-  import Permissions from '@/components/course_admin/roster/permissions.vue';
+  import Permissions from '@/components/course_admin/roster/roster.vue';
   import { Course, User } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
