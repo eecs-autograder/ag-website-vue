@@ -26,7 +26,7 @@
 
             <button @click="add_project"
                     type="submit"
-                    :disabled="!new_project_name_is_valid"
+                    :disabled="!new_project_name_is_valid || d_adding_project"
                     class="add-project-button">
               Add Project
             </button>
@@ -93,6 +93,8 @@
     new_project_name_is_valid = false;
     d_course!: Course;
 
+    d_adding_project = false;
+
     async created() {
       this.d_course = this.course;
       this.projects = await Project.get_all_from_course(this.d_course.pk);
@@ -116,6 +118,7 @@
     @handle_api_errors_async(handle_add_project_error)
     async add_project() {
       try {
+        this.d_adding_project = true;
         this.new_project_name.trim();
         let new_project: Project = await Project.create(
           {name: this.new_project_name, course: this.d_course.pk}
@@ -124,7 +127,9 @@
         this.sort_projects();
         (<ValidatedInput> this.$refs.new_project_name).clear();
       }
-      finally { }
+      finally {
+        this.d_adding_project = false;
+      }
     }
   }
 

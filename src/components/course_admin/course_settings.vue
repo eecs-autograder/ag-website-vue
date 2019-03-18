@@ -67,7 +67,7 @@
               {{d_course.num_late_days.toString() === '1' ? 'day' : 'days'}}
             </div>
           </ValidatedInput>
-        </div>k
+        </div>
 
         <APIErrors ref="api_errors"></APIErrors>
 

@@ -125,4 +125,20 @@ describe('APIErrors component tests', () => {
         messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(0);
     });
+
+    test('Dismiss single error', () => {
+        base_axios_error.response!.status = 400;
+        base_axios_error.response!.data = {
+            'name': 'Name cannot be blank',
+            'size': 'Size must be < 42'
+        };
+        component.show_errors_from_response(base_axios_error);
+
+        let messages = wrapper.findAll('.error-msg');
+        expect(messages.length).toEqual(2);
+
+        wrapper.findAll('.dismiss-error').at(1).trigger('click');
+        messages = wrapper.findAll('.error-msg');
+        expect(messages.length).toEqual(1);
+    });
 });

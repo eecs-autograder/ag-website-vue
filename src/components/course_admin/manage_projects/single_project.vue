@@ -88,11 +88,11 @@
 </template>
 
 <script lang="ts">
-  import APIErrors from "@/components/api_errors.vue";
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import { Course, Project, User } from 'ag-client-typescript';
 
-  import { AxiosResponse } from 'axios';
-
+  import APIErrors from "@/components/api_errors.vue";
   import Dropdown from '@/components/dropdown.vue';
   import Modal from '@/components/modal.vue';
   import Tooltip from '@/components/tooltip.vue';
@@ -100,7 +100,6 @@
   import ValidatedInput from '@/components/validated_input.vue';
   import { handle_api_errors_async } from '@/utils';
   import { is_not_empty } from '@/validators';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -130,7 +129,6 @@
     course_to_clone_to: Course | null = null;
     cloned_project_name: string = "";
     cloned_project_name_is_valid = false;
-    cloning_api_error_present = false;
 
     course_index: number = 0;
 
@@ -146,7 +144,6 @@
     async clone_project() {
       this.api_errors = [];
       this.cloned_project_name = "";
-      this.cloning_api_error_present = false;
       this.course_to_clone_to = this.course;
       (<Modal> this.$refs.clone_project_modal).open();
     }
@@ -154,7 +151,6 @@
     @handle_api_errors_async(handle_add_cloned_project_error)
     async add_cloned_project() {
       this.api_errors = [];
-      this.cloning_api_error_present = false;
       let new_project = await this.project.copy_to_course(
         this.course_to_clone_to!.pk, this.cloned_project_name
       );

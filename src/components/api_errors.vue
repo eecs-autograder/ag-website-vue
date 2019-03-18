@@ -1,13 +1,12 @@
 <template>
   <div>
-    <div v-for="error of d_api_errors"
+    <div v-for="(error, index) of d_api_errors"
          class="error-msg-container">
       <div class="error-msg">{{error}}</div>
       <button class="dismiss-error-button"
               type="button"
-              @click="d_api_errors = []">
-          <span class="dismiss-error"> Dismiss
-          </span>
+              @click="d_api_errors.splice(index, 1)">
+        <span class="dismiss-error">Dismiss</span>
       </button>
     </div>
   </div>
@@ -56,7 +55,6 @@
     clear() {
       this.d_api_errors = [];
     }
-
   }
 </script>
 
