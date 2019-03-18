@@ -181,11 +181,6 @@
   @extend .gray-button;
 }
 
-#add-users-button:disabled:hover {
-  background-color: hsl(210, 13%, 63%);
-  cursor: default;
-}
-
 #add-users-button, #add-users-button:disabled {
   display: block;
   font-size: 16px;

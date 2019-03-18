@@ -2,32 +2,6 @@
 
 $title-size: 17px;
 
-
-// api errors ************************************************************
-.api-error-container {
-    box-sizing: border-box;
-    width: 100%;
-    position: relative;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px 90px 10px 10px;
-    border-radius: .25rem;
-    margin-top: 11px;
-}
-
-.dismiss-error-button {
-    font-size: 15px;
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    padding: 4px 10px;
-    background-color: white;
-    border-radius: .25rem;
-    cursor: pointer;
-    border: 1px solid #f5c6cb;
-}
-
 // dropdown related ******************************************************
 .dropdown-header-wrapper {
     display: inline-block;

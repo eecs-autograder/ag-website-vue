@@ -90,7 +90,6 @@ describe('StaffRoster.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });

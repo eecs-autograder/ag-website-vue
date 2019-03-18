@@ -1,3 +1,4 @@
+import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -46,7 +47,6 @@ describe('CourseSettings.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
@@ -261,52 +261,8 @@ describe('CourseSettings.vue', () => {
             wrapper.find('#course-settings-form').trigger('submit.native');
             await course_settings.$nextTick();
 
-            expect(course_settings.api_errors.length).toEqual(1);
-        });
-    });
-
-    test('When response.data.__all__ is empty when trying to save course settings - no' +
-         'api error is displayed',
-         async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: []
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
-        wrapper = mount(CourseSettings, {
-            propsData: {
-                course: course_1,
-            }
-        });
-
-        course_settings = wrapper.vm;
-
-        return patch_async_class_method(
-            Course,
-            'save',
-            () => Promise.reject(axios_response_instance),
-            async () => {
-
-            let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
-
-            expect(settings_form.is_valid).toBe(true);
-            expect(course_settings.settings_form_is_valid).toBe(true);
-
-            wrapper.find('#course-settings-form').trigger('submit.native');
-            await course_settings.$nextTick();
-
-            expect(course_settings.api_errors.length).toEqual(0);
+            let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+            expect(api_errors.d_api_errors.length).toBe(1);
         });
     });
 });
