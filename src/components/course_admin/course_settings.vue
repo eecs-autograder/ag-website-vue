@@ -145,7 +145,6 @@
     readonly string_to_num = string_to_num;
 
     created() {
-      console.log('weee');
       this.d_course = this.course;
     }
 

@@ -228,7 +228,7 @@ describe('HandgraderRoster.vue', () => {
 
                 let handgrader_roster = wrapper.find({ref: 'handgrader_roster'});
                 let delete_permission_buttons = handgrader_roster.findAll(
-                    '.delete-permission'
+                    '.remove-user'
                 );
                 delete_permission_buttons.at(1).trigger('click');
                 await wrapper.vm.$nextTick();

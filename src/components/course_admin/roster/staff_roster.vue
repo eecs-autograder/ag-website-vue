@@ -5,7 +5,7 @@
             role="staff"
             :roster="staff"
             @add_users="add_staff_to_roster($event)"
-            @remove_permission="remove_staff_from_roster($event)">
+            @remove_user="remove_staff_from_roster($event)">
     </roster>
   </div>
 </template>

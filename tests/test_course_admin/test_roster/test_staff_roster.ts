@@ -228,7 +228,7 @@ describe('StaffRoster.vue', () => {
                 let delete_permission_buttons = wrapper.find(
                     {ref: 'staff_roster'}
                 ).findAll(
-                '.delete-permission'
+                '.remove-user'
                 );
                 delete_permission_buttons.at(1).trigger('click');
                 await staff_roster.$nextTick();
