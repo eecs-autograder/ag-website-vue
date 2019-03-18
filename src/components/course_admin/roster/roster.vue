@@ -1,57 +1,55 @@
 <template>
-  <div class="permissions-container">
-    <div class="class-permissions-body">
-      <div class="adding-container">
-        <validated-form id="add-permissions-form"
-                        autocomplete="off"
-                        @submit.native.prevent="add_permissions"
-                        @form_validity_changed="permissions_form_is_valid = $event">
-          <label class="enrollment-add-label"> Add {{role}}
-            <i class="far fa-question-circle permission-tooltip">
-              <tooltip width="large" placement="top">
-                Enter a comma-separated list of email addresses.
-              </tooltip>
-            </i>
-          </label>
-          <ValidatedInput ref="permissions_textarea"
-                          id="add-permissions-input"
-                          input_style="border-width: 2px"
-                          v-model="users_to_add"
-                          :validators="[contains_valid_emails]"
-                          :num_rows="7">
-          </ValidatedInput>
-          <input type="submit"
-                 id="add-permissions-button"
-                 value="Add to Roster"
-                 :disabled="!permissions_form_is_valid">
-        </validated-form>
-      </div>
+  <div class="roster-container">
+    <div class="adding-container">
+      <validated-form id="add-users-form"
+                      autocomplete="off"
+                      @submit.native.prevent="add_users"
+                      @form_validity_changed="permissions_form_is_valid = $event">
+        <label class="enrollment-add-label"> Add {{role}}
+          <i class="far fa-question-circle permission-tooltip">
+            <tooltip width="large" placement="top">
+              Enter a comma-separated list of email addresses.
+            </tooltip>
+          </i>
+        </label>
+        <ValidatedInput ref="permissions_textarea"
+                        id="add-permissions-input"
+                        input_style="border-width: 2px"
+                        v-model="users_to_add"
+                        :validators="[contains_valid_emails]"
+                        :num_rows="7">
+        </ValidatedInput>
+        <input type="submit"
+               id="add-permissions-button"
+               value="Add to Roster"
+               :disabled="!permissions_form_is_valid">
+      </validated-form>
+    </div>
 
-      <div class="enrolled-container">
-        <div>
-          <div  v-if="d_roster.length !== 0" class="permissions-column">
-            <table class="permissions-table">
-              <tr>
-                <th class="email-column"> Username </th>
-                <th class="name-column"> Name </th>
-                <th class="delete-column"> Delete </th>
-              </tr>
-              <tr v-for="(person, index) in d_roster"
-                  :class="index % 2 ? 'odd-row' : 'even-row'">
-                <td class="email-column email">{{person.username}}</td>
-                <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
-                <td class="delete-column">
-                  <i class="fas fa-user-times delete-permission"
-                     @click="remove_person_from_roster([person], index)">
-                  </i>
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div v-else class="empty-roster-message">
-            The {{role}} roster for this course is currently empty! You can add {{role}}
-            by entering a comma-separated list of their emails in the textarea above!
-          </div>
+    <div class="enrolled-container">
+      <div>
+        <div  v-if="d_roster.length !== 0" class="permissions-column">
+          <table class="permissions-table">
+            <tr>
+              <th class="email-column"> Username </th>
+              <th class="name-column"> Name </th>
+              <th class="delete-column"> Delete </th>
+            </tr>
+            <tr v-for="(person, index) in d_roster"
+                :class="index % 2 ? 'odd-row' : 'even-row'">
+              <td class="email-column email">{{person.username}}</td>
+              <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
+              <td class="delete-column">
+                <i class="fas fa-user-times delete-permission"
+                   @click="remove_person_from_roster([person], index)">
+                </i>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div v-else class="empty-roster-message">
+          The {{role}} roster for this course is currently empty! You can add {{role}}
+          by entering a comma-separated list of their emails in the textarea above!
         </div>
       </div>
     </div>
@@ -131,11 +129,11 @@
       }
     }
 
-    add_permissions() {
+    add_users() {
       let valid_usernames: string[] = [];
       this.check_for_invalid_emails(this.users_to_add, valid_usernames);
       if (this.first_invalid_email === null) {
-        this.$emit('add_permissions', valid_usernames);
+        this.$emit('add_users', valid_usernames);
         this.users_to_add = "";
         let validated_input = <ValidatedInput> this.$refs.permissions_textarea;
         validated_input.clear();
@@ -157,8 +155,7 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: "Quicksand";
 
-.class-permissions-body {
-  font-family: $current-lang-choice;
+.roster-container {
   margin: 0;
 }
 

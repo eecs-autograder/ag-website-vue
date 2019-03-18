@@ -154,7 +154,7 @@ describe('AdminRoster.vue', () => {
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await admin_roster.$nextTick();
 
-                let add_admins_form = wrapper.find('#add-permissions-form');
+                let add_admins_form = wrapper.find('#add-users-form');
                 add_admins_form.trigger('submit');
                 await admin_roster.$nextTick();
 

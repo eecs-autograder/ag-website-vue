@@ -155,7 +155,7 @@ describe('StaffRoster.vue', () => {
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await staff_roster.$nextTick();
 
-                let add_staff_form = wrapper.find('#add-permissions-form');
+                let add_staff_form = wrapper.find('#add-users-form');
                 add_staff_form.trigger('submit');
                 await staff_roster.$nextTick();
 

@@ -4,7 +4,7 @@
             ref="admin_roster"
             role="admins"
             :roster="admins"
-            @add_permissions="add_admins_to_roster($event)"
+            @add_users="add_admins_to_roster($event)"
             @remove_permission="remove_admin_from_roster($event)">
     </roster>
   </div>

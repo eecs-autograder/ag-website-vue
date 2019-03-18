@@ -4,7 +4,7 @@
             ref="handgrader_roster"
             role="handgraders"
             :roster="handgraders"
-            @add_permissions="add_handgraders_to_roster($event)"
+            @add_users="add_handgraders_to_roster($event)"
             @remove_permission="remove_handgrader_from_roster($event)">
     </roster>
   </div>

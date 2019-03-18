@@ -156,7 +156,7 @@ describe('HandgraderRoster.vue', () => {
                 permissions.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
                 await handgrader_roster.$nextTick();
 
-                let add_handgraders_form = wrapper.find('#add-permissions-form');
+                let add_handgraders_form = wrapper.find('#add-users-form');
                 add_handgraders_form.trigger('submit');
                 await handgrader_roster.$nextTick();
 

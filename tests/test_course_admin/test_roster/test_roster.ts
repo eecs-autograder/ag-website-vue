@@ -92,8 +92,8 @@ describe('Roster.vue', () => {
 
         validated_input = <Wrapper<ValidatedInput>> wrapper.find('#add-permissions-input');
         validated_input_component = <ValidatedInput> wrapper.find('#add-permissions-input').vm;
-        permissions_form_component = <ValidatedForm> wrapper.find('#add-permissions-form').vm;
-        permissions_form = <Wrapper<ValidatedForm>> wrapper.find('#add-permissions-form');
+        permissions_form_component = <ValidatedForm> wrapper.find('#add-users-form').vm;
+        permissions_form = <Wrapper<ValidatedForm>> wrapper.find('#add-users-form');
         validated_input.find('#textarea').trigger('input');
     });
 
@@ -200,7 +200,7 @@ describe('Roster.vue', () => {
         permissions_form.trigger('submit.native');
         await course_permissions.$nextTick();
 
-        expect(wrapper.emitted('add_permissions')).not.toBeTruthy();
+        expect(wrapper.emitted('add_users')).not.toBeTruthy();
     });
 
     // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -359,7 +359,7 @@ describe('Roster.vue', () => {
          permissions_form.trigger('submit.native');
          await course_permissions.$nextTick();
 
-         expect(wrapper.emitted().add_permissions.length).toBe(1);
+         expect(wrapper.emitted().add_users.length).toBe(1);
     });
 
     test('Validator function exposes addresses that do not adhere to the format specified ' +
@@ -451,11 +451,11 @@ describe('Roster.vue', () => {
          permissions_form.trigger('submit.native');
          await course_permissions.$nextTick();
 
-         expect(wrapper.emitted('add_permissions')).not.toBeTruthy();
+         expect(wrapper.emitted('add_users')).not.toBeTruthy();
     });
 
     test('If the textarea contains all valid emails, the parent component is notified ' +
-         'when the add_permissions button is pressed.',
+         'when the add_users button is pressed.',
          async () => {
 
          let username_input = "michael@umich.edu\n\nDarryl@umich.edu Bearyl@umich.edu " +
@@ -477,6 +477,6 @@ describe('Roster.vue', () => {
          permissions_form.trigger('submit.native');
          await course_permissions.$nextTick();
 
-         expect(wrapper.emitted().add_permissions.length).toBe(1);
+         expect(wrapper.emitted().add_users.length).toBe(1);
     });
 });
