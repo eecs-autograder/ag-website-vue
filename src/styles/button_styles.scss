@@ -7,13 +7,17 @@
     padding: 7px 12px;
 }
 
+.button:disabled {
+    cursor: not-allowed;
+}
+
 .red-button {
     @extend .button;
     background-color: hsl(0, 80%, 50%);
     border: 1px solid hsl(0, 80%, 66%);
 }
 
-.red-button:hover {
+.red-button:hover:enabled {
     background-color: hsl(0, 80%, 45%);
 }
 
@@ -27,7 +31,7 @@
     border: 1px solid hsl(20, 100%, 71%);
 }
 
-.orange-button:hover {
+.orange-button:hover:enabled {
     background-color: hsl(20, 100%, 50%);
 
 }
@@ -42,7 +46,7 @@
     border: 1px solid hsl(150, 55%, 60%);
 }
 
-.green-button:hover {
+.green-button:hover:enabled {
     background-color: hsl(150, 55%, 39%);
 }
 
@@ -56,7 +60,7 @@
     border: 1px solid hsl(208, 59%, 70%);
 }
 
-.blue-button:hover {
+.blue-button:hover:enabled {
     background-color: hsl(208, 59%, 49%);
 }
 
@@ -70,7 +74,7 @@
     border: 1px solid hsl(275, 48%, 79%);
 }
 
-.purple-button:hover {
+.purple-button:hover:enabled {
     background-color: hsl(275, 48%, 58%);
 }
 
@@ -84,7 +88,7 @@
     border: 1px solid hsl(210, 13%, 79%);
 }
 
-.gray-button:hover {
+.gray-button:hover:enabled {
     background-color: hsl(210, 13%, 58%);
 }
 
