@@ -1,5 +1,5 @@
 <template>
-  <div id="expected-file-pattern" v-if="d_expected_student_file !== null">
+  <div id="single-expected-student-file" v-if="d_expected_student_file !== null">
 
     <div :class="[{'header-editing' : actively_updating},
                   {'odd-header': !actively_updating && odd_index },
@@ -40,14 +40,14 @@
                       ref="edit_expected_student_file_form"
                       autocomplete="off"
                       spellcheck="false"
-                      @submit.native.prevent
+                      @submit.native.prevent="update_expected_student_file"
                       @form_validity_changed="pattern_is_valid = $event">
 
         <div class="input-wrapper">
           <label class="input-label">
             Filename
           </label>
-          <validated-input ref='file_pattern'
+          <validated-input ref='filename'
                            v-model="d_expected_student_file.pattern"
                            :validators="[is_not_empty]"
                            input_style="border-width: 1px; margin-top: 4px;">
@@ -108,15 +108,15 @@
 
         <div class="button-container">
           <button class="cancel-edit-button"
-                  @click="actively_updating = false;
-                          $refs.delete_expected_student_file_modal.close()"> Cancel
+                  type="button"
+                  @click="reset_expected_student_file_values"> Cancel
           </button>
           <button class="update-edit-button"
-                  :disabled="!pattern_is_valid"
-                  @click="update_expected_student_file"> Update
+                  type="submit"
+                  @click="update_expected_student_file"
+                  :disabled="!pattern_is_valid"> Update
           </button>
         </div>
-
       </validated-form>
     </div>
 
@@ -166,7 +166,7 @@
     @Prop({required: true, type: Object})
     expected_student_file!: ExpectedStudentFile;
 
-    @Prop({default: true, type: Boolean})
+    @Prop({required: false, default: true})
     odd_index!: boolean;
 
     readonly is_non_negative = is_non_negative;
@@ -181,6 +181,14 @@
       };
     }
 
+    min_is_less_than_or_equal_to_max(value: string): ValidatorResponse {
+      return {
+        is_valid: this.is_number(value).is_valid
+                  && Number(value) <= this.d_expected_student_file!.max_num_matches,
+        error_msg: "Min matches must be less than or equal to Max Matches"
+      };
+    }
+
     d_expected_student_file: ExpectedStudentFile | null = null;
     actively_updating = false;
     d_delete_pending = false;
@@ -189,14 +197,14 @@
     api_errors: string[] = [];
 
     created() {
-      this.d_expected_student_file = new ExpectedStudentFile({
-        pk: this.expected_student_file.pk,
-        project: this.expected_student_file.project,
-        pattern: this.expected_student_file.pattern,
-        min_num_matches: this.expected_student_file.min_num_matches,
-        max_num_matches: this.expected_student_file.max_num_matches,
-        last_modified: this.expected_student_file.last_modified
-      });
+      this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
+    }
+
+    reset_expected_student_file_values() {
+      this.actively_updating = false;
+      this.d_expected_student_file.pattern = this.expected_student_file.pattern;
+      this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
+      this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
     }
 
     wildcard_is_present() {
@@ -324,7 +332,7 @@ $current-language: "Quicksand";
   position: relative;
 }
 
-#expected-file-pattern {
+#single-expected-student-file {
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 12px;

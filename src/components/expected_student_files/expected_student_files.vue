@@ -5,7 +5,8 @@
       <div class="new-pattern-container">
         <div class="new-pattern-title"> New Expected Student File </div>
         <div id="new-expected-file-pattern">
-          <create-expected-student-file :project="project"
+          <create-expected-student-file ref="create_expected_student_file"
+                                        :project="project"
                                         :updating_pattern="false">
           </create-expected-student-file>
         </div>

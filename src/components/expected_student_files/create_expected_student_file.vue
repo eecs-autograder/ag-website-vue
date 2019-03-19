@@ -20,14 +20,17 @@
 
         <div class="exact-match-container">
           <div class="radio-input">
-            <input type="radio"
+            <input ref="exact_match"
+                   type="radio"
                    id="exact-match"
+                   :disabled="wildcard_is_present"
                    :value="true"
                    v-model="exact_match">
             <label for="exact-match" class="exact-match-label"> Exact Match </label>
           </div>
           <div class="radio-input">
-            <input type="radio"
+            <input ref="not_exact_match"
+                   type="radio"
                    id="shell-wildcard"
                    :value="false"
                    v-model="exact_match">
@@ -35,7 +38,7 @@
           </div>
         </div>
 
-        <div v-if="!exact_match || wildcard_is_present()"
+        <div v-if="!exact_match || wildcard_is_present"
              class="min-max-container">
           <div class="input-wrapper">
             <label class="input-label"> Minimum number of matches </label>
@@ -43,7 +46,8 @@
                              v-model="d_new_expected_student_file.min_num_matches"
                              :validators="[is_not_empty,
                                            is_number,
-                                           is_non_negative]"
+                                           is_non_negative,
+                                           min_is_less_than_or_equal_to_max]"
                              input_style="width: 75px; border-width: 1px; margin-top: 4px;">
             </validated-input>
           </div>
@@ -85,7 +89,7 @@
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   import { AxiosResponse } from 'axios';
 
@@ -95,7 +99,7 @@
 
   import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
-  class CreateExpectedStudentFileData implements NewExpectedStudentFileData {
+  export class CreateExpectedStudentFileData implements NewExpectedStudentFileData {
     pattern: string = "";
     min_num_matches: number = 1;
     max_num_matches: number = 1;
@@ -116,26 +120,30 @@
     d_new_expected_student_file = new CreateExpectedStudentFileData();
     pattern_is_valid = false;
     exact_match = true;
+    d_wildcard_chars_present = false;
     api_errors: string[] = [];
     api_error_present = false;
 
-    wildcard_is_present() {
-      if (this.d_new_expected_student_file!.pattern.match('[*?![\\]]') !== null) {
+    get wildcard_is_present() {
+      return this.d_new_expected_student_file.pattern.match('[*?![\\]]') !== null;
+    }
+
+    @Watch('wildcard_is_present')
+    on_wildcard_is_present_changed(new_val: boolean, old_val: boolean) {
+      if (new_val) {
         this.exact_match = false;
       }
-      return this.d_new_expected_student_file!.pattern.match('[*?![\\]]') !== null;
     }
 
     @handle_400_errors_async(handle_add_expected_student_file_error)
     async create_pattern() {
-      if (this.exact_match || !this.wildcard_is_present()) {
+      if (this.exact_match || !this.wildcard_is_present) {
         this.d_new_expected_student_file!.min_num_matches = 1;
         this.d_new_expected_student_file!.max_num_matches = 1;
       }
-      console.log("here");
       await ExpectedStudentFile.create(this.project.pk, this.d_new_expected_student_file);
-      console.log("Successful create");
       this.d_new_expected_student_file = new CreateExpectedStudentFileData();
+      console.log(this.d_new_expected_student_file);
       (<ValidatedInput> this.$refs.create_expected_student_file_form).clear();
     }
 
@@ -143,6 +151,14 @@
       return {
         is_valid: this.is_number(value).is_valid
                   && Number(value) >= this.d_new_expected_student_file!.min_num_matches,
+        error_msg: "Max matches must be greater than or equal to Min Matches"
+      };
+    }
+
+    min_is_less_than_or_equal_to_max(value: string): ValidatorResponse {
+      return {
+        is_valid: this.is_number(value).is_valid
+                  && Number(value) <= this.d_new_expected_student_file!.max_num_matches,
         error_msg: "Min matches must be less than or equal to Max Matches"
       };
     }
