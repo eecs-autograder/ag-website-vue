@@ -1,8 +1,11 @@
-import CourseList from '../../src/components/course_list/course_list.vue';
-import { AllCourses, Model } from '../../src/model';
 import { config, mount, Wrapper } from '@vue/test-utils';
-import { Course, Semester, User } from 'ag-client-typescript';
 import Vue from 'vue';
+
+import { Course, Semester, User } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
+
+import CourseList from '@/components/course_list/course_list.vue';
+import { AllCourses, Model } from '@/model';
 
 import { patch_async_class_method, patch_async_static_method } from '../mocking';
 
@@ -10,7 +13,7 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('Course_List tests', () => {
+describe('Course_List.vue', () => {
     let wrapper: Wrapper<CourseList>;
     let course_list: CourseList;
     let course_list_page: Wrapper<Vue>;
@@ -24,16 +27,21 @@ describe('Course_List tests', () => {
     let no_semester_2018_eecs493: Course;
     let fall17_eecs183: Course;
     let no_year_winter_eecs482: Course;
+    let copy_of_course: Course;
 
     beforeEach(() => {
-        user = new User({
-            pk: 1, username: 'ashberg', first_name: 'Ashley',
-            last_name: 'IceBerg', email: 'iceberg@umich.edu',
-            is_superuser: false});
+        user = new User(
+            {pk: 1, username: 'ashberg', first_name: 'Ashley', last_name: 'IceBerg',
+             email: 'iceberg@umich.edu', is_superuser: false});
+
+        copy_of_course = new Course(
+            {pk: 11, name: "Clone", semester: Semester.fall, year: 2048, subtitle: '',
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs280 = new Course(
-            {pk: 2, name: 'EECS 280', semester: Semester.fall, year: 2018, subtitle: '',
-             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
+            {pk: 2, name: 'EECS 280', semester: Semester.fall, year: 2018,
+             subtitle: 'Programming and Introductory Data Structures', num_late_days: 0,
+             allowed_guest_domain: '', last_modified: ''});
 
         fall18_eecs370 = new Course(
             {pk: 3, name: 'EECS 370', semester: Semester.fall, year: 2018, subtitle: '',
@@ -66,11 +74,220 @@ describe('Course_List tests', () => {
 
     afterEach(() => {
         if (wrapper.exists()) {
+            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
 
-    test("The semester, year, and name of a course get displayed", async () => {
+    async function call_notify_course_created(name_in: string, year_in: number) {
+        copy_of_course.name = name_in;
+        copy_of_course.year = year_in;
+        Course.notify_course_created(copy_of_course);
+    }
+
+    test('Cloning a course - cloned course causes new term to be created', async () => {
+        all_courses = {
+            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        };
+
+        return patch_async_static_method(
+            User, 'get_current',
+            () => Promise.resolve(user), async () => {
+
+            return patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
+
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
+
+                course_list = wrapper.vm;
+                await course_list.$nextTick();
+
+                expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                expect(course_list.courses_by_term.length).toEqual(1);
+
+                let first_course = wrapper.findAll('.course').at(0);
+                first_course.find('.clone-course').trigger('click');
+                await course_list.$nextTick();
+
+                let clone_name_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(0).find('#input');
+                (<HTMLInputElement> clone_name_input.element).value = "EECS 280";
+                clone_name_input.trigger('input');
+                await course_list.$nextTick();
+
+                let clone_year_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(1).find('#input');
+                (<HTMLInputElement> clone_year_input.element).value = "2019";
+                clone_year_input.trigger('input');
+                await course_list.$nextTick();
+
+                return patch_async_class_method(
+                    Course,
+                    'copy',
+                    () => Promise.resolve(call_notify_course_created("EECS 280", 2019)),
+                    async () => {
+
+                    wrapper.find('#clone-course-form').trigger('submit.native');
+                    await course_list.$nextTick();
+
+                    expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(3);
+                    expect(course_list.courses_by_term.length).toEqual(2);
+                    expect(course_list.courses_by_term[0].course_list[0]).toEqual(copy_of_course);
+                    expect(course_list.courses_by_term[1].course_list[0]).toEqual(fall18_eecs280);
+                    expect(course_list.courses_by_term[1].course_list[1]).toEqual(fall18_eecs370);
+                });
+            });
+        });
+    });
+
+    test('Cloning a course - cloned course inserted into existing term', async () => {
+        all_courses = {
+            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        };
+
+        return patch_async_static_method(
+            User, 'get_current',
+            () => Promise.resolve(user), async () => {
+
+            return patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
+
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
+
+                course_list = wrapper.vm;
+                await course_list.$nextTick();
+
+                expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                expect(course_list.courses_by_term.length).toEqual(1);
+
+                let first_course = wrapper.findAll('.course').at(0);
+                first_course.find('.clone-course').trigger('click');
+                await course_list.$nextTick();
+
+                let clone_name_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(0).find('#input');
+                (<HTMLInputElement> clone_name_input.element).value = "EECS 281";
+                clone_name_input.trigger('input');
+                await course_list.$nextTick();
+
+                let clone_year_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(1).find('#input');
+                (<HTMLInputElement> clone_year_input.element).value = "2018";
+                clone_year_input.trigger('input');
+                await course_list.$nextTick();
+
+                return patch_async_class_method(
+                    Course,
+                    'copy',
+                    () => Promise.resolve(call_notify_course_created("EECS 281", 2018)),
+                    async () => {
+
+                    wrapper.find('#clone-course-form').trigger('submit.native');
+                    await course_list.$nextTick();
+
+                    expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(3);
+                    expect(course_list.courses_by_term.length).toEqual(1);
+                    expect(course_list.courses_by_term[0].course_list[0]).toEqual(fall18_eecs280);
+                    expect(course_list.courses_by_term[0].course_list[1]).toEqual(copy_of_course);
+                    expect(course_list.courses_by_term[0].course_list[2]).toEqual(fall18_eecs370);
+                });
+            });
+        });
+    });
+
+    test('If attempt to clone a course is unsuccessful, a course is not added', async () => {
+        all_courses = {
+            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        };
+
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: "A course with this name, semester, and year already exists."
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
+            },
+            config: {},
+        };
+
+        return patch_async_static_method(
+            User, 'get_current',
+            () => Promise.resolve(user), async () => {
+
+            return patch_async_static_method(
+                Course, 'get_courses_for_user',
+                () =>  Promise.resolve(all_courses), async () => {
+
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
+
+                course_list = wrapper.vm;
+                await course_list.$nextTick();
+
+                expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                expect(course_list.courses_by_term.length).toEqual(1);
+
+                let first_course = wrapper.findAll('.course').at(0);
+                first_course.find('.clone-course').trigger('click');
+                await course_list.$nextTick();
+
+                let clone_name_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(0).find('#input');
+                (<HTMLInputElement> clone_name_input.element).value = "EECS 280";
+                clone_name_input.trigger('input');
+                await course_list.$nextTick();
+
+                let clone_year_input = wrapper.findAll(
+                    '#validated-input-component'
+                ).at(1).find('#input');
+                (<HTMLInputElement> clone_year_input.element).value = "2018";
+                clone_year_input.trigger('input');
+                await course_list.$nextTick();
+
+                return patch_async_class_method(
+                    Course,
+                    'copy',
+                    () => Promise.reject(axios_response_instance),
+                    async () => {
+
+                    wrapper.find('#clone-course-form').trigger('submit.native');
+                    await course_list.$nextTick();
+
+                    expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
+                    expect(course_list.courses_by_term.length).toEqual(1);
+                });
+            });
+        });
+    });
+
+    test("The name and subtitle of a course get displayed", async () => {
 
         all_courses = {
             courses_is_admin_for: [],
@@ -79,18 +296,20 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -98,9 +317,8 @@ describe('Course_List tests', () => {
                 course_list_page = wrapper.find({ref: 'course_list_component'});
 
                 let course_displayed = course_list_page.find('.course');
-                expect(course_displayed.html()).toContain(fall18_eecs280.semester);
-                expect(course_displayed.html()).toContain(fall18_eecs280.year);
                 expect(course_displayed.html()).toContain(fall18_eecs280.name);
+                expect(course_displayed.html()).toContain(fall18_eecs280.subtitle);
             });
         });
     });
@@ -114,18 +332,20 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
               User, 'get_current',
               () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                  let mock_result = await Model.get_instance().get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
 
-                 wrapper = mount(CourseList);
+                 wrapper = mount(CourseList, {
+                     stubs: ['router-link', 'router-view']
+                 });
 
                  await wrapper.vm.$nextTick();
 
@@ -149,18 +369,20 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
         User, 'get_current',
         () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -175,22 +397,16 @@ describe('Course_List tests', () => {
                 expect(course_list_page.findAll('.edit-admin-settings').length).toEqual(1);
 
                 expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.name);
-                expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.semester);
-                expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.year);
                 expect(all_displayed_courses.at(0).findAll(
                     '.edit-admin-settings').length
                 ).toEqual(1);
 
                 expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.name);
-                expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.semester);
-                expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.year);
                 expect(all_displayed_courses.at(1).findAll(
                     '.edit-admin-settings').length
                 ).toEqual(0);
 
                 expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.name);
-                expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.semester);
-                expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.year);
                 expect(all_displayed_courses.at(2).findAll(
                     '.edit-admin-settings').length
                 ).toEqual(0);
@@ -209,18 +425,20 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: []
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                  let mock_result = await Model.get_instance().get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
 
-                 wrapper = mount(CourseList);
+                 wrapper = mount(CourseList, {
+                     stubs: ['router-link', 'router-view']
+                 });
 
                  await wrapper.vm.$nextTick();
 
@@ -245,18 +463,20 @@ describe('Course_List tests', () => {
             courses_is_handgrader_for: [winter18_eecs280]
         };
 
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -283,18 +503,20 @@ describe('Course_List tests', () => {
             courses_is_student_in: [fall18_eecs370, fall18_eecs441, fall18_eecs280],
             courses_is_handgrader_for: []
         };
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
 
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -319,17 +541,19 @@ describe('Course_List tests', () => {
             courses_is_student_in: [fall17_eecs183, no_semester_2018_eecs493],
             courses_is_handgrader_for: [winter18_eecs280]
         };
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
@@ -363,17 +587,19 @@ describe('Course_List tests', () => {
             courses_is_student_in: [fall18_eecs370, fall18_eecs441, fall18_eecs280],
             courses_is_handgrader_for: []
         };
-        await patch_async_static_method(
+        return patch_async_static_method(
             User, 'get_current',
             () => Promise.resolve(user), async () => {
-            await patch_async_static_method(
+            return patch_async_static_method(
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
                 let mock_result = await Model.get_instance().get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
-                wrapper = mount(CourseList);
+                wrapper = mount(CourseList, {
+                    stubs: ['router-link', 'router-view']
+                });
 
                 await wrapper.vm.$nextTick();
 
