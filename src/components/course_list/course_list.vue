@@ -37,11 +37,11 @@
 
 <script lang="ts">
 
-  import { AllCourses, Model } from '@/model';
+  import { AllCourses, Model } from '../../model';
   import { Course, Semester, User } from 'ag-client-typescript';
 
-  import { ObserverComponent } from '@/observer_component';
-  import { array_add_unique, array_get_unique, array_has_unique } from '@/utils';
+  import { ObserverComponent } from '../../observer_component';
+  import { array_add_unique, array_get_unique, array_has_unique } from '../../utils';
 
   import { Component, Vue } from 'vue-property-decorator';
 

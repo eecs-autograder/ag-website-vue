@@ -1,10 +1,10 @@
-import CourseList from '@/components/course_list.vue';
-import { AllCourses, Model } from '@/model';
+import CourseList from '../../src/components/course_list/course_list.vue';
+import { AllCourses, Model } from '../../src/model';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
 import Vue from 'vue';
 
-import { patch_async_class_method, patch_async_static_method } from './mocking';
+import { patch_async_class_method, patch_async_static_method } from '../mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
