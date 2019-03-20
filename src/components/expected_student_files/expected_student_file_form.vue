@@ -1,0 +1,204 @@
+<template>
+  <div id="expected-student-file-form-component" v-if="d_expected_student_file !== null">
+    <validated-form id="expected-student-file-form"
+                      ref="expected_student_file_form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit.native.prevent="check_min_and_max"
+                      @form_validity_changed="on_form_validity_change">
+
+      <div class="input-wrapper">
+        <label class="input-label"> Filename </label>
+        <validated-input ref='filename'
+                         v-model="d_expected_student_file.pattern"
+                         :validators="[is_not_empty]"
+                         input_style="border-width: 1px; margin-top: 4px;">
+        </validated-input>
+      </div>
+
+      <div class="exact-match-container">
+        <div class="radio-input">
+          <input ref="exact_match"
+                 type="radio"
+                 id="exact-match"
+                 :disabled="wildcard_is_present"
+                 :value="true"
+                 v-model="exact_match">
+          <label for="exact-match" class="exact-match-label"> Exact Match </label>
+        </div>
+        <div class="radio-input">
+          <input ref="not_exact_match"
+                 type="radio"
+                 id="shell-wildcard"
+                 :value="false"
+                 v-model="exact_match">
+          <label for="shell-wildcard" class="wildcard-label"> Shell Wildcard </label>
+        </div>
+      </div>
+
+      <div v-if="!exact_match || wildcard_is_present"
+           class="min-max-container">
+        <div class="input-wrapper">
+          <label class="input-label"> Minimum number of matches </label>
+          <validated-input ref='min_matches'
+                           v-model="d_expected_student_file.min_num_matches"
+                           :validators="[is_not_empty,
+                                           is_number,
+                                           is_non_negative]"
+                           input_style="width: 75px; border-width: 1px; margin-top: 4px;">
+          </validated-input>
+        </div>
+
+        <div class="input-wrapper">
+          <label class="input-label"> Maximum number of matches </label>
+          <validated-input ref='max_matches'
+                           v-model="d_expected_student_file.max_num_matches"
+                           :validators="[is_not_empty,
+                                           is_number]"
+                           input_style="width: 75px; border-width: 1px; margin-top: 4px;">
+          </validated-input>
+        </div>
+      </div>
+
+      <slot name="form_footer"></slot>
+    </validated-form>
+  </div>
+</template>
+
+<script lang="ts">
+  import Tooltip from '@/components/tooltip.vue';
+  import ValidatedForm from '@/components/validated_form.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
+  import { is_non_negative, is_not_empty, is_number } from '@/validators';
+
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+  import { ExpectedStudentFile, NewExpectedStudentFileData } from 'ag-client-typescript';
+
+  export class CreateExpectedStudentFileData implements NewExpectedStudentFileData {
+    pattern: string = "";
+    min_num_matches: number = 1;
+    max_num_matches: number = 1;
+  }
+
+  @Component({
+    components: { Tooltip, ValidatedForm, ValidatedInput }
+  })
+  export default class ExpectedStudentFileForm extends Vue {
+
+    @Prop({required: true, type: Function})
+    on_submit!: (file: ExpectedStudentFile | NewExpectedStudentFileData) => void;
+
+    @Prop({required: true, type: Function})
+    on_form_validity_change!: () => void;
+
+    @Prop({required: true, type: Object})
+    expected_student_file: ExpectedStudentFile | NewExpectedStudentFileData;
+
+    d_expected_student_file: ExpectedStudentFile | NewExpectedStudentFileData = null;
+    exact_match = true;
+
+    readonly is_non_negative = is_non_negative;
+    readonly is_not_empty = is_not_empty;
+    readonly is_number = is_number;
+
+    created() {
+      if (this.expected_student_file instanceof ExpectedStudentFile) {
+        this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
+      }
+      else {
+        this.d_expected_student_file = new CreateExpectedStudentFileData();
+      }
+    }
+
+    get wildcard_is_present() {
+      if (this.d_expected_student_file === null) {
+        return false;
+      }
+      return this.d_expected_student_file.pattern.match('[*?![\\]]') !== null;
+    }
+
+    @Watch('wildcard_is_present')
+    on_wildcard_is_present_changed(new_val: boolean, old_val: boolean) {
+      if (new_val) {
+        this.exact_match = false;
+      }
+    }
+
+    check_min_and_max() {
+      if (this.exact_match || !this.wildcard_is_present) {
+        this.d_expected_student_file!.min_num_matches = 1;
+        this.d_expected_student_file!.max_num_matches = 1;
+      }
+      this.$emit('on_submit', this.d_expected_student_file);
+    }
+
+    reset_expected_student_file_values() {
+      this.d_expected_student_file.pattern = this.expected_student_file.pattern;
+      this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
+      this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
+      (<ValidatedForm>this.$refs.expected_student_file_form).clear();
+    }
+  }
+</script>
+
+<style scoped lang="scss">
+  @import '@/styles/button_styles.scss';
+
+  #create-expected-student-file-component {
+    border-radius: 2px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    width: 100%;
+  }
+
+  .radio-input {
+    display: inline-block;
+    padding: 4px 0;
+  }
+
+  .exact-match-container {
+    padding: 4px 0 0 0;
+  }
+
+  .exact-match-container label {
+    padding-left: 3px;
+  }
+
+  .exact-match-label {
+    padding-right: 50px;
+  }
+
+  .min-max-container {
+    padding-bottom: 5px;
+  }
+
+  .add-file-button {
+    @extend .green-button;
+  }
+
+  .add-file-button:disabled {
+    @extend .gray-button;
+  }
+
+  .add-file-button, .add-file-button:disabled {
+    font-size: 15px;
+    margin-top: 12px;
+  }
+
+  .add-file-button:disabled, .add-file-button:disabled:hover {
+    background-color: hsl(220, 30%, 85%);
+    border-color: hsl(220, 30%, 80%);
+    color: gray;
+    cursor: default;
+  }
+
+  .input-wrapper {
+    padding: 10px 0 5px 0;
+  }
+
+  .input-label {
+    font-size: 16px;
+    font-weight: 500;
+  }
+</style>

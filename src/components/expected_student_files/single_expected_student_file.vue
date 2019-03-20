@@ -1,5 +1,5 @@
 <template>
-  <div id="single-expected-student-file" v-if="d_expected_student_file !== null">
+  <div id="single-expected-student-file" v-if="expected_student_file !== null">
 
     <div :class="[{'header-editing' : actively_updating},
                   {'odd-header': !actively_updating && odd_index },
@@ -8,7 +8,7 @@
         <b>{{expected_student_file.pattern}}</b>
       </div>
       <span v-if="actively_updating" class="editing-message"> (Editing)</span>
-      <span v-if="expected_student_file.pattern.match('[*?![\\]]')">
+      <span v-if="wildcard_is_present">
         <div class="matches-label">
           Minimum number of matches: {{expected_student_file.min_num_matches}}
         </div>
@@ -35,89 +35,35 @@
 
     <div v-if="actively_updating"
          :class="(actively_updating) ? 'form-editing' : 'form-not-editing'">
+      <expected-student-file-form id="my_form"
+                                  ref="form"
+                                  @on_submit="update_expected_student_file($event)"
+                                  :on_form_validity_change="(event) => { pattern_is_valid = event }"
+                                  :expected_student_file="expected_student_file">
 
-      <validated-form id="edit-expected-student-file-form"
-                      ref="edit_expected_student_file_form"
-                      autocomplete="off"
-                      spellcheck="false"
-                      @submit.native.prevent="update_expected_student_file"
-                      @form_validity_changed="pattern_is_valid = $event">
-
-        <div class="input-wrapper">
-          <label class="input-label">
-            Filename
-          </label>
-          <validated-input ref='filename'
-                           v-model="d_expected_student_file.pattern"
-                           :validators="[is_not_empty]"
-                           input_style="border-width: 1px; margin-top: 4px;">
-          </validated-input>
-        </div>
-
-        <div class="exact-match-container">
-          <div class="radio-input">
-            <input type="radio"
-                   id="exact-match"
-                   :value="true"
-                   v-model="exact_match">
-            <label for="exact-match" class="exact-match-label"> Exact Match </label>
-          </div>
-          <div class="radio-input">
-            <input type="radio"
-                   id="shell-wildcard"
-                   :value="false"
-                   v-model="exact_match">
-            <label for="shell-wildcard" class="wildcard-label"> Shell Wildcard </label>
-          </div>
-        </div>
-
-        <span v-if="!exact_match || wildcard_is_present()"
-              class="min-max-container">
-          <div class="input-wrapper">
-            <label class="input-label"> Minimum number of matches </label>
-            <validated-input ref='min_matches'
-                             v-model="d_expected_student_file.min_num_matches"
-                             :validators="[is_not_empty,
-                                           is_number,
-                                           is_non_negative]"
-                             input_style="width: 75px; border-width: 1px; margin-top: 4px;">
-            </validated-input>
-          </div>
-
-          <div class="input-wrapper">
-            <label class="input-label"> Maximum number of matches </label>
-            <validated-input ref='max_matches'
-                             v-model="d_expected_student_file.max_num_matches"
-                             :validators="[is_not_empty,
-                                           is_number,
-                                           max_is_greater_than_or_equal_to_min]"
-                             input_style="width: 75px; border-width: 1px; margin-top: 4px;">
-            </validated-input>
-          </div>
-        </span>
-
-        <div v-for="error of api_errors" class="api-error-container">
-          <div class="api-error">{{error}}</div>
-          <button class="dismiss-error-button"
-                  type="button"
-                  @click="api_errors = []">
+        <template slot="form_footer">
+          <div v-for="error of api_errors" class="api-error-container">
+            <div class="api-error">{{error}}</div>
+            <button class="dismiss-error-button"
+                    type="button"
+                    @click="api_errors = []">
               <span class="dismiss-error"> Dismiss
               </span>
-          </button>
-        </div>
+            </button>
+          </div>
 
-        <div class="button-container">
-          <button class="cancel-edit-button"
-                  type="button"
-                  @click="reset_expected_student_file_values"> Cancel
-          </button>
-          <button class="update-edit-button"
-                  type="submit"
-                  @click="update_expected_student_file"
-                  :disabled="!pattern_is_valid"> Update
-          </button>
-        </div>
-      </validated-form>
+          <div class="button-container">
+            <button class="cancel-update-button"
+                    type="button"
+                    @click="cancel_update"> Cancel
+            </button>
+            <button class="update-button"
+                    type="submit"
+                    :disabled="!pattern_is_valid"> Update
+            </button>
+          </div>
+        </template>
+      </expected-student-file-form>
     </div>
 
     <modal ref="delete_expected_student_file_modal"
@@ -126,7 +72,7 @@
       <div id="modal-header">Confirm Deletion</div>
       <hr>
       <div id="modal-body"> Are you sure you want to delete the pattern
-        <b class="file-to-delete">{{d_expected_student_file.pattern}}</b>?
+        <b class="file-to-delete">{{expected_student_file.pattern}}</b>?
         This action cannot be undone, and any test cases that rely on this file may have
         to be updated before they run correctly again.
       </div>
@@ -144,22 +90,18 @@
 </template>
 
 <script lang="ts">
+  import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
   import Modal from '@/components/modal.vue';
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
   import { handle_400_errors_async } from '@/utils';
 
   import { AxiosResponse } from 'axios';
 
   import { ExpectedStudentFile } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-
-  import { is_non_negative, is_not_empty, is_number } from '@/validators';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component({
-    components: { Modal, Tooltip, ValidatedForm, ValidatedInput }
+    components: { ExpectedStudentFileForm, Modal }
   })
   export default class SingleExpectedStudentFile extends Vue {
 
@@ -169,78 +111,42 @@
     @Prop({required: false, default: true})
     odd_index!: boolean;
 
-    readonly is_non_negative = is_non_negative;
-    readonly is_not_empty = is_not_empty;
-    readonly is_number = is_number;
-
-    max_is_greater_than_or_equal_to_min(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid
-                  && Number(value) >= this.d_expected_student_file!.min_num_matches,
-        error_msg: "Min matches must be less than or equal to Max Matches"
-      };
-    }
-
-    min_is_less_than_or_equal_to_max(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid
-                  && Number(value) <= this.d_expected_student_file!.max_num_matches,
-        error_msg: "Min matches must be less than or equal to Max Matches"
-      };
-    }
-
-    d_expected_student_file: ExpectedStudentFile | null = null;
     actively_updating = false;
     d_delete_pending = false;
     pattern_is_valid = false;
-    exact_match = true;
     api_errors: string[] = [];
 
-    created() {
-      this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
-    }
-
-    reset_expected_student_file_values() {
-      this.actively_updating = false;
-      this.d_expected_student_file.pattern = this.expected_student_file.pattern;
-      this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
-      this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
-    }
-
-    wildcard_is_present() {
-      if (this.d_expected_student_file!.pattern.match('[*?![\\]]') !== null) {
-        this.exact_match = false;
-      }
-      return this.d_expected_student_file!.pattern.match('[*?![\\]]') !== null;
+    get wildcard_is_present() {
+      return this.expected_student_file.pattern.match('[*?![\\]]') !== null;
     }
 
     @handle_400_errors_async(handle_edit_expected_student_file_error)
-    async update_expected_student_file() {
-      if (this.exact_match || !this.wildcard_is_present()) {
-        this.d_expected_student_file!.min_num_matches = 1;
-        this.d_expected_student_file!.max_num_matches = 1;
-      }
+    async update_expected_student_file(file: ExpectedStudentFile) {
       try {
-        await this.d_expected_student_file!.save();
+        await file!.save();
         this.actively_updating = false;
-        (<ValidatedInput> this.$refs.edit_expected_student_file_form).clear();
+        (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
       }
       finally {}
+    }
+
+    cancel_update() {
+      this.actively_updating = false;
+      (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
     }
 
     async delete_pattern_permanently() {
       try {
         this.d_delete_pending = true;
         await this.expected_student_file.delete();
-      }
-      finally {
         this.d_delete_pending = false;
       }
+      finally {}
     }
   }
 
   export function handle_edit_expected_student_file_error(component: SingleExpectedStudentFile,
-                                                         response: AxiosResponse) {
+                                                          response: AxiosResponse) {
     let errors = response.data["__all__"];
     if (errors.length > 0) {
       component.api_errors = [errors[0]];
@@ -251,8 +157,6 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-language: "Quicksand";
 
 // api errors ************************************************************
 .api-error-container {
@@ -277,27 +181,6 @@ $current-language: "Quicksand";
   border-radius: .25rem;
   cursor: pointer;
   border: 1px solid #f5c6cb;
-}
-
-.radio-input {
-  display: inline-block;
-  padding: 4px 0;
-}
-
-.exact-match-container {
-  padding: 4px 0 0 0;
-}
-
-.exact-match-container label {
-  padding-left: 3px;
-}
-
-.exact-match-label {
-  padding-right: 50px;
-}
-
-.min-max-container {
-  padding-bottom: 5px;
 }
 
 .editing-message {
@@ -410,22 +293,20 @@ $current-language: "Quicksand";
   padding: 18px 0 0 0;
 }
 
-.update-edit-button {
+.update-button {
   @extend .blue-button;
-  font-family: $current-language;
   font-size: 15px;
 }
 
-.update-edit-button:disabled, .update-edit-button:disabled:hover {
+.update-button:disabled, .update-button:disabled:hover {
   background-color: hsl(220, 30%, 85%);
   border-color: hsl(220, 30%, 80%);
   color: gray;
   cursor: default;
 }
 
-.cancel-edit-button {
+.cancel-update-button {
   @extend .orange-button;
-  font-family: $current-language;
   font-size: 15px;
   margin-right: 20px;
 }
@@ -433,12 +314,10 @@ $current-language: "Quicksand";
 /* ---------------- MODAL ---------------- */
 #modal-header {
   padding: 5px 10px;
-  font-family: $current-language;
 }
 
 #modal-body {
   padding: 10px 10px 20px 10px;
-  font-family: $current-language;
 }
 
 .file-to-delete {
@@ -453,7 +332,6 @@ $current-language: "Quicksand";
 
 .modal-cancel-button, .modal-delete-button {
   border-radius: 2px;
-  font-family: $current-language;
   font-size: 15px;
   font-weight: bold;
 }

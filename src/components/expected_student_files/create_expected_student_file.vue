@@ -1,101 +1,37 @@
 <template>
   <div id="create-expected-student-file-component">
-    <div>
+      <expected-student-file-form ref="form"
+                                  @on_submit="create_expected_student_file($event)"
+                                  :on_form_validity_change="(event) => { pattern_is_valid = event }"
+                                  :expected_student_file="d_new_expected_student_file">
 
-      <validated-form id="create-expected-student-file-form"
-                      ref="create_expected_student_file_form"
-                      autocomplete="off"
-                      spellcheck="false"
-                      @submit.native.prevent="create_pattern"
-                      @form_validity_changed="pattern_is_valid = $event">
-
-        <div class="input-wrapper">
-          <label class="input-label"> Filename </label>
-          <validated-input ref='filename'
-                           v-model="d_new_expected_student_file.pattern"
-                           :validators="[is_not_empty]"
-                           input_style="border-width: 1px; margin-top: 4px;">
-          </validated-input>
-        </div>
-
-        <div class="exact-match-container">
-          <div class="radio-input">
-            <input ref="exact_match"
-                   type="radio"
-                   id="exact-match"
-                   :disabled="wildcard_is_present"
-                   :value="true"
-                   v-model="exact_match">
-            <label for="exact-match" class="exact-match-label"> Exact Match </label>
-          </div>
-          <div class="radio-input">
-            <input ref="not_exact_match"
-                   type="radio"
-                   id="shell-wildcard"
-                   :value="false"
-                   v-model="exact_match">
-            <label for="shell-wildcard" class="wildcard-label"> Shell Wildcard </label>
-          </div>
-        </div>
-
-        <div v-if="!exact_match || wildcard_is_present"
-             class="min-max-container">
-          <div class="input-wrapper">
-            <label class="input-label"> Minimum number of matches </label>
-            <validated-input ref='min_matches'
-                             v-model="d_new_expected_student_file.min_num_matches"
-                             :validators="[is_not_empty,
-                                           is_number,
-                                           is_non_negative,
-                                           min_is_less_than_or_equal_to_max]"
-                             input_style="width: 75px; border-width: 1px; margin-top: 4px;">
-            </validated-input>
+        <template slot="form_footer">
+          <div v-for="error of api_errors" class="api-error-container">
+            <div class="api-error">{{error}}</div>
+            <button class="dismiss-error-button"
+                    type="button"
+                    @click="api_errors = []; api_error_present = false">
+              <span class="dismiss-error"> Dismiss </span>
+            </button>
           </div>
 
-          <div class="input-wrapper">
-            <label class="input-label"> Maximum number of matches </label>
-            <validated-input ref='max_matches'
-                             v-model="d_new_expected_student_file.max_num_matches"
-                             :validators="[is_not_empty,
-                                           is_number,
-                                           max_is_greater_than_or_equal_to_min]"
-                             input_style="width: 75px; border-width: 1px; margin-top: 4px;">
-            </validated-input>
-          </div>
-        </div>
-
-        <div v-for="error of api_errors" class="api-error-container">
-          <div class="api-error">{{error}}</div>
-          <button class="dismiss-error-button"
-                  type="button"
-                  @click="api_errors = []; api_error_present = false">
-              <span class="dismiss-error"> Dismiss
-              </span>
+          <button class="add-file-button"
+                  type="submit"
+                  :disabled="!pattern_is_valid"> Add Filename
           </button>
-        </div>
+        </template>
 
-        <button class="add-file-button"
-                type="submit"
-                :disabled="!pattern_is_valid">
-          Add Filename
-        </button>
-
-      </validated-form>
-    </div>
+      </expected-student-file-form>
   </div>
 </template>
 
 <script lang="ts">
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import { AxiosResponse } from 'axios';
 
   import { handle_400_errors_async } from '@/utils';
-
-  import { is_non_negative, is_not_empty, is_number } from '@/validators';
 
   import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
@@ -106,61 +42,22 @@
   }
 
   @Component({
-    components: { Tooltip, ValidatedForm, ValidatedInput }
+    components: { ExpectedStudentFileForm }
   })
   export default class CreateExpectedStudentFile extends Vue {
 
     @Prop({required: true, type: Project})
     project!: Project;
 
-    readonly is_non_negative = is_non_negative;
-    readonly is_not_empty = is_not_empty;
-    readonly is_number = is_number;
-
     d_new_expected_student_file = new CreateExpectedStudentFileData();
     pattern_is_valid = false;
-    exact_match = true;
-    d_wildcard_chars_present = false;
     api_errors: string[] = [];
     api_error_present = false;
 
-    get wildcard_is_present() {
-      return this.d_new_expected_student_file.pattern.match('[*?![\\]]') !== null;
-    }
-
-    @Watch('wildcard_is_present')
-    on_wildcard_is_present_changed(new_val: boolean, old_val: boolean) {
-      if (new_val) {
-        this.exact_match = false;
-      }
-    }
-
     @handle_400_errors_async(handle_add_expected_student_file_error)
-    async create_pattern() {
-      if (this.exact_match || !this.wildcard_is_present) {
-        this.d_new_expected_student_file!.min_num_matches = 1;
-        this.d_new_expected_student_file!.max_num_matches = 1;
-      }
-      await ExpectedStudentFile.create(this.project.pk, this.d_new_expected_student_file);
-      this.d_new_expected_student_file = new CreateExpectedStudentFileData();
-      console.log(this.d_new_expected_student_file);
-      (<ValidatedInput> this.$refs.create_expected_student_file_form).clear();
-    }
-
-    max_is_greater_than_or_equal_to_min(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid
-                  && Number(value) >= this.d_new_expected_student_file!.min_num_matches,
-        error_msg: "Max matches must be greater than or equal to Min Matches"
-      };
-    }
-
-    min_is_less_than_or_equal_to_max(value: string): ValidatorResponse {
-      return {
-        is_valid: this.is_number(value).is_valid
-                  && Number(value) <= this.d_new_expected_student_file!.max_num_matches,
-        error_msg: "Min matches must be less than or equal to Max Matches"
-      };
+    async create_expected_student_file(new_expected_student_file_data: NewExpectedStudentFileData) {
+      await ExpectedStudentFile.create(this.project.pk, new_expected_student_file_data);
+      (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
     }
   }
 

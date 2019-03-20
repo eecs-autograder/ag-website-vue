@@ -121,6 +121,7 @@ export default class ModalDemo extends Vue {
   chosen_items_2: object[] = [];
 
   add_item_2(item: object) {
+    console.log(item);
     this.chosen_items_2.push(item);
   }
 
