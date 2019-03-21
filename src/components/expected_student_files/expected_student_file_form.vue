@@ -4,12 +4,12 @@
                       ref="expected_student_file_form"
                       autocomplete="off"
                       spellcheck="false"
-                      @submit.native.prevent="check_min_and_max"
-                      @form_validity_changed="on_form_validity_change">
+                      @submit.native.prevent="submit_form"
+                      @form_validity_changed="$emit('form_validity_changed', $event)">
 
       <div class="input-wrapper">
         <label class="input-label"> Filename </label>
-        <validated-input ref='filename'
+        <validated-input ref='pattern'
                          v-model="d_expected_student_file.pattern"
                          :validators="[is_not_empty]"
                          input_style="border-width: 1px; margin-top: 4px;">
@@ -23,7 +23,7 @@
                  id="exact-match"
                  :disabled="wildcard_is_present"
                  :value="true"
-                 v-model="exact_match">
+                 v-model="d_exact_match">
           <label for="exact-match" class="exact-match-label"> Exact Match </label>
         </div>
         <div class="radio-input">
@@ -31,30 +31,30 @@
                  type="radio"
                  id="shell-wildcard"
                  :value="false"
-                 v-model="exact_match">
+                 v-model="d_exact_match">
           <label for="shell-wildcard" class="wildcard-label"> Shell Wildcard </label>
         </div>
       </div>
 
-      <div v-if="!exact_match || wildcard_is_present"
+      <div v-if="!d_exact_match || wildcard_is_present"
            class="min-max-container">
         <div class="input-wrapper">
           <label class="input-label"> Minimum number of matches </label>
-          <validated-input ref='min_matches'
+          <validated-input ref='min_num_matches'
                            v-model="d_expected_student_file.min_num_matches"
                            :validators="[is_not_empty,
-                                           is_number,
-                                           is_non_negative]"
+                                         is_number,
+                                         is_non_negative]"
                            input_style="width: 75px; border-width: 1px; margin-top: 4px;">
           </validated-input>
         </div>
 
         <div class="input-wrapper">
           <label class="input-label"> Maximum number of matches </label>
-          <validated-input ref='max_matches'
+          <validated-input ref='max_num_matches'
                            v-model="d_expected_student_file.max_num_matches"
                            :validators="[is_not_empty,
-                                           is_number]"
+                                         is_number]"
                            input_style="width: 75px; border-width: 1px; margin-top: 4px;">
           </validated-input>
         </div>
@@ -99,11 +99,8 @@
     @Prop({default: () => new ExpectedStudentFileFormData({})})
     expected_student_file: ExpectedStudentFileFormData;
 
-    @Prop({required: true, type: Function})
-    on_form_validity_change!: () => void;
-
     d_expected_student_file: ExpectedStudentFileFormData = null;
-    exact_match = true;
+    d_exact_match = true;
     pattern_is_valid = false;
 
     readonly is_non_negative = is_non_negative;
@@ -124,12 +121,12 @@
     @Watch('wildcard_is_present')
     on_wildcard_is_present_changed(new_val: boolean, old_val: boolean) {
       if (new_val) {
-        this.exact_match = false;
+        this.d_exact_match = false;
       }
     }
 
-    check_min_and_max() {
-      if (this.exact_match || !this.wildcard_is_present) {
+    submit_form() {
+      if (this.d_exact_match || !this.wildcard_is_present) {
         this.d_expected_student_file!.min_num_matches = 1;
         this.d_expected_student_file!.max_num_matches = 1;
       }
@@ -137,7 +134,7 @@
     }
 
     reset_expected_student_file_values() {
-      (<ValidatedForm>this.$refs.expected_student_file_form).clear();
+      (<ValidatedForm>this.$refs.expected_student_file_form).reset_warning_state();
       this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
     }
   }

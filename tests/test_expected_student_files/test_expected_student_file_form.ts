@@ -1,4 +1,6 @@
 import CreateExpectedStudentFile, { CreateExpectedStudentFileData } from '@/components/expected_student_files/create_expected_student_file.vue';
+import ExpectedStudentFileForm
+    from '@/components/expected_student_files/expected_student_file_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
@@ -22,7 +24,224 @@ afterEach(() => {
     sinon.restore();
 });
 
-describe('CreateExpectedStudentFile tests', () => {
+describe('Input property tests', () => {
+    test('Default input', () => {
+        fail();
+    });
+
+    test('Non-default input', () => {
+        fail();
+    });
+});
+
+
+describe('Valid form submit tests', () => {
+
+});
+
+describe('Wildcard chars present and exact_match setting', () => {
+
+});
+
+describe.only('Invalid input tests', () => {
+    let wrapper: Wrapper<ExpectedStudentFileForm>;
+    let component: ExpectedStudentFileForm;
+
+    beforeEach(() => {
+       wrapper = mount(ExpectedStudentFileForm);
+       component = wrapper.vm;
+    });
+
+    test('Error pattern is blank', async () => {
+        let pattern_input = <ValidatedInput> wrapper.find({ref: "pattern"}).vm;
+
+        pattern_input.value = "hello";
+        await component.$nextTick();
+        expect(pattern_input.is_valid).toBe(true);
+
+        pattern_input.value = "  ";
+        await component.$nextTick();
+        expect(pattern_input.is_valid).toBe(false);
+    });
+
+    test('Error min_num_matches is blank or not a number', async () => {
+        component.d_exact_match = false;
+        await component.$nextTick();
+
+        let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
+
+        min_num_matches_input.value = "  ";
+        await component.$nextTick();
+        expect(min_num_matches_input.is_valid).toBe(false);
+
+        min_num_matches_input.value = "carrot";
+        await component.$nextTick();
+        expect(min_num_matches_input.is_valid).toBe(false);
+    });
+
+    test('Error min_num_matches is negative', async () => {
+        component.d_exact_match = false;
+        await component.$nextTick();
+
+        let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
+        min_num_matches_input.value = "-2";
+        await component.$nextTick();
+
+        expect(min_num_matches_input.is_valid).toBe(false);
+    });
+
+    test('Error max_num_matches is blank or not a number', async () => {
+        component.d_exact_match = false;
+        await component.$nextTick();
+
+        let max_num_matches_input = <ValidatedInput> wrapper.find({ref: "max_num_matches"}).vm;
+
+        max_num_matches_input.value = "  ";
+        await component.$nextTick();
+        expect(max_num_matches_input.is_valid).toBe(false);
+
+        max_num_matches_input.value = "carrot";
+        await component.$nextTick();
+        expect(max_num_matches_input.is_valid).toBe(false);
+    });
+    // //
+    // // // RangeError: Maximum call stack size exceeded
+    // // // cannot destroy wrapper because it is undefined
+    // test('Error max_num_matches is blank', async () => {
+    //     wrapper = mount(CreateExpectedStudentFile, {
+    //         propsData: {
+    //             project: project_1
+    //         }
+    //     });
+    //
+    //     create_expected_student_file = wrapper.vm;
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     // select not exact match
+    //     let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
+    //     wildcard_radio_button.element.selected = true;
+    //     wildcard_radio_button.trigger('change');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     let validated_input = <ValidatedInput> wrapper.find({ref: "max_matches"}).vm;
+    //
+    //
+    //     let max_matches = wrapper.find({ref: 'max_matches'}).find('#input');
+    //     (<HTMLInputElement> max_matches.element).value = " ";
+    //     max_matches.trigger('input');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     expect(validated_input.is_valid).toBe(false);
+    // });
+    // test('Error pattern is blank', async () => {
+    //     wrapper = mount(CreateExpectedStudentFile, {
+    //         propsData: {
+    //             project: project_1
+    //         }
+    //     });
+    //
+    //     create_expected_student_file = wrapper.vm;
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     let validated_input = <ValidatedInput> wrapper.find({ref: "filename"}).vm;
+    //
+    //     let filename = wrapper.find({ref: 'filename'}).find('#input');
+    //     (<HTMLInputElement> filename.element).value = "   ";
+    //     filename.trigger('input');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     expect(validated_input.is_valid).toBe(false);
+    // });
+    //
+    // test('Error min_num_matches is blank',  async () => {
+    //     wrapper = mount(CreateExpectedStudentFile, {
+    //         propsData: {
+    //             project: project_1
+    //         }
+    //     });
+    //
+    //     create_expected_student_file = wrapper.vm;
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     // select shell_wildcard
+    //     let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
+    //     wildcard_radio_button.element.selected = true;
+    //     wildcard_radio_button.trigger('change');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
+    //
+    //     let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
+    //     (<HTMLInputElement> min_matches.element).value = "";
+    //     min_matches.trigger('input');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     expect(validated_input.is_valid).toBe(false);
+    // });
+    //
+    // test('Error min_num_matches is negative', async () => {
+    //     wrapper = mount(CreateExpectedStudentFile, {
+    //         propsData: {
+    //             project: project_1
+    //         }
+    //     });
+    //
+    //     create_expected_student_file = wrapper.vm;
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     // select shell_wildcard
+    //     let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
+    //     wildcard_radio_button.element.selected = true;
+    //     wildcard_radio_button.trigger('change');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
+    //
+    //     let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
+    //     (<HTMLInputElement> min_matches.element).value = "-1";
+    //     min_matches.trigger('input');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     expect(validated_input.is_valid).toBe(false);
+    // });
+    // //
+    // // // RangeError: Maximum call stack size exceeded
+    // // // cannot destroy wrapper because it is undefined
+    // test('Error max_num_matches is blank', async () => {
+    //     wrapper = mount(CreateExpectedStudentFile, {
+    //         propsData: {
+    //             project: project_1
+    //         }
+    //     });
+    //
+    //     create_expected_student_file = wrapper.vm;
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     // select not exact match
+    //     let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
+    //     wildcard_radio_button.element.selected = true;
+    //     wildcard_radio_button.trigger('change');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     let validated_input = <ValidatedInput> wrapper.find({ref: "max_matches"}).vm;
+    //
+    //
+    //     let max_matches = wrapper.find({ref: 'max_matches'}).find('#input');
+    //     (<HTMLInputElement> max_matches.element).value = " ";
+    //     max_matches.trigger('input');
+    //     await create_expected_student_file.$nextTick();
+    //
+    //     expect(validated_input.is_valid).toBe(false);
+    // });
+    //
+    // test('Error max_num_matches is negative',  async () => {
+    //
+    // });
+
+});
+
+
+describe(' tests', () => {
     let file_without_wildcard: ExpectedStudentFile;
     let file_with_wildcard: ExpectedStudentFile;
     let wrapper: Wrapper<CreateExpectedStudentFile>;
@@ -218,106 +437,6 @@ describe('CreateExpectedStudentFile tests', () => {
             });
     });
 
-    test('Error pattern is blank', async () => {
-        wrapper = mount(CreateExpectedStudentFile, {
-            propsData: {
-                project: project_1
-            }
-        });
-
-        create_expected_student_file = wrapper.vm;
-        await create_expected_student_file.$nextTick();
-
-        let validated_input = <ValidatedInput> wrapper.find({ref: "filename"}).vm;
-
-        let filename = wrapper.find({ref: 'filename'}).find('#input');
-        (<HTMLInputElement> filename.element).value = "   ";
-        filename.trigger('input');
-        await create_expected_student_file.$nextTick();
-
-        expect(validated_input.is_valid).toBe(false);
-    });
-
-    test('Error min_num_matches is blank',  async () => {
-        wrapper = mount(CreateExpectedStudentFile, {
-            propsData: {
-                project: project_1
-            }
-        });
-
-        create_expected_student_file = wrapper.vm;
-        await create_expected_student_file.$nextTick();
-
-        // select shell_wildcard
-        let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
-        wildcard_radio_button.element.selected = true;
-        wildcard_radio_button.trigger('change');
-        await create_expected_student_file.$nextTick();
-
-        let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
-
-        let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
-        (<HTMLInputElement> min_matches.element).value = "";
-        min_matches.trigger('input');
-        await create_expected_student_file.$nextTick();
-
-        expect(validated_input.is_valid).toBe(false);
-    });
-
-    test('Error min_num_matches is negative', async () => {
-        wrapper = mount(CreateExpectedStudentFile, {
-            propsData: {
-                project: project_1
-            }
-        });
-
-        create_expected_student_file = wrapper.vm;
-        await create_expected_student_file.$nextTick();
-
-        // select shell_wildcard
-        let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
-        wildcard_radio_button.element.selected = true;
-        wildcard_radio_button.trigger('change');
-        await create_expected_student_file.$nextTick();
-
-        let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
-
-        let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
-        (<HTMLInputElement> min_matches.element).value = "-1";
-        min_matches.trigger('input');
-        await create_expected_student_file.$nextTick();
-
-        expect(validated_input.is_valid).toBe(false);
-    });
-    //
-    // // RangeError: Maximum call stack size exceeded
-    // // cannot destroy wrapper because it is undefined
-    test('Error max_num_matches is blank', async () => {
-        wrapper = mount(CreateExpectedStudentFile, {
-            propsData: {
-                project: project_1
-            }
-        });
-
-        create_expected_student_file = wrapper.vm;
-        await create_expected_student_file.$nextTick();
-
-        // select not exact match
-        let wildcard_radio_button = wrapper.find({ref: 'not_exact_match'});
-        wildcard_radio_button.element.selected = true;
-        wildcard_radio_button.trigger('change');
-        await create_expected_student_file.$nextTick();
-
-        let validated_input = <ValidatedInput> wrapper.find({ref: "max_matches"}).vm;
-
-
-        let max_matches = wrapper.find({ref: 'max_matches'}).find('#input');
-        (<HTMLInputElement> max_matches.element).value = " ";
-        max_matches.trigger('input');
-        await create_expected_student_file.$nextTick();
-
-        expect(validated_input.is_valid).toBe(false);
-    });
     //
     // // if you make max matches less than min matches - an error appears
     // // you then make min matches less than max
@@ -451,4 +570,229 @@ describe('CreateExpectedStudentFile tests', () => {
     //     expect(wrapper.findAll({ref: 'min_matches'}).length).toEqual(0);
     //     expect(wrapper.findAll({ref: 'max_matches'}).length).toEqual(0);
     // });
+
+
+    // Error in event handler for "input_validity_changed": "TypeError: Cannot read property
+    // '$options' of undefined" wrt validatedinput
+    test.skip('error - filename is blank', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "filename"}).vm;
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "   ";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - min_matches is blank', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
+
+        let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
+        (<HTMLInputElement> min_matches.element).value = " ";
+        min_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - min_matches is a negative number', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
+
+        let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
+        (<HTMLInputElement> min_matches.element).value = "-5";
+        min_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - min_matches is not a number', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
+
+        let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
+        (<HTMLInputElement> min_matches.element).value = "schfifty-five";
+        min_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - min_matches > max_matches', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "min_matches"}).vm;
+
+        expect(single_file.d_expected_student_file.max_num_matches).toEqual(1);
+
+        let min_matches = wrapper.find({ref: 'min_matches'}).find('#input');
+        (<HTMLInputElement> min_matches.element).value = "2";
+        min_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - max_matches is blank', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "max_matches"}).vm;
+
+        let max_matches = wrapper.find({ref: 'max_matches'}).find('#input');
+        (<HTMLInputElement> max_matches.element).value = " ";
+        max_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - max_matches is not a number', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "max_matches"}).vm;
+
+        let max_matches = wrapper.find({ref: 'max_matches'}).find('#input');
+        (<HTMLInputElement> max_matches.element).value = "grool";
+        max_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
+
+    test.skip('error - max_matches < min_matches', async () => {
+        wrapper = mount(SingleExpectedStudentFile, {
+            propsData: {
+                expected_student_file: file_with_wildcard
+            }
+        });
+
+        single_file = wrapper.vm;
+        await single_file.$nextTick();
+
+        wrapper.find('.edit-file').trigger('click');
+        await single_file.$nextTick();
+
+        let filename = wrapper.find({ref: 'filename'}).find('#input');
+        (<HTMLInputElement> filename.element).value = "*";
+        filename.trigger('input');
+        await single_file.$nextTick();
+
+        let validated_input = <ValidatedInput> wrapper.find({ref: "max_matches"}).vm;
+
+        expect(single_file.d_expected_student_file.min_num_matches).toEqual(1);
+
+        let max_matches = wrapper.find({ref: 'max_matches'}).find('#input');
+        (<HTMLInputElement> max_matches.element).value = "0";
+        max_matches.trigger('input');
+        await single_file.$nextTick();
+
+        expect(validated_input.is_valid).toBe(false);
+    });
 });
