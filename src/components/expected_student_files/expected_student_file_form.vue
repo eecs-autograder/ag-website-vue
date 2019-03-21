@@ -75,10 +75,20 @@
 
   import { ExpectedStudentFile, NewExpectedStudentFileData } from 'ag-client-typescript';
 
-  export class CreateExpectedStudentFileData implements NewExpectedStudentFileData {
-    pattern: string = "";
-    min_num_matches: number = 1;
-    max_num_matches: number = 1;
+  export class ExpectedStudentFileFormData implements NewExpectedStudentFileData {
+    pattern: string;
+    min_num_matches: number;
+    max_num_matches: number;
+
+    constructor({
+      pattern = "",
+      min_num_matches = 1,
+      max_num_matches = 1
+    }: {pattern?: string, min_num_matches? : number, max_num_matches?: number}) {
+      this.pattern = pattern;
+      this.min_num_matches = min_num_matches;
+      this.max_num_matches = max_num_matches;
+    }
   }
 
   @Component({
@@ -86,29 +96,22 @@
   })
   export default class ExpectedStudentFileForm extends Vue {
 
-    // @Prop({required: true, type: Function})
-    // on_submit!: (file: ExpectedStudentFile | NewExpectedStudentFileData) => void;
+    @Prop({default: () => new ExpectedStudentFileFormData({})})
+    expected_student_file: ExpectedStudentFileFormData;
 
     @Prop({required: true, type: Function})
     on_form_validity_change!: () => void;
 
-    @Prop({required: true, type: Object})
-    expected_student_file: ExpectedStudentFile | NewExpectedStudentFileData;
-
-    d_expected_student_file: ExpectedStudentFile | NewExpectedStudentFileData = null;
+    d_expected_student_file: ExpectedStudentFileFormData = null;
     exact_match = true;
+    pattern_is_valid = false;
 
     readonly is_non_negative = is_non_negative;
     readonly is_not_empty = is_not_empty;
     readonly is_number = is_number;
 
     created() {
-      if (this.expected_student_file instanceof ExpectedStudentFile) {
-        this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
-      }
-      else {
-        this.d_expected_student_file = new CreateExpectedStudentFileData();
-      }
+      this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
     }
 
     get wildcard_is_present() {
@@ -134,14 +137,8 @@
     }
 
     reset_expected_student_file_values() {
-      if (this.expected_student_file instanceof ExpectedStudentFile) {
-        this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
-      }
-      else {
-        this.d_expected_student_file = new CreateExpectedStudentFileData();
-        this.exact_match = true;
-      }
       (<ValidatedForm>this.$refs.expected_student_file_form).clear();
+      this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
     }
   }
 </script>
@@ -175,26 +172,6 @@
 
   .min-max-container {
     padding-bottom: 5px;
-  }
-
-  .add-file-button {
-    @extend .green-button;
-  }
-
-  .add-file-button:disabled {
-    @extend .gray-button;
-  }
-
-  .add-file-button, .add-file-button:disabled {
-    font-size: 15px;
-    margin-top: 12px;
-  }
-
-  .add-file-button:disabled, .add-file-button:disabled:hover {
-    background-color: hsl(220, 30%, 85%);
-    border-color: hsl(220, 30%, 80%);
-    color: gray;
-    cursor: default;
   }
 
   .input-wrapper {

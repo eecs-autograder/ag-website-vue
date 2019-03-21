@@ -17,11 +17,7 @@
 
       <div class="existing-patterns-title"> Existing Expected Student Files </div>
       <div class="list-of-patterns-container">
-        <div v-if="expected_student_files.length === 0">
-          Add expected student files above!
-        </div>
-        <div v-else
-             v-for="(file, index) of expected_student_files"
+        <div v-for="(file, index) of expected_student_files"
              :key="file.pk">
           <single-expected-student-file :expected_student_file="file"
                                         :odd_index="index % 2 === 1">
@@ -99,6 +95,12 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-language: "Quicksand";
 
+#expected-student-files-component {
+  font-family: $current-language;
+  width: 95%;
+  margin: 20px 2.5%;
+}
+
 #new-expected-file-pattern {
   color: white;
   padding: 10px 25px 10px 25px;
@@ -106,31 +108,24 @@ $current-language: "Quicksand";
   background-image: linear-gradient(to bottom right, hsl(220, 20%, 37%), hsl(220, 20%, 39%));
 }
 
-#expected-student-files-component {
-  font-family: $current-language;
-  width: 95%;
-  margin: 20px 2.5%;
-}
-
 .new-pattern-side, .existing-patterns {
   display: block;
 }
 
-.new-pattern-title {
+.new-pattern-title, .existing-patterns-title {
   font-size: 17px;
-  padding: 5px 0 10px 0;
   font-weight: 600;
-  color: black;
 }
 
 .existing-patterns-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: black;
   padding: 40px 0 10px 0;
 }
-@media only screen and (min-width: 800px) {
 
+.new-pattern-title {
+  padding: 5px 0 10px 0;
+}
+
+@media only screen and (min-width: 800px) {
   .new-pattern-side, .existing-patterns {
     display: inline-block;
     vertical-align: top;
@@ -147,17 +142,8 @@ $current-language: "Quicksand";
     padding: 0 0 0 40px;
   }
 
-  .new-pattern-title {
+  .new-pattern-title, .existing-patterns-title {
     font-size: 18px;
-    padding: 5px 0 15px 0;
-    font-weight: 400;
-    color: black;
-  }
-
-  .existing-patterns-title {
-    font-size: 18px;
-    font-weight: 400;
-    color: black;
     padding: 5px 0 15px 0;
   }
 }

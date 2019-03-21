@@ -38,9 +38,8 @@
       <expected-student-file-form id="my_form"
                                   ref="form"
                                   @on_submit="update_expected_student_file($event)"
-                                  :on_form_validity_change="(event) => { pattern_is_valid = event }"
-                                  :expected_student_file="expected_student_file">
-
+                                  :expected_student_file="expected_student_file"
+                                  :on_form_validity_change="(event) => { pattern_is_valid = event }">
         <template slot="form_footer">
           <a-p-i-errors ref="api_errors"> </a-p-i-errors>
 
@@ -51,7 +50,7 @@
             </button>
             <button class="update-button"
                     type="submit"
-                    :disabled="!pattern_is_valid"> Update
+                    :disabled="!pattern_is_valid"> Update File
             </button>
           </div>
         </template>
@@ -83,12 +82,12 @@
 
 <script lang="ts">
   import APIErrors from '@/components/api_errors.vue';
-  import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
+  import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/expected_student_files/expected_student_file_form.vue';
   import Modal from '@/components/modal.vue';
-  import { handle_api_errors_async } from '@/utils';
+  import { handle_api_errors_async, safe_assign } from '@/utils';
 
   import { ExpectedStudentFile } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component({
     components: { APIErrors, ExpectedStudentFileForm, Modal }
@@ -102,19 +101,33 @@
     odd_index!: boolean;
 
     actively_updating = false;
+    d_expected_student_file: ExpectedStudentFile | null;
     d_delete_pending = false;
     d_saving = false;
     pattern_is_valid = false;
+
+    created() {
+      this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
+    }
+
+    @Watch('expected_student_file')
+    on_expected_student_file_changed(new_file: ExpectedStudentFile, old_val: ExpectedStudentFile) {
+      this.d_expected_student_file.pattern = this.expected_student_file.pattern;
+      this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
+      this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
+    }
 
     get wildcard_is_present() {
       return this.expected_student_file.pattern.match('[*?![\\]]') !== null;
     }
 
     @handle_api_errors_async(handle_edit_expected_student_file_error)
-    async update_expected_student_file(file: ExpectedStudentFile) {
+    async update_expected_student_file(file: ExpectedStudentFileFormData) {
       try {
         this.d_saving = true;
-        await file!.save();
+        (<APIErrors> this.$refs.api_errors).clear();
+        safe_assign(this.d_expected_student_file, file);
+        await this.d_expected_student_file!.save();
         this.actively_updating = false;
         (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
       }
@@ -149,29 +162,11 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
-// api errors ************************************************************
-.api-error-container {
-  box-sizing: border-box;
+#single-expected-student-file {
   width: 100%;
-  position: relative;
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  padding: 10px 90px 10px 10px;
-  border-radius: .25rem;
-  margin-top: 11px;
-}
-
-.dismiss-error-button {
-  font-size: 15px;
-  position: absolute;
-  right: 5px;
-  top: 6px;
-  padding: 4px 10px;
-  background-color: white;
-  border-radius: .25rem;
-  cursor: pointer;
-  border: 1px solid #f5c6cb;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  border-radius: 2px;
 }
 
 .editing-message {
@@ -192,43 +187,27 @@
   color: white;
 }
 
-.odd-header {
-  background-image: linear-gradient(to bottom right, hsl(212, 100%, 90%), hsl(212, 100%, 85%));
+.odd-header, .even-header {
   padding: 14px 120px 14px 15px;
   border-radius: 3px;
   position: relative;
+}
+
+.odd-header {
+  background-image: linear-gradient(to bottom right, hsl(212, 100%, 90%), hsl(212, 100%, 85%));
 }
 
 .even-header {
   background-image: linear-gradient(to bottom right, hsl(212, 100%, 84%), hsl(212, 100%, 85%));
-  padding: 14px 120px 14px 15px;
-  border-radius: 3px;
-  position: relative;
-}
-
-#single-expected-student-file {
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 12px;
-  border-radius: 2px;
 }
 
 .form-editing {
   color: black;
-  padding: 15px 25px 30px 25px;
+  padding: 15px 25px 25px 25px;
   border: 2px solid hsl(220, 20%, 39%);
   border-top: 0;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-}
-
-.input-wrapper {
-  padding: 10px 0 5px 0;
-}
-
-.input-label {
-  font-size: 16px;
-  font-weight: 500;
 }
 
 .pattern {
@@ -335,8 +314,8 @@
   @extend .red-button;
   margin-right: 20px;
 }
-@media only screen and (min-width: 800px) {
 
+@media only screen and (min-width: 800px) {
   .edit-file span, .delete-file span {
     display: inline-block;
   }
