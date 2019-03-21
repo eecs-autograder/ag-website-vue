@@ -2,7 +2,11 @@
   <div ref="course_list_component">
     <div id="course-list">
 
-      <div v-if="courses_by_term.length === 0"
+      <div v-if="loading" class="loading-spinner">
+        <div> <i class="fa fa-spinner fa-pulse"></i> </div>
+      </div>
+
+      <div v-else-if="courses_by_term.length === 0"
            id="not-enrolled-message">
         <p> You are not enrolled in any courses. </p>
       </div>
@@ -60,6 +64,7 @@
 
     all_courses: AllCourses | null = null;
     courses_by_term: TermCourses[] = [];
+    loading = true;
 
     beforeDestroy() {
       Course.unsubscribe(this);
@@ -68,6 +73,7 @@
     async created() {
       Course.subscribe(this);
       await this.get_and_sort_courses();
+      this.loading = false;
     }
 
     is_admin(course: Course) {
@@ -201,6 +207,15 @@ $current-lang-choice: "Poppins";
 
 #all-semesters {
   margin-top: 40px;
+}
+
+.loading-spinner {
+  color: $ocean-blue;
+  font-size: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
 @media only screen and (min-width: 481px) {

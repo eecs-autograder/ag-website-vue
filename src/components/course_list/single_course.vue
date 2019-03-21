@@ -290,6 +290,11 @@ a {
   margin-top: 40px;
 }
 
+.semester-dropdown-header {
+  width: 140px;
+  height: 39px;
+}
+
 .course-to-copy {
   background-color: hsl(220, 20%, 92%);
   letter-spacing: 1px;
