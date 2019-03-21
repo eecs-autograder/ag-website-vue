@@ -170,15 +170,11 @@
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/course_admin.scss';
 
-$current-lang-choice: "Poppins";
-
 #course-list {
-  font-family: $current-lang-choice;
   margin-left: 5%;
   margin-right: 5%;
   width: 90%;

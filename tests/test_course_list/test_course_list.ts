@@ -106,6 +106,9 @@ describe('Course_List.vue', () => {
                 });
 
                 course_list = wrapper.vm;
+
+                // TODO: After upgrading vue-test-utils, see if this works with only one
+                await course_list.$nextTick();
                 await course_list.$nextTick();
 
                 expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
@@ -169,6 +172,7 @@ describe('Course_List.vue', () => {
                 });
 
                 course_list = wrapper.vm;
+                await course_list.$nextTick();
                 await course_list.$nextTick();
 
                 expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
@@ -249,6 +253,7 @@ describe('Course_List.vue', () => {
 
                 course_list = wrapper.vm;
                 await course_list.$nextTick();
+                await wrapper.vm.$nextTick();
 
                 expect(course_list.all_courses!.courses_is_admin_for.length).toEqual(2);
                 expect(course_list.courses_by_term.length).toEqual(1);
@@ -311,6 +316,7 @@ describe('Course_List.vue', () => {
                     stubs: ['router-link', 'router-view']
                 });
 
+                await wrapper.vm.$nextTick();
                 await wrapper.vm.$nextTick();
 
                 course_list = wrapper.vm;
@@ -385,6 +391,7 @@ describe('Course_List.vue', () => {
                 });
 
                 await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
 
                 course_list = wrapper.vm;
                 course_list_page = wrapper.find({ref: 'course_list_component'});
@@ -441,6 +448,7 @@ describe('Course_List.vue', () => {
                  });
 
                  await wrapper.vm.$nextTick();
+                 await wrapper.vm.$nextTick();
 
                  course_list = wrapper.vm;
                  course_list_page = wrapper.find({ref: 'course_list_component'});
@@ -478,6 +486,7 @@ describe('Course_List.vue', () => {
                     stubs: ['router-link', 'router-view']
                 });
 
+                await wrapper.vm.$nextTick();
                 await wrapper.vm.$nextTick();
 
                 course_list = wrapper.vm;
@@ -518,6 +527,7 @@ describe('Course_List.vue', () => {
                     stubs: ['router-link', 'router-view']
                 });
 
+                await wrapper.vm.$nextTick();
                 await wrapper.vm.$nextTick();
 
                 course_list = wrapper.vm;
