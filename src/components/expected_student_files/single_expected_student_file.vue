@@ -42,15 +42,7 @@
                                   :expected_student_file="expected_student_file">
 
         <template slot="form_footer">
-          <div v-for="error of api_errors" class="api-error-container">
-            <div class="api-error">{{error}}</div>
-            <button class="dismiss-error-button"
-                    type="button"
-                    @click="api_errors = []">
-              <span class="dismiss-error"> Dismiss
-              </span>
-            </button>
-          </div>
+          <a-p-i-errors ref="api_errors"> </a-p-i-errors>
 
           <div class="button-container">
             <button class="cancel-update-button"
@@ -90,18 +82,16 @@
 </template>
 
 <script lang="ts">
+  import APIErrors from '@/components/api_errors.vue';
   import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
   import Modal from '@/components/modal.vue';
-
-  import { handle_400_errors_async } from '@/utils';
-
-  import { AxiosResponse } from 'axios';
+  import { handle_api_errors_async } from '@/utils';
 
   import { ExpectedStudentFile } from 'ag-client-typescript';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
-    components: { ExpectedStudentFileForm, Modal }
+    components: { APIErrors, ExpectedStudentFileForm, Modal }
   })
   export default class SingleExpectedStudentFile extends Vue {
 
@@ -113,21 +103,24 @@
 
     actively_updating = false;
     d_delete_pending = false;
+    d_saving = false;
     pattern_is_valid = false;
-    api_errors: string[] = [];
 
     get wildcard_is_present() {
       return this.expected_student_file.pattern.match('[*?![\\]]') !== null;
     }
 
-    @handle_400_errors_async(handle_edit_expected_student_file_error)
+    @handle_api_errors_async(handle_edit_expected_student_file_error)
     async update_expected_student_file(file: ExpectedStudentFile) {
       try {
+        this.d_saving = true;
         await file!.save();
         this.actively_updating = false;
         (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
       }
-      finally {}
+      finally {
+        this.d_saving = false;
+      }
     }
 
     cancel_update() {
@@ -139,18 +132,16 @@
       try {
         this.d_delete_pending = true;
         await this.expected_student_file.delete();
+      }
+      finally {
         this.d_delete_pending = false;
       }
-      finally {}
     }
   }
 
   export function handle_edit_expected_student_file_error(component: SingleExpectedStudentFile,
-                                                          response: AxiosResponse) {
-    let errors = response.data["__all__"];
-    if (errors.length > 0) {
-      component.api_errors = [errors[0]];
-    }
+                                                          error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 </script>
 

@@ -86,8 +86,8 @@
   })
   export default class ExpectedStudentFileForm extends Vue {
 
-    @Prop({required: true, type: Function})
-    on_submit!: (file: ExpectedStudentFile | NewExpectedStudentFileData) => void;
+    // @Prop({required: true, type: Function})
+    // on_submit!: (file: ExpectedStudentFile | NewExpectedStudentFileData) => void;
 
     @Prop({required: true, type: Function})
     on_form_validity_change!: () => void;
@@ -134,9 +134,13 @@
     }
 
     reset_expected_student_file_values() {
-      this.d_expected_student_file.pattern = this.expected_student_file.pattern;
-      this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
-      this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
+      if (this.expected_student_file instanceof ExpectedStudentFile) {
+        this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
+      }
+      else {
+        this.d_expected_student_file = new CreateExpectedStudentFileData();
+        this.exact_match = true;
+      }
       (<ValidatedForm>this.$refs.expected_student_file_form).clear();
     }
   }

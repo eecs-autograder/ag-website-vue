@@ -17,7 +17,11 @@
 
       <div class="existing-patterns-title"> Existing Expected Student Files </div>
       <div class="list-of-patterns-container">
-        <div v-for="(file, index) of expected_student_files"
+        <div v-if="expected_student_files.length === 0">
+          Add expected student files above!
+        </div>
+        <div v-else
+             v-for="(file, index) of expected_student_files"
              :key="file.pk">
           <single-expected-student-file :expected_student_file="file"
                                         :odd_index="index % 2 === 1">
@@ -115,13 +119,13 @@ $current-language: "Quicksand";
 .new-pattern-title {
   font-size: 17px;
   padding: 5px 0 10px 0;
-  font-weight: 400;
+  font-weight: 600;
   color: black;
 }
 
 .existing-patterns-title {
   font-size: 17px;
-  font-weight: 400;
+  font-weight: 600;
   color: black;
   padding: 40px 0 10px 0;
 }

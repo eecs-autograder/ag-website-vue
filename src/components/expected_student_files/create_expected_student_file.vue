@@ -6,18 +6,11 @@
                                   :expected_student_file="d_new_expected_student_file">
 
         <template slot="form_footer">
-          <div v-for="error of api_errors" class="api-error-container">
-            <div class="api-error">{{error}}</div>
-            <button class="dismiss-error-button"
-                    type="button"
-                    @click="api_errors = []; api_error_present = false">
-              <span class="dismiss-error"> Dismiss </span>
-            </button>
-          </div>
+          <a-p-i-errors ref="api_errors"> </a-p-i-errors>
 
           <button class="add-file-button"
                   type="submit"
-                  :disabled="!pattern_is_valid"> Add Filename
+                  :disabled="!pattern_is_valid"> Add
           </button>
         </template>
 
@@ -26,12 +19,11 @@
 </template>
 
 <script lang="ts">
+  import APIErrors from '@/components/api_errors.vue';
   import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
+
+  import { handle_api_errors_async } from '@/utils';
   import { Component, Prop, Vue } from 'vue-property-decorator';
-
-  import { AxiosResponse } from 'axios';
-
-  import { handle_400_errors_async } from '@/utils';
 
   import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
@@ -42,7 +34,7 @@
   }
 
   @Component({
-    components: { ExpectedStudentFileForm }
+    components: { APIErrors, ExpectedStudentFileForm }
   })
   export default class CreateExpectedStudentFile extends Vue {
 
@@ -51,10 +43,8 @@
 
     d_new_expected_student_file = new CreateExpectedStudentFileData();
     pattern_is_valid = false;
-    api_errors: string[] = [];
-    api_error_present = false;
 
-    @handle_400_errors_async(handle_add_expected_student_file_error)
+    @handle_api_errors_async(handle_add_expected_student_file_error)
     async create_expected_student_file(new_expected_student_file_data: NewExpectedStudentFileData) {
       await ExpectedStudentFile.create(this.project.pk, new_expected_student_file_data);
       (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
@@ -62,12 +52,8 @@
   }
 
   export function handle_add_expected_student_file_error(component: CreateExpectedStudentFile,
-                                                  response: AxiosResponse) {
-    let errors = response.data["__all__"];
-    if (errors.length > 0) {
-      component.api_errors = [errors[0]];
-      component.api_error_present = true;
-    }
+                                                  error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 </script>
 
