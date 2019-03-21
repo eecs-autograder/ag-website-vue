@@ -1,11 +1,11 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
+import { AllCourses } from 'ag-client-typescript/src/course';
 import Vue from 'vue';
 
 import { Course, Semester, User } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 
 import CourseList from '@/components/course_list/course_list.vue';
-import { AllCourses, Model } from '@/model';
 
 import { patch_async_class_method, patch_async_static_method } from '../mocking';
 
@@ -304,7 +304,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                let mock_result = await Model.get_instance().get_courses_for_user(user);
+                let mock_result = await Course.get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
                 wrapper = mount(CourseList, {
@@ -340,7 +340,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                 let mock_result = await Model.get_instance().get_courses_for_user(user);
+                 let mock_result = await Course.get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
 
                  wrapper = mount(CourseList, {
@@ -377,7 +377,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                let mock_result = await Model.get_instance().get_courses_for_user(user);
+                let mock_result = await Course.get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
                 wrapper = mount(CourseList, {
@@ -433,7 +433,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                 let mock_result = await Model.get_instance().get_courses_for_user(user);
+                 let mock_result = await Course.get_courses_for_user(user);
                  expect(mock_result).toEqual(all_courses);
 
                  wrapper = mount(CourseList, {
@@ -471,7 +471,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                let mock_result = await Model.get_instance().get_courses_for_user(user);
+                let mock_result = await Course.get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
                 wrapper = mount(CourseList, {
@@ -511,7 +511,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                let mock_result = await Model.get_instance().get_courses_for_user(user);
+                let mock_result = await Course.get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
                 wrapper = mount(CourseList, {
@@ -548,7 +548,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                let mock_result = await Model.get_instance().get_courses_for_user(user);
+                let mock_result = await Course.get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
                 wrapper = mount(CourseList, {
@@ -594,7 +594,7 @@ describe('Course_List.vue', () => {
                 Course, 'get_courses_for_user',
                 () =>  Promise.resolve(all_courses), async () => {
 
-                let mock_result = await Model.get_instance().get_courses_for_user(user);
+                let mock_result = await Course.get_courses_for_user(user);
                 expect(mock_result).toEqual(all_courses);
 
                 wrapper = mount(CourseList, {

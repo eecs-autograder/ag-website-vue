@@ -8,8 +8,6 @@
   import { Course, User } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
 
-  import { Model } from '@/model';
-
   import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 
   @Component({
@@ -22,7 +20,7 @@
     async created() {
       this.user = await User.get_current();
       console.log(this.user);
-      let courses = await Model.get_instance().get_courses_for_user(this.user);
+      let courses = await Course.get_courses_for_user(this.user);
       console.log(courses);
       let admin_courses = courses.courses_is_admin_for;
       this.my_course = admin_courses[1];

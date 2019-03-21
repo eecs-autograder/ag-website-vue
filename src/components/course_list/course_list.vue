@@ -34,8 +34,8 @@
 
   import SingleCourse from '@/components/course_list/single_course.vue';
 
-  import { AllCourses, Model } from '@/model';
   import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
+  import { AllCourses } from 'ag-client-typescript/src/course';
 
   import {
     array_add_unique,
@@ -116,7 +116,7 @@
 
     async get_and_sort_courses() {
       let user = await User.get_current();
-      this.all_courses = await Model.get_instance().get_courses_for_user(user);
+      this.all_courses = await Course.get_courses_for_user(user);
       for (let [role, courses] of Object.entries(this.all_courses)) {
         this.sort_into_terms(courses);
       }
