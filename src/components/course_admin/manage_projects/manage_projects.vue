@@ -125,7 +125,7 @@
         );
         this.projects.push(new_project);
         this.sort_projects();
-        (<ValidatedInput> this.$refs.new_project_name).clear();
+        (<ValidatedInput> this.$refs.new_project_name).reset_warning_state();
       }
       finally {
         this.d_adding_project = false;

@@ -255,7 +255,7 @@ describe('ValidatedForm.vue', () => {
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
     });
 
-    test('Clear method removes all error messages and clears all input fields ', async () => {
+    test('reset_warning_state hides warnings for all input fields ', async () => {
         const component = {
             template:  `<validated-form ref="form">
                           <validated-input ref="validated_input_1" v-model="value1"
@@ -311,7 +311,7 @@ describe('ValidatedForm.vue', () => {
         expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("invalid value 2");
 
         // Clear
-        form_vm.clear();
+        form_vm.reset_warning_state();
         await wrapper.vm.$nextTick();
 
         // Make sure error messages are no longer displayed, and that inputs are cleared
@@ -319,7 +319,7 @@ describe('ValidatedForm.vue', () => {
         expect(vinput2_vm.d_show_warnings).toBe(false);
         expect(vinput1.find('#error-text').exists()).toBe(false);
         expect(vinput2.find('#error-text').exists()).toBe(false);
-        expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("");
-        expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("");
+        expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
+        expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("invalid value 2");
     });
 });
