@@ -32,9 +32,9 @@
       return true;
     }
 
-    clear() {
+    reset_warning_state() {
       for (const validated_input of this.d_validated_inputs) {
-        validated_input.clear();
+        validated_input.reset_warning_state();
       }
     }
 

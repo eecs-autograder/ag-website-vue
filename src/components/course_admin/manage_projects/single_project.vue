@@ -154,7 +154,7 @@
       let new_project = await this.project.copy_to_course(
         this.course_to_clone_to!.pk, this.cloned_project_name
       );
-      (<ValidatedInput> this.$refs.cloned_project_name).clear();
+      (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
       let clone_project_modal = <Modal> this.$refs.clone_project_modal;
       clone_project_modal.close();
       if (this.course_to_clone_to!.pk === this.course.pk) {

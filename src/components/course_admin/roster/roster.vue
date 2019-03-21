@@ -136,7 +136,7 @@
         this.$emit('add_users', valid_usernames);
         this.users_to_add = "";
         let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
-        validated_input.clear();
+        validated_input.reset_warning_state();
         this.add_users_form_is_valid = false;
       }
     }

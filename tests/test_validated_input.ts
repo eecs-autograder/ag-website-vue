@@ -452,7 +452,7 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.find('#error-text').exists()).toBe(true);
     });
 
-    test('Clear method removes error messages and clears input text', async () => {
+    test('reset_warning_state hides warnings', async () => {
         const wrapper = mount(ValidatedInput, {
             propsData: {
                 value: "1",
@@ -473,13 +473,15 @@ describe('ValidatedInput.vue', () => {
         expect(vinput_vm.d_show_warnings).toBe(true);
         expect(wrapper.find('#error-text').exists()).toBe(true);
 
-        vinput_vm.clear();
+        vinput_vm.reset_warning_state();
         await wrapper.vm.$nextTick();
 
         // Clear method should set input to be empty and not display error messages
         expect(vinput_vm.is_valid).toBe(false);
         expect(vinput_vm.d_show_warnings).toBe(false);
         expect(wrapper.find('#error-text').exists()).toBe(false);
-        expect((<HTMLInputElement> wrapper.find('#input').element).value).toBe("");
+        expect(
+            (<HTMLInputElement> wrapper.find('#input').element).value
+        ).toBe("invalid value here!");
     });
 });

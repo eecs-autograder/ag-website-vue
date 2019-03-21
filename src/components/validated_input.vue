@@ -107,9 +107,8 @@
       return this.d_error_msg === "";
     }
 
-    clear() {
+    reset_warning_state() {
       this.d_show_warnings = false;
-      this.d_input_value = "";
     }
 
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
