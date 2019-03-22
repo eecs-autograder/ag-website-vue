@@ -120,9 +120,9 @@
       try {
         this.d_adding_project = true;
         this.new_project_name.trim();
-        let new_project: Project = await Project.create(
-          this.d_course.pk, {name: this.new_project_name}
-        );
+        let new_project: Project = await Project.create({
+          name: this.new_project_name, course: this.d_course.pk
+        });
         this.projects.push(new_project);
         this.sort_projects();
         (<ValidatedInput> this.$refs.new_project_name).reset_warning_state();
