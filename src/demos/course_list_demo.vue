@@ -8,7 +8,7 @@
   import { HttpClient } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import CourseList from '@/components/course_list.vue';
+  import CourseList from '@/components/course_list/course_list.vue';
 
   @Component({
     components: { CourseList}
