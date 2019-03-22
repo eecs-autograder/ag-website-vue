@@ -10,8 +10,6 @@
   import { Course, Project, User } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
 
-  import { Model } from '@/model';
-
   @Component({
     components: { ExpectedStudentFiles }
   })
@@ -21,13 +19,11 @@
 
     async created() {
       let user = await User.get_current();
-      let courses = await Model.get_instance().get_courses_for_user(user);
-      // console.log(courses);
+      let courses = await Course.get_courses_for_user(user);
       let admin_courses = courses.courses_is_admin_for;
       this.my_course = admin_courses[1];
       let projects = await Project.get_all_from_course(this.my_course.pk);
       this.project_1 = projects[1];
-      // console.log(this.project_1.name);
     }
   }
 </script>

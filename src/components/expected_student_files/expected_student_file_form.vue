@@ -18,21 +18,21 @@
 
       <div class="exact-match-container">
         <div class="radio-input">
-          <input ref="exact_match"
+          <input ref="exact_match_button"
                  type="radio"
-                 id="exact-match"
+                 id="exact-match-button"
                  :disabled="wildcard_is_present"
                  :value="true"
                  v-model="d_exact_match">
-          <label for="exact-match" class="exact-match-label"> Exact Match </label>
+          <label class="exact-match-label"> Exact Match </label>
         </div>
         <div class="radio-input">
-          <input ref="not_exact_match"
+          <input ref="not_exact_match_button"
                  type="radio"
-                 id="shell-wildcard"
+                 id="not-exact-match-button"
                  :value="false"
                  v-model="d_exact_match">
-          <label for="shell-wildcard" class="wildcard-label"> Shell Wildcard </label>
+          <label class="wildcard-label"> Shell Wildcard </label>
         </div>
       </div>
 
@@ -73,7 +73,7 @@
 
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  import { ExpectedStudentFile, NewExpectedStudentFileData } from 'ag-client-typescript';
+  import { NewExpectedStudentFileData } from 'ag-client-typescript';
 
   export class ExpectedStudentFileFormData implements NewExpectedStudentFileData {
     pattern: string;
@@ -90,6 +90,8 @@
       this.max_num_matches = max_num_matches;
     }
   }
+
+  // Address issue of clicking on label in single file affecting radio buttons of create????
 
   @Component({
     components: { Tooltip, ValidatedForm, ValidatedInput }
