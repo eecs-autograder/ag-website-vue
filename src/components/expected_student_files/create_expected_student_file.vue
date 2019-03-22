@@ -2,7 +2,7 @@
   <div id="create-expected-student-file-component">
       <expected-student-file-form ref="form"
                                   @on_submit="create_expected_student_file($event)"
-                                  :on_form_validity_change="(event) => { pattern_is_valid = event }">
+                                  @on_form_validity_changed="pattern_is_valid = $event">
 
         <template slot="form_footer">
           <a-p-i-errors ref="api_errors"> </a-p-i-errors>

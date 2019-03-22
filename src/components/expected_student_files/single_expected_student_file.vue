@@ -39,7 +39,7 @@
                                   ref="form"
                                   @on_submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
-                                  :on_form_validity_change="(event) => { pattern_is_valid = event }">
+                                  @on_form_validity_changed="pattern_is_valid = $event">
         <template slot="form_footer">
           <a-p-i-errors ref="api_errors"> </a-p-i-errors>
 

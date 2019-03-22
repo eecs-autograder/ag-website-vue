@@ -5,7 +5,7 @@
                       autocomplete="off"
                       spellcheck="false"
                       @submit.native.prevent="submit_form"
-                      @form_validity_changed="$emit('form_validity_changed', $event)">
+                      @form_validity_changed="$emit('on_form_validity_changed', $event)">
 
       <div class="input-wrapper">
         <label class="input-label"> Filename </label>
@@ -101,7 +101,6 @@
 
     d_expected_student_file: ExpectedStudentFileFormData = null;
     d_exact_match = true;
-    pattern_is_valid = false;
 
     readonly is_non_negative = is_non_negative;
     readonly is_not_empty = is_not_empty;
@@ -141,42 +140,42 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/button_styles.scss';
+@import '@/styles/button_styles.scss';
 
-  #create-expected-student-file-component {
-    border-radius: 2px;
-    box-sizing: border-box;
-    margin-bottom: 12px;
-    width: 100%;
-  }
+#create-expected-student-file-component {
+  border-radius: 2px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  width: 100%;
+}
 
-  .radio-input {
-    display: inline-block;
-    padding: 4px 0;
-  }
+.radio-input {
+  display: inline-block;
+  padding: 4px 0;
+}
 
-  .exact-match-container {
-    padding: 4px 0 0 0;
-  }
+.exact-match-container {
+  padding: 4px 0 0 0;
+}
 
-  .exact-match-container label {
-    padding-left: 3px;
-  }
+.exact-match-container label {
+  padding-left: 3px;
+}
 
-  .exact-match-label {
-    padding-right: 50px;
-  }
+.exact-match-label {
+  padding-right: 50px;
+}
 
-  .min-max-container {
-    padding-bottom: 5px;
-  }
+.min-max-container {
+  padding-bottom: 5px;
+}
 
-  .input-wrapper {
-    padding: 10px 0 5px 0;
-  }
+.input-wrapper {
+  padding: 10px 0 5px 0;
+}
 
-  .input-label {
-    font-size: 16px;
-    font-weight: 500;
-  }
+.input-label {
+  font-size: 16px;
+  font-weight: 500;
+}
 </style>
