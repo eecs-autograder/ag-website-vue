@@ -2,14 +2,9 @@ import ExpectedStudentFileForm from '@/components/expected_student_files/expecte
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { ExpectedStudentFile } from 'ag-client-typescript';
-import * as sinon from "sinon";
 
 beforeAll(() => {
     config.logModifiedComponents = false;
-});
-
-afterEach(() => {
-    sinon.restore();
 });
 
 describe('Input property tests', () => {
@@ -49,7 +44,7 @@ describe('Input property tests', () => {
 });
 
 
-describe.only('Valid form submit tests', () => {
+describe('Valid form submit tests', () => {
     let wrapper: Wrapper<ExpectedStudentFileForm>;
     let component: ExpectedStudentFileForm;
 
@@ -71,8 +66,8 @@ describe.only('Valid form submit tests', () => {
         expect(wrapper.emitted().on_submit[0][0].max_num_matches).toEqual(1);
     });
 
-    // RangeError: Max call stack size exceeded
-    test.only('Submit without wildcard present and exact match set to false', async () => {
+    test('Submit without wildcard present and exact match set to false', async () => {
+        fail("RangeError: Max call stack size exceeded");
         component.d_exact_match = false;
         await component.$nextTick();
 
@@ -88,8 +83,8 @@ describe.only('Valid form submit tests', () => {
         expect(wrapper.emitted().on_submit[0][0].max_num_matches).toEqual(1);
     });
 
-    //  RangeError: Maximum call stack size exceeded at String.replace (<anonymous>)
     test('Submit with wildcard present', async () => {
+        fail("RangeError: Maximum call stack size exceeded at String.replace (<anonymous>)");
         component.d_exact_match = false;
         await component.$nextTick();
 
@@ -144,10 +139,10 @@ describe('Wildcard chars present and exact_match setting', () => {
         expect(component.wildcard_is_present).toBe(true);
     });
 
-    // Passes but causes error: Error in callback for watcher "wildcard_is_present":
-    // "RangeError: Maximum call stack size exceeded"
     test('exact_match is set to false and cannot change when wildcard_is_present becomes true',
          async () => {
+         fail("RangeError: Maximum call stack size exceeded");
+
          // the one statement below alone causes the Max call stack size exceeded error....
          component.d_expected_student_file.pattern = "zucch!ni.cpp";
          await component.$nextTick();
@@ -162,9 +157,9 @@ describe('Wildcard chars present and exact_match setting', () => {
          expect(component.d_exact_match).toBe(false);
     });
 
-    // RangeError: Maximum call stack size exceeded
     test('min and max num matches are editable when wildcard_is_present and !exact_match',
          async () => {
+         fail("RangeError: Maximum call stack size exceeded");
          component.d_exact_match = false;
          await component.$nextTick();
 

@@ -35,8 +35,7 @@
 
     <div v-if="actively_updating"
          :class="(actively_updating) ? 'form-editing' : 'form-not-editing'">
-      <expected-student-file-form id="my_form"
-                                  ref="form"
+      <expected-student-file-form ref="form"
                                   @on_submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
                                   @on_form_validity_changed="pattern_is_valid = $event">
@@ -124,10 +123,15 @@
     @handle_api_errors_async(handle_edit_expected_student_file_error)
     async update_expected_student_file(file: ExpectedStudentFileFormData) {
       try {
+        console.log("update_expected_student_file");
         this.d_saving = true;
         (<APIErrors> this.$refs.api_errors).clear();
+        console.log("Errors cleared");
         safe_assign(this.d_expected_student_file, file);
+        console.log("Safe assigned");
         await this.d_expected_student_file!.save();
+        console.log(this.d_expected_student_file.pattern);
+        console.log("Done saving");
         this.actively_updating = false;
         (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
       }
@@ -142,6 +146,7 @@
     }
 
     async delete_pattern_permanently() {
+      console.log("Trying to delete permanently");
       try {
         this.d_delete_pending = true;
         await this.expected_student_file.delete();

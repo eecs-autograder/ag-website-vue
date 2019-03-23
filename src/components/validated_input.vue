@@ -116,9 +116,8 @@
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     @Watch('value')
     on_value_change(new_value: unknown, old_value: unknown) {
-      console.log("a;kldsfj;alksjdfl;kajsdf");
-      console.log(old_value);
-      console.log(new_value);
+      // console.log(old_value);
+      // console.log(new_value);
       const str_value = this.to_string_fn(new_value);
 
       if (str_value !== this.d_input_value) {

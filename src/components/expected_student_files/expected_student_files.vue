@@ -58,6 +58,7 @@
     }
 
     update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
+      console.log("In update_esf_created");
       this.expected_student_files.push(expected_student_file);
       this.sort_files();
     }
