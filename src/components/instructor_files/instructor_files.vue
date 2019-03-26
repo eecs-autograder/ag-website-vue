@@ -12,9 +12,9 @@
     <div id="viewing-area">
       <div id="column-of-files" :style="{display: collapsed? 'none' : 'block'}">
         <div v-for="instructor_file of instructor_files" :key="instructor_file.pk">
-          <single-file :file="instructor_file"
+          <single-instructor-file :file="instructor_file"
                        @open_file="view_file($event)">
-          </single-file>
+          </single-instructor-file>
         </div>
       </div>
       <div id="instructor-file-viewer-wrapper"
@@ -23,7 +23,7 @@
                          height_of_view_file="600px"
                          @num_files_viewing_changed="num_files_currently_viewing = $event">
         </MultiFileViewer>
-        <div v-if="num_files_currently_viewing === 0"
+        <div v-if="num_files_currently_viewing === 0 && instructor_files.length !== 0"
              class="helpful-message">
           Click on a file to view its contents.
         </div>
@@ -41,14 +41,14 @@
   import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
   import FileUpload from '@/components/file_upload.vue';
-  import SingleFile from '@/components/instructor_files/single_file.vue';
+  import SingleInstructorFile from '@/components/instructor_files/single_instructor_file.vue';
   import MultiFileViewer from '@/components/multi_file_viewer.vue';
 
   @Component({
     components: {
       FileUpload,
       MultiFileViewer,
-      SingleFile
+      SingleInstructorFile
     }
   })
   export default class InstructorFiles extends Vue implements InstructorFileObserver {
@@ -95,16 +95,16 @@
         let file_already_exists = array_has_unique(
           this.instructor_files,
           file.name,
-          (file: InstructorFile, file_name_to_add: string) =>
-            file_name_equal(file.name, file_name_to_add)
+          (file_a: InstructorFile, file_name_to_add: string) =>
+            file_name_equal(file_a.name, file_name_to_add)
         );
 
         if (file_already_exists) {
           let file_to_update = array_get_unique(
             this.instructor_files,
             file.name,
-            (file: InstructorFile, file_name_to_add: string) =>
-              file_name_equal(file.name, file_name_to_add)
+            (file_a: InstructorFile, file_name_to_add: string) =>
+              file_name_equal(file_a.name, file_name_to_add)
           );
           await file_to_update.set_content(file);
         }
@@ -150,9 +150,6 @@
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-
-$current_language: "Quicksand";
 
 .collapse-button {
   display: inline;
@@ -181,7 +178,6 @@ $current_language: "Quicksand";
   margin-left: 2.5%;
   margin-right: 2.5%;
   margin-top: 25px;
-  font-family: $current_language;
 }
 
 #column-of-files {
@@ -215,5 +211,4 @@ $current_language: "Quicksand";
   font-weight: 600;
   font-size: 17px;
 }
-
 </style>

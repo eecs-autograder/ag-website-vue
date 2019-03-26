@@ -17,7 +17,7 @@
     <!--<TooltipDemo></TooltipDemo>-->
     <!--<ToggleDemo></ToggleDemo>-->
     <!--<ViewFileDemo></ViewFileDemo>-->
-    <!--<ValidatedInputDemo></ValidatedInputDemo>-->
+    <ValidatedInputDemo></ValidatedInputDemo>
     <!--<ValidatedFormDemo></ValidatedFormDemo>-->
   </div>
 </template>

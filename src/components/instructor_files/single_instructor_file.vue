@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="single-file-component" @click="$emit('open_file', file)">
+    <div id="single-instructor-file-component" @click="$emit('open_file', file)">
       <div>
         <div v-if="editing">
           <div @click.stop>
@@ -28,6 +28,7 @@
                 </div>
               </validated-input>
             </validated-form>
+            <APIErrors ref="api_errors"></APIErrors>
           </div>
         </div>
         <div v-else class="not-editing">
@@ -72,39 +73,40 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-
-  import { InstructorFile } from 'ag-client-typescript';
-
-  import * as FileSaver from 'file-saver';
-
+  import APIErrors from '@/components/api_errors.vue';
   import Modal from '@/components/modal.vue';
   import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
+  import { handle_api_errors_async } from '@/utils';
+  import { is_not_empty } from '@/validators';
+  import { InstructorFile } from 'ag-client-typescript';
+  import * as FileSaver from 'file-saver';
+
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
-    components: { Modal, ValidatedForm, ValidatedInput }
+    components: {
+      APIErrors,
+      Modal,
+      ValidatedForm,
+      ValidatedInput
+    }
   })
-  export default class SingleFile extends Vue {
+  export default class SingleInstructorFile extends Vue {
 
     @Prop({required: true, type: InstructorFile})
     file!: InstructorFile;
 
+    readonly is_not_empty = is_not_empty;
+
+    d_delete_pending = false;
     editing = false;
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
     new_file_name: string = "";
-    d_delete_pending = false;
-
     new_name_is_valid = true;
 
-    is_not_empty(value: string): ValidatorResponse {
-      return {
-        is_valid: value.trim() !== "",
-        error_msg: "File name cannot be an empty string."
-      };
-    }
-
+    @handle_api_errors_async(handle_rename_file_error)
     async rename_file() {
       if (this.new_file_name !== this.file.name) {
         await this.file.rename(this.new_file_name);
@@ -129,152 +131,148 @@
         this.d_delete_pending = false;
       }
     }
-
   }
+
+  export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  }
+
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
-  @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Quicksand');
-  $current_language: "Quicksand";
+@import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
 
+.icon-holder {
+  display: inline-block;
+  padding-top: 2px;
+}
 
-  .icon-holder {
-    display: inline-block;
-    padding-top: 2px;
-  }
+.not-editing {
+  max-width: 250px;
+}
 
-  .not-editing {
-    max-width: 250px;
-  }
+.edit-name-buttons {
+  display: block;
+  padding: 9px 0 7px 0;
+}
 
-  .edit-name-buttons {
-    display: block;
-    padding: 9px 0 7px 0;
-  }
+.update-file-name-button, .update-file-name-cancel-button {
+  background-color: hsl(220, 30%, 60%);
+  border-radius: 2px;
+  border: 0;
+  padding: 4px 6px 5px 6px;
+  color: white;
+  display: inline-block;
+  font-size: 15px;
+  cursor: pointer;
+}
 
-  .update-file-name-button, .update-file-name-cancel-button {
-    background-color: hsl(220, 30%, 60%);
-    border-radius: 2px;
-    border: 0;
-    padding: 4px 6px 5px 6px;
-    color: white;
-    display: inline-block;
-    font-family: $current-language;
-    font-size: 15px;
-    cursor: pointer;
-  }
+.update-file-name-button:disabled, .update-file-name-button:disabled:hover {
+  background-color: hsl(220, 30%, 85%);
+  color: gray;
+  cursor: default;
+}
 
-  .update-file-name-button:disabled, .update-file-name-button:disabled:hover {
-    background-color: hsl(220, 30%, 85%);
-    color: gray;
-    cursor: default;
-  }
+.update-file-name-cancel-button {
+  margin-left: 10px;
+}
 
-  .update-file-name-cancel-button {
-    margin-left: 10px;
-  }
+.update-file-name-button:hover, .update-file-name-cancel-button:hover {
+  background-color: hsl(220, 30%, 45%);
+}
 
-  .update-file-name-button:hover, .update-file-name-cancel-button:hover {
-    background-color: hsl(220, 30%, 45%);
-  }
+.delete-file {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: hsl(220, 20%, 75%);
+}
 
-  .delete-file {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    color: hsl(220, 20%, 75%);
-  }
+.delete-file:hover {
+  color: hsl(220, 20%, 55%);
+}
 
-  .delete-file:hover {
-    color: hsl(220, 20%, 55%);
-  }
+.download-file {
+  color: hsl(220, 30%, 60%);
+  padding-left: 1px;
+}
 
-  .download-file {
-    color: hsl(220, 30%, 60%);
-    padding-left: 1px;
-  }
+.download-file:hover {
+  color: hsl(220, 30%, 35%);
+}
 
-  .download-file:hover {
-    color: hsl(220, 30%, 35%);
-  }
+.edit-file-name {
+  color: hsl(220, 30%, 60%);
+  padding-left: 10px;
+}
 
-  .edit-file-name {
-    color: hsl(220, 30%, 60%);
-    padding-left: 10px;
-  }
+.edit-file-name:hover {
+  color: hsl(220, 30%, 35%);
+}
 
-  .edit-file-name:hover {
-    color: hsl(220, 30%, 35%);
-  }
+#single-instructor-file-component {
+  margin-bottom: 5px;
+  cursor: pointer;
+  background-color: hsl(220, 40%, 94%);
+  width: 380px;
+  padding: 9px 11px 7px 11px;
+  border-radius: .25rem;
+  position: relative;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  word-break: break-word;
+}
 
-  #single-file-component {
-    margin-bottom: 5px;
-    cursor: pointer;
-    background-color: hsl(220, 40%, 94%);
-    width: 380px;
-    padding: 9px 11px 7px 11px;
-    border-radius: .25rem;
-    position: relative;
-    box-sizing: border-box;
-    word-wrap: break-word;
-    word-break: break-word;
-  }
+.file-name {
+  display: inline-block;
+  font-size: 16px;
+  padding-bottom: 2px;
+  box-sizing: border-box;
+}
 
-  .file-name {
-    display: inline-block;
-    font-size: 16px;
-    padding-bottom: 2px;
-    box-sizing: border-box;
-  }
+.file-name span {
+  padding-right: 8px;
+}
 
-  .file-name span {
-    padding-right: 8px;
-  }
+.display-timestamp {
+  display: block;
+  color: hsl(220, 20%, 65%);
+  font-size: 15px;
+}
 
-  .display-timestamp {
-    display: block;
-    color: hsl(220, 20%, 65%);
-    font-size: 15px;
-  }
+/* ---------------- MODAL ---------------- */
 
-  /* ---------------- MODAL ---------------- */
+#modal-header {
+  padding: 5px 10px;
+}
 
-  #modal-header {
-    padding: 5px 10px;
-    font-family: $current-language;
-  }
+#modal-body {
+  padding: 10px 10px 20px 10px;
+}
 
-  #modal-body {
-    padding: 10px 10px 20px 10px;
-    font-family: $current-language;
-  }
+.file-to-delete {
+  background-color: hsl(220, 20%, 85%);
+  letter-spacing: 1px;
+}
 
-  .file-to-delete {
-    background-color: hsl(220, 20%, 85%);
-    letter-spacing: 1px;
-  }
+#modal-button-container {
+  text-align: right;
+  padding: 10px;
+}
 
-  #modal-button-container {
-    text-align: right;
-    padding: 10px;
-  }
+.modal-cancel-button, .modal-delete-button {
+  border-radius: 2px;
+  font-size: 15px;
+  font-weight: bold;
+}
 
-  .modal-cancel-button, .modal-delete-button {
-    border-radius: 2px;
-    font-family: $current-language;
-    font-size: 15px;
-    font-weight: bold;
-  }
+.modal-cancel-button {
+  @extend .gray-button;
+}
 
-  .modal-cancel-button {
-    @extend .gray-button;
-  }
-
-  .modal-delete-button {
-    @extend .red-button;
-    margin-right: 20px;
-  }
-
+.modal-delete-button {
+  @extend .red-button;
+  margin-right: 20px;
+}
 </style>

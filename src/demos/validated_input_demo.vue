@@ -1,9 +1,5 @@
 <template>
   <div style="padding: 10px;">
-<<<<<<< 7a566fc1e903c3f0ce033b9699ed54bdea932a8b
-<<<<<<< e769faea0846dbc108ec7b0433024250f773dfd0
-=======
->>>>>>> Added tests for the SingleFile component. Still need to implement the download function.
     Validated Input #1
     <hr/>
     <h1>Validated Input (number)</h1>
@@ -13,10 +9,7 @@
                      v-model="number_input"
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
-<<<<<<< 7a566fc1e903c3f0ce033b9699ed54bdea932a8b
                      placeholder="Enter a negative, even integer"
-=======
->>>>>>> Added tests for the SingleFile component. Still need to implement the download function.
                      @input_validity_changed="validated_input_1_valid = $event"></validated-input>
 
     <p>
