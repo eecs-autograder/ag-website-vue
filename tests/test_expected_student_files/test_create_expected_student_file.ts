@@ -1,8 +1,9 @@
+import APIErrors from '@/components/api_errors.vue';
 import CreateExpectedStudentFile from '@/components/expected_student_files/create_expected_student_file.vue';
 import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { ExpectedStudentFile, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 beforeAll(() => {
@@ -56,30 +57,18 @@ describe('CreateExpectedStudentFile tests', () => {
         fail("The only way for the test to pass is to call the function for submitting, " +
              "but the event should really come from the form - so we know the form is valid" +
              "but that approach is not working right now.");
-        let fake_create = sinon.fake();
-        sinon.replace(ExpectedStudentFile, 'create', fake_create);
-
-        expect(component.project).toEqual(project_1);
+        let create_stub = sinon.stub(ExpectedStudentFile, 'create');
 
         let form_wrapper = wrapper.find({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
-
-        // let pattern_input = form_wrapper.find({ref: 'pattern'}).find('#input');
-        // (<HTMLInputElement> pattern_input.element).value = "Giraffe.cpp";
-        // pattern_input.trigger('input');
-        // await component.$nextTick();
-        // // button is still disabled with this approach
-        // expect(wrapper.find('.add-file-button').is('[disabled]')).toBe(false);
-        // let pattern_input = <ValidatedInput> form_wrapper.find({ref: "pattern"}).vm;
-        // pattern_input.value = "Giraffe.cpp";
-
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
+        await component.$nextTick();
 
         form_component.submit_form();
         await component.$nextTick();
 
-        expect(
-            fake_create.getCall(0).args[1]
+        expect(create_stub.getCall(0).args[0]).toEqual(project_1.pk);
+        expect(create_stub.getCall(0).args[1]
         ).toEqual({
             pattern: "Giraffe.cpp",
             min_num_matches: 1,
@@ -87,15 +76,43 @@ describe('CreateExpectedStudentFile tests', () => {
         });
     });
 
-    test('Unsuccessful creation of a file - name is not unique', () => {
-        fail("Can't figure out how to get the form to submit");
+    test('Unsuccessful creation of a file - name is not unique', async () => {
+        fail("The only way for the test to pass is to call the function for submitting, " +
+             "but the event should really come from the form - so we know the form is valid" +
+             "but that approach is not working right now.");
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: "File with this name already exists in project"
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
+            },
+            config: {},
+        };
+
+        let form_wrapper = wrapper.find({ref: 'form'});
+        let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
+        form_component.d_expected_student_file.pattern = "Giraffe.cpp";
+        await component.$nextTick();
+
+        sinon.stub(ExpectedStudentFile, 'create').rejects(axios_response_instance);
+        form_component.submit_form();
+        await component.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
     });
 
     test("The 'create' button is disabled when an input value is invalid", async () => {
         fail("The button is always registering as disabled so this test passing " +
              "really doesnt prove anything");
-        let fake_create = sinon.fake();
-        sinon.replace(ExpectedStudentFile, 'create', fake_create);
+        let create_stub = sinon.stub(ExpectedStudentFile, 'create');
 
         expect(component.project).toEqual(project_1);
 
@@ -106,6 +123,6 @@ describe('CreateExpectedStudentFile tests', () => {
         form_wrapper.trigger('submit.native');
         await component.$nextTick();
 
-        expect(fake_create.callCount).toEqual(0);
+        expect(create_stub.callCount).toEqual(0);
     });
 });

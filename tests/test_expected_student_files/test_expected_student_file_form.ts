@@ -44,7 +44,7 @@ describe('Input property tests', () => {
 });
 
 
-describe('Valid form submit tests', () => {
+describe.only('Valid form submit tests', () => {
     let wrapper: Wrapper<ExpectedStudentFileForm>;
     let component: ExpectedStudentFileForm;
 
