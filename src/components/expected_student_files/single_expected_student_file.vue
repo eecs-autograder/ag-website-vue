@@ -123,15 +123,10 @@
     @handle_api_errors_async(handle_edit_expected_student_file_error)
     async update_expected_student_file(file: ExpectedStudentFileFormData) {
       try {
-        console.log("update_expected_student_file");
         this.d_saving = true;
         (<APIErrors> this.$refs.api_errors).clear();
-        console.log("Errors cleared");
         safe_assign(this.d_expected_student_file, file);
-        console.log("Safe assigned");
         await this.d_expected_student_file!.save();
-        console.log(this.d_expected_student_file.pattern);
-        console.log("Done saving");
         this.actively_updating = false;
         (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
       }

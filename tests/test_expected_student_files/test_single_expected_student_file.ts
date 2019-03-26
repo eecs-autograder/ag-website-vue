@@ -1,12 +1,10 @@
-import ExpectedStudentFileForm
-    from '@/components/expected_student_files/expected_student_file_form.vue';
+import APIErrors from '@/components/api_errors.vue';
+import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
 import SingleExpectedStudentFile from '@/components/expected_student_files/single_expected_student_file.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { ExpectedStudentFile } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
 import * as sinon from "sinon";
-import { createDeflateRaw } from 'zlib';
-import clearAllMocks = jest.clearAllMocks;
-
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -49,10 +47,8 @@ describe('ExpectedStudentFiles tests', () => {
         component = wrapper.vm;
     });
 
-    test.only('Successful edit of file', async () => {
-        fail("save() is receiving undefined as argument");
-        let fake_update = sinon.fake();
-        sinon.replace(component.d_expected_student_file, 'save', fake_update);
+    test('Successful edit of file', async () => {
+        let save_stub = sinon.stub(component.d_expected_student_file, 'save');
 
         expect(component.expected_student_file.pattern).toEqual("filename*.cpp");
         expect(component.expected_student_file.min_num_matches).toEqual(2);
@@ -70,46 +66,79 @@ describe('ExpectedStudentFiles tests', () => {
         await component.$nextTick();
         await component.$nextTick();
 
-        // This works
-        expect(fake_update.callCount).toEqual(1);
+        expect(save_stub.calledOnce).toBe(true);
+        expect(save_stub.thisValues[0].pattern).toEqual(file_without_wildcard.pattern);
+        expect(save_stub.thisValues[0].min_num_matches).toEqual(
+            file_without_wildcard.min_num_matches
+        );
+        expect(save_stub.thisValues[0].max_num_matches).toEqual(
+            file_without_wildcard.max_num_matches
+        );
+        expect(component.actively_updating).toBe(false);
 
-        // This doesn't
-        // apparently it's getting called with undefined...
-        // expect(fake_update.getCall(0).args[0]
-        // ).toEqual({
-        //     pk: 1,
-        //     project: 1,
-        //     pattern: "filename.cpp",
-        //     min_num_matches: 1,
-        //     max_num_matches: 1,
-        //     last_modified: "now"
-        // });
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(0);
     });
 
-    test('Cancel edit of file', async () => {
-        fail("Max call stack size exceeded");
+    test('error - edited filename not unique to project', async () => {
+        let axios_response_instance: AxiosError = {
+            name: 'AxiosError',
+            message: 'u heked up',
+            response: {
+                data: {
+                    __all__: "File with this name already exists in project"
+                },
+                status: 400,
+                statusText: 'OK',
+                headers: {},
+                request: {},
+                config: {}
+            },
+            config: {},
+        };
 
-        let fake_update = sinon.fake();
-        sinon.replace(file_with_wildcard, 'save', fake_update);
+        expect(component.expected_student_file.pattern).toEqual("filename*.cpp");
+        expect(component.expected_student_file.min_num_matches).toEqual(2);
+        expect(component.expected_student_file.max_num_matches).toEqual(4);
 
         wrapper.find('.edit-file').trigger('click');
+        await component.$nextTick();
 
         let form_wrapper = wrapper.find({ref: "form"});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
+        form_component.d_expected_student_file.pattern = "filename.cpp";
+        await component.$nextTick();
 
+        sinon.stub(component.d_expected_student_file, 'save').rejects(axios_response_instance);
+        form_component.submit_form();
+        await component.$nextTick();
+        await component.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
+        expect(component.actively_updating).toBe(true);
+    });
+
+    test('Cancel edit of file', async () => {
+        let save_stub = sinon.stub(component.d_expected_student_file, 'save');
+
+        wrapper.find('.edit-file').trigger('click');
+        await component.$nextTick();
+
+        let form_wrapper = wrapper.find({ref: "form"});
+        let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
         wrapper.find('.cancel-update-button').trigger('click');
         await component.$nextTick();
 
-        expect(fake_update.callCount).toEqual(0);
-        expect(component.d_expected_student_file.pattern).toEqual("filename*.cpp");
+        expect(save_stub.callCount).toEqual(0);
+        expect(component.d_expected_student_file.pattern).toEqual(file_with_wildcard.pattern);
     });
 
     test('Delete file', async () => {
-        let fake_delete = sinon.fake();
-        sinon.replace(file_with_wildcard, 'delete', fake_delete);
+        let delete_stub = sinon.stub(component.expected_student_file, 'delete');
 
         wrapper.find('.delete-file').trigger('click');
         await component.$nextTick();
@@ -117,12 +146,12 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
-        expect(fake_delete.callCount).toEqual(1);
+        expect(delete_stub.callCount).toEqual(1);
+        expect(component.d_delete_pending).toBe(false);
     });
 
     test('Cancel delete file', async () => {
-        let fake_delete = sinon.fake();
-        sinon.replace(file_with_wildcard, 'delete', fake_delete);
+        let delete_stub = sinon.stub(component.expected_student_file, 'delete');
 
         wrapper.find('.delete-file').trigger('click');
         await component.$nextTick();
@@ -130,6 +159,15 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.modal-cancel-button').trigger('click');
         await component.$nextTick();
 
-        expect(fake_delete.callCount).toEqual(0);
+        expect(delete_stub.callCount).toEqual(0);
+    });
+
+    test('Update expected_student_file', async () => {
+        expect(component.expected_student_file).toEqual(file_with_wildcard);
+
+        wrapper.setProps({expected_student_file: file_without_wildcard});
+        await component.$nextTick();
+
+        expect(component.expected_student_file).toEqual(file_without_wildcard);
     });
 });
