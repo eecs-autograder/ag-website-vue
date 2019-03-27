@@ -22,51 +22,51 @@
       <p v-for="item of chosen_items_1"> {{item.state}} </p>
     </div>
 
-    <!--<p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { first_name:-->
-      <!--string, last_name: string } objects and uses a scoped slot</b></p>-->
-    <!--<div class="control-width-2">-->
-      <!--<dropdown-typeahead-->
-        <!--placeholder_text="Enter a Character"-->
-        <!--:choices="strangers"-->
-        <!--@update_item_chosen="add_item_2($event)"-->
-        <!--:filter_fn="stranger_things_filter_fn">-->
-        <!--<template slot-scope="{item}">-->
-          <!--<span> {{item.first_name}} {{item.last_name}}</span>-->
-        <!--</template>-->
-      <!--</dropdown-typeahead>-->
-    <!--</div>-->
+    <p class="typeahead-label"><b> This Dropdown Typeahead instance deals with { first_name:
+      string, last_name: string } objects and uses a scoped slot</b></p>
+    <div class="control-width-2">
+      <dropdown-typeahead
+        placeholder_text="Enter a Character"
+        :choices="strangers"
+        @update_item_chosen="add_item_2($event)"
+        :filter_fn="stranger_things_filter_fn">
+        <template slot-scope="{item}">
+          <span> {{item.first_name}} {{item.last_name}}</span>
+        </template>
+      </dropdown-typeahead>
+    </div>
 
-    <!--<div class="typeahead-2-selections">-->
-      <!--<h3> Chosen from Typeahead: </h3>-->
-      <!--<p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>-->
-    <!--</div>-->
+    <div class="typeahead-2-selections">
+      <h3> Chosen from Typeahead: </h3>
+      <p v-for="item of chosen_items_2"> {{item.last_name}}, {{item.first_name}} </p>
+    </div>
 
-    <!--<p class="typeahead-label">-->
-      <!--<b>-->
-        <!--This Dropdown Typeahead instance deals with string objects <br>-->
-        <!--It uses a custom, unscoped style class for the typeahead text input.-->
-          <!--(The font size is intentionally small) <br>-->
-        <!--It uses the custom styling for dropdown menu items.<br>-->
-        <!--It also has a custom "No results" message.-->
-      <!--</b>-->
-    <!--</p>-->
-    <!--<div class="control-width-3">-->
-      <!--<dropdown-typeahead-->
-        <!--typeahead_class="custom-typeahead"-->
-        <!--placeholder_text="Enter a Season"-->
-        <!--:choices="seasons"-->
-        <!--@update_item_chosen="add_item_3($event)"-->
-        <!--:filter_fn="seasons_filter_fn">-->
-        <!--<template slot="no_matching_results">-->
-          <!--No Matching Results-->
-        <!--</template>-->
-      <!--</dropdown-typeahead>-->
-    <!--</div>-->
+    <p class="typeahead-label">
+      <b>
+        This Dropdown Typeahead instance deals with string objects <br>
+        It uses a custom, unscoped style class for the typeahead text input.
+          (The font size is intentionally small) <br>
+        It uses the custom styling for dropdown menu items.<br>
+        It also has a custom "No results" message.
+      </b>
+    </p>
+    <div class="control-width-3">
+      <dropdown-typeahead
+        typeahead_class="custom-typeahead"
+        placeholder_text="Enter a Season"
+        :choices="seasons"
+        @update_item_chosen="add_item_3($event)"
+        :filter_fn="seasons_filter_fn">
+        <template slot="no_matching_results">
+          No Matching Results
+        </template>
+      </dropdown-typeahead>
+    </div>
 
-    <!--<div class="typeahead-3-selections">-->
-      <!--<h3> Chosen from Typeahead: </h3>-->
-      <!--<p v-for="item of chosen_items_3"> {{item}} </p>-->
-    <!--</div>-->
+    <div class="typeahead-3-selections">
+      <h3> Chosen from Typeahead: </h3>
+      <p v-for="item of chosen_items_3"> {{item}} </p>
+    </div>
 
   </div>
 </template>

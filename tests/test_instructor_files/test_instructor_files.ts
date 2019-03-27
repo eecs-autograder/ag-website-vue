@@ -400,7 +400,7 @@ describe('InstructorFiles.vue', () => {
         let instructor_files_column = wrapper.find('#column-of-files');
 
         let toggle_collapse_button = wrapper.find('.collapse-button');
-        expect(component.collapsed).toBe(false);
+        expect(component.d_collapsed).toBe(false);
         expect(toggle_collapse_button.text()).toContain("Collapse");
         expect(instructor_files_column.element.style.display).toEqual('block');
 
@@ -417,14 +417,14 @@ describe('InstructorFiles.vue', () => {
         await component.$nextTick();
 
         expect(toggle_collapse_button.text()).toContain("Show");
-        expect(component.collapsed).toBe(true);
+        expect(component.d_collapsed).toBe(true);
         expect(instructor_files_column.element.style.display).toEqual('none');
 
         toggle_collapse_button.trigger('click');
         await component.$nextTick();
 
         expect(toggle_collapse_button.text()).toContain("Collapse");
-        expect(component.collapsed).toBe(false);
+        expect(component.d_collapsed).toBe(false);
         expect(instructor_files_column.element.style.display).toEqual('block');
     });
 });

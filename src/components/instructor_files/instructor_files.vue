@@ -6,19 +6,19 @@
 
     <div id="instructor-files-label"> Uploaded Instructor Files
       <div class="collapse-button"
-           @click="collapsed = !collapsed">( {{collapsed? 'Show' : 'Collapse'}} )</div>
+           @click="d_collapsed = !d_collapsed">( {{d_collapsed? 'Show' : 'Collapse'}} )</div>
     </div>
 
     <div id="viewing-area">
-      <div id="column-of-files" :style="{display: collapsed? 'none' : 'block'}">
+      <div id="column-of-files" :style="{display: d_collapsed? 'none' : 'block'}">
         <div v-for="instructor_file of instructor_files" :key="instructor_file.pk">
           <single-instructor-file :file="instructor_file"
-                       @open_file="view_file($event)">
+                                  @open_file="view_file($event)">
           </single-instructor-file>
         </div>
       </div>
       <div id="instructor-file-viewer-wrapper"
-           :style="{left: collapsed ? '0' : '390px'}">
+           :style="{left: d_collapsed ? '0' : '390px'}">
         <MultiFileViewer ref="instructor_files_viewer"
                          height_of_view_file="600px"
                          @num_files_viewing_changed="num_files_currently_viewing = $event">
@@ -56,7 +56,7 @@
     instructor_files: InstructorFile[] = [];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    collapsed = false;
+    d_collapsed = false;
     num_files_currently_viewing = 0;
 
     @Prop({required: true, type: Project})
