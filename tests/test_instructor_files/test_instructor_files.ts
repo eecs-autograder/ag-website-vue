@@ -230,7 +230,7 @@ describe('InstructorFiles.vue', () => {
     });
 
     test('Clicking on a file that is already being viewed makes it the active tab ' +
-         'in the multi-file-viewer & does not call get_content',
+         'in the multi-file-viewer',
          async () => {
         let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content');
         let get_content_stub_2 = sinon.stub(instructor_file_2, 'get_content');
@@ -258,7 +258,7 @@ describe('InstructorFiles.vue', () => {
         expect(mfv.files_currently_viewing.length).toEqual(2);
         expect(wrapper.find('.active-tab-header').text()).toEqual(instructor_file_1.name);
 
-        expect(get_content_stub_1.calledOnce).toBe(true);
+        expect(get_content_stub_1.calledTwice).toBe(true);
         expect(get_content_stub_2.calledOnce).toBe(true);
     });
 

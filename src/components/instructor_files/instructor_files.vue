@@ -78,7 +78,7 @@
 
     async view_file(file: InstructorFile) {
       (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
-        file.name, () => file.get_content(), file.pk
+        file.name, file.get_content(), file.pk
       );
     }
 
@@ -110,7 +110,7 @@
     update_instructor_file_content_changed(instructor_file: InstructorFile,
                                            file_content: string) {
       (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
-        instructor_file.name, file_content
+        instructor_file.name, Promise.resolve(file_content)
       );
     }
 

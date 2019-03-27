@@ -41,7 +41,7 @@
 
   interface OpenFile {
     name: string;
-    content: string;
+    content: Promise<string>;
     id: number | null;
   }
 
@@ -56,8 +56,7 @@
     files_currently_viewing: OpenFile[] = [];
     active_tab_index = 0;
 
-    async add_to_viewing(filename: string, file_contents: string | (() => Promise<string>),
-                         id: number | null = null) {
+    add_to_viewing(filename: string, file_contents: Promise<string>, id: number | null = null) {
       let file_exists = this.files_currently_viewing.find(
         open_file => open_file.name === filename
       ) !== undefined;
@@ -68,14 +67,7 @@
         return;
       }
 
-      let content: string;
-      if (typeof file_contents === 'string') {
-        content = <string> file_contents;
-      }
-      else {
-        content = await (<() => Promise<string>> file_contents)();
-      }
-      this.files_currently_viewing.push({name: filename, content: content, id: id});
+      this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
       this.active_tab_index = this.files_currently_viewing.length - 1;
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
@@ -99,7 +91,7 @@
       this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
     }
 
-    update_contents_by_name(name: string, new_content: string) {
+    update_contents_by_name(name: string, new_content: Promise<string>) {
       let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
       if (index !== -1) {
         Vue.set(this.files_currently_viewing, index, {

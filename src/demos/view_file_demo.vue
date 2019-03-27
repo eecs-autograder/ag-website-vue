@@ -5,7 +5,7 @@
         than the length of the content. </b></p>
       <div class="border-box">
         <view-file :filename="filename_1"
-                   :file_contents="file_contents_1">
+                   :file_contents="Promise.resolve(file_contents_1)">
         </view-file>
       </div>
     </div>
@@ -14,7 +14,7 @@
         fit in the height of the display. </b></p>
       <div class="border-box">
         <view-file :filename="filename_2"
-                   :file_contents="file_contents_2"
+                   :file_contents="Promise.resolve(file_contents_2)"
                    :view_file_height="height_in">
         </view-file>
       </div>
@@ -28,7 +28,7 @@
       </button>
       <div class="border-box">
         <view-file :filename="filename_3"
-                   :file_contents="file_contents_3"
+                   :file_contents="Promise.resolve(file_contents_3)"
                    view_file_height="95px">
         </view-file>
       </div>

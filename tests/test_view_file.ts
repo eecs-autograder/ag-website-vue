@@ -1,70 +1,39 @@
 import ViewFile from '@/components/view_file.vue';
-import { config, mount } from '@vue/test-utils';
-import Vue from 'vue';
-import Component from 'vue-class-component';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 describe('ViewFile.vue', () => {
+    let wrapper: Wrapper<ViewFile>;
+    let component: ViewFile;
+    const filename = 'ke$ha_file.cpp';
+    const content = Promise.resolve('line one\nline two');
+    const height_in = "250px";
 
-    test('ViewFile data set to values passed in by parent', () => {
-        const filename = 'ke$ha_file.cpp';
-        const content = 'blah\nblah\nblah';
-        const wrapper = mount(ViewFile, {
+    beforeEach(() => {
+        wrapper = mount(ViewFile, {
             propsData: {
                 filename: filename,
-                file_contents: content
+                file_contents: content,
+                view_file_height: height_in
             }
         });
-
-        const vm = wrapper.vm;
-        expect(vm.$data.d_filename).toBe(filename);
-        expect(vm.$data.d_file_contents).toBe(content);
+        component = wrapper.vm;
     });
 
-    test('File content and line numbers displayed in order', () => {
-        const wrapper = mount(ViewFile, {
-            propsData: {
-                filename: 'filename',
-                file_contents: 'line one\nline two'
-            }
-        });
+    test('ViewFile data set to values passed in by parent', async () => {
+        await component.$nextTick();
 
-        const line_numbers = wrapper.findAll('.line-number');
-        expect(line_numbers.length).toEqual(2);
-        expect(line_numbers.at(0).text()).toContain('1');
-        expect(line_numbers.at(1).text()).toContain('2');
-
-        const content_lines = wrapper.findAll('.line-of-file-content');
-        expect(content_lines.length).toEqual(2);
-        expect(content_lines.at(0).text()).toContain('line one');
-        expect(content_lines.at(1).text()).toContain('line two');
-    });
-
-    test('Height of the ViewFile component is set to the height passed in', () => {
-
-        @Component({
-            template:  `<view_file ref='view_file'
-                          filename='filename'
-                          file_contents='line one\nline two'
-                          :view_file_height="height_of_view_file_in">
-                        </view_file>`,
-            components: {
-                'view_file': ViewFile
-            }
-        })
-
-        class WrapperComponent2 extends Vue {
-            height_of_view_file_in = "250px";
-        }
-
-        const wrapper = mount(WrapperComponent2);
-        const view_file_component = wrapper.find({ref: 'view_file'});
-
-        let view_file_wrapper = view_file_component.find('#view-file-component');
+        let view_file_wrapper = wrapper.find('#view-file-component');
         expect(view_file_wrapper.element.style.height).toEqual('250px');
+        expect(component.d_filename).toBe(filename);
+        expect(component.d_file_contents).toBe(await content);
+    });
+
+    test('File content and line numbers displayed in order', async () => {
+        await component.$nextTick();
 
         const line_numbers = wrapper.findAll('.line-number');
         expect(line_numbers.length).toEqual(2);
@@ -77,65 +46,32 @@ describe('ViewFile.vue', () => {
         expect(content_lines.at(1).text()).toContain('line two');
     });
 
-    test('The contents of a ViewFile Component can change', async () => {
-
-        @Component({
-            template:  `<div>
-                            <button id='change-contents-button'
-                               @click="change_contents()">
-                               Change Contents
-                            </button>
-                            <view_file ref='view_file'
-                              :filename="filename_3"
-                              :file_contents="file_contents_3">
-                            </view_file>
-                        </div>`,
-            components: {
-                'view_file': ViewFile
-            }
-        })
-
-        class WrapperComponent2 extends Vue {
-
-            filename_3 = "Ice_Cream.cpp";
-            file_contents_3 = "Mint\nChocolate\nChip";
-            alternate_file_contents_3 = "Blue\nMoon";
-
-            change_contents() {
-                this.file_contents_3 = this.alternate_file_contents_3;
-            }
-        }
-
-        const wrapper = mount(WrapperComponent2);
-        const view_file_wrapper = wrapper.find({ref: 'view_file'});
-        const view_file_component = <ViewFile> view_file_wrapper.vm;
-
-        let line_numbers = wrapper.findAll('.line-number');
-        expect(line_numbers.length).toEqual(3);
-        expect(line_numbers.at(0).text()).toContain('1');
-        expect(line_numbers.at(1).text()).toContain('2');
-        expect(line_numbers.at(2).text()).toContain('3');
+    test('The contents of a ViewFile component can change', async () => {
+        await component.$nextTick();
 
         let content_lines = wrapper.findAll('.line-of-file-content');
-        expect(content_lines.length).toEqual(3);
-        expect(content_lines.at(0).text()).toContain('Mint');
-        expect(content_lines.at(1).text()).toContain('Chocolate');
-        expect(content_lines.at(2).text()).toContain('Chip');
+        expect(content_lines.length).toEqual(2);
+        expect(content_lines.at(0).text()).toContain('line one');
+        expect(content_lines.at(1).text()).toContain('line two');
 
-        let change_contents_button = wrapper.find('#change-contents-button');
-
-        change_contents_button.trigger('click');
-
-        await view_file_component.$nextTick();
-
-        line_numbers = wrapper.findAll('.line-number');
-        expect(line_numbers.length).toEqual(2);
-        expect(line_numbers.at(0).text()).toContain('1');
-        expect(line_numbers.at(1).text()).toContain('2');
+        wrapper.setData({file_contents: Promise.resolve("Blue \nMoon")});
+        await component.$nextTick();
 
         content_lines = wrapper.findAll('.line-of-file-content');
         expect(content_lines.length).toEqual(2);
         expect(content_lines.at(0).text()).toContain('Blue');
         expect(content_lines.at(1).text()).toContain('Moon');
+    });
+
+    test('The filename of a ViewFile Component can change', async () => {
+        let new_filename = "macklemore.cpp";
+        await component.$nextTick();
+
+        expect(component.d_filename).toEqual(filename);
+
+        wrapper.setData({filename: new_filename});
+        await component.$nextTick();
+
+        expect(component.d_filename).toEqual(new_filename);
     });
 });
