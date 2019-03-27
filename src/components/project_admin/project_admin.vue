@@ -17,7 +17,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Project Settings - TODO (branch exists)
+            PROJECT SETTINGS - TODO (branch exists)
           </div>
         </template>
       </tab>
@@ -31,7 +31,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Instructor Files - Pull Requested ATM
+            INSTRUCTOR FILES - Pull Requested ATM
           </div>
         </template>
       </tab>
@@ -59,7 +59,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            AG Test Cases - TODO (branch exists)
+            AG TEST CASES - TODO (branch exists)
           </div>
         </template>
       </tab>
@@ -73,7 +73,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Mutation Testing - TODO
+            MUTATION TESTING - TODO
           </div>
         </template>
       </tab>
@@ -87,7 +87,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Edit Groups - TODO (branch exists)
+            EDIT GROUPS- TODO (branch exists)
           </div>
         </template>
       </tab>
@@ -101,7 +101,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Download Grades - TODO
+            DOWNLOAD GRADES - TODO
           </div>
         </template>
       </tab>
@@ -115,7 +115,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Rerun Tests - TODO
+            RERUN TESTS - TODO
           </div>
         </template>
       </tab>
@@ -129,7 +129,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Configure Handgrading - TODO
+            CONFIGURE HANDGRADING - TODO
           </div>
         </template>
       </tab>
@@ -160,6 +160,7 @@
     project: Project | null = null;
 
     async created() {
+      console.log("Getting created");
       this.project = await Project.get_by_pk(Number(this.$route.params.projectId));
       this.d_loading = false;
     }
