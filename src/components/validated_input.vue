@@ -6,12 +6,12 @@
              :style="input_style"
              class="input"
              :class="{
-              'error-input' : input_style === '' && _show_errors
+              'error-input' : input_style === '' && show_errors
              }"
              type="text"
              :value="d_input_value"
              :placeholder="placeholder"
-             @input="$e => _change_input($e.target.value)"/>
+             @input="$e => change_input($e.target.value)"/>
 
       <textarea id="textarea"
                 v-if="num_rows > 1"
@@ -19,15 +19,15 @@
                 :style="input_style"
                 class="input"
                 :class="{
-                 'error-input' : input_style === '' && _show_errors
+                 'error-input' : input_style === '' && show_errors
                 }"
                 :value="d_input_value"
                 :placeholder="placeholder"
-                @input="$e => _change_input($e.target.value)"></textarea>
+                @input="$e => change_input($e.target.value)"></textarea>
       <slot name="suffix"> </slot>
     </div>
     <transition name="fade">
-      <slot :d_error_msg="d_error_msg" v-if="_show_errors">
+      <slot :d_error_msg="d_error_msg" v-if="show_errors">
         <ul class="error-ul">
             <li id="error-text" class="error-li">{{d_error_msg}}</li>
         </ul>
@@ -88,23 +88,25 @@
     placeholder!: string;
 
     d_input_value: string = "";
+    private d_is_valid: boolean = false;
     d_error_msg: string = "";
     d_show_warnings: boolean = false;
 
-    private _debounced_enable_warnings!: (...args: unknown[]) => unknown;
+    private debounced_enable_warnings!: (...args: unknown[]) => unknown;
 
     // Note: This assumes "value" provided will not throw exception when running _to_string_fn
     created() {
       // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
       this.register(this);
-      this._update_and_validate(this.to_string_fn(this.value));
+      this.update_and_validate(this.to_string_fn(this.value));
+      // We always want this event to fire on creation.
       this.$emit('input_validity_changed', this.is_valid);
 
-      this._debounced_enable_warnings = debounce(() => this.d_show_warnings = true, 500);
+      this.debounced_enable_warnings = debounce(() => this.d_show_warnings = true, 500);
     }
 
     get is_valid(): boolean {
-      return this.d_error_msg === "";
+      return this.d_is_valid;
     }
 
     reset_warning_state() {
@@ -117,17 +119,17 @@
       const str_value = this.to_string_fn(new_value);
 
       if (str_value !== this.d_input_value) {
-        this._update_and_validate(str_value);
+        this.update_and_validate(str_value);
       }
     }
 
-    private _change_input(new_value: string) {
+    private change_input(new_value: string) {
       // If the input is invalid, don't turn off warnings.
       if (this.is_valid) {
         this.d_show_warnings = false;
       }
-      this._update_and_validate(new_value);
-      this._debounced_enable_warnings();
+      this.update_and_validate(new_value);
+      this.debounced_enable_warnings();
 
       // Only if there are no errors should the value be emitted to the parent component
       if (this.d_error_msg === "") {
@@ -136,8 +138,9 @@
       }
     }
 
-    private _run_validators(new_value: string) {
-      // Clear d_error_msg
+    private run_validators(new_value: string) {
+      let original_is_valid = this.is_valid;
+      this.d_is_valid = true;
       this.d_error_msg = "";
 
       // Display error message of first validator that fails
@@ -145,24 +148,24 @@
         let response: ValidatorResponse = validator(new_value);
 
         if (!response.is_valid) {
+          this.d_is_valid = false;
           this.d_error_msg = response.error_msg;
           return;
         }
       }
     }
 
-    private _update_and_validate(new_value: string) {
+    private update_and_validate(new_value: string) {
       this.d_input_value = new_value;
-      this._run_validators(new_value);
+      let original_is_valid = this.is_valid;
+      this.run_validators(new_value);
+      if (original_is_valid !== this.is_valid) {
+          this.$emit('input_validity_changed', this.is_valid);
+      }
     }
 
-    private get _show_errors(): boolean {
+    private get show_errors(): boolean {
       return this.d_error_msg !== '' && this.d_show_warnings;
-    }
-
-    @Watch('is_valid')
-    on_input_validity_changed(new_value: boolean, old_value: boolean) {
-      this.$emit('input_validity_changed', new_value);
     }
   }
 </script>

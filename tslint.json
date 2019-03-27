@@ -177,9 +177,6 @@
             // Static readonly members can be upper case.
             {"type": "member", "modifiers": ["static", "readonly"], "format": ["UPPER_CASE"]},
 
-            // Require leading underscores for private methods and non-reactive private properties.
-            {"type": "member", "modifiers": "private", "filter": "^(?!d_)",
-                "leadingUnderscore": "require"},
             {"type": "member", "modifiers": "protected", "leadingUnderscore": "require"},
             {"type": "member", "trailingUnderscore": "forbid"},
 
