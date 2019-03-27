@@ -55,7 +55,7 @@
       <div id="modal-header">Confirm Deletion</div>
       <hr>
       <div id="modal-body"> Are you sure you want to delete the file
-        <b class="file-to-delete">{{file.name}}</b>?
+        <span class="file-to-delete">{{file.name}}</span>?
         This action cannot be undone, and any test cases that rely on this file may have
         to be updated before they run correctly again.
       </div>
@@ -64,8 +64,8 @@
         <button class="modal-delete-button"
                 :disabled="d_delete_pending"
                 @click="delete_file_permanently"> Delete </button>
-        <div class="modal-cancel-button"
-             @click="$refs.delete_instructor_file_modal.close()"> Cancel </div>
+        <button class="modal-cancel-button"
+             @click="$refs.delete_instructor_file_modal.close()"> Cancel </button>
       </div>
     </modal>
 
@@ -252,7 +252,7 @@
 }
 
 .file-to-delete {
-  background-color: hsl(220, 20%, 85%);
+  color: $ocean-blue;
   letter-spacing: 1px;
 }
 
@@ -272,7 +272,7 @@
 }
 
 .modal-delete-button {
-  @extend .red-button;
+  @extend .orange-button;
   margin-right: 20px;
 }
 </style>

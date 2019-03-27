@@ -43,7 +43,6 @@ export default class Dropdown extends Vue {
   created() {
     this.d_items = this.items;
     this.d_highlighted_index = this.initial_highlighted_index;
-    console.log("Dropdown created");
   }
 
   mounted() {
@@ -58,7 +57,6 @@ export default class Dropdown extends Vue {
     header_slot_content.addEventListener("click", () => {
       this.d_is_open = !this.d_is_open;
     });
-    console.log("Dropdown mounted");
   }
 
   get current_highlighted_index() {

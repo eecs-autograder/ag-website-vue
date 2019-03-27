@@ -1,5 +1,5 @@
 <template>
-  <div id="instructor-files-component" v-if="project !== null">
+  <div id="instructor-files-component">
     <FileUpload ref="instructor_files_upload"
                 @upload_files="add_instructor_files($event)">
     </FileUpload>
@@ -22,11 +22,10 @@
         <MultiFileViewer ref="instructor_files_viewer"
                          height_of_view_file="600px"
                          @num_files_viewing_changed="num_files_currently_viewing = $event">
+          <div slot="view_files_message" style="min-width: 280px;">
+            Click on a file to view its contents.
+          </div>
         </MultiFileViewer>
-        <div v-if="num_files_currently_viewing === 0 && instructor_files.length !== 0"
-             class="helpful-message">
-          Click on a file to view its contents.
-        </div>
       </div>
     </div>
 
@@ -34,15 +33,14 @@
 </template>
 
 <script lang="ts">
-  import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
-
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-
   import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import FileUpload from '@/components/file_upload.vue';
   import SingleInstructorFile from '@/components/instructor_files/single_instructor_file.vue';
   import MultiFileViewer from '@/components/multi_file_viewer.vue';
+
+  import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
 
   @Component({
     components: {
@@ -53,10 +51,10 @@
   })
   export default class InstructorFiles extends Vue implements InstructorFileObserver {
 
+    d_collapsed = false;
     instructor_files: InstructorFile[] = [];
     last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                             hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    d_collapsed = false;
     num_files_currently_viewing = 0;
 
     @Prop({required: true, type: Project})
@@ -74,19 +72,13 @@
 
     sort_files() {
       this.instructor_files.sort(
-        (file_a: InstructorFile, file_b: InstructorFile) => {
-        if (file_a.name <= file_b.name) {
-          return -1;
-        }
-        else {
-          return 1;
-        }
-      });
+        (file_a: InstructorFile, file_b: InstructorFile) =>
+          file_a.name.localeCompare(file_b.name));
     }
 
     async view_file(file: InstructorFile) {
       (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
-        file.name,  () => file.get_content(), file.pk
+        file.name, () => file.get_content(), file.pk
       );
     }
 
@@ -95,16 +87,14 @@
         let file_already_exists = array_has_unique(
           this.instructor_files,
           file.name,
-          (file_a: InstructorFile, file_name_to_add: string) =>
-            file_name_equal(file_a.name, file_name_to_add)
+          (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
         );
 
         if (file_already_exists) {
           let file_to_update = array_get_unique(
             this.instructor_files,
             file.name,
-            (file_a: InstructorFile, file_name_to_add: string) =>
-              file_name_equal(file_a.name, file_name_to_add)
+            (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
           );
           await file_to_update.set_content(file);
         }
@@ -141,10 +131,6 @@
     }
   }
 
-  function file_name_equal(file_name_a: string, file_name_b: string) {
-    return file_name_a === file_name_b;
-  }
-
 </script>
 
 <style scoped lang="scss">
@@ -160,16 +146,6 @@
 
 .collapse-button:hover {
   color: hsl(220, 30%, 35%);
-}
-
-.helpful-message {
-  box-sizing: border-box;
-  text-align: center;
-  padding: 10px;
-  position: absolute;
-  width: 100%;
-  min-width: 250px;
-  top: 0;
 }
 
 #instructor-files-component {

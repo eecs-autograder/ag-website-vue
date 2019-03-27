@@ -146,7 +146,6 @@ describe('MultiFileViewer.vue', () => {
         await multi_file_viewer.$nextTick();
 
         expect(multi_file_viewer.$data.files_currently_viewing.length).toEqual(2);
-        // Is this the behavior that we want for all cases?
         expect(multi_file_viewer.$data.active_tab_index).toEqual(0);
         expect(view_file_component.text()).toContain('Kiwi Body');
     });

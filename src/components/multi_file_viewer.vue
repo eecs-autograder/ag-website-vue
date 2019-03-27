@@ -1,5 +1,9 @@
 <template>
   <div id="multi-file-viewer">
+    <div v-if="files_currently_viewing.length === 0"
+         class="view-files-message">
+      <slot name="view_files_message"></slot>
+    </div>
     <tabs ref="multi-viewing-tabs"
           v-model="active_tab_index"
           tab_active_class="gray-white-theme-active"
@@ -117,6 +121,15 @@
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
+.view-files-message {
+  box-sizing: border-box;
+  text-align: center;
+  padding: 10px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+}
 
 .close-x {
   background-color: inherit;
