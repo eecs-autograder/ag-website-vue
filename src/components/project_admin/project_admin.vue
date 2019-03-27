@@ -160,7 +160,6 @@
     project: Project | null = null;
 
     async created() {
-      console.log("Getting created");
       this.project = await Project.get_by_pk(Number(this.$route.params.projectId));
       this.d_loading = false;
     }
