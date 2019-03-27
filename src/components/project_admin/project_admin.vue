@@ -143,7 +143,7 @@
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
-  
+
   import { Project } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
 
