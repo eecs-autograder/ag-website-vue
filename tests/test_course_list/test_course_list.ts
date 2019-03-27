@@ -107,7 +107,6 @@ describe('Course_List.vue', () => {
 
                 course_list = wrapper.vm;
 
-                // TODO: After upgrading vue-test-utils, see if this works with only one
                 await course_list.$nextTick();
                 await course_list.$nextTick();
 
