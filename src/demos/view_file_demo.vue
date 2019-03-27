@@ -5,7 +5,7 @@
         than the length of the content. </b></p>
       <div class="border-box">
         <view-file :filename="filename_1"
-                   :file_contents="Promise.resolve(file_contents_1)">
+                   :file_contents="file_contents_1">
         </view-file>
       </div>
     </div>
@@ -14,7 +14,7 @@
         fit in the height of the display. </b></p>
       <div class="border-box">
         <view-file :filename="filename_2"
-                   :file_contents="Promise.resolve(file_contents_2)"
+                   :file_contents="file_contents_2"
                    :view_file_height="height_in">
         </view-file>
       </div>
@@ -28,7 +28,7 @@
       </button>
       <div class="border-box">
         <view-file :filename="filename_3"
-                   :file_contents="Promise.resolve(file_contents_3)"
+                   :file_contents="file_contents_3"
                    view_file_height="95px">
         </view-file>
       </div>
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Vue } from 'vue-property-decorator';
 
   import ViewFile from '@/components/view_file.vue';
 
@@ -47,12 +47,13 @@
   export default class ViewFileDemo extends Vue {
     height_in = '300px';
     filename_1 = "long_lines.txt";
-    file_contents_1 = "I watch two episodes of family fued back to back every night. \n" +
-                      "They're supposed to pick the 5 7 or 9 most probable answers from \na " +
-                      "survey \nof 100 people. Like if the show was called 'hey that's " +
-                      "possible' the show \nwould be called Family Feud";
+    file_contents_1 = Promise.resolve("I watch two episodes of family fued back to back every " +
+                                      "night. \nThey're supposed to pick the 5 7 or 9 most " +
+                                      "probable answers from \na survey \nof 100 people. Like " +
+                                      "if the show was called 'hey that's possible' the show \n" +
+                                      "would be called Family Feud");
     filename_2 = "many_lines.txt";
-    file_contents_2 =
+    file_contents_2 = Promise.resolve(
 `#file-container {
     border: 0px solid lightgray;
     border-radius: 0px 0px 3px 3px;
@@ -72,10 +73,10 @@
 
 #current-file {
     background-color: #E8EEFE;
-}`;
+}`);
     filename_3 = "Ice_Cream.cpp";
-    file_contents_3 = "Mint Chocolate Chip";
-    alternate_file_contents_3 = "Blue Moon";
+    file_contents_3 = Promise.resolve("Mint Chocolate Chip");
+    alternate_file_contents_3 = Promise.resolve("Blue Moon");
 
     change_contents() {
       this.file_contents_3 = this.alternate_file_contents_3;
