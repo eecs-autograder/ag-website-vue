@@ -1,8 +1,8 @@
 <template>
   <div tabindex="1"
-    id="context-menu-container"
-    @blur="hide_context_menu"
-    @keyup.esc="hide_context_menu">
+       id="context-menu-container"
+       @blur="hide_context_menu"
+       @keyup.esc="hide_context_menu">
     <slot name="context_menu_items">
       <context-menu-item :disabled="true">
         <template slot="label">
@@ -29,21 +29,21 @@
     private d_height_of_menu = 0;
     private d_width_of_menu = 0;
 
-    private _wheel_event_handler!: (event: Event) => void;
+    private wheel_event_handler!: (event: Event) => void;
 
     mounted() {
-      this.$el.style.left = "0px";
-      this.$el.style.top = "0px";
+      (<HTMLElement> this.$el).style.left = "0px";
+      (<HTMLElement> this.$el).style.top = "0px";
       this.d_height_of_menu = this.$el.clientHeight;
       this.d_width_of_menu = this.$el.clientWidth;
 
-      this._wheel_event_handler = (event: Event) => {
+      this.wheel_event_handler = (event: Event) => {
         if (this.menu_is_open) {
           event.preventDefault();
           event.stopPropagation();
         }
       };
-      window.addEventListener('wheel', this._wheel_event_handler, true);
+      window.addEventListener('wheel', this.wheel_event_handler, true);
 
       let children = this.$el.getElementsByClassName('context-menu-option');
       if (children.length === 0) {
@@ -58,7 +58,7 @@
     }
 
     destroyed() {
-      window.removeEventListener('wheel', this._wheel_event_handler, true);
+      window.removeEventListener('wheel', this.wheel_event_handler, true);
     }
 
     get menu_is_open() {
@@ -66,7 +66,7 @@
     }
 
     hide_context_menu() {
-      this.$el.style.visibility = "hidden";
+      (<HTMLElement> this.$el).style.visibility = "hidden";
       this.d_is_open = false;
     }
 
@@ -82,14 +82,14 @@
         y_coordinate = (y_coordinate - this.d_height_of_menu) - 5;
       }
 
-      this.$el.style.left = x_coordinate + "px";
-      this.$el.style.top = y_coordinate + "px";
+      (<HTMLElement> this.$el).style.left = x_coordinate + "px";
+      (<HTMLElement> this.$el).style.top = y_coordinate + "px";
 
-      this.$el.style.visibility = "visible";
+      (<HTMLElement> this.$el).style.visibility = "visible";
       this.d_is_open = true;
 
       // focus must be applied after the element is visible
-      this.$el.focus();
+      (<HTMLElement> this.$el).focus();
     }
   }
 </script>

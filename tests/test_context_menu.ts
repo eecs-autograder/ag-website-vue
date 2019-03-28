@@ -148,7 +148,7 @@ describe('ContextMenu.vue', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        expect(context_menu.$el.style.visibility).toBe('visible');
+        expect((<HTMLElement> context_menu.$el).style.visibility).toBe('visible');
         expect(context_menu.menu_is_open).toBe(true);
 
         let context_menu_item_1 = wrapper.find({ref: 'item_1'});
@@ -156,7 +156,7 @@ describe('ContextMenu.vue', () => {
         context_menu_item_1.trigger('click');
         await context_menu.$nextTick();
 
-        expect(context_menu.$el.style.visibility).toBe('hidden');
+        expect((<HTMLElement> context_menu.$el).style.visibility).toBe('hidden');
         expect(context_menu.menu_is_open).toBe(false);
 
         wrapper.vm.$destroy();
@@ -214,7 +214,7 @@ describe('ContextMenu.vue', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        expect(context_menu.$el.style.visibility).toBe("visible");
+        expect((<HTMLElement> context_menu.$el).style.visibility).toBe("visible");
 
         let outside_input = wrapper.find('#outside');
 
@@ -222,7 +222,7 @@ describe('ContextMenu.vue', () => {
         outside_input.element.focus();
         await context_menu.$nextTick();
 
-        expect(context_menu.$el.style.visibility).toBe("hidden");
+        expect((<HTMLElement> context_menu.$el).style.visibility).toBe("hidden");
 
         wrapper.vm.$destroy();
     });
@@ -381,7 +381,7 @@ describe('ContextMenu.vue', () => {
         patch_object_prototype(document.body, fake_body, () => {
             patch_component_data_member(context_menu, 'd_width_of_menu', 10, () => {
                 context_menu.show_context_menu(798, 2);
-                let new_left = context_menu.$el.style.left;
+                let new_left = (<HTMLElement> context_menu.$el).style.left;
                 expect(new_left).not.toBeNull();
                 // Chop off 'px'
                 new_left = new_left!.substring(0, new_left!.length - 2);
@@ -448,7 +448,7 @@ describe('ContextMenu.vue', () => {
         patch_object_prototype(document.body, fake_body, () => {
             patch_component_data_member(context_menu, 'd_height_of_menu', 15, () => {
                 context_menu.show_context_menu(2, 498);
-                let new_top = context_menu.$el.style.top;
+                let new_top = (<HTMLElement> context_menu.$el).style.top;
                 expect(new_top).not.toBeNull();
                 new_top = new_top!.substring(0, new_top!.length - 2);
                 let number_new_top: number = parseInt(new_top, 10);

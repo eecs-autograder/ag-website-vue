@@ -52,8 +52,8 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
 - Lines of code should be no longer than 100 characters.
 - Names:
     - Use `snake_case` for variable, function, method, and file names.
-    - Start non-public names with a single leading underscore.
-    - Start Vue "data" members (declared as default-initialized member variables in Typescript component classes) with a leading "d_".
+    - Do not start names with a leading underscore. Vue reserves these names for its implementation, and collisions can cause bugs that are hard to diagnose.
+    - Start all Vue "data" members (declared as default-initialized member variables in Typescript component classes) with a leading "d_".
         - Note: If a data member is publically accessible and modifiable, you do not need to use this naming convention.
         - These members that start with "d_" should only be accessed by the component itself and the test cases for that specific component. If possible, add a property getter and make the data member private.
         ```

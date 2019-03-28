@@ -218,6 +218,8 @@ describe('Roster.vue', () => {
         // fail (only when the input is changed more than once in a test).
         // This behavior has been independently tested as part of the validated form
         // tests.
+        // UPDATE: The refactoring of validated form and input included in fixing #127
+        // appears to have fixed this issue.
         expect(roster_form_component.is_valid).toBe(false);
         expect(roster.add_users_form_is_valid).toBe(false);
 
@@ -230,8 +232,8 @@ describe('Roster.vue', () => {
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a?@e.iou');
         // See above comment
-        // expect(roster_form_component.is_valid).toBe(false);
-        // expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster_form_component.is_valid).toBe(false);
+        expect(roster.add_users_form_is_valid).toBe(false);
 
         (<HTMLInputElement> validated_input.find(
         '#textarea'
@@ -242,8 +244,8 @@ describe('Roster.vue', () => {
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a(@e.iou');
         // See above comment
-        // expect(roster_form_component.is_valid).toBe(false);
-        // expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster_form_component.is_valid).toBe(false);
+        expect(roster.add_users_form_is_valid).toBe(false);
     });
 
     test('Emails missing the @ character after the local part are invalid',

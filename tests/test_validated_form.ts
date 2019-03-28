@@ -9,7 +9,7 @@ beforeAll(() => {
 });
 
 describe('ValidatedForm.vue', () => {
-    test('is_valid returns true only if all ValidatedInputs are valid ', () => {
+    test('is_valid returns true only if all ValidatedInputs are valid ', async () => {
         const component = {
             template:  `<validated-form ref="form">
                           <validated-input ref="validated_input_1" v-model="value1"
@@ -41,16 +41,21 @@ describe('ValidatedForm.vue', () => {
         const form = wrapper.find({ref: 'form'});
         const form_vm = <ValidatedForm> form.vm;
 
+        await wrapper.vm.$nextTick();
+
         expect(form_vm.d_validated_inputs.length).toBe(2);
         expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value2: 42});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(true);
 
         wrapper.setData({value1: "invalid"});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value2: "invalid"});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(false);
     });
 
@@ -72,7 +77,7 @@ describe('ValidatedForm.vue', () => {
 
     });
 
-    test('is_valid works with a single ValidatedInput child', () => {
+    test('is_valid works with a single ValidatedInput child', async () => {
         const component = {
             template:  `<validated-form ref="form">
                           <validated-input ref="validated_input_1" v-model="value1"
@@ -107,15 +112,18 @@ describe('ValidatedForm.vue', () => {
         const validated_input = wrapper.find({ref: 'validated_input_1'});
         (<HTMLInputElement> validated_input.find('#input').element).value = "invalid";
         validated_input.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
 
         expect(form_vm.is_valid).toBe(false);
 
         (<HTMLInputElement> validated_input.find('#input').element).value = "2001";
         validated_input.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
+
         expect(form_vm.is_valid).toBe(true);
     });
 
-    test('is_valid works with deeply nested ValidatedInput elements', () => {
+    test('is_valid works with deeply nested ValidatedInput elements', async () => {
         const component = {
             template:  `<validated-form ref="form">
                           <div>
@@ -158,15 +166,19 @@ describe('ValidatedForm.vue', () => {
         expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value3: 42});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(true);
 
         wrapper.setData({value1: "invalid"});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(false);
 
         wrapper.setData({value1: 23});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(true);
 
         wrapper.setData({value2: "invalid"});
+        await wrapper.vm.$nextTick();
         expect(form_vm.is_valid).toBe(false);
     });
 
@@ -235,6 +247,7 @@ describe('ValidatedForm.vue', () => {
 
         (<HTMLInputElement> validated_input.find('#input').element).value = "42";
         validated_input.find('#input').trigger('input');
+        await wrapper.vm.$nextTick();
 
         expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
@@ -305,6 +318,9 @@ describe('ValidatedForm.vue', () => {
         // Make sure error messages are displayed
         expect(vinput1_vm.d_show_warnings).toBe(true);
         expect(vinput2_vm.d_show_warnings).toBe(true);
+        await vinput1_vm.$nextTick();
+        await vinput2_vm.$nextTick();
+        await form_vm.$nextTick();
         expect(vinput1.find('#error-text').exists()).toBe(true);
         expect(vinput2.find('#error-text').exists()).toBe(true);
         expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
