@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
 
     <button class="blue-button"> Click On Me </button>
     <br>
@@ -36,24 +36,6 @@ export default class ButtonDemo extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-
-h3 {
-  margin: 40px 0 0;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
 
 .custom-button {
   background-color: hsl(330, 100%, 65%);

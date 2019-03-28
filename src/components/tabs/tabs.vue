@@ -22,6 +22,9 @@ export default class Tabs extends Vue {
   @Prop({default: "white-theme-inactive", type: String})
   tab_inactive_class!: string;
 
+  @Prop({default: 'top', validator: (value: string) => value === 'top' || value === 'side'})
+  tab_position!: 'top' | 'side';
+
   @Watch('value')
   on_value_changed(new_value: number, old_value: number) {
     this.d_active_tab_index = new_value;
@@ -77,8 +80,16 @@ export default class Tabs extends Vue {
       tab_data.push({header: header, body: body});
     }
 
+    let tab_container_style = {};
+    if (this.tab_position === 'side') {
+      tab_container_style = {
+        'display': 'flex',
+      };
+    }
+
     return create_element(
       'div',
+      {style: tab_container_style},
       [this._render_tab_headers(create_element, tab_data),
        this._render_tab_body(create_element, tab_data)]
     );
@@ -119,8 +130,11 @@ export default class Tabs extends Vue {
         if (element_data.style === undefined) {
           element_data.style = {};
         }
-        let element_style = <{width: string}> element_data.style;
-        element_style.width = window_width.matches ? `${100 / tab_data.length}%` : '100%';
+
+        if (this.tab_position === 'top') {
+          let element_style = <{ width: string }> element_data.style;
+          element_style.width = window_width.matches ? `${100 / tab_data.length}%` : '100%';
+        }
 
         if (element_data.class === undefined) {
           element_data.class = [];
@@ -168,6 +182,10 @@ export default class Tabs extends Vue {
       }
     );
 
+    let tab_container_style = {};
+    if (this.tab_position === 'side') {
+      tab_container_style['display'] = 'inline-block';
+    }
     return create_element('div', header_elts);
   }
 
@@ -176,10 +194,18 @@ export default class Tabs extends Vue {
       this._set_active_tab(tab_data.length - 1);
     }
 
+    let body_style = {};
+    if (this.tab_position === 'side') {
+      body_style = {
+        'flex-grow': '1'
+      };
+    }
+
     return create_element(
       'div',
       {
-        ref: 'active-tab-body'
+        ref: 'active-tab-body',
+        style: body_style
       },
       tab_data[this.d_active_tab_index].body.children
     );
