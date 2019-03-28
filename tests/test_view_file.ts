@@ -54,7 +54,7 @@ describe('ViewFile.vue', () => {
         expect(content_lines.at(0).text()).toContain('line one');
         expect(content_lines.at(1).text()).toContain('line two');
 
-        wrapper.setData({file_contents: Promise.resolve("Blue \nMoon")});
+        wrapper.setProps({file_contents: Promise.resolve("Blue \nMoon")});
         await component.$nextTick();
 
         content_lines = wrapper.findAll('.line-of-file-content');
@@ -69,7 +69,7 @@ describe('ViewFile.vue', () => {
 
         expect(component.d_filename).toEqual(filename);
 
-        wrapper.setData({filename: new_filename});
+        wrapper.setProps({filename: new_filename});
         await component.$nextTick();
 
         expect(component.d_filename).toEqual(new_filename);
