@@ -1,5 +1,4 @@
 import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
-import roster from '@/components/course_admin/roster/roster.vue';
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
