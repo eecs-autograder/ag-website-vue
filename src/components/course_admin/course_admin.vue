@@ -6,12 +6,12 @@
             tab_active_class="gray-theme-active-no-padding"
             tab_inactive_class="gray-theme-inactive-no-padding"
             v-model="current_tab_index"
+            @input="on_tab_changed"
             v-if="!loading">
 
         <!--SETTINGS TAB-->
         <tab>
-          <tab-header ref="settings_tab"
-                      @click.native="update_tab_index(0)">
+          <tab-header ref="settings_tab">
             <div class="tab-label">
               <p class="tab-header"> Settings </p>
             </div>
@@ -30,7 +30,9 @@
 
             <dropdown ref="roster_dropdown"
                       :items="roles"
-                      @update_item_selected="role_selected = $event; update_tab_index(1)">
+                      @update_item_selected="role_selected = $event;
+                                             current_tab_index = 1;
+                                             on_tab_changed(1);">
               <template slot="header">
                 <div class="tab-label" tabindex="1">
                   <p class="roster-tab-header tab-header"
@@ -51,29 +53,29 @@
 
           <template slot="body">
             <div class="tab-body">
-              <admin-roster v-if="role_selected === 'Admin' && course !== null"
+              <admin-roster v-if="role_selected === RosterChoice.admin && course !== null"
                             :course="course">
               </admin-roster>
 
-              <handgrader-roster v-if="role_selected === 'Handgrader' && course !== null"
-                                 :course="course">
-              </handgrader-roster>
-
-              <staff-roster v-if="role_selected === 'Staff' && course !== null"
+              <staff-roster v-if="role_selected === RosterChoice.staff && course !== null"
                             :course="course">
               </staff-roster>
 
-              <student-roster v-if="role_selected === 'Student' && course !== null"
+              <student-roster v-if="role_selected === RosterChoice.student && course !== null"
                               :course="course">
               </student-roster>
+
+              <handgrader-roster v-if="role_selected === RosterChoice.handgrader
+                                       && course !== null"
+                                 :course="course">
+              </handgrader-roster>
             </div>
           </template>
         </tab>
 
         <!--PROJECTS TAB-->
         <tab>
-          <tab-header ref="projects_tab"
-                      @click.native="update_tab_index(2)">
+          <tab-header ref="projects_tab">
             <div class="tab-label">
               <p class="tab-header"> Projects </p>
             </div>
@@ -105,6 +107,7 @@
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
+  import { get_query_param } from "@/utils";
   import { Course } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
   @Component({
@@ -126,23 +129,21 @@
     current_tab_index = 0;
     loading = true;
     role_selected = "";
-    roles = ["Admin", "Staff", "Student", "Handgrader"];
+    roles = [
+      RosterChoice.admin,
+      RosterChoice.staff,
+      RosterChoice.student,
+      RosterChoice.handgrader
+    ];
     course: Course | null = null;
-    last_modified_format = {
-      year: 'numeric', month: 'long', day: 'numeric',
-      hour: 'numeric', minute: 'numeric', second: 'numeric'
-    };
 
     async created() {
-      this.course = await Course.get_by_pk(Number(this.$route.params.courseId));
+      this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
       this.loading = false;
     }
 
-    update_tab_index(index: number) {
-      this.current_tab_index = index;
-      if (this.current_tab_index === 0 || this.current_tab_index === 2) {
-        this.role_selected = "";
-      }
+    mounted() {
+      this.select_tab(get_query_param(this.$route.query, "current_tab"));
     }
 
     show_roster_tab_dropdown_menu(event: Event) {
@@ -150,6 +151,69 @@
       roster_dropdown.show_the_dropdown_menu();
       event.stopPropagation();
     }
+
+    on_tab_changed(index: number) {
+      if (this.current_tab_index !== 1) {
+        this.role_selected = "";
+      }
+      switch (index) {
+        case 0:
+          this.$router.replace({query: {current_tab: "settings"}});
+          break;
+        case 1:
+          if (this.role_selected === RosterChoice.admin) {
+            this.$router.replace({query: {current_tab: "admin_roster"}});
+          }
+          else if (this.role_selected === RosterChoice.staff) {
+            this.$router.replace({query: {current_tab: "staff_roster"}});
+          }
+          else if (this.role_selected === RosterChoice.student) {
+            this.$router.replace({query: {current_tab: "student_roster"}});
+          }
+          else {
+            this.$router.replace({query: {current_tab: "handgrader_roster"}});
+          }
+          break;
+        case 2:
+          this.$router.replace(({query: {current_tab: "manage_projects"}}));
+      }
+    }
+
+    select_tab(tab_name: string | null) {
+      switch (tab_name) {
+        case "settings":
+          break;
+        case "admin_roster":
+          this.current_tab_index = 1;
+          this.role_selected = RosterChoice.admin;
+          break;
+        case "staff_roster":
+          this.current_tab_index = 1;
+          this.role_selected = RosterChoice.staff;
+          break;
+        case "student_roster":
+          this.current_tab_index = 1;
+          this.role_selected = RosterChoice.student;
+          break;
+        case "handgrader_roster":
+          this.current_tab_index = 1;
+          this.role_selected = RosterChoice.handgrader;
+          break;
+        case "manage_projects":
+          this.current_tab_index = 2;
+          break;
+        default:
+          this.current_tab_index = 0;
+      }
+    }
+    readonly RosterChoice = RosterChoice;
+  }
+
+  export enum RosterChoice {
+    admin = "Admin",
+    staff = "Staff",
+    student = "Student",
+    handgrader = "Handgrader"
   }
 </script>
 
