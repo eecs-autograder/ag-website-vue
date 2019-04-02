@@ -7,10 +7,10 @@
     <tabs ref="course_admin_tabs"
           tab_active_class="gray-white-theme-active"
           tab_inactive_class="gray-white-theme-inactive"
-          v-model="current_tab_index">
+          v-model="current_tab_index"
+          @input="on_tab_changed">
       <tab>
-        <tab-header ref="project_settings_tab"
-                    @click.native="update_tab_index(0)">
+        <tab-header ref="project_settings_tab">
           <div class="tab-label">
             <p class="tab-header"> Project Settings </p>
           </div>
@@ -23,8 +23,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="instructor_files_tab"
-                    @click.native="update_tab_index(1)">
+        <tab-header ref="instructor_files_tab">
           <div class="tab-label">
             <p class="tab-header"> Instructor Files </p>
           </div>
@@ -37,8 +36,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="expected_student_files_tab"
-                    @click.native="update_tab_index(2)">
+        <tab-header ref="expected_student_files_tab">
           <div class="tab-label">
             <p class="tab-header"> Files Students Should Submit </p>
           </div>
@@ -51,8 +49,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="ag_test_cases_tab"
-                    @click.native="update_tab_index(3)">
+        <tab-header ref="ag_test_cases_tab">
           <div class="tab-label">
             <p class="tab-header"> Test Cases </p>
           </div>
@@ -65,8 +62,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="mutation_testing_tab"
-                    @click.native="update_tab_index(4)">
+        <tab-header ref="mutation_testing_tab">
           <div class="tab-label">
             <p class="tab-header"> Mutation Testing </p>
           </div>
@@ -79,8 +75,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="edit_groups_tab"
-                    @click.native="update_tab_index(5)">
+        <tab-header ref="edit_groups_tab">
           <div class="tab-label">
             <p class="tab-header"> Edit Groups </p>
           </div>
@@ -93,8 +88,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="download_grades_tab"
-                    @click.native="update_tab_index(6)">
+        <tab-header ref="download_grades_tab">
           <div class="tab-label">
             <p class="tab-header"> Download Grades </p>
           </div>
@@ -107,8 +101,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="rerun_tests_tab"
-                    @click.native="update_tab_index(7)">
+        <tab-header ref="rerun_tests_tab">
           <div class="tab-label">
             <p class="tab-header"> Rerun Tests </p>
           </div>
@@ -121,8 +114,7 @@
       </tab>
 
       <tab>
-        <tab-header ref="configure_handgrading_tab"
-                    @click.native="update_tab_index(8)">
+        <tab-header ref="configure_handgrading_tab">
           <div class="tab-label">
             <p class="tab-header"> Configure Handgrading </p>
           </div>
@@ -134,7 +126,6 @@
         </template>
       </tab>
 
-
     </tabs>
   </div>
 </template>
@@ -144,6 +135,7 @@
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
 
+  import { get_query_param } from "@/utils";
   import { Project } from 'ag-client-typescript';
   import { Component, Vue } from 'vue-property-decorator';
 
@@ -160,12 +152,78 @@
     project: Project | null = null;
 
     async created() {
-      this.project = await Project.get_by_pk(Number(this.$route.params.projectId));
+      this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
       this.d_loading = false;
     }
 
-    update_tab_index(index: number) {
-      this.current_tab_index = index;
+    mounted() {
+      this.select_tab(get_query_param(this.$route.query, "current_tab"));
+    }
+
+    on_tab_changed(index: number) {
+      switch (index) {
+        case 0:
+          this.$router.replace({query: {current_tab: "settings"}});
+          break;
+        case 1:
+          this.$router.replace({query: {current_tab: "instructor_files"}});
+          break;
+        case 2:
+          this.$router.replace({query: {current_tab: "expected_student_files"}});
+          break;
+        case 3:
+          this.$router.replace({query: {current_tab: "test_cases"}});
+          break;
+        case 4:
+          this.$router.replace({query: {current_tab: "mutation_testing"}});
+          break;
+        case 5:
+          this.$router.replace({query: {current_tab: "edit_groups"}});
+          break;
+        case 6:
+          this.$router.replace({query: {current_tab: "download_grades"}});
+          break;
+        case 7:
+          this.$router.replace({query: {current_tab: "rerun_tests"}});
+          break;
+        case 8:
+          this.$router.replace({query: {current_tab: "configure_handgrading"}});
+          break;
+      }
+    }
+
+    select_tab(tab_name: string | null) {
+      switch (tab_name) {
+        case "settings":
+          break;
+        case "instructor_files":
+          this.current_tab_index = 1;
+          break;
+        case "expected_student_files":
+          this.current_tab_index = 2;
+          break;
+        case "test_cases":
+          this.current_tab_index = 3;
+          break;
+        case "mutation_testing":
+          this.current_tab_index = 4;
+          break;
+        case "edit_groups":
+          this.current_tab_index = 5;
+          break;
+        case "download_grades":
+          this.current_tab_index = 6;
+          break;
+        case "rerun_tests":
+          this.current_tab_index = 7;
+          break;
+        case "configure_handgrading":
+          this.current_tab_index = 8;
+          break;
+        default:
+          this.current_tab_index = 0;
+          break;
+      }
     }
   }
 </script>

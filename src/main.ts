@@ -13,7 +13,7 @@ Vue.use(VueRouter);
 const ROUTES = [
     { path: '/', name: "course_list", component: CourseList },
     { path: '/web/course_admin/:course_id', name: "course_admin", component: CourseAdmin },
-    { path: '/web/project_admin/:projectId', component: ProjectAdmin }
+    { path: '/web/project_admin/:project_id', name: 'project_admin', component: ProjectAdmin }
 ];
 
 const ROUTER = new VueRouter ({
