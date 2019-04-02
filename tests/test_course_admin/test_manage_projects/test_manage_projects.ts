@@ -210,7 +210,9 @@ describe('ManageProjects.vue', () => {
 
         expect(validated_input.is_valid).toBe(true);
 
-        let create_project_stub = sinon.stub(Project, 'create').returns(Promise.resolve(new_project));
+        let create_project_stub = sinon.stub(Project, 'create').returns(
+            Promise.resolve(new_project)
+        );
         wrapper.find('.add-project-button').trigger('click');
         await component.$nextTick();
 
@@ -294,7 +296,7 @@ describe('ManageProjects.vue', () => {
 
         wrapper.find('.clone-project-button').trigger('click');
         await component.$nextTick();
-        
+
         expect(copy_to_course_stub.firstCall.calledWith(
             current_course.pk, newly_cloned_project_1.name)
         ).toBe(true);
