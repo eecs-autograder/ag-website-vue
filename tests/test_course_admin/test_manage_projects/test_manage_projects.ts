@@ -19,6 +19,7 @@ describe('ManageProjects.vue', () => {
     let user: User;
     let current_course: Course;
     let another_course: Course;
+    let courses: Course[];
     let new_project: Project;
     let project_1: Project;
     let project_2: Project;
@@ -152,6 +153,10 @@ describe('ManageProjects.vue', () => {
             hide_ultimate_submission_fdbk: false
         });
 
+        courses = [current_course, another_course];
+
+        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve(courses));
         sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve(projects));
 
         wrapper = mount(ManageProjects, {
@@ -277,10 +282,6 @@ describe('ManageProjects.vue', () => {
         let project_to_clone = <SingleProject> wrapper.findAll(
             {ref: 'single_project'}
         ).at(0).vm;
-
-        let courses = [current_course, another_course];
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
-        sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve(courses));
 
         wrapper.findAll('.copier').at(0).trigger('click');
         await component.$nextTick();
