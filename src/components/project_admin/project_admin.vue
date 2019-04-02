@@ -188,7 +188,6 @@
           break;
         case 8:
           this.$router.replace({query: {current_tab: "configure_handgrading"}});
-          break;
       }
     }
 
@@ -222,7 +221,6 @@
           break;
         default:
           this.current_tab_index = 0;
-          break;
       }
     }
   }
