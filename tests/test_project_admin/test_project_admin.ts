@@ -15,6 +15,7 @@ describe('Changing tabs in project admin', () => {
     let component: ProjectAdmin;
     let project_1: Project;
     let original_match_media: (query: string) => MediaQueryList;
+    // tslint:disable-next-line naming-convention
     const localVue = createLocalVue();
     localVue.use(VueRouter);
 
