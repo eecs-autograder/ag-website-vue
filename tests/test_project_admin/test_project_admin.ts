@@ -410,6 +410,48 @@ describe('select_tab function called with different values associated with "curr
         expect(component.project).toEqual(project_1);
         expect(component.current_tab_index).toEqual(8);
     });
+
+    test('current tab parameter value = empty string', async () => {
+        $route.query = { current_tab: '' };
+        wrapper = mount(ProjectAdmin, {
+            mocks: {
+                $route
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.project).toEqual(project_1);
+        expect(component.current_tab_index).toEqual(0);
+    });
+
+    test('current tab parameter value = empty string', async () => {
+        $route.query = { current_tab: ['edit_groups', 'dont_edit_groups'] };
+        wrapper = mount(ProjectAdmin, {
+            mocks: {
+                $route
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.project).toEqual(project_1);
+        expect(component.current_tab_index).toEqual(5);
+    });
+
+    test('current_tab query not provided', async () => {
+        $route.query = { };
+        wrapper = mount(ProjectAdmin, {
+            mocks: {
+                $route
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.project).toEqual(project_1);
+        expect(component.current_tab_index).toEqual(0);
+    });
 });
 
 
