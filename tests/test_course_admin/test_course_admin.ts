@@ -19,6 +19,7 @@ describe('Changing Tabs', ()  => {
     let roster: User[];
     let projects: Project[];
     let original_match_media: (query: string) => MediaQueryList;
+    // tslint:disable-next-line naming-convention
     const localVue = createLocalVue();
     localVue.use(VueRouter);
 
@@ -89,8 +90,9 @@ describe('Changing Tabs', ()  => {
 
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.admin);
-        expect(router_replace.calledTwice).toBe(true);
-        expect(router_replace.calledWith({ query: { current_tab: 'admin_roster'}})).toBe(true);
+        expect(router_replace.firstCall.calledWith(
+            { query: { current_tab: 'admin_roster'}}
+        )).toBe(true);
     });
 
     test('Clicking on roster tab with role selected = "Staff"', async () => {
@@ -112,8 +114,9 @@ describe('Changing Tabs', ()  => {
 
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.staff);
-        expect(router_replace.calledTwice).toBe(true);
-        expect(router_replace.calledWith({ query: { current_tab: 'staff_roster'}})).toBe(true);
+        expect(router_replace.firstCall.calledWith(
+            { query: { current_tab: 'staff_roster'}})
+        ).toBe(true);
     });
 
     test('Clicking on roster tab with role selected = "Student"', async () => {
@@ -136,8 +139,9 @@ describe('Changing Tabs', ()  => {
 
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.student);
-        expect(router_replace.calledTwice).toBe(true);
-        expect(router_replace.calledWith({ query: { current_tab: 'student_roster'}})).toBe(true);
+        expect(router_replace.firstCall.calledWith(
+            { query: { current_tab: 'student_roster'}}
+        )).toBe(true);
     });
 
     test('Clicking on roster tab with role selected = "Handgrader"', async () => {
@@ -161,10 +165,9 @@ describe('Changing Tabs', ()  => {
 
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.handgrader);
-        expect(router_replace.calledTwice).toBe(true);
-        expect(router_replace.calledWith(
-            { query: { current_tab: 'handgrader_roster'}})
-        ).toBe(true);
+        expect(router_replace.firstCall.calledWith(
+            { query: { current_tab: 'handgrader_roster'}}
+        )).toBe(true);
     });
 
     test('Pressing enter on roster tab with role selected = "Handgrader"', async () => {

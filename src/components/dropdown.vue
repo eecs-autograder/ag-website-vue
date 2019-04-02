@@ -13,7 +13,7 @@
         <div :class="['dropdown-row', {'highlight': index === d_highlighted_index}]"
              v-for="(item, index) of d_items"
              @mousedown="$event.preventDefault()"
-             @click="choose_item_from_dropdown_menu(item, index)">
+             @click.stop="choose_item_from_dropdown_menu(item, index)">
           <slot v-bind:item="item">{{item}}</slot>
         </div>
       </div>
