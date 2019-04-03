@@ -2,8 +2,7 @@ import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster
 import Roster from '@/components/course_admin/roster/roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
-
-import { patch_async_class_method, patch_async_static_method } from '../../mocking';
+import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -11,19 +10,20 @@ beforeAll(() => {
 
 describe('HandgraderRoster.vue', () => {
     let wrapper: Wrapper<HandgraderRoster>;
-    let handgrader_roster: HandgraderRoster;
-    let original_match_media: (query: string) => MediaQueryList;
+    let component: HandgraderRoster;
     let user_1: User;
     let user_2: User;
     let user_3: User;
     let user_4: User;
     let new_user_1: User;
     let new_user_2: User;
-    let my_course: Course;
+    let course: Course;
     let handgraders: User[];
+    let updated_handgraders: User[];
+    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        my_course = new Course({
+        course = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
@@ -82,9 +82,25 @@ describe('HandgraderRoster.vue', () => {
                 return {matches: true};
             })
         });
+
+        handgraders = [user_1, user_2, user_3, user_4];
+        updated_handgraders = [user_1, user_2, user_3, user_4, new_user_1, new_user_2];
+
+        let get_handgraders_stub = sinon.stub(course, 'get_handgraders');
+        get_handgraders_stub.onFirstCall().returns(Promise.resolve(handgraders));
+        get_handgraders_stub.onSecondCall().returns(Promise.resolve(updated_handgraders));
+
+        wrapper = mount(HandgraderRoster, {
+            propsData: {
+                course: course
+            }
+        });
+        component = wrapper.vm;
     });
 
     afterEach(() => {
+        sinon.restore();
+
         Object.defineProperty(window, "matchMedia", {
             value: original_match_media
         });
@@ -94,147 +110,49 @@ describe('HandgraderRoster.vue', () => {
         }
     });
 
-    test('The created function calls the Course method "get_handgraders"', () => {
-        handgraders = [user_1, user_2, user_3, user_4];
+    test('The created function calls the Course method "get_handgraders"', async () => {
+        await component.$nextTick();
 
-        return patch_async_class_method(
-            Course,
-            'get_handgraders',
-            () => Promise.resolve(handgraders),
-            async () => {
-
-            wrapper = mount(HandgraderRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-
-            handgrader_roster = wrapper.vm;
-            await handgrader_roster.$nextTick();
-
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
-        });
+        expect(component.d_course).toEqual(course);
+        expect(component.handgraders).toEqual(handgraders);
     });
 
     test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
          'add_handgraders method to be called',
          async () => {
-        handgraders = [
-            make_user(0, `user${0}`),
-            make_user(1, `user${1}`),
-            make_user(2, `user${2}`)
-        ];
+        let add_handgraders_stub = sinon.stub(course, 'add_handgraders');
+        await component.$nextTick();
 
-        return patch_async_class_method(
-            Course,
-            'get_handgraders',
-            make_fake_get_handgraders_func(),
-            async () => {
+        expect(component.d_course).toEqual(course);
+        expect(component.handgraders).toEqual(handgraders);
 
-            wrapper = mount(HandgraderRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
+        let roster = <Roster> wrapper.find({ref: 'handgrader_roster'}).vm;
+        roster.users_to_add = new_user_1.username + " " + new_user_2.username;
+        await component.$nextTick();
 
-            handgrader_roster = wrapper.vm;
-            await handgrader_roster.$nextTick();
+        let add_handgraders_form = wrapper.find('#add-users-form');
+        add_handgraders_form.trigger('submit');
+        await component.$nextTick();
 
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
-
-            const spy = jest.fn();
-            return patch_async_class_method(
-                Course,
-                'add_handgraders',
-                spy,
-                async () => {
-
-                let roster = <Roster> wrapper.find({ref: 'handgrader_roster'}).vm;
-                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await handgrader_roster.$nextTick();
-
-                let add_handgraders_form = wrapper.find('#add-users-form');
-                add_handgraders_form.trigger('submit');
-                await handgrader_roster.$nextTick();
-
-                handgraders.push(make_user(3, `user${3}`));
-
-                expect(handgrader_roster.handgraders).toEqual(handgraders);
-                expect(spy.mock.calls.length).toBe(1);
-            });
-        });
+        expect(add_handgraders_stub.firstCall.calledWith(
+            new_user_1.username + " " + new_user_2.username)
+        );
+        expect(component.handgraders).toEqual(updated_handgraders);
     });
-
-    function make_fake_get_handgraders_func() {
-        let counter = 0;
-        let handgraders2: User[] = [];
-        for (let i = 0; i < 3; ++i) {
-            handgraders2.push(make_user(counter, `user${counter}`));
-            counter += 1;
-        }
-
-        return () => {
-            let to_return = handgraders2.slice(0);
-            handgraders2.push(make_user(counter, `user${counter}`));
-            counter += 1;
-            return Promise.resolve(to_return);
-        };
-    }
-
-    function make_user(pk: number, username: string): User {
-        return new User({
-            pk: pk,
-            username: username,
-            first_name: 'Steve the Llama',
-            last_name: 'Spam',
-            is_superuser: false,
-            email: 'steve@thellama.com'
-        });
-    }
 
     test('Deleting a user from the roster causes the Course "remove_handgraders" method to' +
          ' be called ',
          async () => {
+        let remove_handgraders_stub = sinon.stub(course, 'remove_handgraders');
+        await component.$nextTick();
 
-        handgraders = [user_1, user_2, user_3, user_4];
+        expect(component.d_course).toEqual(course);
+        expect(component.handgraders).toEqual(handgraders);
 
-        return patch_async_class_method(
-            Course,
-            'get_handgraders',
-            () => Promise.resolve(handgraders),
-            async () => {
+        let remove_user_buttons = wrapper.find({ref: 'handgrader_roster'}).findAll('.remove-user');
+        remove_user_buttons.at(1).trigger('click');
+        await component.$nextTick();
 
-            wrapper = mount(HandgraderRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-
-            handgrader_roster = wrapper.vm;
-            await handgrader_roster.$nextTick();
-
-            expect(handgrader_roster.d_course).toEqual(my_course);
-            expect(handgrader_roster.handgraders).toEqual(handgraders);
-
-            const spy = jest.fn();
-            return patch_async_class_method(
-                Course,
-                'remove_handgraders',
-                spy,
-                async () => {
-
-                let remove_user_buttons = wrapper.find(
-                    {ref: 'handgrader_roster'}
-                ).findAll(
-                    '.remove-user'
-                );
-                remove_user_buttons.at(1).trigger('click');
-                await wrapper.vm.$nextTick();
-
-                expect(spy.mock.calls.length).toBe(1);
-            });
-        });
+        expect(remove_handgraders_stub.firstCall.calledWith([user_1])).toBe(true);
     });
 });
