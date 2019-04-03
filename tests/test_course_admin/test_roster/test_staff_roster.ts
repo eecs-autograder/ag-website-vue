@@ -2,28 +2,28 @@ import Roster from '@/components/course_admin/roster/roster.vue';
 import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
-
-import { patch_async_class_method } from '../../mocking';
+import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('StaffRoster.vue', () => {
+describe('StaffRoster tests', () => {
     let wrapper: Wrapper<StaffRoster>;
-    let staff_roster: StaffRoster;
-    let original_match_media: (query: string) => MediaQueryList;
+    let component: StaffRoster;
     let user_1: User;
     let user_2: User;
     let user_3: User;
     let user_4: User;
     let new_user_1: User;
     let new_user_2: User;
-    let my_course: Course;
+    let course: Course;
     let staff: User[];
+    let updated_staff: User[];
+    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        my_course = new Course({
+        course = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
@@ -82,6 +82,20 @@ describe('StaffRoster.vue', () => {
                 return {matches: true};
             })
         });
+
+        staff = [user_1, user_2, user_3, user_4];
+        updated_staff = [user_1, user_2, user_3, user_4, new_user_1, new_user_2];
+
+        let get_staff_stub = sinon.stub(course, 'get_staff');
+        get_staff_stub.onFirstCall().returns(Promise.resolve(staff));
+        get_staff_stub.onSecondCall().returns(Promise.resolve(updated_staff));
+
+        wrapper = mount(StaffRoster, {
+            propsData: {
+                course: course
+            }
+        });
+        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -94,146 +108,49 @@ describe('StaffRoster.vue', () => {
         }
     });
 
-    test('The created function calls the Course method "get_staff"', () => {
-        staff = [user_1, user_2, user_3, user_4];
+    test('The created function calls the Course method "get_staff"', async () => {
+        await component.$nextTick();
 
-        return patch_async_class_method(
-            Course,
-            'get_staff',
-            () => Promise.resolve(staff),
-            async () => {
-
-            wrapper = mount(StaffRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-            staff_roster = wrapper.vm;
-            await staff_roster.$nextTick();
-
-            expect(staff_roster.d_course).toEqual(my_course);
-            expect(staff_roster.staff).toEqual(staff);
-        });
+        expect(component.d_course).toEqual(course);
+        expect(component.staff).toEqual(staff);
     });
 
     test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
          'add_staff method to be called',
          async () => {
-        staff = [
-            make_user(0, `user${0}`),
-            make_user(1, `user${1}`),
-            make_user(2, `user${2}`)
-        ];
+        let add_staff_stub = sinon.stub(course, 'add_staff');
+        await component.$nextTick();
 
-        return patch_async_class_method(
-            Course,
-            'get_staff',
-            make_fake_get_staff_func(),
-            async () => {
+        expect(component.d_course).toEqual(course);
+        expect(component.staff).toEqual(staff);
 
-            wrapper = mount(StaffRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
+        let roster = <Roster> wrapper.find({ref: 'staff_roster'}).vm;
+        roster.users_to_add = new_user_1.username + " " + new_user_2.username;
+        await component.$nextTick();
 
-            staff_roster = wrapper.vm;
-            await staff_roster.$nextTick();
+        let add_staff_form = wrapper.find('#add-users-form');
+        add_staff_form.trigger('submit');
+        await component.$nextTick();
 
-            expect(staff_roster.d_course).toEqual(my_course);
-            expect(staff_roster.staff).toEqual(staff);
-
-            const spy = jest.fn();
-            return patch_async_class_method(
-                Course,
-                'add_staff',
-                spy,
-                async () => {
-
-                let roster = <Roster> wrapper.find({ref: 'staff_roster'}).vm;
-                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await staff_roster.$nextTick();
-
-                let add_staff_form = wrapper.find('#add-users-form');
-                add_staff_form.trigger('submit');
-                await staff_roster.$nextTick();
-
-                staff.push(make_user(3, `user${3}`));
-
-                expect(staff_roster.staff).toEqual(staff);
-                expect(spy.mock.calls.length).toBe(1);
-            });
-        });
+        expect(add_staff_stub.firstCall.calledWith(
+            new_user_1.username + " " + new_user_2.username)
+        );
+        expect(component.staff).toEqual(updated_staff);
     });
-
-    function make_fake_get_staff_func() {
-        let counter = 0;
-        let staff2: User[] = [];
-        for (let i = 0; i < 3; ++i) {
-            staff2.push(make_user(counter, `user${counter}`));
-            counter += 1;
-        }
-
-        return () => {
-            let to_return = staff2.slice(0);
-            staff2.push(make_user(counter, `user${counter}`));
-            counter += 1;
-            return Promise.resolve(to_return);
-        };
-    }
-
-    function make_user(pk: number, username: string): User {
-        return new User({
-            pk: pk,
-            username: username,
-            first_name: 'Steve the Llama',
-            last_name: 'Spam',
-            is_superuser: false,
-            email: 'steve@thellama.com'
-        });
-    }
 
     test('Deleting a user from the roster causes the Course "remove_staff" method to' +
          ' be called',
          async () => {
+        let remove_staff_stub = sinon.stub(course, 'remove_staff');
+        await component.$nextTick();
 
-        staff = [user_1, user_2, user_3, user_4];
+        expect(component.d_course).toEqual(course);
+        expect(component.staff).toEqual(staff);
 
-        return patch_async_class_method(
-            Course,
-            'get_staff',
-            () => Promise.resolve(staff),
-            async () => {
+        let remove_user_buttons = wrapper.find({ref: 'staff_roster'}).findAll('.remove-user');
+        remove_user_buttons.at(1).trigger('click');
+        await component.$nextTick();
 
-            wrapper = mount(StaffRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-
-            staff_roster = wrapper.vm;
-            await staff_roster.$nextTick();
-
-            expect(staff_roster.d_course).toEqual(my_course);
-            expect(staff_roster.staff).toEqual(staff);
-
-            const spy = jest.fn();
-            return patch_async_class_method(
-                Course,
-                'remove_staff',
-                spy,
-                async () => {
-
-                let remove_user_buttons = wrapper.find(
-                    {ref: 'staff_roster'}
-                ).findAll(
-                '.remove-user'
-                );
-                remove_user_buttons.at(1).trigger('click');
-                await staff_roster.$nextTick();
-
-                expect(spy.mock.calls.length).toBe(1);
-            });
-        });
+        expect(remove_staff_stub.firstCall.calledWith([user_1])).toBe(true);
     });
 });

@@ -8,7 +8,7 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('AdminRoster.vue', () => {
+describe('AdminRoster tests', () => {
     let wrapper: Wrapper<AdminRoster>;
     let component: AdminRoster;
     let user_1: User;

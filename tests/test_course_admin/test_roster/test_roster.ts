@@ -8,7 +8,7 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('Roster.vue', () => {
+describe('Roster tests', () => {
     let wrapper: Wrapper<Roster>;
     let roster: Roster;
     let original_match_media: (query: string) => MediaQueryList;

@@ -9,7 +9,7 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('StudentRoster.vue', () => {
+describe('StudentRoster tests', () => {
     let wrapper: Wrapper<StudentRoster>;
     let student_roster: StudentRoster;
     let original_match_media: (query: string) => MediaQueryList;
