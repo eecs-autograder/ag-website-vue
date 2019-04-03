@@ -2,8 +2,7 @@ import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
 import Roster from '@/components/course_admin/roster/roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester, User } from 'ag-client-typescript';
-
-import { patch_async_class_method } from '../../mocking';
+import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -11,19 +10,20 @@ beforeAll(() => {
 
 describe('AdminRoster.vue', () => {
     let wrapper: Wrapper<AdminRoster>;
-    let admin_roster: AdminRoster;
-    let original_match_media: (query: string) => MediaQueryList;
+    let component: AdminRoster;
     let user_1: User;
     let user_2: User;
     let user_3: User;
     let user_4: User;
     let new_user_1: User;
     let new_user_2: User;
-    let my_course: Course;
+    let course: Course;
     let admins: User[];
+    let updated_admins: User[];
+    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        my_course = new Course({
+        course = new Course({
            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
@@ -82,9 +82,25 @@ describe('AdminRoster.vue', () => {
                 return {matches: true};
             })
         });
+
+        admins = [user_1, user_2, user_3, user_4];
+        updated_admins = [user_1, user_2, user_3, user_4, new_user_1, new_user_2];
+
+        let get_admins_stub = sinon.stub(course, 'get_admins');
+        get_admins_stub.onFirstCall().returns(Promise.resolve(admins));
+        get_admins_stub.onSecondCall().returns(Promise.resolve(updated_admins));
+
+        wrapper = mount(AdminRoster, {
+            propsData: {
+                course: course
+            }
+        });
+        component = wrapper.vm;
     });
 
     afterEach(() => {
+        sinon.restore();
+
         Object.defineProperty(window, "matchMedia", {
             value: original_match_media
         });
@@ -94,145 +110,49 @@ describe('AdminRoster.vue', () => {
         }
     });
 
-    test('The created function calls the Course method "get_admins"', () => {
-        admins = [user_1, user_2, user_3, user_4];
-        return patch_async_class_method(
-            Course,
-            'get_admins',
-            () => Promise.resolve(admins),
-            async () => {
+    test('The created function calls the Course method "get_admins"', async () => {
+        await component.$nextTick();
 
-            wrapper = mount(AdminRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-            admin_roster = wrapper.vm;
-            await admin_roster.$nextTick();
-
-            expect(admin_roster.d_course).toEqual(my_course);
-            expect(admin_roster.admins).toEqual(admins);
-        });
+        expect(component.d_course).toEqual(course);
+        expect(component.admins).toEqual(admins);
     });
 
     test('Clicking the "Add to Roster" button with valid input prompts the Course ' +
          'add_admins method to be called',
          async () => {
-        admins = [
-            make_user(0, `user${0}`),
-            make_user(1, `user${1}`),
-            make_user(2, `user${2}`)
-        ];
+        let add_admins_stub = sinon.stub(course, 'add_admins');
+        await component.$nextTick();
 
-        return patch_async_class_method(
-            Course,
-            'get_admins',
-            make_fake_get_admins_func(),
-            async () => {
+        expect(component.d_course).toEqual(course);
+        expect(component.admins).toEqual(admins);
 
-            wrapper = mount(AdminRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
+        let roster = <Roster> wrapper.find({ref: 'admin_roster'}).vm;
+        roster.users_to_add = new_user_1.username + " " + new_user_2.username;
+        await component.$nextTick();
 
-            admin_roster = wrapper.vm;
-            await admin_roster.$nextTick();
+        let add_admins_form = wrapper.find('#add-users-form');
+        add_admins_form.trigger('submit');
+        await component.$nextTick();
 
-            expect(admin_roster.d_course).toEqual(my_course);
-            expect(admin_roster.admins).toEqual(admins);
-
-            const spy = jest.fn();
-            return patch_async_class_method(
-                Course,
-                'add_admins',
-                spy,
-                async () => {
-
-                let roster = <Roster> wrapper.find({ref: 'admin_roster'}).vm;
-                roster.users_to_add = "letitsnow@umich.edu sevenEleven@umich.edu";
-                await admin_roster.$nextTick();
-
-                let add_admins_form = wrapper.find('#add-users-form');
-                add_admins_form.trigger('submit');
-                await admin_roster.$nextTick();
-
-                admins.push(make_user(3, `user${3}`));
-
-                expect(admin_roster.admins).toEqual(admins);
-                expect(spy.mock.calls.length).toBe(1);
-            });
-        });
+        expect(add_admins_stub.firstCall.calledWith(
+            new_user_1.username + " " + new_user_2.username)
+        );
+        expect(component.admins).toEqual(updated_admins);
     });
-
-    function make_fake_get_admins_func() {
-        let counter = 0;
-        let admins2: User[] = [];
-        for (let i = 0; i < 3; ++i) {
-            admins2.push(make_user(counter, `user${counter}`));
-            counter += 1;
-        }
-
-        return () => {
-            let to_return = admins2.slice(0);
-            admins2.push(make_user(counter, `user${counter}`));
-            counter += 1;
-            return Promise.resolve(to_return);
-        };
-    }
-
-    function make_user(pk: number, username: string): User {
-        return new User({
-            pk: pk,
-            username: username,
-            first_name: 'Steve the Llama',
-            last_name: 'Spam',
-            is_superuser: false,
-            email: 'steve@thellama.com'
-        });
-    }
 
     test('Deleting a user from the roster causes the Course "remove_admins" method to' +
         ' be called ',
          async () => {
+        let remove_admins_stub = sinon.stub(course, 'remove_admins');
+        await component.$nextTick();
 
-        admins = [user_1, user_2, user_3, user_4];
+        expect(component.d_course).toEqual(course);
+        expect(component.admins).toEqual(admins);
 
-        return patch_async_class_method(
-            Course,
-            'get_admins',
-            () => Promise.resolve(admins),
-            async () => {
+        let remove_user_buttons = wrapper.find({ref: 'admin_roster'}).findAll('.remove-user');
+        remove_user_buttons.at(1).trigger('click');
+        await component.$nextTick();
 
-            wrapper = mount(AdminRoster, {
-                propsData: {
-                    course: my_course
-                }
-            });
-
-            admin_roster = wrapper.vm;
-            await admin_roster.$nextTick();
-
-            expect(admin_roster.d_course).toEqual(my_course);
-            expect(admin_roster.admins).toEqual(admins);
-
-            const spy = jest.fn();
-            return patch_async_class_method(
-                Course,
-                'remove_admins',
-                spy,
-                async () => {
-
-                let remove_user_buttons = wrapper.find(
-                    {ref: 'admin_roster'}
-                ).findAll(
-                '.remove-user'
-                );
-                remove_user_buttons.at(1).trigger('click');
-                await admin_roster.$nextTick();
-
-                expect(spy.mock.calls.length).toBe(1);
-            });
-        });
+        expect(remove_admins_stub.firstCall.calledWith([user_1])).toBe(true);
     });
 });
