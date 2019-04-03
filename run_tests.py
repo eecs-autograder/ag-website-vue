@@ -30,7 +30,7 @@ def main():
             http.request('READY', '/')
             http.getresponse()
      
-    result = subprocess.run(['npm', 'test'] + args.test_args) 
+    result = subprocess.run(['./node_modules/.bin/vue-cli-service', 'test:unit'] + args.test_args) 
 
     tcp_server.shutdown()
     server_thread.join()
