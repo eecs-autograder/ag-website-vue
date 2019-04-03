@@ -210,10 +210,21 @@ describe('File Upload tests not involving the empty files modal', () => {
 
         let add_files_stub = sinon.stub(component, 'add_files_from_button');
         file_input_element.trigger('change');
+
         expect(add_files_stub.calledOnce).toBe(true);
-        expect(add_files_stub.getCall(0).args[0].target.files instanceof FileList).toBe(true);
+        expect(add_files_stub.firstCall.args[0].target.files instanceof FileList).toBe(true);
 
         sinon.restore();
+    });
+
+    test('calling add_files_from_button when event.target.files is not null', () => {
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        let mock_event = <HTMLInputEvent> <unknown> {
+            target: {
+                files: new MockFileList([file_1, empty_file])
+            }
+        };
+
         component.add_files_from_button(mock_event);
 
         expect(component.d_files.length).toEqual(2);
@@ -341,10 +352,7 @@ describe("File Upload tests concerning the empty files modal", () => {
     });
 
     test('You can choose to upload despite having one or more empty files', () => {
-        let upload_despite_empty_files_button = wrapper.find(
-            '.upload-despite-empty-files-button'
-        );
-
+        let upload_despite_empty_files_button = wrapper.find('.upload-despite-empty-files-button');
         upload_despite_empty_files_button.trigger('click');
 
         expect(wrapper.emitted().upload_files.length).toBe(1);
@@ -354,10 +362,7 @@ describe("File Upload tests concerning the empty files modal", () => {
     test('You can choose not to upload after receiving the warning modal concerning ' +
          'empty files in your upload',
          () => {
-        let cancel_upload_button = wrapper.find(
-              '.cancel-upload-process-button'
-        );
-
+        let cancel_upload_button = wrapper.find('.cancel-upload-process-button');
         cancel_upload_button.trigger('click');
 
         expect(wrapper.emitted('upload_click')).not.toBeTruthy();
