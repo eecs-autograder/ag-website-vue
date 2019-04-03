@@ -4,7 +4,6 @@ import { config, mount } from '@vue/test-utils';
 import * as sinon from 'sinon';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import { compile } from 'vue-template-compiler';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -136,7 +135,6 @@ describe('ContextMenu tests', () => {
          wrapper.vm.$destroy();
     });
 
-
     test("Clicking on a context menu item closes the context menu",
          async () => {
         let wrapper = mount(WrapperComponent);
@@ -216,7 +214,6 @@ describe('ContextMenu tests', () => {
         expect((<HTMLElement> context_menu.$el).style.visibility).toBe("visible");
 
         let outside_input = wrapper.find('#outside');
-
         outside_input.trigger('click');
         outside_input.element.focus();
         await context_menu.$nextTick();
@@ -267,7 +264,7 @@ describe('ContextMenu tests', () => {
 
         expect(context_menu_item_1.emitted('context_menu_item_clicked')).not.toBeTruthy();
 
-        wrapper.vm.$data.is_disabled = false;
+        wrapper.vm.is_disabled = false;
         context_menu_item_1.trigger('click');
 
         expect(context_menu_item_1.emitted().context_menu_item_clicked.length).toBe(1);
@@ -319,7 +316,7 @@ describe('ContextMenu tests', () => {
         await context_menu.$nextTick();
 
         let context_menu_item_1 = wrapper.find({ref: 'item_1'});
-        expect(context_menu_item_1.vm.$data.d_disabled).toBe(true);
+        expect(context_menu_item_1.vm.d_disabled).toBe(true);
 
         context_menu_item_1.trigger('click');
         await context_menu.$nextTick();
@@ -477,23 +474,18 @@ describe('ContextMenu tests', () => {
     test("Scrolling via wheel event is disallowed while the context menu is open",
          () => {
         let wrapper = mount(WrapperComponent, {attachToDocument: true});
-
         let context_menu_area = wrapper.find('.context-menu-area');
 
-        let num_wheel_events = 0;
-        let handle_wheel_event = () => {
-            ++num_wheel_events;
-        };
-
+        let handle_wheel_event = sinon.fake();
         context_menu_area.element.addEventListener('wheel', handle_wheel_event);
 
         context_menu_area.trigger('wheel');
-        expect(num_wheel_events).toEqual(1);
+        expect(handle_wheel_event.calledOnce).toBe(true);
 
         context_menu_area.trigger('click');
 
         context_menu_area.trigger('wheel');
-        expect(num_wheel_events).toEqual(1);
+        expect(handle_wheel_event.calledOnce).toBe(true);
 
         wrapper.destroy();
     });

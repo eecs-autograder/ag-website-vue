@@ -16,7 +16,7 @@
 <script lang="ts">
 
   import ContextMenuItem from '@/components/context_menu_item.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
