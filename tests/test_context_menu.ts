@@ -1,15 +1,14 @@
 import ContextMenu from '@/components/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu_item.vue';
 import { config, mount } from '@vue/test-utils';
+import * as sinon from 'sinon';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-import { patch_component_data_member, patch_object_prototype } from './mocking';
+import { compile } from 'vue-template-compiler';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
-
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Make sure that you call wrapper.vm.$destroy() at the end of each test case. Otherwise,
@@ -76,7 +75,7 @@ class WrapperComponent extends Vue {
     }
 }
 
-describe('ContextMenu.vue', () => {
+describe('ContextMenu tests', () => {
     test("Context Menu Item data is set to the values passed in",
          async () => {
          @Component({
@@ -373,26 +372,19 @@ describe('ContextMenu.vue', () => {
         let wrapper = mount(WrapperComponent2);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
-        let fake_body = {
-            clientWidth: 800,
-            clientHeight: 500
-        };
+        sinon.stub(document.body, 'clientWidth').value(800);
+        sinon.stub(document.body, 'clientHeight').value(500);
+        sinon.stub(context_menu, 'd_width_of_menu').value(10);
 
-        patch_object_prototype(document.body, fake_body, () => {
-            patch_component_data_member(context_menu, 'd_width_of_menu', 10, () => {
-                context_menu.show_context_menu(798, 2);
-                let new_left = (<HTMLElement> context_menu.$el).style.left;
-                expect(new_left).not.toBeNull();
-                // Chop off 'px'
-                new_left = new_left!.substring(0, new_left!.length - 2);
-                let number_new_left: number = parseInt(new_left, 10);
-                expect(number_new_left).toBeLessThan(798);
-            });
-        });
+        context_menu.show_context_menu(798, 2);
+        let new_left = (<HTMLElement> context_menu.$el).style.left;
+        expect(new_left).not.toBeNull();
+        // Chop off 'px'
+        new_left = new_left!.substring(0, new_left!.length - 2);
+        let number_new_left: number = parseInt(new_left, 10);
+        expect(number_new_left).toBeLessThan(798);
 
-
-        expect(document.body.clientHeight).toEqual(0);
-        expect(document.body.clientWidth).toEqual(0);
+        sinon.restore();
 
         wrapper.vm.$destroy();
     });
@@ -440,46 +432,29 @@ describe('ContextMenu.vue', () => {
         let wrapper = mount(WrapperComponent2);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
-        let fake_body = {
-            clientWidth: 800,
-            clientHeight: 500
-        };
+        sinon.stub(document.body, 'clientWidth').value(800);
+        sinon.stub(document.body, 'clientHeight').value(500);
+        sinon.stub(context_menu, 'd_height_of_menu').value(15);
 
-        patch_object_prototype(document.body, fake_body, () => {
-            patch_component_data_member(context_menu, 'd_height_of_menu', 15, () => {
-                context_menu.show_context_menu(2, 498);
-                let new_top = (<HTMLElement> context_menu.$el).style.top;
-                expect(new_top).not.toBeNull();
-                new_top = new_top!.substring(0, new_top!.length - 2);
-                let number_new_top: number = parseInt(new_top, 10);
-                expect(number_new_top).toBeLessThan(498);
-            });
-        });
+        context_menu.show_context_menu(2, 498);
+        let new_top = (<HTMLElement> context_menu.$el).style.top;
+        expect(new_top).not.toBeNull();
+        new_top = new_top!.substring(0, new_top!.length - 2);
+        let number_new_top: number = parseInt(new_top, 10);
+        expect(number_new_top).toBeLessThan(498);
 
-        expect(document.body.clientHeight).toEqual(0);
-        expect(document.body.clientWidth).toEqual(0);
+        sinon.restore();
+
         wrapper.vm.$destroy();
      });
 
     test('Default menu slot', () => {
-        const component = {
-            template: `
-                <context-menu ref="context_menu"></context-menu>
-            `,
-            components: {
-                'context-menu': ContextMenu,
-                'context-menu-item': ContextMenuItem
-            }
-        };
+        let wrapper = mount(ContextMenu);
 
-        let wrapper = mount(component);
-        expect(wrapper.exists()).toBe(true);
-
-        let menu_items = wrapper.find({ref: 'context_menu'}).findAll('.context-menu-option');
+        let menu_items = wrapper.findAll('.context-menu-option');
         expect(menu_items.length).toBe(1);
 
-
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test('Invalid Context Menu Content', () => {
@@ -520,12 +495,11 @@ describe('ContextMenu.vue', () => {
         context_menu_area.trigger('wheel');
         expect(num_wheel_events).toEqual(1);
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("Pressing esc closes the context menu", async () => {
         let wrapper = mount(WrapperComponent);
-
         let context_menu_area = wrapper.find('.context-menu-area');
         let context_menu_wrapper = wrapper.find('#context-menu-container');
         let context_menu_component = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
