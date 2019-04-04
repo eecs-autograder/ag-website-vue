@@ -32,7 +32,7 @@ import Diff from '@/components/diff.vue';
 @Component({
   components: {Diff}
 })
-export default class HelloWorld extends Vue {
+export default class DiffDemo extends Vue {
 
   balanced_diff = [
     '  one\r\n',

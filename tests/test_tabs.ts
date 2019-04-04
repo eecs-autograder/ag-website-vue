@@ -55,14 +55,10 @@ describe('Newly Added Tabs Test', () => {
 
         let wrapper = mount(WrapperComponent);
 
-        console.log(wrapper.html());
-
         const tabs = wrapper.find({ref: 'tabs'});
         let tabs_component = <Tabs> tabs.vm;
 
         let active_body = tabs.find({ref: 'active-tab-body'});
-
-        console.log(active_body.html());
         expect(active_body.text()).toEqual('Tab 1 body');
         expect(tabs_component.d_active_tab_index).toEqual(0);
 
@@ -1167,8 +1163,6 @@ describe('Tabs tests', () => {
 
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
-        console.log(tabs.html());
-
         expect(tabs.vm.tab_active_class).toBe("white-theme-active");
 
         expect(tabs.vm.tab_inactive_class).toBe("white-theme-inactive");
@@ -1189,7 +1183,61 @@ describe('Tabs tests', () => {
         expect(tab_1.classes()).toContain("white-theme-inactive");
 
         expect(tabs.vm.d_active_tab_index).toEqual(1);
-
         expect(active_body.text()).toEqual('Tab 2 body');
+    });
+});
+
+describe('Sidebar tabs tests', () => {
+    const component = {
+        template:  `
+<tabs ref="tabs" tab_position="side">
+  <tab>
+    <tab-header>
+      Tab 1
+    </tab-header>
+    <template slot="body">
+     Tab 1 body
+    </template>
+  </tab>
+  <tab>
+    <tab-header ref="tab_2">
+      Tab 2
+    </tab-header>
+    <template slot="body">
+      Tab 2 body
+    </template>
+  </tab>
+</tabs>`,
+        components: {
+            'tab': Tab,
+            'tabs': Tabs
+        }
+    };
+
+    test('Select sidebar tabs with click', () => {
+        let wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
+
+        let active_body = tabs.find({ref: 'active-tab-body'});
+        expect(active_body.text()).toEqual('Tab 1 body');
+
+        let tab_2 = tabs.find({ref: 'tab_2'});
+        tab_2.trigger('click');
+
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
+
+        let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
+        expect(active_headers.length).toBe(1);
+        expect(active_headers.at(0).text()).toEqual('Tab 2');
+        expect(active_body.text()).toEqual('Tab 2 body');
+
+        expect(tabs.findAll('.' + tabs.vm.tab_inactive_class).length).toBe(1);
+    });
+
+    test('Sidebar tabs snapshot', () => {
+        let wrapper = mount(component);
+        expect(wrapper.vm.$el).toMatchSnapshot();
     });
 });

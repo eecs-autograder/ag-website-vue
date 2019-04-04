@@ -191,6 +191,10 @@
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
+* {
+  box-sizing: border-box;
+}
+
 #file-input {
   display: none;
 }
