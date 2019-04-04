@@ -51,7 +51,6 @@ describe('SingleCourse.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
