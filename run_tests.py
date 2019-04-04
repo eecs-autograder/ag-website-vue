@@ -2,6 +2,7 @@
 
 # This script starts an http server listening on localhost:9999 and then runs
 # npm test (with arguments to this script passed through).
+# Requires Python 3.6 or newer.
 
 import argparse
 from collections import Counter
