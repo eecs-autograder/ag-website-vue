@@ -8,9 +8,6 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-// If this test suite is placed below the following test suite, this suite will fail.
-// Tests in the suite will list the error: Request failed with status code 502
-// The tests that display this error will vary but usually its about 4-5 of them at a time
 describe('Changing Tabs', ()  => {
     let wrapper: Wrapper<CourseAdmin>;
     let component: CourseAdmin;
