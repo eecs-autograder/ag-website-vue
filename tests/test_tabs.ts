@@ -1193,3 +1193,53 @@ describe('Tabs tests', () => {
         expect(active_body.text()).toEqual('Tab 2 body');
     });
 });
+
+describe('Sidebar tabs tests', () => {
+    test('Select sidebar tabs with click', () => {
+        const component = {
+            template:  `<tabs ref="tabs" tab_position="side">
+  <tab>
+    <tab-header>
+      Tab 1
+    </tab-header>
+    <template slot="body">
+     Tab 1 body
+    </template>
+  </tab>
+  <tab>
+    <tab-header ref="tab_2">
+      Tab 2
+    </tab-header>
+    <template slot="body">
+      Tab 2 body
+    </template>
+  </tab>
+</tabs>`,
+            components: {
+                'tab': Tab,
+                'tabs': Tabs
+            }
+        };
+
+        let wrapper = mount(component);
+        const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
+
+        expect(tabs.vm.d_active_tab_index).toEqual(0);
+
+        let active_body = tabs.find({ref: 'active-tab-body'});
+        expect(active_body.text()).toEqual('Tab 1 body');
+
+        let tab_2 = tabs.find({ref: 'tab_2'});
+        tab_2.trigger('click');
+
+        expect(tabs.vm.d_active_tab_index).toEqual(1);
+
+        let active_headers = tabs.findAll('.' + tabs.vm.tab_active_class);
+        expect(active_headers.length).toBe(1);
+        expect(active_headers.at(0).text()).toEqual('Tab 2');
+
+        expect(tabs.findAll('.' + tabs.vm.tab_inactive_class).length).toBe(1);
+
+        expect(active_body.text()).toEqual('Tab 2 body');
+    });
+});
