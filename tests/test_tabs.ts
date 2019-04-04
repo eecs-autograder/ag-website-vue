@@ -1195,9 +1195,9 @@ describe('Tabs tests', () => {
 });
 
 describe('Sidebar tabs tests', () => {
-    test('Select sidebar tabs with click', () => {
-        const component = {
-            template:  `<tabs ref="tabs" tab_position="side">
+    const component = {
+        template:  `
+<tabs ref="tabs" tab_position="side">
   <tab>
     <tab-header>
       Tab 1
@@ -1215,12 +1215,13 @@ describe('Sidebar tabs tests', () => {
     </template>
   </tab>
 </tabs>`,
-            components: {
-                'tab': Tab,
-                'tabs': Tabs
-            }
-        };
+        components: {
+            'tab': Tab,
+            'tabs': Tabs
+        }
+    };
 
+    test('Select sidebar tabs with click', () => {
         let wrapper = mount(component);
         const tabs = <Wrapper<Tabs>> wrapper.find({ref: 'tabs'});
 
@@ -1241,5 +1242,10 @@ describe('Sidebar tabs tests', () => {
         expect(tabs.findAll('.' + tabs.vm.tab_inactive_class).length).toBe(1);
 
         expect(active_body.text()).toEqual('Tab 2 body');
+    });
+
+    test('Sidebar tabs snapshot', () => {
+        let wrapper = mount(component);
+        expect(wrapper.vm.$el).toMatchSnapshot();
     });
 });
