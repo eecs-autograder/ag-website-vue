@@ -6,27 +6,25 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
-
-import {
-    patch_async_class_method,
-    patch_async_static_method
-} from '../../mocking';
+import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 describe('ManageProjects.vue', () => {
+    let component: ManageProjects;
     let wrapper: Wrapper<ManageProjects>;
-    let original_match_media: (query: string) => MediaQueryList;
     let user: User;
     let current_course: Course;
     let another_course: Course;
+    let courses: Course[];
     let new_project: Project;
     let project_1: Project;
     let project_2: Project;
     let projects: Project[];
     let newly_cloned_project_1: Project;
+    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
         original_match_media = window.matchMedia;
@@ -153,9 +151,25 @@ describe('ManageProjects.vue', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best_with_normal_fdbk,
             hide_ultimate_submission_fdbk: false
         });
+
+        courses = [current_course, another_course];
+
+        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve(courses));
+        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve(projects));
+
+        wrapper = mount(ManageProjects, {
+            propsData: {
+                course: current_course
+            },
+            stubs: ['router-link']
+        });
+        component = wrapper.vm;
     });
 
     afterEach(() => {
+        sinon.restore();
+
         Object.defineProperty(window, "matchMedia", {
             value: original_match_media
         });
@@ -166,105 +180,53 @@ describe('ManageProjects.vue', () => {
     });
 
     test('Existing projects get fetched (sorted in http response)', async () => {
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
+        await component.$nextTick();
 
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
-
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
-
-            expect(manage_projects.d_course).toEqual(current_course);
-            expect(manage_projects.projects).toEqual(projects);
-            expect(manage_projects.projects[0]).toEqual(project_1);
-            expect(manage_projects.projects[1]).toEqual(project_2);
-        });
+        expect(component.d_course).toEqual(current_course);
+        expect(component.projects).toEqual(projects);
+        expect(component.projects[0]).toEqual(project_1);
+        expect(component.projects[1]).toEqual(project_2);
     });
 
     test('New project name cannot be an empty string', async () => {
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
+        let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
+        expect(validated_input.is_valid).toBe(false);
 
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
+        let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
+        (<HTMLInputElement> new_project_name.element).value = "   ";
+        new_project_name.trigger('input');
+        await component.$nextTick();
 
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
-
-            let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
-
-            expect(validated_input.is_valid).toBe(false);
-
-            let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-            (<HTMLInputElement> new_project_name.element).value = "   ";
-            new_project_name.trigger('input');
-            await manage_projects.$nextTick();
-
-            expect(validated_input.is_valid).toBe(false);
-            expect(wrapper.find('.add-project-button').is('[disabled]')).toBe(true);
-        });
+        expect(validated_input.is_valid).toBe(false);
+        expect(wrapper.find('.add-project-button').is('[disabled]')).toBe(true);
     });
 
     test('A project can be created and then displayed in the list of projects', async () => {
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
+        expect(component.projects.length).toEqual(2);
 
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
+        let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
+        expect(validated_input.is_valid).toBe(false);
 
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
+        let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
+        (<HTMLInputElement> new_project_name.element).value = new_project.name;
+        new_project_name.trigger('input');
+        await component.$nextTick();
 
-            expect(manage_projects.projects.length).toEqual(2);
+        expect(validated_input.is_valid).toBe(true);
 
-            let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
+        let create_project_stub = sinon.stub(Project, 'create').returns(
+            Promise.resolve(new_project)
+        );
+        wrapper.find('.add-project-button').trigger('click');
+        await component.$nextTick();
 
-            expect(validated_input.is_valid).toBe(false);
-
-            let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-            (<HTMLInputElement> new_project_name.element).value = new_project.name;
-            new_project_name.trigger('input');
-            await manage_projects.$nextTick();
-
-            expect(validated_input.is_valid).toBe(true);
-
-            return patch_async_static_method(
-                Project,
-                'create',
-                () => Promise.resolve(new_project),
-                async () => {
-
-                wrapper.find('.add-project-button').trigger('click');
-                await manage_projects.$nextTick();
-
-                expect(manage_projects.projects.length).toEqual(3);
-                expect(manage_projects.projects[0]).toEqual(new_project);
-                expect(manage_projects.projects[1]).toEqual(project_1);
-                expect(manage_projects.projects[2]).toEqual(project_2);
-            });
-        });
+        expect(create_project_stub.firstCall.calledWith(
+            current_course.pk, { name: new_project.name }
+        )).toBe(true);
+        expect(component.projects.length).toEqual(3);
+        expect(component.projects[0]).toEqual(new_project);
+        expect(component.projects[1]).toEqual(project_1);
+        expect(component.projects[2]).toEqual(project_2);
     });
 
     test('New project name must be unique among projects in the same course - violates ' +
@@ -286,113 +248,61 @@ describe('ManageProjects.vue', () => {
             config: {},
         };
 
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
+        expect(component.projects.length).toEqual(2);
 
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
+        let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
+        expect(validated_input.is_valid).toBe(false);
 
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
+        let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
+        (<HTMLInputElement> new_project_name.element).value = project_1.name;
+        new_project_name.trigger('input');
+        await component.$nextTick();
 
-            expect(manage_projects.projects.length).toEqual(2);
+        expect(validated_input.is_valid).toBe(true);
 
-            let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
+        let create_project_stub = sinon.stub(Project, 'create').returns(
+            Promise.reject(axios_response_instance)
+        );
 
-            expect(validated_input.is_valid).toBe(false);
+        wrapper.find('.add-project-button').trigger('click');
+        await component.$nextTick();
 
-            let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-            (<HTMLInputElement> new_project_name.element).value = project_1.name;
-            new_project_name.trigger('input');
-            await manage_projects.$nextTick();
-
-            expect(validated_input.is_valid).toBe(true);
-
-            return patch_async_static_method(
-                Project,
-                'create',
-                () => Promise.reject(axios_response_instance),
-                async () => {
-
-                wrapper.find('.add-project-button').trigger('click');
-                await manage_projects.$nextTick();
-
-                let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
-                // Note: api_errors.d_api_errors is flagged by the compiler here with error message
-                // "Property 'd_api_errors' does not exist on type 'Vue'." It's unclear why that
-                // is happening, so we'll access it through $data for now.
-                expect(api_errors.$data.d_api_errors.length).toBe(1);
-            });
-        });
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        // Note: api_errors.d_api_errors is flagged by the compiler here with error message
+        // "Property 'd_api_errors' does not exist on type 'Vue'." It's unclear why that
+        // is happening, so we'll access it through $data for now.
+        expect(create_project_stub.calledOnce).toBe(true);
+        expect(api_errors.$data.d_api_errors.length).toBe(1);
     });
 
     test('A project can be cloned to the current course', async () => {
-        return patch_async_static_method(
-            Project,
-            'get_all_from_course',
-            () => Promise.resolve(projects),
-            async () => {
+        expect(component.projects.length).toEqual(2);
 
-            wrapper = mount(ManageProjects, {
-                propsData: {
-                    course: current_course
-                },
-                stubs: ['router-link']
-            });
+        let project_to_clone = <SingleProject> wrapper.findAll(
+            {ref: 'single_project'}
+        ).at(0).vm;
 
-            let manage_projects = wrapper.vm;
-            await manage_projects.$nextTick();
+        wrapper.findAll('.copier').at(0).trigger('click');
+        await component.$nextTick();
 
-            expect(manage_projects.projects.length).toEqual(2);
+        project_to_clone.cloned_project_name = newly_cloned_project_1.name;
+        await component.$nextTick();
 
-            let project_to_clone = <SingleProject> wrapper.findAll(
-                {ref: 'single_project'}
-            ).at(0).vm;
+        expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
 
-            let courses = [current_course, another_course];
-            return patch_async_static_method(
-                User,
-                'get_current',
-                () => Promise.resolve(user),
-                async () => {
+        let copy_to_course_stub = sinon.stub(project_1, 'copy_to_course').returns(
+            Promise.resolve(newly_cloned_project_1)
+        );
 
-                return patch_async_class_method(
-                    User,
-                    'courses_is_admin_for',
-                    () => Promise.resolve(courses),
-                    async () => {
+        wrapper.find('.clone-project-button').trigger('click');
+        await component.$nextTick();
 
-                    wrapper.findAll('.copier').at(0).trigger('click');
-                    await manage_projects.$nextTick();
-
-                    project_to_clone.cloned_project_name = newly_cloned_project_1.name;
-                    await manage_projects.$nextTick();
-
-                    expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
-
-                    return patch_async_class_method(
-                        Project,
-                        'copy_to_course',
-                        () => Promise.resolve(newly_cloned_project_1),
-                        async () => {
-
-                        wrapper.find('.clone-project-button').trigger('click');
-                        await manage_projects.$nextTick();
-
-                        expect(manage_projects.projects.length).toEqual(3);
-                        expect(manage_projects.projects[0]).toEqual(project_1);
-                        expect(manage_projects.projects[1]).toEqual(project_2);
-                        expect(manage_projects.projects[2]).toEqual(newly_cloned_project_1);
-                    });
-                });
-            });
-        });
+        expect(copy_to_course_stub.firstCall.calledWith(
+            current_course.pk, newly_cloned_project_1.name)
+        ).toBe(true);
+        expect(component.projects.length).toEqual(3);
+        expect(component.projects[0]).toEqual(project_1);
+        expect(component.projects[1]).toEqual(project_2);
+        expect(component.projects[2]).toEqual(newly_cloned_project_1);
     });
 });
