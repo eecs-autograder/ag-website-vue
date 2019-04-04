@@ -113,7 +113,7 @@ describe('Changing Tabs', ()  => {
 
         expect(component.current_tab_index).toEqual(1);
         expect(router_replace.calledOnce).toBe(true);
-        expect(router_replace.secondCall.calledWith({ query: { current_tab: 'submissions'}}));
+        expect(router_replace.firstCall.calledWith({ query: { current_tab: 'my_submissions'}}));
     });
 
     test('Clicking on student_lookup tab', async () => {
@@ -125,8 +125,8 @@ describe('Changing Tabs', ()  => {
         await component.$nextTick();
 
         expect(component.current_tab_index).toEqual(2);
-        expect(router_replace.calledTwice).toBe(true);
-        expect(router_replace.secondCall.calledWith({ query: { current_tab: 'student_lookup'}}));
+        expect(router_replace.calledOnce).toBe(true);
+        expect(router_replace.firstCall.calledWith({ query: { current_tab: 'student_lookup'}}));
     });
 });
 
@@ -211,8 +211,8 @@ describe('select_tab function called with different values associated with "curr
         expect(component.d_loading).toEqual(false);
     });
 
-    test('current_tab parameter value = submissions', async () => {
-        $route.query = { current_tab: 'submissions' };
+    test('current_tab parameter value = my_submissions', async () => {
+        $route.query = { current_tab: 'my_submissions' };
         wrapper = mount(ProjectSubmission, {
             mocks: {
                 $route
@@ -272,6 +272,7 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current_tab parameter value = null', async () => {
+        $route.query = { };
         wrapper = mount(ProjectSubmission, {
             mocks: {
                 $route
