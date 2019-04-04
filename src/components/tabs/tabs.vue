@@ -25,6 +25,12 @@ export default class Tabs extends Vue {
   @Prop({default: 'top', validator: (value: string) => value === 'top' || value === 'side'})
   tab_position!: 'top' | 'side';
 
+  @Prop({default: '', type: String})
+  tab_headers_container_class!: string;
+
+  @Prop({default: '', type: String})
+  tab_body_container_class!: string;
+
   @Watch('value')
   on_value_changed(new_value: number, old_value: number) {
     this.d_active_tab_index = new_value;
@@ -80,16 +86,14 @@ export default class Tabs extends Vue {
       tab_data.push({header: header, body: body});
     }
 
-    let tab_container_style = {};
+    let tabs_container_class = '';
     if (this.tab_position === 'side') {
-      tab_container_style = {
-        'display': 'flex',
-      };
+      tabs_container_class = 'container-sidebar';
     }
 
     return create_element(
       'div',
-      {style: tab_container_style},
+      {class: tabs_container_class},
       [this._render_tab_headers(create_element, tab_data),
        this._render_tab_body(create_element, tab_data)]
     );
@@ -143,8 +147,10 @@ export default class Tabs extends Vue {
           element_data.class = [element_data.class];
         }
 
+        if (this.tab_position === 'top') {
+          element_data.class.push('tab-style');
+        }
         element_data.class.push(
-          'tab-style',
           index === this.d_active_tab_index ? this.tab_active_class : this.tab_inactive_class,
           index === this.d_active_tab_index ? 'active-tab-header' : 'inactive-tab-header',
         );
@@ -182,11 +188,15 @@ export default class Tabs extends Vue {
       }
     );
 
-    let tab_container_style = {};
+    let tab_header_container_class = '';
     if (this.tab_position === 'side') {
-      tab_container_style['display'] = 'inline-block';
+      tab_header_container_class = 'tab-header-container-sidebar';
     }
-    return create_element('div', header_elts);
+    return create_element(
+      'div',
+      {class: [tab_header_container_class, this.tab_headers_container_class]},
+      header_elts
+    );
   }
 
   private _render_tab_body(create_element: CreateElement, tab_data: ExtractedTabData[]) {
@@ -194,18 +204,16 @@ export default class Tabs extends Vue {
       this._set_active_tab(tab_data.length - 1);
     }
 
-    let body_style = {};
+    let body_class = '';
     if (this.tab_position === 'side') {
-      body_style = {
-        'flex-grow': '1'
-      };
+      body_class = 'tab-body-container-sidebar';
     }
 
     return create_element(
       'div',
       {
         ref: 'active-tab-body',
-        style: body_style
+        class: [body_class, this.tab_body_container_class]
       },
       tab_data[this.d_active_tab_index].body.children
     );
@@ -225,5 +233,18 @@ interface ExtractedTabData {
 </script>
 
 <style scoped lang="scss">
+  .container-sidebar {
+    display: flex;
+    align-items: flex-start;
+  }
 
+  .tab-header-container-sidebar {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+  }
+
+  .tab-body-container-sidebar {
+    flex-grow: 1;
+  }
 </style>
