@@ -453,6 +453,3 @@ describe('select_tab function called with different values associated with "curr
         expect(component.current_tab_index).toEqual(0);
     });
 });
-
-
-
