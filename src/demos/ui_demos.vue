@@ -1,101 +1,98 @@
 <template>
   <div id="demos-container">
+    <h2>UI Component Demos</h2>
     <tabs tab_active_class="sidebar-tab-active"
           tab_inactive_class="sidebar-tab-inactive"
-          tab_position="side">
+          tab_position="side"
+          tab_headers_container_class="sidebar-container"
+          tab_body_container_class="demo-body">
       <tab>
-        <tab-header>ButtonDemo</tab-header>
+        <tab-header>Buttons</tab-header>
         <template slot="body">
           <ButtonDemo></ButtonDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ColorPaletteDemo</tab-header>
+        <tab-header>Color Palette</tab-header>
         <template slot="body">
           <ColorPaletteDemo></ColorPaletteDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ContextMenuDemo</tab-header>
+        <tab-header>Context Menu</tab-header>
         <template slot="body">
           <ContextMenuDemo></ContextMenuDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>DiffDemo</tab-header>
+        <tab-header>Diff</tab-header>
         <template slot="body">
           <DiffDemo></DiffDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>DropdownDemo</tab-header>
+        <tab-header>Dropdown</tab-header>
         <template slot="body">
           <DropdownDemo></DropdownDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>DropdownTypeaheadDemo</tab-header>
+        <tab-header>Dropdown Typeahead</tab-header>
         <template slot="body">
           <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>FileUploadDemo</tab-header>
+        <tab-header>File Upload</tab-header>
         <template slot="body">
           <FileUploadDemo></FileUploadDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ManageProjectsDemo</tab-header>
-        <template slot="body">
-          <ManageProjectsDemo></ManageProjectsDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>ModalDemo</tab-header>
+        <tab-header>Modal</tab-header>
         <template slot="body">
           <ModalDemo></ModalDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>MultiFileViewerDemo</tab-header>
+        <tab-header>Multi-file Viewer</tab-header>
         <template slot="body">
           <MultiFileViewerDemo></MultiFileViewerDemo>
         </template>
       </tab>
 
       <tab>
-        <tab-header>TabsDemo</tab-header>
+        <tab-header>Tabs</tab-header>
         <template slot="body">
           <TabsDemo></TabsDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>TooltipDemo</tab-header>
+        <tab-header>Tooltip</tab-header>
         <template slot="body">
           <TooltipDemo></TooltipDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ToggleDemo</tab-header>
+        <tab-header>Toggle</tab-header>
         <template slot="body">
           <ToggleDemo></ToggleDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ViewFileDemo</tab-header>
+        <tab-header>View File</tab-header>
         <template slot="body">
           <ViewFileDemo></ViewFileDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ValidatedInputDemo</tab-header>
+        <tab-header>Validated Input</tab-header>
         <template slot="body">
           <ValidatedInputDemo></ValidatedInputDemo>
         </template>
       </tab>
       <tab>
-        <tab-header>ValidatedFormDemo</tab-header>
+        <tab-header>Validated Form</tab-header>
         <template slot="body">
           <ValidatedFormDemo></ValidatedFormDemo>
         </template>
@@ -105,6 +102,7 @@
 </template>
 
 <script lang="ts">
+import TabHeader from "@/components/tabs/tab_header.vue";
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '../components/dropdown.vue';
@@ -145,6 +143,7 @@ import ViewFileDemo from './view_file_demo.vue';
     MultiFileViewerDemo,
     Tab,
     Tabs,
+    TabHeader,
     TabsDemo,
     Toggle,
     ToggleDemo,
@@ -163,37 +162,35 @@ export default class UIDemos extends Vue {}
   @import '@/styles/colors.scss';
 
   #demos-container {
-    /*margin-left: 7%;*/
-    /*margin-right: 7%;*/
   }
-
-  /*.demo-group {*/
-    /*padding-top: 50px;*/
-    /*padding-bottom: 50px;*/
-    /*border-bottom: 1px solid black;*/
-  /*}*/
 </style>
 
 <style lang="scss">
   @import '@/styles/colors.scss';
 
   .sidebar-tab-active {
-    background-color: $stormy-gray-light;
+    background-color: lighten($stormy-gray-light, 10%);
   }
 
-  .sidebar-tab-inactive {
+  .sidebar-tab-inactive:hover {
+    background-color: lighten($stormy-gray-light, 20%);
   }
 
-  /*.sidebar-body {*/
-    /*margin-left: 5%;*/
-    /*margin-right: 5%;*/
-    /*display: inline-block;*/
-    /*!*float: left;*!*/
-    /*!*background-color: hotpink;*!*/
-    /*!*margin-left: 500px;*!*/
-  /*}*/
+  .sidebar-tab-active, .sidebar-tab-inactive {
+    padding: 3px 20px 3px 8px;
+    font-size: 1.2em;
+  }
 
-  /*.sidebar-items {*/
-    /*display: inline-block;*/
-  /*}*/
+  .sidebar-container {
+    padding-top: 5px;
+    /*padding-left: 5px;*/
+    /*padding-right: 8px;*/
+    height: 100vh;
+    min-width: 220px;
+    border-right: 1px solid lighten($stormy-gray-light, 20%);
+  }
+
+  .demo-body {
+    margin-left: 8px;
+  }
 </style>
