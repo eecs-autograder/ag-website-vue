@@ -183,8 +183,6 @@ export default class UIDemos extends Vue {}
 
   .sidebar-container {
     padding-top: 5px;
-    /*padding-left: 5px;*/
-    /*padding-right: 8px;*/
     height: 100vh;
     min-width: 220px;
     border-right: 1px solid lighten($stormy-gray-light, 20%);
