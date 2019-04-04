@@ -116,8 +116,8 @@
 </template>
 
 <script lang="ts">
-  import ContextMenu from '@/components/context_menu.vue';
-  import ContextMenuItem from '@/components/context_menu_item.vue';
+  import ContextMenu from '@/components/context_menu/context_menu.vue';
+  import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({

@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-  import ContextMenu from '@/components/context_menu.vue';
+  import ContextMenu from '@/components/context_menu/context_menu.vue';
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   @Component

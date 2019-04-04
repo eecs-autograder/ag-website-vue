@@ -1,5 +1,5 @@
-import ContextMenu from '@/components/context_menu.vue';
-import ContextMenuItem from '@/components/context_menu_item.vue';
+import ContextMenu from '@/components/context_menu/context_menu.vue';
+import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import { config, mount } from '@vue/test-utils';
 import * as sinon from 'sinon';
 import Vue from 'vue';
@@ -132,7 +132,7 @@ describe('ContextMenu tests', () => {
          expect(context_menu_item_1.$el.classList).toContain('first-child');
          expect(context_menu_item_3.$el.classList).toContain('last-child');
 
-         wrapper.vm.$destroy();
+         wrapper.destroy();
     });
 
     test("Clicking on a context menu item closes the context menu",
@@ -156,7 +156,7 @@ describe('ContextMenu tests', () => {
         expect((<HTMLElement> context_menu.$el).style.visibility).toBe('hidden');
         expect(context_menu.menu_is_open).toBe(false);
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("Context Menu Items in a Context Menu can handle click events differently",
@@ -199,7 +199,7 @@ describe('ContextMenu tests', () => {
 
         expect(greeting.text()).toBe('Boo!');
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("Clicking inside the context menu area makes the menu visible, and clicking" +
@@ -220,7 +220,7 @@ describe('ContextMenu tests', () => {
 
         expect((<HTMLElement> context_menu.$el).style.visibility).toBe("hidden");
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("toggle disabled property on context menu item",
@@ -269,7 +269,7 @@ describe('ContextMenu tests', () => {
 
         expect(context_menu_item_1.emitted().context_menu_item_clicked.length).toBe(1);
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("parent component is not notified when disabled context menu items are clicked",
@@ -315,15 +315,15 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_1 = wrapper.find({ref: 'item_1'});
-        expect(context_menu_item_1.vm.d_disabled).toBe(true);
+        let context_menu_item_1 = <ContextMenuItem> wrapper.find({ref: 'item_1'}).vm;
+        expect(context_menu_item_1.d_disabled).toBe(true);
 
-        context_menu_item_1.trigger('click');
+        wrapper.find({ref: 'item_1'}).trigger('click');
         await context_menu.$nextTick();
 
         expect(greeting.element.style.color).toBe("black");
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("When a user clicks too near to the right edge, the positioning of the " +
@@ -382,8 +382,7 @@ describe('ContextMenu tests', () => {
         expect(number_new_left).toBeLessThan(798);
 
         sinon.restore();
-
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("When a user clicks too near to the bottom edge, the positioning of the " +
@@ -441,8 +440,7 @@ describe('ContextMenu tests', () => {
         expect(number_new_top).toBeLessThan(498);
 
         sinon.restore();
-
-        wrapper.vm.$destroy();
+        wrapper.destroy();
      });
 
     test('Default menu slot', () => {
@@ -504,7 +502,6 @@ describe('ContextMenu tests', () => {
         await context_menu_component.$nextTick();
 
         expect(context_menu_component.menu_is_open).toBe(false);
-
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 });
