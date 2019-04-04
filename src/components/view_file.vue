@@ -1,6 +1,10 @@
 <template>
   <div id="view-file-component" :style="{height: view_file_height}">
-    <table id="viewing-container">
+    <div v-if="d_loading" class="loading-spinner">
+      <div><i class="fa fa-spinner fa-pulse"></i></div>
+    </div>
+    <table v-else
+           id="viewing-container">
       <tr v-for="(line, index) of d_file_contents.split('\n')">
         <td class="line-number">{{index + 1}}</td>
         <td class="line-of-file-content">{{line === "" ? "\n" : line}}</td>
@@ -18,23 +22,32 @@
     @Prop({required: true, type: String})
     filename!: string;
 
-    @Prop({required: true, type: String})
-    file_contents!: string;
+    @Prop({required: true, type: Promise})
+    file_contents!: Promise<string>;
 
     @Prop({default: "", type: String})
     view_file_height!: string;
 
     @Watch('file_contents')
-    on_file_contents_change(new_content: string, old_content: string) {
-      this.d_file_contents = new_content;
+    async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {
+      this.d_loading = true;
+      this.d_file_contents = await new_content;
+      this.d_loading = false;
+    }
+
+    @Watch('filename')
+    on_filename_change(new_file_name: string, old_file_name: string) {
+      this.d_filename = new_file_name;
     }
 
     d_filename: string = "";
     d_file_contents: string = "";
+    d_loading = true;
 
-    created() {
-      this.d_file_contents = this.file_contents;
+    async created() {
+      this.d_file_contents = await this.file_contents;
       this.d_filename = this.filename;
+      this.d_loading = false;
     }
   }
 </script>
@@ -70,6 +83,15 @@
   white-space: pre-wrap;
   word-break: break-word;
   word-wrap: break-word;
+}
+
+.loading-spinner {
+  color: mediumvioletred;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 90%;
 }
 
 </style>

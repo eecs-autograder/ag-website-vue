@@ -7,11 +7,11 @@
            inside of it. The 'height_of_view_file' variable specifies the height
            in this example of the m.f.v </b>
       </p>
-      <p class="btn fruits" @click="open_file('Apple')"> Add A </p>
-      <p class="btn fruits" @click="open_file('Banana')"> Add B </p>
-      <p class="btn fruits" @click="open_file('Cantaloupe')"> Add C </p>
-      <p class="btn fruits" @click="open_file('Dragonfruit')"> Add D </p>
-      <p class="btn fruits" @click="open_file('Grapes')"> Add E </p>
+      <p class="btn fruits" @click="open_file_1('Apple')"> Add A </p>
+      <p class="btn fruits" @click="open_file_1('Banana')"> Add B </p>
+      <p class="btn fruits" @click="open_file_1('Cantaloupe')"> Add C </p>
+      <p class="btn fruits" @click="open_file_1('Dragonfruit')"> Add D </p>
+      <p class="btn fruits" @click="open_file_1('Grapes')"> Add E </p>
       <div class="mvf-container">
         <multi-file-viewer
           ref="multi_file"
@@ -27,9 +27,9 @@
           inside of it resort to their default height.
         </b>
       </p>
-      <p class="btn letters" @click="open_file2('A')"> Add A </p>
-      <p class="btn letters" @click="open_file2('B')"> Add B </p>
-      <p class="btn letters" @click="open_file2('C')"> Add C </p>
+      <p class="btn letters" @click="open_file_2('A')"> Add A </p>
+      <p class="btn letters" @click="open_file_2('B')"> Add B </p>
+      <p class="btn letters" @click="open_file_2('C')"> Add C </p>
       <div class="mvf-container">
         <multi-file-viewer
           ref="multi_file2">
@@ -43,7 +43,7 @@
 <script lang="ts">
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import { SafeMap } from "@/safe_map";
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
   components: { MultiFileViewer }
@@ -61,18 +61,18 @@ export default class MultiFileViewerDemo extends Vue {
       ['Grapes', 'Green Grapes\nPurple Grapes']
   ]);
 
-  open_file(file_in: string) {
+  open_file_1(file_in: string) {
     let mfv = <MultiFileViewer> this.$refs.multi_file;
-    mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
+    let my_promise: Promise<string> = Promise.resolve(this.files_and_content.get(file_in));
+    mfv.add_to_viewing(file_in, my_promise);
   }
 
-  open_file2(file_in: string) {
+  open_file_2(file_in: string) {
     let mfv = <MultiFileViewer> this.$refs.multi_file2;
-    mfv.add_to_viewing(file_in, this.files_and_content.get(file_in)!);
+    let my_promise: Promise<string> = Promise.resolve(this.files_and_content.get(file_in));
+    mfv.add_to_viewing(file_in, my_promise);
   }
-
   height_of_view_file = "350px";
-
 }
 </script>
 

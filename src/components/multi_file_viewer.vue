@@ -1,5 +1,9 @@
 <template>
   <div id="multi-file-viewer">
+    <div v-if="files_currently_viewing.length === 0"
+         class="view-files-message">
+      <slot name="view_files_message"></slot>
+    </div>
     <tabs ref="multi-viewing-tabs"
           v-model="active_tab_index"
           tab_active_class="gray-white-theme-active"
@@ -37,7 +41,8 @@
 
   interface OpenFile {
     name: string;
-    content: string;
+    content: Promise<string>;
+    id: number | null;
   }
 
   @Component({
@@ -51,16 +56,31 @@
     files_currently_viewing: OpenFile[] = [];
     active_tab_index = 0;
 
-    add_to_viewing(filename: string, file_contents: string) {
+    add_to_viewing(filename: string, file_contents: Promise<string>, id: number | null = null) {
       let file_exists = this.files_currently_viewing.find(
         open_file => open_file.name === filename
       ) !== undefined;
       if (file_exists) {
+        this.active_tab_index = this.files_currently_viewing.findIndex(
+          (open_file) => open_file.name === filename
+        );
         return;
       }
 
-      this.files_currently_viewing.push({name: filename, content: file_contents});
+      this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
       this.active_tab_index = this.files_currently_viewing.length - 1;
+      this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
+    }
+
+    rename_file(id: number, new_name: string) {
+      let index = this.files_currently_viewing.findIndex((open_file) => open_file.id === id);
+      if (index !== -1) {
+        Vue.set(this.files_currently_viewing, index, {
+          name: new_name,
+          content: this.files_currently_viewing[index].content,
+          id: id
+        });
+      }
     }
 
     remove_from_viewing(tab_index: number) {
@@ -68,12 +88,40 @@
         this.active_tab_index -= 1;
       }
       this.files_currently_viewing.splice(tab_index, 1);
+      this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
+    }
+
+    update_contents_by_name(name: string, new_content: Promise<string>) {
+      let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
+      if (index !== -1) {
+        Vue.set(this.files_currently_viewing, index, {
+          name: name,
+          content: new_content,
+          id: this.files_currently_viewing[index].id
+        });
+      }
+    }
+
+    remove_by_name(name: string) {
+      let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
+      if (index !== -1) {
+        this.remove_from_viewing(index);
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
+.view-files-message {
+  box-sizing: border-box;
+  text-align: center;
+  padding: 10px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+}
 
 .close-x {
   background-color: inherit;
@@ -85,7 +133,6 @@
   right: 6px;
   top: 5.5px;
 }
-
 .close-x:hover {
   color: hsl(220, 20%, 55%);
 }
@@ -102,12 +149,22 @@
   background-color: inherit;
   margin: 0;
   overflow: hidden;
+  height: 20px;
 }
 
 .tab-label {
   display: inline-block;
   margin: 0;
   padding-right: 25px;
+}
+@media only screen and (min-width: 481px) {
+  .close-x {
+    background-color: inherit;
+    font-size: inherit;
+    padding: 3px 5px;
+    right: 8px;
+    top: 10px;
+  }
 }
 
 @media only screen and (min-width: 481px) {

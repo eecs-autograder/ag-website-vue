@@ -1,4 +1,4 @@
-.button {
+button {
     border-radius: 4px;
     cursor: pointer;
     color: white;
@@ -33,7 +33,6 @@
 
 .orange-button:hover:enabled {
     background-color: hsl(20, 100%, 50%);
-
 }
 
 .orange-button:focus {

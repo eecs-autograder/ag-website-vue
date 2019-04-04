@@ -1,23 +1,24 @@
 <template>
   <div>
-    <!--<ButtonDemo></ButtonDemo>-->
-    <!--<ColorPaletteDemo></ColorPaletteDemo>-->
-    <!--<ContextMenuDemo></ContextMenuDemo>-->
-    <!--<CourseListDemo></CourseListDemo>-->
-    <!--<DiffDemo></DiffDemo>-->
-    <!--<DropdownDemo></DropdownDemo>-->
-    <!--<DropdownTypeaheadDemo></DropdownTypeaheadDemo>-->
-    <!--<ModalDemo></ModalDemo>-->
-    <!--<FileUploadDemo></FileUploadDemo>-->
-    <!--<LoadingIconDemo></LoadingIconDemo>-->
-    <!--<ManageProjectsDemo></ManageProjectsDemo>-->
-    <!--<MultiFileViewerDemo></MultiFileViewerDemo>-->
-    <!--<TabsDemo></TabsDemo>-->
-    <!--<TooltipDemo></TooltipDemo>-->
-    <!--<ToggleDemo></ToggleDemo>-->
-    <!--<ViewFileDemo></ViewFileDemo>-->
-    <!--<ValidatedInputDemo></ValidatedInputDemo>-->
-    <!--<ValidatedFormDemo></ValidatedFormDemo>-->
+    <ButtonDemo></ButtonDemo>
+    <ColorPaletteDemo></ColorPaletteDemo>
+    <ContextMenuDemo></ContextMenuDemo>
+    <CourseListDemo></CourseListDemo>
+    <DiffDemo></DiffDemo>
+    <DropdownDemo></DropdownDemo>
+    <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
+    <ModalDemo></ModalDemo>
+    <FileUploadDemo></FileUploadDemo>
+    <InstructorFilesDemo></InstructorFilesDemo>
+    <LoadingIconDemo></LoadingIconDemo>
+    <ManageProjectsDemo></ManageProjectsDemo>
+    <MultiFileViewerDemo></MultiFileViewerDemo>
+    <TabsDemo></TabsDemo>
+    <TooltipDemo></TooltipDemo>
+    <ToggleDemo></ToggleDemo>
+    <ViewFileDemo></ViewFileDemo>
+    <ValidatedInputDemo></ValidatedInputDemo>
+    <ValidatedFormDemo></ValidatedFormDemo>
   </div>
 </template>
 
@@ -38,6 +39,7 @@ import DiffDemo from '@/demos/diff_demo.vue';
 import DropdownDemo from '@/demos/dropdown_demo.vue';
 import DropdownTypeaheadDemo from '@/demos/dropdown_typeahead_demo.vue';
 import FileUploadDemo from '@/demos/file_upload_demo.vue';
+import InstructorFilesDemo from '@/demos/instructor_files_demo.vue';
 import LoadingIconDemo from '@/demos/loading_icon_demo.vue';
 import ManageProjectsDemo from '@/demos/manage_projects_demo.vue';
 import ModalDemo from '@/demos/modal_demo.vue';
@@ -60,6 +62,7 @@ import ViewFileDemo from '@/demos/view_file_demo.vue';
     DropdownDemo,
     DropdownTypeaheadDemo,
     FileUploadDemo,
+    InstructorFilesDemo,
     LoadingIconDemo,
     ManageProjectsDemo,
     ModalDemo,
