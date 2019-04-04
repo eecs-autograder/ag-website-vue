@@ -2,6 +2,7 @@
 // that "to" is a derived class of "from".
 // Also limits "from" to a single value.
 import { AxiosError, AxiosResponse } from 'axios';
+import { Dictionary, RawLocation, Route, VueRouter } from 'vue-router/types/router';
 import { Vue } from 'vue/types/vue';
 
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
@@ -114,4 +115,15 @@ export function get_axios_error_status(error: unknown): [AxiosResponse, number] 
         throw error;
     }
     return [response, response.status];
+}
+
+// Returns the value associated with key in query params. If more than one value is associated with
+// the key, returns the first of those values.
+export function get_query_param(query_params: Dictionary<string | string[]>, key: string) {
+    let query_value = query_params[key];
+    if (Array.isArray(query_value)) {
+        console.assert(query_value.length !== 0);
+        return query_value[0];
+    }
+    return query_value === undefined ? null : query_value;
 }

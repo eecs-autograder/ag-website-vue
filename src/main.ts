@@ -10,8 +10,8 @@ Vue.config.productionTip = false;
 Vue.use(VueRouter);
 
 const ROUTES = [
-    { path: '/', component: CourseList },
-    { path: '/web/course_admin/:courseId', component: CourseAdmin }
+    { path: '/', name: "course_list", component: CourseList },
+    { path: '/web/course_admin/:course_id', name: "course_admin", component: CourseAdmin }
 ];
 
 const ROUTER = new VueRouter ({
