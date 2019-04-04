@@ -25,12 +25,12 @@ def main():
     server_thread = threading.Thread(target=start_server)
     server_thread.start()
 
-    while server_ready.wait(.1): 
+    while server_ready.wait(.1):
         with HTTPConnection('localhost', port=PORT, timeout=1) as http:
             http.request('READY', '/')
             http.getresponse()
-     
-    result = subprocess.run(['./node_modules/.bin/vue-cli-service', 'test:unit'] + args.test_args) 
+
+    result = subprocess.run(['./node_modules/.bin/vue-cli-service', 'test:unit'] + args.test_args)
 
     tcp_server.shutdown()
     server_thread.join()
@@ -41,8 +41,8 @@ def main():
     print('\nWARNING: Unmocked HTTP requests were '
           'sent to the following urls (<url>, <count>):')
     for url, count in request_urls.items():
-        print(f'{url}, {count}')
-        
+        print('{}, {}'.format(url, count))
+
     exit(1)
 
 
