@@ -15,8 +15,8 @@
 
 <script lang="ts">
 
-  import ContextMenuItem from '@/components/context_menu_item.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
+  import { Component, Vue } from 'vue-property-decorator';
 
   @Component({
     components: {
@@ -26,8 +26,8 @@
   export default class ContextMenu extends Vue {
 
     private d_is_open = false;
-    private d_height_of_menu = 0;
-    private d_width_of_menu = 0;
+    d_height_of_menu = 0;
+    d_width_of_menu = 0;
 
     private wheel_event_handler!: (event: Event) => void;
 

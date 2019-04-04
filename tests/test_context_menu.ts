@@ -1,15 +1,13 @@
-import ContextMenu from '@/components/context_menu.vue';
-import ContextMenuItem from '@/components/context_menu_item.vue';
+import ContextMenu from '@/components/context_menu/context_menu.vue';
+import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import { config, mount } from '@vue/test-utils';
+import * as sinon from 'sinon';
 import Vue from 'vue';
 import Component from 'vue-class-component';
-
-import { patch_component_data_member, patch_object_prototype } from './mocking';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
-
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Make sure that you call wrapper.vm.$destroy() at the end of each test case. Otherwise,
@@ -76,7 +74,7 @@ class WrapperComponent extends Vue {
     }
 }
 
-describe('ContextMenu.vue', () => {
+describe('ContextMenu tests', () => {
     test("Context Menu Item data is set to the values passed in",
          async () => {
          @Component({
@@ -134,9 +132,8 @@ describe('ContextMenu.vue', () => {
          expect(context_menu_item_1.$el.classList).toContain('first-child');
          expect(context_menu_item_3.$el.classList).toContain('last-child');
 
-         wrapper.vm.$destroy();
+         wrapper.destroy();
     });
-
 
     test("Clicking on a context menu item closes the context menu",
          async () => {
@@ -159,7 +156,7 @@ describe('ContextMenu.vue', () => {
         expect((<HTMLElement> context_menu.$el).style.visibility).toBe('hidden');
         expect(context_menu.menu_is_open).toBe(false);
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("Context Menu Items in a Context Menu can handle click events differently",
@@ -202,7 +199,7 @@ describe('ContextMenu.vue', () => {
 
         expect(greeting.text()).toBe('Boo!');
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("Clicking inside the context menu area makes the menu visible, and clicking" +
@@ -217,14 +214,13 @@ describe('ContextMenu.vue', () => {
         expect((<HTMLElement> context_menu.$el).style.visibility).toBe("visible");
 
         let outside_input = wrapper.find('#outside');
-
         outside_input.trigger('click');
         outside_input.element.focus();
         await context_menu.$nextTick();
 
         expect((<HTMLElement> context_menu.$el).style.visibility).toBe("hidden");
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("toggle disabled property on context menu item",
@@ -268,12 +264,12 @@ describe('ContextMenu.vue', () => {
 
         expect(context_menu_item_1.emitted('context_menu_item_clicked')).not.toBeTruthy();
 
-        wrapper.vm.$data.is_disabled = false;
+        wrapper.vm.is_disabled = false;
         context_menu_item_1.trigger('click');
 
         expect(context_menu_item_1.emitted().context_menu_item_clicked.length).toBe(1);
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("parent component is not notified when disabled context menu items are clicked",
@@ -319,15 +315,15 @@ describe('ContextMenu.vue', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_1 = wrapper.find({ref: 'item_1'});
-        expect(context_menu_item_1.vm.$data.d_disabled).toBe(true);
+        let context_menu_item_1 = <ContextMenuItem> wrapper.find({ref: 'item_1'}).vm;
+        expect(context_menu_item_1.d_disabled).toBe(true);
 
-        context_menu_item_1.trigger('click');
+        wrapper.find({ref: 'item_1'}).trigger('click');
         await context_menu.$nextTick();
 
         expect(greeting.element.style.color).toBe("black");
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("When a user clicks too near to the right edge, the positioning of the " +
@@ -373,28 +369,20 @@ describe('ContextMenu.vue', () => {
         let wrapper = mount(WrapperComponent2);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
-        let fake_body = {
-            clientWidth: 800,
-            clientHeight: 500
-        };
+        sinon.stub(document.body, 'clientWidth').value(800);
+        sinon.stub(document.body, 'clientHeight').value(500);
+        sinon.stub(context_menu, 'd_width_of_menu').value(10);
 
-        patch_object_prototype(document.body, fake_body, () => {
-            patch_component_data_member(context_menu, 'd_width_of_menu', 10, () => {
-                context_menu.show_context_menu(798, 2);
-                let new_left = (<HTMLElement> context_menu.$el).style.left;
-                expect(new_left).not.toBeNull();
-                // Chop off 'px'
-                new_left = new_left!.substring(0, new_left!.length - 2);
-                let number_new_left: number = parseInt(new_left, 10);
-                expect(number_new_left).toBeLessThan(798);
-            });
-        });
+        context_menu.show_context_menu(798, 2);
+        let new_left = (<HTMLElement> context_menu.$el).style.left;
+        expect(new_left).not.toBeNull();
+        // Chop off 'px'
+        new_left = new_left!.substring(0, new_left!.length - 2);
+        let number_new_left: number = parseInt(new_left, 10);
+        expect(number_new_left).toBeLessThan(798);
 
-
-        expect(document.body.clientHeight).toEqual(0);
-        expect(document.body.clientWidth).toEqual(0);
-
-        wrapper.vm.$destroy();
+        sinon.restore();
+        wrapper.destroy();
     });
 
     test("When a user clicks too near to the bottom edge, the positioning of the " +
@@ -440,46 +428,28 @@ describe('ContextMenu.vue', () => {
         let wrapper = mount(WrapperComponent2);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
-        let fake_body = {
-            clientWidth: 800,
-            clientHeight: 500
-        };
+        sinon.stub(document.body, 'clientWidth').value(800);
+        sinon.stub(document.body, 'clientHeight').value(500);
+        sinon.stub(context_menu, 'd_height_of_menu').value(15);
 
-        patch_object_prototype(document.body, fake_body, () => {
-            patch_component_data_member(context_menu, 'd_height_of_menu', 15, () => {
-                context_menu.show_context_menu(2, 498);
-                let new_top = (<HTMLElement> context_menu.$el).style.top;
-                expect(new_top).not.toBeNull();
-                new_top = new_top!.substring(0, new_top!.length - 2);
-                let number_new_top: number = parseInt(new_top, 10);
-                expect(number_new_top).toBeLessThan(498);
-            });
-        });
+        context_menu.show_context_menu(2, 498);
+        let new_top = (<HTMLElement> context_menu.$el).style.top;
+        expect(new_top).not.toBeNull();
+        new_top = new_top!.substring(0, new_top!.length - 2);
+        let number_new_top: number = parseInt(new_top, 10);
+        expect(number_new_top).toBeLessThan(498);
 
-        expect(document.body.clientHeight).toEqual(0);
-        expect(document.body.clientWidth).toEqual(0);
-        wrapper.vm.$destroy();
+        sinon.restore();
+        wrapper.destroy();
      });
 
     test('Default menu slot', () => {
-        const component = {
-            template: `
-                <context-menu ref="context_menu"></context-menu>
-            `,
-            components: {
-                'context-menu': ContextMenu,
-                'context-menu-item': ContextMenuItem
-            }
-        };
+        let wrapper = mount(ContextMenu);
 
-        let wrapper = mount(component);
-        expect(wrapper.exists()).toBe(true);
-
-        let menu_items = wrapper.find({ref: 'context_menu'}).findAll('.context-menu-option');
+        let menu_items = wrapper.findAll('.context-menu-option');
         expect(menu_items.length).toBe(1);
 
-
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test('Invalid Context Menu Content', () => {
@@ -502,30 +472,24 @@ describe('ContextMenu.vue', () => {
     test("Scrolling via wheel event is disallowed while the context menu is open",
          () => {
         let wrapper = mount(WrapperComponent, {attachToDocument: true});
-
         let context_menu_area = wrapper.find('.context-menu-area');
 
-        let num_wheel_events = 0;
-        let handle_wheel_event = () => {
-            ++num_wheel_events;
-        };
-
+        let handle_wheel_event = sinon.fake();
         context_menu_area.element.addEventListener('wheel', handle_wheel_event);
 
         context_menu_area.trigger('wheel');
-        expect(num_wheel_events).toEqual(1);
+        expect(handle_wheel_event.calledOnce).toBe(true);
 
         context_menu_area.trigger('click');
 
         context_menu_area.trigger('wheel');
-        expect(num_wheel_events).toEqual(1);
+        expect(handle_wheel_event.calledOnce).toBe(true);
 
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 
     test("Pressing esc closes the context menu", async () => {
         let wrapper = mount(WrapperComponent);
-
         let context_menu_area = wrapper.find('.context-menu-area');
         let context_menu_wrapper = wrapper.find('#context-menu-container');
         let context_menu_component = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
@@ -538,7 +502,6 @@ describe('ContextMenu.vue', () => {
         await context_menu_component.$nextTick();
 
         expect(context_menu_component.menu_is_open).toBe(false);
-
-        wrapper.vm.$destroy();
+        wrapper.destroy();
     });
 });
