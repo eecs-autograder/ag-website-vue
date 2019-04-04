@@ -1,11 +1,16 @@
 <template>
   <div id="demos-container">
     <h2>UI Component Demos</h2>
+    <div id="sidebar-toggle" @click="d_show_sidebar = !d_show_sidebar">
+      Menu
+      <i class="fas fa-bars"></i>
+    </div>
     <tabs tab_active_class="sidebar-tab-active"
           tab_inactive_class="sidebar-tab-inactive"
           tab_position="side"
-          tab_headers_container_class="sidebar-container"
-          tab_body_container_class="demo-body">
+          :tab_headers_container_class="d_show_sidebar ? 'sidebar-container'
+                                                       : 'sidebar-container-hidden'"
+          :tab_body_container_class="d_show_sidebar ? 'demo-body' : 'demo-body-sidebar-collapsed'">
       <tab>
         <tab-header>Buttons</tab-header>
         <template slot="body">
@@ -154,7 +159,13 @@ import ViewFileDemo from './view_file_demo.vue';
     ViewFileDemo
   }
 })
-export default class UIDemos extends Vue {}
+export default class UIDemos extends Vue {
+  d_show_sidebar = false;
+
+  mounted() {
+    this.d_show_sidebar = window.matchMedia('(min-width: 768px)').matches;
+  }
+}
 
 </script>
 
@@ -181,14 +192,57 @@ export default class UIDemos extends Vue {}
     font-size: 1.2em;
   }
 
-  .sidebar-container {
-    padding-top: 5px;
-    height: 100vh;
-    min-width: 220px;
-    border-right: 1px solid lighten($stormy-gray-light, 20%);
+  $sidebar-width: 220px;
+
+  #sidebar-toggle {
+    width: $sidebar-width;
+    background-color: $pebble-light;
+    font-size: 1.2em;
+    border: 1px solid lighten($stormy-gray-light, 20%);
+    border-left: 0;
+    text-align: center;
+    padding: 3px 0;
+
+    z-index: 1;
+
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
   }
 
-  .demo-body {
-    margin-left: 8px;
+  #sidebar-toggle:hover {
+    background-color: darken($pebble-light, 10%);
+    cursor: pointer;
+  }
+
+  .sidebar-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 30px;  // So that it doesn't overlap with the menu button
+
+    min-width: $sidebar-width;
+    border-right: 1px solid lighten($stormy-gray-light, 20%);
+
+    z-index: 2;
+    background-color: $pebble-light;
+  }
+
+  .sidebar-container-hidden {
+    visibility: hidden;
+  }
+
+  .demo-body-sidebar-collapsed, .demo-body {
+    margin-top: 5px;
+    margin-left: 8px - $sidebar-width;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .demo-body {
+      margin-left: 8px;
+    }
+
+    .sidebar-container {
+      z-index: 0;
+    }
   }
 </style>

@@ -188,13 +188,9 @@ export default class Tabs extends Vue {
       }
     );
 
-    let tab_header_container_class = '';
-    if (this.tab_position === 'side') {
-      tab_header_container_class = 'tab-header-container-sidebar';
-    }
     return create_element(
       'div',
-      {class: [tab_header_container_class, this.tab_headers_container_class]},
+      {class: this.tab_headers_container_class},
       header_elts
     );
   }
@@ -236,12 +232,6 @@ interface ExtractedTabData {
   .container-sidebar {
     display: flex;
     align-items: flex-start;
-  }
-
-  .tab-header-container-sidebar {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
   }
 
   .tab-body-container-sidebar {
