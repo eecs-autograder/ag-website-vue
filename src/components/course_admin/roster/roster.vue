@@ -19,10 +19,11 @@
                         :validators="[contains_valid_emails]"
                         :num_rows="7">
         </ValidatedInput>
-        <input type="submit"
+        <button type="submit"
                id="add-users-button"
-               value="Add to Roster"
                :disabled="!add_users_form_is_valid">
+          Add to Roster
+        </button>
       </validated-form>
     </div>
 
