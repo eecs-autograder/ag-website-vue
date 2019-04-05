@@ -173,6 +173,9 @@ export default class UIDemos extends Vue {
   @import '@/styles/colors.scss';
 
   #demos-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 </style>
 
@@ -202,12 +205,6 @@ export default class UIDemos extends Vue {
     border-left: 0;
     text-align: center;
     padding: 3px 0;
-
-    z-index: 1;
-
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
   }
 
   #sidebar-toggle:hover {
@@ -216,33 +213,18 @@ export default class UIDemos extends Vue {
   }
 
   .sidebar-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 30px;  // So that it doesn't overlap with the menu button
-
-    min-width: $sidebar-width;
+    width: $sidebar-width;
     border-right: 1px solid lighten($stormy-gray-light, 20%);
 
-    z-index: 2;
     background-color: $pebble-light;
   }
 
   .sidebar-container-hidden {
-    visibility: hidden;
+    display: none;
   }
 
   .demo-body-sidebar-collapsed, .demo-body {
     margin-top: 5px;
-    margin-left: 8px - $sidebar-width;
-  }
-
-  @media only screen and (min-width: 768px) {
-    .demo-body {
-      margin-left: 8px;
-    }
-
-    .sidebar-container {
-      z-index: 0;
-    }
+    margin-left: 8px;;
   }
 </style>

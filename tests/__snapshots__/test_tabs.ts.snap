@@ -2,10 +2,10 @@
 
 exports[`Sidebar tabs tests Sidebar tabs snapshot 1`] = `
 <div
-  class="container-sidebar"
+  class="tabs-container container-sidebar"
 >
   <div
-    class="tab-header-container-sidebar"
+    class="tab-headers-container-sidebar"
   >
     <div
       class="white-theme-active active-tab-header"

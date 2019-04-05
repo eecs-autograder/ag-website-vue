@@ -14,8 +14,10 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
-  body {
+  body, #app {
     margin: 0;
+    padding: 0;
+    height: 100%;
   }
 
   body, input {
