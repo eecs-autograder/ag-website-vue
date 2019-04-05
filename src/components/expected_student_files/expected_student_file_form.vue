@@ -127,12 +127,10 @@
     }
 
     submit_form() {
-      console.log("Submitting");
       if (this.d_exact_match || !this.wildcard_is_present) {
         this.d_expected_student_file!.min_num_matches = 1;
         this.d_expected_student_file!.max_num_matches = 1;
       }
-      console.log("emitting");
       this.$emit('on_submit', this.d_expected_student_file);
     }
 

@@ -44,7 +44,7 @@ describe('Input property tests', () => {
 });
 
 
-describe.only('Valid form submit tests', () => {
+describe('Valid form submit tests', () => {
     let wrapper: Wrapper<ExpectedStudentFileForm>;
     let component: ExpectedStudentFileForm;
 
@@ -67,7 +67,6 @@ describe.only('Valid form submit tests', () => {
     });
 
     test('Submit without wildcard present and exact match set to false', async () => {
-        fail("RangeError: Max call stack size exceeded");
         component.d_exact_match = false;
         await component.$nextTick();
 
@@ -84,21 +83,12 @@ describe.only('Valid form submit tests', () => {
     });
 
     test('Submit with wildcard present', async () => {
-        fail("RangeError: Maximum call stack size exceeded at String.replace (<anonymous>)");
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let pattern_input = <ValidatedInput> wrapper.find({ref: "pattern"}).vm;
-        pattern_input.value = "yellow_pepper_*.cpp";
-        await component.$nextTick();
-
-        let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
-        min_num_matches_input.value = "3";
-        await component.$nextTick();
-
-        let max_num_matches_input = <ValidatedInput> wrapper.find({ref: "max_num_matches"}).vm;
-        max_num_matches_input.value = "5";
-        await component.$nextTick();
+        component.d_expected_student_file.pattern = "yellow_pepper_*.cpp";
+        component.d_expected_student_file.min_num_matches = 3;
+        component.d_expected_student_file.max_num_matches = 5;
 
         wrapper.find({ref: 'expected_student_file_form'}).trigger('submit.native');
         await component.$nextTick();
@@ -122,17 +112,11 @@ describe('Wildcard chars present and exact_match setting', () => {
 
     test('wildcard_is_present is true when pattern contains shell wildcard chars',
          async () => {
-        // let pattern_input = <ValidatedInput> wrapper.find({ref: "pattern"}).vm;
-        // pattern_input.value = "zucch!ni.cpp";
-        // await component.$nextTick();
+        component.d_expected_student_file.pattern = "zucch!ni.cpp";
+        await component.$nextTick();
 
-        // expect(pattern_input.is_valid).toBe(true);
-        // The statement immediately below fails
-        // expect(component.wildcard_is_present).toBe(true);
+        expect(component.wildcard_is_present).toBe(true);
 
-        // The combination of statements below passes but causes:
-        // Error in callback for watcher "wildcard_is_present": "RangeError: Maximum call
-        // stack size exceeded"
         component.d_expected_student_file.pattern = "zucch!ni.cpp";
         await component.$nextTick();
 
@@ -141,17 +125,12 @@ describe('Wildcard chars present and exact_match setting', () => {
 
     test('exact_match is set to false and cannot change when wildcard_is_present becomes true',
          async () => {
-         fail("RangeError: Maximum call stack size exceeded");
-
-         // the one statement below alone causes the Max call stack size exceeded error....
          component.d_expected_student_file.pattern = "zucch!ni.cpp";
          await component.$nextTick();
 
          expect(component.wildcard_is_present).toBe(true);
          expect(component.d_exact_match).toBe(false);
-
-         component.d_exact_match = true;
-         await component.$nextTick();
+         expect(wrapper.find('#exact-match-button').is('[disabled]')).toBe(true);
 
          expect(component.wildcard_is_present).toBe(true);
          expect(component.d_exact_match).toBe(false);
@@ -159,7 +138,6 @@ describe('Wildcard chars present and exact_match setting', () => {
 
     test('min and max num matches are editable when wildcard_is_present and !exact_match',
          async () => {
-         fail("RangeError: Maximum call stack size exceeded");
          component.d_exact_match = false;
          await component.$nextTick();
 
@@ -168,9 +146,6 @@ describe('Wildcard chars present and exact_match setting', () => {
 
          component.d_expected_student_file.pattern = "zucch!ni.cpp";
          await component.$nextTick();
-
-         // doesn't even get to this line before failing
-         console.log(wrapper.html());
 
          expect(component.wildcard_is_present).toBe(true);
          expect(component.d_exact_match).toBe(false);
@@ -212,11 +187,11 @@ describe('Invalid input tests', () => {
     test('Error pattern is blank', async () => {
         let pattern_input = <ValidatedInput> wrapper.find({ref: "pattern"}).vm;
 
-        pattern_input.value = "hello*";
+        component.d_expected_student_file.pattern = "hello*";
         await component.$nextTick();
         expect(pattern_input.is_valid).toBe(true);
 
-        pattern_input.value = "  ";
+        component.d_expected_student_file.pattern = "  ";
         await component.$nextTick();
         expect(pattern_input.is_valid).toBe(false);
     });
@@ -227,11 +202,11 @@ describe('Invalid input tests', () => {
 
         let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
 
-        min_num_matches_input.value = "  ";
+        component.d_expected_student_file.min_num_matches = "  ";
         await component.$nextTick();
         expect(min_num_matches_input.is_valid).toBe(false);
 
-        min_num_matches_input.value = "carrot";
+        component.d_expected_student_file.min_num_matches = "carrot";
         await component.$nextTick();
         expect(min_num_matches_input.is_valid).toBe(false);
     });
@@ -241,7 +216,7 @@ describe('Invalid input tests', () => {
         await component.$nextTick();
 
         let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
-        min_num_matches_input.value = "-2";
+        component.d_expected_student_file.min_num_matches = "-2";
         await component.$nextTick();
 
         expect(min_num_matches_input.is_valid).toBe(false);
@@ -253,11 +228,11 @@ describe('Invalid input tests', () => {
 
         let max_num_matches_input = <ValidatedInput> wrapper.find({ref: "max_num_matches"}).vm;
 
-        max_num_matches_input.value = "  ";
+        component.d_expected_student_file.max_num_matches = " ";
         await component.$nextTick();
         expect(max_num_matches_input.is_valid).toBe(false);
 
-        max_num_matches_input.value = "onion";
+        component.d_expected_student_file.max_num_matches = "onion";
         await component.$nextTick();
         expect(max_num_matches_input.is_valid).toBe(false);
     });

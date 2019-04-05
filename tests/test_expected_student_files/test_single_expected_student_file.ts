@@ -9,10 +9,6 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-afterEach(() => {
-    sinon.restore();
-});
-
 describe('ExpectedStudentFiles tests', () => {
     let wrapper: Wrapper<SingleExpectedStudentFile>;
     let component: SingleExpectedStudentFile;
@@ -47,6 +43,14 @@ describe('ExpectedStudentFiles tests', () => {
         component = wrapper.vm;
     });
 
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
     test('Successful edit of file', async () => {
         let save_stub = sinon.stub(component.d_expected_student_file, 'save');
 
@@ -62,8 +66,7 @@ describe('ExpectedStudentFiles tests', () => {
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        form_component.submit_form();
-        await component.$nextTick();
+        wrapper.find('#expected-student-file-form').trigger('submit.native');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
@@ -75,9 +78,6 @@ describe('ExpectedStudentFiles tests', () => {
             file_without_wildcard.max_num_matches
         );
         expect(component.actively_updating).toBe(false);
-
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(0);
     });
 
     test('error - edited filename not unique to project', async () => {
@@ -96,6 +96,7 @@ describe('ExpectedStudentFiles tests', () => {
             },
             config: {},
         };
+        sinon.stub(component.d_expected_student_file, 'save').rejects(axios_response_instance);
 
         expect(component.expected_student_file.pattern).toEqual("filename*.cpp");
         expect(component.expected_student_file.min_num_matches).toEqual(2);
@@ -109,9 +110,7 @@ describe('ExpectedStudentFiles tests', () => {
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        sinon.stub(component.d_expected_student_file, 'save').rejects(axios_response_instance);
-        form_component.submit_form();
-        await component.$nextTick();
+        wrapper.find('#expected-student-file-form').trigger('submit.native');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
@@ -160,6 +159,19 @@ describe('ExpectedStudentFiles tests', () => {
         await component.$nextTick();
 
         expect(delete_stub.callCount).toEqual(0);
+    });
+
+    test("The 'Update File' button is disabled when an input value is invalid", async () => {
+        wrapper.find('.edit-file').trigger('click');
+        await component.$nextTick();
+
+        let form_wrapper = wrapper.find({ref: "form"});
+        let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
+        form_component.d_expected_student_file.pattern = " ";
+        await component.$nextTick();
+
+        expect(wrapper.find('.update-button').is('[disabled]')).toBe(true);
+        expect(component.pattern_is_valid).toBe(false);
     });
 
     test('Update expected_student_file', async () => {

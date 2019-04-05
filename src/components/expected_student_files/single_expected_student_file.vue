@@ -141,7 +141,6 @@
     }
 
     async delete_pattern_permanently() {
-      console.log("Trying to delete permanently");
       try {
         this.d_delete_pending = true;
         await this.expected_student_file.delete();

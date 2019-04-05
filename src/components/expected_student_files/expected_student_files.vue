@@ -38,7 +38,11 @@
   import Tooltip from '@/components/tooltip.vue';
 
   @Component({
-    components: { CreateExpectedStudentFile, SingleExpectedStudentFile, Tooltip }
+    components: {
+      CreateExpectedStudentFile,
+      SingleExpectedStudentFile,
+      Tooltip
+    }
   })
   export default class ExpectedStudentFiles extends Vue implements ExpectedStudentFileObserver {
 
@@ -58,13 +62,11 @@
     }
 
     update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
-      console.log("In update_esf_created");
       this.expected_student_files.push(expected_student_file);
       this.sort_files();
     }
 
     update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
-      console.log("A file was changed");
       let index = this.expected_student_files.findIndex(
         (file) => file.pk === expected_student_file.pk);
       Vue.set(this.expected_student_files, index, expected_student_file);

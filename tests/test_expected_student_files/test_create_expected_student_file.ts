@@ -53,18 +53,22 @@ describe('CreateExpectedStudentFile tests', () => {
         component = wrapper.vm;
     });
 
-    test('Successful creation of a file', async () => {
-        fail("The only way for the test to pass is to call the function for submitting, " +
-             "but the event should really come from the form - so we know the form is valid" +
-             "but that approach is not working right now.");
-        let create_stub = sinon.stub(ExpectedStudentFile, 'create');
+    afterEach(() => {
+        sinon.restore();
 
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('Successful creation of a file', async () => {
+        let create_stub = sinon.stub(ExpectedStudentFile, 'create');
         let form_wrapper = wrapper.find({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
         await component.$nextTick();
 
-        form_component.submit_form();
+        wrapper.find('#expected-student-file-form').trigger('submit.native');
         await component.$nextTick();
 
         expect(create_stub.getCall(0).args[0]).toEqual(project_1.pk);
@@ -77,9 +81,6 @@ describe('CreateExpectedStudentFile tests', () => {
     });
 
     test('Unsuccessful creation of a file - name is not unique', async () => {
-        fail("The only way for the test to pass is to call the function for submitting, " +
-             "but the event should really come from the form - so we know the form is valid" +
-             "but that approach is not working right now.");
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -102,7 +103,7 @@ describe('CreateExpectedStudentFile tests', () => {
         await component.$nextTick();
 
         sinon.stub(ExpectedStudentFile, 'create').rejects(axios_response_instance);
-        form_component.submit_form();
+        wrapper.find('#expected-student-file-form').trigger('submit.native');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
@@ -110,19 +111,14 @@ describe('CreateExpectedStudentFile tests', () => {
     });
 
     test("The 'create' button is disabled when an input value is invalid", async () => {
-        fail("The button is always registering as disabled so this test passing " +
-             "really doesnt prove anything");
-        let create_stub = sinon.stub(ExpectedStudentFile, 'create');
-
         expect(component.project).toEqual(project_1);
 
         let form_wrapper = wrapper.find({ref: 'form'});
-
-        expect(wrapper.find('.add-file-button').is('[disabled]')).toBe(true);
-
-        form_wrapper.trigger('submit.native');
+        let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
+        form_component.d_expected_student_file.pattern = "   ";
         await component.$nextTick();
 
-        expect(create_stub.callCount).toEqual(0);
+        expect(wrapper.find('.add-file-button').is('[disabled]')).toBe(true);
+        expect(component.pattern_is_valid).toBe(false);
     });
 });
