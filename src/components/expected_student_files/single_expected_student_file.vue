@@ -81,7 +81,9 @@
 
 <script lang="ts">
   import APIErrors from '@/components/api_errors.vue';
-  import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/expected_student_files/expected_student_file_form.vue';
+  import ExpectedStudentFileForm,
+         { ExpectedStudentFileFormData }
+         from '@/components/expected_student_files/expected_student_file_form.vue';
   import Modal from '@/components/modal.vue';
   import { handle_api_errors_async, safe_assign } from '@/utils';
 
@@ -110,7 +112,8 @@
     }
 
     @Watch('expected_student_file')
-    on_expected_student_file_changed(new_file: ExpectedStudentFile, old_val: ExpectedStudentFile) {
+    on_expected_student_file_changed(new_file: ExpectedStudentFile,
+                                     old_file: ExpectedStudentFile) {
       this.d_expected_student_file.pattern = this.expected_student_file.pattern;
       this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
       this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
@@ -127,8 +130,8 @@
         (<APIErrors> this.$refs.api_errors).clear();
         safe_assign(this.d_expected_student_file, file);
         await this.d_expected_student_file!.save();
-        this.actively_updating = false;
         (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+        this.actively_updating = false;
       }
       finally {
         this.d_saving = false;
@@ -136,8 +139,8 @@
     }
 
     cancel_update() {
-      this.actively_updating = false;
       (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+      this.actively_updating = false;
     }
 
     async delete_pattern_permanently() {

@@ -84,7 +84,7 @@
       pattern = "",
       min_num_matches = 1,
       max_num_matches = 1
-    }: {pattern?: string, min_num_matches? : number, max_num_matches?: number}) {
+    }: {pattern?: string, min_num_matches?: number, max_num_matches?: number}) {
       this.pattern = pattern;
       this.min_num_matches = min_num_matches;
       this.max_num_matches = max_num_matches;
@@ -135,7 +135,7 @@
     }
 
     reset_expected_student_file_values() {
-      (<ValidatedForm>this.$refs.expected_student_file_form).reset_warning_state();
+      (<ValidatedForm> this.$refs.expected_student_file_form).reset_warning_state();
       this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
     }
   }

@@ -19,7 +19,8 @@
 
 <script lang="ts">
   import APIErrors from '@/components/api_errors.vue';
-  import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
+  import ExpectedStudentFileForm
+    from '@/components/expected_student_files/expected_student_file_form.vue';
 
   import { handle_api_errors_async } from '@/utils';
   import { Component, Prop, Vue } from 'vue-property-decorator';
@@ -38,7 +39,8 @@
     pattern_is_valid = false;
 
     @handle_api_errors_async(handle_add_expected_student_file_error)
-    async create_expected_student_file(new_expected_student_file_data: NewExpectedStudentFileData) {
+    async create_expected_student_file(
+      new_expected_student_file_data: NewExpectedStudentFileData) {
       try {
         this.d_create_pending = true;
         (<APIErrors> this.$refs.api_errors).clear();
@@ -52,7 +54,7 @@
   }
 
   export function handle_add_expected_student_file_error(component: CreateExpectedStudentFile,
-                                                  error: unknown) {
+                                                         error: unknown) {
     (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 </script>

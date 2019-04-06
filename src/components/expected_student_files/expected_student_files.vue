@@ -33,8 +33,10 @@
   import { array_remove_unique } from '@/utils';
   import { ExpectedStudentFile, ExpectedStudentFileObserver, Project } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
-  import CreateExpectedStudentFile from '@/components/expected_student_files/create_expected_student_file.vue';
-  import SingleExpectedStudentFile from '@/components/expected_student_files/single_expected_student_file.vue';
+  import CreateExpectedStudentFile
+    from '@/components/expected_student_files/create_expected_student_file.vue';
+  import SingleExpectedStudentFile
+    from '@/components/expected_student_files/single_expected_student_file.vue';
   import Tooltip from '@/components/tooltip.vue';
 
   @Component({
@@ -53,7 +55,9 @@
 
     async created() {
       ExpectedStudentFile.subscribe(this);
-      this.expected_student_files = await ExpectedStudentFile.get_all_from_project(this.project.pk);
+      this.expected_student_files = await ExpectedStudentFile.get_all_from_project(
+        this.project.pk
+      );
       this.sort_files();
     }
 

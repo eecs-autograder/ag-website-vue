@@ -1,5 +1,8 @@
-import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
+import ExpectedStudentFileForm
+    from '@/components/expected_student_files/expected_student_file_form.vue';
 import ExpectedStudentFiles from '@/components/expected_student_files/expected_student_files.vue';
+import SingleExpectedStudentFile
+    from '@/components/expected_student_files/single_expected_student_file.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     ExpectedStudentFile,
@@ -60,9 +63,9 @@ describe('ExpectedStudentFiles tests', () => {
         file_2_no_wildcard = new ExpectedStudentFile({
             pk: 2,
             project: 10,
-            pattern: "monkey.cpp",
-            min_num_matches: 2,
-            max_num_matches: 4,
+            pattern: "monkey?.cpp",
+            min_num_matches: 1,
+            max_num_matches: 2,
             last_modified: "now"
         });
 
@@ -118,8 +121,7 @@ describe('ExpectedStudentFiles tests', () => {
         ExpectedStudentFile.notify_expected_student_file_created(created_file);
     }
 
-    function call_notify_expected_student_file_changed(
-        file_that_changed: ExpectedStudentFile) {
+    function call_notify_expected_student_file_changed(file_that_changed: ExpectedStudentFile) {
         ExpectedStudentFile.notify_expected_student_file_changed(file_that_changed);
     }
 
@@ -131,7 +133,7 @@ describe('ExpectedStudentFiles tests', () => {
     });
 
     test('Create a file', async () => {
-        sinon.stub(ExpectedStudentFile, "create").callsFake(
+        let create_stub = sinon.stub(ExpectedStudentFile, "create").callsFake(
             () => call_notify_expected_student_file_created(new_file)
         );
         expect(component.expected_student_files.length).toEqual(3);
@@ -146,6 +148,7 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('#expected-student-file-form').trigger('submit.native');
         await component.$nextTick();
 
+        expect(create_stub.calledOnce).toBe(true);
         expect(component.expected_student_files.length).toEqual(4);
         expect(component.expected_student_files[0]).toEqual(file_1_has_wildcard);
         expect(component.expected_student_files[1]).toEqual(file_2_no_wildcard);
@@ -170,42 +173,98 @@ describe('ExpectedStudentFiles tests', () => {
         expect(component.expected_student_files[1]).toEqual(file_3_no_wildcard);
     });
 
-    test('Edit a file', async () => {
+    test('Edit a file - no pattern to pattern', async () => {
         let updated_file = new ExpectedStudentFile({
             pk: 3,
             project: 10,
             pattern: "aardvarks?.cpp",
             min_num_matches: 1,
-            max_num_matches: 1,
+            max_num_matches: 6,
             last_modified: "now"
         });
-        // let save_stub = sinon.stub(file_3_no_wildcard, "save").callsFake(
-        //     () => call_notify_expected_student_file_changed(updated_file)
-        // );
 
         let file_to_edit = wrapper.findAll('#single-expected-student-file').at(2);
+        let file_to_edit_component = <SingleExpectedStudentFile> file_to_edit.vm;
         file_to_edit.find('.edit-file').trigger('click');
         await component.$nextTick();
 
-        let form_wrapper = wrapper.find({ref: "form"});
-        let form_component = <ExpectedStudentFileForm> file_to_edit.find({ref: 'form'}).vm;
-        expect(form_component.d_expected_student_file.pattern).toEqual(file_3_no_wildcard.pattern);
-        expect(form_component.d_expected_student_file.min_num_matches).toEqual(file_3_no_wildcard.min_num_matches);
-        expect(form_component.d_expected_student_file.max_num_matches).toEqual(file_3_no_wildcard.max_num_matches);
+        let form_wrapper = file_to_edit.find({ref: 'form'});
+        let form = <ExpectedStudentFileForm> form_wrapper.vm;
 
-        form_component.d_expected_student_file.pattern = updated_file.pattern;
+        expect(form.d_expected_student_file.pattern).toEqual(file_3_no_wildcard.pattern);
+        expect(form.d_expected_student_file.min_num_matches).toEqual(
+            file_3_no_wildcard.min_num_matches
+        );
+        expect(form.d_expected_student_file.max_num_matches).toEqual(
+            file_3_no_wildcard.max_num_matches
+        );
+
+        form.d_expected_student_file.pattern = updated_file.pattern;
+        await component.$nextTick();
+
+        form.d_expected_student_file.max_num_matches = updated_file.max_num_matches;
         await component.$nextTick();
 
         expect(wrapper.find('.update-button').is('[disabled]')).toBe(false);
 
-        wrapper.find('#expected-student-file-form').trigger('submit.native');
+        let save_stub = sinon.stub(
+            file_to_edit_component.d_expected_student_file, "save"
+        ).callsFake(
+            () => call_notify_expected_student_file_changed(updated_file)
+        );
+        form_wrapper.find('#expected-student-file-form').trigger('submit.native');
         await component.$nextTick();
 
-        // expect(save_stub.calledOnce).toBe(true);
+        expect(save_stub.calledOnce).toBe(true);
+        expect(component.expected_student_files.length).toEqual(3);
+        expect(component.expected_student_files[0]).toEqual(updated_file);
+        expect(component.expected_student_files[1]).toEqual(file_1_has_wildcard);
+        expect(component.expected_student_files[2]).toEqual(file_2_no_wildcard);
+    });
 
-        // expect(component.expected_student_files.length).toEqual(3);
-        // expect(component.expected_student_files[0]).toEqual(file_3_no_wildcard);
-        // expect(component.expected_student_files[1]).toEqual(file_1_has_wildcard);
-        // expect(component.expected_student_files[2]).toEqual(file_2_no_wildcard);
+    test('Edit a file - pattern to no pattern', async () => {
+        let updated_file = new ExpectedStudentFile({
+            pk: 2,
+            project: 10,
+            pattern: "aardvarks.cpp",
+            min_num_matches: 1,
+            max_num_matches: 1,
+            last_modified: "now"
+        });
+
+        let file_to_edit = wrapper.findAll('#single-expected-student-file').at(0);
+        let file_to_edit_component = <SingleExpectedStudentFile> file_to_edit.vm;
+        file_to_edit.find('.edit-file').trigger('click');
+        await component.$nextTick();
+
+        let form_wrapper = file_to_edit.find({ref: 'form'});
+        let form = <ExpectedStudentFileForm> form_wrapper.vm;
+
+        expect(form.d_expected_student_file.pattern).toEqual(file_1_has_wildcard.pattern);
+        expect(form.d_expected_student_file.min_num_matches).toEqual(
+            file_1_has_wildcard.min_num_matches
+        );
+        expect(form.d_expected_student_file.max_num_matches).toEqual(
+            file_1_has_wildcard.max_num_matches
+        );
+
+        form.d_expected_student_file.pattern = updated_file.pattern;
+        await component.$nextTick();
+
+        expect(wrapper.find('.update-button').is('[disabled]')).toBe(false);
+
+        let save_stub = sinon.stub(
+            file_to_edit_component.d_expected_student_file, "save"
+        ).callsFake(
+            () => call_notify_expected_student_file_changed(updated_file)
+        );
+        form_wrapper.find('#expected-student-file-form').trigger('submit.native');
+        await component.$nextTick();
+
+        expect(save_stub.calledOnce).toBe(true);
+        expect(component.expected_student_files.length).toEqual(3);
+        expect(component.expected_student_files[0]).toEqual(updated_file);
+        expect(component.expected_student_files[1]).toEqual(file_1_has_wildcard);
+        expect(component.expected_student_files[2]).toEqual(file_3_no_wildcard);
     });
 });
