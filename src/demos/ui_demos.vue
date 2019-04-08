@@ -54,6 +54,12 @@
         </template>
       </tab>
       <tab>
+        <tab-header>Group Lookup</tab-header>
+        <template slot="body">
+          <GroupLookupDemo></GroupLookupDemo>
+        </template>
+      </tab>
+      <tab>
         <tab-header>Modal</tab-header>
         <template slot="body">
           <ModalDemo></ModalDemo>
@@ -123,6 +129,7 @@ import DiffDemo from './diff_demo.vue';
 import DropdownDemo from './dropdown_demo.vue';
 import DropdownTypeaheadDemo from './dropdown_typeahead_demo.vue';
 import FileUploadDemo from './file_upload_demo.vue';
+import GroupLookupDemo from './group_lookup_demo.vue';
 import ManageProjectsDemo from './manage_projects_demo.vue';
 import ModalDemo from './modal_demo.vue';
 import MultiFileViewerDemo from './multi_file_viewer_demo.vue';
@@ -143,6 +150,7 @@ import ViewFileDemo from './view_file_demo.vue';
     DropdownDemo,
     DropdownTypeaheadDemo,
     FileUploadDemo,
+    GroupLookupDemo,
     ManageProjectsDemo,
     ModalDemo,
     MultiFileViewerDemo,

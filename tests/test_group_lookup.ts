@@ -15,16 +15,19 @@ interface Member {
 interface Group {
     pk: number;
     project: number;
-    member_names: Member[];
     extended_due_date: string;
-    num_submits_towards_limit: number;
-    num_submissions: number;
+    member_names: Member[];
     bonus_submissions_remaining: number;
+    late_days_used: {[username: string]: number};
+    num_submissions: number;
+    num_submits_towards_limit: number;
+    created_at: string;
+    last_modified: string;
 }
 
 describe('GroupLookup.vue', () => {
     let wrapper: Wrapper<GroupLookup>;
-    let group_lookup: GroupLookup;
+    let component: GroupLookup;
     let group1: Group;
     let group2: Group;
     let group3: Group;
@@ -46,54 +49,65 @@ describe('GroupLookup.vue', () => {
         group1 = {
             pk: 1,
             project: 2,
+            extended_due_date: "no",
             member_names: [
                 {username: "chuckfin@umich.edu", full_name: "Charles Finster"},
                 {username: "tpickles@umich.edu", full_name: "Thomas Pickles"}
             ],
-            extended_due_date: "no",
-            num_submits_towards_limit: 1,
+            bonus_submissions_remaining: 0,
+            late_days_used: {"chuckfin@umich.edu": 2},
             num_submissions: 3,
-            bonus_submissions_remaining: 0
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
         };
 
         group2 = {
             pk: 2,
             project: 2,
+            extended_due_date: "no",
             member_names: [
                 {username: "dpickles@umich.edu", full_name: "Dylan Pickles"},
                 {username: "lmjdev@umich.edu", full_name: "Lillian DeVille"}
             ],
-            extended_due_date: "no",
-            num_submits_towards_limit: 0,
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
             num_submissions: 3,
-            bonus_submissions_remaining: 0
+            num_submits_towards_limit: 0,
+            created_at: "4pm",
+            last_modified: "6pm"
         };
 
         group3 = {
             pk: 3,
             project: 2,
+            extended_due_date: "yes",
             member_names: [
                 {username: "kwatfin@umich.edu", full_name: "Kimiko Watanabe-Finster"},
                 {username: "prbdev@umich.edu", full_name: "Phillip DeVille"}
             ],
-            extended_due_date: "no",
-            num_submits_towards_limit: 0,
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
             num_submissions: 3,
-            bonus_submissions_remaining: 0
+            num_submits_towards_limit: 0,
+            created_at: "11am",
+            last_modified: "5pm"
         };
 
         group4 = {
             pk: 4,
             project: 2,
+            extended_due_date: "no",
             member_names: [
                 {username: "suscarm@umich.edu", full_name: "Susanna Carmichael"},
             ],
-            extended_due_date: "no",
-            num_submits_towards_limit: 0,
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
             num_submissions: 3,
-            bonus_submissions_remaining: 0
+            num_submits_towards_limit: 0,
+            created_at: "2pm",
+            last_modified: "2:45pm"
         };
-        groups = [group1, group2, group3, group4];
 
         project = new Project({
             pk: 2,
@@ -119,6 +133,16 @@ describe('GroupLookup.vue', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false
         });
+
+        groups = [group1, group2, group3, group4];
+
+        wrapper = mount(GroupLookup, {
+            propsData: {
+                groups: groups,
+                project: project
+            }
+        });
+        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -127,80 +151,58 @@ describe('GroupLookup.vue', () => {
         });
 
         if (wrapper.exists()) {
-            console.log("wrapper exists");
             wrapper.destroy();
         }
     });
 
     test('filter text matches username', async () => {
-        // patch getting groups
-        wrapper = mount(GroupLookup, {
-            propsData: {
-                project: project
-            }
-        });
-        group_lookup = wrapper.vm;
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
 
-        dropdown_typeahead.filter_text = "Kimiko";
-        await group_lookup.$nextTick();
+        dropdown_typeahead.filter_text = "kwatfin@um";
+        await component.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group3);
     });
 
     test('filter text matches full name', async () => {
-        // patch getting groups
-        wrapper = mount(GroupLookup, {
-            propsData: {
-                project: project
-            }
-        });
-        group_lookup = wrapper.vm;
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
 
         dropdown_typeahead.filter_text = "lm";
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group2);
     });
 
     test('filter text matches full name (case_insensitive)', async () => {
-        // patch getting groups
-        wrapper = mount(GroupLookup, {
-            propsData: {
-                project: project
-            }
-        });
-        group_lookup = wrapper.vm;
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
 
         dropdown_typeahead.filter_text = "deville";
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(2);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group2);
         expect(dropdown_typeahead.filtered_choices[1]).toEqual(group3);
 
         dropdown_typeahead.filter_text = "DEVILLE";
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(2);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group2);
         expect(dropdown_typeahead.filtered_choices[1]).toEqual(group3);
 
         dropdown_typeahead.filter_text = "DeVille";
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(2);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group2);
@@ -208,14 +210,7 @@ describe('GroupLookup.vue', () => {
     });
 
     test('When a group is selected from the typeahead, an event is emitted', async () => {
-        // patch getting groups
-        wrapper = mount(GroupLookup, {
-            propsData: {
-                project: project
-            }
-        });
-        group_lookup = wrapper.vm;
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
@@ -224,7 +219,7 @@ describe('GroupLookup.vue', () => {
         search_bar.trigger("click");
 
         dropdown_typeahead.filter_text = "susc";
-        await group_lookup.$nextTick();
+        await component.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group4);
@@ -232,8 +227,19 @@ describe('GroupLookup.vue', () => {
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(group_lookup.group_selected).toEqual(group4);
         expect(wrapper.emitted().update_group_selected.length).toEqual(1);
-        expect(dropdown_typeahead.filter_text).toEqual("");
+        // expect(dropdown_typeahead.filter_text).toEqual("");
+    });
+
+    test("When the prop 'groups' changes in the parent component, d_groups is updated",
+         async () => {
+        await component.$nextTick();
+
+        expect(component.d_groups).toEqual(groups);
+
+        wrapper.setProps({groups: [group1, group3]});
+        await component.$nextTick();
+
+        expect(component.d_groups).toEqual([group1, group3]);
     });
 });
