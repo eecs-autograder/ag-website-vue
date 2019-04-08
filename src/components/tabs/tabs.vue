@@ -183,7 +183,8 @@ export default class Tabs extends Vue {
       }
     );
 
-    let sidebar_headers_class = this.tab_position === 'side' ? 'tab-headers-container-sidebar' : '';
+    let sidebar_headers_class
+      = this.tab_position === 'side' ? 'tab-headers-container-sidebar' : '';
     return create_element(
       'div',
       {class: [this.tab_headers_container_class, sidebar_headers_class]},
