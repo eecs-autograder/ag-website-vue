@@ -62,4 +62,5 @@ export default class GroupLookup extends Vue {
   font-size: 15px;
   padding-right: 5px;
 }
+
 </style>
