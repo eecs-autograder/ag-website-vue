@@ -9,7 +9,7 @@
 
   import { Component, Vue } from 'vue-property-decorator';
 
-  import InstructorFiles from '@/components/instructor_files/instructor_files.vue';
+  import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 
   @Component({
     components: { InstructorFiles }

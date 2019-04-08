@@ -1,5 +1,5 @@
 import FileUpload from '@/components/file_upload.vue';
-import InstructorFiles from '@/components/instructor_files/instructor_files.vue';
+import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { InstructorFile, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
