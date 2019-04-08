@@ -91,15 +91,13 @@
     }
   }
 
-  // Address issue of clicking on label in single file affecting radio buttons of create????
-
   @Component({
     components: { Tooltip, ValidatedForm, ValidatedInput }
   })
   export default class ExpectedStudentFileForm extends Vue {
 
     @Prop({default: () => new ExpectedStudentFileFormData({})})
-    expected_student_file: ExpectedStudentFileFormData;
+    expected_student_file!: ExpectedStudentFileFormData;
 
     d_expected_student_file: ExpectedStudentFileFormData = null;
     d_exact_match = true;

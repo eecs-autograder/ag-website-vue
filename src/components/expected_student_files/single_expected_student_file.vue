@@ -69,10 +69,12 @@
 
       <div id="modal-button-container">
         <button class="modal-delete-button"
+                type="button"
                 :disabled="d_delete_pending"
                 @click="delete_pattern_permanently"> Delete </button>
-        <div class="modal-cancel-button"
-             @click="$refs.delete_expected_student_file_modal.close()"> Cancel </div>
+        <button class="modal-cancel-button"
+                type="button"
+             @click="$refs.delete_expected_student_file_modal.close()"> Cancel </button>
       </div>
     </modal>
 
@@ -102,7 +104,7 @@
     odd_index!: boolean;
 
     actively_updating = false;
-    d_expected_student_file: ExpectedStudentFile | null;
+    d_expected_student_file: ExpectedStudentFile;
     d_delete_pending = false;
     d_saving = false;
     pattern_is_valid = false;
@@ -114,9 +116,9 @@
     @Watch('expected_student_file')
     on_expected_student_file_changed(new_file: ExpectedStudentFile,
                                      old_file: ExpectedStudentFile) {
-      this.d_expected_student_file.pattern = this.expected_student_file.pattern;
-      this.d_expected_student_file.min_num_matches = this.expected_student_file.min_num_matches;
-      this.d_expected_student_file.max_num_matches = this.expected_student_file.max_num_matches;
+      this.d_expected_student_file!.pattern = new_file.pattern;
+      this.d_expected_student_file!.min_num_matches = new_file.min_num_matches;
+      this.d_expected_student_file!.max_num_matches = new_file.max_num_matches;
     }
 
     get wildcard_is_present() {
@@ -293,8 +295,8 @@
 }
 
 .file-to-delete {
-  background-color: hsl(220, 20%, 85%);
   letter-spacing: 1px;
+  color: $ocean-blue;
 }
 
 #modal-button-container {

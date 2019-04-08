@@ -32,7 +32,7 @@ export function* zip<T1, T2>(iterable1: IterableType<T1>,
 
 // array_add_unique, array_has_unique, and array_remove_unique are
 // intended to be used together to achieve Set-like behavior with an
-// array. This is a workaround until Vue implementes reactivity for
+// array. This is a workaround until Vue implements reactivity for
 // Sets. These functions have linear complexity.
 
 type EqualityFunctionType<ItemType, SentinelType>

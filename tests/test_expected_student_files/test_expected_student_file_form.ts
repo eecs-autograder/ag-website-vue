@@ -186,55 +186,79 @@ describe('Invalid input tests', () => {
     });
 
     test('Error pattern is blank', async () => {
-        let pattern_input = <ValidatedInput> wrapper.find({ref: "pattern"}).vm;
+        let pattern_input = wrapper.find({ref: "pattern"}).find('#input');
+        let pattern_validator = <ValidatedInput> wrapper.find({ ref: "pattern" }).vm;
 
-        component.d_expected_student_file.pattern = "hello*";
+        (<HTMLInputElement> pattern_input.element).value = "hello*";
+        pattern_input.trigger('input');
         await component.$nextTick();
-        expect(pattern_input.is_valid).toBe(true);
 
-        component.d_expected_student_file.pattern = "  ";
+        expect(pattern_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> pattern_input.element).value = " ";
+        pattern_input.trigger('input');
         await component.$nextTick();
-        expect(pattern_input.is_valid).toBe(false);
+
+        expect(pattern_validator.is_valid).toBe(false);
     });
 
     test('Error min_num_matches is blank or not a number', async () => {
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
+        let min_num_matches_input = wrapper.find({ref: "min_num_matches"}).find('#input');
+        let min_num_matches_validator = <ValidatedInput> wrapper.find(
+            { ref: "min_num_matches" }
+        ).vm;
 
-        component.d_expected_student_file.min_num_matches = "  ";
+        (<HTMLInputElement> min_num_matches_input.element).value = "  ";
+        min_num_matches_input.trigger('input');
         await component.$nextTick();
-        expect(min_num_matches_input.is_valid).toBe(false);
 
-        component.d_expected_student_file.min_num_matches = "carrot";
+        expect(min_num_matches_validator.is_valid).toBe(false);
+
+        (<HTMLInputElement> min_num_matches_input.element).value = "carrot";
+        min_num_matches_input.trigger('input');
         await component.$nextTick();
-        expect(min_num_matches_input.is_valid).toBe(false);
+
+        expect(min_num_matches_validator.is_valid).toBe(false);
     });
 
     test('Error min_num_matches is negative', async () => {
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let min_num_matches_input = <ValidatedInput> wrapper.find({ref: "min_num_matches"}).vm;
-        component.d_expected_student_file.min_num_matches = "-2";
+        let min_num_matches_input = wrapper.find({ref: "min_num_matches"}).find('#input');
+        let min_num_matches_validator = <ValidatedInput> wrapper.find(
+            { ref: "min_num_matches" }
+        ).vm;
+
+        (<HTMLInputElement> min_num_matches_input.element).value = "-2";
+        min_num_matches_input.trigger('input');
         await component.$nextTick();
 
-        expect(min_num_matches_input.is_valid).toBe(false);
+        expect(min_num_matches_validator.is_valid).toBe(false);
     });
 
     test('Error max_num_matches is blank or not a number', async () => {
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let max_num_matches_input = <ValidatedInput> wrapper.find({ref: "max_num_matches"}).vm;
+        let max_num_matches_input = wrapper.find({ref: "max_num_matches"}).find('#input');
+        let max_num_matches_validator = <ValidatedInput> wrapper.find(
+            { ref: "max_num_matches" }
+        ).vm;
 
-        component.d_expected_student_file.max_num_matches = " ";
+        (<HTMLInputElement> max_num_matches_input.element).value = "  ";
+        max_num_matches_input.trigger('input');
         await component.$nextTick();
-        expect(max_num_matches_input.is_valid).toBe(false);
 
-        component.d_expected_student_file.max_num_matches = "onion";
+        expect(max_num_matches_validator.is_valid).toBe(false);
+
+        (<HTMLInputElement> max_num_matches_input.element).value = "zero";
+        max_num_matches_input.trigger('input');
         await component.$nextTick();
-        expect(max_num_matches_input.is_valid).toBe(false);
+
+        expect(max_num_matches_validator.is_valid).toBe(false);
     });
 });
