@@ -1,0 +1,311 @@
+<template>
+  <div id="edit-single-group-component" v-if="d_group !== null">
+    <div class="edit-group-members-container">
+      <p class="group-members-label"> Group members: </p>
+      <div v-for="(member, index) of group.member_names">
+        <div class="group-member-editing">
+          <div class="username-validated-container">
+            <validated-input v-model="group.member_names[index]"
+                            :validators="[]"
+                            :num_rows="1"
+                            input_style="width: 100%;
+                                           border: 1px solid #ced4da;">
+            </validated-input>
+          </div>
+          <div class="remove-group-member"
+               :title="`Remove ${member} from group`"
+               @click="remove_group_member(index)">
+            <i class="fas fa-times"></i>
+          </div>
+        </div>
+      </div>
+      <div class="add-member-container">
+        <button class="add-member-button"
+                :disabled="group.member_names.length >= max_group_size"
+                @click="add_group_member">
+          Add Another Member
+        </button>
+      </div>
+
+      <div id="extension-toggle">
+        <Toggle v-model="has_extension"
+                :active_background_color="toggle_color">
+          <div slot="on">
+            <p class="toggle-on"> {{has_extension ? 'Has extension' : 'Grant extension'}}</p>
+          </div>
+          <div slot="off">
+            <p class="toggle-off"> {{has_extension ? 'Revoke Extension' : 'No extension'}} </p>
+          </div>
+        </Toggle>
+      </div>
+    </div>
+
+    <div id="datetime-picker-container"> DateTime Picker </div>
+
+    <div id="bonus-submissions-container">
+      <div id="bonus-submissions-label"> Bonus Submissions </div>
+      <validated-input v-model="d_group.bonus_submissions_remaining"
+                      :validators="[]"
+                      :num_rows="1"
+                      input_style="width: 20%;
+                                   border: 1px solid #ced4da;">
+      </validated-input>
+    </div>
+
+    <APIErrors ref="api_errors"></APIErrors>
+    <button class="update-group-button"
+            :disabled="d_saving"
+            @click="update_group()"> Update Group </button>
+    <div v-if="successful_update"
+         :class="d_saving ? 'successful-group-update' : 'done-updating-group'">
+      <i class="fas fa-check"></i>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+  import APIErrors from '@/components/api_errors.vue';
+  import Toggle from '@/components/toggle.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
+
+  import { Project } from 'ag-client-typescript';
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+  interface Member {
+    username: string;
+    full_name: string;
+  }
+
+  interface Group {
+    pk: number;
+    project: number;
+    extended_due_date: string;
+    member_names: string[];
+    bonus_submissions_remaining: number;
+    late_days_used: {[username: string]: number};
+    num_submissions: number;
+    num_submits_towards_limit: number;
+    created_at: string;
+    last_modified: string;
+  }
+
+  @Component({
+    components: {
+      APIErrors,
+      Toggle,
+      ValidatedInput
+    }
+  })
+  export default class EditSingleGroup extends Vue {
+
+    // @Prop({required: true, type: Group})
+    // group!: Group;
+
+    @Prop({required: true, type: Project})
+    project!: Project;
+
+    toggle_color = "orange";
+
+    // where is this info located?
+    max_group_size = 3;
+
+    has_extension = true;
+
+    d_saving = false;
+
+    group = {
+      pk: 2,
+      project: 2,
+      extended_due_date: "no",
+      member_names: ["dpickles@umich.edu", "lmjdev@umich.edu"],
+      bonus_submissions_remaining: 0,
+      late_days_used: {},
+      num_submissions: 3,
+      num_submits_towards_limit: 0,
+      created_at: "4pm",
+      last_modified: "6pm"
+    };
+
+    d_group: Group | null = null;
+
+    successful_update = false;
+
+    created() {
+      // member-wise copy?
+      this.d_group = this.group;
+    }
+
+    remove_group_member(index: number) {
+      this.d_group!.member_names.splice(index, 1);
+    }
+
+    add_group_member() {
+      this.d_group!.member_names.push('@umich.edu');
+    }
+
+    update_group() {
+      try {
+        this.d_saving = true;
+        // Group.create(this.project.pk, data: NewGroupData); returns the group - just dont do anything with it?
+        // Group.create_solo_group(this.project.pk); again, returns group
+        // merge might come into play here too?
+        this.successful_update = true;
+        setTimeout(() => {
+          this.d_saving = false;
+          setTimeout(() => {
+            this.successful_update = false;
+          }, 1000);
+        }, 1000);
+      }
+      catch(error) {
+        this.d_saving = false;
+      }
+    }
+  }
+</script>
+
+<style scoped lang="scss">
+  @import '@/styles/colors.scss';
+  @import '@/styles/button_styles.scss';
+  @import url('https://fonts.googleapis.com/css?family=Quicksand');
+  $current-lang-choice: 'Quicksand';
+
+  #edit-single-group-component {
+    font-family: Quicksand;
+    font-size: 15px;
+  }
+
+  .edit-group-members-container {
+    padding-top: 16px;
+  }
+
+  .group-members-label {
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0 10px 10px 0;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .group-member {
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    padding: 3px 8px;
+    background-color: hsl(212, 70%, 95%);
+    display: inline-block;
+    border-radius: 5px;
+    color: hsl(212, 50%, 20%);
+  }
+
+  .remove-group-member {
+    cursor: pointer;
+    display: inline-block;
+    padding: 7px 11px;
+    border-radius: 3px;
+    margin-left: 8px;
+    /*background-color: hsl(220, 30%, 30%);*/
+    /*color: white;*/
+  }
+
+  .remove-group-member:hover {
+    background-color: hsl(220, 30%, 30%);
+    color: white;
+  }
+
+  .username-validated-container {
+    display: inline-block;
+  }
+
+  .group-member-editing {
+    padding-bottom: 10px;
+  }
+
+  .add-member {
+    color: white;
+  }
+
+  .update-group-button {
+    margin-top: 10px;
+    @extend .teal-button;
+  }
+
+  .add-member-button {
+    @extend .dark-purple-button;
+  }
+
+  .add-member-button:disabled, .update-group-button:disabled {
+    @extend .gray-button;
+  }
+
+  .add-member-container {
+    padding: 8px 0 15px 0;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0;}
+    to { opacity: 1;}
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1;}
+    to { opacity: 0;}
+  }
+
+  #extension-toggle {
+    padding-top: 3px;
+  }
+
+  .successful-group-creation {
+    animation-duration: 0.5s;
+    animation-name: fadeIn;
+    color: $save-green;
+    display: inline-block;
+    padding-left: 15px;
+  }
+
+  .done-adding-group {
+    animation-duration: 1s;
+    animation-name: fadeOut;
+    color: $save-green;
+    display: inline-block;
+    padding-left: 15px;
+  }
+
+  .toggle-on, .toggle-off {
+    font-size: 14px;
+    color: black;
+  }
+
+  #bonus-submissions-container {
+    padding: 16px 0 8px 0;
+  }
+
+  #bonus-submissions-label {
+    padding-bottom: 6px;
+  }
+
+  #datetime-picker-container {
+    padding: 16px 0 0 0;
+  }
+
+  .successful-group-update {
+    animation-duration: 0.5s;
+    animation-name: fadeIn;
+    color: $save-green;
+    display: inline-block;
+    padding-left: 15px;
+  }
+
+  .done-updating-group {
+    animation-duration: 1s;
+    animation-name: fadeOut;
+    color: $save-green;
+    display: inline-block;
+    padding-left: 15px;
+  }
+
+</style>
