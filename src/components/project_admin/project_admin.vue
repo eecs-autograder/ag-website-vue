@@ -30,7 +30,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            INSTRUCTOR FILES - Pull Requested ATM
+            <instructor-files :project="project"></instructor-files>
           </div>
         </template>
       </tab>
@@ -131,6 +131,7 @@
 </template>
 
 <script lang="ts">
+  import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
   import Tab from '@/components/tabs/tab.vue';
   import TabHeader from '@/components/tabs/tab_header.vue';
   import Tabs from '@/components/tabs/tabs.vue';
@@ -141,6 +142,7 @@
 
   @Component({
     components: {
+      InstructorFiles,
       Tab,
       TabHeader,
       Tabs
