@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "./check_line_length.py 100 'src/**/*.*' 'tests/**/*.*' && vue-cli-service build",
+    "build": "./check_line_length.py -i 'import' -i '} from' 100 'src/**/*.*' 'tests/**/*.*' && vue-cli-service build",
     "test": "python3.6 run_tests.py"
   },
   "dependencies": {
