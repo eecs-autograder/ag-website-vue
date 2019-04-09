@@ -282,9 +282,9 @@ a {
 }
 
 .project-to-clone {
-  background-color: hsl(220, 20%, 85%);
   letter-spacing: 1px;
   margin-left: 5px;
+  color: $ocean-blue;
 }
 
 .cloned-project-name {
@@ -319,7 +319,7 @@ a {
 
 .clone-project-button, .clone-project-button:disabled {
   font-size: 16px;
-  margin: 32px 0 20px 0;
+  margin: 30px 0 10px 0;
   padding: 10px 15px;
 }
 

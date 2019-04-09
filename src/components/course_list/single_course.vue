@@ -32,67 +32,69 @@
     <modal ref="clone_course_modal"
            click_outside_to_close
            size="large">
-      <h2>
-        Cloning course:
-        <span class="course-to-copy">{{course.name}} - {{course.semester}} {{course.year}}</span>
-      </h2>
-      <hr>
-      <div id="clone-course-modal">
-        <ValidatedForm ref="clone_course_form"
-                       id="clone-course-form"
-                       autocomplete="off"
-                       @submit.native.prevent="make_copy_of_course">
+      <span class="modal-container">
+        <p class="modal-header"> Cloning course:
+          <span class="course-to-copy">{{course.name}} - {{course.semester}} {{course.year}}</span>
+        </p>
+        <hr>
+        <div id="clone-course-modal">
+          <ValidatedForm ref="clone_course_form"
+                         id="clone-course-form"
+                         autocomplete="off"
+                         @submit.native.prevent="make_copy_of_course">
 
-          <div class="name-container">
-            <label class="input-label"> Course name: </label>
-            <ValidatedInput ref="copy_of_course_name"
-                            v-model="new_course_name"
-                            input_style="width: 100%; max-width: 500px;"
-                            :validators="[is_not_empty]"
-                            :num_rows="1"
-                            @input_validity_changed="clone_course_form_is_valid = $event">
-            </ValidatedInput>
-          </div>
-
-          <div class="semester-container">
-            <label class="input-label"> Semester: </label>
-            <div>
-              <dropdown ref="semester_dropdown"
-                        :items="semesters"
-                        @update_item_selected="new_course_semester = $event">
-                <template slot="header">
-                  <div tabindex="1" class="dropdown-header-wrapper">
-                    <div class="dropdown-header semester-dropdown-header">{{new_course_semester}}
-                      <i class="fas fa-caret-down dropdown-caret"></i>
-                    </div>
-                  </div>
-                </template>
-                <div slot-scope="{item}">
-                  <span class="semester-item">{{item}}</span>
-                </div>
-              </dropdown>
+            <div class="name-container">
+              <label class="input-label"> Course name: </label>
+              <ValidatedInput ref="copy_of_course_name"
+                              v-model="new_course_name"
+                              input_style="width: 100%; max-width: 500px;"
+                              :validators="[is_not_empty]"
+                              :num_rows="1"
+                              @input_validity_changed="clone_course_form_is_valid = $event">
+              </ValidatedInput>
             </div>
-          </div>
 
-          <div class="year-container">
-            <label class="input-label"> Year: </label>
-            <ValidatedInput ref="copy_of_course_year"
-                            v-model="new_course_year"
-                            :num_rows="1"
-                            input_style="width: 65px;"
-                            :validators="[is_not_empty, is_number, is_valid_course_year]"
-                            @input_validity_changed="clone_course_form_is_valid = $event">
-            </ValidatedInput>
-          </div>
+            <div class="semester-container">
+              <label class="input-label"> Semester: </label>
+              <div>
+                <dropdown ref="semester_dropdown"
+                          :items="semesters"
+                          @update_item_selected="new_course_semester = $event">
+                  <template slot="header">
+                    <div tabindex="1" class="dropdown-header-wrapper">
+                      <div class="dropdown-header semester-dropdown-header">{{new_course_semester}}
+                        <i class="fas fa-caret-down dropdown-caret"></i>
+                      </div>
+                    </div>
+                  </template>
+                  <div slot-scope="{item}">
+                    <span class="semester-item">{{item}}</span>
+                  </div>
+                </dropdown>
+              </div>
+            </div>
 
-          <APIErrors ref="api_errors"></APIErrors>
+            <div class="year-container">
+              <label class="input-label"> Year: </label>
+              <ValidatedInput ref="copy_of_course_year"
+                              v-model="new_course_year"
+                              :num_rows="1"
+                              input_style="width: 65px;"
+                              :validators="[is_not_empty, is_number, is_valid_course_year]"
+                              @input_validity_changed="clone_course_form_is_valid = $event">
+              </ValidatedInput>
+            </div>
 
-          <input type="submit"
-                 class="create-clone-button"
-                 value="Create Course"
-                 :disabled="!clone_course_form_is_valid || clone_course_pending">
-        </ValidatedForm>
-      </div>
+            <APIErrors ref="api_errors"></APIErrors>
+
+            <button type="submit"
+                   class="create-clone-button"
+                   :disabled="!clone_course_form_is_valid || clone_course_pending">
+              Clone Course
+            </button>
+          </ValidatedForm>
+        </div>
+      </span>
     </modal>
   </div>
 </template>
@@ -268,15 +270,11 @@ a {
 
 /**** Modal *******************************************************************/
 
-#clone-course-modal {
-}
-
-.create-clone-button {
-  @extend .green-button;
-}
-
-.create-clone-button:disabled {
-  @extend .gray-button;
+.modal-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  padding: 5px 0;
 }
 
 .name-container, .year-container,
@@ -284,6 +282,10 @@ a {
   padding-bottom: 16px;
   display: block;
   max-width: 500px;
+}
+
+.name-container {
+  padding-top: 10px;
 }
 
 #all-semesters {
@@ -296,10 +298,23 @@ a {
 }
 
 .course-to-copy {
-  background-color: hsl(220, 20%, 92%);
   letter-spacing: 1px;
   margin-left: 5px;
-  padding: 0 5px;
+  color: $ocean-blue;
+}
+
+.create-clone-button {
+  @extend .green-button;
+}
+
+.create-clone-button:disabled {
+  @extend .gray-button;
+}
+
+.create-clone-button, .create-clone-button:disabled {
+  font-size: 16px;
+  margin: 12px 0 10px 0;
+  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 681px) {
