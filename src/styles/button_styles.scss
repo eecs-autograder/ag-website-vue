@@ -55,6 +55,20 @@ button {
     outline-color: lighten($save-green, 35%);
 }
 
+.teal-button {
+    @extend .button;
+    background-color: teal;
+    border: 1px solid lighten(teal, 5);
+}
+
+.teal-button:hover:enabled {
+    background-color: darken(teal, 5);
+}
+
+.teal-button:focus {
+    outline-color: lighten(teal, 5);
+}
+
 .blue-button {
     @extend .button;
     background-color: hsl(208, 59%, 54%);
@@ -81,6 +95,20 @@ button {
 
 .purple-button:focus {
     outline-color: hsl(275, 48%, 88%);
+}
+
+.dark-purple-button {
+    @extend .button;
+    background-color: hsl(300, 80%, 25%);
+    border: 1px solid hsl(300, 80%, 35%);
+}
+
+.dark-purple-button:hover:enabled {
+    background-color: hsl(300, 80%, 20%);
+}
+
+.dark-purple-button:focus {
+    outline-color: hsl(300, 80%, 85%);
 }
 
 .gray-button {

@@ -7,6 +7,9 @@
     <button class="green-button"> Save </button>
     <br>
     <br>
+    <button class="teal-button"> Press Button </button>
+    <br>
+    <br>
     <button class="red-button"> Delete
       <p class="trash-can fas fa-trash"></p>
     </button>
@@ -19,6 +22,9 @@
     <br>
     <br>
     <button class="purple-button"> Enter Contest </button>
+    <br>
+    <br>
+    <button class="dark-purple-button"> Press Button </button>
     <br>
     <br>
 

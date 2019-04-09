@@ -120,11 +120,11 @@ export default class DropdownTypeahead extends Vue {
   outline-color: $ocean-blue;
 }
 
-#no-matching-results {
+.no-matching-results {
   @extend %dropdown-content;
 }
 
-#no-matching-results-row {
+.no-matching-results-row {
   @extend %dropdown-row;
 }
 

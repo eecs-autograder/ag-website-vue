@@ -82,7 +82,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            EDIT GROUPS- TODO (branch exists)
+            <edit-groups :project="project"></edit-groups>
           </div>
         </template>
       </tab>
@@ -131,6 +131,7 @@
 </template>
 
 <script lang="ts">
+import EditGroups from '@/components/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -143,6 +144,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
   components: {
+    EditGroups,
     ExpectedStudentFiles,
     InstructorFiles,
     Tab,
