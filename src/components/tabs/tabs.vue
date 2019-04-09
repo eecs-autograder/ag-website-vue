@@ -86,14 +86,9 @@ export default class Tabs extends Vue {
       tab_data.push({header: header, body: body});
     }
 
-    let tabs_container_class = '';
-    if (this.tab_position === 'side') {
-      tabs_container_class = 'container-sidebar';
-    }
-
     return create_element(
       'div',
-      {class: tabs_container_class},
+      {class: ['tabs-container', this.tab_position === 'side' ? 'container-sidebar' : '']},
       [this._render_tab_headers(create_element, tab_data),
        this._render_tab_body(create_element, tab_data)]
     );
@@ -188,13 +183,11 @@ export default class Tabs extends Vue {
       }
     );
 
-    let tab_header_container_class = '';
-    if (this.tab_position === 'side') {
-      tab_header_container_class = 'tab-header-container-sidebar';
-    }
+    let sidebar_headers_class
+      = this.tab_position === 'side' ? 'tab-headers-container-sidebar' : '';
     return create_element(
       'div',
-      {class: [tab_header_container_class, this.tab_headers_container_class]},
+      {class: [this.tab_headers_container_class, sidebar_headers_class]},
       header_elts
     );
   }
@@ -233,18 +226,22 @@ interface ExtractedTabData {
 </script>
 
 <style scoped lang="scss">
-  .container-sidebar {
-    display: flex;
-    align-items: flex-start;
+  // Always added to the outermost element.
+  .tabs-container {
+    height: 100%;
   }
 
-  .tab-header-container-sidebar {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
+  // Added to the outermost element when displaying tabs as sidebar.
+  .container-sidebar {
+    overflow: hidden;
+    display: flex;
   }
 
   .tab-body-container-sidebar {
     flex-grow: 1;
+  }
+
+  .tab-headers-container-sidebar, .tab-body-container-sidebar {
+    overflow: auto;
   }
 </style>
