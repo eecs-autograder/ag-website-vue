@@ -37,10 +37,10 @@
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import FileUpload from '@/components/file_upload.vue';
-  import SingleInstructorFile from '@/components/instructor_files/single_instructor_file.vue';
   import MultiFileViewer from '@/components/multi_file_viewer.vue';
-
   import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
+
+  import SingleInstructorFile from './single_instructor_file.vue';
 
   @Component({
     components: {

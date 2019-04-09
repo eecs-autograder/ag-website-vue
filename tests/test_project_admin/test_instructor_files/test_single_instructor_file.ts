@@ -1,5 +1,5 @@
 import APIErrors from '@/components/api_errors.vue';
-import SingleInstructorFile from '@/components/instructor_files/single_instructor_file.vue';
+import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { InstructorFile } from 'ag-client-typescript';
