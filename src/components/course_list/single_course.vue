@@ -90,7 +90,7 @@
             <button type="submit"
                    class="create-clone-button"
                    :disabled="!clone_course_form_is_valid || clone_course_pending">
-              Create Course
+              Clone Course
             </button>
           </ValidatedForm>
         </div>
