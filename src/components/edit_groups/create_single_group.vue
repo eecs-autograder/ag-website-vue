@@ -1,6 +1,6 @@
 <template>
   <div id="create-group-component">
-    <div id="create-group-title"> Create Group: </div>
+<!--    <div id="create-group-title"> Create Group: </div>-->
     <div class="create-group-container">
       <p class="group-members-label"> Group members: </p>
       <div class="add-group-members-container">
@@ -88,7 +88,9 @@
     }
 
     remove_group_member(index: number) {
-      this.group_members.splice(index, 1);
+      if (this.group_members.length !== 1) {
+        this.group_members.splice(index, 1);
+      }
     }
 
     add_group_member() {
@@ -113,7 +115,7 @@
   .create-group-container {
     background-color: white;
     border-radius: 3px;
-    padding: 16px 0;
+    padding: 0 0 16px 0;
     display: inline-block;
   }
 
@@ -145,7 +147,7 @@
   }
 
   .group-members-label {
-    color: black;
+    color: lighten(black, 25);
     font-size: 16px;
     font-weight: bold;
     margin: 0;

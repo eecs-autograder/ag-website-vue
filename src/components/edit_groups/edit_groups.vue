@@ -1,15 +1,74 @@
 <template>
   <div id="edit-groups-component">
     <div class="left">
-      <create-single-group :project="project"> </create-single-group>
+
+      <div id="component-toggle">
+        <Toggle v-model="editing_existing_group"
+                :active_background_color="toggle_color">
+          <div slot="on">
+            <p class="toggle-on">{{editing_existing_group ? 'Editing existing group' : 'Edit existing group'}}</p>
+          </div>
+          <div slot="off">
+            <p class="toggle-off">{{editing_existing_group ? 'Create new group' : 'Creating new group'}} </p>
+          </div>
+        </Toggle>
+      </div>
+
+      <div v-if="editing_existing_group">
+        <group-lookup :groups="groups"
+                      :project="project"
+                      @update_group_selected="update_group_selected"> </group-lookup>
+        <edit-single-group :project="project">
+        </edit-single-group>
+      </div>
+      <div v-else>
+        <create-single-group :project="project"> </create-single-group>
+      </div>
     </div>
     <div class="right">
-      <div class="edit-side-title"> Edit Group: </div>
-      <group-lookup :groups="groups"
-                    :project="project"
-                    @update_group_selected="update_group_selected"> </group-lookup>
-      <edit-single-group :project="project">
-      </edit-single-group>
+<!--      <div class="extensions-title"> Extensions </div>-->
+      <table class="extensions-container">
+        <tr>
+          <th> Extensions</th>
+          <th> </th>
+<!--          <th> Group Members: </th>-->
+<!--          <th> Due Date: </th>-->
+        </tr>
+        <tr class="odd">
+          <td class="group-members">
+            <div> aredondo@umich.edu </div>
+            <div> tdaly@umich.edu </div>
+          </td>
+        <td class="due-date"> Feb 18, 2019, 8:07:00 PM</td>
+        </tr>
+        <tr class="even">
+          <td class="group-members">
+            <div> ashberg@umich.edu </div>
+            <div> hmzeder@umich.edu </div>
+          </td>
+          <td class="due-date"> Feb 18, 2019, 8:07:00 PM </td>
+        </tr>
+        <tr class="odd">
+          <td class="group-members">
+            <div> taylor@umich.edu </div>
+          </td>
+          <td class="due-date"> Feb 19, 2019, 8:07:00 PM </td>
+        </tr>
+        <tr class="even">
+          <td class="group-members">
+            <div> edahuron@umich.edu </div>
+            <div> jschwab@umich.edu </div>
+          </td>
+          <td class="due-date"> Feb 20, 2019, 12:00:00 PM </td>
+        </tr>
+        <tr class="odd">
+          <td class="group-members">
+            <div> emiller@umich.edu </div>
+            <div> beihla@umich.edu </div>
+          </td>
+          <td class="due-date"> Feb 20, 2019, 4:00:00 PM </td>
+        </tr>
+      </table>
     </div>
   </div>
 </template>
@@ -19,6 +78,7 @@
   import CreateSingleGroup from '@/components/edit_groups/create_single_group.vue';
   import EditSingleGroup from '@/components/edit_groups/edit_single_group.vue';
   import GroupLookup from '@/components/group_lookup.vue';
+  import Toggle from '@/components/toggle.vue';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   interface Member {
@@ -43,7 +103,8 @@
     components: {
       CreateSingleGroup,
       EditSingleGroup,
-      GroupLookup
+      GroupLookup,
+      Toggle
     }
   })
   export default class CreateGroup extends Vue { // implements GroupObserver
@@ -52,6 +113,10 @@
     project!: Project;
 
     groups: Group[] = [];
+
+    toggle_color = "hsl(210, 20%, 50%)";
+
+    editing_existing_group = true;
 
     group1 = {
       pk: 1,
@@ -153,31 +218,114 @@
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
-  @import url('https://fonts.googleapis.com/css?family=Quicksand');
-  $current-lang-choice: 'Quicksand';
+@import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+$current-lang-choice: 'Quicksand';
+
+#component-toggle {
+  padding: 10px 0 20px 0;
+}
+
+#edit-groups-component {
+  margin-top: 10px;
+  font-family: Quicksand;
+}
+
+.left {
+  box-sizing: border-box;
+  vertical-align: top;
+  padding: 0 2.5% 50px 2.5%;
+  min-width: 400px;
+}
+
+.right {
+  box-sizing: border-box;
+  padding: 0 2.5%;
+}
+
+.extensions-container {
+  width: 100%;
+}
+
+/*.extensions-title {*/
+/*  color: lighten(black, 25);*/
+/*  font-size: 17px;*/
+/*  font-weight: bold;*/
+/*  margin: 0;*/
+/*  padding: 3px 10px 8px 5px;*/
+/*}*/
+
+.extension-row {
+  padding: 5px;
+}
+
+.extension-row span {
+  padding-left: 100px;
+}
+
+.even {
+  background-color: hsl(210, 20%, 96%);
+}
+
+.odd {
+  background-color: white;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 16px;
+  width: 100%;
+}
+
+th {
+  padding:  8px 5px;
+  font-weight: bold;
+  color: lighten(black, 25);
+  /*border-bottom: 2px solid hsl(210, 20%, 80%);*/
+  border-bottom: 2px solid $grape;
+  font-size: 17px;
+}
+
+.group-members {
+  padding: 8px 100px 8px 5px;
+  font-weight: 500;
+  border-bottom: 1px solid hsl(210, 20%, 94%);
+}
+
+.due-date {
+  padding: 8px 5px;
+  vertical-align: top;
+  border-bottom: 1px solid hsl(210, 20%, 94%);
+}
+
+
+@media only screen and (min-width: 681px) {
+
+  #component-toggle {
+    padding: 10px 0 20px 0;
+  }
 
   #edit-groups-component {
     margin-top: 10px;
     font-family: Quicksand;
   }
 
-  .edit-side-title {
-    color: lighten(black, 25);
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0;
-    padding: 3px 10px 24px 0;
-    display: inline-block;
-    vertical-align: top;
-  }
+  /*.edit-side-title {*/
+  /*  color: lighten(black, 25);*/
+  /*  font-size: 16px;*/
+  /*  font-weight: bold;*/
+  /*  margin: 0;*/
+  /*  padding: 3px 10px 24px 0;*/
+  /*  display: inline-block;*/
+  /*  vertical-align: top;*/
+  /*}*/
 
   .left {
     width: 50%;
     display: inline-block;
     box-sizing: border-box;
     vertical-align: top;
-    padding: 0 2.5%;
   }
 
   .right {
@@ -186,5 +334,34 @@
     display: inline-block;
     padding: 0 2.5%;
   }
+
+  .extensions-container {
+    width: 100%;
+  }
+
+  .extensions-title {
+    color: lighten(black, 25);
+    font-size: 17px;
+    font-weight: bold;
+    margin: 0;
+    padding: 3px 10px 8px 5px;
+  }
+
+  .extension-row {
+    padding: 5px;
+  }
+
+  .extension-row span {
+    padding-left: 100px;
+  }
+
+  .even {
+    background-color: hsl(210, 20%, 96%);
+  }
+
+  .odd {
+    background-color: white;
+  }
+}
 
 </style>

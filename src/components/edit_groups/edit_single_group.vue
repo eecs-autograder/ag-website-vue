@@ -40,7 +40,10 @@
       </div>
     </div>
 
-    <div id="datetime-picker-container"> DateTime Picker </div>
+    <div id="datetime-picker-container" v-if="has_extension">
+      Datetime Picker
+      <div class="datetime-picker"> </div>
+    </div>
 
     <div id="bonus-submissions-container">
       <div id="bonus-submissions-label"> Bonus Submissions </div>
@@ -180,7 +183,7 @@
   }
 
   .group-members-label {
-    color: black;
+    color: lighten(black, 25);
     font-size: 16px;
     font-weight: bold;
     margin: 0;
@@ -306,6 +309,13 @@
     color: $save-green;
     display: inline-block;
     padding-left: 15px;
+  }
+
+  .datetime-picker {
+    margin-top: 5px;
+    width: 250px;
+    height: 200px;
+    background-color: hsl(210, 20%, 90%);
   }
 
 </style>
