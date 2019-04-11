@@ -104,7 +104,7 @@
     odd_index!: boolean;
 
     actively_updating = false;
-    d_expected_student_file: ExpectedStudentFile;
+    d_expected_student_file!: ExpectedStudentFile;
     d_delete_pending = false;
     d_saving = false;
     pattern_is_valid = false;

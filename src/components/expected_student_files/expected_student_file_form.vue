@@ -99,7 +99,7 @@
     @Prop({default: () => new ExpectedStudentFileFormData({})})
     expected_student_file!: ExpectedStudentFileFormData;
 
-    d_expected_student_file: ExpectedStudentFileFormData = null;
+    d_expected_student_file!: ExpectedStudentFileFormData;
     d_exact_match = true;
 
     readonly is_non_negative = is_non_negative;
