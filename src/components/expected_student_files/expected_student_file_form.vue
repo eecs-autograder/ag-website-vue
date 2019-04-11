@@ -1,5 +1,5 @@
 <template>
-  <div id="expected-student-file-form-component" v-if="d_expected_student_file !== null">
+  <div id="expected-student-file-form-component">
     <validated-form id="expected-student-file-form"
                       ref="expected_student_file_form"
                       autocomplete="off"
@@ -99,7 +99,7 @@
     @Prop({default: () => new ExpectedStudentFileFormData({})})
     expected_student_file!: ExpectedStudentFileFormData;
 
-    d_expected_student_file!: ExpectedStudentFileFormData;
+    d_expected_student_file: ExpectedStudentFileFormData = new ExpectedStudentFileFormData({});
     d_exact_match = true;
 
     readonly is_non_negative = is_non_negative;
@@ -111,9 +111,6 @@
     }
 
     get wildcard_is_present() {
-      if (this.d_expected_student_file === null) {
-        return false;
-      }
       return this.d_expected_student_file.pattern.match('[*?![\\]]') !== null;
     }
 
@@ -126,8 +123,8 @@
 
     submit_form() {
       if (this.d_exact_match || !this.wildcard_is_present) {
-        this.d_expected_student_file!.min_num_matches = 1;
-        this.d_expected_student_file!.max_num_matches = 1;
+        this.d_expected_student_file.min_num_matches = 1;
+        this.d_expected_student_file.max_num_matches = 1;
       }
       this.$emit('on_submit', this.d_expected_student_file);
     }

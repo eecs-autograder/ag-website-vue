@@ -54,6 +54,7 @@ describe('ExpectedStudentFiles tests', () => {
     });
 
     test('Successful edit of file', async () => {
+        await component.$nextTick();
         let save_stub = sinon.stub(component.d_expected_student_file, 'save');
 
         expect(component.expected_student_file.pattern).toEqual("filename*.cpp");
@@ -83,6 +84,7 @@ describe('ExpectedStudentFiles tests', () => {
     });
 
     test('error - edited filename not unique to project', async () => {
+        await component.$nextTick();
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -121,6 +123,7 @@ describe('ExpectedStudentFiles tests', () => {
     });
 
     test('Cancel edit of file', async () => {
+        await component.$nextTick();
         let save_stub = sinon.stub(component.d_expected_student_file, 'save');
 
         wrapper.find('.edit-file').trigger('click');
@@ -135,7 +138,7 @@ describe('ExpectedStudentFiles tests', () => {
         await component.$nextTick();
 
         expect(save_stub.callCount).toEqual(0);
-        expect(component.d_expected_student_file.pattern).toEqual(file_with_wildcard.pattern);
+        expect(component.d_expected_student_file!.pattern).toEqual(file_with_wildcard.pattern);
     });
 
     test('Delete file', async () => {

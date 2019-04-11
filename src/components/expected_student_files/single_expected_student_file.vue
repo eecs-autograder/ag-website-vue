@@ -104,7 +104,7 @@
     odd_index!: boolean;
 
     actively_updating = false;
-    d_expected_student_file!: ExpectedStudentFile;
+    d_expected_student_file: ExpectedStudentFile | null = null;
     d_delete_pending = false;
     d_saving = false;
     pattern_is_valid = false;
@@ -130,7 +130,7 @@
       try {
         this.d_saving = true;
         (<APIErrors> this.$refs.api_errors).clear();
-        safe_assign(this.d_expected_student_file, file);
+        safe_assign(this.d_expected_student_file!, file);
         await this.d_expected_student_file!.save();
         (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
         this.actively_updating = false;
