@@ -1,8 +1,6 @@
-import ExpectedStudentFileForm
-    from '@/components/expected_student_files/expected_student_file_form.vue';
+import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
 import ExpectedStudentFiles from '@/components/expected_student_files/expected_student_files.vue';
-import SingleExpectedStudentFile
-    from '@/components/expected_student_files/single_expected_student_file.vue';
+import SingleExpectedStudentFile from '@/components/expected_student_files/single_expected_student_file.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     ExpectedStudentFile,

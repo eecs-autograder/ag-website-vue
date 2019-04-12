@@ -1,8 +1,6 @@
 import APIErrors from '@/components/api_errors.vue';
-import CreateExpectedStudentFile
-    from '@/components/expected_student_files/create_expected_student_file.vue';
-import ExpectedStudentFileForm
-    from '@/components/expected_student_files/expected_student_file_form.vue';
+import CreateExpectedStudentFile from '@/components/expected_student_files/create_expected_student_file.vue';
+import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { ExpectedStudentFile, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import { AxiosError } from 'axios';

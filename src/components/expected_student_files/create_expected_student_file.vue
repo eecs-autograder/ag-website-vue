@@ -5,7 +5,7 @@
                                   @on_form_validity_changed="pattern_is_valid = $event">
 
         <template slot="form_footer">
-          <a-p-i-errors ref="api_errors"> </a-p-i-errors>
+          <APIErrors ref="api_errors"> </APIErrors>
 
           <button class="add-file-button"
                   type="submit"
@@ -18,45 +18,44 @@
 </template>
 
 <script lang="ts">
-  import APIErrors from '@/components/api_errors.vue';
-  import ExpectedStudentFileForm
-    from '@/components/expected_student_files/expected_student_file_form.vue';
+import APIErrors from '@/components/api_errors.vue';
+import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
 
-  import { handle_api_errors_async } from '@/utils';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { handle_api_errors_async } from '@/utils';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
+import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
-  @Component({
-    components: { APIErrors, ExpectedStudentFileForm }
-  })
-  export default class CreateExpectedStudentFile extends Vue {
+@Component({
+  components: { APIErrors, ExpectedStudentFileForm }
+})
+export default class CreateExpectedStudentFile extends Vue {
 
-    @Prop({required: true, type: Project})
-    project!: Project;
+  @Prop({required: true, type: Project})
+  project!: Project;
 
-    d_create_pending = false;
-    pattern_is_valid = false;
+  d_create_pending = false;
+  pattern_is_valid = false;
 
-    @handle_api_errors_async(handle_add_expected_student_file_error)
-    async create_expected_student_file(
-      new_expected_student_file_data: NewExpectedStudentFileData) {
-      try {
-        this.d_create_pending = true;
-        (<APIErrors> this.$refs.api_errors).clear();
-        await ExpectedStudentFile.create(this.project.pk, new_expected_student_file_data);
-        (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
-      }
-      finally {
-        this.d_create_pending = false;
-      }
+  @handle_api_errors_async(handle_add_expected_student_file_error)
+  async create_expected_student_file(
+    new_expected_student_file_data: NewExpectedStudentFileData) {
+    try {
+      this.d_create_pending = true;
+      (<APIErrors> this.$refs.api_errors).clear();
+      await ExpectedStudentFile.create(this.project.pk, new_expected_student_file_data);
+      (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+    }
+    finally {
+      this.d_create_pending = false;
     }
   }
+}
 
-  export function handle_add_expected_student_file_error(component: CreateExpectedStudentFile,
-                                                         error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
-  }
+export function handle_add_expected_student_file_error(component: CreateExpectedStudentFile,
+                                                       error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 </script>
 
 <style scoped lang="scss">

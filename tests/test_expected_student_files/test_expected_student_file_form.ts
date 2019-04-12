@@ -1,5 +1,4 @@
-import ExpectedStudentFileForm
-    from '@/components/expected_student_files/expected_student_file_form.vue';
+import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { ExpectedStudentFile } from 'ag-client-typescript';

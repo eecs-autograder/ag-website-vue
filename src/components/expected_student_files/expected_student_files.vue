@@ -30,71 +30,70 @@
 </template>
 
 <script lang="ts">
-  import { array_remove_unique } from '@/utils';
-  import { ExpectedStudentFile, ExpectedStudentFileObserver, Project } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-  import CreateExpectedStudentFile
-    from '@/components/expected_student_files/create_expected_student_file.vue';
-  import SingleExpectedStudentFile
-    from '@/components/expected_student_files/single_expected_student_file.vue';
-  import Tooltip from '@/components/tooltip.vue';
+import CreateExpectedStudentFile from '@/components/expected_student_files/create_expected_student_file.vue';
+import SingleExpectedStudentFile from '@/components/expected_student_files/single_expected_student_file.vue';
+import Tooltip from '@/components/tooltip.vue';
 
-  @Component({
-    components: {
-      CreateExpectedStudentFile,
-      SingleExpectedStudentFile,
-      Tooltip
-    }
-  })
-  export default class ExpectedStudentFiles extends Vue implements ExpectedStudentFileObserver {
+import { array_remove_unique } from '@/utils';
+import { ExpectedStudentFile, ExpectedStudentFileObserver, Project } from 'ag-client-typescript';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-    @Prop({required: true, type: Project})
-    project!: Project;
-
-    expected_student_files: ExpectedStudentFile[] = [];
-
-    async created() {
-      ExpectedStudentFile.subscribe(this);
-      this.expected_student_files = await ExpectedStudentFile.get_all_from_project(
-        this.project.pk
-      );
-      this.sort_files();
-    }
-
-    destroyed() {
-      ExpectedStudentFile.unsubscribe(this);
-    }
-
-    update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
-      this.expected_student_files.push(expected_student_file);
-      this.sort_files();
-    }
-
-    update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
-      let index = this.expected_student_files.findIndex(
-        (file) => file.pk === expected_student_file.pk);
-      Vue.set(this.expected_student_files, index, expected_student_file);
-      this.sort_files();
-    }
-
-    update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
-      array_remove_unique(this.expected_student_files,
-                          expected_student_file.pk,
-                          (file, pk) => file.pk === pk
-      );
-    }
-
-    sort_files() {
-      this.expected_student_files.sort(
-        (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
-          if (file_a.pattern <= file_b.pattern) {
-            return -1;
-          }
-          return 1;
-        }
-      );
-    }
+@Component({
+  components: {
+    CreateExpectedStudentFile,
+    SingleExpectedStudentFile,
+    Tooltip
   }
+})
+export default class ExpectedStudentFiles extends Vue implements ExpectedStudentFileObserver {
+
+  @Prop({required: true, type: Project})
+  project!: Project;
+
+  expected_student_files: ExpectedStudentFile[] = [];
+
+  async created() {
+    ExpectedStudentFile.subscribe(this);
+    this.expected_student_files = await ExpectedStudentFile.get_all_from_project(
+      this.project.pk
+    );
+    this.sort_files();
+  }
+
+  destroyed() {
+    ExpectedStudentFile.unsubscribe(this);
+  }
+
+  update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
+    this.expected_student_files.push(expected_student_file);
+    this.sort_files();
+  }
+
+  update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
+    let index = this.expected_student_files.findIndex(
+      (file) => file.pk === expected_student_file.pk);
+    Vue.set(this.expected_student_files, index, expected_student_file);
+    this.sort_files();
+  }
+
+  update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
+    array_remove_unique(this.expected_student_files,
+                        expected_student_file.pk,
+                        (file, pk) => file.pk === pk
+    );
+  }
+
+  sort_files() {
+    this.expected_student_files.sort(
+      (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
+        if (file_a.pattern <= file_b.pattern) {
+          return -1;
+        }
+        return 1;
+      }
+    );
+  }
+}
 </script>
 
 <style scoped lang="scss">

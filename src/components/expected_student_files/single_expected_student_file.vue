@@ -1,5 +1,5 @@
 <template>
-  <div id="single-expected-student-file" v-if="expected_student_file !== null">
+  <div id="single-expected-student-file">
 
     <div :class="[{'header-editing' : actively_updating},
                   {'odd-header': !actively_updating && odd_index },
@@ -82,84 +82,91 @@
 </template>
 
 <script lang="ts">
-  import APIErrors from '@/components/api_errors.vue';
-  import ExpectedStudentFileForm,
-         { ExpectedStudentFileFormData }
-         from '@/components/expected_student_files/expected_student_file_form.vue';
-  import Modal from '@/components/modal.vue';
-  import { handle_api_errors_async, safe_assign } from '@/utils';
+import APIErrors from '@/components/api_errors.vue';
+import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/expected_student_files/expected_student_file_form.vue';
+import Modal from '@/components/modal.vue';
+import { handle_api_errors_async, safe_assign } from '@/utils';
 
-  import { ExpectedStudentFile } from 'ag-client-typescript';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { ExpectedStudentFile } from 'ag-client-typescript';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  @Component({
-    components: { APIErrors, ExpectedStudentFileForm, Modal }
-  })
-  export default class SingleExpectedStudentFile extends Vue {
+@Component({
+  components: { APIErrors, ExpectedStudentFileForm, Modal }
+})
+export default class SingleExpectedStudentFile extends Vue {
 
-    @Prop({required: true, type: Object})
-    expected_student_file!: ExpectedStudentFile;
+  @Prop({required: true, type: Object})
+  expected_student_file!: ExpectedStudentFile;
 
-    @Prop({required: false, default: true})
-    odd_index!: boolean;
+  @Prop({required: false, default: true})
+  odd_index!: boolean;
 
-    actively_updating = false;
-    d_expected_student_file: ExpectedStudentFile | null = null;
-    d_delete_pending = false;
-    d_saving = false;
-    pattern_is_valid = false;
+  actively_updating = false;
+  // Using a default value here is cleaner than making this field nullable and using
+  // the non-null assertion operator at all use points
+  d_expected_student_file: ExpectedStudentFile = new ExpectedStudentFile({
+    pk: 0,
+    project: 0,
+    pattern: "",
+    min_num_matches: 1,
+    max_num_matches: 1,
+    last_modified: ""
+  });
+  d_delete_pending = false;
+  d_saving = false;
+  pattern_is_valid = false;
 
-    created() {
-      this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
-    }
+  created() {
+    this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
+  }
 
-    @Watch('expected_student_file')
-    on_expected_student_file_changed(new_file: ExpectedStudentFile,
-                                     old_file: ExpectedStudentFile) {
-      this.d_expected_student_file!.pattern = new_file.pattern;
-      this.d_expected_student_file!.min_num_matches = new_file.min_num_matches;
-      this.d_expected_student_file!.max_num_matches = new_file.max_num_matches;
-    }
+  @Watch('expected_student_file')
+  on_expected_student_file_changed(new_file: ExpectedStudentFile,
+                                   old_file: ExpectedStudentFile) {
+    this.d_expected_student_file.pattern = new_file.pattern;
+    this.d_expected_student_file.min_num_matches = new_file.min_num_matches;
+    this.d_expected_student_file.max_num_matches = new_file.max_num_matches;
+  }
 
-    get wildcard_is_present() {
-      return this.expected_student_file.pattern.match('[*?![\\]]') !== null;
-    }
+  get wildcard_is_present() {
+    return this.expected_student_file.pattern.match('[*?![\\]]') !== null;
+  }
 
-    @handle_api_errors_async(handle_edit_expected_student_file_error)
-    async update_expected_student_file(file: ExpectedStudentFileFormData) {
-      try {
-        this.d_saving = true;
-        (<APIErrors> this.$refs.api_errors).clear();
-        safe_assign(this.d_expected_student_file!, file);
-        await this.d_expected_student_file!.save();
-        (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
-        this.actively_updating = false;
-      }
-      finally {
-        this.d_saving = false;
-      }
-    }
-
-    cancel_update() {
+  @handle_api_errors_async(handle_edit_expected_student_file_error)
+  async update_expected_student_file(file: ExpectedStudentFileFormData) {
+    try {
+      this.d_saving = true;
+      (<APIErrors> this.$refs.api_errors).clear();
+      safe_assign(this.d_expected_student_file, file);
+      await this.d_expected_student_file.save();
       (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
       this.actively_updating = false;
     }
-
-    async delete_pattern_permanently() {
-      try {
-        this.d_delete_pending = true;
-        await this.expected_student_file.delete();
-      }
-      finally {
-        this.d_delete_pending = false;
-      }
+    finally {
+      this.d_saving = false;
     }
   }
 
-  export function handle_edit_expected_student_file_error(component: SingleExpectedStudentFile,
-                                                          error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  cancel_update() {
+    (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+    this.actively_updating = false;
   }
+
+  async delete_pattern_permanently() {
+    try {
+      this.d_delete_pending = true;
+      await this.expected_student_file.delete();
+    }
+    finally {
+      this.d_delete_pending = false;
+    }
+  }
+}
+
+export function handle_edit_expected_student_file_error(component: SingleExpectedStudentFile,
+                                                        error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 </script>
 
 <style scoped lang="scss">
