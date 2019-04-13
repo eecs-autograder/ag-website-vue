@@ -17,7 +17,9 @@
         </slot>
       </template>
     </Dropdown>
-    <div v-if="filtered_choices.length === 0 && $refs.dropdown_component.is_open"
+    <div v-if="choices.length === 0 && filter_text !== '' ||
+               (choices.length !== 0 && filtered_choices.length === 0
+                && $refs.dropdown_component.is_open)"
          id="no-matching-results">
       <div id="no-matching-results-row">
         <slot name="no_matching_results" v-bind:filter_text="filter_text">
