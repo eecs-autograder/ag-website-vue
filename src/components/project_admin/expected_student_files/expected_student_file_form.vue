@@ -66,74 +66,78 @@
 </template>
 
 <script lang="ts">
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
-  import { is_non_negative, is_not_empty, is_number } from '@/validators';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 
-  import { NewExpectedStudentFileData } from 'ag-client-typescript';
+import { is_non_negative, is_not_empty, is_number } from '@/validators';
+import { NewExpectedStudentFileData } from 'ag-client-typescript';
 
-  export class ExpectedStudentFileFormData implements NewExpectedStudentFileData {
-    pattern: string;
-    min_num_matches: number;
-    max_num_matches: number;
+export class ExpectedStudentFileFormData implements NewExpectedStudentFileData {
+  pattern: string;
+  min_num_matches: number;
+  max_num_matches: number;
 
-    constructor({
-      pattern = "",
-      min_num_matches = 1,
-      max_num_matches = 1
-    }: {pattern?: string, min_num_matches?: number, max_num_matches?: number}) {
-      this.pattern = pattern;
-      this.min_num_matches = min_num_matches;
-      this.max_num_matches = max_num_matches;
+  constructor({
+    pattern = "",
+    min_num_matches = 1,
+    max_num_matches = 1
+  }: {pattern?: string, min_num_matches?: number, max_num_matches?: number}) {
+    this.pattern = pattern;
+    this.min_num_matches = min_num_matches;
+    this.max_num_matches = max_num_matches;
+  }
+}
+
+@Component({
+  components: {
+    Tooltip,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class ExpectedStudentFileForm extends Vue {
+
+  @Prop({default: () => new ExpectedStudentFileFormData({})})
+  expected_student_file!: ExpectedStudentFileFormData;
+
+  d_expected_student_file: ExpectedStudentFileFormData = new ExpectedStudentFileFormData({});
+  d_exact_match = true;
+
+  readonly is_non_negative = is_non_negative;
+  readonly is_not_empty = is_not_empty;
+  readonly is_number = is_number;
+
+  created() {
+    this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
+  }
+
+  get wildcard_is_present() {
+    return this.d_expected_student_file.pattern.match('[*?![\\]]') !== null;
+  }
+
+  @Watch('wildcard_is_present')
+  on_wildcard_is_present_changed(new_val: boolean, old_val: boolean) {
+    if (new_val) {
+      this.d_exact_match = false;
     }
   }
 
-  @Component({
-    components: { Tooltip, ValidatedForm, ValidatedInput }
-  })
-  export default class ExpectedStudentFileForm extends Vue {
-
-    @Prop({default: () => new ExpectedStudentFileFormData({})})
-    expected_student_file!: ExpectedStudentFileFormData;
-
-    d_expected_student_file: ExpectedStudentFileFormData = new ExpectedStudentFileFormData({});
-    d_exact_match = true;
-
-    readonly is_non_negative = is_non_negative;
-    readonly is_not_empty = is_not_empty;
-    readonly is_number = is_number;
-
-    created() {
-      this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
+  submit_form() {
+    if (this.d_exact_match || !this.wildcard_is_present) {
+      this.d_expected_student_file.min_num_matches = 1;
+      this.d_expected_student_file.max_num_matches = 1;
     }
-
-    get wildcard_is_present() {
-      return this.d_expected_student_file.pattern.match('[*?![\\]]') !== null;
-    }
-
-    @Watch('wildcard_is_present')
-    on_wildcard_is_present_changed(new_val: boolean, old_val: boolean) {
-      if (new_val) {
-        this.d_exact_match = false;
-      }
-    }
-
-    submit_form() {
-      if (this.d_exact_match || !this.wildcard_is_present) {
-        this.d_expected_student_file.min_num_matches = 1;
-        this.d_expected_student_file.max_num_matches = 1;
-      }
-      this.$emit('on_submit', this.d_expected_student_file);
-    }
-
-    reset_expected_student_file_values() {
-      (<ValidatedForm> this.$refs.expected_student_file_form).reset_warning_state();
-      this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
-    }
+    this.$emit('on_submit', this.d_expected_student_file);
   }
+
+  reset_expected_student_file_values() {
+    (<ValidatedForm> this.$refs.expected_student_file_form).reset_warning_state();
+    this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
+  }
+}
 </script>
 
 <style scoped lang="scss">

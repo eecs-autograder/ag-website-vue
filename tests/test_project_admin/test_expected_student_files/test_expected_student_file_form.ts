@@ -1,4 +1,4 @@
-import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
+import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { ExpectedStudentFile } from 'ag-client-typescript';
@@ -42,7 +42,6 @@ describe('Input property tests', () => {
         expect(component.d_expected_student_file.max_num_matches).toEqual(file.max_num_matches);
     });
 });
-
 
 describe('Valid form submit tests', () => {
     let wrapper: Wrapper<ExpectedStudentFileForm>;

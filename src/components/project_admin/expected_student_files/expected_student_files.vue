@@ -1,7 +1,6 @@
 <template>
   <div id="expected-student-files-component">
     <div class="new-pattern-side">
-
       <div class="new-pattern-container">
         <div class="new-pattern-title"> New Expected Student File </div>
         <div id="new-expected-file-pattern">
@@ -10,11 +9,9 @@
           </create-expected-student-file>
         </div>
       </div>
-
     </div>
 
     <div class="existing-patterns">
-
       <div class="existing-patterns-title"> Existing Expected Student Files </div>
       <div class="list-of-patterns-container">
         <div v-for="(file, index) of expected_student_files"
@@ -24,19 +21,19 @@
           </single-expected-student-file>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import CreateExpectedStudentFile from '@/components/expected_student_files/create_expected_student_file.vue';
-import SingleExpectedStudentFile from '@/components/expected_student_files/single_expected_student_file.vue';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import CreateExpectedStudentFile from '@/components/project_admin/expected_student_files/create_expected_student_file.vue';
+import SingleExpectedStudentFile from '@/components/project_admin/expected_student_files/single_expected_student_file.vue';
 import Tooltip from '@/components/tooltip.vue';
 
 import { array_remove_unique } from '@/utils';
 import { ExpectedStudentFile, ExpectedStudentFileObserver, Project } from 'ag-client-typescript';
-import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component({
   components: {

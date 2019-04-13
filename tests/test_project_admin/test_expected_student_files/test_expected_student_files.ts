@@ -1,6 +1,4 @@
-import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
-import ExpectedStudentFiles from '@/components/expected_student_files/expected_student_files.vue';
-import SingleExpectedStudentFile from '@/components/expected_student_files/single_expected_student_file.vue';
+import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     ExpectedStudentFile,
@@ -111,18 +109,6 @@ describe('ExpectedStudentFiles tests', () => {
         }
     });
 
-    function call_notify_expected_student_file_deleted(file_to_delete: ExpectedStudentFile) {
-        ExpectedStudentFile.notify_expected_student_file_deleted(file_to_delete);
-    }
-
-    function call_notify_expected_student_file_created(created_file: ExpectedStudentFile) {
-        ExpectedStudentFile.notify_expected_student_file_created(created_file);
-    }
-
-    function call_notify_expected_student_file_changed(file_that_changed: ExpectedStudentFile) {
-        ExpectedStudentFile.notify_expected_student_file_changed(file_that_changed);
-    }
-
     test('Existing files get fetched and sorted', () => {
         expect(component.expected_student_files.length).toEqual(3);
         expect(component.expected_student_files[0]).toEqual(file_1_has_wildcard);
@@ -143,17 +129,11 @@ describe('ExpectedStudentFiles tests', () => {
     });
 
     test('Delete a file', async () => {
-        let delete_stub = sinon.stub(file_2_no_wildcard, "delete").callsFake(
-            () => call_notify_expected_student_file_deleted(file_2_no_wildcard)
-        );
+        expect(component.expected_student_files.length).toEqual(3);
 
-        wrapper.findAll('.delete-file').at(1).trigger('click');
+        ExpectedStudentFile.notify_expected_student_file_deleted(file_2_no_wildcard);
         await component.$nextTick();
 
-        wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
-
-        expect(delete_stub.calledOnce).toBe(true);
         expect(component.expected_student_files.length).toEqual(2);
         expect(component.expected_student_files[0]).toEqual(file_1_has_wildcard);
         expect(component.expected_student_files[1]).toEqual(file_3_no_wildcard);
@@ -189,6 +169,7 @@ describe('ExpectedStudentFiles tests', () => {
         });
 
         ExpectedStudentFile.notify_expected_student_file_changed(updated_file);
+        await component.$nextTick();
 
         expect(component.expected_student_files.length).toEqual(3);
         expect(component.expected_student_files[0]).toEqual(updated_file);

@@ -3,31 +3,31 @@
       <expected-student-file-form ref="form"
                                   @on_submit="create_expected_student_file($event)"
                                   @on_form_validity_changed="pattern_is_valid = $event">
-
         <template slot="form_footer">
           <APIErrors ref="api_errors"> </APIErrors>
-
           <button class="add-file-button"
                   type="submit"
                   :disabled="!pattern_is_valid"> Add File
           </button>
         </template>
-
       </expected-student-file-form>
   </div>
 </template>
 
 <script lang="ts">
-import APIErrors from '@/components/api_errors.vue';
-import ExpectedStudentFileForm from '@/components/expected_student_files/expected_student_file_form.vue';
-
-import { handle_api_errors_async } from '@/utils';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import APIErrors from '@/components/api_errors.vue';
+import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
+
+import { handle_api_errors_async } from '@/utils';
 import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
 @Component({
-  components: { APIErrors, ExpectedStudentFileForm }
+  components: {
+    APIErrors,
+    ExpectedStudentFileForm
+  }
 })
 export default class CreateExpectedStudentFile extends Vue {
 
@@ -79,13 +79,6 @@ export function handle_add_expected_student_file_error(component: CreateExpected
 .add-file-button, .add-file-button:disabled {
   font-size: 15px;
   margin-top: 12px;
-}
-
-.add-file-button:disabled, .add-file-button:disabled:hover {
-  background-color: hsl(220, 30%, 85%);
-  border-color: hsl(220, 30%, 80%);
-  color: gray;
-  cursor: default;
 }
 
 </style>

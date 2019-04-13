@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import ExpectedStudentFiles from '@/components/expected_student_files/expected_student_files.vue';
+import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import { Course, Project, User } from 'ag-client-typescript';
 import { Component, Vue } from 'vue-property-decorator';
 
@@ -27,7 +27,5 @@ export default class ExpectedStudentFilesDemo extends Vue {
 }
 </script>
 
-<!--globally scoped-->
 <style lang="scss">
-  @import '@/styles/colors.scss';
 </style>

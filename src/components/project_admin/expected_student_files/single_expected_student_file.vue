@@ -12,7 +12,6 @@
         <div class="matches-label">
           Minimum number of matches: {{expected_student_file.min_num_matches}}
         </div>
-
         <div class="matches-label">
           Maximum number of matches: {{expected_student_file.max_num_matches}}
         </div>
@@ -40,7 +39,7 @@
                                   :expected_student_file="expected_student_file"
                                   @on_form_validity_changed="pattern_is_valid = $event">
         <template slot="form_footer">
-          <a-p-i-errors ref="api_errors"> </a-p-i-errors>
+          <APIErrors ref="api_errors"> </APIErrors>
 
           <div class="button-container">
             <button class="cancel-update-button"
@@ -66,7 +65,6 @@
         This action cannot be undone, and any test cases that rely on this file may have
         to be updated before they run correctly again.
       </div>
-
       <div id="modal-button-container">
         <button class="modal-delete-button"
                 type="button"
@@ -82,16 +80,21 @@
 </template>
 
 <script lang="ts">
-import APIErrors from '@/components/api_errors.vue';
-import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/expected_student_files/expected_student_file_form.vue';
-import Modal from '@/components/modal.vue';
-import { handle_api_errors_async, safe_assign } from '@/utils';
-
-import { ExpectedStudentFile } from 'ag-client-typescript';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
+import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
+
+import { handle_api_errors_async, safe_assign } from '@/utils';
+import { ExpectedStudentFile } from 'ag-client-typescript';
+
 @Component({
-  components: { APIErrors, ExpectedStudentFileForm, Modal }
+  components: {
+    APIErrors,
+    ExpectedStudentFileForm,
+    Modal
+  }
 })
 export default class SingleExpectedStudentFile extends Vue {
 
@@ -102,6 +105,7 @@ export default class SingleExpectedStudentFile extends Vue {
   odd_index!: boolean;
 
   actively_updating = false;
+  d_delete_pending = false;
   // Using a default value here is cleaner than making this field nullable and using
   // the non-null assertion operator at all use points
   d_expected_student_file: ExpectedStudentFile = new ExpectedStudentFile({
@@ -112,7 +116,6 @@ export default class SingleExpectedStudentFile extends Vue {
     max_num_matches: 1,
     last_modified: ""
   });
-  d_delete_pending = false;
   d_saving = false;
   pattern_is_valid = false;
 
