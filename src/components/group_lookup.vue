@@ -3,7 +3,7 @@
     <div class="search-bar-label"> Search groups: </div>
     <div class="group-lookup-search-bar">
       <dropdown-typeahead ref="group_typeahead"
-                          placeholder_text="Enter a username or name of an individual"
+                          placeholder_text="Enter a username"
                           :choices="d_groups"
                           @update_item_chosen="$emit('update_group_selected', $event)"
                           :filter_fn="group_filter_fn">
@@ -23,26 +23,8 @@
 <script lang="ts">
   import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
   import ValidatedInput from '@/components/validated_input.vue';
-  import { Project } from 'ag-client-typescript';
+  import { Group, Project } from 'ag-client-typescript';
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-
-  interface Member {
-    username: string;
-    full_name: string;
-  }
-
-  interface Group {
-    pk: number;
-    project: number;
-    extended_due_date: string;
-    member_names: Member[];
-    bonus_submissions_remaining: number;
-    late_days_used: {[username: string]: number};
-    num_submissions: number;
-    num_submits_towards_limit: number;
-    created_at: string;
-    last_modified: string;
-  }
 
   @Component({
     components: {
@@ -66,14 +48,12 @@
     }
 
     async created() {
-      // are the groups going to be sorted by the first member name? Or do I need to do that here?
       this.d_groups = this.groups.slice(0);
     }
 
     group_filter_fn(item: Group, filter_text: string) {
-      for (let i = 0; i < item.member_names.length; ++i) {
-        if ((item.member_names[i].full_name.toLowerCase()).indexOf(filter_text.toLowerCase()) >= 0
-         || item.member_names[i].username.indexOf(filter_text) >= 0) {
+      for (let member_name of item.member_names) {
+        if ((member_name.toLowerCase()).indexOf(filter_text.toLowerCase()) >= 0) {
           return true;
         }
       }
