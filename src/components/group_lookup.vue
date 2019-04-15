@@ -9,7 +9,7 @@
         <template slot-scope="{item}">
           <span v-for="(member, index) of item.member_names">
             <span class="typeahead-row">
-              {{member}}{{index === item.member_names.length - 1 ? "" : ", "}}
+              {{member}} {{item.bonus_submissions_remaining}} {{index === item.member_names.length - 1 ? "" : ", "}}
             </span>
           </span>
         </template>
@@ -37,7 +37,11 @@ export default class GroupLookup extends Vue {
 
   @Watch('groups')
   on_groups_changed(new_groups: Group[], old_groups: Group[]) {
+    console.log(old_groups);
+    console.log(new_groups);
     this.d_groups = new_groups.slice(0);
+    console.log("The groups array changed again*************");
+    console.log("Laura bonus " + this.d_groups[2].bonus_submissions_remaining);
   }
 
   created() {

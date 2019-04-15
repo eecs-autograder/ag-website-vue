@@ -8,10 +8,11 @@
           <div class="group-member-editing">
             <div class="username-validated-container">
               <validated-input v-model="member.username"
-                              :validators="[]"
-                              :num_rows="1"
-                              input_style="width: 100%;
-                                           border: 1px solid #ced4da;">
+                               :key="member.id"
+                               :validators="[]"
+                               :num_rows="1"
+                               input_style="width: 100%;
+                                            border: 1px solid #ced4da;">
               </validated-input>
             </div>
             <div class="remove-group-member"
@@ -29,7 +30,9 @@
           </button>
         </div>
       </div>
-      <APIErrors ref="api_errors"></APIErrors>
+
+      <APIErrors ref="api_errors"> </APIErrors>
+
       <button class="create-group-button"
               :disabled="d_creating_group"
               @click="create_group()"> Create Group </button>
@@ -45,8 +48,14 @@
   import APIErrors from '@/components/api_errors.vue';
   import ValidatedInput from '@/components/validated_input.vue';
 
-  import { Project } from 'ag-client-typescript';
+  import { Group, Project, NewGroupData } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { handle_api_errors_async } from '@/utils';
+
+  interface GroupMember {
+    id: number;
+    username: string;
+  }
 
   @Component({
     components: {
@@ -59,30 +68,48 @@
     @Prop({required: true, type: Project})
     project!: Project;
 
-    group_members: Object[] = [{username: '@umich.edu'}];
-
-    max_group_size = 3;
-
     d_creating_group = false;
 
+    group_members: object[] = [
+      {
+        id: 1,
+        username: "@umich.edu" // get from elsewhere
+      }
+    ];
+
+    max_group_size = 1;
     successful_submission = false;
 
+    created() {
+      this.max_group_size = this.project.max_group_size;
+      console.log("Max group size: " + this.max_group_size);
+    }
+
+    @handle_api_errors_async(handle_create_group_error)
     async create_group() {
       try {
         this.d_creating_group = true;
-        // Group.create(this.project.pk, data: NewGroupData); returns the group - just dont do anything with it?
-        // Group.create_solo_group(this.project.pk); again, returns group
-        // merge might come into play here too?
+        let list_of_members: string[] = [];
+        for (let group_member of this.group_members) {
+          list_of_members.push(group_member.username);
+        }
+        let new_group = await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
         this.successful_submission = true;
         setTimeout(() => {
           this.d_creating_group = false;
           setTimeout(() => {
             this.successful_submission = false;
-            this.group_members = [{username: '@umich.edu'}];
+            this.group_members = [
+              {
+                id: 1,
+                username: "@umich.edu"
+              }
+            ];
           }, 1000);
         }, 1500);
       }
       catch(error) {
+        console.log(error);
         this.d_creating_group = false;
       }
     }
@@ -94,9 +121,16 @@
     }
 
     add_group_member() {
-      this.group_members.push({username: '@umich.edu'});
+      this.group_members.push({
+          id: this.group_members.length,
+          username: '@umich.edu'
+      });
     }
+  }
 
+  function handle_create_group_error(component: CreateSingleGroup, error: unknown) {
+    console.log("Am I even getting called"); // the answer is no
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 </script>
 
@@ -108,8 +142,6 @@
 
   #create-group-component {
     font-family: Quicksand;
-    /*width: 95%;*/
-    /*margin: 0 2.5%;*/
   }
 
   .create-group-container {
@@ -126,7 +158,6 @@
     padding: 0 0 8px 0;
     color: lighten(black, 25);
     width: 160px;
-    //border-bottom: 2px dashed $stormy-gray-dark;
   }
 
   .create-group-button {
