@@ -82,7 +82,6 @@
 
     created() {
       this.max_group_size = this.project.max_group_size;
-      console.log("Max group size: " + this.max_group_size);
     }
 
     @handle_api_errors_async(handle_create_group_error)
@@ -93,23 +92,22 @@
         for (let group_member of this.group_members) {
           list_of_members.push(group_member.username);
         }
-        let new_group = await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
+        await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
         this.successful_submission = true;
         setTimeout(() => {
           this.d_creating_group = false;
           setTimeout(() => {
-            this.successful_submission = false;
             this.group_members = [
               {
                 id: 1,
                 username: "@umich.edu"
               }
             ];
+            this.successful_submission = false;
           }, 1000);
-        }, 1500);
+        }, 1200);
       }
-      catch(error) {
-        console.log(error);
+      finally {
         this.d_creating_group = false;
       }
     }
@@ -129,7 +127,6 @@
   }
 
   function handle_create_group_error(component: CreateSingleGroup, error: unknown) {
-    console.log("Am I even getting called"); // the answer is no
     (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 </script>
@@ -168,7 +165,9 @@
     @extend .gray-button;
   }
 
-  .create-group-button, .create-group-button:disabled {}
+  .create-group-button, .create-group-button:disabled {
+    margin-top: 15px;
+  }
 
   .selected-group {
     display: inline-block;
@@ -229,7 +228,7 @@
   }
 
   .add-member-container {
-    padding: 8px 0 15px 0;
+    padding: 8px 0 5px 0;
     cursor: pointer;
     display: inline-block;
   }

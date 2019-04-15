@@ -82,6 +82,7 @@ export default class APIErrors extends Vue {
   padding: 4px 10px;
   background-color: white;
   border-radius: .25rem;
+  color: black; // text is not visible without this
   cursor: pointer;
   color: black;
   border: 1px solid #f5c6cb;

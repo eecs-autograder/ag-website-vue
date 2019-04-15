@@ -43,7 +43,7 @@
               {{member_name}}
             </div>
           </td>
-        <td class="due-date"> {{group.bonus_submissions_remaining}}  __Feb 20, 2019, 4:00:00 PM </td>
+        <td class="due-date"> {{group.bonus_submissions_remaining}} __Feb 20, 2019, 4:00:00 PM </td>
 <!--          {{group.extended_due_date}}-->
         </tr>
       </table>
@@ -99,25 +99,20 @@
 
     update_group_selected(group: Group) {
       this.selected_group = group;
-      console.log("Update group selected: " + this.selected_group.member_names);
-      console.log("Update selected: " + this.selected_group.bonus_submissions_remaining);
     }
 
     update_group_created(group: Group): void {
       this.groups.push(group);
+      // figure out where to put the group (don't just push it on the back
     }
 
     update_group_changed(group: Group): void {
-      console.log("update_group_changed bonus to: " + group.bonus_submissions_remaining);
       let index = this.groups.findIndex((item: Group) => item.pk === group.pk);
-      Vue.set(this.groups, index, group);
-      // this.groups = await Group.get_all_from_project(this.project.pk);
-      // member names could have been added/removed
-      // extended due date could have changed
-      // bonus_submissions_remaining could have changed.
-      // find group
-      // update group ? people could have been removed or added
-      // or an extension could have been granted redacted
+      // using set does not work. the member name is thereafter sharing the same space ....
+      this.groups[index].member_names = group.member_names.slice(0);
+      this.groups[index].extended_due_date = group.extended_due_date;
+      this.groups[index].bonus_submissions_remaining = group.bonus_submissions_remaining;
+      // figure out where to put this group now
     }
 
     update_group_merged(group: Group): void {
@@ -157,14 +152,6 @@ $current-lang-choice: 'Quicksand';
   width: 100%;
 }
 
-/*.extensions-title {*/
-/*  color: lighten(black, 25);*/
-/*  font-size: 17px;*/
-/*  font-weight: bold;*/
-/*  margin: 0;*/
-/*  padding: 3px 10px 8px 5px;*/
-/*}*/
-
 .extension-row {
   padding: 5px;
 }
@@ -184,26 +171,25 @@ $current-lang-choice: 'Quicksand';
 table {
   border-collapse: collapse;
   font-size: 16px;
-  width: 100%;
+  display: inline-block;
 }
 
 th {
   padding:  8px 5px;
   font-weight: bold;
   color: lighten(black, 25);
-  /*border-bottom: 2px solid hsl(210, 20%, 80%);*/
   border-bottom: 2px solid $grape;
   font-size: 17px;
 }
 
 .group-members {
-  padding: 8px 100px 8px 5px;
+  padding: 10px 100px 10px 10px;
   font-weight: 500;
   border-bottom: 1px solid hsl(210, 20%, 94%);
 }
 
 .due-date {
-  padding: 8px 5px;
+  padding: 10px;
   vertical-align: top;
   border-bottom: 1px solid hsl(210, 20%, 94%);
 }
@@ -219,16 +205,6 @@ th {
     margin-top: 10px;
     font-family: Quicksand;
   }
-
-  /*.edit-side-title {*/
-  /*  color: lighten(black, 25);*/
-  /*  font-size: 16px;*/
-  /*  font-weight: bold;*/
-  /*  margin: 0;*/
-  /*  padding: 3px 10px 24px 0;*/
-  /*  display: inline-block;*/
-  /*  vertical-align: top;*/
-  /*}*/
 
   .left {
     width: 50%;
