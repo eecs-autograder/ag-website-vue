@@ -2,10 +2,10 @@
   <div id="edit-single-group-component" v-if="d_group !== null">
     <div class="edit-group-members-container">
       <p class="group-members-label"> Group members: </p>
-      <div v-for="(member, index) of group.member_names">
+      <div v-for="(member, index) of d_group.member_names">
         <div class="group-member-editing">
           <div class="username-validated-container">
-            <validated-input v-model="group.member_names[index]"
+            <validated-input v-model="d_group.member_names[index]"
                             :validators="[]"
                             :num_rows="1"
                             input_style="width: 100%;
@@ -21,20 +21,24 @@
       </div>
       <div class="add-member-container">
         <button class="add-member-button"
-                :disabled="group.member_names.length >= max_group_size"
+                :disabled="d_group.member_names.length >= max_group_size"
                 @click="add_group_member">
           Add Another Member
         </button>
       </div>
 
       <div id="extension-toggle">
-        <Toggle v-model="has_extension"
+        <Toggle v-model="d_group.extended_due_date !== null"
                 :active_background_color="toggle_color">
           <div slot="on">
-            <p class="toggle-on"> {{has_extension ? 'Has extension' : 'Grant extension'}}</p>
+            <p class="toggle-on">
+              {{d_group.extended_due_date !== null ? 'Has extension' : 'Grant extension'}}
+            </p>
           </div>
           <div slot="off">
-            <p class="toggle-off"> {{has_extension ? 'Revoke Extension' : 'No extension'}} </p>
+            <p class="toggle-off">
+              {{d_group.extended_due_date !== null ? 'Revoke Extension' : 'No extension'}}
+            </p>
           </div>
         </Toggle>
       </div>
@@ -56,6 +60,7 @@
     </div>
 
     <APIErrors ref="api_errors"></APIErrors>
+
     <button class="update-group-button"
             :disabled="d_saving"
             @click="update_group()"> Update Group </button>
@@ -70,27 +75,10 @@
   import APIErrors from '@/components/api_errors.vue';
   import Toggle from '@/components/toggle.vue';
   import ValidatedInput from '@/components/validated_input.vue';
+  import { safe_assign } from "@/utils";
 
-  import { Project } from 'ag-client-typescript';
+  import { Group, Project } from 'ag-client-typescript';
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-
-  interface Member {
-    username: string;
-    full_name: string;
-  }
-
-  interface Group {
-    pk: number;
-    project: number;
-    extended_due_date: string;
-    member_names: string[];
-    bonus_submissions_remaining: number;
-    late_days_used: {[username: string]: number};
-    num_submissions: number;
-    num_submits_towards_limit: number;
-    created_at: string;
-    last_modified: string;
-  }
 
   @Component({
     components: {
@@ -101,41 +89,56 @@
   })
   export default class EditSingleGroup extends Vue {
 
-    // @Prop({required: true, type: Group})
-    // group!: Group;
+    @Prop({required: true, type: Group})
+    group!: Group;
 
     @Prop({required: true, type: Project})
     project!: Project;
 
+    @Watch('group')
+    on_group_selected_changed(new_group: Group, old_group: Group) {
+      console.log("ESG Watcher Bonus " + new_group.bonus_submissions_remaining);
+      this.d_group = new Group({
+        pk: new_group.pk,
+        project: new_group.project,
+        extended_due_date: new_group.extended_due_date,
+        member_names: new_group.member_names.slice(0),
+        bonus_submissions_remaining: new_group.bonus_submissions_remaining,
+        late_days_used: new_group.late_days_used,
+        num_submissions: new_group.num_submissions,
+        num_submits_towards_limit: new_group.num_submits_towards_limit,
+        created_at: new_group.created_at,
+        last_modified: new_group.last_modified
+      });
+      // console.log("Bonus submissions " + this.d_group.bonus_submissions_remaining);
+    }
+
     toggle_color = "orange";
 
-    // where is this info located?
-    max_group_size = 3;
+    max_group_size = 1;
 
     has_extension = true;
 
     d_saving = false;
-
-    group = {
-      pk: 2,
-      project: 2,
-      extended_due_date: "no",
-      member_names: ["dpickles@umich.edu", "lmjdev@umich.edu"],
-      bonus_submissions_remaining: 0,
-      late_days_used: {},
-      num_submissions: 3,
-      num_submits_towards_limit: 0,
-      created_at: "4pm",
-      last_modified: "6pm"
-    };
 
     d_group: Group | null = null;
 
     successful_update = false;
 
     created() {
-      // member-wise copy?
-      this.d_group = this.group;
+      this.d_group = new Group({
+        pk: this.group.pk,
+        project: this.group.project,
+        extended_due_date: this.group.extended_due_date,
+        member_names: this.group.member_names.slice(0),
+        bonus_submissions_remaining: this.group.bonus_submissions_remaining,
+        late_days_used: this.group.late_days_used,
+        num_submissions: this.group.num_submissions,
+        num_submits_towards_limit: this.group.num_submits_towards_limit,
+        created_at: this.group.created_at,
+        last_modified: this.group.last_modified
+      });
+      this.max_group_size = this.project.max_group_size;
     }
 
     remove_group_member(index: number) {
@@ -146,12 +149,11 @@
       this.d_group!.member_names.push('@umich.edu');
     }
 
-    update_group() {
+    async update_group() {
       try {
         this.d_saving = true;
-        // Group.create(this.project.pk, data: NewGroupData); returns the group - just dont do anything with it?
-        // Group.create_solo_group(this.project.pk); again, returns group
-        // merge might come into play here too?
+        console.log(this.d_group!.bonus_submissions_remaining);
+        await this.d_group!.save();
         this.successful_update = true;
         setTimeout(() => {
           this.d_saving = false;
@@ -208,8 +210,6 @@
     padding: 7px 11px;
     border-radius: 3px;
     margin-left: 8px;
-    /*background-color: hsl(220, 30%, 30%);*/
-    /*color: white;*/
   }
 
   .remove-group-member:hover {

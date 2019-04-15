@@ -1,15 +1,17 @@
 <template>
-  <div id="edit-groups-component">
+  <div id="edit-groups-component" v-if="!d_loading">
     <div class="left">
 
       <div id="component-toggle">
         <Toggle v-model="editing_existing_group"
                 :active_background_color="toggle_color">
           <div slot="on">
-            <p class="toggle-on">{{editing_existing_group ? 'Editing existing group' : 'Edit existing group'}}</p>
+            <p class="toggle-on">{{editing_existing_group
+                                   ? 'Editing existing group' : 'Edit existing group'}}</p>
           </div>
           <div slot="off">
-            <p class="toggle-off">{{editing_existing_group ? 'Create new group' : 'Creating new group'}} </p>
+            <p class="toggle-off">{{editing_existing_group
+                                    ? 'Create new group' : 'Creating new group'}} </p>
           </div>
         </Toggle>
       </div>
@@ -18,7 +20,9 @@
         <group-lookup :groups="groups"
                       :project="project"
                       @update_group_selected="update_group_selected"> </group-lookup>
-        <edit-single-group :project="project">
+        <edit-single-group v-if="selected_group !== null"
+                           :project="project"
+                           :group="selected_group">
         </edit-single-group>
       </div>
       <div v-else>
@@ -26,47 +30,21 @@
       </div>
     </div>
     <div class="right">
-<!--      <div class="extensions-title"> Extensions </div>-->
       <table class="extensions-container">
         <tr>
           <th> Extensions</th>
           <th> </th>
-<!--          <th> Group Members: </th>-->
-<!--          <th> Due Date: </th>-->
         </tr>
-        <tr class="odd">
+        <tr v-for="(group, index) of groups"
+            :class="index % 2 === 0 ? 'even' : 'odd'">
+<!--            v-if="group.extended_due_date !== null">-->
           <td class="group-members">
-            <div> aredondo@umich.edu </div>
-            <div> tdaly@umich.edu </div>
+            <div v-for="member_name of group.member_names">
+              {{member_name}}
+            </div>
           </td>
-        <td class="due-date"> Feb 18, 2019, 8:07:00 PM</td>
-        </tr>
-        <tr class="even">
-          <td class="group-members">
-            <div> ashberg@umich.edu </div>
-            <div> hmzeder@umich.edu </div>
-          </td>
-          <td class="due-date"> Feb 18, 2019, 8:07:00 PM </td>
-        </tr>
-        <tr class="odd">
-          <td class="group-members">
-            <div> taylor@umich.edu </div>
-          </td>
-          <td class="due-date"> Feb 19, 2019, 8:07:00 PM </td>
-        </tr>
-        <tr class="even">
-          <td class="group-members">
-            <div> edahuron@umich.edu </div>
-            <div> jschwab@umich.edu </div>
-          </td>
-          <td class="due-date"> Feb 20, 2019, 12:00:00 PM </td>
-        </tr>
-        <tr class="odd">
-          <td class="group-members">
-            <div> emiller@umich.edu </div>
-            <div> beihla@umich.edu </div>
-          </td>
-          <td class="due-date"> Feb 20, 2019, 4:00:00 PM </td>
+        <td class="due-date"> {{group.bonus_submissions_remaining}}  __Feb 20, 2019, 4:00:00 PM </td>
+<!--          {{group.extended_due_date}}-->
         </tr>
       </table>
     </div>
@@ -74,30 +52,12 @@
 </template>
 
 <script lang="ts">
-  import { Project } from 'ag-client-typescript';
+  import { Group, Project } from 'ag-client-typescript';
   import CreateSingleGroup from '@/components/edit_groups/create_single_group.vue';
   import EditSingleGroup from '@/components/edit_groups/edit_single_group.vue';
   import GroupLookup from '@/components/group_lookup.vue';
   import Toggle from '@/components/toggle.vue';
   import { Component, Prop, Vue } from 'vue-property-decorator';
-
-  interface Member {
-    username: string;
-    full_name: string;
-  }
-
-  interface Group {
-    pk: number;
-    project: number;
-    extended_due_date: string;
-    member_names: Member[];
-    bonus_submissions_remaining: number;
-    late_days_used: {[username: string]: number};
-    num_submissions: number;
-    num_submits_towards_limit: number;
-    created_at: string;
-    last_modified: string;
-  }
 
   @Component({
     components: {
@@ -107,10 +67,14 @@
       Toggle
     }
   })
-  export default class CreateGroup extends Vue { // implements GroupObserver
+  export default class EditGroups extends Vue { // implements GroupObserver
+
+    // get the course to get the domain?
 
     @Prop({required: true, type: Project})
     project!: Project;
+
+    d_loading = true;
 
     groups: Group[] = [];
 
@@ -118,87 +82,25 @@
 
     editing_existing_group = true;
 
-    group1 = {
-      pk: 1,
-      project: 2,
-      extended_due_date: "no",
-      member_names: [
-        {username: "chuckfin@umich.edu", full_name: "Charles Finster"},
-        {username: "tpickles@umich.edu", full_name: "Thomas Pickles"}
-      ],
-      bonus_submissions_remaining: 0,
-      late_days_used: {"chuckfin@umich.edu": 2},
-      num_submissions: 3,
-      num_submits_towards_limit: 2,
-      created_at: "9am",
-      last_modified: "10am"
-    };
-
-    group2 = {
-      pk: 2,
-      project: 2,
-      extended_due_date: "no",
-      member_names: [
-        {username: "dpickles@umich.edu", full_name: "Dylan Pickles"},
-        {username: "lmjdev@umich.edu", full_name: "Lillian DeVille"}
-      ],
-      bonus_submissions_remaining: 0,
-      late_days_used: {},
-      num_submissions: 3,
-      num_submits_towards_limit: 0,
-      created_at: "4pm",
-      last_modified: "6pm"
-    };
-
-    group3 = {
-      pk: 3,
-      project: 2,
-      extended_due_date: "yes",
-      member_names: [
-        {username: "kwatfin@umich.edu", full_name: "Kimiko Watanabe-Finster"},
-        {username: "prbdev@umich.edu", full_name: "Phillip DeVille"}
-      ],
-      bonus_submissions_remaining: 0,
-      late_days_used: {},
-      num_submissions: 3,
-      num_submits_towards_limit: 0,
-      created_at: "11am",
-      last_modified: "5pm"
-    };
-
-    group4 = {
-      pk: 4,
-      project: 2,
-      extended_due_date: "no",
-      member_names: [
-        {username: "suscarm@umich.edu", full_name: "Susanna Carmichael"},
-      ],
-      bonus_submissions_remaining: 0,
-      late_days_used: {},
-      num_submissions: 3,
-      num_submits_towards_limit: 0,
-      created_at: "2pm",
-      last_modified: "2:45pm"
-    };
-
     selected_group: Group | null = null;
 
     async created() {
-      // this.groups = Group.get_all_from_project(this.project.pk);
-      this.groups = [this.group1, this.group2, this.group3];
-      console.log("Created EG");
+      this.groups = await Group.get_all_from_project(this.project.pk);
+      this.d_loading = false;
     }
 
     mounted() {
-      // Group.subscribe(this);
+      Group.subscribe(this);
     }
 
     beforeDestroy() {
-      // Group.unsubscribe(this);
+      Group.unsubscribe(this);
     }
 
     update_group_selected(group: Group) {
-      console.log(group.member_names);
+      this.selected_group = group;
+      console.log("Update group selected: " + this.selected_group.member_names);
+      console.log("Update selected: " + this.selected_group.bonus_submissions_remaining);
     }
 
     update_group_created(group: Group): void {
@@ -206,13 +108,20 @@
     }
 
     update_group_changed(group: Group): void {
+      console.log("update_group_changed bonus to: " + group.bonus_submissions_remaining);
+      let index = this.groups.findIndex((item: Group) => item.pk === group.pk);
+      Vue.set(this.groups, index, group);
+      // this.groups = await Group.get_all_from_project(this.project.pk);
+      // member names could have been added/removed
+      // extended due date could have changed
+      // bonus_submissions_remaining could have changed.
       // find group
       // update group ? people could have been removed or added
       // or an extension could have been granted redacted
     }
 
     update_group_merged(group: Group): void {
-      // ?
+      console.log("Merging not implemented in UI yet");
     }
   }
 </script>
