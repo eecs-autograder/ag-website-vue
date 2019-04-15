@@ -37,11 +37,7 @@ export default class GroupLookup extends Vue {
 
   @Watch('groups')
   on_groups_changed(new_groups: Group[], old_groups: Group[]) {
-    console.log(old_groups);
-    console.log(new_groups);
     this.d_groups = new_groups.slice(0);
-    console.log("The groups array changed again*************");
-    console.log("Laura bonus " + this.d_groups[2].bonus_submissions_remaining);
   }
 
   created() {

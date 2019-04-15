@@ -9,7 +9,7 @@
                             :validators="[]"
                             :num_rows="1"
                             input_style="width: 100%;
-                                           border: 1px solid #ced4da;">
+                                         border: 1px solid #ced4da;">
             </validated-input>
           </div>
           <div class="remove-group-member"
@@ -28,16 +28,16 @@
       </div>
 
       <div id="extension-toggle">
-        <Toggle v-model="d_group.extended_due_date !== null"
+        <Toggle v-model="has_extension"
                 :active_background_color="toggle_color">
           <div slot="on">
             <p class="toggle-on">
-              {{d_group.extended_due_date !== null ? 'Has extension' : 'Grant extension'}}
+              {{has_extension !== null ? 'Has extension' : 'Grant extension'}}
             </p>
           </div>
           <div slot="off">
             <p class="toggle-off">
-              {{d_group.extended_due_date !== null ? 'Revoke Extension' : 'No extension'}}
+              {{has_extension !== null ? 'Revoke Extension' : 'No extension'}}
             </p>
           </div>
         </Toggle>
@@ -72,101 +72,100 @@
 </template>
 
 <script lang="ts">
-  import APIErrors from '@/components/api_errors.vue';
-  import Toggle from '@/components/toggle.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
-  import { safe_assign } from "@/utils";
+import APIErrors from '@/components/api_errors.vue';
+import Toggle from '@/components/toggle.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
 
-  import { Group, Project } from 'ag-client-typescript';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Group, Project } from 'ag-client-typescript';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      APIErrors,
-      Toggle,
-      ValidatedInput
-    }
-  })
-  export default class EditSingleGroup extends Vue {
+@Component({
+  components: {
+    APIErrors,
+    Toggle,
+    ValidatedInput
+  }
+})
+export default class EditSingleGroup extends Vue {
 
-    @Prop({required: true, type: Group})
-    group!: Group;
+  @Prop({required: true, type: Group})
+  group!: Group;
 
-    @Prop({required: true, type: Project})
-    project!: Project;
+  @Prop({required: true, type: Project})
+  project!: Project;
 
-    @Watch('group')
-    on_group_selected_changed(new_group: Group, old_group: Group) {
-      console.log("ESG Watcher Bonus " + new_group.bonus_submissions_remaining);
-      this.d_group = new Group({
-        pk: new_group.pk,
-        project: new_group.project,
-        extended_due_date: new_group.extended_due_date,
-        member_names: new_group.member_names.slice(0),
-        bonus_submissions_remaining: new_group.bonus_submissions_remaining,
-        late_days_used: new_group.late_days_used,
-        num_submissions: new_group.num_submissions,
-        num_submits_towards_limit: new_group.num_submits_towards_limit,
-        created_at: new_group.created_at,
-        last_modified: new_group.last_modified
-      });
-      // console.log("Bonus submissions " + this.d_group.bonus_submissions_remaining);
-    }
+  @Watch('group')
+  on_group_selected_changed(new_group: Group, old_group: Group) {
+    this.d_group = new Group({
+      pk: new_group.pk,
+      project: new_group.project,
+      extended_due_date: new_group.extended_due_date,
+      member_names: new_group.member_names.slice(0),
+      bonus_submissions_remaining: new_group.bonus_submissions_remaining,
+      late_days_used: new_group.late_days_used,
+      num_submissions: new_group.num_submissions,
+      num_submits_towards_limit: new_group.num_submits_towards_limit,
+      created_at: new_group.created_at,
+      last_modified: new_group.last_modified
+    });
+  }
 
-    toggle_color = "orange";
+  toggle_color = "orange";
+  max_group_size = 1;
+  has_extension = true;
+  d_saving = false;
+  d_group: Group | null = null;
+  successful_update = false;
 
-    max_group_size = 1;
+  created() {
+    this.d_group = new Group({
+      pk: this.group.pk,
+      project: this.group.project,
+      extended_due_date: this.group.extended_due_date,
+      member_names: this.group.member_names.slice(0),
+      bonus_submissions_remaining: this.group.bonus_submissions_remaining,
+      late_days_used: this.group.late_days_used,
+      num_submissions: this.group.num_submissions,
+      num_submits_towards_limit: this.group.num_submits_towards_limit,
+      created_at: this.group.created_at,
+      last_modified: this.group.last_modified
+    });
+    this.max_group_size = this.project.max_group_size;
+  }
 
-    has_extension = true;
+  remove_group_member(index: number) {
+    this.d_group!.member_names.splice(index, 1);
+  }
 
-    d_saving = false;
+  add_group_member() {
+    this.d_group!.member_names.push('@umich.edu');
+  }
 
-    d_group: Group | null = null;
-
-    successful_update = false;
-
-    created() {
-      this.d_group = new Group({
-        pk: this.group.pk,
-        project: this.group.project,
-        extended_due_date: this.group.extended_due_date,
-        member_names: this.group.member_names.slice(0),
-        bonus_submissions_remaining: this.group.bonus_submissions_remaining,
-        late_days_used: this.group.late_days_used,
-        num_submissions: this.group.num_submissions,
-        num_submits_towards_limit: this.group.num_submits_towards_limit,
-        created_at: this.group.created_at,
-        last_modified: this.group.last_modified
-      });
-      this.max_group_size = this.project.max_group_size;
-    }
-
-    remove_group_member(index: number) {
-      this.d_group!.member_names.splice(index, 1);
-    }
-
-    add_group_member() {
-      this.d_group!.member_names.push('@umich.edu');
-    }
-
-    async update_group() {
-      try {
-        this.d_saving = true;
-        console.log(this.d_group!.bonus_submissions_remaining);
-        await this.d_group!.save();
-        this.successful_update = true;
-        setTimeout(() => {
-          this.d_saving = false;
-          setTimeout(() => {
-            this.successful_update = false;
-          }, 1000);
-        }, 1000);
-      }
-      catch(error) {
+  @handle_api_errors_async(handle_save_group_error)
+  async update_group() {
+    try {
+      this.d_saving = true;
+      this.d_group!.extended_due_date = this.has_extension
+                                        ? this.d_group!.extended_due_date : null;
+      await this.d_group!.save();
+      this.successful_update = true;
+      setTimeout(() => {
         this.d_saving = false;
-      }
+        setTimeout(() => {
+          this.successful_update = false;
+        }, 1000);
+      }, 1000);
+    }
+    finally {
+      this.d_saving = false;
     }
   }
+}
+
+function handle_save_group_error(component: EditSingleGroup, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 </script>
 
 <style scoped lang="scss">
@@ -230,7 +229,7 @@
   }
 
   .update-group-button {
-    margin-top: 10px;
+    margin-top: 15px;
     @extend .teal-button;
   }
 
@@ -245,7 +244,7 @@
   .add-member-container {
     padding: 8px 0 15px 0;
     cursor: pointer;
-    display: inline-block;
+    display: block;
   }
 
   @keyframes fadeIn {
@@ -284,7 +283,7 @@
   }
 
   #bonus-submissions-container {
-    padding: 16px 0 8px 0;
+    padding: 16px 0 5px 0;
   }
 
   #bonus-submissions-label {
