@@ -46,7 +46,7 @@ export default class GroupLookup extends Vue {
     this.d_groups = new_groups.slice(0);
   }
 
-  async created() {
+  created() {
     this.d_groups = this.groups.slice(0);
   }
 
