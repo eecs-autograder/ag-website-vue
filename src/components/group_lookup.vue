@@ -9,7 +9,7 @@
         <template slot-scope="{item}">
           <span v-for="(member, index) of item.member_names">
             <span class="typeahead-row">
-              {{member}} {{item.bonus_submissions_remaining}} {{index === item.member_names.length - 1 ? "" : ", "}}
+              {{member}} {{index === item.member_names.length - 1 ? "" : ", "}}
             </span>
           </span>
         </template>
