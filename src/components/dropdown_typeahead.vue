@@ -57,7 +57,7 @@ export default class DropdownTypeahead extends Vue {
   created() {
     this.d_choices = this.choices;
   }
-
+  
   private d_mounted_called = false;
 
   mounted() {

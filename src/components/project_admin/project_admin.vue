@@ -253,7 +253,7 @@ export default class ProjectAdmin extends Vue {
 .tab-body {
   text-align: left;
   position: relative;
-  padding-top: 10px;
+  padding-top: 0px;
 }
 
 .tab-label {

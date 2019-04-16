@@ -54,7 +54,7 @@
       <validated-input v-model="d_group.bonus_submissions_remaining"
                       :validators="[]"
                       :num_rows="1"
-                      input_style="width: 20%;
+                      input_style="width: 80px;
                                    border: 1px solid #ced4da;">
       </validated-input>
     </div>
@@ -149,13 +149,8 @@ export default class EditSingleGroup extends Vue {
       this.d_group!.extended_due_date = this.has_extension
                                         ? this.d_group!.extended_due_date : null;
       await this.d_group!.save();
-      this.successful_update = true;
-      setTimeout(() => {
-        this.d_saving = false;
-        setTimeout(() => {
-          this.successful_update = false;
-        }, 1000);
-      }, 1000);
+      // this.successful_update = true;
+      setTimeout(() => {  }, 1500);
     }
     finally {
       this.d_saving = false;
@@ -206,9 +201,12 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   .remove-group-member {
     cursor: pointer;
     display: inline-block;
-    padding: 7px 11px;
+    padding: 9px 16px;
     border-radius: 3px;
     margin-left: 8px;
+    background-color: hsl(220, 30%, 90%);
+    color: black;
+    vertical-align: bottom;
   }
 
   .remove-group-member:hover {
@@ -278,7 +276,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   }
 
   .toggle-on, .toggle-off {
-    font-size: 14px;
+    font-size: 15px;
     color: black;
   }
 

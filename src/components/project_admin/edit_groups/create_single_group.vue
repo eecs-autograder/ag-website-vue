@@ -81,7 +81,8 @@
     successful_submission = false;
 
     created() {
-      this.max_group_size = this.project.max_group_size;
+      // this.max_group_size = this.project.max_group_size;
+      this.max_group_size = 4;
     }
 
     @handle_api_errors_async(handle_create_group_error)
@@ -113,9 +114,7 @@
     }
 
     remove_group_member(index: number) {
-      if (this.group_members.length !== 1) {
-        this.group_members.splice(index, 1);
-      }
+      this.group_members.splice(index, 1);
     }
 
     add_group_member() {
@@ -199,11 +198,12 @@
   .remove-group-member {
     cursor: pointer;
     display: inline-block;
-    padding: 7px 11px;
+    padding: 9px 16px;
     border-radius: 3px;
     margin-left: 8px;
-    /*background-color: hsl(220, 30%, 30%);*/
-    /*color: white;*/
+    background-color: hsl(220, 30%, 90%);
+    color: black;
+    vertical-align: bottom;
   }
 
   .remove-group-member:hover {
