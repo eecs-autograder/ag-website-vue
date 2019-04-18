@@ -96,14 +96,8 @@
     async created() {
       this.groups = await Group.get_all_from_project(this.project.pk);
       this.groups_with_extensions = this.groups.filter(group => group.extended_due_date !== null);
-      this.groups_with_extensions.sort((group_a: Group, group_b: Group) => {
-        if (group_a.extended_due_date! <= group_b.extended_due_date!) {
-          return -1;
-        }
-        return 1;
-      });
-      this.d_loading = false;
       this.groups_with_extensions.sort(this.extension_sort);
+      this.d_loading = false;
     }
 
     mounted() {

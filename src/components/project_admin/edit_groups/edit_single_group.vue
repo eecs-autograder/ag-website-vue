@@ -124,6 +124,7 @@ export default class EditSingleGroup extends Vue {
   }
 
   toggle_color = "orange";
+  min_group_size = 1;
   max_group_size = 1;
   has_extension = false;
   d_saving = false;
@@ -158,6 +159,7 @@ export default class EditSingleGroup extends Vue {
     // console.log("editable group type: " + this.d_group.constructor.name);
     // console.log("edit group prop type: " + this.group.constructor.name);
     // console.log(this.d_group instanceof Group);
+    this.min_group_size = this.project.min_group_size;
     this.max_group_size = this.project.max_group_size;
     this.has_extension = this.d_group.extended_due_date !== null;
   }
