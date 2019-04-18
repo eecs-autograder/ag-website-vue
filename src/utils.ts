@@ -8,6 +8,11 @@ export function safe_assign<ToType extends FromType, FromType>(to: ToType, from:
     Object.assign(to, from);
 }
 
+export function deep_copy<T>(obj: T): T {
+    let my_obj: T =  JSON.parse(JSON.stringify(obj));
+    return my_obj;
+}
+
 type IterableType<T> = Iterable<T> | IterableIterator<T>;
 
 // Given two iterables, returns an iterable iterator that produces

@@ -23,16 +23,20 @@
           <th> Extensions </th>
           <th> </th>
         </tr>
-        <tr v-for="(group, index) of groups"
+        <tr v-for="(group, index) of groups_with_extensions"
             :class="index % 2 === 0 ? 'even' : 'odd'"
             v-if="group.extended_due_date !== null">
           <td class="group-members">
             <div v-for="member_name of group.member_names">{{member_name}}</div>
           </td>
-        <td class="due-date">{{group.extended_due_date}}</td>
+        <td class="due-date">
+          {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
+        </td>
         </tr>
       </table>
-      <div>No extensions have been issued yet.</div>
+      <div v-if="groups_with_extensions.length === 0">
+        No extensions have been issued for this project.
+      </div>
     </div>
 
     <modal ref="create_group_modal"
@@ -49,13 +53,16 @@
 </template>
 
 <script lang="ts">
-  import { Group, Project } from 'ag-client-typescript';
-  import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
-  import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import GroupLookup from '@/components/group_lookup.vue';
   import Modal from '@/components/modal.vue';
+  import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
+  import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
   import Toggle from '@/components/toggle.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+
+  import { array_remove_unique, deep_copy } from "@/utils";
+  import { Group, Project } from 'ag-client-typescript';
 
   @Component({
     components: {
@@ -81,9 +88,22 @@
 
     selected_group: Group | null = null;
 
+    groups_with_extensions: Group[] = [];
+
+    extended_due_date_format = {year: 'numeric', month: 'short', day: 'numeric',
+                                hour: 'numeric', minute: 'numeric', second: 'numeric'};
+
     async created() {
       this.groups = await Group.get_all_from_project(this.project.pk);
+      this.groups_with_extensions = this.groups.filter(group => group.extended_due_date !== null);
+      this.groups_with_extensions.sort((group_a: Group, group_b: Group) => {
+        if (group_a.extended_due_date! <= group_b.extended_due_date!) {
+          return -1;
+        }
+        return 1;
+      });
       this.d_loading = false;
+      this.groups_with_extensions.sort(this.extension_sort);
     }
 
     mounted() {
@@ -95,56 +115,84 @@
     }
 
     update_group_selected(group: Group) {
-      this.selected_group = group;
+      let deep_copy_of_group: Group = new Group(group);
+      this.selected_group = deep_copy_of_group;
+      console.log("update group selected argument type: " + group.constructor.name);
+      console.log("Selected Group type: " + deep_copy_of_group.constructor.name);
     }
 
     update_group_created(group: Group): void {
-      let index_to_insert = this.find_first_group_greater_than(group);
-      this.groups.splice(index_to_insert, 0, group);
-      this.selected_group = group;
-      (<Modal>this.$refs.create_group_modal).close();
+      let deep_copy_of_group = new Group(group);
+      let index_to_insert = this.groups.findIndex(
+        (group_a) => deep_copy_of_group.member_names[0].localeCompare(group_a.member_names[0]) <= 0
+      );
+      this.groups.splice(index_to_insert, 0, deep_copy_of_group);
+      this.selected_group = deep_copy_of_group;
+      (<Modal> this.$refs.create_group_modal).close();
     }
 
     update_group_changed(group: Group): void {
-      for (let member of group.member_names) {
-        console.log(member);
+      let deep_copy_of_group = new Group({
+        pk: group.pk,
+        project: group.project,
+        extended_due_date: group.extended_due_date,
+        member_names: [],
+        bonus_submissions_remaining: group.bonus_submissions_remaining,
+        late_days_used: group.late_days_used,
+        num_submissions: group.num_submissions,
+        num_submits_towards_limit: group.num_submits_towards_limit,
+        created_at: group.created_at,
+        last_modified: group.last_modified
+      });
+      for (let i = 0; i < group.member_names.length; ++i) {
+        deep_copy_of_group.member_names.push(deep_copy(group.member_names[i]));
       }
 
       let current_index = this.groups.findIndex((item: Group) => item.pk === group.pk);
-      let new_index = this.groups.length;
-      if (this.groups[current_index].member_names.length === group.member_names.length
-          && this.groups[current_index].member_names[0].localeCompare(group.member_names[0]) === 0) {
-        new_index = current_index;
-      }
+      let old_extension = this.groups[current_index].extended_due_date;
+      this.groups.splice(current_index, 1);
+      let new_index = this.groups.findIndex(
+        (group_a) => group.member_names[0].localeCompare(group_a.member_names[0]) <= 0
+      );
+      this.groups.splice(new_index, 0, deep_copy_of_group);
 
-      if (new_index !== current_index) {
-        new_index = this.find_first_group_greater_than(group);
+      // EXTENSIONS
+      if (old_extension !== null) {
+        array_remove_unique(this.groups_with_extensions, group.pk,
+                            (group_a: Group, pk) => group_a.pk === pk
+        );
       }
+      if (group.extended_due_date !== null) {
+        this.groups_with_extensions.push(deep_copy_of_group);
+        this.groups_with_extensions.sort(this.extension_sort);
+        // let index_to_insert_at = this.groups_with_extensions.findIndex(
+        //   (group_a) =>
+        //     group_a.extended_due_date!.localeCompare(group.extended_due_date!) > 0
+        //     || (group_a.extended_due_date!.localeCompare(group.extended_due_date!) === 0
+        //         && group_a.member_names[0].localeCompare(group.member_names[0]) > 0)
+        // );
+        // console.log("Index to insert at " + index_to_insert_at);
+        // this.groups_with_extensions.splice(index_to_insert_at, 0, deep_copy_of_group);
+      }
+    }
 
-      if (new_index !== current_index) {
-        this.groups.splice(current_index, 1);
-        new_index = current_index < new_index ? new_index - 1 : new_index;
-        this.groups.splice(new_index, 0, group);
+    extension_sort(group_a: Group, group_b: Group) {
+      if (group_a.extended_due_date! < group_b!.extended_due_date!) {
+        return -1;
       }
-      this.groups[new_index].member_names = group.member_names.slice(0);
-      this.groups[new_index].extended_due_date = group.extended_due_date;
-      this.groups[new_index].bonus_submissions_remaining = group.bonus_submissions_remaining;
+      else if (group_a.extended_due_date! > group_b.extended_due_date!) {
+        return 1;
+      }
+      else {
+        if (group_a.member_names[0] < group_b.member_names[0]) {
+          return -1;
+        }
+        return 1;
+      }
     }
 
     update_group_merged(group: Group): void {
       console.log("Merging not implemented in UI yet");
-    }
-
-    find_first_group_greater_than(group: Group): number {
-      let index = this.groups.length;
-      for (let i = 0; i < this.groups.length; ++i) {
-        if (group.member_names[0].localeCompare(this.groups[i].member_names[0]) <= 0) {
-          index = i;
-          console.log("The first index greater than " + group.member_names[0] + " is " + index);
-          break;
-        }
-      }
-      return index;
     }
   }
 </script>
@@ -185,14 +233,8 @@ $current-lang-choice: 'Quicksand';
 
 .extensions-table {
   width: 100%;
-}
-
-.extension-row {
-  padding: 5px;
-}
-
-.extension-row span {
-  padding-left: 100px;
+  border-collapse: collapse;
+  font-size: 16px;
 }
 
 .even {
@@ -203,11 +245,6 @@ $current-lang-choice: 'Quicksand';
   background-color: white;
 }
 
-table {
-  border-collapse: collapse;
-  font-size: 16px;
-}
-
 th {
   padding:  12px 0;
   font-weight: bold;
@@ -216,7 +253,7 @@ th {
 }
 
 .group-members {
-  padding: 10px 100px 10px 10px;
+  padding: 10px 20px 10px 10px;
   font-weight: 500;
   border-bottom: 1px solid hsl(210, 20%, 94%);
 }
@@ -226,6 +263,7 @@ th {
   vertical-align: top;
   border-bottom: 1px solid hsl(210, 20%, 94%);
   text-align: right;
+  width: 177px;
 }
 
 .create-group-bar {
@@ -265,6 +303,12 @@ th {
 }
 
 @media only screen and (min-width: 881px) {
+
+  .extensions-table {
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+
   .edit-group-container {
     width: 50%;
     display: inline-block;

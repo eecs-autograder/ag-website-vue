@@ -1,6 +1,5 @@
 <template>
   <div id="create-group-component">
-<!--    <div id="create-group-title"> Create Group: </div>-->
     <div class="create-group-container">
       <p class="group-members-label"> Group members: </p>
       <div class="add-group-members-container">
@@ -26,7 +25,7 @@
           <button class="add-member-button"
                   :disabled="group_members.length >= max_group_size"
                   @click="add_group_member">
-            Add Another Member
+            {{group_members.length === 0 ? "Add A member" : "Add Another Member"}}
           </button>
         </div>
       </div>
@@ -36,21 +35,18 @@
       <button class="create-group-button"
               :disabled="d_creating_group"
               @click="create_group()"> Create Group </button>
-      <div v-if="successful_submission"
-           :class="d_creating_group ? 'successful-group-creation' : 'done-adding-group'">
-        <i class="fas fa-check"></i>
-      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import APIErrors from '@/components/api_errors.vue';
   import ValidatedInput from '@/components/validated_input.vue';
 
-  import { Group, Project, NewGroupData } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
   import { handle_api_errors_async } from '@/utils';
+  import { Group, NewGroupData, Project } from 'ag-client-typescript';
 
   interface GroupMember {
     id: number;
@@ -70,19 +66,15 @@
 
     d_creating_group = false;
 
-    group_members: object[] = [
-      {
+    group_members: GroupMember[] = [{
         id: 1,
-        username: "@umich.edu" // get from elsewhere
-      }
-    ];
+        username: "@umich.edu"
+    }];
 
     max_group_size = 1;
-    successful_submission = false;
 
     created() {
-      // this.max_group_size = this.project.max_group_size;
-      this.max_group_size = 4;
+      this.max_group_size = this.project.max_group_size;
     }
 
     @handle_api_errors_async(handle_create_group_error)
@@ -94,19 +86,11 @@
           list_of_members.push(group_member.username);
         }
         await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
-        this.successful_submission = true;
-        setTimeout(() => {
-          this.d_creating_group = false;
-          setTimeout(() => {
-            this.group_members = [
-              {
-                id: 1,
-                username: "@umich.edu"
-              }
-            ];
-            this.successful_submission = false;
-          }, 1000);
-        }, 1200);
+        this.d_creating_group = false;
+        this.group_members = [{
+            id: 1,
+            username: "@umich.edu"
+        }];
       }
       finally {
         this.d_creating_group = false;

@@ -23,7 +23,7 @@
         <button class="add-member-button"
                 :disabled="d_group.member_names.length >= max_group_size"
                 @click="add_group_member">
-          Add Another Member
+          {{d_group.member_names.length === 0 ? "Add A member" : "Add Another Member"}}
         </button>
       </div>
 
@@ -75,7 +75,7 @@
 import APIErrors from '@/components/api_errors.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { deep_copy, handle_api_errors_async } from '@/utils';
 
 import { Group, Project } from 'ag-client-typescript';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
@@ -97,11 +97,18 @@ export default class EditSingleGroup extends Vue {
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
+    // this.d_group = deep_copy(new_group);
+    // this.d_group = new Group(new_group);
+    // this.d_group = new Group(new_group);
+    // for (let i = 0; i < new_group.member_names.length; ++i) {
+    //   this.d_group.member_names[i] = deep_copy(new_group.member_names[i]);
+    // }
+    console.log("The selected group changed");
     this.d_group = new Group({
       pk: new_group.pk,
       project: new_group.project,
       extended_due_date: new_group.extended_due_date,
-      member_names: new_group.member_names.slice(0),
+      member_names: [],
       bonus_submissions_remaining: new_group.bonus_submissions_remaining,
       late_days_used: new_group.late_days_used,
       num_submissions: new_group.num_submissions,
@@ -109,21 +116,33 @@ export default class EditSingleGroup extends Vue {
       created_at: new_group.created_at,
       last_modified: new_group.last_modified
     });
+
+    for (let i = 0; i < new_group.member_names.length; ++i) {
+      this.d_group.member_names.push(deep_copy(new_group.member_names[i]));
+    }
+    this.has_extension = this.d_group.extended_due_date !== null;
   }
 
   toggle_color = "orange";
   max_group_size = 1;
-  has_extension = true;
+  has_extension = false;
   d_saving = false;
   d_group: Group | null = null;
   successful_update = false;
 
   created() {
+    // let deep_copy_of_group: Group = <Group> deep_copy(this.group);
+    // this.d_group = deep_copy_of_group;
+    // this.d_group = new Group(this.group);
+    // for (let i = 0; i < this.group.member_names.length; ++i) {
+    //   this.d_group.member_names[i] = deep_copy(this.group.member_names[i]);
+    // }
+
     this.d_group = new Group({
       pk: this.group.pk,
       project: this.group.project,
       extended_due_date: this.group.extended_due_date,
-      member_names: this.group.member_names.slice(0),
+      member_names: [],
       bonus_submissions_remaining: this.group.bonus_submissions_remaining,
       late_days_used: this.group.late_days_used,
       num_submissions: this.group.num_submissions,
@@ -131,7 +150,16 @@ export default class EditSingleGroup extends Vue {
       created_at: this.group.created_at,
       last_modified: this.group.last_modified
     });
+
+    for (let i = 0; i < this.group.member_names.length; ++i) {
+      this.d_group.member_names.push(deep_copy(this.group.member_names[i]));
+    }
+
+    // console.log("editable group type: " + this.d_group.constructor.name);
+    // console.log("edit group prop type: " + this.group.constructor.name);
+    // console.log(this.d_group instanceof Group);
     this.max_group_size = this.project.max_group_size;
+    this.has_extension = this.d_group.extended_due_date !== null;
   }
 
   remove_group_member(index: number) {
@@ -147,10 +175,8 @@ export default class EditSingleGroup extends Vue {
     try {
       this.d_saving = true;
       this.d_group!.extended_due_date = this.has_extension
-                                        ? this.d_group!.extended_due_date : null;
+                                        ? this.d_group!.last_modified : null;
       await this.d_group!.save();
-      // this.successful_update = true;
-      setTimeout(() => {  }, 1500);
     }
     finally {
       this.d_saving = false;

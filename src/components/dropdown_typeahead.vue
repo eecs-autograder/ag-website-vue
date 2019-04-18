@@ -59,7 +59,7 @@ export default class DropdownTypeahead extends Vue {
   }
   
   private d_mounted_called = false;
-
+  
   mounted() {
     // When this is true, we can safely access $refs in the template.
     this.d_mounted_called = true;
@@ -120,11 +120,11 @@ export default class DropdownTypeahead extends Vue {
   outline-color: $ocean-blue;
 }
 
-.no-matching-results {
+#no-matching-results {
   @extend %dropdown-content;
 }
 
-.no-matching-results-row {
+#no-matching-results-row {
   @extend %dropdown-row;
 }
 
