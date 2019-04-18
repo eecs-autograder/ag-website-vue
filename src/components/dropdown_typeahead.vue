@@ -59,7 +59,7 @@ export default class DropdownTypeahead extends Vue {
   }
   
   private d_mounted_called = false;
-  
+
   mounted() {
     // When this is true, we can safely access $refs in the template.
     this.d_mounted_called = true;

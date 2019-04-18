@@ -1,40 +1,47 @@
 <template>
   <div id="create-group-component">
     <div class="create-group-container">
-      <p class="group-members-label"> Group members: </p>
-      <div class="add-group-members-container">
-        <div v-for="(member, index) of group_members">
-          <div class="group-member-editing">
-            <div class="username-validated-container">
-              <validated-input v-model="member.username"
-                               :key="member.id"
-                               :validators="[]"
-                               :num_rows="1"
-                               input_style="width: 100%;
-                                            border: 1px solid #ced4da;">
-              </validated-input>
-            </div>
-            <div class="remove-group-member"
-                 :title="`Remove ${member.username} from group`"
-                 @click="remove_group_member(index)">
-              <i class="fas fa-times"></i>
+      <ValidatedForm ref="create_group_form"
+                     autocomplete="off"
+                     spellcheck="false"
+                     @submit.native.prevent="create_group">
+        <p class="group-members-label"> Group members: </p>
+        <div class="add-group-members-container">
+          <div v-for="(member, index) of group_members">
+            <div class="group-member-editing">
+              <div class="username-validated-container">
+                <validated-input ref="member_name_input"
+                                 v-model="member.username"
+                                 :key="member.id"
+                                 :validators="[]"
+                                 :num_rows="1"
+                                 input_style="width: 100%;
+                                              border: 1px solid #ced4da;">
+                </validated-input>
+              </div>
+              <div class="remove-member-button"
+                   :title="`Remove ${member.username} from group`"
+                   @click="remove_group_member(index)">
+                <i class="fas fa-times"></i>
+              </div>
             </div>
           </div>
+          <div class="add-member-container">
+            <button class="add-member-button"
+                    :disabled="group_members.length === max_group_size"
+                    @click="add_group_member">
+              {{group_members.length === 0 ? "Add A member" : "Add Another Member"}}
+            </button>
+          </div>
         </div>
-        <div class="add-member-container">
-          <button class="add-member-button"
-                  :disabled="group_members.length >= max_group_size"
-                  @click="add_group_member">
-            {{group_members.length === 0 ? "Add A member" : "Add Another Member"}}
-          </button>
-        </div>
-      </div>
 
-      <APIErrors ref="api_errors"> </APIErrors>
-
-      <button class="create-group-button"
-              :disabled="d_creating_group"
-              @click="create_group()"> Create Group </button>
+        <APIErrors ref="api_errors"> </APIErrors>
+        <button class="create-group-button"
+                type="submit"
+                :disabled="d_creating_group">
+          Create Group
+        </button>
+      </ValidatedForm>
     </div>
   </div>
 </template>
@@ -43,10 +50,11 @@
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   import APIErrors from '@/components/api_errors.vue';
+  import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
 
   import { handle_api_errors_async } from '@/utils';
-  import { Group, NewGroupData, Project } from 'ag-client-typescript';
+  import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
 
   interface GroupMember {
     id: number;
@@ -56,6 +64,7 @@
   @Component({
     components: {
       APIErrors,
+      ValidatedForm,
       ValidatedInput
     }
   })
@@ -65,16 +74,26 @@
     project!: Project;
 
     d_creating_group = false;
+    allowed_guest_domain = "";
 
-    group_members: GroupMember[] = [{
-        id: 1,
-        username: "@umich.edu"
-    }];
+    group_members: GroupMember[] = [];
 
     max_group_size = 1;
+    min_group_size = 1;
 
-    created() {
+    async created() {
+      this.min_group_size = this.project.min_group_size;
       this.max_group_size = this.project.max_group_size;
+      let course = await Course.get_by_pk(this.project.course);
+      this.allowed_guest_domain = course.allowed_guest_domain;
+      for (let i = 0; i < this.min_group_size; ++i) {
+        this.group_members.push(
+          {
+            id: i + 1,
+            username: this.allowed_guest_domain
+          }
+        )
+      }
     }
 
     @handle_api_errors_async(handle_create_group_error)
@@ -86,11 +105,14 @@
           list_of_members.push(group_member.username);
         }
         await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
-        this.d_creating_group = false;
-        this.group_members = [{
-            id: 1,
-            username: "@umich.edu"
-        }];
+        for (let i = 0; i < this.min_group_size; ++i) {
+          this.group_members.push(
+            {
+              id: i + 1,
+              username: this.allowed_guest_domain
+            }
+          )
+        }
       }
       finally {
         this.d_creating_group = false;
@@ -98,13 +120,15 @@
     }
 
     remove_group_member(index: number) {
-      this.group_members.splice(index, 1);
+      if (this.group_members.length !== 1) {
+        this.group_members.splice(index, 1);
+      }
     }
 
     add_group_member() {
       this.group_members.push({
           id: this.group_members.length,
-          username: '@umich.edu'
+          username: this.allowed_guest_domain
       });
     }
   }
@@ -179,7 +203,7 @@
     color: hsl(212, 50%, 20%);
   }
 
-  .remove-group-member {
+  .remove-member-button {
     cursor: pointer;
     display: inline-block;
     padding: 9px 16px;
@@ -190,7 +214,7 @@
     vertical-align: bottom;
   }
 
-  .remove-group-member:hover {
+  .remove-member-button:hover {
     background-color: hsl(220, 30%, 30%);
     color: white;
   }

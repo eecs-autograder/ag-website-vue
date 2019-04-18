@@ -2,6 +2,7 @@ import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 import {
     ExpectedStudentFile,
+    Group,
     InstructorFile,
     Project,
     UltimateSubmissionPolicy
@@ -171,6 +172,9 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Edit Groups tab', async () => {
+        sinon.stub(Group, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -372,6 +376,9 @@ describe('select_tab function called with different values associated with "curr
 
 
     test('current tab parameter value = edit_groups', async () => {
+        sinon.stub(Group, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
         $route.query = { current_tab: 'edit_groups' };
         wrapper = mount(ProjectAdmin, {
             mocks: {
