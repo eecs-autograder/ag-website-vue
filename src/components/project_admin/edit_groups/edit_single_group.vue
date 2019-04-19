@@ -1,93 +1,109 @@
 <template>
   <div id="edit-single-group-component" v-if="d_group !== null">
-    <div class="edit-group-members-container">
-      <p class="group-members-label"> Group members: </p>
-      <div v-for="(member, index) of d_group.member_names">
-        <div class="group-member-editing">
-          <div class="username-validated-container">
-            <validated-input v-model="d_group.member_names[index]"
-                            :validators="[]"
-                            :num_rows="1"
-                            input_style="width: 100%;
-                                         border: 1px solid #ced4da;">
-            </validated-input>
-          </div>
-          <div class="remove-group-member"
-               :title="`Remove ${member} from group`"
-               @click="remove_group_member(index)">
-            <i class="fas fa-times"></i>
+    <validated-form ref="edit_group_form"
+                    autocomplete="off"
+                    spellcheck="false"
+                    @submit.native.prevent="update_group">
+      <div class="edit-group-members-container">
+        <p class="group-members-label"> Group members: </p>
+        <div v-for="(member, index) of d_group.member_names">
+          <div class="group-member-editing">
+            <div class="username-validated-container">
+              <validated-input ref="member_name_input"
+                               v-model="d_group.member_names[index]"
+                               :validators="[is_not_empty]"
+                               :num_rows="1"
+                               input_style="width: 280px;
+                                            border: 1px solid #ced4da;">
+                <div slot="suffix" class="remove-member-button"
+                       :title="`Remove ${member} from group`"
+                       @click="remove_group_member(index)">
+                    <i class="fas fa-times"></i>
+                </div>
+              </validated-input>
+            </div>
           </div>
         </div>
+        <div class="add-member-container">
+          <button class="add-member-button"
+                  :disabled="d_group.member_names.length >= max_group_size"
+                  @click="add_group_member">
+            {{d_group.member_names.length === 0 ? "Add A member" : "Add Another Member"}}
+          </button>
+        </div>
+
+        <div id="extension-toggle">
+          <toggle v-model="has_extension"
+                  :active_background_color="toggle_color">
+            <div slot="on">
+              <p class="toggle-on">
+                {{has_extension !== null ? 'Has extension' : 'Grant extension'}}
+              </p>
+            </div>
+            <div slot="off">
+              <p class="toggle-off">
+                {{has_extension !== null ? 'Revoke Extension' : 'No extension'}}
+              </p>
+            </div>
+          </toggle>
+        </div>
       </div>
-      <div class="add-member-container">
-        <button class="add-member-button"
-                :disabled="d_group.member_names.length >= max_group_size"
-                @click="add_group_member">
-          {{d_group.member_names.length === 0 ? "Add A member" : "Add Another Member"}}
-        </button>
+
+      <div id="datetime-picker-container" v-if="has_extension">
+        Datetime Picker
+        <div class="datetime-picker"> </div>
       </div>
 
-      <div id="extension-toggle">
-        <Toggle v-model="has_extension"
-                :active_background_color="toggle_color">
-          <div slot="on">
-            <p class="toggle-on">
-              {{has_extension !== null ? 'Has extension' : 'Grant extension'}}
-            </p>
-          </div>
-          <div slot="off">
-            <p class="toggle-off">
-              {{has_extension !== null ? 'Revoke Extension' : 'No extension'}}
-            </p>
-          </div>
-        </Toggle>
+      <div id="bonus-submissions-container">
+        <div id="bonus-submissions-label"> Bonus Submissions </div>
+        <validated-input ref="bonus_submissions_remaining_input"
+                         v-model="d_group.bonus_submissions_remaining"
+                         :validators="[is_integer, is_non_negative, is_not_empty]"
+                         :num_rows="1"
+                         input_style="width: 80px;
+                                     border: 1px solid #ced4da;"
+                         :from_string_fn="string_to_num">
+        </validated-input>
       </div>
-    </div>
 
-    <div id="datetime-picker-container" v-if="has_extension">
-      Datetime Picker
-      <div class="datetime-picker"> </div>
-    </div>
+      <APIErrors ref="api_errors"></APIErrors>
 
-    <div id="bonus-submissions-container">
-      <div id="bonus-submissions-label"> Bonus Submissions </div>
-      <validated-input v-model="d_group.bonus_submissions_remaining"
-                      :validators="[]"
-                      :num_rows="1"
-                      input_style="width: 80px;
-                                   border: 1px solid #ced4da;">
-      </validated-input>
-    </div>
-
-    <APIErrors ref="api_errors"></APIErrors>
-
-    <button class="update-group-button"
-            :disabled="d_saving"
-            @click="update_group()"> Update Group </button>
-    <div v-if="successful_update"
-         :class="d_saving ? 'successful-group-update' : 'done-updating-group'">
-      <i class="fas fa-check"></i>
-    </div>
+      <button class="update-group-button"
+              type="submit"
+              :disabled="d_saving"> Update Group </button>
+      <div v-if="successful_update"
+           :class="d_saving ? 'successful-group-update' : 'done-updating-group'">
+        <i class="fas fa-check"></i>
+      </div>
+    </validated-form>
   </div>
 </template>
 
 <script lang="ts">
 import APIErrors from '@/components/api_errors.vue';
 import Toggle from '@/components/toggle.vue';
+import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
 
-import { Group, Project } from 'ag-client-typescript';
+import { Course, Group, Project } from 'ag-client-typescript';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { is_integer, is_non_negative, is_not_empty, string_to_num} from '@/validators';
 
 @Component({
   components: {
     APIErrors,
     Toggle,
+    ValidatedForm,
     ValidatedInput
   }
 })
 export default class EditSingleGroup extends Vue {
+
+  readonly is_not_empty = is_not_empty;
+  readonly is_non_negative = is_non_negative;
+  readonly is_integer = is_integer;
+  readonly string_to_num = string_to_num;
 
   @Prop({required: true, type: Group})
   group!: Group;
@@ -95,15 +111,17 @@ export default class EditSingleGroup extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
+  allowed_guest_domain = "";
+  d_group: Group | null = null;
+  d_saving = false;
+  has_extension = false;
+  min_group_size = 1;
+  max_group_size = 1;
+  successful_update = false;
+  toggle_color = "orange";
+
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
-    // this.d_group = deep_copy(new_group);
-    // this.d_group = new Group(new_group);
-    // this.d_group = new Group(new_group);
-    // for (let i = 0; i < new_group.member_names.length; ++i) {
-    //   this.d_group.member_names[i] = deep_copy(new_group.member_names[i]);
-    // }
-    console.log("The selected group changed");
     this.d_group = new Group({
       pk: new_group.pk,
       project: new_group.project,
@@ -123,22 +141,7 @@ export default class EditSingleGroup extends Vue {
     this.has_extension = this.d_group.extended_due_date !== null;
   }
 
-  toggle_color = "orange";
-  min_group_size = 1;
-  max_group_size = 1;
-  has_extension = false;
-  d_saving = false;
-  d_group: Group | null = null;
-  successful_update = false;
-
-  created() {
-    // let deep_copy_of_group: Group = <Group> deep_copy(this.group);
-    // this.d_group = deep_copy_of_group;
-    // this.d_group = new Group(this.group);
-    // for (let i = 0; i < this.group.member_names.length; ++i) {
-    //   this.d_group.member_names[i] = deep_copy(this.group.member_names[i]);
-    // }
-
+  async created() {
     this.d_group = new Group({
       pk: this.group.pk,
       project: this.group.project,
@@ -151,21 +154,20 @@ export default class EditSingleGroup extends Vue {
       created_at: this.group.created_at,
       last_modified: this.group.last_modified
     });
-
     for (let i = 0; i < this.group.member_names.length; ++i) {
       this.d_group.member_names.push(deep_copy(this.group.member_names[i]));
     }
-
-    // console.log("editable group type: " + this.d_group.constructor.name);
-    // console.log("edit group prop type: " + this.group.constructor.name);
-    // console.log(this.d_group instanceof Group);
+    let course = await Course.get_by_pk(this.project.course);
+    this.allowed_guest_domain = course.allowed_guest_domain;
     this.min_group_size = this.project.min_group_size;
     this.max_group_size = this.project.max_group_size;
     this.has_extension = this.d_group.extended_due_date !== null;
   }
 
   remove_group_member(index: number) {
-    this.d_group!.member_names.splice(index, 1);
+    if (this.d_group!.member_names.length !== 1) {
+      this.d_group!.member_names.splice(index, 1);
+    }
   }
 
   add_group_member() {
@@ -177,7 +179,7 @@ export default class EditSingleGroup extends Vue {
     try {
       this.d_saving = true;
       this.d_group!.extended_due_date = this.has_extension
-                                        ? this.d_group!.last_modified : null;
+                                        ? "2019-08-18T15:25:06.965696Z" : null;
       await this.d_group!.save();
     }
     finally {
@@ -196,6 +198,11 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   @import '@/styles/button_styles.scss';
   @import url('https://fonts.googleapis.com/css?family=Quicksand');
   $current-lang-choice: 'Quicksand';
+
+  .suffix-element {
+    display: inline-block;
+    vertical-align: top;
+  }
 
   #edit-single-group-component {
     font-family: Quicksand;
@@ -226,7 +233,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
     color: hsl(212, 50%, 20%);
   }
 
-  .remove-group-member {
+  .remove-member-button {
     cursor: pointer;
     display: inline-block;
     padding: 9px 16px;
@@ -234,10 +241,10 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
     margin-left: 8px;
     background-color: hsl(220, 30%, 90%);
     color: black;
-    vertical-align: bottom;
+    vertical-align: top;
   }
 
-  .remove-group-member:hover {
+  .remove-member-button:hover {
     background-color: hsl(220, 30%, 30%);
     color: white;
   }

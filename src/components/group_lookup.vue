@@ -37,18 +37,11 @@ export default class GroupLookup extends Vue {
 
   @Watch('groups')
   on_groups_changed(new_groups: Group[], old_groups: Group[]) {
-    // this.groups = [];
-    // for (let group of new_groups) {
-    //   this.groups.push(new Group(group));
-    // }
     this.d_groups = this.groups.slice(0);
   }
 
   created() {
     this.d_groups = this.groups.slice(0);
-    // for (let group of this.groups) {
-    //   this.groups.push(new Group(group));
-    // }
   }
 
   group_filter_fn(group: Group, filter_text: string) {

@@ -1,10 +1,10 @@
 <template>
   <div id="create-group-component">
     <div class="create-group-container">
-      <ValidatedForm ref="create_group_form"
-                     autocomplete="off"
-                     spellcheck="false"
-                     @submit.native.prevent="create_group">
+      <validated-form ref="create_group_form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit.native.prevent="create_group">
         <p class="group-members-label"> Group members: </p>
         <div class="add-group-members-container">
           <div v-for="(member, index) of group_members">
@@ -13,16 +13,16 @@
                 <validated-input ref="member_name_input"
                                  v-model="member.username"
                                  :key="member.id"
-                                 :validators="[]"
+                                 :validators="[is_not_empty]"
                                  :num_rows="1"
-                                 input_style="width: 100%;
+                                 input_style="width: 280px;
                                               border: 1px solid #ced4da;">
+                  <div slot="suffix" class="remove-member-button"
+                       :title="`Remove ${member} from group`"
+                       @click="remove_group_member(index)">
+                    <i class="fas fa-times"></i>
+                  </div>
                 </validated-input>
-              </div>
-              <div class="remove-member-button"
-                   :title="`Remove ${member.username} from group`"
-                   @click="remove_group_member(index)">
-                <i class="fas fa-times"></i>
               </div>
             </div>
           </div>
@@ -41,7 +41,7 @@
                 :disabled="d_creating_group">
           Create Group
         </button>
-      </ValidatedForm>
+      </validated-form>
     </div>
   </div>
 </template>
@@ -55,6 +55,7 @@
 
   import { handle_api_errors_async } from '@/utils';
   import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
+  import { is_not_empty } from '@/validators';
 
   interface GroupMember {
     id: number;
@@ -70,14 +71,14 @@
   })
   export default class CreateSingleGroup extends Vue {
 
+    readonly is_not_empty = is_not_empty;
+
     @Prop({required: true, type: Project})
     project!: Project;
 
-    d_creating_group = false;
     allowed_guest_domain = "";
-
+    d_creating_group = false;
     group_members: GroupMember[] = [];
-
     max_group_size = 1;
     min_group_size = 1;
 
@@ -201,6 +202,7 @@
     display: inline-block;
     border-radius: 5px;
     color: hsl(212, 50%, 20%);
+    vertical-align: top;
   }
 
   .remove-member-button {

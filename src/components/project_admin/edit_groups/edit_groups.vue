@@ -9,7 +9,8 @@
 
     <div class="edit-group-container">
         <div class="edit-title"> Edit Group </div>
-        <group-lookup :groups="groups"
+        <group-lookup ref="group_lookup"
+                      :groups="groups"
                       :project="project"
                       @update_group_selected="update_group_selected"> </group-lookup>
         <edit-single-group v-if="selected_group !== null"
@@ -30,6 +31,7 @@
             <div v-for="member_name of group.member_names">{{member_name}}</div>
           </td>
         <td class="due-date">
+<!--          {{group.extended_due_date}}-->
           {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
         </td>
         </tr>
@@ -75,23 +77,16 @@
   })
   export default class EditGroups extends Vue { // implements GroupObserver
 
-    // get the course to get the domain?
-
     @Prop({required: true, type: Project})
     project!: Project;
 
     d_loading = true;
-
-    groups: Group[] = [];
-
-    toggle_color = "hsl(210, 20%, 50%)";
-
-    selected_group: Group | null = null;
-
-    groups_with_extensions: Group[] = [];
-
     extended_due_date_format = {year: 'numeric', month: 'short', day: 'numeric',
                                 hour: 'numeric', minute: 'numeric', second: 'numeric'};
+    groups: Group[] = [];
+    groups_with_extensions: Group[] = [];
+    selected_group: Group | null = null;
+    toggle_color = "hsl(210, 20%, 50%)";
 
     async created() {
       this.groups = await Group.get_all_from_project(this.project.pk);
@@ -111,15 +106,14 @@
     update_group_selected(group: Group) {
       let deep_copy_of_group: Group = new Group(group);
       this.selected_group = deep_copy_of_group;
-      console.log("update group selected argument type: " + group.constructor.name);
-      console.log("Selected Group type: " + deep_copy_of_group.constructor.name);
     }
 
     update_group_created(group: Group): void {
       let deep_copy_of_group = new Group(group);
       let index_to_insert = this.groups.findIndex(
-        (group_a) => deep_copy_of_group.member_names[0].localeCompare(group_a.member_names[0]) <= 0
+        (group_a) => group_a.member_names[0].localeCompare(group.member_names[0]) > 0
       );
+      index_to_insert = index_to_insert < 0 ? this.groups.length : index_to_insert;
       this.groups.splice(index_to_insert, 0, deep_copy_of_group);
       this.selected_group = deep_copy_of_group;
       (<Modal> this.$refs.create_group_modal).close();
@@ -146,11 +140,12 @@
       let old_extension = this.groups[current_index].extended_due_date;
       this.groups.splice(current_index, 1);
       let new_index = this.groups.findIndex(
-        (group_a) => group.member_names[0].localeCompare(group_a.member_names[0]) <= 0
+        (group_a) => group_a.member_names[0].localeCompare(group.member_names[0]) > 0
       );
+      new_index = new_index === -1 ? this.groups.length : new_index;
+      console.log("index to insert: " + new_index);
       this.groups.splice(new_index, 0, deep_copy_of_group);
 
-      // EXTENSIONS
       if (old_extension !== null) {
         array_remove_unique(this.groups_with_extensions, group.pk,
                             (group_a: Group, pk) => group_a.pk === pk
@@ -159,28 +154,29 @@
       if (group.extended_due_date !== null) {
         this.groups_with_extensions.push(deep_copy_of_group);
         this.groups_with_extensions.sort(this.extension_sort);
-        // let index_to_insert_at = this.groups_with_extensions.findIndex(
-        //   (group_a) =>
-        //     group_a.extended_due_date!.localeCompare(group.extended_due_date!) > 0
-        //     || (group_a.extended_due_date!.localeCompare(group.extended_due_date!) === 0
-        //         && group_a.member_names[0].localeCompare(group.member_names[0]) > 0)
-        // );
-        // console.log("Index to insert at " + index_to_insert_at);
-        // this.groups_with_extensions.splice(index_to_insert_at, 0, deep_copy_of_group);
+      }
+
+      for (let i = 0; i < this.groups_with_extensions.length; ++i) {
+        console.log(i + ": " + this.groups_with_extensions[i].member_names[0]);
       }
     }
 
     extension_sort(group_a: Group, group_b: Group) {
       if (group_a.extended_due_date! < group_b!.extended_due_date!) {
+        // console.log(group_a.extended_due_date + " < " + group_b.extended_due_date);
         return -1;
       }
       else if (group_a.extended_due_date! > group_b.extended_due_date!) {
+        // console.log(group_a.extended_due_date + " > " + group_b.extended_due_date);
         return 1;
       }
       else {
+        // console.log(group_a.extended_due_date + " === " + group_b.extended_due_date);
         if (group_a.member_names[0] < group_b.member_names[0]) {
+          // console.log(group_a.member_names[0] + " < " + group_b.member_names[0]);
           return -1;
         }
+        // console.log(group_a.member_names[0] + " > " + group_b.member_names[0]);
         return 1;
       }
     }

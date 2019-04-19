@@ -1,6 +1,5 @@
-import APIErrors from '@/components/api_errors.vue';
-import EditSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,
@@ -10,19 +9,21 @@ import {
     Semester,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-jest.mock('file-saver');
-
-describe('EditSingleGroup tests', () => {
-    let wrapper: Wrapper<EditSingleGroup>;
-    let component: EditSingleGroup;
+describe('EditGroups tests', () => {
+    let wrapper: Wrapper<EditGroups>;
+    let component: EditGroups;
     let course: Course;
+    let group_1: Group;
+    let group_2: Group;
+    let group_3: Group;
+    let group_4: Group;
+    let groups: Group[];
     let project: Project;
     let original_match_media: (query: string) => MediaQueryList;
 
@@ -32,6 +33,72 @@ describe('EditSingleGroup tests', () => {
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '@cornell.edu', last_modified: ''
         });
+
+        group_1 = new Group({
+            pk: 1,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+                "andy@cornell.edu",
+                "roy@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        group_2 = new Group({
+            pk: 2,
+            project: 2,
+            extended_due_date: "2019-08-18T15:25:06.965696Z",
+            member_names: [
+                "kelly@cornell.edu",
+                "meredith@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        group_3 = new Group({
+            pk: 3,
+            project: 2,
+            extended_due_date: "2019-08-18T15:25:06.965696Z",
+            member_names: [
+                "kevin@cornell.edu",
+                "oscar@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        group_4 = new Group({
+            pk: 4,
+            project: 2,
+            extended_due_date: "2019-08-18T15:24:06.965696Z",
+            member_names: [
+                "phyllis@cornell.edu",
+                "stanley@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        groups = [group_1, group_2, group_3, group_4];
 
         project = new Project({
             pk: 2,
@@ -65,10 +132,10 @@ describe('EditSingleGroup tests', () => {
             })
         });
 
-        let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
-        get_course_by_pk_stub.returns(Promise.resolve(course));
+        let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project');
+        get_all_groups_stub.returns(Promise.resolve(groups));
 
-        wrapper = mount(EditSingleGroup, {
+        wrapper = mount(EditGroups, {
             propsData: {
                 project: project
             }
@@ -88,42 +155,175 @@ describe('EditSingleGroup tests', () => {
         }
     });
 
-    test('There are min_group_size number of editable member name fields at the time of ' +
-         'creation',
+    test('groups_with_extensions sorted by extension ASC, first group member name ASC ' +
+         '(groups are sorted by first group member name ASC - server side)',
          async () => {
+        expect(component.d_loading).toBe(false);
+        expect(component.groups.length).toEqual(groups.length);
+        expect(component.groups[0]).toEqual(group_1);
+        expect(component.groups[1]).toEqual(group_2);
+        expect(component.groups[2]).toEqual(group_3);
+        expect(component.groups[3]).toEqual(group_4);
 
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions[0]).toEqual(group_4);
+        expect(component.groups_with_extensions[1]).toEqual(group_2);
+        expect(component.groups_with_extensions[2]).toEqual(group_3);
     });
 
-    test('A minimum of 1 member name fields can be edited to create a group',
-         async () => {
+    test('extension_sort', async () => {
+        group_1.extended_due_date = "2019-08-18T15:25:06.965696Z";
+        group_1.member_names = ["josh@cornell.edu", "dave@cornell.edu"];
+        group_2.extended_due_date = "2019-08-18T15:26:06.965696Z";
+        group_2.member_names = ["jim@cornell.edu", "andrew@cornell.edu"];
+        group_3.extended_due_date = "2019-08-18T15:27:06.965696Z";
+        group_3.member_names = ["jan@cornell.edu", "ally@cornell.edu"];
+        group_4.extended_due_date = "2019-08-18T15:25:06.965696Z";
+        group_4.member_names = ["jo@cornell.edu", "randy@corenll.edu"];
 
+        let groups_with_extensions = [group_4, group_3, group_2, group_1];
+
+        groups_with_extensions.sort(component.extension_sort);
+        expect(groups_with_extensions[0]).toEqual(group_4);
+        expect(groups_with_extensions[1]).toEqual(group_1);
+        expect(groups_with_extensions[2]).toEqual(group_2);
+        expect(groups_with_extensions[3]).toEqual(group_3);
     });
 
-    test('A maximum of max_group_size member name fields can be edited to create a group',
+    test('Create a group - (selected_group set to new group on successful creation)',
          async () => {
+        let new_group = new Group({
+            pk: 1,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+                "angela@cornell.edu",
+                "creed@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
 
+        expect(component.groups.length).toEqual(4);
+
+        Group.notify_group_created(new_group);
+        expect(component.groups.length).toEqual(5);
+        expect(component.selected_group).toEqual(new_group);
     });
 
+    test('Selected group set to group selected in GroupLookup',
+         async () => {
+        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+        expect(component.selected_group).toBeNull();
 
-    test('Group member must be enrolled in course - violates condition', async () => {
-        let create_group_stub = sinon.stub(Group, 'create');
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Error in \"members\": This project only accepts submissions " +
-                             "from enrolled students."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-        create_group_stub.returns(Promise.reject(axios_response_instance));
+        let group_lookup = wrapper.find({ref: 'group_lookup'});
+        let search_bar = group_lookup.find({ref: 'group_typeahead'}).find('input');
+        search_bar.trigger("click");
+        search_bar.trigger('keydown', { code: 'Enter' });
+        await component.$nextTick();
+
+        expect(component.selected_group).toEqual(group_1);
+    });
+
+    test('Add a group member to a group - groups stays sorted', async () => {
+        group_3.member_names.unshift("angela@cornell.edu");
+        Group.notify_group_changed(group_3);
+        await component.$nextTick();
+
+        expect(component.groups.length).toEqual(groups.length);
+        expect(component.groups[0]).toEqual(group_1);
+        expect(component.groups[1]).toEqual(group_3);
+        expect(component.groups[2]).toEqual(group_2);
+        expect(component.groups[3]).toEqual(group_4);
+    });
+
+    test('Remove a group member from a group - groups stays sorted',
+         async () => {
+        group_1.member_names.splice(0, 1);
+        Group.notify_group_changed(group_1);
+        await component.$nextTick();
+
+        expect(component.groups.length).toEqual(groups.length);
+        expect(component.groups[0]).toEqual(group_2);
+        expect(component.groups[1]).toEqual(group_3);
+        expect(component.groups[2]).toEqual(group_4);
+        expect(component.groups[3]).toEqual(group_1);
+    });
+
+    test('Give a group an extension - extension list gets updated', async () => {
+        expect(component.groups_with_extensions.length).toEqual(3);
+
+        group_1.extended_due_date = "2019-08-18T15:22:06.965696Z";
+        Group.notify_group_changed(group_1);
+        await component.$nextTick();
+
+        expect(component.groups_with_extensions.length).toEqual(4);
+        expect(component.groups_with_extensions[0]).toEqual(group_1);
+        expect(component.groups_with_extensions[1]).toEqual(group_4);
+        expect(component.groups_with_extensions[2]).toEqual(group_2);
+        expect(component.groups_with_extensions[3]).toEqual(group_3);
+    });
+
+    test('Change the time/date of an extension for a group - extension list gets updated',
+         async () => {
+        expect(component.groups_with_extensions.length).toEqual(3);
+
+        group_2.extended_due_date = "2019-08-18T15:22:06.965696Z";
+        Group.notify_group_changed(group_2);
+        await component.$nextTick();
+
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions[0]).toEqual(group_2);
+        expect(component.groups_with_extensions[1]).toEqual(group_4);
+        expect(component.groups_with_extensions[2]).toEqual(group_3);
+    });
+
+    test('Change the member(s) of a group with an extension - extension list gets updated',
+         async () => {
+        expect(component.groups_with_extensions.length).toEqual(3);
+
+        group_3.member_names[0] = "creed@cornell.edu";
+        Group.notify_group_changed(group_3);
+        await component.$nextTick();
+
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions[0]).toEqual(group_4);
+        expect(component.groups_with_extensions[1]).toEqual(group_3);
+        expect(component.groups_with_extensions[2]).toEqual(group_2);
+    });
+
+    test('Remove an extension from a group - extension list gets updated', async () => {
+        let group_2_without_extension = new Group({
+            pk: 2,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+            "kelly@cornell.edu",
+            "meredith@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        expect(component.groups_with_extensions.length).toEqual(3);
+
+        Group.notify_group_changed(group_2_without_extension);
+        await component.$nextTick();
+
+        expect(component.groups_with_extensions.length).toEqual(2);
+        expect(component.groups_with_extensions[0]).toEqual(group_4);
+        expect(component.groups_with_extensions[1]).toEqual(group_3);
+    });
+
+    test.skip('Merge a group', async () => {
 
     });
 });

@@ -134,7 +134,7 @@ describe('GroupLookup.vue', () => {
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group4);
 
         search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
+        await component.$nextTick();
 
         expect(wrapper.emitted().update_group_selected.length).toEqual(1);
     });
