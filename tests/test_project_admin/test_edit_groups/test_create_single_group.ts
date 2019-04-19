@@ -17,8 +17,6 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-jest.mock('file-saver');
-
 describe('CreateSingleGroup tests', () => {
     let wrapper: Wrapper<CreateSingleGroup>;
     let component: CreateSingleGroup;
@@ -91,42 +89,64 @@ describe('CreateSingleGroup tests', () => {
     test('There are min_group_size number of editable member name fields at the time of ' +
          'creation',
          async () => {
-        expect(component.min_group_size).toEqual(2);
-        expect(component.max_group_size).toEqual(3);
-        expect(component.group_members.length).toEqual(2);
+        expect(component.min_group_size).toEqual(project.min_group_size);
+        expect(component.max_group_size).toEqual(project.max_group_size);
+        expect(component.group_members.length).toEqual(project.min_group_size);
+        expect(component.allowed_guest_domain).toEqual(course.allowed_guest_domain);
         for (let i = 0; i < component.min_group_size; ++i) {
             expect(component.group_members[i].id).toEqual(i + 1);
-            expect(component.group_members[i].username).toEqual("@cornell.edu");
+            expect(component.group_members[i].username).toEqual(course.allowed_guest_domain);
         }
     });
 
     test('A minimum of 1 member name fields can be edited to create a group',
          async () => {
         expect(component.group_members.length).toEqual(2);
+        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
 
         let delete_member_2_button = wrapper.findAll(".remove-member-button").at(1);
         delete_member_2_button.trigger('click');
 
         expect(component.group_members.length).toEqual(1);
+        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
 
         let delete_only_member_button = wrapper.findAll(".remove-member-button").at(0);
         delete_only_member_button.trigger('click');
 
         expect(component.group_members.length).toEqual(1);
+        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
     });
 
     test('A maximum of max_group_size member name fields can be edited to create a group',
          async () => {
         expect(component.group_members.length).toEqual(2);
+        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
 
-        let add_member_button = wrapper.find(".add-member-button");
-        add_member_button.trigger('click');
-
-        expect(component.group_members.length).toEqual(3);
-
-        add_member_button.trigger('click');
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
 
         expect(component.group_members.length).toEqual(3);
+        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
+
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        expect(component.group_members.length).toEqual(3);
+        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
+    });
+
+    test('Member names cannot be empty', async () => {
+        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+
+        let member_1_name_input = member_name_inputs.at(0).find('#input');
+        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
+            { ref: "member_name_input" }
+        ).at(0).vm;
+        (<HTMLInputElement> member_1_name_input.element).value = "";
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_1_name_validator.is_valid).toBe(false);
     });
 
     test('Successful creation of a group', async () => {
