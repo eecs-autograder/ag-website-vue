@@ -1,6 +1,11 @@
 import {
-    array_add_unique, array_get_unique, array_has_unique, array_remove_unique,
-    safe_assign, UniqueArrayError, zip
+    array_add_unique,
+    array_get_unique,
+    array_has_unique,
+    array_remove_unique,
+    safe_assign,
+    UniqueArrayError,
+    zip
 } from '@/utils';
 
 

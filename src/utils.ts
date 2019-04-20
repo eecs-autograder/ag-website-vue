@@ -2,8 +2,7 @@
 // that "to" is a derived class of "from".
 // Also limits "from" to a single value.
 import { AxiosError, AxiosResponse } from 'axios';
-import { Dictionary, RawLocation, Route, VueRouter } from 'vue-router/types/router';
-import { Vue } from 'vue/types/vue';
+import { Dictionary } from 'vue-router/types/router';
 
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
     Object.assign(to, from);
