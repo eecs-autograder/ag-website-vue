@@ -1,6 +1,5 @@
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
-import { array_has_unique } from '@/utils';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import * as sinon from 'sinon';
 import Vue from 'vue';
@@ -73,11 +72,11 @@ describe('File Upload tests not involving the empty files modal', () => {
     });
 
     test('Empty files are identified on upload', () => {
-        expect(component.d_empty_filenames.length).toEqual(0);
+        expect(component.d_empty_filenames.size()).toEqual(0);
         component.check_for_emptiness(file_1);
-        expect(component.d_empty_filenames.length).toEqual(0);
+        expect(component.d_empty_filenames.size()).toEqual(0);
         component.check_for_emptiness(empty_file);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
     });
 
     test('Calling clear_files() on the file upload component erases all files (empty ' +
@@ -90,12 +89,12 @@ describe('File Upload tests not involving the empty files modal', () => {
         component.check_for_emptiness(empty_file);
 
         expect(component.d_files.length).toEqual(2);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
 
         component.clear_files();
 
         expect(component.d_files.length).toEqual(0);
-        expect(component.d_empty_filenames.length).toEqual(0);
+        expect(component.d_empty_filenames.size()).toEqual(0);
     });
 
     test('Dragging a file over the drag and drop area causes the area to become ' +
@@ -130,7 +129,7 @@ describe('File Upload tests not involving the empty files modal', () => {
         });
 
         expect(component.d_files.length).toEqual(2);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
     });
 
     test('If a user uploads a file that has the same name of a file already in the ' +
@@ -155,14 +154,14 @@ describe('File Upload tests not involving the empty files modal', () => {
         component.check_for_emptiness(empty_file);
 
         expect(component.d_files.length).toEqual(2);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
         expect(component.d_files[0].lastModified).toEqual(file_1.lastModified);
         expect(component.d_files[1].lastModified).toEqual(empty_file.lastModified);
 
         component.add_files_from_button(mock_event);
 
         expect(component.d_files.length).toEqual(2);
-        expect(component.d_empty_filenames.length).toEqual(0);
+        expect(component.d_empty_filenames.size()).toEqual(0);
         expect(component.d_files[0].lastModified).toEqual(file_2.lastModified);
         expect(component.d_files[1].lastModified).toEqual(file_3.lastModified);
     });
@@ -177,11 +176,11 @@ describe('File Upload tests not involving the empty files modal', () => {
 
         component.add_files_from_button(mock_html_input_event);
         expect(component.d_files.length).toEqual(1);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
 
         component.add_files_from_button(mock_html_input_event);
         expect(component.d_files.length).toEqual(1);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
 
         let mock_drop_event = <DragEvent> {
             // tslint:disable-next-line:no-object-literal-type-assertion
@@ -196,7 +195,7 @@ describe('File Upload tests not involving the empty files modal', () => {
         component.add_dropped_files(mock_drop_event);
 
         expect(component.d_files.length).toEqual(1);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
     });
 
     test('Clicking the add file button allows you to upload one or more files', () => {
@@ -279,21 +278,20 @@ describe('File Upload tests not involving the empty files modal', () => {
         component.check_for_emptiness(empty_file);
 
         expect(component.d_files.length).toEqual(2);
-        expect(component.d_empty_filenames.length).toEqual(1);
+        expect(component.d_empty_filenames.size()).toEqual(1);
 
         let file_delete_buttons = wrapper.findAll('.remove-file-button');
         file_delete_buttons.at(0).trigger('click');
 
         expect(component.d_files.length).toEqual(1);
 
-        expect(array_has_unique(component.d_empty_filenames,
-                                empty_file.name)).toBe(true);
+        expect(component.d_empty_filenames.has(empty_file.name)).toBe(true);
 
         file_delete_buttons = wrapper.findAll('.remove-file-button');
         file_delete_buttons.at(0).trigger('click');
 
         expect(component.d_files.length).toEqual(0);
-        expect(component.d_empty_filenames.length).toEqual(0);
+        expect(component.d_empty_filenames.size()).toEqual(0);
     });
 
     test('Users can successfully upload files when all files are non-empty', () => {
@@ -338,7 +336,7 @@ describe("File Upload tests concerning the empty files modal", () => {
         component.check_for_emptiness(file_1);
         component.check_for_emptiness(empty_file);
 
-        expect(component.d_empty_filenames.length).toBeGreaterThan(0);
+        expect(component.d_empty_filenames.size()).toBeGreaterThan(0);
 
         empty_files_present_modal = <Modal> wrapper.find(
             {ref: 'empty_file_found_in_upload_attempt'}

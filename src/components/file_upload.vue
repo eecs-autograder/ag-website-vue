@@ -59,7 +59,7 @@
           The following files are empty:
         </p>
         <ul class="list-of-empty-file-names">
-          <li v-for="empty_file of d_empty_filenames">
+          <li v-for="empty_file of d_empty_filenames.data">
             <i class="fas fa-exclamation-triangle empty-warning-symbol"></i>
             {{empty_file}}
           </li>
@@ -84,7 +84,7 @@
   import { Component, Vue } from 'vue-property-decorator';
 
   import Modal from '@/components/modal.vue';
-  import { array_add_unique, array_remove_unique } from '@/utils';
+  import { ArraySet } from '@/array_set';
 
   interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
@@ -97,7 +97,7 @@
 
     d_files: File[] = [];
     d_files_dragged_over = false;
-    d_empty_filenames: string[] = [];
+    d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
 
     table_row_styling(file_in: File, row_index: number): string {
       if (file_in.size === 0) {
@@ -138,11 +138,11 @@
 
     remove_file_from_upload(filename: string, file_index: number) {
       this.d_files.splice(file_index, 1);
-      array_remove_unique(this.d_empty_filenames, filename);
+      this.d_empty_filenames.remove(filename, false);
     }
 
     attempt_to_upload() {
-      if (this.d_empty_filenames.length !== 0) {
+      if (!this.d_empty_filenames.empty()) {
         let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
         empty_files_modal.open();
       }
@@ -161,7 +161,7 @@
       for (let index = 0; index < this.d_files.length; ++index) {
         if (this.d_files[index].name === uploaded_file.name) {
           Vue.set(this.d_files, index, uploaded_file);
-          array_remove_unique(this.d_empty_filenames, uploaded_file.name);
+          this.d_empty_filenames.remove(uploaded_file.name, false);
           return;
         }
       }
@@ -170,7 +170,7 @@
 
     check_for_emptiness(file: File) {
       if (file.size === 0) {
-        array_add_unique(this.d_empty_filenames, file.name);
+        this.d_empty_filenames.insert(file.name);
       }
     }
 
@@ -182,7 +182,7 @@
 
     clear_files() {
       this.d_files = [];
-      this.d_empty_filenames = [];
+      this.d_empty_filenames = new ArraySet<string>([]);
     }
   }
 </script>

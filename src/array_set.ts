@@ -75,6 +75,14 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
         }
     }
 
+    size() {
+        return this.data.length;
+    }
+
+    empty() {
+        return this.size() === 0;
+    }
+
     // Inserts item into the ArraySet. Returns true if the insert was successful, false if the
     // item already exists.
     insert(to_insert: ElementType): boolean {
