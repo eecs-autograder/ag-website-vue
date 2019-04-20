@@ -130,6 +130,7 @@ describe('ArraySet custom comparator tests', () => {
 
     test('get missing element, throw_if_not_found true, exception thrown', () => {
         let set = new ArraySet<Custom, SentinalType>([], {less_func: custom_less});
+        expect(() => set.get({id: 42})).toThrow(ArraySetElementNotFoundError);
         expect(() => set.get(new Custom(42))).toThrow(ArraySetElementNotFoundError);
     });
 
@@ -147,6 +148,9 @@ describe('ArraySet custom comparator tests', () => {
     test('remove missing element, throw_if_not_found true, exception thrown', () => {
         let set = new ArraySet([new Custom(1)], {less_func: custom_less});
         expect(() => set.remove({id: 42})).toThrow(ArraySetElementNotFoundError);
+
+        let other_set = new ArraySet<Custom, SentinalType>([], {less_func: custom_less});
+        expect(() => other_set.remove({id: 42})).toThrow(ArraySetElementNotFoundError);
     });
 
     test('remove missing element, throw_if_not_found false, false returned', () => {

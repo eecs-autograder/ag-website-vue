@@ -32,7 +32,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(file, index) of d_files" :class="table_row_styling(file, index)">
+        <tr v-for="(file, index) of d_files.data" :class="table_row_styling(file, index)"
+            :key="file.name">
           <td class="name-of-file">{{file.name}}</td>
           <td class="size-of-file">{{file.size}} Bytes</td>
           <td>
@@ -83,11 +84,16 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
-  import Modal from '@/components/modal.vue';
   import { ArraySet } from '@/array_set';
+  import Modal from '@/components/modal.vue';
 
   interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
+  }
+
+  type HasName = {name: string};
+  function name_less(first: HasName, second: HasName) {
+    return first.name < second.name;
   }
 
   @Component({
@@ -95,7 +101,7 @@
   })
   export default class FileUpload extends Vue {
 
-    d_files: File[] = [];
+    d_files: ArraySet<File, HasName> = new ArraySet<File, HasName>([], {less_func: name_less});
     d_files_dragged_over = false;
     d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
 
@@ -137,7 +143,7 @@
     }
 
     remove_file_from_upload(filename: string, file_index: number) {
-      this.d_files.splice(file_index, 1);
+      this.d_files.remove({name: filename});
       this.d_empty_filenames.remove(filename, false);
     }
 
@@ -147,25 +153,20 @@
         empty_files_modal.open();
       }
       else {
-        this.$emit('upload_files', this.d_files);
+        this.$emit('upload_files', this.d_files.data);
       }
     }
 
     continue_with_upload_despite_empty_files() {
-      this.$emit('upload_files', this.d_files);
+      this.$emit('upload_files', this.d_files.data);
       let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
       empty_files_modal.close();
     }
 
     add_or_update_file(uploaded_file: File) {
-      for (let index = 0; index < this.d_files.length; ++index) {
-        if (this.d_files[index].name === uploaded_file.name) {
-          Vue.set(this.d_files, index, uploaded_file);
-          this.d_empty_filenames.remove(uploaded_file.name, false);
-          return;
-        }
-      }
-      this.d_files.push(uploaded_file);
+      this.d_files.remove(uploaded_file, false);
+      this.d_empty_filenames.remove(uploaded_file.name, false);
+      this.d_files.insert(uploaded_file);
     }
 
     check_for_emptiness(file: File) {
@@ -181,10 +182,12 @@
     }
 
     clear_files() {
-      this.d_files = [];
+      this.d_files = new ArraySet<File, HasName>([], {less_func: name_less});
       this.d_empty_filenames = new ArraySet<string>([]);
     }
   }
+
+
 </script>
 
 <style scoped lang="scss">
