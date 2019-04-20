@@ -36,7 +36,7 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
     // The underlying array to store the data. This needs to be publically
     // accessible so that we get Vue reactivity.
     // DO NOT MODIFY THIS DIRECTLY.
-    readonly data: ElementType[];
+    readonly data: ReadonlyArray<ElementType>;
 
     // A "less than" comparator function used to define the ordering
     // of items in data. This defaults to a comparison using the "<" operator.
@@ -71,7 +71,7 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
         };
 
         if (sort_initial) {
-            this.data.sort(this._compare_func);
+            this._mutable_data.sort(this._compare_func);
         }
     }
 
@@ -94,10 +94,10 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
         // -1 indicates there's no element that's greater than to_insert.
         let insert_before = this.data.findIndex((element) => this._less_func(to_insert, element));
         if (insert_before === -1) {
-            this.data.push(to_insert);
+            this._mutable_data.push(to_insert);
         }
         else {
-            this.data.splice(insert_before, 0, to_insert);
+            this._mutable_data.splice(insert_before, 0, to_insert);
         }
 
         return true;
@@ -128,7 +128,7 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
         if (index === -1) {
             return false;
         }
-        this.data.splice(index, 1);
+        this._mutable_data.splice(index, 1);
         return true;
     }
 
@@ -144,6 +144,17 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
 
     private _items_equal(first: SentinalType, second: SentinalType): boolean {
         return this._compare_func(first, second) === 0;
+    }
+
+    // FOR INTERNAL USE ONLY
+    // This lets us modify this.data internally while having it behave as read only
+    // to users who access it through ArraySet.data (such as in vue components).
+    //
+    // Note that "reversing" this approach (making this.data private and exposing a
+    // property that returns this.data as a ReadonlArray) doesn't work with Vue's
+    // reactivity.
+    private get _mutable_data() {
+        return <ElementType[]> this.data;
     }
 }
 
