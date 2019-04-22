@@ -1,10 +1,8 @@
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,
     Group,
-    NewGroupData,
     Project,
     Semester,
     UltimateSubmissionPolicy
@@ -169,25 +167,6 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions[0]).toEqual(group_4);
         expect(component.groups_with_extensions[1]).toEqual(group_2);
         expect(component.groups_with_extensions[2]).toEqual(group_3);
-    });
-
-    test('extension_sort', async () => {
-        group_1.extended_due_date = "2019-08-18T15:25:06.965696Z";
-        group_1.member_names = ["josh@cornell.edu", "dave@cornell.edu"];
-        group_2.extended_due_date = "2019-08-18T15:26:06.965696Z";
-        group_2.member_names = ["jim@cornell.edu", "andrew@cornell.edu"];
-        group_3.extended_due_date = "2019-08-18T15:27:06.965696Z";
-        group_3.member_names = ["jan@cornell.edu", "ally@cornell.edu"];
-        group_4.extended_due_date = "2019-08-18T15:25:06.965696Z";
-        group_4.member_names = ["jo@cornell.edu", "randy@corenll.edu"];
-
-        let groups_with_extensions = [group_4, group_3, group_2, group_1];
-
-        groups_with_extensions.sort(component.extension_sort);
-        expect(groups_with_extensions[0]).toEqual(group_4);
-        expect(groups_with_extensions[1]).toEqual(group_1);
-        expect(groups_with_extensions[2]).toEqual(group_2);
-        expect(groups_with_extensions[3]).toEqual(group_3);
     });
 
     test('Create a group - (selected_group set to new group on successful creation)',

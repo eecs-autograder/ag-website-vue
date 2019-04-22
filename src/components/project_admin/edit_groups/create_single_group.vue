@@ -53,8 +53,9 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
 
-  import { handle_api_errors_async } from '@/utils';
   import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
+
+  import { handle_api_errors_async } from '@/utils';
   import { is_not_empty } from '@/validators';
 
   interface GroupMember {
@@ -93,7 +94,7 @@
             id: i + 1,
             username: this.allowed_guest_domain
           }
-        )
+        );
       }
     }
 
@@ -112,7 +113,7 @@
               id: i + 1,
               username: this.allowed_guest_domain
             }
-          )
+          );
         }
       }
       finally {

@@ -107,9 +107,9 @@ describe('EditSingleGroup tests', () => {
          async () => {
         expect(component.min_group_size).toEqual(project.min_group_size);
         expect(component.max_group_size).toEqual(project.max_group_size);
-        expect(component.d_group.member_names[0]).toEqual(group.member_names[0]);
-        expect(component.d_group.member_names[1]).toEqual(group.member_names[1]);
-        expect(component.d_group.bonus_submissions_remaining).toEqual(
+        expect(component.d_group!.member_names[0]).toEqual(group.member_names[0]);
+        expect(component.d_group!.member_names[1]).toEqual(group.member_names[1]);
+        expect(component.d_group!.bonus_submissions_remaining).toEqual(
             group.bonus_submissions_remaining
         );
         expect(component.allowed_guest_domain).toEqual(course.allowed_guest_domain);
@@ -117,35 +117,35 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('A group must have at least one member', async () => {
-        expect(component.d_group.member_names.length).toEqual(2);
+        expect(component.d_group!.member_names.length).toEqual(2);
         expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
 
         let delete_member_2_button = wrapper.findAll(".remove-member-button").at(1);
         delete_member_2_button.trigger('click');
 
-        expect(component.d_group.member_names.length).toEqual(1);
+        expect(component.d_group!.member_names.length).toEqual(1);
         expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
 
         let delete_only_member_button = wrapper.findAll(".remove-member-button").at(0);
         delete_only_member_button.trigger('click');
 
-        expect(component.d_group.member_names.length).toEqual(1);
+        expect(component.d_group!.member_names.length).toEqual(1);
         expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
     });
 
     test('A group can have at most max_group_size members', async () => {
-        expect(component.d_group.member_names.length).toEqual(2);
+        expect(component.d_group!.member_names.length).toEqual(2);
         expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
 
         wrapper.find(".add-member-button").trigger('click');
 
-        expect(component.d_group.member_names.length).toEqual(3);
+        expect(component.d_group!.member_names.length).toEqual(3);
         expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
 
         wrapper.find(".add-member-button").trigger('click');
         await component.$nextTick();
 
-        expect(component.d_group.member_names.length).toEqual(3);
+        expect(component.d_group!.member_names.length).toEqual(3);
         expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
     });
 
