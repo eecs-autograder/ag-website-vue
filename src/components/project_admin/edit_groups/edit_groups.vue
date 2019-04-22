@@ -1,14 +1,8 @@
 <template>
   <div id="edit-groups-component" v-if="!d_loading">
-
-    <div class="create-group-bar">
-      <button class="create-group-button"
-              @click="$refs.create_group_modal.open()"> Create New Group
-      </button>
-    </div>
-
     <div class="edit-group-container">
-        <div class="edit-title"> Edit Group </div>
+      <div class="edit-limits">
+        <div class="edit-title"> Edit Existing Group </div>
         <group-lookup ref="group_lookup"
                       :groups="groups"
                       :project="project"
@@ -17,6 +11,7 @@
                            :project="project"
                            :group="selected_group">
         </edit-single-group>
+        </div>
     </div>
     <div class="extensions-container">
       <table class="extensions-table">
@@ -31,7 +26,6 @@
             <div v-for="member_name of group.member_names">{{member_name}}</div>
           </td>
         <td class="due-date">
-<!--          {{group.extended_due_date}}-->
           {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
         </td>
         </tr>
@@ -51,6 +45,23 @@
       </div>
     </modal>
 
+    <modal ref="merge_groups_modal"
+           click_outside_to_close
+           size="medium">
+      <div class="modal-header"> Merging existing groups </div>
+      <hr>
+      <div class="modal-body"> </div>
+    </modal>
+
+    <div class="button-footer">
+      <button class="create-group-button"
+              @click="$refs.create_group_modal.open()"> Create New Group
+      </button>
+
+      <button class="merge-groups-button"
+              @click="$refs.merge_groups_modal.open()"> Merge Existing Groups
+      </button>
+    </div>
   </div>
 </template>
 
@@ -190,16 +201,12 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand');
 $current-lang-choice: 'Quicksand';
 
-#component-toggle {
-  padding: 10px 0 20px 0;
-}
-
 .edit-title {
   color: lighten(black, 25);
   font-size: 19px;
   font-weight: bold;
   margin: 0;
-  padding: 12px 0;
+  padding: 12px 0 12px 0;
 }
 
 #edit-groups-component {
@@ -215,7 +222,7 @@ $current-lang-choice: 'Quicksand';
 
 .extensions-container {
   box-sizing: border-box;
-  padding: 10px 10px 50px 10px;
+  padding: 10px 10px 64px 10px;
 }
 
 .extensions-table {
@@ -253,21 +260,32 @@ th {
   width: 177px;
 }
 
-.create-group-bar {
-  width: 100%;
-  background-color: hsl(220, 30%, 30%);
-  padding: 10px;
-  position: relative;
-  text-align: right;
-  box-sizing: border-box;
-}
-
 .extensions-container {
   width: 100%;
 }
 
-/**** Modal *******************************************************************/
+.button-footer {
+  width: 100%;
+  min-width: 370px;
+  background-color: hsl(210, 20%, 96%);
+  border-top: 1px solid hsl(210, 20%, 94%);
+  padding: 10px 10px 10px 10px;
+  position: fixed;
+  text-align: center;
+  bottom: 0;
+  box-sizing: border-box;
+}
 
+.merge-groups-button {
+  @extend .teal-button;
+  margin-left: 15px;
+}
+
+.create-group-button {
+  @extend .teal-button;
+}
+
+/**** Modal *******************************************************************/
 .modal-header {
   font-size: 24px;
   font-weight: bold;
@@ -279,17 +297,32 @@ th {
   padding: 10px 0 0 0;
 }
 
-.create-group-button {
-  @extend .green-button;
-  font-size: 16px;
-  font-family: $current-lang-choice;
-}
-
-.create-group-button:disabled {
-  @extend .gray-button;
+@media only screen and (min-width: 481px) {
+  .button-footer {
+    width: 100%;
+    min-width: 370px;
+    background-color: hsl(210, 20%, 96%);
+    border-top: 1px solid hsl(210, 20%, 94%);
+    padding: 10px 10px 10px 10px;
+    position: fixed;
+    text-align: right;
+    bottom: 0;
+    box-sizing: border-box;
+  }
 }
 
 @media only screen and (min-width: 881px) {
+  .button-footer {
+    width: 100%;
+    min-width: 370px;
+    background-color: hsl(210, 20%, 96%);
+    border-top: 1px solid hsl(210, 20%, 94%);
+    padding: 10px 10px 10px 10px;
+    position: fixed;
+    text-align: right;
+    bottom: 0;
+    box-sizing: border-box;
+  }
 
   .extensions-table {
     border-collapse: collapse;
@@ -297,6 +330,7 @@ th {
   }
 
   .edit-group-container {
+    box-sizing: border-box;
     width: 50%;
     display: inline-block;
     vertical-align: top;
@@ -304,18 +338,10 @@ th {
   }
 
   .extensions-container {
+    box-sizing: border-box;
     width: 50%;
     display: inline-block;
-    padding: 10px 1.5% 0 1.5%;
-  }
-
-  .create-group-bar {
-    width: 100%;
-    background-color: hsl(220, 30%, 30%);
-    padding: 10px;
-    position: relative;
-    text-align: right;
-    box-sizing: border-box;
+    padding: 10px 1.5% 30px 1.5%;
   }
 }
 

@@ -15,17 +15,21 @@
                                :num_rows="1"
                                input_style="width: 280px;
                                             border: 1px solid #ced4da;">
-                <div slot="suffix" class="remove-member-button"
-                       :title="`Remove ${member} from group`"
-                       @click="remove_group_member(index)">
-                    <i class="fas fa-times"></i>
-                </div>
+                <button slot="suffix"
+                        class="remove-member-button"
+                        :title="`Remove ${member} from group`"
+                        :disabled="d_group.member_names.length === 1"
+                        type="button"
+                        @click="remove_group_member(index)">
+                  <i class="fas fa-times"></i>
+                </button>
               </validated-input>
             </div>
           </div>
         </div>
         <div class="add-member-container">
           <button class="add-member-button"
+                  type="button"
                   :disabled="d_group.member_names.length >= max_group_size"
                   @click="add_group_member">
             {{d_group.member_names.length === 0 ? "Add A member" : "Add Another Member"}}
@@ -50,9 +54,7 @@
       </div>
 
       <div id="datetime-picker-container" v-if="has_extension">
-<!--        <datetime v-model="some_date"> </datetime>-->
-        <flat-pickr v-model="d_group.extended_due_date"
-                    :config="datetime_config"></flat-pickr>
+        <div class="datetime-picker"></div>
       </div>
 
       <div id="bonus-submissions-container">
@@ -93,17 +95,9 @@ import { Course, Group, Project } from 'ag-client-typescript';
 
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
-// import Datetime from 'vue-datetime';
-// import 'vue-datetime/dist/vue-datetime.css';
-
-import flatPickr from 'vue-flatpickr-component';
-// import 'flatpickr/dist/flatpickr.css';
-// import 'flatpickr/dist/themes/airbnb.css';
-
 @Component({
   components: {
     APIErrors,
-    flatPickr,
     Toggle,
     ValidatedForm,
     ValidatedInput
@@ -115,11 +109,6 @@ export default class EditSingleGroup extends Vue {
   readonly is_non_negative = is_non_negative;
   readonly is_integer = is_integer;
   readonly string_to_num = string_to_num;
-
-  datetime_config = {
-    enableTime: true,
-    dateFormat: "Y-m-d H:i"
-  };
 
   @Prop({required: true, type: Group})
   group!: Group;
@@ -146,8 +135,6 @@ export default class EditSingleGroup extends Vue {
   max_group_size = 1;
   successful_update = false;
   toggle_color = "orange";
-
-  some_date = "";
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
@@ -223,160 +210,83 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
-  @import '@/styles/button_styles.scss';
-  @import url('https://fonts.googleapis.com/css?family=Quicksand');
-  $current-lang-choice: 'Quicksand';
+@import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
+@import '@/styles/components/edit_groups.scss';
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+$current-lang-choice: 'Quicksand';
 
-  .suffix-element {
-    display: inline-block;
-    vertical-align: top;
-  }
+#edit-single-group-component {
+  font-family: Quicksand;
+  font-size: 15px;
+}
 
-  #edit-single-group-component {
-    font-family: Quicksand;
-    font-size: 15px;
-  }
+.edit-group-members-container {
+  padding-top: 16px;
+}
 
-  .edit-group-members-container {
-    padding-top: 16px;
-  }
+#extension-toggle {
+  padding-top: 10px;
+}
 
-  .group-members-label {
-    color: lighten(black, 25);
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0;
-    padding: 0 10px 10px 0;
-    display: inline-block;
-    vertical-align: top;
-  }
+.toggle-on, .toggle-off {
+  font-size: 15px;
+  color: black;
+}
 
-  .group-member {
-    font-size: 16px;
-    margin: 0 0 10px 0;
-    padding: 3px 8px;
-    background-color: hsl(212, 70%, 95%);
-    display: inline-block;
-    border-radius: 5px;
-    color: hsl(212, 50%, 20%);
-  }
+#bonus-submissions-container {
+  padding: 16px 0 5px 0;
+}
 
-  .remove-member-button {
-    cursor: pointer;
-    display: inline-block;
-    padding: 9px 16px;
-    border-radius: 3px;
-    margin-left: 8px;
-    background-color: hsl(220, 30%, 90%);
-    color: black;
-    vertical-align: top;
-  }
+#bonus-submissions-label {
+  padding-bottom: 6px;
+}
 
-  .remove-member-button:hover {
-    background-color: hsl(220, 30%, 30%);
-    color: white;
-  }
+#datetime-picker-container {
+  padding: 16px 0 0 0;
+}
 
-  .username-validated-container {
-    display: inline-block;
-  }
+.datetime-picker {
+  margin-top: 5px;
+  width: 250px;
+  height: 200px;
+  background-color: hsl(210, 20%, 90%);
+}
 
-  .group-member-editing {
-    padding-bottom: 10px;
-  }
+.update-group-button {
+  margin-top: 15px;
+  @extend .teal-button;
+}
 
-  .add-member {
-    color: white;
-  }
+.update-group-button:disabled {
+  @extend .light-gray-button;
+  color: hsl(220, 30%, 25%);
+}
 
-  .update-group-button {
-    margin-top: 15px;
-    @extend .teal-button;
-  }
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to { opacity: 1;}
+}
 
-  .add-member-button {
-    @extend .dark-purple-button;
-  }
+@keyframes fadeOut {
+  from { opacity: 1;}
+  to { opacity: 0;}
+}
 
-  .add-member-button:disabled, .update-group-button:disabled {
-    @extend .gray-button;
-  }
+.successful-group-creation {
+  animation-duration: 0.5s;
+  animation-name: fadeIn;
+  color: $save-green;
+  display: inline-block;
+  padding-left: 15px;
+}
 
-  .add-member-container {
-    padding: 8px 0 15px 0;
-    cursor: pointer;
-    display: block;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0;}
-    to { opacity: 1;}
-  }
-
-  @keyframes fadeOut {
-    from { opacity: 1;}
-    to { opacity: 0;}
-  }
-
-  #extension-toggle {
-    padding-top: 3px;
-  }
-
-  .successful-group-creation {
-    animation-duration: 0.5s;
-    animation-name: fadeIn;
-    color: $save-green;
-    display: inline-block;
-    padding-left: 15px;
-  }
-
-  .done-adding-group {
-    animation-duration: 1s;
-    animation-name: fadeOut;
-    color: $save-green;
-    display: inline-block;
-    padding-left: 15px;
-  }
-
-  .toggle-on, .toggle-off {
-    font-size: 15px;
-    color: black;
-  }
-
-  #bonus-submissions-container {
-    padding: 16px 0 5px 0;
-  }
-
-  #bonus-submissions-label {
-    padding-bottom: 6px;
-  }
-
-  #datetime-picker-container {
-    padding: 16px 0 0 0;
-  }
-
-  .successful-group-update {
-    animation-duration: 0.5s;
-    animation-name: fadeIn;
-    color: $save-green;
-    display: inline-block;
-    padding-left: 15px;
-  }
-
-  .done-updating-group {
-    animation-duration: 1s;
-    animation-name: fadeOut;
-    color: $save-green;
-    display: inline-block;
-    padding-left: 15px;
-  }
-
-  .datetime-picker {
-    margin-top: 5px;
-    width: 250px;
-    height: 200px;
-    background-color: hsl(210, 20%, 90%);
-  }
+.done-adding-group {
+  animation-duration: 1s;
+  animation-name: fadeOut;
+  color: $save-green;
+  display: inline-block;
+  padding-left: 15px;
+}
 
 </style>

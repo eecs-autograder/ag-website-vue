@@ -1,0 +1,49 @@
+@import '@/styles/colors.scss';
+
+$title-size: 17px;
+
+// group member input related ******************************************************
+
+.group-members-label {
+    color: lighten(black, 25);
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0 10px 10px 0;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.remove-member-button {
+    @extend .light-gray-button;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 6px;
+    margin-left: 8px;
+    color: hsl(220, 30%, 25%);
+}
+
+.add-member-button {
+    @extend .dark-purple-button;
+}
+
+.add-member-button:disabled {
+    @extend .light-gray-button;
+    color: hsl(220, 30%, 25%);
+}
+
+.add-member-container {
+    padding: 0px 0 8px 0;
+    cursor: pointer;
+    display: block;
+}
+
+.group-member-editing {
+    padding-bottom: 10px;
+}
+
+.username-validated-container {
+    display: inline-block;
+}
