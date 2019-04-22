@@ -91,7 +91,7 @@
     async created() {
       this.groups = await Group.get_all_from_project(this.project.pk);
       this.groups_with_extensions = this.groups.filter(group => group.extended_due_date !== null);
-      this.groups_with_extensions.sort(this.extension_sort);
+      this.sort_groups_with_extensions();
       this.d_loading = false;
     }
 
@@ -153,7 +153,7 @@
       }
       if (group.extended_due_date !== null) {
         this.groups_with_extensions.push(deep_copy_of_group);
-        this.groups_with_extensions.sort(this.extension_sort);
+        this.sort_groups_with_extensions();
       }
 
       for (let i = 0; i < this.groups_with_extensions.length; ++i) {
@@ -161,24 +161,21 @@
       }
     }
 
-    extension_sort(group_a: Group, group_b: Group) {
-      if (group_a.extended_due_date! < group_b!.extended_due_date!) {
-        // console.log(group_a.extended_due_date + " < " + group_b.extended_due_date);
-        return -1;
-      }
-      else if (group_a.extended_due_date! > group_b.extended_due_date!) {
-        // console.log(group_a.extended_due_date + " > " + group_b.extended_due_date);
-        return 1;
-      }
-      else {
-        // console.log(group_a.extended_due_date + " === " + group_b.extended_due_date);
-        if (group_a.member_names[0] < group_b.member_names[0]) {
-          // console.log(group_a.member_names[0] + " < " + group_b.member_names[0]);
+    sort_groups_with_extensions() {
+      this.groups_with_extensions.sort((group_a: Group, group_b: Group) => {
+        if (group_a.extended_due_date! < group_b!.extended_due_date!) {
           return -1;
         }
-        // console.log(group_a.member_names[0] + " > " + group_b.member_names[0]);
-        return 1;
-      }
+        else if (group_a.extended_due_date! > group_b.extended_due_date!) {
+          return 1;
+        }
+        else {
+          if (group_a.member_names[0] < group_b.member_names[0]) {
+            return -1;
+          }
+          return 1;
+        }
+      });
     }
 
     update_group_merged(group: Group): void {

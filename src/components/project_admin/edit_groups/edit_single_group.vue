@@ -50,8 +50,9 @@
       </div>
 
       <div id="datetime-picker-container" v-if="has_extension">
-        Datetime Picker
-        <div class="datetime-picker"> </div>
+<!--        <datetime v-model="some_date"> </datetime>-->
+        <flat-pickr v-model="d_group.extended_due_date"
+                    :config="datetime_config"></flat-pickr>
       </div>
 
       <div id="bonus-submissions-container">
@@ -80,6 +81,8 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
 import APIErrors from '@/components/api_errors.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -87,12 +90,20 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
 
 import { Course, Group, Project } from 'ag-client-typescript';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { is_integer, is_non_negative, is_not_empty, string_to_num} from '@/validators';
+
+import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
+
+// import Datetime from 'vue-datetime';
+// import 'vue-datetime/dist/vue-datetime.css';
+
+import flatPickr from 'vue-flatpickr-component';
+// import 'flatpickr/dist/flatpickr.css';
+// import 'flatpickr/dist/themes/airbnb.css';
 
 @Component({
   components: {
     APIErrors,
+    flatPickr,
     Toggle,
     ValidatedForm,
     ValidatedInput
@@ -105,6 +116,11 @@ export default class EditSingleGroup extends Vue {
   readonly is_integer = is_integer;
   readonly string_to_num = string_to_num;
 
+  datetime_config = {
+    enableTime: true,
+    dateFormat: "Y-m-d H:i"
+  };
+
   @Prop({required: true, type: Group})
   group!: Group;
 
@@ -112,13 +128,26 @@ export default class EditSingleGroup extends Vue {
   project!: Project;
 
   allowed_guest_domain = "";
-  d_group: Group | null = null;
+  d_group: Group = new Group({
+    pk: 0,
+    project: 0,
+    extended_due_date: null,
+    member_names: [],
+    bonus_submissions_remaining: 0,
+    late_days_used: {},
+    num_submissions: 0,
+    num_submits_towards_limit: 0,
+    created_at: "",
+    last_modified: ""
+  });
   d_saving = false;
   has_extension = false;
   min_group_size = 1;
   max_group_size = 1;
   successful_update = false;
   toggle_color = "orange";
+
+  some_date = "";
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
