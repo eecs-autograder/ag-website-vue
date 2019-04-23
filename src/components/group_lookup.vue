@@ -21,23 +21,18 @@
 
 <script lang="ts">
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import ValidatedInput from '@/components/validated_input.vue';
-import { Group, Project } from 'ag-client-typescript';
+import { Group } from 'ag-client-typescript';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
-    DropdownTypeahead,
-    ValidatedInput
+    DropdownTypeahead
   }
 })
 export default class GroupLookup extends Vue {
 
   @Prop({required: true, type: Array})
   groups!: Group[];
-
-  @Prop({required: true, type: Project})
-  project!: Project;
 
   d_groups: Group[] = [];
 
@@ -63,12 +58,6 @@ export default class GroupLookup extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: 'Quicksand';
-
-#group-lookup-component {
-  font-family: $current-lang-choice;
-}
 
 .search-bar-label {
   font-size: 16px;
@@ -79,7 +68,6 @@ $current-lang-choice: 'Quicksand';
 }
 
 .typeahead-row {
-  font-family: $current-lang-choice;
   font-size: 15px;
   padding-right: 5px;
 }
