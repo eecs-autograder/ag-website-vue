@@ -1,3 +1,5 @@
+@import '@/styles/colors.scss';
+
 button {
     border-radius: 4px;
     cursor: pointer;
@@ -41,16 +43,16 @@ button {
 
 .green-button {
     @extend .button;
-    background-color: hsl(150, 55%, 44%);
-    border: 1px solid hsl(150, 55%, 60%);
+    background-color: $save-green;
+    border: 1px solid lighten($save-green, 14%);
 }
 
 .green-button:hover:enabled {
-    background-color: hsl(150, 55%, 39%);
+    background-color: darken($save-green, 5%);
 }
 
 .green-button:focus {
-    outline-color: hsl(150, 55%, 79%);
+    outline-color: lighten($save-green, 35%);
 }
 
 .blue-button {
@@ -93,4 +95,13 @@ button {
 
 .gray-button:focus {
     outline-color: hsl(210, 13%, 88%);
+}
+
+.white-button {
+    @extend .button;
+    color: black;
+}
+
+.white-button:hover:enabled {
+    background-color: $pebble-light;
 }

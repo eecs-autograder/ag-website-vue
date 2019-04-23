@@ -43,7 +43,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            EXPECTED STUDENT FILES - Testing ATM
+            <expected-student-files :project="project"></expected-student-files>
           </div>
         </template>
       </tab>
@@ -131,101 +131,103 @@
 </template>
 
 <script lang="ts">
-  import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
-  import Tab from '@/components/tabs/tab.vue';
-  import TabHeader from '@/components/tabs/tab_header.vue';
-  import Tabs from '@/components/tabs/tabs.vue';
+import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
+import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
 
-  import { get_query_param } from "@/utils";
-  import { Project } from 'ag-client-typescript';
-  import { Component, Vue } from 'vue-property-decorator';
+import { get_query_param } from "@/utils";
+import { Project } from 'ag-client-typescript';
+import { Component, Vue } from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      InstructorFiles,
-      Tab,
-      TabHeader,
-      Tabs
-    }
-  })
-  export default class ProjectAdmin extends Vue {
-    current_tab_index = 0;
-    d_loading = true;
-    project: Project | null = null;
+@Component({
+  components: {
+    ExpectedStudentFiles,
+    InstructorFiles,
+    Tab,
+    TabHeader,
+    Tabs
+  }
+})
+export default class ProjectAdmin extends Vue {
+  current_tab_index = 0;
+  d_loading = true;
+  project: Project | null = null;
 
-    async created() {
-      this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
-      this.d_loading = false;
-    }
+  async created() {
+    this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
+    this.d_loading = false;
+  }
 
-    mounted() {
-      this.select_tab(get_query_param(this.$route.query, "current_tab"));
-    }
+  mounted() {
+    this.select_tab(get_query_param(this.$route.query, "current_tab"));
+  }
 
-    on_tab_changed(index: number) {
-      switch (index) {
-        case 0:
-          this.$router.replace({query: {current_tab: "settings"}});
-          break;
-        case 1:
-          this.$router.replace({query: {current_tab: "instructor_files"}});
-          break;
-        case 2:
-          this.$router.replace({query: {current_tab: "expected_student_files"}});
-          break;
-        case 3:
-          this.$router.replace({query: {current_tab: "test_cases"}});
-          break;
-        case 4:
-          this.$router.replace({query: {current_tab: "mutation_testing"}});
-          break;
-        case 5:
-          this.$router.replace({query: {current_tab: "edit_groups"}});
-          break;
-        case 6:
-          this.$router.replace({query: {current_tab: "download_grades"}});
-          break;
-        case 7:
-          this.$router.replace({query: {current_tab: "rerun_tests"}});
-          break;
-        case 8:
-          this.$router.replace({query: {current_tab: "configure_handgrading"}});
-      }
-    }
-
-    select_tab(tab_name: string | null) {
-      switch (tab_name) {
-        case "settings":
-          break;
-        case "instructor_files":
-          this.current_tab_index = 1;
-          break;
-        case "expected_student_files":
-          this.current_tab_index = 2;
-          break;
-        case "test_cases":
-          this.current_tab_index = 3;
-          break;
-        case "mutation_testing":
-          this.current_tab_index = 4;
-          break;
-        case "edit_groups":
-          this.current_tab_index = 5;
-          break;
-        case "download_grades":
-          this.current_tab_index = 6;
-          break;
-        case "rerun_tests":
-          this.current_tab_index = 7;
-          break;
-        case "configure_handgrading":
-          this.current_tab_index = 8;
-          break;
-        default:
-          this.current_tab_index = 0;
-      }
+  on_tab_changed(index: number) {
+    switch (index) {
+      case 0:
+        this.$router.replace({query: {current_tab: "settings"}});
+        break;
+      case 1:
+        this.$router.replace({query: {current_tab: "instructor_files"}});
+        break;
+      case 2:
+        this.$router.replace({query: {current_tab: "expected_student_files"}});
+        break;
+      case 3:
+        this.$router.replace({query: {current_tab: "test_cases"}});
+        break;
+      case 4:
+        this.$router.replace({query: {current_tab: "mutation_testing"}});
+        break;
+      case 5:
+        this.$router.replace({query: {current_tab: "edit_groups"}});
+        break;
+      case 6:
+        this.$router.replace({query: {current_tab: "download_grades"}});
+        break;
+      case 7:
+        this.$router.replace({query: {current_tab: "rerun_tests"}});
+        break;
+      case 8:
+        this.$router.replace({query: {current_tab: "configure_handgrading"}});
     }
   }
+
+  select_tab(tab_name: string | null) {
+    switch (tab_name) {
+      case "settings":
+        break;
+      case "instructor_files":
+        this.current_tab_index = 1;
+        break;
+      case "expected_student_files":
+        this.current_tab_index = 2;
+        break;
+      case "test_cases":
+        this.current_tab_index = 3;
+        break;
+      case "mutation_testing":
+        this.current_tab_index = 4;
+        break;
+      case "edit_groups":
+        this.current_tab_index = 5;
+        break;
+      case "download_grades":
+        this.current_tab_index = 6;
+        break;
+      case "rerun_tests":
+        this.current_tab_index = 7;
+        break;
+      case "configure_handgrading":
+        this.current_tab_index = 8;
+        break;
+      default:
+        this.current_tab_index = 0;
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

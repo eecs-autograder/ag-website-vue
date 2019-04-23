@@ -83,6 +83,7 @@ export default class APIErrors extends Vue {
   background-color: white;
   border-radius: .25rem;
   cursor: pointer;
+  color: black;
   border: 1px solid #f5c6cb;
 }
 </style>

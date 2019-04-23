@@ -1,6 +1,11 @@
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
-import { InstructorFile, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import {
+    ExpectedStudentFile,
+    InstructorFile,
+    Project,
+    UltimateSubmissionPolicy
+} from 'ag-client-typescript';
 import * as sinon from 'sinon';
 import VueRouter from 'vue-router';
 
@@ -121,6 +126,9 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Expected Student Files tab', async () => {
+        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(
+            Promise.resolve([])
+        );
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -317,6 +325,9 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current tab parameter value = expected_student_files', async () => {
+        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(
+            Promise.resolve([])
+        );
         $route.query = { current_tab: 'expected_student_files' };
         wrapper = mount(ProjectAdmin, {
             mocks: {

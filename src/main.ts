@@ -3,7 +3,6 @@ import CourseList from '@/components/course_list/course_list.vue';
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import ProjectSubmission from '@/components/project_submission/project_submission.vue';
 import UIDemos from '@/demos/ui_demos.vue';
-
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Vue from 'vue';
 import VueRouter from 'vue-router';
