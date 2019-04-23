@@ -79,7 +79,7 @@ describe('ExpectedStudentFiles tests', () => {
         expect(save_stub.thisValues[0].max_num_matches).toEqual(
             file_without_wildcard.max_num_matches
         );
-        expect(component.actively_updating).toBe(false);
+        expect(component.editing).toBe(false);
     });
 
     test('error - edited filename not unique to project', async () => {
@@ -117,7 +117,7 @@ describe('ExpectedStudentFiles tests', () => {
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
-        expect(component.actively_updating).toBe(true);
+        expect(component.editing).toBe(true);
     });
 
     test('Cancel edit of file', async () => {
