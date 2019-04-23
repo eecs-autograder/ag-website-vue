@@ -142,7 +142,7 @@ export default class SingleExpectedStudentFile extends Vue {
       (<APIErrors> this.$refs.api_errors).clear();
       safe_assign(this.d_expected_student_file, file);
       await this.d_expected_student_file.save();
-      (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+      (<ExpectedStudentFileForm> this.$refs.form).reset();
       this.actively_updating = false;
     }
     finally {
@@ -151,7 +151,7 @@ export default class SingleExpectedStudentFile extends Vue {
   }
 
   cancel_update() {
-    (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+    (<ExpectedStudentFileForm> this.$refs.form).reset();
     this.actively_updating = false;
   }
 

@@ -1,11 +1,11 @@
 <template>
   <div id="expected-student-file-form-component">
     <validated-form id="expected-student-file-form"
-                      ref="expected_student_file_form"
-                      autocomplete="off"
-                      spellcheck="false"
-                      @submit.native.prevent="submit_form"
-                      @form_validity_changed="$emit('on_form_validity_changed', $event)">
+                    ref="expected_student_file_form"
+                    autocomplete="off"
+                    spellcheck="false"
+                    @submit.native.prevent="submit_form"
+                    @form_validity_changed="$emit('on_form_validity_changed', $event)">
 
       <div class="input-wrapper">
         <label class="input-label"> Filename </label>
@@ -133,7 +133,7 @@ export default class ExpectedStudentFileForm extends Vue {
     this.$emit('on_submit', this.d_expected_student_file);
   }
 
-  reset_expected_student_file_values() {
+  reset() {
     (<ValidatedForm> this.$refs.expected_student_file_form).reset_warning_state();
     this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
   }

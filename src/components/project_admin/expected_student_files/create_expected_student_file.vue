@@ -44,7 +44,7 @@ export default class CreateExpectedStudentFile extends Vue {
       this.d_create_pending = true;
       (<APIErrors> this.$refs.api_errors).clear();
       await ExpectedStudentFile.create(this.project.pk, new_expected_student_file_data);
-      (<ExpectedStudentFileForm> this.$refs.form).reset_expected_student_file_values();
+      (<ExpectedStudentFileForm> this.$refs.form).reset();
     }
     finally {
       this.d_create_pending = false;
