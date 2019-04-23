@@ -69,6 +69,9 @@ describe('Changing tabs in project admin', () => {
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
+        sinon.stub(Group, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
 
         wrapper = mount(ProjectAdmin, {
             localVue,
@@ -172,9 +175,9 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Edit Groups tab', async () => {
-        sinon.stub(Group, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
+        //     Promise.resolve([])
+        // );
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -186,6 +189,7 @@ describe('Changing tabs in project admin', () => {
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'edit_groups'}})
         ).toBe(true);
+        // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
 
     test('Clicking on Download Grades tab', async () => {
@@ -231,7 +235,6 @@ describe('Changing tabs in project admin', () => {
     });
 });
 
-
 describe('select_tab function called with different values associated with "current_tab" ' +
          'key on create',
          () => {
@@ -275,6 +278,9 @@ describe('select_tab function called with different values associated with "curr
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
+        sinon.stub(Group, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
 
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
@@ -376,9 +382,9 @@ describe('select_tab function called with different values associated with "curr
 
 
     test('current tab parameter value = edit_groups', async () => {
-        sinon.stub(Group, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
+        //     Promise.resolve([])
+        // );
         $route.query = { current_tab: 'edit_groups' };
         wrapper = mount(ProjectAdmin, {
             mocks: {
@@ -390,6 +396,7 @@ describe('select_tab function called with different values associated with "curr
 
         expect(component.project).toEqual(project_1);
         expect(component.current_tab_index).toEqual(5);
+        // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
 
 
