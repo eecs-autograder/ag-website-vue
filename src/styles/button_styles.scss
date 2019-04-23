@@ -99,12 +99,12 @@ button {
 
 .dark-purple-button {
     @extend .button;
-    background-color: hsl(300, 80%, 25%);
-    border: 1px solid hsl(300, 80%, 35%);
+    background-color: hsl(300, 80%, 35%);
+    border: 1px solid hsl(300, 80%, 45%);
 }
 
 .dark-purple-button:hover:enabled {
-    background-color: hsl(300, 80%, 20%);
+    background-color: hsl(300, 80%, 31%);
 }
 
 .dark-purple-button:focus {

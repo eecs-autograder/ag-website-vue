@@ -133,6 +133,9 @@ describe('EditGroups tests', () => {
         let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project');
         get_all_groups_stub.returns(Promise.resolve(groups));
 
+        let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
+        get_course_by_pk_stub.returns(Promise.resolve(course));
+
         wrapper = mount(EditGroups, {
             propsData: {
                 project: project
@@ -169,10 +172,11 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions[2]).toEqual(group_3);
     });
 
-    test('Create a group - (selected_group set to new group on successful creation)',
+    test('selected_group set to new group on successful creation and new group inserted ' +
+         'at an index < groups.length',
          async () => {
         let new_group = new Group({
-            pk: 1,
+            pk: 5,
             project: 2,
             extended_due_date: null,
             member_names: [
@@ -194,9 +198,33 @@ describe('EditGroups tests', () => {
         expect(component.selected_group).toEqual(new_group);
     });
 
+    test('selected_group set to new group on successful creation and new group inserted ' +
+         'at an index === groups.length',
+         async () => {
+            let new_group = new Group({
+                pk: 5,
+                project: 2,
+                extended_due_date: null,
+                member_names: [
+                    "toby@cornell.edu"
+                ],
+                bonus_submissions_remaining: 0,
+                late_days_used: {},
+                num_submissions: 3,
+                num_submits_towards_limit: 2,
+                created_at: "9am",
+                last_modified: "10am"
+            });
+
+            expect(component.groups.length).toEqual(4);
+
+            Group.notify_group_created(new_group);
+            expect(component.groups.length).toEqual(5);
+            expect(component.selected_group).toEqual(new_group);
+         });
+
     test('Selected group set to group selected in GroupLookup',
          async () => {
-        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
         expect(component.selected_group).toBeNull();
 
         let group_lookup = wrapper.find({ref: 'group_lookup'});
@@ -281,8 +309,8 @@ describe('EditGroups tests', () => {
             project: 2,
             extended_due_date: null,
             member_names: [
-            "kelly@cornell.edu",
-            "meredith@cornell.edu"
+                "kelly@cornell.edu",
+                "meredith@cornell.edu"
             ],
             bonus_submissions_remaining: 0,
             late_days_used: {},

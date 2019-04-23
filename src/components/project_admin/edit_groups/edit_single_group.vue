@@ -3,7 +3,8 @@
     <validated-form ref="edit_group_form"
                     autocomplete="off"
                     spellcheck="false"
-                    @submit.native.prevent="update_group">
+                    @submit.native.prevent="update_group"
+                    @form_validity_changed="edit_group_form_is_valid = $event">
       <div class="edit-group-members-container">
         <p class="group-members-label"> Group members: </p>
         <div v-for="(member, index) of d_group.member_names">
@@ -30,9 +31,8 @@
         <div class="add-member-container">
           <button class="add-member-button"
                   type="button"
-                  :disabled="d_group.member_names.length >= max_group_size"
-                  @click="add_group_member">
-            {{d_group.member_names.length === 0 ? "Add A member" : "Add Another Member"}}
+                  :disabled="d_group.member_names.length === max_group_size"
+                  @click="add_group_member"> Add Another Member
           </button>
         </div>
 
@@ -73,7 +73,7 @@
 
       <button class="update-group-button"
               type="submit"
-              :disabled="d_saving"> Update Group </button>
+              :disabled="d_saving || !edit_group_form_is_valid"> Update Group </button>
       <div v-if="successful_update"
            :class="d_saving ? 'successful-group-update' : 'done-updating-group'">
         <i class="fas fa-check"></i>
@@ -135,55 +135,25 @@ export default class EditSingleGroup extends Vue {
   max_group_size = 1;
   successful_update = false;
   toggle_color = "orange";
+  edit_group_form_is_valid = true;
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
-    this.d_group = new Group({
-      pk: new_group.pk,
-      project: new_group.project,
-      extended_due_date: new_group.extended_due_date,
-      member_names: [],
-      bonus_submissions_remaining: new_group.bonus_submissions_remaining,
-      late_days_used: new_group.late_days_used,
-      num_submissions: new_group.num_submissions,
-      num_submits_towards_limit: new_group.num_submits_towards_limit,
-      created_at: new_group.created_at,
-      last_modified: new_group.last_modified
-    });
-
-    for (let i = 0; i < new_group.member_names.length; ++i) {
-      this.d_group.member_names.push(deep_copy(new_group.member_names[i]));
-    }
+    this.d_group = deep_copy(new_group, Group);
     this.has_extension = this.d_group.extended_due_date !== null;
   }
 
   async created() {
-    this.d_group = new Group({
-      pk: this.group.pk,
-      project: this.group.project,
-      extended_due_date: this.group.extended_due_date,
-      member_names: [],
-      bonus_submissions_remaining: this.group.bonus_submissions_remaining,
-      late_days_used: this.group.late_days_used,
-      num_submissions: this.group.num_submissions,
-      num_submits_towards_limit: this.group.num_submits_towards_limit,
-      created_at: this.group.created_at,
-      last_modified: this.group.last_modified
-    });
-    for (let i = 0; i < this.group.member_names.length; ++i) {
-      this.d_group.member_names.push(deep_copy(this.group.member_names[i]));
-    }
+    this.d_group = deep_copy(this.group, Group);
     let course = await Course.get_by_pk(this.project.course);
     this.allowed_guest_domain = course.allowed_guest_domain;
     this.min_group_size = this.project.min_group_size;
-    this.max_group_size = this.project.max_group_size;
+    this.max_group_size = 3;
     this.has_extension = this.d_group.extended_due_date !== null;
   }
 
   remove_group_member(index: number) {
-    if (this.d_group!.member_names.length !== 1) {
       this.d_group!.member_names.splice(index, 1);
-    }
   }
 
   add_group_member() {
@@ -194,9 +164,11 @@ export default class EditSingleGroup extends Vue {
   async update_group() {
     try {
       this.d_saving = true;
+      (<APIErrors> this.$refs.api_errors).clear();
       this.d_group!.extended_due_date = this.has_extension
                                         ? "2019-08-18T15:25:06.965696Z" : null;
       await this.d_group!.save();
+      (<ValidatedForm> this.$refs.edit_group_form).reset_warning_state();
     }
     finally {
       this.d_saving = false;
@@ -213,11 +185,8 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: 'Quicksand';
 
 #edit-single-group-component {
-  font-family: Quicksand;
   font-size: 15px;
 }
 
@@ -234,16 +203,16 @@ $current-lang-choice: 'Quicksand';
   color: black;
 }
 
+#datetime-picker-container {
+  padding: 16px 0 0 0;
+}
+
 #bonus-submissions-container {
   padding: 16px 0 5px 0;
 }
 
 #bonus-submissions-label {
   padding-bottom: 6px;
-}
-
-#datetime-picker-container {
-  padding: 16px 0 0 0;
 }
 
 .datetime-picker {
@@ -254,23 +223,22 @@ $current-lang-choice: 'Quicksand';
 }
 
 .update-group-button {
-  margin-top: 15px;
   @extend .teal-button;
+  margin-top: 15px;
 }
 
 .update-group-button:disabled {
-  @extend .light-gray-button;
-  color: hsl(220, 30%, 25%);
+  @extend .gray-button;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0;}
-  to { opacity: 1;}
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1;}
-  to { opacity: 0;}
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .successful-group-creation {
