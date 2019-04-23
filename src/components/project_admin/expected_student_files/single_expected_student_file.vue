@@ -69,10 +69,10 @@
         <button class="modal-delete-button"
                 type="button"
                 :disabled="d_delete_pending"
-                @click="delete_pattern_permanently"> Delete </button>
+                @click="delete_expected_student_file"> Delete </button>
         <button class="modal-cancel-button"
                 type="button"
-             @click="$refs.delete_expected_student_file_modal.close()"> Cancel </button>
+                @click="$refs.delete_expected_student_file_modal.close()"> Cancel </button>
       </div>
     </modal>
 
@@ -106,6 +106,7 @@ export default class SingleExpectedStudentFile extends Vue {
 
   editing = false;
   d_delete_pending = false;
+
   // Using a default value here is cleaner than making this field nullable and using
   // the non-null assertion operator at all use points
   d_expected_student_file: ExpectedStudentFile = new ExpectedStudentFile({
@@ -155,7 +156,7 @@ export default class SingleExpectedStudentFile extends Vue {
     this.editing = false;
   }
 
-  async delete_pattern_permanently() {
+  async delete_expected_student_file() {
     try {
       this.d_delete_pending = true;
       await this.expected_student_file.delete();
