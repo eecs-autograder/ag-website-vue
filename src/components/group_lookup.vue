@@ -1,6 +1,5 @@
 <template>
   <div id="group-lookup-component">
-    <div class="search-bar-label"> Search groups: </div>
     <div class="group-lookup-search-bar">
       <dropdown-typeahead ref="group_typeahead"
                           placeholder_text="Enter a username"
@@ -58,14 +57,6 @@ export default class GroupLookup extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-
-.search-bar-label {
-  font-size: 16px;
-  font-weight: bold;
-  margin: 0;
-  padding: 0 0 8px 0;
-  color: lighten(black, 25);
-}
 
 .typeahead-row {
   font-size: 15px;
