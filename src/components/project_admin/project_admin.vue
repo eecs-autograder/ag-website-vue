@@ -131,7 +131,7 @@
 </template>
 
 <script lang="ts">
-import EditGroups from '@/components/edit_groups/edit_groups.vue';
+import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import Tab from '@/components/tabs/tab.vue';
