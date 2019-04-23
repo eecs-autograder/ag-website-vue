@@ -1,13 +1,13 @@
 <template>
   <div id="single-expected-student-file">
 
-    <div :class="[{'header-editing' : actively_updating},
-                  {'odd-header': !actively_updating && odd_index },
-                  {'even-header': !actively_updating && !odd_index}]">
-      <div :class="['pattern', {'editing-pattern': actively_updating}]">
+    <div :class="[{'header-editing' : editing},
+                  {'odd-header': !editing && odd_index },
+                  {'even-header': !editing && !odd_index}]">
+      <div :class="['pattern', {'editing-pattern': editing}]">
         <b>{{expected_student_file.pattern}}</b>
       </div>
-      <span v-if="actively_updating" class="editing-message"> (Editing)</span>
+      <span v-if="editing" class="editing-message"> (Editing)</span>
       <span v-if="wildcard_is_present">
         <div class="matches-label">
           Minimum number of matches: {{expected_student_file.min_num_matches}}
@@ -18,22 +18,22 @@
       </span>
 
 
-      <div v-if="!actively_updating" class="icon-holder">
+      <div v-if="!editing" class="icon-holder">
         <div class="delete-file"
              @click="$refs.delete_expected_student_file_modal.open()">
           <span> Delete </span>
           <i class="fas fa-trash delete-file-icon"></i>
         </div>
         <div class="edit-file"
-             @click="actively_updating = true">
+             @click="editing = true">
           <span> Edit </span>
           <i class="fas fa-edit edit-file-icon"></i>
         </div>
       </div>
     </div>
 
-    <div v-if="actively_updating"
-         :class="(actively_updating) ? 'form-editing' : 'form-not-editing'">
+    <div v-if="editing"
+         :class="(editing) ? 'form-editing' : 'form-not-editing'">
       <expected-student-file-form ref="form"
                                   @on_submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
@@ -104,7 +104,7 @@ export default class SingleExpectedStudentFile extends Vue {
   @Prop({required: false, default: true})
   odd_index!: boolean;
 
-  actively_updating = false;
+  editing = false;
   d_delete_pending = false;
   // Using a default value here is cleaner than making this field nullable and using
   // the non-null assertion operator at all use points
@@ -143,7 +143,7 @@ export default class SingleExpectedStudentFile extends Vue {
       safe_assign(this.d_expected_student_file, file);
       await this.d_expected_student_file.save();
       (<ExpectedStudentFileForm> this.$refs.form).reset();
-      this.actively_updating = false;
+      this.editing = false;
     }
     finally {
       this.d_saving = false;
@@ -152,7 +152,7 @@ export default class SingleExpectedStudentFile extends Vue {
 
   cancel_update() {
     (<ExpectedStudentFileForm> this.$refs.form).reset();
-    this.actively_updating = false;
+    this.editing = false;
   }
 
   async delete_pattern_permanently() {
