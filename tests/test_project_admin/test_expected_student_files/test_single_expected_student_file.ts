@@ -131,7 +131,7 @@ describe('ExpectedStudentFiles tests', () => {
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        wrapper.find('.cancel-update-button').trigger('click');
+        wrapper.find('.cancel-save-button').trigger('click');
         await component.$nextTick();
 
         expect(save_stub.callCount).toEqual(0);
@@ -172,7 +172,7 @@ describe('ExpectedStudentFiles tests', () => {
         form_component.d_expected_student_file.pattern = " ";
         await component.$nextTick();
 
-        expect(wrapper.find('.update-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
         expect(component.pattern_is_valid).toBe(false);
     });
 

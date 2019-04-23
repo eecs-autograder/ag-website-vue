@@ -42,13 +42,13 @@
           <APIErrors ref="api_errors"> </APIErrors>
 
           <div class="button-container">
-            <button class="cancel-update-button"
+            <button class="save-button"
+                    type="submit"
+                    :disabled="!pattern_is_valid"> Save
+            </button>
+            <button class="cancel-save-button"
                     type="button"
                     @click="cancel_update"> Cancel
-            </button>
-            <button class="update-button"
-                    type="submit"
-                    :disabled="!pattern_is_valid"> Update File
             </button>
           </div>
         </template>
@@ -278,22 +278,22 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
   padding: 18px 0 0 0;
 }
 
-.update-button {
-  @extend .blue-button;
+.save-button {
+  @extend .green-button;
   font-size: 15px;
 }
 
-.update-button:disabled, .update-button:disabled:hover {
+.save-button:disabled, .save-button:disabled:hover {
   background-color: hsl(220, 30%, 85%);
   border-color: hsl(220, 30%, 80%);
   color: gray;
   cursor: default;
 }
 
-.cancel-update-button {
-  @extend .orange-button;
+.cancel-save-button {
+  @extend .white-button;
   font-size: 15px;
-  margin-right: 20px;
+  margin-left: 10px;
 }
 
 /* ---------------- MODAL ---------------- */
