@@ -64,7 +64,7 @@
                          :validators="[is_integer, is_non_negative, is_not_empty]"
                          :num_rows="1"
                          input_style="width: 80px;
-                                     border: 1px solid #ced4da;"
+                                      border: 1px solid #ced4da;"
                          :from_string_fn="string_to_num">
         </validated-input>
       </div>
@@ -74,10 +74,6 @@
       <button class="update-group-button"
               type="submit"
               :disabled="d_saving || !edit_group_form_is_valid"> Update Group </button>
-      <div v-if="successful_update"
-           :class="d_saving ? 'successful-group-update' : 'done-updating-group'">
-        <i class="fas fa-check"></i>
-      </div>
     </validated-form>
   </div>
 </template>
@@ -153,11 +149,11 @@ export default class EditSingleGroup extends Vue {
   }
 
   remove_group_member(index: number) {
-      this.d_group!.member_names.splice(index, 1);
+    this.d_group!.member_names.splice(index, 1);
   }
 
   add_group_member() {
-    this.d_group!.member_names.push('@umich.edu');
+    this.d_group!.member_names.push(this.allowed_guest_domain);
   }
 
   @handle_api_errors_async(handle_save_group_error)
@@ -165,6 +161,9 @@ export default class EditSingleGroup extends Vue {
     try {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
+      for (let i = 0; i < this.d_group.member_names.length; ++i) {
+        Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
+      }
       this.d_group!.extended_due_date = this.has_extension
                                         ? "2019-08-18T15:25:06.965696Z" : null;
       await this.d_group!.save();
@@ -229,32 +228,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 
 .update-group-button:disabled {
   @extend .gray-button;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-.successful-group-creation {
-  animation-duration: 0.5s;
-  animation-name: fadeIn;
-  color: $save-green;
-  display: inline-block;
-  padding-left: 15px;
-}
-
-.done-adding-group {
-  animation-duration: 1s;
-  animation-name: fadeOut;
-  color: $save-green;
-  display: inline-block;
-  padding-left: 15px;
 }
 
 </style>
