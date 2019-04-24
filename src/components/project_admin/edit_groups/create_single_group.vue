@@ -18,10 +18,11 @@
                                  :num_rows="1"
                                  input_style="width: 70%;
                                               border: 1px solid #ced4da;">
-                  <button slot="suffix" class="remove-member-button"
+                  <button slot="suffix"
+                          class="remove-member-button"
+                          :disabled="group_members.length === 1"
                           :title="`Remove ${member} from group`"
                           type="button"
-                          :disabled="group_members.length === 1"
                           @click="remove_group_member(index)">
                     <i class="fas fa-times"></i>
                   </button>
@@ -108,8 +109,9 @@ export default class CreateSingleGroup extends Vue {
       (<APIErrors> this.$refs.api_errors).clear();
       let list_of_members: string[] = [];
       for (let group_member of this.group_members) {
-        list_of_members.push(group_member.username);
+        list_of_members.push(group_member.username.trim());
       }
+      console.log(list_of_members);
       await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
     }
     finally {
@@ -118,7 +120,7 @@ export default class CreateSingleGroup extends Vue {
   }
 
   remove_group_member(index: number) {
-      this.group_members.splice(index, 1);
+    this.group_members.splice(index, 1);
   }
 
   add_group_member() {
@@ -149,8 +151,7 @@ function handle_create_group_error(component: CreateSingleGroup, error: unknown)
 }
 
 .create-group-button:disabled {
-  @extend .light-gray-button;
-  color: hsl(220, 30%, 25%);
+  @extend .gray-button;
 }
 
 </style>
