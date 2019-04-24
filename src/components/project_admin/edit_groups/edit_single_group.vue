@@ -144,7 +144,7 @@ export default class EditSingleGroup extends Vue {
     let course = await Course.get_by_pk(this.project.course);
     this.allowed_guest_domain = course.allowed_guest_domain;
     this.min_group_size = this.project.min_group_size;
-    this.max_group_size = 3;
+    this.max_group_size = this.project.max_group_size;
     this.has_extension = this.d_group.extended_due_date !== null;
   }
 
