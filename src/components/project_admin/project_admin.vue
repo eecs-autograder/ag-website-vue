@@ -17,7 +17,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            PROJECT SETTINGS - TODO (branch exists)
+            <project-settings :project="project"> </project-settings>
           </div>
         </template>
       </tab>
@@ -134,6 +134,7 @@
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
+import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -147,6 +148,7 @@ import { Component, Vue } from 'vue-property-decorator';
     EditGroups,
     ExpectedStudentFiles,
     InstructorFiles,
+    ProjectSettings,
     Tab,
     TabHeader,
     Tabs
