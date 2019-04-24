@@ -111,7 +111,6 @@ export default class CreateSingleGroup extends Vue {
       for (let group_member of this.group_members) {
         list_of_members.push(group_member.username.trim());
       }
-      console.log(list_of_members);
       await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
     }
     finally {
