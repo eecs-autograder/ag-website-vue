@@ -194,8 +194,9 @@ export default class EditGroups extends Vue { // implements GroupObserver
 
 .edit-group-container {
   box-sizing: border-box;
-  vertical-align: top;
+  min-width: 200px;
   padding: 10px 10px 50px 10px;
+  vertical-align: top;
 }
 
 .extensions-container {
@@ -204,9 +205,9 @@ export default class EditGroups extends Vue { // implements GroupObserver
 }
 
 .extensions-table {
-  width: 100%;
   border-collapse: collapse;
   font-size: 16px;
+  width: 100%;
 }
 
 .even-row {
@@ -229,10 +230,10 @@ th {
 }
 
 .extension-date {
-  padding: 10px;
-  vertical-align: top;
   border-bottom: 1px solid hsl(210, 20%, 94%);
+  padding: 10px;
   text-align: right;
+  vertical-align: top;
   width: 200px;
 }
 
@@ -241,15 +242,15 @@ th {
 }
 
 .button-footer {
-  width: 100%;
-  min-width: 370px;
   background-color: hsl(210, 20%, 96%);
   border-top: 1px solid hsl(210, 20%, 94%);
+  bottom: 0;
+  box-sizing: border-box;
+  min-width: 370px;
   padding: 10px 10px 10px 10px;
   position: fixed;
   text-align: center;
-  bottom: 0;
-  box-sizing: border-box;
+  width: 100%;
 }
 
 .merge-groups-button {
@@ -270,8 +271,8 @@ th {
 }
 
 .modal-body {
-  padding: 10px 0 0 0;
   min-width: 200px;
+  padding: 10px 0 0 0;
 }
 
 @media only screen and (min-width: 481px) {
@@ -287,15 +288,15 @@ th {
   }
 
   .edit-group-container {
-    width: 50%;
     display: inline-block;
     padding: 10px 5% 0 1.5%;
+    width: 50%;
   }
 
   .extensions-container {
-    width: 50%;
     display: inline-block;
     padding: 10px 1.5% 30px 1.5%;
+    width: 50%;
   }
 }
 
