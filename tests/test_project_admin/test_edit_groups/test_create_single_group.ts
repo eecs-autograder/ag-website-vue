@@ -183,6 +183,64 @@ describe('CreateSingleGroup tests', () => {
         ));
     });
 
+    test('Usernames of group members are trimmed before attempt to create group',
+         async () => {
+        let create_group_stub = sinon.stub(Group, 'create');
+        let group_members = [
+            "   abernard@cornell.edu  ",
+            "  amartin@cornell.edu",
+            "kelly@cornell.edu   "
+        ];
+
+        let trimmed_group_members = [
+            "abernard@cornell.edu",
+            "amartin@cornell.edu",
+            "kelly@cornell.edu"
+        ];
+
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+
+        let member_1_name_input = member_name_inputs.at(0).find('#input');
+        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
+            { ref: "member_name_input" }
+        ).at(0).vm;
+        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_1_name_validator.is_valid).toBe(true);
+
+        let member_2_name_input = member_name_inputs.at(1).find('#input');
+        let member_2_name_validator = <ValidatedInput> wrapper.findAll(
+        { ref: "member_name_input" }
+        ).at(1).vm;
+        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_2_name_validator.is_valid).toBe(true);
+
+        let member_3_name_input = member_name_inputs.at(2).find('#input');
+        let member_3_name_validator = <ValidatedInput> wrapper.findAll(
+            { ref: "member_name_input" }
+        ).at(0).vm;
+        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
+        member_3_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_3_name_validator.is_valid).toBe(true);
+
+        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(create_group_stub.firstCall.calledWith(
+            project.pk, new NewGroupData({member_names: trimmed_group_members})
+        ));
+    });
+
     test('Group member must be enrolled in course - violates condition', async () => {
         let create_group_stub = sinon.stub(Group, 'create');
         let axios_response_instance: AxiosError = {

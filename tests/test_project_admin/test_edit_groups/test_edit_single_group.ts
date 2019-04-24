@@ -4,7 +4,7 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,
-    Group,
+    Group, NewGroupData,
     Project,
     Semester,
     UltimateSubmissionPolicy
@@ -197,6 +197,64 @@ describe('EditSingleGroup tests', () => {
 
         expect(component.edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
+    });
+
+    test('Usernames of group members are trimmed before attempt to create group',
+         async () => {
+        let save_group_stub = sinon.stub(component.d_group,  'save');
+
+        let group_members = [
+            "   abernard@cornell.edu  ",
+            "  amartin@cornell.edu",
+            "kelly@cornell.edu   "
+        ];
+
+        let trimmed_group_members = [
+            "abernard@cornell.edu",
+            "amartin@cornell.edu",
+            "kelly@cornell.edu"
+        ];
+
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+
+        let member_1_name_input = member_name_inputs.at(0).find('#input');
+        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
+        { ref: "member_name_input" }
+        ).at(0).vm;
+        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_1_name_validator.is_valid).toBe(true);
+
+        let member_2_name_input = member_name_inputs.at(1).find('#input');
+        let member_2_name_validator = <ValidatedInput> wrapper.findAll(
+        { ref: "member_name_input" }
+        ).at(1).vm;
+        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_2_name_validator.is_valid).toBe(true);
+
+        let member_3_name_input = member_name_inputs.at(2).find('#input');
+        let member_3_name_validator = <ValidatedInput> wrapper.findAll(
+        { ref: "member_name_input" }
+        ).at(0).vm;
+        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
+        member_3_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(member_3_name_validator.is_valid).toBe(true);
+
+        expect(component.edit_group_form_is_valid).toBe(true);
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(save_group_stub.firstCall.thisValue.member_names).toEqual(trimmed_group_members);
     });
 
     test('Successful call to Group.save after updating member names', async () => {
