@@ -129,7 +129,6 @@ export default class EditSingleGroup extends Vue {
   has_extension = false;
   min_group_size = 1;
   max_group_size = 1;
-  successful_update = false;
   toggle_color = "orange";
   edit_group_form_is_valid = true;
 

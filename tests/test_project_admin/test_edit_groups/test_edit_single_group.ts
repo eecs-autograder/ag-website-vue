@@ -294,17 +294,6 @@ describe('EditSingleGroup tests', () => {
         expect(save_group_stub.firstCall.thisValue.extended_due_date).toBeNull();
     });
 
-    // this should start out with a group with no extension - perhaps different describe block
-    test.skip('Call to save with an extension', async () => {
-        let save_group_stub = sinon.stub(component.d_group,  'save');
-
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
-        await component.$nextTick();
-
-        expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue.extended_due_date).not.toBeNull();
-    });
-
     test('Group member must be enrolled in course - violates condition', async () => {
         let save_group_stub = sinon.stub(component.d_group,  'save');
         let axios_response_instance: AxiosError = {
@@ -372,5 +361,110 @@ describe('EditSingleGroup tests', () => {
 
         expect(component.d_group).toEqual(different_group);
         expect(component.has_extension).toBe(false);
+    });
+});
+
+describe('EditSingleGroup without an extension initially', () => {
+    let wrapper: Wrapper<EditSingleGroup>;
+    let component: EditSingleGroup;
+    let course: Course;
+    let group: Group;
+    let project: Project;
+    let original_match_media: (query: string) => MediaQueryList;
+
+
+    beforeEach(() => {
+        course = new Course({
+            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
+            num_late_days: 0, allowed_guest_domain: '@cornell.edu', last_modified: ''
+        });
+
+        group = new Group({
+            pk: 1,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+                "kevin@cornell.edu",
+                "oscar@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {"oscar@cornell.edu": 2},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        project = new Project({
+            pk: 2,
+            name: "Project 1 - Statistics",
+            last_modified: "today",
+            course: 1,
+            visible_to_students: true,
+            closing_time: null,
+            soft_closing_time: null,
+            disallow_student_submissions: true,
+            disallow_group_registration: true,
+            guests_can_submit: true,
+            min_group_size: 2,
+            max_group_size: 3,
+            submission_limit_per_day: null,
+            allow_submissions_past_limit: true,
+            groups_combine_daily_submissions: false,
+            submission_limit_reset_time: "",
+            submission_limit_reset_timezone: "",
+            num_bonus_submissions: 1,
+            total_submission_limit: null,
+            allow_late_days: true,
+            ultimate_submission_policy: UltimateSubmissionPolicy.best,
+            hide_ultimate_submission_fdbk: false
+        });
+
+        original_match_media = window.matchMedia;
+        Object.defineProperty(window, "matchMedia", {
+            value: jest.fn(() => {
+                return {matches: true};
+            })
+        });
+
+        let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
+        get_course_by_pk_stub.returns(Promise.resolve(course));
+
+        wrapper = mount(EditSingleGroup, {
+            propsData: {
+                project: project,
+                group: group
+            }
+        });
+        component = wrapper.vm;
+    });
+
+    afterEach(() => {
+        Object.defineProperty(window, "matchMedia", {
+            value: original_match_media
+        });
+
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+
+    test('Call to save with an extension', async () => {
+        let save_group_stub = sinon.stub(component.d_group, 'save');
+        expect(component.has_extension).toBe(false);
+
+        component.has_extension = true;
+        await component.$nextTick();
+
+        expect(component.has_extension).toBe(true);
+
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(save_group_stub.calledOnce);
+        expect(save_group_stub.firstCall.thisValue.extended_due_date).not.toBeNull();
     });
 });
