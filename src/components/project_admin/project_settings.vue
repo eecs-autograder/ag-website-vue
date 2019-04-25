@@ -1,6 +1,5 @@
 <template>
   <div id="project-settings-component" v-if="d_project != null">
-
     <validated-form ref="project_settings_form"
                     autocomplete="off"
                     spellcheck="false"
@@ -10,11 +9,12 @@
         <label class="project-settings-label"> Project Name </label>
         <validated-input ref="project_name_input"
                          v-model="d_project.name"
-                         :validators="[is_not_empty]">
+                         :validators="[is_not_empty]"
+                         input_style="width: 500px;">
         </validated-input>
       </div>
 
-      <div class="project-input-container grades-toggle">
+      <div class="toggle">
         <div class="toggle-container">
           <Toggle v-model="d_project.hide_ultimate_submission_fdbk">
             <div slot="on">
@@ -24,7 +24,14 @@
               Publish Final Grades
             </div>
           </Toggle>
+          <i class="fas fa-question-circle input-tooltip">
+            <tooltip width="medium" placement="right">
+              When the hard deadline has passed and scores are published,
+              students will see their final grade for the project on the submit page.
+            </tooltip>
+          </i>
         </div>
+
       </div>
 
       <div class="project-input-container">
@@ -45,9 +52,11 @@
                for="guests-can-submit">
           Guests can submit
         </label>
-        <i class="far fa-question-circle input-tooltip">
-          <tooltip width="medium" placement="right">
-            I'm not sure what this means
+        <i class="fas fa-question-circle input-tooltip">
+          <tooltip width="large" placement="right">
+            Anyone with the link can submit.
+            This can be restricted to users with a specific email domain
+            in the course settings.
           </tooltip>
         </i>
       </div>
@@ -60,26 +69,46 @@
                for="disallow-student-submissions">
           Disallow student submissions
         </label>
+        <i class="fas fa-question-circle input-tooltip">
+          <tooltip width="large" placement="right">
+            Temporarily prevent students from submitting (they can still see their
+            previous submissions).
+          </tooltip>
+        </i>
       </div>
 
       <div class="project-input-container">
         <label class="project-settings-label"> Min group size </label>
         <validated-input ref="min_group_size_input"
                          v-model="d_project.min_group_size"
-                         :validators="[is_integer, is_not_empty, is_non_negative]">
+                         :validators="[is_integer, is_not_empty, is_non_negative]"
+                         input_style="width: 80px;">
         </validated-input>
+
       </div>
 
       <div class="project-input-container">
         <label class="project-settings-label"> Max group size </label>
+        <i class="fas fa-question-circle input-tooltip">
+          <tooltip width="large" placement="right">
+            When this is > 1, users will be prompted to register their group
+            members the first time they visit the project page.
+          </tooltip>
+        </i>
         <validated-input ref="max_group_size_input"
                          v-model="d_project.max_group_size"
-                         :validators="[is_integer, is_not_empty, is_non_negative]">
+                         :validators="[is_integer, is_not_empty, is_non_negative]"
+                         input_style="width: 80px;">
         </validated-input>
       </div>
 
       <div class="project-input-container">
         <label class="project-settings-label"> Final graded submission policy </label>
+        <i class="fas fa-question-circle input-tooltip">
+          <tooltip width="large" placement="right">
+            Use students' most recent or best submission for their final score.
+          </tooltip>
+        </i>
         <div>
           <dropdown ref="dropdown_final_graded_submission_policy"
                     :items="final_graded_submission_policy_options"
@@ -104,11 +133,12 @@
         <label class="project-settings-label"> Submission limit per day </label>
         <validated-input ref="submission_limit_input"
                          v-model="submission_limit_per_day"
-                         :validators="[]">
+                         :validators="[]"
+                         input_style="width: 80px;">
         </validated-input>
       </div>
 
-      <div v-if="submission_limit_per_day !== ''"
+      <div v-if="submission_limit_per_day_exists"
            class="project-input-container">
         <input id="allow-submissions-past-limit"
                type="checkbox"
@@ -121,14 +151,10 @@
 
       <div class="project-input-container">
         <label class="project-settings-label"> Bonus submissions per group </label>
-        <i class="far fa-question-circle input-tooltip">
-          <tooltip width="medium" placement="right">
-            I'm not sure what this means
-          </tooltip>
-        </i>
         <validated-input ref="bonus_submissions_input"
                          v-model="d_project.num_bonus_submissions"
-                         :validators="[is_integer, is_not_empty, is_non_negative]">
+                         :validators="[is_integer, is_not_empty, is_non_negative]"
+                         input_style="width: 80px;">
         </validated-input>
       </div>
 
@@ -140,10 +166,27 @@
                for="groups-combine-daily-submissions">
           Groups get more submissions than individuals
         </label>
+        <i class="fas fa-question-circle input-tooltip">
+          <tooltip width="large" placement="right">
+            When unchecked, individuals and groups receive the same number of
+            submissions per day. When checked, the daily limit for a group
+            is multiplied by the number of users in that group.
+            For example, if the daily limit is 2, a group with 3 members would
+            receive 6 submissions per day with this box checked.
+          </tooltip>
+        </i>
       </div>
 
-      <!--// timepicker & timezone-->
-      <!--// RESET SUBMISSIONS PER DAY AT-->
+      <div class="project-input-container">
+        <label class="project-settings-label"
+               for="groups-combine-daily-submissions">
+          Reset submissions per day at:
+        </label>
+        <div>
+          <div class="timepicker"> </div>
+          <div class="timezone"> </div>
+        </div>
+      </div>
 
       <div class="project-input-container">
         <input id="allow-late-days"
@@ -153,31 +196,36 @@
                for="allow-late-days">
           Allow late days
         </label>
+        <i class="fas fa-question-circle input-tooltip">
+          <tooltip width="large" placement="right">
+            Whether students can use late days for this project.
+          </tooltip>
+        </i>
       </div>
 
       <div class="project-input-container">
         <label class="project-settings-label"> Total submission limit (Ever!) </label>
-        <i class="far fa-question-circle input-tooltip">
+        <i class="fas fa-question-circle input-tooltip">
           <tooltip width="medium" placement="right">
-            I'm not sure what this means
+            A hard limit on how many times students can submit ever.
           </tooltip>
         </i>
-
         <validated-input ref="total_submissions_input"
-                         v-model="d_project.total_submission_limit"
-                         :validators="[]">
+                         v-model="total_submission_limit"
+                         :validators="[]"
+                         input_style="width: 80px;">
         </validated-input>
       </div>
 
-      <div class="project-input-container grades-toggle">
+      <div class="toggle">
         <label class="project-settings-label"> Soft deadline </label>
-        <i class="far fa-question-circle input-tooltip">
+        <i class="fas fa-question-circle input-tooltip">
           <tooltip width="medium" placement="right">
-            Possibly more clarification
+            The deadline shown to students.
           </tooltip>
         </i>
         <div class="toggle-container">
-          <Toggle v-model="d_project.soft_closing_time">
+          <Toggle v-model="has_soft_closing_time">
             <div slot="on">
               Yes
             </div>
@@ -186,18 +234,22 @@
             </div>
           </Toggle>
         </div>
-        <!--Datetime picker-->
+        <div v-if="has_soft_closing_time"
+             class="datetime-picker-container">
+          <div class="datetime-picker"></div>
+        </div>
       </div>
 
-      <div class="project-input-container grades-toggle">
+      <div class="toggle">
         <label class="project-settings-label"> Hard deadline </label>
-        <i class="far fa-question-circle input-tooltip">
+        <i class="fas fa-question-circle input-tooltip">
           <tooltip width="medium" placement="right">
-            Possibly more clarification
+            The actual deadline. Submissions will not be accepted after this time
+            (and late days will come into effect if applicable). This date is not shown to students.
           </tooltip>
         </i>
         <div class="toggle-container">
-          <Toggle v-model="d_project.closing_time">
+          <Toggle v-model="has_closing_time">
             <div slot="on">
               Yes
             </div>
@@ -206,8 +258,10 @@
             </div>
           </Toggle>
         </div>
-
-        <!--Datetime picker-->
+        <div v-if=has_closing_time
+             class="datetime-picker-container">
+          <div class="datetime-picker"></div>
+        </div>
       </div>
 
       <APIErrors ref="api_errors"></APIErrors>
@@ -259,7 +313,9 @@ export default class ProjectSettings extends Vue {
   d_loading = true;
   d_saving = false;
   settings_form_is_valid = true;
+
   submission_limit_per_day = "";
+  total_submission_limit = "";
   has_soft_closing_time = false;
   has_closing_time = false;
 
@@ -279,14 +335,24 @@ export default class ProjectSettings extends Vue {
     this.d_project = this.project;
     this.submission_limit_per_day = this.d_project.submission_limit_per_day === null
                                     ? "" : this.submission_limit_per_day;
+    this.total_submission_limit = this.total_submission_limit === null
+                                  ? "" : this.total_submission_limit;
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
     this.has_closing_time = this.d_project.closing_time !== null;
+  }
+
+  get submission_limit_per_day_exists() {
+    return this.submission_limit_per_day.match('^[0-9]+$') !== null;
   }
 
   @handle_api_errors_async(handle_save_project_settings_error)
   async save_project_settings() {
     try {
       this.d_saving = true;
+      this.d_project.soft_closing_time = this.has_soft_closing_time ? this.d_project.soft_closing_time : null;
+      this.d_project.closing_time = this.has_closing_time ? this.d_project.closing_time : null;
+      this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists ? string_to_num(this.submission_limit_per_day) : null;
+      this.d_project.total_submission_limit = is_integer(this.total_submission_limit) ? string_to_num(this.total_submission_limit) : null;
       await this.d_project!.save();
     }
     finally {
@@ -311,28 +377,31 @@ export default class ProjectSettings extends Vue {
 
 .project-settings-label {
   text-align: right;
-  font-size: 17px;
-  margin: 5px 15px 7px 0;
+  font-size: 15px;
+  margin: 0 0 7px 0;
   display: inline-block;
   color: lighten(black, 10);
   font-weight: 700;
 }
 
 .project-input-container {
-  padding-bottom: 20px;
+  padding-bottom: 15px;
 }
 
 .input-tooltip {
-  color: teal;
-  margin-left: 0;
-  font-size: 16px;
-  top: 2px;
-  left: -3px;
+  color: mediumvioletred;
+  font-size: 15px;
+  margin-left: 8px;
+}
+
+.toggle {
+  padding-bottom: 15px;
 }
 
 .toggle-container {
   margin-top: 3px;
   margin-bottom: 3px;
+  font-size: 15px;
 }
 
 input[type=checkbox] + label::before {
@@ -340,18 +409,17 @@ input[type=checkbox] + label::before {
   font-size: 18px;
   content: '\f0c8';
   display: inline-block;
-  width: 18px;
+  width: 12px;
   height: 18px;
   margin-right: 10px;
   border-radius: 2px;
-  color: $pebble-dark;
+  color: hsl(210, 20%, 86%);
 }
 
 input[type=checkbox]:checked + label::before {
   font-family: "Font Awesome 5 Free";
   color: transparent;
-  /*font-size: 22px;*/
-  width: 18px;
+  width: 12px;
   height: 18px;
   content: '\f14a';
   color: $ocean-blue;
@@ -365,6 +433,7 @@ input[type=checkbox] {
 
 #save-button {
   @extend .green-button;
+  margin-top: 10px;
 }
 
 #save-button:disabled {
@@ -408,5 +477,34 @@ input[type=checkbox] {
   right: 18px;
   top: 3px;
 }
+
+// Datetime stuff **************************************************************
+.datetime-picker-container {
+  padding: 16px 0 0 0;
+}
+
+.datetime-picker {
+  margin-top: 5px;
+  width: 250px;
+  height: 200px;
+  background-color: hsl(210, 20%, 90%);
+}
+
+.timepicker {
+  margin-top: 5px;
+  width: 250px;
+  height: 25px;
+  background-color: hsl(210, 20%, 90%);
+  display: inline-block;
+}
+
+.timezone {
+  margin: 5px 0 0 20px;
+  width: 100px;
+  height: 25px;
+  background-color: hsl(210, 20%, 90%);
+  display: inline-block;
+}
+
 
 </style>
