@@ -69,6 +69,14 @@ describe('ProjectSettings tests', () => {
         }
     });
 
+    test('Data members assigned correct values in created()', async () => {
+        expect(component.d_project).toEqual(project);
+        expect(component.submission_limit_per_day).toEqual("");
+        expect(component.total_submission_limit).toEqual("");
+        expect(component.has_soft_closing_time).toBe(false);
+        expect(component.has_closing_time).toBe(false);
+    });
+
     test('Successful attempt to save project settings', async () => {
         let save_settings_stub = sinon.stub(component.d_project, 'save');
 
@@ -78,6 +86,25 @@ describe('ProjectSettings tests', () => {
         await component.$nextTick();
 
         expect(save_settings_stub.firstCall.thisValue).toEqual(component.d_project);
+    });
+
+    test('When submission_limit_per_day_exists, the allow_submissions_past_limit input is ' +
+         'accessible ',
+         async () => {
+        let daily_submission_limit_input = wrapper.find(
+            {ref: "daily_submission_limit_input"}
+        ).find('#input');
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(0);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "2";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(true);
+        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(1);
     });
 
     test('Unsuccessful attempt to save project settings', async () => {
@@ -266,6 +293,58 @@ describe('Invalid input tests', () => {
         await component.$nextTick();
 
         expect(max_num_matches_validator.is_valid).toBe(false);
+    });
+
+    test('Submission_limit_per_day_exists only returns true when the input only consists ' +
+         'of numbers',
+         async () => {
+        let daily_submission_limit_input = wrapper.find(
+            {ref: "daily_submission_limit_input"}
+        ).find('#input');
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "2";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(true);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "2abc";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "abc2";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "4abc5";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "  ";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = ".?4";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(false);
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "100";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day_exists).toBe(true);
     });
 
     test('num_bonus_submissions is empty or not a number', async () => {

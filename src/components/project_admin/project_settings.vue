@@ -131,7 +131,7 @@
 
       <div class="project-input-container">
         <label class="project-settings-label"> Submission limit per day </label>
-        <validated-input ref="submission_limit_input"
+        <validated-input ref="daily_submission_limit_input"
                          v-model="submission_limit_per_day"
                          :validators="[]"
                          input_style="width: 80px;">
