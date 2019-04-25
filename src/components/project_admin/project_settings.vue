@@ -340,6 +340,9 @@ export default class ProjectSettings extends Vue {
 
   async created() {
     this.d_project = this.project;
+    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null
+                                    ? ""
+                                    : this.d_project.submission_limit_per_day.toString();
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
     this.has_closing_time = this.d_project.closing_time !== null;
   }
@@ -352,6 +355,9 @@ export default class ProjectSettings extends Vue {
   async save_project_settings() {
     try {
       this.d_saving = true;
+      this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
+                                                ? Number(this.submission_limit_per_day)
+                                                : null;
       this.d_project.soft_closing_time = this.has_soft_closing_time
                                          ? this.d_project.soft_closing_time : null;
       this.d_project.closing_time = this.has_closing_time ? this.d_project.closing_time : null;
