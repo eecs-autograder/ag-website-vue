@@ -1,242 +1,253 @@
 <template>
-  <div id="project-admin" v-if="d_project != null">
-    <nav id="side-nav-bar">
-      <ul>
-        <li @click=""
-            class="active-page"> Project Settings </li>
-        <li @click=""
-            class="inactive-page"> Upload Project Files </li>
-        <li @click=""
-            class="inactive-page"> Files Students Should Submit </li>
-        <li @click=""
-            class="inactive-page"> Test Cases </li>
-        <li @click=""
-            class="inactive-page"> Student Test Suites </li>
-        <li @click=""
-            class="inactive-page"> Edit Groups </li>
-        <li @click=""
-            class="inactive-page"> Download Grades </li>
-        <li @click=""
-            class="inactive-page"> Rerun Tests </li>
-        <li @click=""
-            class="inactive-page"> Configure Handgrading </li>
-      </ul>
-    </nav>
-    <div id="project-admin-main"
-         @wheel.stop>
-      <div id="inner-project-view-main">
+  <div id="project-settings-component" v-if="d_project != null">
 
-        <div class="project-input-container">
-          <label class="project-settings-label"> Project Name </label>
-          <input class="project-settings-input"
-                 type="text"
-                 v-model="project.name"/>
+    <validated-form ref="project_settings_form"
+                    autocomplete="off"
+                    spellcheck="false"
+                    @submit.native.prevent="save_project_settings"
+                    @form_validity_changed="settings_form_is_valid = $event">
+      <div class="project-input-container">
+        <label class="project-settings-label"> Project Name </label>
+        <validated-input ref="project_name_input"
+                         v-model="d_project.name"
+                         :validators="[is_not_empty]">
+        </validated-input>
+      </div>
+
+      <div class="project-input-container grades-toggle">
+        <div class="toggle-container">
+          <Toggle v-model="d_project.hide_ultimate_submission_fdbk">
+            <div slot="on">
+              Hide Final Grades
+            </div>
+            <div slot="off">
+              Publish Final Grades
+            </div>
+          </Toggle>
         </div>
+      </div>
 
-        <div class="project-input-container grades-toggle">
-          <div class="toggle-container">
-            <Toggle v-model="project.hide_ultimate_submission_fdbk">
-              <div slot="on">
-                Hide Final Grades
-              </div>
-              <div slot="off">
-                Publish Final Grades
-              </div>
-            </Toggle>
-          </div>
-        </div>
+      <div class="project-input-container">
+        <input id="visible-to-students"
+               type="checkbox"
+               v-model="d_project.visible_to_students"/>
+        <label class="project-settings-label"
+               for="visible-to-students">
+          Visible to students
+        </label>
+      </div>
 
-        <div class="project-input-container">
-          <input id="visible-to-students"
-                 type="checkbox"
-                 v-model="project.visible_to_students"/>
-          <label class="project-settings-label"
-                 for="visible-to-students">
-            Visible to students
-          </label>
-        </div>
+      <div class="project-input-container">
+        <input id="guests-can-submit"
+               type="checkbox"
+               v-model="d_project.guests_can_submit"/>
+        <label class="project-settings-label"
+               for="guests-can-submit">
+          Guests can submit
+        </label>
+        <i class="far fa-question-circle input-tooltip">
+          <tooltip width="medium" placement="right">
+            I'm not sure what this means
+          </tooltip>
+        </i>
+      </div>
 
-        <div class="project-input-container">
-          <input id="guests-can-submit"
-                 type="checkbox"
-                 v-model="project.guests_can_submit"/>
-          <label class="project-settings-label"
-                 for="guests-can-submit">
-            Guests can submit
-          </label>
-          <i class="far fa-question-circle input-tooltip">
-            <tooltip width="medium" placement="right">
-              I'm not sure what this means
-            </tooltip>
-          </i>
-        </div>
+      <div class="project-input-container">
+        <input id="disallow-student-submissions"
+               type="checkbox"
+               v-model="d_project.disallow_student_submissions"/>
+        <label class="project-settings-label"
+               for="disallow-student-submissions">
+          Disallow student submissions
+        </label>
+      </div>
 
-        <div class="project-input-container">
-          <input id="disallow-student-submissions"
-                 type="checkbox"
-                 v-model="project.disallow_student_submissions"/>
-          <label class="project-settings-label"
-                 for="disallow-student-submissions">
-            Disallow student submissions
-          </label>
-        </div>
+      <div class="project-input-container">
+        <label class="project-settings-label"> Min group size </label>
+        <validated-input ref="min_group_size_input"
+                         v-model="d_project.min_group_size"
+                         :validators="[is_integer, is_not_empty, is_non_negative]">
+        </validated-input>
+      </div>
 
-        <div class="project-input-container">
-          <label class="project-settings-label"> Min group size </label>
-          <input class="project-settings-input input-short"
-                 type="text"
-                 v-model="project.min_group_size"/>
-        </div>
+      <div class="project-input-container">
+        <label class="project-settings-label"> Max group size </label>
+        <validated-input ref="max_group_size_input"
+                         v-model="d_project.max_group_size"
+                         :validators="[is_integer, is_not_empty, is_non_negative]">
+        </validated-input>
+      </div>
 
-        <div class="project-input-container">
-          <label class="project-settings-label"> Max group size </label>
-          <input class="project-settings-input input-short"
-                 type="text"
-                 v-model="project.max_group_size"/>
-        </div>
-
-        <div class="project-input-container">
-          <label class="project-settings-label"> Final graded submission policy </label>
-          <div class="final-graded-submission-policy">
-            <dropdown ref="dropdown_final_graded_submission_policy"
-                      :items="final_graded_submission_policy_options"
-                      :initial_highlighted_index="0"
-                      @update_item_selected="project.ultimate_submission_policy = $event">
-              <template slot="header">
-                <div tabindex="1" class="input-wrapper">
-                  <input class="project-settings-input input-long"
-                         type="text"
-                         v-model="project.ultimate_submission_policy"
-                         @blur="close_dropdown_menu"/>
+      <div class="project-input-container">
+        <label class="project-settings-label"> Final graded submission policy </label>
+        <div>
+          <dropdown ref="dropdown_final_graded_submission_policy"
+                    :items="final_graded_submission_policy_options"
+                    :initial_highlighted_index="0"
+                    @update_item_selected="d_project.ultimate_submission_policy = $event">
+            <template slot="header">
+              <div tabindex="1" class="dropdown-header-wrapper">
+                <div id="final-graded-submission-policy" class="dropdown-header">
+                  {{d_project.ultimate_submission_policy}}
                   <i class="fas fa-caret-down dropdown-caret"></i>
                 </div>
-              </template>
-              <template slot-scope="{item}">
-                <span> {{item}} </span>
-              </template>
-            </dropdown>
-          </div>
-        </div>
-
-        <div class="project-input-container">
-          <label class="project-settings-label"> Submission limit per day </label>
-          <input class="project-settings-input input-short"
-                 type="text"
-                 v-model="project.submission_limit_per_day"/>
-        </div>
-
-        <div class="project-input-container">
-          <input id="allow-submissions-past-limit"
-                 type="checkbox"
-                 v-model="project.allow_submissions_past_limit"/>
-          <label class="project-settings-label"
-                 for="allow-submissions-past-limit">
-            Allow submissions past limit
-          </label>
-        </div>
-
-        <div class="project-input-container">
-          <label class="project-settings-label"> Bonus submissions per group </label>
-          <i class="far fa-question-circle input-tooltip">
-            <tooltip width="medium" placement="right">
-              I'm not sure what this means
-            </tooltip>
-          </i>
-          <input class="project-settings-input input-short"
-                 type="text"
-                 v-model="project.num_bonus_submissions"/>
-        </div>
-
-        <div class="project-input-container">
-          <input id="groups-combine-daily-submissions"
-                 type="checkbox"
-                 v-model="project.groups_combine_daily_submissions"/>
-          <label class="project-settings-label"
-                 for="groups-combine-daily-submissions">
-            Groups get more submissions than individuals
-          </label>
-        </div>
-
-        <!--// RESET SUBMISSIONS PER DAY AT-->
-
-        <div class="project-input-container">
-          <input id="allow-late-days"
-                 type="checkbox"
-                 v-model="project.allow_late_days"/>
-          <label class="project-settings-label"
-                 for="allow-late-days">
-            Allow late days
-          </label>
-        </div>
-
-        <div class="project-input-container">
-          <label class="project-settings-label"> Total submission limit (Ever!) </label>
-          <i class="far fa-question-circle input-tooltip">
-            <tooltip width="medium" placement="right">
-              I'm not sure what this means
-            </tooltip>
-          </i>
-          <input class="project-settings-input input-short"
-                 type="text"
-                 v-model="project.total_submission_limit"/>
-        </div>
-
-        <div class="project-input-container grades-toggle">
-          <label class="project-settings-label"> Soft deadline </label>
-          <i class="far fa-question-circle input-tooltip">
-            <tooltip width="medium" placement="right">
-              Possibly more clarification
-            </tooltip>
-          </i>
-          <div class="toggle-container">
-            <Toggle v-model="project.soft_closing_time">
-              <div slot="on">
-                Yes
               </div>
-              <div slot="off">
-                No
-              </div>
-            </Toggle>
-          </div>
-          <!--Calendar-->
+            </template>
+            <span slot-scope="{item}">
+              <span class="submission-policy">{{item}}</span>
+            </span>
+          </dropdown>
         </div>
-
-        <div class="project-input-container grades-toggle">
-          <label class="project-settings-label"> Hard deadline </label>
-          <i class="far fa-question-circle input-tooltip">
-            <tooltip width="medium" placement="right">
-              Possibly more clarification
-            </tooltip>
-          </i>
-          <div class="toggle-container">
-            <Toggle v-model="project.closing_time">
-              <div slot="on">
-                Yes
-              </div>
-              <div slot="off">
-                No
-              </div>
-            </Toggle>
-          </div>
-
-          <!--Calendar-->
-        </div>
-
       </div>
-    </div>
 
+      <div class="project-input-container">
+        <label class="project-settings-label"> Submission limit per day </label>
+        <validated-input ref="submission_limit_input"
+                         v-model="submission_limit_per_day"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
+      <div v-if="submission_limit_per_day !== ''"
+           class="project-input-container">
+        <input id="allow-submissions-past-limit"
+               type="checkbox"
+               v-model="d_project.allow_submissions_past_limit"/>
+        <label class="project-settings-label"
+               for="allow-submissions-past-limit">
+          Allow submissions past limit
+        </label>
+      </div>
+
+      <div class="project-input-container">
+        <label class="project-settings-label"> Bonus submissions per group </label>
+        <i class="far fa-question-circle input-tooltip">
+          <tooltip width="medium" placement="right">
+            I'm not sure what this means
+          </tooltip>
+        </i>
+        <validated-input ref="bonus_submissions_input"
+                         v-model="d_project.num_bonus_submissions"
+                         :validators="[is_integer, is_not_empty, is_non_negative]">
+        </validated-input>
+      </div>
+
+      <div class="project-input-container">
+        <input id="groups-combine-daily-submissions"
+               type="checkbox"
+               v-model="d_project.groups_combine_daily_submissions"/>
+        <label class="project-settings-label"
+               for="groups-combine-daily-submissions">
+          Groups get more submissions than individuals
+        </label>
+      </div>
+
+      <!--// timepicker & timezone-->
+      <!--// RESET SUBMISSIONS PER DAY AT-->
+
+      <div class="project-input-container">
+        <input id="allow-late-days"
+               type="checkbox"
+               v-model="d_project.allow_late_days"/>
+        <label class="project-settings-label"
+               for="allow-late-days">
+          Allow late days
+        </label>
+      </div>
+
+      <div class="project-input-container">
+        <label class="project-settings-label"> Total submission limit (Ever!) </label>
+        <i class="far fa-question-circle input-tooltip">
+          <tooltip width="medium" placement="right">
+            I'm not sure what this means
+          </tooltip>
+        </i>
+
+        <validated-input ref="total_submissions_input"
+                         v-model="d_project.total_submission_limit"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
+      <div class="project-input-container grades-toggle">
+        <label class="project-settings-label"> Soft deadline </label>
+        <i class="far fa-question-circle input-tooltip">
+          <tooltip width="medium" placement="right">
+            Possibly more clarification
+          </tooltip>
+        </i>
+        <div class="toggle-container">
+          <Toggle v-model="d_project.soft_closing_time">
+            <div slot="on">
+              Yes
+            </div>
+            <div slot="off">
+              No
+            </div>
+          </Toggle>
+        </div>
+        <!--Datetime picker-->
+      </div>
+
+      <div class="project-input-container grades-toggle">
+        <label class="project-settings-label"> Hard deadline </label>
+        <i class="far fa-question-circle input-tooltip">
+          <tooltip width="medium" placement="right">
+            Possibly more clarification
+          </tooltip>
+        </i>
+        <div class="toggle-container">
+          <Toggle v-model="d_project.closing_time">
+            <div slot="on">
+              Yes
+            </div>
+            <div slot="off">
+              No
+            </div>
+          </Toggle>
+        </div>
+
+        <!--Datetime picker-->
+      </div>
+
+      <APIErrors ref="api_errors"></APIErrors>
+
+      <button id="save-button"
+              type="submit"
+              :disabled="!settings_form_is_valid || d_saving">
+        Save Updates
+      </button>
+    </validated-form>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import Dropdown from '@/components/dropdown.vue';
-import Toggle from '@/components/toggle.vue';
-import Tooltip from '@/components/tooltip.vue';
-import { Course, Semester, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+  import APIErrors from '@/components/api_errors.vue';
+  import Dropdown from '@/components/dropdown.vue';
+  import Toggle from '@/components/toggle.vue';
+  import Tooltip from '@/components/tooltip.vue';
+  import ValidatedForm from '@/components/validated_form.vue';
+  import ValidatedInput from '@/components/validated_input.vue';
+  import { handle_api_errors_async } from "@/utils";
+  import {
+    is_integer,
+    is_non_negative,
+    is_not_empty,
+    is_number,
+    string_to_num
+  } from '@/validators';
+  import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component({
-  components: { Dropdown, Toggle, Tooltip }
+  @Component({
+  components: {
+    APIErrors,
+    Dropdown,
+    Toggle,
+    Tooltip,
+    ValidatedForm,
+    ValidatedInput
+  }
 })
 
 export default class ProjectSettings extends Vue {
@@ -244,108 +255,58 @@ export default class ProjectSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  d_project: Project | null = null;
+  d_project!: Project;
+  d_loading = true;
+  d_saving = false;
+  settings_form_is_valid = true;
+  submission_limit_per_day = "";
+  has_soft_closing_time = false;
+  has_closing_time = false;
 
-  hide_final_grades = false;
+  final_graded_submission_policy_options = [
+    UltimateSubmissionPolicy.most_recent,
+    UltimateSubmissionPolicy.best_with_normal_fdbk,
+    UltimateSubmissionPolicy.best
+  ];
 
-  final_graded_submission_policy_options = ["Most recent submission",
-    "Best score using 'Normal' feedback", "Best score"];
-
-  dropdown_do_something(item: Event) {
-    // console.log("Dropdown item chosen");
-  }
-
-  drop_dropdown_final_submission_policy() {
-    // let grading_policy_dropdown = <Dropdown> this.$refs.dropdown_final_graded_submission_policy;
-    // grading_policy_dropdown.show_the_dropdown_menu();
-    // grading_policy_dropdown.
-  }
-
-  close_dropdown_menu() {
-    // let grading_policy_dropdown = <Dropdown> this.$refs.dropdown_final_graded_submission_policy;
-    // grading_policy_dropdown.hide_the_dropdown_menu();
-  }
+  readonly is_non_negative = is_non_negative;
+  readonly is_not_empty = is_not_empty;
+  readonly is_number = is_number;
+  readonly is_integer = is_integer;
+  readonly string_to_num = string_to_num;
 
   async created() {
     this.d_project = this.project;
+    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null
+                                    ? "" : this.submission_limit_per_day;
+    this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
+    this.has_closing_time = this.d_project.closing_time !== null;
+  }
+
+  @handle_api_errors_async(handle_save_project_settings_error)
+  async save_project_settings() {
+    try {
+      this.d_saving = true;
+      await this.d_project!.save();
+    }
+    finally {
+      this.d_saving = false;
+    }
   }
 }
+
+  export function handle_save_project_settings_error(component: ProjectSettings, error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  }
 
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import url('https://fonts.googleapis.com/css?family=Montserrat');
-$current-lang-choice: "Montserrat";
+@import '@/styles/button_styles.scss';
 
-#project-admin {
-  font-family: $current-lang-choice;
-  /*display: flex;*/
-}
-
-#side-nav-bar {
-  background-color: darken($stormy-gray-dark, 25);
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  width: 300px;
-}
-
-#project-admin-main{
-  position: absolute;
-  /*padding: 20px;*/
-  top: 0;
-  left: 300px;
-  height: 100vh;
-  width: 100%;
-  overflow: scroll;
-  display: block;
-  /*background-color:paleturquoise;*/
-}
-
-#project-admin-main::-webkit-scrollbar {
-  display: none;
-}
-
-#side-nav-bar ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-#side-nav-bar li {
-  text-decoration: none;
-  padding: 18px 20px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.inactive-page {
-  color: white;
-}
-
-.inactive-page:hover {
-  background-color: darken(rgba(119, 136, 153, 0.7), 20);
-}
-
-.active-page {
-  /*background-color: rgb(128, 0, 128);*/
-  /*background-color: hsl(558, 93%, 36%);*/
-  /*background-color: hsl(78, 39%, 47%);*/
-  background-color: $green;
-  /*background-color: plum;*/
-  /*background-color: tomato;*/
-  color: white;
-}
-
-.active-page:hover {
-  /*background-color: hsl(281, 100%, 13%);*/
-}
-
-#inner-project-view-main {
-  padding: 20px 40px;
-  min-width: 500px;
+#project-settings-component {
+  padding: 10px 1.5%;
 }
 
 .project-settings-label {
@@ -357,34 +318,14 @@ $current-lang-choice: "Montserrat";
   font-weight: 700;
 }
 
-.project-settings-input {
-  outline: none;
-  display: block;
-  margin: 0;
-  border-radius: 3px;
-  border: 2px solid lighten($stormy-gray-dark, 10);
-  padding: 6px 9px;
-  font-family: $current-lang-choice;
-  font-size: 18px;
-  width: 400px;
-}
-
 .project-input-container {
   padding-bottom: 20px;
 }
 
-.grades-toggle {
-  margin-top: 0px;
-}
-
-.input-short {
-  width: 100px;
-}
-
 .input-tooltip {
-  color: $ocean-blue;
-  margin-left: 0px;
-  font-size: 20px;
+  color: teal;
+  margin-left: 0;
+  font-size: 16px;
   top: 2px;
   left: -3px;
 }
@@ -394,46 +335,16 @@ $current-lang-choice: "Montserrat";
   margin-bottom: 3px;
 }
 
-.input-wrapper {
-  position: relative;
-  display: inline-block;
-  margin: 0px;
-}
-
-.dropdown-caret {
-  position: absolute;
-  right: 18px;
-  top: 4px;
-  font-size: 30px;
-  cursor: pointer;
-}
-
-.input-medium {
-  width: 310px;
-}
-
-.input-wrapper:focus {
-  /*border: 2px solid green;*/
-}
-
-.input-medium:focus {
-  /*border: 2px solid purple;*/
-}
-
 input[type=checkbox] + label::before {
   font-family: "Font Awesome 5 Free";
   font-size: 18px;
   content: '\f0c8';
   display: inline-block;
-  /*vertical-align: .2em;*/
   width: 18px;
   height: 18px;
   margin-right: 10px;
   border-radius: 2px;
   color: $pebble-dark;
-  /*color: transparent;*/
-  /*text-indent: .15em;*/
-  /*line-height: .65;*/
 }
 
 input[type=checkbox]:checked + label::before {
@@ -450,6 +361,52 @@ input[type=checkbox]:checked + label::before {
 input[type=checkbox] {
   position: absolute;
   clip: rect(0,0,0,0);
+}
+
+#save-button {
+  @extend .green-button;
+}
+
+#save-button:disabled {
+  @extend .gray-button;
+}
+
+// Dropdown stuff ************************************************************
+#final-graded-submission-policy {
+  width: 350px;
+}
+
+.dropdown-header-wrapper {
+  display: inline-block;
+  margin: 0;
+  position: relative;
+}
+
+.dropdown-header {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  box-sizing: border-box;
+  color: #495057;
+  cursor: default;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: .375rem .75rem;
+  position: relative;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.dropdown-header:focus {
+  border-color: $ocean-blue;
+}
+
+.dropdown-caret {
+  cursor: pointer;
+  font-size: 30px;
+  position: absolute;
+  right: 18px;
+  top: 3px;
 }
 
 </style>
