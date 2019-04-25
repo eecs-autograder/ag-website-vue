@@ -77,30 +77,33 @@
         </i>
       </div>
 
-      <div class="project-input-container">
-        <label class="project-settings-label"> Min group size </label>
-        <validated-input ref="min_group_size_input"
-                         v-model="d_project.min_group_size"
-                         :validators="[is_integer, is_not_empty, is_non_negative]"
-                         input_style="width: 80px;">
-        </validated-input>
 
-      </div>
+      <div>
+        <div class="min-group-size-container">
+          <label class="project-settings-label"> Min group size </label>
+          <validated-input ref="min_group_size_input"
+                           v-model="d_project.min_group_size"
+                           :validators="[is_integer, is_not_empty, is_non_negative]"
+                           input_style="width: 80px;">
+          </validated-input>
 
-      <div class="project-input-container">
-        <label class="project-settings-label"> Max group size </label>
-        <i class="fas fa-question-circle input-tooltip">
-          <tooltip width="large" placement="right">
-            When this is > 1, users will be prompted to register their group
-            members the first time they visit the project page.
-          </tooltip>
-        </i>
-        <validated-input ref="max_group_size_input"
-                         v-model="d_project.max_group_size"
-                         :validators="[is_integer, is_not_empty, is_non_negative]"
-                         input_style="width: 80px;">
-        </validated-input>
+        </div>
+
+        <div class="max-group-size-container">
+          <label class="project-settings-label"> Max group size </label>
+          <i class="fas fa-question-circle input-tooltip">
+            <tooltip width="large" placement="right">
+              When this is > 1, users will be prompted to register their group
+              members the first time they visit the project page.
+            </tooltip>
+          </i>
+          <validated-input ref="max_group_size_input"
+                           v-model="d_project.max_group_size"
+                           :validators="[is_integer, is_not_empty, is_non_negative]"
+                           input_style="width: 80px;">
+          </validated-input>
       </div>
+    </div>
 
       <div class="project-input-container">
         <label class="project-settings-label"> Final graded submission policy </label>
@@ -131,11 +134,10 @@
 
       <div class="project-input-container">
         <label class="project-settings-label"> Submission limit per day </label>
-        <validated-input ref="daily_submission_limit_input"
-                         v-model="submission_limit_per_day"
-                         :validators="[]"
-                         input_style="width: 80px;">
-        </validated-input>
+        <input id="submission-limit-per-day"
+               class="project-settings-input"
+               type="number"
+               v-model="submission_limit_per_day"/>
       </div>
 
       <div v-if="submission_limit_per_day_exists"
@@ -210,11 +212,10 @@
             A hard limit on how many times students can submit ever.
           </tooltip>
         </i>
-        <validated-input ref="total_submissions_input"
-                         v-model="total_submission_limit"
-                         :validators="[]"
-                         input_style="width: 80px;">
-        </validated-input>
+        <input ref="total_submissions_input"
+               class="project-settings-input"
+               type="number"
+               v-model="d_project.total_submission_limit"/>
       </div>
 
       <div class="toggle">
@@ -244,8 +245,8 @@
         <label class="project-settings-label"> Hard deadline </label>
         <i class="fas fa-question-circle input-tooltip">
           <tooltip width="medium" placement="right">
-            The actual deadline. Submissions will not be accepted after this time
-            (and late days will come into effect if applicable). This date is not shown to students.
+            The actual deadline. Submissions will not be accepted after this time (and late
+            days will come into effect if applicable). This date is not shown to students.
           </tooltip>
         </i>
         <div class="toggle-container">
@@ -313,16 +314,22 @@ export default class ProjectSettings extends Vue {
   d_loading = true;
   d_saving = false;
   settings_form_is_valid = true;
-
-  submission_limit_per_day = "";
-  total_submission_limit = "";
   has_soft_closing_time = false;
   has_closing_time = false;
+  submission_limit_per_day = "";
 
   final_graded_submission_policy_options = [
     UltimateSubmissionPolicy.most_recent,
     UltimateSubmissionPolicy.best_with_normal_fdbk,
     UltimateSubmissionPolicy.best
+  ];
+
+  timezones = [
+    'US/Central',
+    'US/Eastern',
+    'US/Mountain',
+    'US/Pacific',
+    'UTC'
   ];
 
   readonly is_non_negative = is_non_negative;
@@ -333,26 +340,21 @@ export default class ProjectSettings extends Vue {
 
   async created() {
     this.d_project = this.project;
-    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null
-                                    ? "" : this.submission_limit_per_day;
-    this.total_submission_limit = this.total_submission_limit === null
-                                  ? "" : this.total_submission_limit;
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
     this.has_closing_time = this.d_project.closing_time !== null;
   }
 
   get submission_limit_per_day_exists() {
-    return this.submission_limit_per_day.match('^[0-9]+$') !== null;
+    return this.submission_limit_per_day.toString().match('^[0-9]+$') !== null;
   }
 
   @handle_api_errors_async(handle_save_project_settings_error)
   async save_project_settings() {
     try {
       this.d_saving = true;
-      this.d_project.soft_closing_time = this.has_soft_closing_time ? this.d_project.soft_closing_time : null;
+      this.d_project.soft_closing_time = this.has_soft_closing_time
+                                         ? this.d_project.soft_closing_time : null;
       this.d_project.closing_time = this.has_closing_time ? this.d_project.closing_time : null;
-      this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists ? string_to_num(this.submission_limit_per_day) : null;
-      this.d_project.total_submission_limit = is_integer(this.total_submission_limit) ? string_to_num(this.total_submission_limit) : null;
       await this.d_project!.save();
     }
     finally {
@@ -375,6 +377,26 @@ export default class ProjectSettings extends Vue {
   padding: 10px 1.5%;
 }
 
+.project-settings-input {
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  width: 80px;
+}
+
+.min-group-size-container, .max-group-size-container {
+  display: inline-block;
+  padding-bottom: 18px;
+}
+
 .project-settings-label {
   text-align: right;
   font-size: 15px;
@@ -385,7 +407,7 @@ export default class ProjectSettings extends Vue {
 }
 
 .project-input-container {
-  padding-bottom: 15px;
+  padding-bottom: 18px;
 }
 
 .input-tooltip {
@@ -487,14 +509,14 @@ input[type=checkbox] {
   margin-top: 5px;
   width: 250px;
   height: 200px;
-  background-color: hsl(210, 20%, 90%);
+  background-color: hsl(210, 20%, 95%);
 }
 
 .timepicker {
   margin-top: 5px;
   width: 250px;
   height: 25px;
-  background-color: hsl(210, 20%, 90%);
+  background-color: hsl(210, 20%, 95%);
   display: inline-block;
 }
 
@@ -502,9 +524,8 @@ input[type=checkbox] {
   margin: 5px 0 0 20px;
   width: 100px;
   height: 25px;
-  background-color: hsl(210, 20%, 90%);
+  background-color: hsl(210, 20%, 95%);
   display: inline-block;
 }
-
 
 </style>

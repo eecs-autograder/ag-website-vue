@@ -10,6 +10,90 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+describe('ProjectSettings created() tests', () => {
+    let wrapper: Wrapper<ProjectSettings>;
+    let component: ProjectSettings;
+    let project: Project;
+    let original_match_media: (query: string) => MediaQueryList;
+
+    beforeEach(() => {
+        original_match_media = window.matchMedia;
+        Object.defineProperty(window, "matchMedia", {
+            value: jest.fn(() => {
+                return {matches: true};
+            })
+        });
+
+        project = new Project({
+            pk: 3,
+            name: "Project 200",
+            last_modified: "today",
+            course: 2,
+            visible_to_students: true,
+            closing_time: null,
+            soft_closing_time: null,
+            disallow_student_submissions: true,
+            disallow_group_registration: true,
+            guests_can_submit: true,
+            min_group_size: 1,
+            max_group_size: 1,
+            submission_limit_per_day: null,
+            allow_submissions_past_limit: true,
+            groups_combine_daily_submissions: false,
+            submission_limit_reset_time: "",
+            submission_limit_reset_timezone: "",
+            num_bonus_submissions: 1,
+            total_submission_limit: null,
+            allow_late_days: true,
+            ultimate_submission_policy: UltimateSubmissionPolicy.best,
+            hide_ultimate_submission_fdbk: false
+        });
+    });
+
+    afterEach(() => {
+        Object.defineProperty(window, "matchMedia", {
+            value: original_match_media
+        });
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('Data members assigned correct values in created() - all are null', async () => {
+        wrapper = mount(ProjectSettings, {
+            propsData: {
+                project: project
+            }
+        });
+        component = wrapper.vm;
+
+        expect(component.d_project).toEqual(project);
+        expect(component.has_soft_closing_time).toBe(false);
+        expect(component.has_closing_time).toBe(false);
+    });
+
+    test('Data members assigned correct values in created() - all are NOT null', async () => {
+        project.submission_limit_per_day = 2;
+        project.total_submission_limit = 10;
+        project.soft_closing_time = "tomorrow";
+        project.closing_time = "never";
+
+        wrapper = mount(ProjectSettings, {
+            propsData: {
+                project: project
+            }
+        });
+        component = wrapper.vm;
+
+        expect(component.d_project.submission_limit_per_day).not.toBeNull();
+
+        expect(component.d_project).toEqual(project);
+        expect(component.has_soft_closing_time).toBe(true);
+        expect(component.has_closing_time).toBe(true);
+    });
+});
+
 describe('ProjectSettings tests', () => {
     let wrapper: Wrapper<ProjectSettings>;
     let component: ProjectSettings;
@@ -69,12 +153,43 @@ describe('ProjectSettings tests', () => {
         }
     });
 
-    test('Data members assigned correct values in created()', async () => {
-        expect(component.d_project).toEqual(project);
-        expect(component.submission_limit_per_day).toEqual("");
-        expect(component.total_submission_limit).toEqual("");
-        expect(component.has_soft_closing_time).toBe(false);
-        expect(component.has_closing_time).toBe(false);
+    // // DNW
+    // component.d_project.submission_limit_per_day = 2;
+    // await component.$nextTick();
+    // console.log(component.d_project.submission_limit_per_day);  // prints 2
+
+    // let daily_submission_limit_input = wrapper.find({ref: "daily_submission_limit_input"});
+
+    // DNW
+    // daily_submission_limit_input.setValue(2);
+    // await component.$nextTick();
+    // console.log(component.d_project.submission_limit_per_day); // prints 2
+
+    // DNW
+    // (<HTMLInputElement> daily_submission_limit_input.element).value = 2;
+    // daily_submission_limit_input.trigger('input');
+    // await component.$nextTick();
+
+    // for some reason, v-modeling d_project.submission_limit_per_day is not causing
+    // submission_limit_per_day_exists to get re-evaluated when d_project.submission_limit_per_day
+    // changes. I think it has something to do with the variable being of type null or number,
+    // because d_expected_student_file.pattern is able to cause it's computed function
+    // to re-evaluate in the expected student file form?
+    test('When submission_limit_per_day_exists, the allow_submissions_past_limit input is ' +
+          'accessible ',
+         async () => {
+        expect(component.submission_limit_per_day_exists).toBe(false);
+        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(0);
+
+        let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
+
+        (<HTMLInputElement> daily_submission_limit_input.element).value = "7";
+        daily_submission_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.submission_limit_per_day).not.toBeNull();
+        expect(component.submission_limit_per_day_exists).toBe(true);
+        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(1);
     });
 
     test('Successful attempt to save project settings', async () => {
@@ -86,25 +201,6 @@ describe('ProjectSettings tests', () => {
         await component.$nextTick();
 
         expect(save_settings_stub.firstCall.thisValue).toEqual(component.d_project);
-    });
-
-    test('When submission_limit_per_day_exists, the allow_submissions_past_limit input is ' +
-         'accessible ',
-         async () => {
-        let daily_submission_limit_input = wrapper.find(
-            {ref: "daily_submission_limit_input"}
-        ).find('#input');
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-
-        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(0);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "2";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(true);
-        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(1);
     });
 
     test('Unsuccessful attempt to save project settings', async () => {
@@ -298,9 +394,7 @@ describe('Invalid input tests', () => {
     test('Submission_limit_per_day_exists only returns true when the input only consists ' +
          'of numbers',
          async () => {
-        let daily_submission_limit_input = wrapper.find(
-            {ref: "daily_submission_limit_input"}
-        ).find('#input');
+        let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
 
         expect(component.submission_limit_per_day_exists).toBe(false);
 
