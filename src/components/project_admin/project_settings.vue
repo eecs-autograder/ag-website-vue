@@ -145,7 +145,7 @@
 
       <div class="section-container">
         <fieldset>
-          <legend> Submission Related </legend>
+          <legend> Submissions </legend>
           <div class="project-input-container">
             <label class="text-label"> Submission limit per day </label>
             <input id="submission-limit-per-day"
@@ -198,15 +198,16 @@
               Reset submissions per day at:
             </label>
             <div>
-              <div class="timepicker"> </div>
+              <div class="timepicker"> {{d_project.submission_limit_reset_time}} </div>
               <div class="timezone">
                 <dropdown ref="dropdown_timezone"
                           :items="timezones"
-                          @update_item_selected="timezone = $event">
+                          @update_item_selected="
+                          d_project.submission_limit_reset_timezone = $event">
                   <template slot="header">
                     <div tabindex="1" class="dropdown-header-wrapper">
                       <div id="timezone-dropdown" class="dropdown-header">
-                          {{timezone}}
+                          {{d_project.submission_limit_reset_timezone}}
                         <i class="fas fa-caret-down dropdown-caret"></i>
                       </div>
                     </div>
@@ -365,13 +366,11 @@ export default class ProjectSettings extends Vue {
   ];
 
   d_project!: Project;
-  d_loading = true;
   d_saving = false;
   settings_form_is_valid = true;
   has_soft_closing_time = false;
   has_closing_time = false;
   submission_limit_per_day = "";
-  timezone = this.timezones[0];
 
   readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
@@ -605,8 +604,9 @@ input[type=checkbox] {
 .timepicker {
   background-color: hsl(210, 20%, 95%);
   border-radius: 5px;
+  color: #495057;
   display: inline-block;
-  height: 38px;
+  padding: 9.5px;
   margin: 5px 0 0 0;
   width: 250px;
 }

@@ -140,7 +140,10 @@
     border-radius: 4px;
     color: white;
     display: inline-block;
-    font-size: 15px;
+    font-size: 13px;
+    font-family: Helvetica;
+    line-height: 16px;
+    font-weight: normal;
     padding: 10px;
     position: absolute;
     text-align: center;
