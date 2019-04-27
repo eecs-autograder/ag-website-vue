@@ -284,7 +284,7 @@
               <div v-if="has_soft_closing_time"
                    class="datetime-picker-container">
                 <div class="datetime-picker">
-                  <vue-ctk-date-time-picker v-model="d_project.soft_closing_time"
+                  <vue-ctk-date-time-picker v-model="soft_closing_time"
                                             input-size="lg">
                   </vue-ctk-date-time-picker>
                 </div>
@@ -312,7 +312,7 @@
               <div v-if=has_closing_time
                    class="datetime-picker-container">
                 <div class="datetime-picker">
-                  <vue-ctk-date-time-picker v-model="d_project.closing_time"
+                  <vue-ctk-date-time-picker v-model="closing_time"
                                             input-size="lg">
                   </vue-ctk-date-time-picker>
                 </div>
@@ -395,6 +395,8 @@ export default class ProjectSettings extends Vue {
   has_closing_time = false;
   submission_limit_per_day = "";
   submission_limit_reset_time = "";
+  soft_closing_time = "";
+  closing_time = "";
 
   readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
@@ -407,8 +409,14 @@ export default class ProjectSettings extends Vue {
     this.submission_limit_reset_time = moment(this.project.submission_limit_reset_time, 'HH:mm:ss').format("LT");
     this.submission_limit_per_day = this.d_project.submission_limit_per_day === null ? ""
                                     : this.d_project.submission_limit_per_day.toString();
+
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
+    this.soft_closing_time = this.has_soft_closing_time ? moment(this.d_project.soft_closing_time).format("YYYY-MM-DD HH:mm")
+                             : moment().format("YYYY-MM-DD HH:mm");
+
     this.has_closing_time = this.d_project.closing_time !== null;
+    this.closing_time = this.has_closing_time ? moment(this.d_project.closing_time).format("YYYY-MM-DD HH:mm")
+                        : moment().format("YYYY-MM-DD HH:mm");
   }
 
   get submission_limit_per_day_exists() {
@@ -423,20 +431,14 @@ export default class ProjectSettings extends Vue {
       // sometimes only 1 digit? Is that ok?
       let reset_time = moment(this.submission_limit_reset_time, 'HH:mm a');
       this.d_project.submission_limit_reset_time = reset_time.hours() + ":" + reset_time.minutes() + ":00";
-      console.log(this.d_project.submission_limit_reset_time);
 
 
       this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
                                                 ? Number(this.submission_limit_per_day)
                                                 : null;
 
-
-      this.d_project.soft_closing_time = this.has_soft_closing_time
-                                         ? this.d_project.soft_closing_time : null;
-
-
-      this.d_project.closing_time = this.has_closing_time ? this.d_project.closing_time : null;
-
+      this.d_project.soft_closing_time = this.has_soft_closing_time ? new Date(this.soft_closing_time).toISOString() : null;
+      this.d_project.closing_time = this.has_closing_time ? new Date(this.closing_time).toISOString() : null;
 
       await this.d_project!.save();
     }
@@ -635,13 +637,13 @@ input[type=checkbox] {
 .timepicker {
   border-radius: 5px;
   display: inline-block;
-  margin: 5px 0 0 0;
+  margin: 5px 30px 0 0;
   width: 210px;
 }
 
 .timezone {
   display: inline-block;
-  margin: 5px 0 0 30px;
+  margin: 5px 0 0 0;
   vertical-align: top;
 }
 
