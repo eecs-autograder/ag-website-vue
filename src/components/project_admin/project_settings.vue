@@ -1,5 +1,6 @@
 <template>
   <div id="project-settings-component" v-if="d_project != null">
+
     <validated-form ref="project_settings_form"
                     autocomplete="off"
                     spellcheck="false"
@@ -198,7 +199,16 @@
               Reset submissions per day at:
             </label>
             <div>
-              <div class="timepicker"> {{d_project.submission_limit_reset_time}} </div>
+              <div class="timepicker">
+                <vue-ctk-date-time-picker id="TimePicker"
+                                          :only-time="true"
+                                          v-model="submission_limit_reset_time"
+                                          label="Select time"
+                                          format="hh:mm a"
+                                          formatted="hh:mm a"
+                                          input-size="lg">
+                </vue-ctk-date-time-picker>
+              </div>
               <div class="timezone">
                 <dropdown ref="dropdown_timezone"
                           :items="timezones"
@@ -273,7 +283,11 @@
               </div>
               <div v-if="has_soft_closing_time"
                    class="datetime-picker-container">
-                <div class="datetime-picker"></div>
+                <div class="datetime-picker">
+                  <vue-ctk-date-time-picker v-model="d_project.soft_closing_time"
+                                            input-size="lg">
+                  </vue-ctk-date-time-picker>
+                </div>
               </div>
             </div>
 
@@ -297,7 +311,11 @@
               </div>
               <div v-if=has_closing_time
                    class="datetime-picker-container">
-                <div class="datetime-picker"></div>
+                <div class="datetime-picker">
+                  <vue-ctk-date-time-picker v-model="d_project.closing_time"
+                                            input-size="lg">
+                  </vue-ctk-date-time-picker>
+                </div>
               </div>
             </div>
           </div>
@@ -324,6 +342,7 @@
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
   import { handle_api_errors_async } from "@/utils";
   import {
     is_integer,
@@ -334,6 +353,9 @@
   } from '@/validators';
   import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
   import { Component, Prop, Vue } from 'vue-property-decorator';
+  import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
+
+  import moment from 'moment';
 
   @Component({
   components: {
@@ -342,7 +364,8 @@
     Toggle,
     Tooltip,
     ValidatedForm,
-    ValidatedInput
+    ValidatedInput,
+    'vue-ctk-date-time-picker': VueCtkDateTimePicker
   }
 })
 
@@ -371,6 +394,7 @@ export default class ProjectSettings extends Vue {
   has_soft_closing_time = false;
   has_closing_time = false;
   submission_limit_per_day = "";
+  submission_limit_reset_time = "";
 
   readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
@@ -380,8 +404,8 @@ export default class ProjectSettings extends Vue {
 
   async created() {
     this.d_project = this.project;
-    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null
-                                    ? ""
+    this.submission_limit_reset_time = moment(this.project.submission_limit_reset_time, 'HH:mm:ss').format("LT");
+    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null ? ""
                                     : this.d_project.submission_limit_per_day.toString();
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
     this.has_closing_time = this.d_project.closing_time !== null;
@@ -395,12 +419,25 @@ export default class ProjectSettings extends Vue {
   async save_project_settings() {
     try {
       this.d_saving = true;
+
+      // sometimes only 1 digit? Is that ok?
+      let reset_time = moment(this.submission_limit_reset_time, 'HH:mm a');
+      this.d_project.submission_limit_reset_time = reset_time.hours() + ":" + reset_time.minutes() + ":00";
+      console.log(this.d_project.submission_limit_reset_time);
+
+
       this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
                                                 ? Number(this.submission_limit_per_day)
                                                 : null;
+
+
       this.d_project.soft_closing_time = this.has_soft_closing_time
                                          ? this.d_project.soft_closing_time : null;
+
+
       this.d_project.closing_time = this.has_closing_time ? this.d_project.closing_time : null;
+
+
       await this.d_project!.save();
     }
     finally {
@@ -457,7 +494,8 @@ legend {
 
 .soft-deadline, .hard-deadline {
   display: inline-block;
-  min-width: 320px;
+  min-width: 400px;
+  vertical-align: top;
 }
 
 .footer {
@@ -591,24 +629,14 @@ input[type=checkbox] {
 // Datetime stuff **************************************************************
 .datetime-picker-container {
   padding: 16px 0 0 0;
-}
-
-.datetime-picker {
-  background-color: hsl(210, 20%, 95%);
-  border-radius: 7px;
-  height: 200px;
-  margin-top: 5px;
-  width: 250px;
+  max-width: 300px;
 }
 
 .timepicker {
-  background-color: hsl(210, 20%, 95%);
   border-radius: 5px;
-  color: #495057;
   display: inline-block;
-  padding: 9.5px;
   margin: 5px 0 0 0;
-  width: 250px;
+  width: 210px;
 }
 
 .timezone {
