@@ -1,3 +1,4 @@
+import {UltimateSubmissionPolicy} from "ag-client-typescript";
 <template>
   <div id="project-settings-component">
 
@@ -11,7 +12,7 @@
         <validated-input ref="project_name_input"
                          v-model="d_project.name"
                          :validators="[is_not_empty]"
-                         input_style="width: 500px;">
+                         input_style="max-width: 500px; width: 100%">
         </validated-input>
       </div>
 
@@ -85,16 +86,18 @@
           <legend> Group Size </legend>
           <div class="project-input-container">
             <div class="min-group-size-container">
-              <label class="text-label"> Min group size </label>
-              <validated-input ref="min_group_size_input"
-                               v-model="d_project.min_group_size"
-                               :validators="[is_integer, is_not_empty, is_non_negative]"
-                               input_style="width: 80px;">
-              </validated-input>
-
+              <div class="side-by-side">
+                <label class="text-label"> Min group size </label>
+                <validated-input ref="min_group_size_input"
+                                 v-model="d_project.min_group_size"
+                                 :validators="[is_integer, is_not_empty, is_non_negative]"
+                                 input_style="width: 80px;">
+                </validated-input>
+              </div>
             </div>
 
             <div class="max-group-size-container">
+              <div class="side-by-side">
               <label class="text-label"> Max group size </label>
               <i class="fas fa-question-circle input-tooltip">
                 <tooltip width="large" placement="right">
@@ -107,6 +110,7 @@
                                :validators="[is_integer, is_not_empty, is_non_negative]"
                                input_style="width: 80px;">
               </validated-input>
+              </div>
             </div>
           </div>
         </fieldset>
@@ -126,17 +130,18 @@
               <dropdown ref="dropdown_final_graded_submission_policy"
                         :items="final_graded_submission_policy_options"
                         :initial_highlighted_index="0"
-                        @update_item_selected="d_project.ultimate_submission_policy = $event">
+                        @update_item_selected="d_project.ultimate_submission_policy
+                                               = $event.policy">
                 <template slot="header">
                   <div tabindex="1" class="dropdown-header-wrapper">
                     <div id="final-graded-submission-policy" class="dropdown-header">
-                      {{d_project.ultimate_submission_policy}}
+                      {{submission_policy_selected}}
                       <i class="fas fa-caret-down dropdown-caret"></i>
                     </div>
                   </div>
                 </template>
                 <span slot-scope="{item}">
-                  <span class="submission-policy">{{item}}</span>
+                  <span class="submission-policy">{{item.label}}</span>
                 </span>
               </dropdown>
             </div>
@@ -152,6 +157,7 @@
             <input id="submission-limit-per-day"
                    class="project-settings-input"
                    type="number"
+                   min="1"
                    v-model="submission_limit_per_day"/>
           </div>
 
@@ -212,8 +218,8 @@
               <div class="timezone">
                 <dropdown ref="dropdown_timezone"
                           :items="timezones"
-                          @update_item_selected="
-                          d_project.submission_limit_reset_timezone = $event">
+                          @update_item_selected="d_project.submission_limit_reset_timezone
+                                                 = $event">
                   <template slot="header">
                     <div tabindex="1" class="dropdown-header-wrapper">
                       <div id="timezone-dropdown" class="dropdown-header">
@@ -255,12 +261,13 @@
             <input ref="total_submissions_input"
                    class="project-settings-input"
                    type="number"
+                   min="1"
                    v-model="d_project.total_submission_limit"/>
           </div>
         </fieldset>
       </div>
 
-      <div class="section-container">
+      <div>
         <fieldset>
           <legend> Project Deadline </legend>
           <div class="project-input-container">
@@ -336,15 +343,12 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-
   import APIErrors from '@/components/api_errors.vue';
   import Dropdown from '@/components/dropdown.vue';
   import Toggle from '@/components/toggle.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
 
   import { handle_api_errors_async } from "@/utils";
   import {
@@ -355,9 +359,14 @@
     string_to_num
   } from '@/validators';
   import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-  // import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
-
   import moment from 'moment';
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
+  interface UltimateSubmissionPolicyOption {
+    label: string;
+    policy: UltimateSubmissionPolicy;
+  }
 
   @Component({
   components: {
@@ -376,10 +385,19 @@ export default class ProjectSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  final_graded_submission_policy_options = [
-    UltimateSubmissionPolicy.most_recent,
-    UltimateSubmissionPolicy.best_with_normal_fdbk,
-    UltimateSubmissionPolicy.best
+  final_graded_submission_policy_options: UltimateSubmissionPolicyOption[] = [
+    {
+      label: "Most recent submission",
+      policy: UltimateSubmissionPolicy.most_recent
+    },
+    {
+      label: "Best score using Normal feedback",
+      policy: UltimateSubmissionPolicy.best_with_normal_fdbk
+    },
+    {
+      label: "Best score",
+      policy: UltimateSubmissionPolicy.best
+    }
   ];
 
   timezones = [
@@ -408,25 +426,28 @@ export default class ProjectSettings extends Vue {
 
   async created() {
     this.d_project = this.project;
-
     this.submission_limit_per_day = this.d_project.submission_limit_per_day === null ? ""
       : this.d_project.submission_limit_per_day.toString();
-
     this.submission_limit_reset_time = moment(this.d_project.submission_limit_reset_time,
                                               'HH:mm:ss').format("LT");
-
-    console.log(this.d_project.soft_closing_time);
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
     this.soft_closing_time = this.has_soft_closing_time
-                             ? moment(this.d_project.soft_closing_time!).format("YYYY-MM-DD hh:mm a")
+                             ? moment(this.d_project.soft_closing_time!).format(
+                               "YYYY-MM-DD hh:mm a"
+                             )
                              : moment().format("YYYY-MM-DD hh:mm a");
-
-    console.log(this.soft_closing_time);
-
     this.has_closing_time = this.d_project.closing_time !== null;
     this.closing_time = this.has_closing_time
                         ? moment(this.d_project.closing_time!).format("YYYY-MM-DD hh:mm a")
                         : moment().format("YYYY-MM-DD hh:mm a");
+  }
+
+  get submission_policy_selected() {
+    let index = this.final_graded_submission_policy_options.findIndex((policy_option) =>
+      policy_option.policy === this.d_project.ultimate_submission_policy
+    );
+    console.log("Called and index is " + index);
+    return this.final_graded_submission_policy_options[index].label;
   }
 
   get submission_limit_per_day_exists() {
@@ -437,24 +458,16 @@ export default class ProjectSettings extends Vue {
   async save_project_settings() {
     try {
       this.d_saving = true;
-
+      (<APIErrors> this.$refs.api_errors).clear();
       let reset_time = moment(this.submission_limit_reset_time, 'HH:mm a');
       this.d_project.submission_limit_reset_time = reset_time.hours() + ":"
                                                    + reset_time.minutes() + ":00";
-
-
       this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
                                                 ? Number(this.submission_limit_per_day) : null;
-
-      console.log("Save***");
-      console.log(this.soft_closing_time);
       this.d_project.soft_closing_time = this.has_soft_closing_time
                                          ? new Date(this.soft_closing_time).toISOString() : null;
-      console.log(this.d_project.soft_closing_time);
-
       this.d_project.closing_time = this.has_closing_time
                                     ? new Date(this.closing_time).toISOString() : null;
-
       await this.d_project!.save();
     }
     finally {
@@ -472,9 +485,11 @@ export default class ProjectSettings extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '~vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 
 #project-settings-component {
   padding: 10px;
+  min-width: 100%;
 }
 
 fieldset {
@@ -506,13 +521,27 @@ legend {
 
 .min-group-size-container, .max-group-size-container {
   display: inline-block;
-  max-width: 160px;
+  max-width: 250px;
+  vertical-align: top;
+}
+
+.side-by-side {
+  display: inline-block;
+  max-width: 80%;
 }
 
 .soft-deadline, .hard-deadline {
   display: inline-block;
-  min-width: 400px;
+  min-width: 450px;
   vertical-align: top;
+}
+
+.soft-deadline {
+  padding-bottom: 20px;
+}
+
+.hard-deadline {
+  padding-bottom: 10px;
 }
 
 .footer {
@@ -594,14 +623,13 @@ input[type=checkbox] {
 
 #save-button {
   @extend .green-button;
-  margin-top: 10px;
 }
 
 #save-button:disabled {
   @extend .gray-button;
 }
 
-// Dropdown stuff ************************************************************
+// Dropdown related ************************************************************
 #final-graded-submission-policy {
   width: 350px;
 }
@@ -643,23 +671,22 @@ input[type=checkbox] {
   top: 3px;
 }
 
-// Datetime stuff **************************************************************
+// Datetime related ************************************************************
 .datetime-picker-container {
-  padding: 16px 0 0 0;
+  padding: 6px 0 10px 0;
   max-width: 300px;
 }
 
 .timepicker {
   border-radius: 5px;
   display: inline-block;
-  margin: 5px 30px 0 0;
+  margin: 0 30px 0 0;
   width: 250px;
 }
 
 .timezone {
   display: inline-block;
-  margin: 5px 0 0 0;
+  margin: 0 0 0 0;
   vertical-align: top;
 }
-
 </style>

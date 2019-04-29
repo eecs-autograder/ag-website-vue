@@ -136,14 +136,11 @@
   @import '@/styles/colors.scss';
 
   #tooltip {
-    background-color: hsl(220, 20%, 37%);
-    border-radius: 4px;
+    background-color: $stormy-gray-dark;
+    border-radius: 6px;
     color: white;
     display: inline-block;
-    font-size: 13px;
-    font-family: Helvetica;
     line-height: 16px;
-    font-weight: normal;
     padding: 10px;
     position: absolute;
     text-align: center;
@@ -184,28 +181,28 @@
   }
 
   .placement-left::after {
-    border-color: transparent transparent transparent hsl(220, 20%, 37%);
+    border-color: transparent transparent transparent $stormy-gray-dark;
     left: 100%;
     margin-top: -5px;
     top: 50%;
   }
 
   .placement-right::after {
-    border-color: transparent hsl(220, 20%, 37%) transparent transparent;
+    border-color: transparent $stormy-gray-dark transparent transparent;
     margin-top: -5px;
     right: 100%;
     top: 50%;
   }
 
   .placement-top::after {
-    border-color: hsl(220, 20%, 37%) transparent transparent transparent;
+    border-color: $stormy-gray-dark transparent transparent transparent;
     left: 50%;
     margin-left: -5px;
     top: 100%;
   }
 
   .placement-bottom::after {
-    border-color: transparent transparent hsl(220, 20%, 37%) transparent;
+    border-color: transparent transparent $stormy-gray-dark transparent;
     left: 50%;
     margin-left: -5px;
     bottom: 100%;

@@ -173,7 +173,7 @@ describe('ProjectSettings tests', () => {
     // for some reason, v-modeling d_project.submission_limit_per_day is not causing
     // submission_limit_per_day_exists to get re-evaluated when d_project.submission_limit_per_day
     // changes. I think it has something to do with the variable being of type null or number,
-    // because d_expected_student_file.pattern is able to cause it's computed function
+    // because d_expected_student_file.pattern is able to cause its computed function
     // to re-evaluate in the expected student file form?
     test('When submission_limit_per_day_exists, the allow_submissions_past_limit input is ' +
           'accessible ',
@@ -190,6 +190,30 @@ describe('ProjectSettings tests', () => {
         expect(component.submission_limit_per_day).not.toBeNull();
         expect(component.submission_limit_per_day_exists).toBe(true);
         expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(1);
+    });
+
+    // Submission policy is not re-evaluating when the nested property changes (just in tests)
+    // Should I just make another variable to keep track of the submission policy selected?
+    test.skip('submission_policy_selected', async () => {
+        expect(component.d_project.ultimate_submission_policy).toEqual(
+            project.ultimate_submission_policy
+        );
+        expect(component.submission_policy_selected).toEqual(
+            component.final_graded_submission_policy_options[2].label
+        );
+
+        component.d_project.ultimate_submission_policy
+            = UltimateSubmissionPolicy.best_with_normal_fdbk;
+        await component.$nextTick();
+        expect(component.submission_policy_selected).toEqual(
+            component.final_graded_submission_policy_options[1].label
+        );
+
+        component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.most_recent;
+        await component.$nextTick();
+        expect(component.submission_policy_selected).toEqual(
+            component.final_graded_submission_policy_options[0].label
+        );
     });
 
     test('d_project.submission_limit_per_day is assigned a non null value in ' +
@@ -251,7 +275,6 @@ describe('ProjectSettings tests', () => {
          'has_soft_closing_time is true',
          async () => {
         let save_settings_stub = sinon.stub(component.d_project, 'save');
-
         wrapper.setData({has_soft_closing_time: true});
         component.soft_closing_time = "2019-05-09 09:54 pm";
         await component.$nextTick();
