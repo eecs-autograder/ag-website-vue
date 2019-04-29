@@ -102,7 +102,7 @@ describe('EditSingleGroup tests', () => {
         }
     });
 
-    test('If the extended due date of the group passed in is not null, has extension is ' +
+    test('If the extended due date of the group passed in is not null, has_extension is ' +
          'set to true',
          async () => {
         expect(component.min_group_size).toEqual(project.min_group_size);
@@ -118,49 +118,35 @@ describe('EditSingleGroup tests', () => {
 
     test('A group must have at most max_group_size members and at least one member', async () => {
         expect(component.d_group!.member_names.length).toEqual(2);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
         expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(false);
 
         wrapper.find(".add-member-button").trigger('click');
 
         expect(component.d_group!.member_names.length).toEqual(3);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
         expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(true);
 
         wrapper.find(".add-member-button").trigger('click');
         await component.$nextTick();
 
         expect(component.d_group!.member_names.length).toEqual(3);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
 
         wrapper.findAll(".remove-member-button").at(1).trigger('click');
 
         expect(component.d_group!.member_names.length).toEqual(2);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
         wrapper.findAll(".remove-member-button").at(1).trigger('click');
 
         expect(component.d_group!.member_names.length).toEqual(1);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(1);
 
         wrapper.findAll(".remove-member-button").at(0).trigger('click');
 
         expect(component.d_group!.member_names.length).toEqual(1);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
-    });
-
-    test('Member names cannot be empty', async () => {
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
-        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
-            { ref: "member_name_input" }
-        ).at(0).vm;
-        (<HTMLInputElement> member_1_name_input.element).value = "";
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.edit_group_form_is_valid).toBe(false);
-        expect(member_1_name_validator.is_valid).toBe(false);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(1);
     });
 
     test('bonus_submissions_remaining cannot be a negative number', async () => {
@@ -201,7 +187,7 @@ describe('EditSingleGroup tests', () => {
 
     test('Usernames of group members are trimmed before attempt to create group',
          async () => {
-        let save_group_stub = sinon.stub(component.d_group,  'save');
+        let save_group_stub = sinon.stub(component.d_group, 'save');
 
         let group_members = [
             "   abernard@cornell.edu  ",
@@ -218,37 +204,22 @@ describe('EditSingleGroup tests', () => {
         wrapper.find(".add-member-button").trigger('click');
         await component.$nextTick();
 
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+        let member_name_inputs = wrapper.findAll('.member-name-input');
 
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
-        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
-        { ref: "member_name_input" }
-        ).at(0).vm;
+        let member_1_name_input = member_name_inputs.at(0);
         (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        expect(member_1_name_validator.is_valid).toBe(true);
-
-        let member_2_name_input = member_name_inputs.at(1).find('#input');
-        let member_2_name_validator = <ValidatedInput> wrapper.findAll(
-        { ref: "member_name_input" }
-        ).at(1).vm;
+        let member_2_name_input = member_name_inputs.at(1);
         (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        expect(member_2_name_validator.is_valid).toBe(true);
-
-        let member_3_name_input = member_name_inputs.at(2).find('#input');
-        let member_3_name_validator = <ValidatedInput> wrapper.findAll(
-        { ref: "member_name_input" }
-        ).at(0).vm;
+        let member_3_name_input = member_name_inputs.at(2);
         (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
         member_3_name_input.trigger('input');
         await component.$nextTick();
-
-        expect(member_3_name_validator.is_valid).toBe(true);
 
         expect(component.edit_group_form_is_valid).toBe(true);
         wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
@@ -257,19 +228,36 @@ describe('EditSingleGroup tests', () => {
         expect(save_group_stub.firstCall.thisValue.member_names).toEqual(trimmed_group_members);
     });
 
-    test('Successful call to Group.save after updating member names', async () => {
-        let save_group_stub = sinon.stub(component.d_group,  'save');
+    test('Blank or incomplete member names are thrown out before save', async () => {
+        let save_group_stub = sinon.stub(component.d_group, 'save');
+        let group_members = [
+            "    ",
+            "  amartin@cornell.edu",
+            component.allowed_guest_domain
+        ];
 
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+        let savable_group_members = [
+            "amartin@cornell.edu"
+        ];
 
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
-        (<HTMLInputElement> member_1_name_input.element).value = "stanley@cornell.edu";
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        let member_name_inputs = wrapper.findAll('.member-name-input');
+
+        let member_1_name_input = member_name_inputs.at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        let member_2_name_input = member_name_inputs.at(1).find('#input');
-        (<HTMLInputElement> member_2_name_input.element).value = "phyllis@cornell.edu";
+        let member_2_name_input = member_name_inputs.at(1);
+        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
         member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_3_name_input = member_name_inputs.at(2);
+        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
+        member_3_name_input.trigger('input');
         await component.$nextTick();
 
         expect(component.edit_group_form_is_valid).toBe(true);
@@ -277,14 +265,17 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue).toEqual(component.d_group);
+        expect(save_group_stub.firstCall.thisValue.member_names).toEqual(savable_group_members);
     });
 
-
     test('Call to save without an extension', async () => {
-        let save_group_stub = sinon.stub(component.d_group,  'save');
+        let save_group_stub = sinon.stub(component.d_group, 'save');
 
-        component.has_extension = false;
+        wrapper.setData({has_extension: true});
+        component.extension_datetime = "2019-05-09 09:54 pm";
+        await component.$nextTick();
+
+        wrapper.setData({has_extension: false});
         await component.$nextTick();
 
         wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
@@ -295,7 +286,7 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Group member must be enrolled in course - violates condition', async () => {
-        let save_group_stub = sinon.stub(component.d_group,  'save');
+        let save_group_stub = sinon.stub(component.d_group, 'save');
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -314,14 +305,14 @@ describe('EditSingleGroup tests', () => {
         };
         save_group_stub.returns(Promise.reject(axios_response_instance));
 
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+        let member_name_inputs = wrapper.findAll('.member-name-input');
 
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
+        let member_1_name_input = member_name_inputs.at(0);
         (<HTMLInputElement> member_1_name_input.element).value = "michael@cornell.edu";
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        let member_2_name_input = member_name_inputs.at(1).find('#input');
+        let member_2_name_input = member_name_inputs.at(1);
         (<HTMLInputElement> member_2_name_input.element).value = "ryan@cornell.edu";
         member_2_name_input.trigger('input');
         await component.$nextTick();
@@ -456,7 +447,8 @@ describe('EditSingleGroup without an extension initially', () => {
         let save_group_stub = sinon.stub(component.d_group, 'save');
         expect(component.has_extension).toBe(false);
 
-        component.has_extension = true;
+        wrapper.setData({has_extension: true});
+        component.extension_datetime = "2019-05-09 09:54 pm";
         await component.$nextTick();
 
         expect(component.has_extension).toBe(true);
@@ -465,6 +457,8 @@ describe('EditSingleGroup without an extension initially', () => {
         await component.$nextTick();
 
         expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue.extended_due_date).not.toBeNull();
+        expect(save_group_stub.firstCall.thisValue.extended_due_date).toEqual(
+            "2019-05-10T01:54:00.000Z"
+        );
     });
 });
