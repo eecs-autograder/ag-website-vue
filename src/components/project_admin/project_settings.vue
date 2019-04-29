@@ -1,5 +1,5 @@
 <template>
-  <div id="project-settings-component" v-if="d_project != null">
+  <div id="project-settings-component">
 
     <validated-form ref="project_settings_form"
                     autocomplete="off"
@@ -336,6 +336,8 @@
 </template>
 
 <script lang="ts">
+  import { Component, Prop, Vue } from 'vue-property-decorator';
+
   import APIErrors from '@/components/api_errors.vue';
   import Dropdown from '@/components/dropdown.vue';
   import Toggle from '@/components/toggle.vue';
@@ -343,6 +345,7 @@
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
   import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+
   import { handle_api_errors_async } from "@/utils";
   import {
     is_integer,
@@ -352,8 +355,7 @@
     string_to_num
   } from '@/validators';
   import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
-  import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
+  // import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 
   import moment from 'moment';
 
@@ -365,7 +367,7 @@
     Tooltip,
     ValidatedForm,
     ValidatedInput,
-    'vue-ctk-date-time-picker': VueCtkDateTimePicker
+    VueCtkDateTimePicker
   }
 })
 
@@ -406,17 +408,25 @@ export default class ProjectSettings extends Vue {
 
   async created() {
     this.d_project = this.project;
-    this.submission_limit_reset_time = moment(this.project.submission_limit_reset_time, 'HH:mm:ss').format("LT");
-    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null ? ""
-                                    : this.d_project.submission_limit_per_day.toString();
 
+    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null ? ""
+      : this.d_project.submission_limit_per_day.toString();
+
+    this.submission_limit_reset_time = moment(this.d_project.submission_limit_reset_time,
+                                              'HH:mm:ss').format("LT");
+
+    console.log(this.d_project.soft_closing_time);
     this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
-    this.soft_closing_time = this.has_soft_closing_time ? moment(this.d_project.soft_closing_time).format("YYYY-MM-DD HH:mm")
-                             : moment().format("YYYY-MM-DD HH:mm");
+    this.soft_closing_time = this.has_soft_closing_time
+                             ? moment(this.d_project.soft_closing_time!).format("YYYY-MM-DD hh:mm a")
+                             : moment().format("YYYY-MM-DD hh:mm a");
+
+    console.log(this.soft_closing_time);
 
     this.has_closing_time = this.d_project.closing_time !== null;
-    this.closing_time = this.has_closing_time ? moment(this.d_project.closing_time).format("YYYY-MM-DD HH:mm")
-                        : moment().format("YYYY-MM-DD HH:mm");
+    this.closing_time = this.has_closing_time
+                        ? moment(this.d_project.closing_time!).format("YYYY-MM-DD hh:mm a")
+                        : moment().format("YYYY-MM-DD hh:mm a");
   }
 
   get submission_limit_per_day_exists() {
@@ -428,17 +438,22 @@ export default class ProjectSettings extends Vue {
     try {
       this.d_saving = true;
 
-      // sometimes only 1 digit? Is that ok?
       let reset_time = moment(this.submission_limit_reset_time, 'HH:mm a');
-      this.d_project.submission_limit_reset_time = reset_time.hours() + ":" + reset_time.minutes() + ":00";
+      this.d_project.submission_limit_reset_time = reset_time.hours() + ":"
+                                                   + reset_time.minutes() + ":00";
 
 
       this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
-                                                ? Number(this.submission_limit_per_day)
-                                                : null;
+                                                ? Number(this.submission_limit_per_day) : null;
 
-      this.d_project.soft_closing_time = this.has_soft_closing_time ? new Date(this.soft_closing_time).toISOString() : null;
-      this.d_project.closing_time = this.has_closing_time ? new Date(this.closing_time).toISOString() : null;
+      console.log("Save***");
+      console.log(this.soft_closing_time);
+      this.d_project.soft_closing_time = this.has_soft_closing_time
+                                         ? new Date(this.soft_closing_time).toISOString() : null;
+      console.log(this.d_project.soft_closing_time);
+
+      this.d_project.closing_time = this.has_closing_time
+                                    ? new Date(this.closing_time).toISOString() : null;
 
       await this.d_project!.save();
     }
@@ -638,7 +653,7 @@ input[type=checkbox] {
   border-radius: 5px;
   display: inline-block;
   margin: 5px 30px 0 0;
-  width: 210px;
+  width: 250px;
 }
 
 .timezone {

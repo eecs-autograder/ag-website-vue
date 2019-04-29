@@ -4,6 +4,7 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
+import moment from 'moment';
 import * as sinon from 'sinon';
 
 beforeAll(() => {
@@ -40,7 +41,7 @@ describe('ProjectSettings created() tests', () => {
             submission_limit_per_day: null,
             allow_submissions_past_limit: true,
             groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
+            submission_limit_reset_time: "00:00:00",
             submission_limit_reset_timezone: "",
             num_bonus_submissions: 1,
             total_submission_limit: null,
@@ -70,14 +71,22 @@ describe('ProjectSettings created() tests', () => {
 
         expect(component.d_project).toEqual(project);
         expect(component.d_project.submission_limit_per_day).toBeNull();
+        expect(component.submission_limit_per_day).toEqual("");
+        expect(component.submission_limit_reset_time).toEqual("12:00 AM");
+
+        expect(component.d_project.soft_closing_time).toBeNull();
         expect(component.has_soft_closing_time).toBe(false);
+        expect(component.soft_closing_time).toEqual(moment().format("YYYY-MM-DD hh:mm a"));
+
+        expect(component.d_project.closing_time).toBeNull();
         expect(component.has_closing_time).toBe(false);
+        expect(component.closing_time).toEqual(moment().format("YYYY-MM-DD hh:mm a"));
     });
 
     test('Data members assigned correct values in created() - all are NOT null', async () => {
         project.submission_limit_per_day = 2;
-        project.soft_closing_time = "tomorrow";
-        project.closing_time = "never";
+        project.soft_closing_time = "2019-04-18T01:48:00Z";
+        project.closing_time = "2019-04-18T01:49:00.000Z";
 
         wrapper = mount(ProjectSettings, {
             propsData: {
@@ -87,9 +96,17 @@ describe('ProjectSettings created() tests', () => {
         component = wrapper.vm;
 
         expect(component.d_project).toEqual(project);
-        expect(component.d_project.submission_limit_per_day).not.toBeNull();
+        expect(component.d_project.submission_limit_per_day).toEqual(2);
+        expect(component.submission_limit_per_day).toEqual("2");
+        expect(component.submission_limit_reset_time).toEqual("12:00 AM");
+
+        expect(component.d_project.soft_closing_time).not.toBeNull();
         expect(component.has_soft_closing_time).toBe(true);
+        expect(component.soft_closing_time).toEqual("2019-04-17 09:48 pm");
+
+        expect(component.d_project.closing_time).not.toBeNull();
         expect(component.has_closing_time).toBe(true);
+        expect(component.closing_time).toEqual("2019-04-17 09:49 pm");
     });
 });
 
@@ -138,6 +155,7 @@ describe('ProjectSettings tests', () => {
             }
         });
         component = wrapper.vm;
+
     });
 
     afterEach(() => {
@@ -160,6 +178,7 @@ describe('ProjectSettings tests', () => {
     test('When submission_limit_per_day_exists, the allow_submissions_past_limit input is ' +
           'accessible ',
          async () => {
+
         expect(component.submission_limit_per_day_exists).toBe(false);
         expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(0);
 
@@ -211,13 +230,30 @@ describe('ProjectSettings tests', () => {
         expect(save_settings_stub.firstCall.thisValue.submission_limit_per_day).toBeNull();
     });
 
+    test('d_project.submission_limit_reset_time is assigned the correct value on save()',
+         async () => {
+        let save_settings_stub = sinon.stub(component.d_project, 'save');
+
+        component.submission_limit_reset_time = "08:45 PM";
+        await component.$nextTick();
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(save_settings_stub.firstCall.thisValue.submission_limit_reset_time).toEqual(
+            "20:45:00"
+        );
+    });
+
     test('d_project.soft_closing_time is assigned a non-null value when ' +
          'has_soft_closing_time is true',
          async () => {
         let save_settings_stub = sinon.stub(component.d_project, 'save');
 
         wrapper.setData({has_soft_closing_time: true});
-        component.d_project.soft_closing_time = "today";
+        component.soft_closing_time = "2019-05-09 09:54 pm";
         await component.$nextTick();
 
         expect(component.has_soft_closing_time).toBe(true);
@@ -226,7 +262,9 @@ describe('ProjectSettings tests', () => {
         wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
         await component.$nextTick();
 
-        expect(save_settings_stub.firstCall.thisValue.soft_closing_time).not.toBeNull();
+        expect(save_settings_stub.firstCall.thisValue.soft_closing_time).toEqual(
+            "2019-05-10T01:54:00.000Z"
+        );
     });
 
     test('d_project.soft_closing_time is assigned a null value when ' +
@@ -235,7 +273,7 @@ describe('ProjectSettings tests', () => {
         let save_settings_stub = sinon.stub(component.d_project, 'save');
 
         wrapper.setData({has_soft_closing_time: true});
-        component.d_project.soft_closing_time = "today";
+        component.soft_closing_time = "2019-04-17 09:48 pm";
         await component.$nextTick();
 
         wrapper.setData({has_soft_closing_time: false});
@@ -250,12 +288,30 @@ describe('ProjectSettings tests', () => {
         expect(save_settings_stub.firstCall.thisValue.soft_closing_time).toBeNull();
     });
 
+    test('d_project.closing_time is assigned a non-null value when has_closing_time is true',
+         async () => {
+        let save_settings_stub = sinon.stub(component.d_project, 'save');
+        wrapper.setData({has_closing_time: true});
+        component.closing_time = "2019-04-17 09:48 pm";
+        await component.$nextTick();
+
+        expect(component.has_closing_time).toBe(true);
+        expect(component.settings_form_is_valid).toBe(true);
+
+        wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(save_settings_stub.firstCall.thisValue.closing_time).toEqual(
+            "2019-04-18T01:48:00.000Z"
+        );
+    });
+
     test('d_project.closing_time is assigned a null value when has_closing_time is false',
          async () => {
         let save_settings_stub = sinon.stub(component.d_project, 'save');
 
         wrapper.setData({has_closing_time: true});
-        component.d_project.closing_time = "tomorrow";
+        component.closing_time = "2019-04-17 09:48 pm";
         await component.$nextTick();
 
         wrapper.setData({has_closing_time: false});
@@ -269,23 +325,6 @@ describe('ProjectSettings tests', () => {
 
         expect(save_settings_stub.firstCall.thisValue.closing_time).toBeNull();
     });
-
-    test('d_project.closing_time is assigned a non-null value when has_closing_time is true',
-         async () => {
-             let save_settings_stub = sinon.stub(component.d_project, 'save');
-
-             wrapper.setData({has_closing_time: true});
-             component.d_project.closing_time = "tomorrow";
-             await component.$nextTick();
-
-             expect(component.has_closing_time).toBe(true);
-             expect(component.settings_form_is_valid).toBe(true);
-
-             wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
-             await component.$nextTick();
-
-             expect(save_settings_stub.firstCall.thisValue.closing_time).not.toBeNull();
-         });
 
     test('Successful attempt to save project settings', async () => {
         let save_settings_stub = sinon.stub(component.d_project, 'save');
