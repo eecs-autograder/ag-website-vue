@@ -446,7 +446,6 @@ export default class ProjectSettings extends Vue {
     let index = this.final_graded_submission_policy_options.findIndex((policy_option) =>
       policy_option.policy === this.d_project.ultimate_submission_policy
     );
-    console.log("Called and index is " + index);
     return this.final_graded_submission_policy_options[index].label;
   }
 
