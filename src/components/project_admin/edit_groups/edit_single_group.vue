@@ -54,7 +54,11 @@
       </div>
 
       <div id="datetime-picker-container" v-if="has_extension">
-        <div class="datetime-picker"></div>
+        <div class="datetime-picker">
+          <vue-ctk-date-time-picker v-model="extension_date"
+                                    input-size="lg">
+          </vue-ctk-date-time-picker>
+        </div>
       </div>
 
       <div id="bonus-submissions-container">
@@ -86,8 +90,10 @@ import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
 
 import { Course, Group, Project } from 'ag-client-typescript';
+import moment from 'moment';
 
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
@@ -96,7 +102,8 @@ import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/vali
     APIErrors,
     Toggle,
     ValidatedForm,
-    ValidatedInput
+    ValidatedInput,
+    VueCtkDateTimePicker
   }
 })
 export default class EditSingleGroup extends Vue {
@@ -131,6 +138,7 @@ export default class EditSingleGroup extends Vue {
   max_group_size = 1;
   toggle_color = "orange";
   edit_group_form_is_valid = true;
+  extension_date = "";
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
@@ -145,6 +153,10 @@ export default class EditSingleGroup extends Vue {
     this.min_group_size = this.project.min_group_size;
     this.max_group_size = this.project.max_group_size;
     this.has_extension = this.d_group.extended_due_date !== null;
+    this.extension_date = this.has_extension
+                          ? moment(this.d_group.extended_due_date).format("YYYY-MM-DD hh:mm a")
+                          : moment().format("YYYY-MM-DD hh:mm a");
+    console.log(this.extension_date);
   }
 
   remove_group_member(index: number) {
@@ -164,7 +176,7 @@ export default class EditSingleGroup extends Vue {
         Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
       }
       this.d_group!.extended_due_date = this.has_extension
-                                        ? "2019-08-18T15:25:06.965696Z" : null;
+                                        ? new Date(this.extension_date).toISOString() : null;
       await this.d_group!.save();
       (<ValidatedForm> this.$refs.edit_group_form).reset_warning_state();
     }
@@ -183,6 +195,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
+@import '~vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 
 #edit-single-group-component {
   font-size: 15px;
@@ -215,9 +228,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 
 .datetime-picker {
   margin-top: 5px;
-  width: 250px;
-  height: 200px;
-  background-color: hsl(210, 20%, 90%);
+  width: 50%;
 }
 
 .update-group-button {
