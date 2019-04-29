@@ -10,12 +10,9 @@
         <div v-for="(member, index) of d_group.member_names">
           <div class="group-member-editing">
             <div class="username-validated-container">
-              <validated-input ref="member_name_input"
-                               v-model="d_group.member_names[index]"
-                               :validators="[is_not_empty]"
-                               :num_rows="1"
-                               input_style="width: 280px;
-                                            border: 1px solid #ced4da;">
+              <input class="member-name-input"
+                     type="text"
+                     v-model="d_group.member_names[index]"/>
                 <button slot="suffix"
                         class="remove-member-button"
                         :title="`Remove ${member} from group`"
@@ -24,7 +21,6 @@
                         @click="remove_group_member(index)">
                   <i class="fas fa-times"></i>
                 </button>
-              </validated-input>
             </div>
           </div>
         </div>
@@ -55,7 +51,7 @@
 
       <div id="datetime-picker-container" v-if="has_extension">
         <div class="datetime-picker">
-          <vue-ctk-date-time-picker v-model="extension_date"
+          <vue-ctk-date-time-picker v-model="extension_datetime"
                                     input-size="lg">
           </vue-ctk-date-time-picker>
         </div>
@@ -138,7 +134,7 @@ export default class EditSingleGroup extends Vue {
   max_group_size = 1;
   toggle_color = "orange";
   edit_group_form_is_valid = true;
-  extension_date = "";
+  extension_datetime = "";
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
@@ -153,18 +149,17 @@ export default class EditSingleGroup extends Vue {
     this.min_group_size = this.project.min_group_size;
     this.max_group_size = this.project.max_group_size;
     this.has_extension = this.d_group.extended_due_date !== null;
-    this.extension_date = this.has_extension
-                          ? moment(this.d_group.extended_due_date).format("YYYY-MM-DD hh:mm a")
-                          : moment().format("YYYY-MM-DD hh:mm a");
-    console.log(this.extension_date);
+    this.extension_datetime = this.has_extension
+                              ? moment(this.d_group.extended_due_date).format("YYYY-MM-DD hh:mm a")
+                              : moment().format("YYYY-MM-DD hh:mm a");
   }
 
   remove_group_member(index: number) {
-    this.d_group!.member_names.splice(index, 1);
+    this.d_group.member_names.splice(index, 1);
   }
 
   add_group_member() {
-    this.d_group!.member_names.push(this.allowed_guest_domain);
+    this.d_group.member_names.push(this.allowed_guest_domain);
   }
 
   @handle_api_errors_async(handle_save_group_error)
@@ -172,12 +167,15 @@ export default class EditSingleGroup extends Vue {
     try {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
+      this.d_group.member_names = this.d_group.member_names.filter(
+        name => name.trim() !== "" && name.trim() !== this.allowed_guest_domain
+      );
       for (let i = 0; i < this.d_group.member_names.length; ++i) {
         Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
       }
-      this.d_group!.extended_due_date = this.has_extension
-                                        ? new Date(this.extension_date).toISOString() : null;
-      await this.d_group!.save();
+      this.d_group.extended_due_date = this.has_extension
+                                       ? new Date(this.extension_datetime).toISOString() : null;
+      await this.d_group.save();
       (<ValidatedForm> this.$refs.edit_group_form).reset_warning_state();
     }
     finally {
@@ -205,6 +203,21 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   padding-top: 16px;
 }
 
+.member-name-input {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  box-sizing: border-box;
+  color: #495057;
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1.5;
+  position: relative;
+  padding: .375rem .75rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  width: 240px;
+}
+
 #extension-toggle {
   padding-top: 10px;
 }
@@ -229,6 +242,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 .datetime-picker {
   margin-top: 5px;
   width: 50%;
+  min-width: 260px;
 }
 
 .update-group-button {
