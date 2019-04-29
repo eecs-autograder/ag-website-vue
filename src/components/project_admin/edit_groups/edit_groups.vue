@@ -75,7 +75,7 @@ import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_
 import Toggle from '@/components/toggle.vue';
 
 import { array_remove_unique, deep_copy } from "@/utils";
-import { Group, Project } from 'ag-client-typescript';
+import { Group, GroupObserver, Project } from 'ag-client-typescript';
 
 @Component({
   components: {
@@ -86,14 +86,14 @@ import { Group, Project } from 'ag-client-typescript';
     Toggle
   }
 })
-export default class EditGroups extends Vue { // implements GroupObserver
+export default class EditGroups extends Vue implements GroupObserver {
 
   @Prop({required: true, type: Project})
   project!: Project;
 
   d_loading = true;
   extended_due_date_format = {year: 'numeric', month: 'short', day: 'numeric',
-                              hour: 'numeric', minute: 'numeric', second: 'numeric'};
+                              hour: 'numeric', minute: 'numeric'};
   groups: Group[] = [];
   groups_with_extensions: Group[] = [];
   selected_group: Group | null = null;
