@@ -321,21 +321,21 @@ describe('Course_List.vue', () => {
 
         let all_displayed_courses = course_list_page.findAll('.course');
         expect(all_displayed_courses.length).toEqual(3);
-        expect(course_list_page.findAll('.edit-admin-settings').length).toEqual(1);
+        expect(course_list_page.findAll('.edit-course-settings').length).toEqual(1);
 
         expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.name);
         expect(all_displayed_courses.at(0).findAll(
-            '.edit-admin-settings').length
+            '.edit-course-settings').length
         ).toEqual(1);
 
         expect(all_displayed_courses.at(1).html()).toContain(fall18_eecs370.name);
         expect(all_displayed_courses.at(1).findAll(
-            '.edit-admin-settings').length
+            '.edit-course-settings').length
         ).toEqual(0);
 
         expect(all_displayed_courses.at(2).html()).toContain(winter18_eecs280.name);
         expect(all_displayed_courses.at(2).findAll(
-            '.edit-admin-settings').length
+            '.edit-course-settings').length
         ).toEqual(0);
     });
 

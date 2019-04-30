@@ -17,13 +17,15 @@
         </div>
         <router-link tag="div"
                      :to="`/web/course_admin/${course.pk}`"
-                     class="edit-admin-settings"
+                     style="display: inline-block"
                      :title="'Edit ' + course.name"
                      v-if="is_admin">
           <a>
-            <p class="edit-settings-label">
-              <i class="fas fa-cog cog"></i>
-            </p>
+            <div class="edit-course-settings">
+              <p class="edit-settings-label">
+                <i class="fas fa-cog cog"></i>
+              </p>
+            </div>
           </a>
         </router-link>
       </div>
@@ -119,7 +121,7 @@
       ValidatedInput
     }
   })
-  export default class CourseList extends Vue {
+  export default class SingleCourse extends Vue {
 
     @Prop({required: true, type: Course})
     course!: Course;
@@ -164,7 +166,7 @@
     }
   }
 
-  function handle_add_copied_course_error(component: CourseList, error: unknown) {
+  function handle_add_copied_course_error(component: SingleCourse, error: unknown) {
     (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
   }
 
@@ -199,6 +201,10 @@ a {
   margin: 0;
 }
 
+.edit-settings-clickable {
+  background-color: firebrick;
+}
+
 .cog {
   transform: rotate(0deg);
   transition-duration: 1s;
@@ -210,17 +216,17 @@ a {
   font-size: 18px;
 }
 
-.edit-admin-settings, .clone-course {
+.edit-course-settings, .clone-course {
   color: hsl(212, 50%, 27%);
   display: inline-block;
-  padding: 5px 10px;
+  padding: 8px 10px;
 }
 
 .clone-course {
   margin-right: 5px;
 }
 
-.edit-admin-settings:hover .cog  {
+.edit-course-settings:hover .cog  {
   transform: rotate(365deg);
   transition-duration: 1s;
   color: mediumvioletred;
