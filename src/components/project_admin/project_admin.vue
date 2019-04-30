@@ -56,7 +56,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            AG TEST CASES - TODO (branch exists)
+            <AGTestCases></AGTestCases>
           </div>
         </template>
       </tab>
@@ -136,6 +136,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Project } from 'ag-client-typescript';
 
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
+import AGTestCases from '@/components/project_admin/ag_test_cases/ag_test_cases.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
@@ -147,6 +148,7 @@ import { get_query_param } from "@/utils";
 @Component({
   components: {
     EditGroups,
+    AGTestCases,
     ExpectedStudentFiles,
     InstructorFiles,
     ProjectSettings,
