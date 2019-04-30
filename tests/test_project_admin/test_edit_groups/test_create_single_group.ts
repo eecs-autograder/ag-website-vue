@@ -102,78 +102,54 @@ describe('CreateSingleGroup tests', () => {
     test('A minimum of 1 member name fields can be edited to create a group',
          async () => {
         expect(component.group_members.length).toEqual(2);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
         let delete_member_2_button = wrapper.findAll(".remove-member-button").at(1);
         delete_member_2_button.trigger('click');
 
         expect(component.group_members.length).toEqual(1);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(1);
 
         let delete_only_member_button = wrapper.findAll(".remove-member-button").at(0);
         delete_only_member_button.trigger('click');
 
         expect(component.group_members.length).toEqual(1);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(1);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(1);
     });
 
     test('A maximum of max_group_size member name fields can be edited to create a group',
          async () => {
         expect(component.group_members.length).toEqual(2);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
         wrapper.find(".add-member-button").trigger('click');
         await component.$nextTick();
 
         expect(component.group_members.length).toEqual(3);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
 
         wrapper.find(".add-member-button").trigger('click');
         await component.$nextTick();
 
         expect(component.group_members.length).toEqual(3);
-        expect(wrapper.findAll({ref: 'member_name_input'}).length).toEqual(3);
-    });
-
-    test('Member names cannot be empty', async () => {
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
-
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
-        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
-            { ref: "member_name_input" }
-        ).at(0).vm;
-        (<HTMLInputElement> member_1_name_input.element).value = "";
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(member_1_name_validator.is_valid).toBe(false);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
     });
 
     test('Successful creation of a group', async () => {
         let create_group_stub = sinon.stub(Group, 'create');
         let group_members = ["abernard@cornell.edu", "amartin@cornell.edu"];
 
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+        let member_name_inputs = wrapper.findAll('.member-name-input');
 
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
-        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
-            { ref: "member_name_input" }
-        ).at(0).vm;
+        let member_1_name_input = member_name_inputs.at(0);
         (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        expect(member_1_name_validator.is_valid).toBe(true);
-
-        let member_2_name_input = member_name_inputs.at(1).find('#input');
-        let member_2_name_validator = <ValidatedInput> wrapper.findAll(
-            { ref: "member_name_input" }
-        ).at(1).vm;
+        let member_2_name_input = member_name_inputs.at(1);
         (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
         member_2_name_input.trigger('input');
         await component.$nextTick();
-
-        expect(member_2_name_validator.is_valid).toBe(true);
 
         wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
         await component.$nextTick();
@@ -201,43 +177,68 @@ describe('CreateSingleGroup tests', () => {
         wrapper.find(".add-member-button").trigger('click');
         await component.$nextTick();
 
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+        let member_name_inputs = wrapper.findAll('.member-name-input');
 
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
-        let member_1_name_validator = <ValidatedInput> wrapper.findAll(
-            { ref: "member_name_input" }
-        ).at(0).vm;
+        let member_1_name_input = member_name_inputs.at(0);
         (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        expect(member_1_name_validator.is_valid).toBe(true);
-
-        let member_2_name_input = member_name_inputs.at(1).find('#input');
-        let member_2_name_validator = <ValidatedInput> wrapper.findAll(
-        { ref: "member_name_input" }
-        ).at(1).vm;
+        let member_2_name_input = member_name_inputs.at(1);
         (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        expect(member_2_name_validator.is_valid).toBe(true);
-
-        let member_3_name_input = member_name_inputs.at(2).find('#input');
-        let member_3_name_validator = <ValidatedInput> wrapper.findAll(
-            { ref: "member_name_input" }
-        ).at(0).vm;
+        let member_3_name_input = member_name_inputs.at(2);
         (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
         member_3_name_input.trigger('input');
         await component.$nextTick();
-
-        expect(member_3_name_validator.is_valid).toBe(true);
 
         wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
         await component.$nextTick();
 
         expect(create_group_stub.firstCall.calledWith(
             project.pk, new NewGroupData({member_names: trimmed_group_members})
+        ));
+    });
+
+    test('Blank or incomplete member names are thrown out before create()', async () => {
+        let create_group_stub = sinon.stub(Group, 'create');
+        let group_members = [
+            "    ",
+            "  amartin@cornell.edu",
+            component.allowed_guest_domain
+        ];
+
+        let creatable_group_members = [
+            "amartin@cornell.edu"
+        ];
+
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        let member_name_inputs = wrapper.findAll('.member-name-input');
+
+        let member_1_name_input = member_name_inputs.at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_2_name_input = member_name_inputs.at(1);
+        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_3_name_input = member_name_inputs.at(2);
+        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
+        member_3_name_input.trigger('input');
+        await component.$nextTick();
+
+        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(create_group_stub.firstCall.calledWith(
+            project.pk, new NewGroupData({member_names: creatable_group_members})
         ));
     });
 
@@ -261,14 +262,14 @@ describe('CreateSingleGroup tests', () => {
         };
         create_group_stub.returns(Promise.reject(axios_response_instance));
 
-        let member_name_inputs = wrapper.findAll({ref: 'member_name_input'});
+        let member_name_inputs = wrapper.findAll('.member-name-input');
 
-        let member_1_name_input = member_name_inputs.at(0).find('#input');
+        let member_1_name_input = member_name_inputs.at(0);
         (<HTMLInputElement> member_1_name_input.element).value = "sprinkles@cornell.edu";
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        let member_2_name_input = member_name_inputs.at(1).find('#input');
+        let member_2_name_input = member_name_inputs.at(1);
         (<HTMLInputElement> member_2_name_input.element).value = "bandit@cornell.edu";
         member_2_name_input.trigger('input');
         await component.$nextTick();

@@ -23,7 +23,10 @@
             :class="index % 2 === 0 ? 'even-row' : 'odd-row'"
             v-if="group.extended_due_date !== null">
           <td class="group-members">
-            <div v-for="member_name of group.member_names">{{member_name}}</div>
+            <div v-for="(member_name, index) of group.member_names"
+                 :class="{'space-out-members' : index !== group.member_names.length - 1}">
+              {{member_name}}
+            </div>
           </td>
         <td class="extension-date">
           {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
@@ -227,6 +230,10 @@ th {
   padding: 10px 20px 10px 10px;
   font-weight: 500;
   border-bottom: 1px solid hsl(210, 20%, 94%);
+}
+
+.space-out-members {
+  padding-bottom: 5px;
 }
 
 .extension-date {
