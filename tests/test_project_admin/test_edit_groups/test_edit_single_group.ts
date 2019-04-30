@@ -269,7 +269,8 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('When all member names are invalid in save(), all names are thrown out' +
-         ' and a single field with the allowed guest domain will replace them', async () => {
+         ' and a single field with the allowed guest domain will replace them',
+         async () => {
         let save_group_stub = sinon.stub(component.d_group, 'save');
         let group_members = [
             "    ",
