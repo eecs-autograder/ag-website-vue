@@ -170,8 +170,13 @@ export default class EditSingleGroup extends Vue {
       this.d_group.member_names = this.d_group.member_names.filter(
         name => name.trim() !== "" && name.trim() !== this.allowed_guest_domain
       );
-      for (let i = 0; i < this.d_group.member_names.length; ++i) {
-        Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
+      if (this.d_group.member_names.length === 0) {
+        this.add_group_member();
+      }
+      else {
+        for (let i = 0; i < this.d_group.member_names.length; ++i) {
+          Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
+        }
       }
       this.d_group.extended_due_date = this.has_extension
                                        ? new Date(this.extension_datetime).toISOString() : null;

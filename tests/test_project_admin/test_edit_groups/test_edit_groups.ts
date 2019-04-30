@@ -329,8 +329,4 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions[0]).toEqual(group_4);
         expect(component.groups_with_extensions[1]).toEqual(group_3);
     });
-
-    test.skip('Merge a group', async () => {
-
-    });
 });

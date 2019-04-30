@@ -242,6 +242,47 @@ describe('CreateSingleGroup tests', () => {
         ));
     });
 
+    test('When all member names are invalid in create(), all names are thrown out' +
+         ' and a single field with the allowed guest domain will replace them', async () => {
+        let create_group_stub = sinon.stub(Group, 'create');
+        let group_members = [
+            "    ",
+            component.allowed_guest_domain,
+            "  "
+        ];
+
+        let creatable_group_members = [
+            component.allowed_guest_domain
+        ];
+
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        let member_name_inputs = wrapper.findAll('.member-name-input');
+
+        let member_1_name_input = member_name_inputs.at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_2_name_input = member_name_inputs.at(1);
+        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_3_name_input = member_name_inputs.at(2);
+        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
+        member_3_name_input.trigger('input');
+        await component.$nextTick();
+
+        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(create_group_stub.firstCall.calledWith(
+            project.pk, new NewGroupData({member_names: creatable_group_members})
+        ));
+    });
+
     test('Group member must be enrolled in course - violates condition', async () => {
         let create_group_stub = sinon.stub(Group, 'create');
         let axios_response_instance: AxiosError = {

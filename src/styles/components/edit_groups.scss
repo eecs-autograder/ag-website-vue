@@ -11,12 +11,6 @@
     vertical-align: top;
 }
 
-.add-member-container {
-    cursor: pointer;
-    display: block;
-    padding: 0 0 8px 0;
-}
-
 .member-name-input {
     background-color: #fff;
     border: 1px solid #ced4da;
@@ -50,8 +44,14 @@
     color: hsl(220, 30%, 70%);
 }
 
+.add-member-container {
+    cursor: pointer;
+    display: block;
+    padding: 2px 0 8px 0;
+}
+
 .add-member-button {
-    @extend .dark-purple-button;
+    @extend .purple-button;
 }
 
 .add-member-button:disabled {
