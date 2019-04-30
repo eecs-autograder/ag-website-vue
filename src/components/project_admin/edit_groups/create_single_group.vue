@@ -10,28 +10,23 @@
         <div class="add-group-members-container">
           <div v-for="(member, index) of group_members">
             <div class="group-member-editing">
-              <div class="username-validated-container">
-                <validated-input ref="member_name_input"
-                                 v-model="member.username"
-                                 :key="member.id"
-                                 :validators="[is_not_empty]"
-                                 :num_rows="1"
-                                 input_style="width: 70%;
-                                              border: 1px solid #ced4da;">
-                  <button slot="suffix"
-                          class="remove-member-button"
-                          :disabled="group_members.length === 1"
-                          :title="`Remove ${member} from group`"
-                          type="button"
-                          @click="remove_group_member(index)">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </validated-input>
+              <div class="username-container">
+                <input class="member-name-input"
+                       v-model="member.username"/>
+                <button slot="suffix"
+                        class="remove-member-button"
+                        :disabled="group_members.length === 1"
+                        :title="`Remove ${member} from group`"
+                        type="button"
+                        @click="remove_group_member(index)">
+                  <i class="fas fa-times"></i>
+                </button>
               </div>
             </div>
           </div>
           <div class="add-member-container">
             <button class="add-member-button"
+                    type="button"
                     :disabled="group_members.length === max_group_size"
                     @click="add_group_member"> Add Another Member
             </button>
@@ -107,9 +102,18 @@ export default class CreateSingleGroup extends Vue {
     try {
       this.d_creating_group = true;
       (<APIErrors> this.$refs.api_errors).clear();
+
       let list_of_members: string[] = [];
-      for (let group_member of this.group_members) {
-        list_of_members.push(group_member.username.trim());
+      this.group_members = this.group_members.filter(
+        group_member => group_member.username.trim() !== ""
+                        && group_member.username.trim() !== this.allowed_guest_domain
+      );
+      for (let i = 0; i < this.group_members.length; ++i) {
+        list_of_members.push(this.group_members[i].username.trim());
+        Vue.set(this.group_members, i, {
+            id: i + 1,
+            username: this.group_members[i].username.trim()
+        });
       }
       await Group.create(this.project.pk, new NewGroupData({member_names: list_of_members}));
     }
@@ -151,6 +155,15 @@ function handle_create_group_error(component: CreateSingleGroup, error: unknown)
 
 .create-group-button:disabled {
   @extend .gray-button;
+}
+
+.member-name-input {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.username-container {
+  min-width: 300px;
 }
 
 </style>

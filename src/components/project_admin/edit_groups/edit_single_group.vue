@@ -9,7 +9,7 @@
         <p class="group-members-label"> Group members: </p>
         <div v-for="(member, index) of d_group.member_names">
           <div class="group-member-editing">
-            <div class="username-validated-container">
+            <div class="username-container">
               <input class="member-name-input"
                      type="text"
                      v-model="d_group.member_names[index]"/>
@@ -203,21 +203,14 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   padding-top: 16px;
 }
 
-.member-name-input {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-  display: inline-block;
-  font-size: 1rem;
-  line-height: 1.5;
-  position: relative;
-  padding: .375rem .75rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  width: 240px;
+/*FIXME*/
+.username-container {
+  min-width: 400px;
 }
 
+.member-name-input {
+  width: 240px;
+}
 #extension-toggle {
   padding-top: 10px;
 }

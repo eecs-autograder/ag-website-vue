@@ -17,12 +17,22 @@
     padding: 0 0 8px 0;
 }
 
-.group-member-editing {
-    padding-bottom: 10px;
+.member-name-input {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    box-sizing: border-box;
+    color: #495057;
+    display: inline-block;
+    font-size: 1rem;
+    line-height: 1.5;
+    position: relative;
+    padding: .375rem .75rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.username-validated-container {
-    display: inline-block;
+.group-member-editing {
+    padding-bottom: 10px;
 }
 
 .remove-member-button {
