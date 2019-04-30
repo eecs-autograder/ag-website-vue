@@ -89,13 +89,14 @@ export default class CourseView extends Vue {
   font-size: 22px;
   font-weight: bold;
   margin: 0;
-  padding: 20px 10px 15px 0px;
+  padding: 20px 10px 15px 0;
 }
 
 #project {
   border-radius: 2px;
   box-sizing: border-box;
   margin-bottom: 8px;
+  min-width: 380px;
   padding: 0;
 }
 
