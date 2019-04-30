@@ -68,6 +68,16 @@
       <p v-for="item of chosen_items_3"> {{item}} </p>
     </div>
 
+    <div class="typeahead-example">
+      <p class="typeahead-label">This one has an empty input array</p>
+      <dropdown-typeahead placeholder_text="So empty"
+                          :choices="empty"
+                          :filter_fn="() => true">
+        <template slot="no_matching_results">
+          Still empty
+        </template>
+      </dropdown-typeahead>
+    </div>
   </div>
 </template>
 
@@ -142,10 +152,11 @@ export default class ModalDemo extends Vue {
     this.chosen_items_3.push(item);
   }
 
+  empty = [];
+
 }
 </script>
 
-<!--globally scoped-->
 <style lang="scss">
 @import '@/styles/colors.scss';
 
@@ -165,7 +176,6 @@ export default class ModalDemo extends Vue {
 }
 
 </style>
-
 
 <style scoped lang="scss">
 
@@ -215,6 +225,10 @@ p {
 .control-width-3 {
   width: 20%;
   min-width: 200px;
+}
+
+.typeahead-example {
+  margin-bottom: 50px;
 }
 
 </style>

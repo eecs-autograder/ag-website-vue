@@ -17,9 +17,8 @@
         </slot>
       </template>
     </Dropdown>
-    <div v-if="choices.length === 0 && filter_text !== '' ||
-               (choices.length !== 0 && filtered_choices.length === 0
-                && $refs.dropdown_component.is_open)"
+    <div v-if="filtered_choices.length === 0
+               && d_mounted_called && $refs.dropdown_component.is_open"
          id="no-matching-results">
       <div id="no-matching-results-row">
         <slot name="no_matching_results" v-bind:filter_text="filter_text">
@@ -59,6 +58,13 @@ export default class DropdownTypeahead extends Vue {
     this.d_choices = this.choices;
   }
 
+  private d_mounted_called = false;
+
+  mounted() {
+    // When this is true, we can safely access $refs in the template.
+    this.d_mounted_called = true;
+  }
+
   resume_search(key: KeyboardEvent) {
     let dropdown = <Dropdown> this.$refs.dropdown_component;
     if (!dropdown.is_open) {
@@ -88,6 +94,10 @@ export default class DropdownTypeahead extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/components/dropdown_styles.scss';
+
+#dropdown-typeahead-container {
+  position: relative;
+}
 
 .search-field {
   background-color: white;

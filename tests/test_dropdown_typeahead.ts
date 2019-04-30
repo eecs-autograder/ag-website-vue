@@ -47,11 +47,17 @@ describe('DropdownTypeahead.vue', () => {
 
         let search_bar = wrapper.find('input');
         search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "word";
         await dropdown_typeahead.$nextTick();
 
         let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+
+        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(dropdown_no_matches_message.text()).toContain(
+            "We couldn't find any results containing: ''"
+        );
+        dropdown_typeahead.filter_text = "word";
+        await dropdown_typeahead.$nextTick();
+
         expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "We couldn't find any results containing: 'word'"
