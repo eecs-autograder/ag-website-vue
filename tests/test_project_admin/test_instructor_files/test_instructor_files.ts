@@ -151,7 +151,7 @@ describe('InstructorFiles.vue', () => {
 
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
-        file_upload_component.d_files.push(file_same_name_as_1);
+        file_upload_component.d_files.insert(file_same_name_as_1);
 
         final_upload_button.trigger('click');
         await component.$nextTick();
@@ -174,7 +174,7 @@ describe('InstructorFiles.vue', () => {
 
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
-        file_upload_component.d_files.push(file_same_name_as_1);
+        file_upload_component.d_files.insert(file_same_name_as_1);
 
         mfv = <MultiFileViewer> wrapper.find({ref: 'instructor_files_viewer'}).vm;
 
@@ -196,7 +196,7 @@ describe('InstructorFiles.vue', () => {
 
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
-        file_upload_component.d_files.push(uniquely_named_file);
+        file_upload_component.d_files.insert(uniquely_named_file);
 
         let create_stub = sinon.stub(InstructorFile, 'create');
         create_stub.resolves(new_uniquely_named_instructor_file);
