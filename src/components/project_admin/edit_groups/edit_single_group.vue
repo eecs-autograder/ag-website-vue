@@ -33,8 +33,7 @@
         </div>
 
         <div id="extension-toggle">
-          <toggle v-model="has_extension"
-                  :active_background_color="toggle_color">
+          <toggle v-model="has_extension">
             <div slot="on">
               <p class="toggle-on">
                 {{has_extension !== null ? 'Has extension' : 'Grant extension'}}
@@ -132,7 +131,6 @@ export default class EditSingleGroup extends Vue {
   has_extension = false;
   min_group_size = 1;
   max_group_size = 1;
-  toggle_color = "orange";
   edit_group_form_is_valid = true;
   extension_datetime = "";
 
@@ -222,7 +220,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 
 .toggle-on, .toggle-off {
   font-size: 15px;
-  color: black;
 }
 
 #datetime-picker-container {

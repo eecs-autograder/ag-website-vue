@@ -243,7 +243,8 @@ describe('CreateSingleGroup tests', () => {
     });
 
     test('When all member names are invalid in create(), all names are thrown out' +
-         ' and a single field with the allowed guest domain will replace them', async () => {
+         ' and a single field with the allowed guest domain will replace them',
+         async () => {
         let create_group_stub = sinon.stub(Group, 'create');
         let group_members = [
             "    ",
