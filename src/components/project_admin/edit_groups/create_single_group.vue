@@ -4,8 +4,7 @@
       <validated-form ref="create_group_form"
                       autocomplete="off"
                       spellcheck="false"
-                      @submit.native.prevent="create_group"
-                      @form_validity_changed="create_group_form_is_valid = $event">
+                      @submit.native.prevent="create_group">
         <p class="group-members-label"> Group members: </p>
         <div class="add-group-members-container">
           <div v-for="(member, index) of group_members">
@@ -36,7 +35,7 @@
         <APIErrors ref="api_errors"> </APIErrors>
         <button class="create-group-button"
                 type="submit"
-                :disabled="d_creating_group || !create_group_form_is_valid">
+                :disabled="d_creating_group">
           Create Group
         </button>
       </validated-form>
@@ -49,12 +48,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import APIErrors from '@/components/api_errors.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
 import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
 
 import { handle_api_errors_async } from '@/utils';
-import { is_not_empty } from '@/validators';
 
 interface GroupMember {
   id: number;
@@ -64,19 +61,15 @@ interface GroupMember {
 @Component({
   components: {
     APIErrors,
-    ValidatedForm,
-    ValidatedInput
+    ValidatedForm
   }
 })
 export default class CreateSingleGroup extends Vue {
-
-  readonly is_not_empty = is_not_empty;
 
   @Prop({required: true, type: Project})
   project!: Project;
 
   allowed_guest_domain = "";
-  create_group_form_is_valid = false;
   d_creating_group = false;
   group_members: GroupMember[] = [];
   max_group_size = 1;
@@ -105,9 +98,12 @@ export default class CreateSingleGroup extends Vue {
 
       let list_of_members: string[] = [];
       this.group_members = this.group_members.filter(
-        group_member => group_member.username.trim() !== ""
-                        && group_member.username.trim() !== this.allowed_guest_domain
+        member => member.username.trim() !== ""
+                  && member.username.trim() !== this.allowed_guest_domain
       );
+      if (this.group_members.length === 0) {
+        this.add_group_member();
+      }
       for (let i = 0; i < this.group_members.length; ++i) {
         list_of_members.push(this.group_members[i].username.trim());
         Vue.set(this.group_members, i, {

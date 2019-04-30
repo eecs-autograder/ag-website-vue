@@ -75,7 +75,6 @@ import GroupLookup from '@/components/group_lookup.vue';
 import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
-import Toggle from '@/components/toggle.vue';
 
 import { array_remove_unique, deep_copy } from "@/utils";
 import { Group, GroupObserver, Project } from 'ag-client-typescript';
@@ -85,8 +84,7 @@ import { Group, GroupObserver, Project } from 'ag-client-typescript';
     CreateSingleGroup,
     EditSingleGroup,
     GroupLookup,
-    Modal,
-    Toggle
+    Modal
   }
 })
 export default class EditGroups extends Vue implements GroupObserver {
@@ -100,7 +98,6 @@ export default class EditGroups extends Vue implements GroupObserver {
   groups: Group[] = [];
   groups_with_extensions: Group[] = [];
   selected_group: Group | null = null;
-  toggle_color = "hsl(210, 20%, 50%)";
 
   async created() {
     this.groups = await Group.get_all_from_project(this.project.pk);
@@ -124,18 +121,16 @@ export default class EditGroups extends Vue implements GroupObserver {
 
   sort_groups_with_extensions() {
     this.groups_with_extensions.sort((group_a: Group, group_b: Group) => {
-      if (group_a.extended_due_date! < group_b!.extended_due_date!) {
+      let group_a_date = new Date(group_a.extended_due_date!);
+      let group_b_date = new Date(group_b.extended_due_date!);
+
+      if (group_a_date < group_b_date) {
         return -1;
       }
-      else if (group_a.extended_due_date! > group_b.extended_due_date!) {
+      else if (group_a_date > group_b_date) {
         return 1;
       }
-      else {
-        if (group_a.member_names[0] < group_b.member_names[0]) {
-          return -1;
-        }
-        return 1;
-      }
+      return group_a.member_names[0].localeCompare(group_b.member_names[0]);
     });
   }
 

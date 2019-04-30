@@ -85,12 +85,12 @@ button {
 
 .purple-button {
     @extend .button;
-    background-color: hsl(275, 48%, 63%);
+    background-color: hsl(275, 48%, 58%);
     border: 1px solid hsl(275, 48%, 79%);
 }
 
 .purple-button:hover:enabled {
-    background-color: hsl(275, 48%, 58%);
+    background-color: hsl(275, 48%, 53%);
 }
 
 .purple-button:focus {
@@ -99,16 +99,16 @@ button {
 
 .dark-purple-button {
     @extend .button;
-    background-color: hsl(300, 80%, 35%);
-    border: 1px solid hsl(300, 80%, 45%);
+    background-color: hsl(300, 80%, 30%);
+    border: 1px solid hsl(300, 80%, 35%);
 }
 
 .dark-purple-button:hover:enabled {
-    background-color: hsl(300, 80%, 31%);
+    background-color: hsl(300, 80%, 26%);
 }
 
 .dark-purple-button:focus {
-    outline-color: hsl(300, 80%, 85%);
+    outline-color: hsl(300, 80%, 40%);
 }
 
 
