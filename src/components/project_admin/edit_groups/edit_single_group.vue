@@ -73,6 +73,9 @@
       <button class="update-group-button"
               type="submit"
               :disabled="d_saving || !edit_group_form_is_valid"> Update Group </button>
+      <div v-show="d_saving" class="saving-spinner">
+        <i class="fa fa-spinner fa-pulse"></i>
+      </div>
     </validated-form>
   </div>
 </template>
@@ -238,6 +241,13 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   margin-top: 5px;
   width: 50%;
   min-width: 260px;
+}
+
+.saving-spinner {
+  color: $ocean-blue;
+  display: inline-block;
+  padding-left: 10px;
+  font-size: 18px;
 }
 
 .update-group-button {
