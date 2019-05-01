@@ -12,8 +12,7 @@
           <ValidatedInput ref="course_name_input"
                           v-model="d_course.name"
                           input_style="width: 100%;
-                                       max-width: 500px;
-                                       border: 1px solid #ced4da;"
+                                       max-width: 500px;"
                           :validators="[is_not_empty]"
                           :num_rows="1">
           </ValidatedInput>
@@ -45,8 +44,7 @@
           <ValidatedInput ref="course_year_input"
                           v-model="d_course.year"
                           :num_rows="1"
-                          input_style="width: 65px;
-                                       border: 1px solid #ced4da;"
+                          input_style="width: 65px;"
                           :validators="[is_not_empty, is_number, is_integer, is_valid_course_year]"
                           :from_string_fn="string_to_num">
           </ValidatedInput>
@@ -58,8 +56,7 @@
           <ValidatedInput ref="course_late_days_input"
                           v-model="d_course.num_late_days"
                           :num_rows="1"
-                          input_style="width: 50px;
-                                       border: 1px solid #ced4da;"
+                          input_style="width: 50px;"
                           :validators="[is_not_empty, is_number, is_integer, is_non_negative]"
                           :from_string_fn="string_to_num">
             <div slot="suffix"
