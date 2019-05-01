@@ -337,6 +337,9 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
                 :disabled="!settings_form_is_valid || d_saving">
           Save Updates
         </button>
+        <span v-show="d_saving" class="saving-spinner">
+          <i class="fa fa-spinner fa-pulse"></i>
+        </span>
       </div>
     </validated-form>
   </div>
@@ -626,6 +629,13 @@ input[type=checkbox] {
 
 #save-button:disabled {
   @extend .gray-button;
+}
+
+.saving-spinner {
+  color: $ocean-blue;
+  display: inline-block;
+  padding-left: 10px;
+  font-size: 18px;
 }
 
 // Dropdown related ************************************************************
