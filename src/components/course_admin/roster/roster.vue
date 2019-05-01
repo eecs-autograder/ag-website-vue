@@ -7,7 +7,7 @@
                       @form_validity_changed="add_users_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
           <i class="far fa-question-circle add-users-tooltip">
-            <tooltip width="large" placement="top">
+            <tooltip width="large" placement="right">
               Enter a comma-separated list of email addresses.
             </tooltip>
           </i>

@@ -91,7 +91,6 @@
 
 <script lang="ts">
   import { Course, Semester } from 'ag-client-typescript';
-  import { AxiosResponse } from 'axios';
 
   import APIErrors from "@/components/api_errors.vue";
   import Dropdown from '@/components/dropdown.vue';

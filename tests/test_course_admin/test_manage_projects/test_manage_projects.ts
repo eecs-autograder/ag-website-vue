@@ -217,7 +217,7 @@ describe('ManageProjects.vue', () => {
         let create_project_stub = sinon.stub(Project, 'create').returns(
             Promise.resolve(new_project)
         );
-        wrapper.find('.add-project-button').trigger('click');
+        wrapper.find({ref: 'new_project_form'}).trigger('submit.native');
         await component.$nextTick();
 
         expect(create_project_stub.firstCall.calledWith(
@@ -264,7 +264,7 @@ describe('ManageProjects.vue', () => {
             Promise.reject(axios_response_instance)
         );
 
-        wrapper.find('.add-project-button').trigger('click');
+        wrapper.find({ref: 'new_project_form'}).trigger('submit.native');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
