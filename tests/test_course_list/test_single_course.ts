@@ -84,7 +84,7 @@ describe('SingleCourse.vue', () => {
 
         expect(component.is_admin).toBe(true);
         expect(wrapper.findAll('.clone-course').length).toEqual(1);
-        expect(wrapper.findAll('.edit-admin-settings').length).toEqual(1);
+        expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
     });
 
     test("If the user is not an admin, they don't have the option to clone or edit a course",
@@ -101,7 +101,7 @@ describe('SingleCourse.vue', () => {
 
         expect(component.is_admin).toBe(false);
         expect(wrapper.findAll('.clone-course').length).toEqual(0);
-        expect(wrapper.findAll('.edit-admin-settings').length).toEqual(0);
+        expect(wrapper.findAll('.edit-course-settings').length).toEqual(0);
     });
 
     test('SingleCourse with a Course as input whose semester and year are null',
