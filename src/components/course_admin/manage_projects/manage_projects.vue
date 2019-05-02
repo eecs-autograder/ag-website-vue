@@ -4,32 +4,33 @@
       <div id="new-project-side">
         <div id="new-project-space">
 
-            <p id="new-project-label"> Create a New Project </p>
+          <p id="new-project-label"> Create a New Project </p>
 
-            <div class="new-project-validation-wrapper">
-              <ValidatedForm autocomplete="off"
-                             spellcheck="false"
-                             @submit.native.prevent="add_project">
-                <ValidatedInput ref="new_project_name"
-                                v-model="new_project_name"
-                                :validators="[is_not_empty]"
-                                :num_rows="1"
-                                input_style="width: 100%;
-                                             max-width: 500px;
-                                             border: 1px solid #ced4da;"
-                                @input_validity_changed="new_project_name_is_valid = $event">
-                </ValidatedInput>
-              </ValidatedForm>
-            </div>
+          <div class="new-project-validation-wrapper">
+            <ValidatedForm ref="new_project_form"
+                           autocomplete="off"
+                           spellcheck="false"
+                           @submit.native.prevent="add_project">
+              <ValidatedInput ref="new_project_name"
+                              v-model="new_project_name"
+                              :validators="[is_not_empty]"
+                              :num_rows="1"
+                              input_style="width: 100%;
+                                           max-width: 500px;
+                                           border: 1px solid #ced4da;"
+                              @input_validity_changed="new_project_name_is_valid = $event">
+              </ValidatedInput>
 
-            <APIErrors ref="api_errors"></APIErrors>
+              <APIErrors ref="api_errors"></APIErrors>
 
-            <button @click="add_project"
-                    type="submit"
-                    :disabled="!new_project_name_is_valid || d_adding_project"
-                    class="add-project-button">
-              Add Project
-            </button>
+              <button type="submit"
+                      :disabled="!new_project_name_is_valid || d_adding_project"
+                      class="add-project-button">
+                Add Project
+              </button>
+
+            </ValidatedForm>
+          </div>
         </div>
       </div>
 
@@ -125,6 +126,7 @@
         );
         this.projects.push(new_project);
         this.sort_projects();
+        this.new_project_name = "";
         (<ValidatedInput> this.$refs.new_project_name).reset_warning_state();
       }
       finally {

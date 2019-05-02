@@ -6,15 +6,14 @@
                       @submit.native.prevent="add_users"
                       @form_validity_changed="add_users_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
-          <i class="far fa-question-circle add-users-tooltip">
-            <tooltip width="large" placement="top">
+          <i class="fas fa-question-circle add-users-tooltip">
+            <tooltip width="large" placement="right">
               Enter a comma-separated list of email addresses.
             </tooltip>
           </i>
         </label>
         <ValidatedInput ref="add_users_textarea"
                         id="add-users-input"
-                        input_style="border-width: 2px"
                         v-model="users_to_add"
                         :validators="[contains_valid_emails]"
                         :num_rows="7">
@@ -29,7 +28,8 @@
 
     <div class="enrolled-container">
       <div>
-        <div  v-if="d_roster.length !== 0" class="user-table-wrapper">
+        <div  v-if="d_roster.length !== 0"
+              class="user-table-wrapper">
           <table class="user-table">
             <tr>
               <th class="email-column"> Username </th>
@@ -42,6 +42,7 @@
               <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
               <td class="remove-user-column">
                 <i class="fas fa-user-times remove-user"
+                   :title="'Delete ' + person.username"
                    @click="remove_person_from_roster([person], index)">
                 </i>
               </td>
@@ -49,8 +50,7 @@
           </table>
         </div>
         <div v-else class="empty-roster-message">
-          The {{role}} roster for this course is currently empty! You can add {{role}}
-          by entering a comma-separated list of their emails in the textarea above!
+          The {{role}} roster for this course is currently empty!
         </div>
       </div>
     </div>
@@ -168,7 +168,7 @@
 }
 
 .add-users-tooltip {
-  color: #8785a2;
+  color: mediumvioletred;
   font-size: 18px;
   margin-left: 3px;
   top: 1px;
@@ -205,7 +205,7 @@
 }
 
 .user-table th {
-  border-bottom: 2px solid hsl(200, 1%, 85%);
+  border-bottom: 2px solid hsl(210, 20%, 92%);
   color: black;
   font-size: 16px;
   padding: 10px 15px 10px 15px;
@@ -242,15 +242,15 @@
 }
 
 .user-table tr td {
-  border-bottom: 1px solid hsl(200, 1%, 85%);
+  border-bottom: 1px solid hsl(210, 20%, 94%);
 }
 
 .odd-row {
-  background-color: hsl(200, 57%, 100%);
+  background-color: white;
 }
 
 .even-row {
-  background-color: hsl(240, 10%, 96%);
+  background-color: hsl(210, 20%, 96%);
 }
 
 .user-table-wrapper {
@@ -258,12 +258,13 @@
 }
 
 .remove-user {
-  color: hsl(200, 1%, 40%);
+  /*color: hsl(200, 1%, 40%);*/
+  color: hsl(212, 10%, 47%);
   cursor: pointer;
 }
 
 .remove-user:hover {
-  color: black;
+  color: hsl(212, 50%, 22%);
 }
 
 ::-webkit-scrollbar {
