@@ -5,7 +5,6 @@
         <div class="edit-title"> Edit Existing Group </div>
         <group-lookup ref="group_lookup"
                       :groups="groups"
-                      :project="project"
                       @update_group_selected="update_group_selected"> </group-lookup>
         <edit-single-group v-if="selected_group !== null"
                            :project="project"

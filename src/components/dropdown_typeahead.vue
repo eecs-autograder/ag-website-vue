@@ -53,12 +53,11 @@ export default class DropdownTypeahead extends Vue {
   d_choices: object[] = [];
   filter_text: string = "";
   private _filtered_choices: object[] = [];
+  private d_mounted_called = false;
 
   created() {
     this.d_choices = this.choices;
   }
-  
-  private d_mounted_called = false;
 
   mounted() {
     // When this is true, we can safely access $refs in the template.

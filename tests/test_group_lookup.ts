@@ -1,7 +1,7 @@
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
-import { Group, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { Group } from 'ag-client-typescript';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -15,7 +15,6 @@ describe('GroupLookup.vue', () => {
     let group3: Group;
     let group4: Group;
     let groups: Group[];
-    let project: Project;
 
     beforeEach(() => {
         group1 = new Group({
