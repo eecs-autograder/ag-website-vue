@@ -10,9 +10,107 @@ beforeAll(() => {
 });
 
 describe('DropdownTypeahead.vue', () => {
+    test('choices array is empty', async () => {
+        @Component({
+                       template: `<div>
+              <dropdown-typeahead ref="dropdown_typeahead"
+                  typeahead_class="custom-style"
+                  placeholder_text="Enter a State"
+                  :choices="states"
+                  :filter_fn="states_filter_fn"
+                  @update_item_chosen="add_item($event)">
+                  <template slot-scope="{ item }">
+                    <span> {{ item }}</span>
+                  </template>
+              </dropdown-typeahead>
+            </div>`,
+                       components: {
+                           'dropdown-typeahead': DropdownTypeahead
+                       },
+                   })
+        class WrapperComponent extends Vue {
+            states = [];
+
+            states_filter_fn(item: string, filter_text: string) {
+                return item.indexOf(filter_text) >= 0;
+            }
+
+            add_item(item: object) {
+                console.log(item);
+            }
+        }
+
+        let wrapper = mount(WrapperComponent);
+        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+
+        expect(dropdown_typeahead.choices).toEqual(wrapper.vm.states);
+
+        let search_bar = wrapper.find('input');
+        search_bar.trigger("click");
+        await dropdown_typeahead.$nextTick();
+
+        let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+
+        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(dropdown_no_matches_message.text()).toContain(
+            "We couldn't find any results containing: ''"
+        );
+        dropdown_typeahead.filter_text = "word";
+        await dropdown_typeahead.$nextTick();
+
+        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(dropdown_no_matches_message.text()).toContain(
+            "We couldn't find any results containing: 'word'"
+        );
+    });
+
+    test('calling clear_filter_text sets filter_text to an empty string', async () => {
+        @Component({
+                       template: `<div>
+              <dropdown-typeahead ref="dropdown_typeahead"
+                  typeahead_class="custom-style"
+                  placeholder_text="Enter a State"
+                  :choices="states"
+                  :filter_fn="states_filter_fn"
+                  @update_item_chosen="add_item($event)">
+                  <template slot-scope="{ item }">
+                    <span> {{ item }}</span>
+                  </template>
+              </dropdown-typeahead>
+            </div>`,
+                       components: {
+                           'dropdown-typeahead': DropdownTypeahead
+                       },
+                   })
+        class WrapperComponent extends Vue {
+            states = [];
+
+            states_filter_fn(item: string, filter_text: string) {
+                return item.indexOf(filter_text) >= 0;
+            }
+
+            add_item(item: object) {
+                console.log(item);
+            }
+        }
+
+        let wrapper = mount(WrapperComponent);
+        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let search_bar = wrapper.find('input');
+        search_bar.trigger("click");
+
+        dropdown_typeahead.filter_text = "word";
+        await dropdown_typeahead.$nextTick();
+
+        expect(dropdown_typeahead.filter_text).toEqual("word");
+
+        dropdown_typeahead.clear_filter_text();
+        await dropdown_typeahead.$nextTick();
+
+        expect(dropdown_typeahead.filter_text).toEqual("");
+    });
 
     test('DropdownTypeahead data set to values passed in by parent', () => {
-
         @Component({
             template: `<div>
               <dropdown-typeahead ref="dropdown_typeahead"
