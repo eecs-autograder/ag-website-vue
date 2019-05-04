@@ -19,9 +19,10 @@
 </template>
 
 <script lang="ts">
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import { Group } from 'ag-client-typescript';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import { deep_copy } from "@/utils";
+import { Group } from 'ag-client-typescript';
 
 @Component({
   components: {
@@ -29,7 +30,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
   }
 })
 export default class GroupLookup extends Vue {
-
   @Prop({required: true, type: Array})
   groups!: Group[];
 
@@ -37,11 +37,17 @@ export default class GroupLookup extends Vue {
 
   @Watch('groups')
   on_groups_changed(new_groups: Group[], old_groups: Group[]) {
-    this.d_groups = this.groups.slice(0);
+    this.d_groups = [];
+    for (let group of new_groups) {
+      this.d_groups.push(deep_copy(group, Group));
+    }
+    console.log(this.d_groups.length);
   }
 
   created() {
-    this.d_groups = this.groups.slice(0);
+    for (let group of this.groups) {
+      this.d_groups.push(deep_copy(group, Group));
+    }
   }
 
   group_filter_fn(group: Group, filter_text: string) {
@@ -62,5 +68,4 @@ export default class GroupLookup extends Vue {
   font-size: 15px;
   padding-right: 5px;
 }
-
 </style>

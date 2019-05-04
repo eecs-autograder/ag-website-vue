@@ -5,12 +5,13 @@
         <div class="edit-title"> Edit Existing Group </div>
         <group-lookup ref="group_lookup"
                       :groups="groups"
+                      :project="project"
                       @update_group_selected="update_group_selected"> </group-lookup>
         <edit-single-group v-if="selected_group !== null"
                            :project="project"
                            :group="selected_group">
         </edit-single-group>
-        </div>
+      </div>
     </div>
     <div class="extensions-container">
       <table class="extensions-table">
@@ -27,9 +28,9 @@
               {{member_name}}
             </div>
           </td>
-        <td class="extension-date">
-          {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
-        </td>
+          <td class="extension-date">
+            {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
+          </td>
         </tr>
       </table>
       <div v-if="groups_with_extensions.length === 0">
@@ -50,17 +51,24 @@
     <modal ref="merge_groups_modal"
            click_outside_to_close
            size="large">
-      <div class="modal-header"> Merging existing groups </div>
+      <div class="modal-header"> Choose groups to merge: </div>
       <hr>
-      <div class="modal-body"> </div>
+      <div class="modal-body">
+        <merge_groups :project="project"
+                      :groups="groups">
+        </merge_groups>
+      </div>
     </modal>
 
     <div class="button-footer">
       <button class="create-group-button"
+              type="button"
               @click="$refs.create_group_modal.open()"> Create New Group
       </button>
 
       <button class="merge-groups-button"
+              type="button"
+              :disabled="groups.length < 2"
               @click="$refs.merge_groups_modal.open()"> Merge Existing Groups
       </button>
     </div>
@@ -68,26 +76,25 @@
 </template>
 
 <script lang="ts">
+import Merge_groups from '@/components/project_admin/edit_groups/merge_groups.vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
-
 import GroupLookup from '@/components/group_lookup.vue';
 import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
-
 import { array_remove_unique, deep_copy } from "@/utils";
 import { Group, GroupObserver, Project } from 'ag-client-typescript';
 
 @Component({
-  components: {
-    CreateSingleGroup,
-    EditSingleGroup,
-    GroupLookup,
-    Modal
-  }
-})
+             components: {
+               Merge_groups,
+               CreateSingleGroup,
+               EditSingleGroup,
+               GroupLookup,
+               Modal
+             }
+           })
 export default class EditGroups extends Vue implements GroupObserver {
-
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -122,7 +129,6 @@ export default class EditGroups extends Vue implements GroupObserver {
     this.groups_with_extensions.sort((group_a: Group, group_b: Group) => {
       let group_a_date = new Date(group_a.extended_due_date!);
       let group_b_date = new Date(group_b.extended_due_date!);
-
       if (group_a_date < group_b_date) {
         return -1;
       }
@@ -133,7 +139,7 @@ export default class EditGroups extends Vue implements GroupObserver {
     });
   }
 
-  update_group_created(group: Group): void {
+  add_group(group: Group) {
     let deep_copy_of_group = new Group(group);
     let index_to_insert = this.groups.findIndex(
       (group_a) => group_a.member_names[0].localeCompare(group.member_names[0]) > 0
@@ -141,12 +147,22 @@ export default class EditGroups extends Vue implements GroupObserver {
     index_to_insert = index_to_insert < 0 ? this.groups.length : index_to_insert;
     this.groups.splice(index_to_insert, 0, deep_copy_of_group);
     this.selected_group = deep_copy_of_group;
+  }
+
+  delete_group(group_pk: number) {
+    array_remove_unique(this.groups, group_pk,
+                        (group_a: Group) => group_a.pk === group_pk);
+    array_remove_unique(this.groups_with_extensions, group_pk,
+                        (group_a: Group) => group_a.pk === group_pk);
+  }
+
+  update_group_created(group: Group): void {
+    this.add_group(group);
     (<Modal> this.$refs.create_group_modal).close();
   }
 
   update_group_changed(group: Group): void {
     let deep_copy_of_group = deep_copy(group, Group);
-
     let current_index = this.groups.findIndex((item: Group) => item.pk === group.pk);
     let old_extension = this.groups[current_index].extended_due_date;
     this.groups.splice(current_index, 1);
@@ -155,7 +171,6 @@ export default class EditGroups extends Vue implements GroupObserver {
     );
     new_index = new_index === -1 ? this.groups.length : new_index;
     this.groups.splice(new_index, 0, deep_copy_of_group);
-
     if (old_extension !== null) {
       array_remove_unique(this.groups_with_extensions, group.pk,
                           (group_a: Group, pk) => group_a.pk === pk
@@ -167,7 +182,16 @@ export default class EditGroups extends Vue implements GroupObserver {
     }
   }
 
-  update_group_merged(group: Group): void { }
+  update_group_merged(group: Group, group1_pk: number, group2_pk: number): void {
+    this.add_group(group);
+    this.delete_group(group1_pk);
+    this.delete_group(group2_pk);
+    if (group.extended_due_date !== null) {
+      this.groups_with_extensions.push(group);
+      this.sort_groups_with_extensions();
+    }
+    (<Modal> this.$refs.merge_groups_modal).close();
+  }
 }
 </script>
 
@@ -175,7 +199,6 @@ export default class EditGroups extends Vue implements GroupObserver {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
-
 #edit-groups-component {
   padding-bottom: 100px;
 }
@@ -259,6 +282,10 @@ th {
   margin-left: 15px;
 }
 
+.merge-groups-button:disabled {
+  @extend .gray-button;
+}
+
 .create-group-button {
   @extend .teal-button;
 }
@@ -300,5 +327,4 @@ th {
     width: 50%;
   }
 }
-
 </style>

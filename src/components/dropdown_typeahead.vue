@@ -50,6 +50,11 @@ export default class DropdownTypeahead extends Vue {
   @Prop({default: "search-field", type: String})
   typeahead_class!: string;
 
+  @Watch('choices')
+  on_choices_changed(new_choices: object[], old_choices: object[]) {
+    this.d_choices = new_choices;
+  }
+
   d_choices: object[] = [];
   filter_text: string = "";
   private _filtered_choices: object[] = [];
