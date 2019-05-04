@@ -52,6 +52,7 @@ export default class DropdownTypeahead extends Vue {
 
   @Watch('choices')
   on_choices_changed(new_choices: object[], old_choices: object[]) {
+    console.log("This happened");
     this.d_choices = new_choices;
   }
 
@@ -91,7 +92,6 @@ export default class DropdownTypeahead extends Vue {
       (item) => this.filter_fn(item, this.filter_text));
     return this._filtered_choices;
   }
-
 }
 </script>
 

@@ -20,7 +20,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+
 import { deep_copy } from "@/utils";
 import { Group } from 'ag-client-typescript';
 
@@ -41,7 +43,6 @@ export default class GroupLookup extends Vue {
     for (let group of new_groups) {
       this.d_groups.push(deep_copy(group, Group));
     }
-    console.log(this.d_groups.length);
   }
 
   created() {

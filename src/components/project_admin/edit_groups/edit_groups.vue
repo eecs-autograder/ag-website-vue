@@ -54,9 +54,9 @@
       <div class="modal-header"> Choose groups to merge: </div>
       <hr>
       <div class="modal-body">
-        <merge_groups :project="project"
+        <merge-groups :project="project"
                       :groups="groups">
-        </merge_groups>
+        </merge-groups>
       </div>
     </modal>
 
@@ -76,24 +76,26 @@
 </template>
 
 <script lang="ts">
-import Merge_groups from '@/components/project_admin/edit_groups/merge_groups.vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
+
 import GroupLookup from '@/components/group_lookup.vue';
 import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
+import MergeGroups from '@/components/project_admin/edit_groups/merge_groups.vue';
+
 import { array_remove_unique, deep_copy } from "@/utils";
 import { Group, GroupObserver, Project } from 'ag-client-typescript';
 
 @Component({
-             components: {
-               Merge_groups,
-               CreateSingleGroup,
-               EditSingleGroup,
-               GroupLookup,
-               Modal
-             }
-           })
+  components: {
+    CreateSingleGroup,
+    EditSingleGroup,
+    GroupLookup,
+    MergeGroups,
+    Modal
+  }
+})
 export default class EditGroups extends Vue implements GroupObserver {
   @Prop({required: true, type: Project})
   project!: Project;

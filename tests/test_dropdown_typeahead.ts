@@ -43,7 +43,7 @@ describe('DropdownTypeahead.vue', () => {
         let wrapper = mount(WrapperComponent);
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
 
-        expect(dropdown_typeahead.choices).toEqual(wrapper.vm.states);
+        expect(dropdown_typeahead.d_choices).toEqual(wrapper.vm.states);
 
         let search_bar = wrapper.find('input');
         search_bar.trigger("click");
@@ -144,7 +144,7 @@ describe('DropdownTypeahead.vue', () => {
         let wrapper = mount(WrapperComponent);
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
 
-        expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
+        expect(dropdown_typeahead.d_choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
         expect(dropdown_typeahead.filter_fn).toBeDefined();
         expect(dropdown_typeahead.typeahead_class).toEqual("custom-style");
@@ -651,5 +651,55 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_no_matches_message.text()).toContain(
             "No Matching Results"
         );
+    });
+
+    test("'choices' changed by parent component",
+         async () => {
+        @Component({
+            template: `<div class="control-width-3">
+                          <dropdown-typeahead ref="dropdown_typeahead"
+                                              placeholder_text="Enter a Season"
+                                              :choices="seasons"
+                                              @update_item_chosen="add_item_3($event)"
+                                              :filter_fn="seasons_filter_fn">
+                            <template slot="no_matching_results">
+                              No Matching Results
+                            </template>
+                          </dropdown-typeahead>
+                       </div>`,
+            components: {
+                'dropdown-typeahead': DropdownTypeahead
+            },
+        })
+        class WrapperComponent extends Vue {
+            seasons = [
+                "Fall",
+                "Winter",
+                "Spring",
+                "Summer"
+            ];
+
+            seasons_filter_fn(item: string, filter_text: string) {
+                return item.indexOf(filter_text) >= 0;
+            }
+
+            add_item_3(item: object) {
+                console.log(item);
+            }
+
+            change_seasons() {
+                this.seasons = [];
+            }
+        }
+
+        let wrapper = mount(WrapperComponent);
+        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+
+        expect(dropdown_typeahead.d_choices).toEqual(wrapper.vm.seasons);
+
+        wrapper.vm.change_seasons();
+        await dropdown_typeahead.$nextTick();
+
+        expect(dropdown_typeahead.d_choices).toEqual([]);
     });
 });
