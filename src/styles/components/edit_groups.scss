@@ -58,6 +58,31 @@
     @extend .gray-button;
 }
 
+.error-input {
+    outline: none;
+    box-shadow: 0 0 10px $warning-red;
+    border: 1px solid $warning-red;
+    border-radius: .25rem;
+}
+
+.error-input:focus, .error-input:active {
+    outline: none;
+    box-shadow: 0 0 10px $warning-red;
+    border: 1px solid $warning-red;
+    border-radius: .25rem;
+}
+
+.incomplete-input-msg {
+    box-sizing: border-box;
+    color: #721c24;
+    display: inline-block;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: .25rem;
+    margin-top: 11px;
+}
+
 // section title related ***********************************************************
 .section-title {
     color: lighten(black, 25);

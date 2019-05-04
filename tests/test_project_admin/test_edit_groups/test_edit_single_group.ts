@@ -113,6 +113,7 @@ describe('EditSingleGroup tests', () => {
             group.bonus_submissions_remaining
         );
         expect(component.allowed_guest_domain).toEqual(course.allowed_guest_domain);
+        expect(component.incomplete_input_present).toBe(false);
         expect(component.has_extension).toBe(true);
     });
 
@@ -228,12 +229,12 @@ describe('EditSingleGroup tests', () => {
         expect(save_group_stub.firstCall.thisValue.member_names).toEqual(trimmed_group_members);
     });
 
-    test('Blank or incomplete member names are thrown out before save', async () => {
+    test('Member name inputs that are blank are thrown out before save', async () => {
         let save_group_stub = sinon.stub(component.d_group, 'save');
         let group_members = [
             "    ",
             "  amartin@cornell.edu",
-            component.allowed_guest_domain
+            " "
         ];
 
         let savable_group_members = [
@@ -268,17 +269,52 @@ describe('EditSingleGroup tests', () => {
         expect(save_group_stub.firstCall.thisValue.member_names).toEqual(savable_group_members);
     });
 
-    test('When all member names are invalid in save(), all names are thrown out' +
-         ' and a single field with the allowed guest domain will replace them',
+    test('When all member names are blank in save(), all names are thrown out' +
+         ' and a single field with the allowed_guest_domain will replace them',
          async () => {
         let save_group_stub = sinon.stub(component.d_group, 'save');
         let group_members = [
             "    ",
             "    ",
-            component.allowed_guest_domain
+            " "
         ];
 
-        let savable_group_members = [
+        wrapper.find(".add-member-button").trigger('click');
+        await component.$nextTick();
+
+        let member_name_inputs = wrapper.findAll('.member-name-input');
+
+        let member_1_name_input = member_name_inputs.at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_2_name_input = member_name_inputs.at(1);
+        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_3_name_input = member_name_inputs.at(2);
+        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
+        member_3_name_input.trigger('input');
+        await component.$nextTick();
+
+        expect(component.edit_group_form_is_valid).toBe(true);
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        await component.$nextTick();
+
+        expect(save_group_stub.callCount).toEqual(0);
+        expect(component.d_group.member_names.length).toEqual(1);
+        expect(component.d_group.member_names[0]).toEqual(component.allowed_guest_domain);
+    });
+
+    test('When a member name field contains just the allowed guest domain, the ' +
+         'attempt to save the group is unsuccessful and an error message is raised',
+         async () => {
+        let save_group_stub = sinon.stub(component.d_group, 'save');
+        let group_members = [
+            "jim@cornell.edu",
+            component.allowed_guest_domain,
             component.allowed_guest_domain
         ];
 
@@ -306,8 +342,11 @@ describe('EditSingleGroup tests', () => {
         wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
         await component.$nextTick();
 
-        expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue.member_names).toEqual(savable_group_members);
+        expect(save_group_stub.callCount).toEqual(0);
+        expect(component.d_group.member_names.length).toEqual(3);
+        expect(component.incomplete_input_present).toBe(true);
+        expect(wrapper.findAll('.error-input').length).toEqual(2);
+        expect(wrapper.findAll('.incomplete-input-msg').length).toEqual(2);
     });
 
     test('Call to save without an extension', async () => {
@@ -367,8 +406,14 @@ describe('EditSingleGroup tests', () => {
         expect(save_group_stub.calledOnce);
     });
 
-    test("When the prop 'group' changes in the parent component, d_group is updated",
+    test("When the prop 'group' changes in the parent component, d_group is updated and" +
+         "incomplete_input_present is reset to false",
          async () => {
+        wrapper.setData({incomplete_input_present: true});
+        await component.$nextTick();
+
+        expect(component.incomplete_input_present).toBe(true);
+
         let different_group = new Group({
             pk: 2,
             project: 2,
@@ -394,6 +439,7 @@ describe('EditSingleGroup tests', () => {
 
         expect(component.d_group).toEqual(different_group);
         expect(component.has_extension).toBe(false);
+        expect(component.incomplete_input_present).toBe(false);
     });
 });
 
