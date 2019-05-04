@@ -10,7 +10,9 @@
           <div v-for="(member, index) of group_members">
             <div class="group-member-editing">
               <div class="username-container">
-                <input class="member-name-input"
+                <input :class="['member-name-input',
+                               {'error-input': incomplete_input_present
+                                 && member.username === allowed_guest_domain}]"
                        v-model="member.username"/>
                 <button slot="suffix"
                         class="remove-member-button"
@@ -20,13 +22,19 @@
                         @click="remove_group_member(index)">
                   <i class="fas fa-times"></i>
                 </button>
+                <div>
+                  <div v-if="incomplete_input_present && member.username === allowed_guest_domain"
+                       class="incomplete-input-msg">
+                    Incomplete member name
+                  </div>
+                </div>
               </div>
             </div>
           </div>
           <div class="add-member-container">
             <button class="add-member-button"
                     type="button"
-                    :disabled="group_members.length === max_group_size"
+                    :disabled="group_members.length >= max_group_size"
                     @click="add_group_member"> Add Another Member
             </button>
           </div>
@@ -74,6 +82,7 @@ export default class CreateSingleGroup extends Vue {
   group_members: GroupMember[] = [];
   max_group_size = 1;
   min_group_size = 1;
+  incomplete_input_present = false;
 
   async created() {
     this.min_group_size = this.project.min_group_size;
@@ -94,17 +103,23 @@ export default class CreateSingleGroup extends Vue {
   async create_group() {
     try {
       this.d_creating_group = true;
+      this.incomplete_input_present = false;
       (<APIErrors> this.$refs.api_errors).clear();
 
       let list_of_members: string[] = [];
       this.group_members = this.group_members.filter(
         member => member.username.trim() !== ""
-                  && member.username.trim() !== this.allowed_guest_domain
       );
+
       if (this.group_members.length === 0) {
         this.add_group_member();
       }
+
       for (let i = 0; i < this.group_members.length; ++i) {
+        if (this.group_members[i].username.trim() === this.allowed_guest_domain) {
+          this.incomplete_input_present = true;
+          return;
+        }
         list_of_members.push(this.group_members[i].username.trim());
         Vue.set(this.group_members, i, {
             id: i + 1,

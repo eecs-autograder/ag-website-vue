@@ -10,24 +10,33 @@
         <div v-for="(member, index) of d_group.member_names">
           <div class="group-member-editing">
             <div class="username-container">
-              <input class="member-name-input"
+              <input :class="['member-name-input',
+                              {'error-input': incomplete_input_present
+                                              && member === allowed_guest_domain}]"
                      type="text"
                      v-model="d_group.member_names[index]"/>
-                <button slot="suffix"
-                        class="remove-member-button"
-                        :title="`Remove ${member} from group`"
-                        :disabled="d_group.member_names.length === 1"
-                        type="button"
-                        @click="remove_group_member(index)">
-                  <i class="fas fa-times"></i>
-                </button>
+              <button slot="suffix"
+                      class="remove-member-button"
+                      :title="`Remove ${member} from group`"
+                      :disabled="d_group.member_names.length === 1"
+                      type="button"
+                      @click="remove_group_member(index)">
+                <i class="fas fa-times"></i>
+              </button>
+              <div>
+                <div v-if="incomplete_input_present
+                            && member === allowed_guest_domain"
+                     class="incomplete-input-msg">
+                  Incomplete member name
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div class="add-member-container">
           <button class="add-member-button"
                   type="button"
-                  :disabled="d_group.member_names.length === max_group_size"
+                  :disabled="d_group.member_names.length >= max_group_size"
                   @click="add_group_member"> Add Another Member
           </button>
         </div>
@@ -67,7 +76,6 @@
                          :from_string_fn="string_to_num">
         </validated-input>
       </div>
-
       <APIErrors ref="api_errors"></APIErrors>
 
       <button class="update-group-button"
@@ -136,9 +144,11 @@ export default class EditSingleGroup extends Vue {
   max_group_size = 1;
   edit_group_form_is_valid = true;
   extension_datetime = "";
+  incomplete_input_present = false;
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
+    this.incomplete_input_present = false;
     this.d_group = deep_copy(new_group, Group);
     this.has_extension = this.d_group.extended_due_date !== null;
   }
@@ -167,18 +177,25 @@ export default class EditSingleGroup extends Vue {
   async update_group() {
     try {
       this.d_saving = true;
+      this.incomplete_input_present = false;
       (<APIErrors> this.$refs.api_errors).clear();
+
       this.d_group.member_names = this.d_group.member_names.filter(
-        name => name.trim() !== "" && name.trim() !== this.allowed_guest_domain
+        name => name.trim() !== ""
       );
+
       if (this.d_group.member_names.length === 0) {
         this.add_group_member();
       }
-      else {
-        for (let i = 0; i < this.d_group.member_names.length; ++i) {
-          Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
+
+      for (let i = 0; i < this.d_group.member_names.length; ++i) {
+        if (this.d_group.member_names[i] === this.allowed_guest_domain) {
+          this.incomplete_input_present = true;
+          return;
         }
+        Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
       }
+
       this.d_group.extended_due_date = this.has_extension
                                        ? new Date(this.extension_datetime).toISOString() : null;
       await this.d_group.save();
