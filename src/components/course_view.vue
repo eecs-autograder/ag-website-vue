@@ -20,7 +20,8 @@
         <tr class="project" v-for="(project, index) of projects">
           <router-link tag="td"
                        :to="`/web/project/${project.pk}`"
-                       :class="['project-name', (index % 2 === 0) ? 'even-project' : 'odd-project']">
+                       :class="['project-name',
+                                (index % 2 === 0) ? 'even-project' : 'odd-project']">
             {{project.name}}
           </router-link>
 
