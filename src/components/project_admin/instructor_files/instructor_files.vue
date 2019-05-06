@@ -12,7 +12,7 @@
         </div>
         <button class="collapse-show-button"
                 type="button">
-          ( {{d_collapsed? 'Show ' : 'Collapse '}} Files )
+          ( {{d_collapsed? 'Show' : 'Collapse'}} )
         </button>
       </div>
     </div>
