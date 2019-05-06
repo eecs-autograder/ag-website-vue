@@ -16,23 +16,23 @@
         No projects have been published yet.
       </div>
 
-      <div id="list-of-projects" v-else>
-        <div id="project" v-for="project of projects">
-          <router-link tag="div"
+      <table id="list-of-projects" v-else>
+        <tr class="project" v-for="(project, index) of projects">
+          <router-link tag="td"
                        :to="`/web/project/${project.pk}`"
-                       class="project-name">
+                       :class="['project-name', (index % 2 === 0) ? 'even-project' : 'odd-project']">
             {{project.name}}
           </router-link>
 
-          <router-link tag="div"
+          <router-link tag="td"
                        :to="`/web/project_admin/${project.pk}`"
                        :title="'Edit ' + project.name"
                        class="edit-project"
                        v-if="is_admin">
             <i class="fas fa-cog cog"></i>
           </router-link>
-        </div>
-      </div>
+        </tr>
+      </table>
     </div>
   </div>
 </template>
@@ -92,25 +92,21 @@ export default class CourseView extends Vue {
   padding: 20px 10px 15px 0;
 }
 
-#project {
-  border-radius: 2px;
+#list-of-projects {
+  border-spacing: 10px;
+}
+
+.project {
   box-sizing: border-box;
-  margin-bottom: 8px;
-  min-width: 380px;
-  padding: 0;
 }
 
 .project-name {
-  background-image: linear-gradient(to bottom right, lighten(lavender, 1), lavender);
   border: 2px solid lighten(lavender, 1);
   border-radius: 4px;
   box-sizing: border-box;
   cursor: pointer;
-  display: inline-block;
   font-size: 18px;
-  margin: 0;
-  padding: 10px;
-  width: 80%;
+  padding: 10px 40px 10px 10px;
 }
 
 .edit-project {
@@ -119,9 +115,17 @@ export default class CourseView extends Vue {
   border-radius: 4px;
   cursor: pointer;
   display: inline-block;
-  margin: 0 0 0 6px;
   padding: 10.5px 12px;
   vertical-align: top;
+  color: hsl(212, 50%, 27%);
+}
+
+.even-project {
+  background-image: linear-gradient(to bottom right, lighten(lavender, 1), lavender);
+}
+
+.odd-project {
+  background-image: linear-gradient(to bottom right, lighten(lavender, 1), lighten(lavender, 1));
 }
 
 .project-name:hover {
@@ -129,19 +133,11 @@ export default class CourseView extends Vue {
 }
 
 .edit-project:hover {
-  border: 2px solid hsl(212, 20%, 88%);
-}
-
-.edit-project:hover .cog {
-  transform: rotate(365deg);
-  transition-duration: 1s;
+  border: 2px solid darken(lavender, 6);
 }
 
 .cog {
-  color: hsl(212, 50%, 27%);
   font-size: 18px;
-  transform: rotate(0deg);
-  transition-duration: 1s;
 }
 
 @media only screen and (min-width: 481px) {
@@ -150,10 +146,4 @@ export default class CourseView extends Vue {
   }
 }
 
-@media only screen and (min-width: 1000px) {
-  .project-name {
-    width: 50%;
-    min-width: 700px;
-  }
-}
 </style>
