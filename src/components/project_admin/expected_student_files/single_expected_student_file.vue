@@ -1,13 +1,28 @@
 <template>
   <div id="single-expected-student-file">
 
-    <div :class="[{'header-editing' : editing},
-                  {'odd-header': !editing && odd_index },
-                  {'even-header': !editing && !odd_index}]">
-      <div :class="['pattern', {'editing-pattern': editing}]">
-        <b>{{expected_student_file.pattern}}</b>
+    <div :class="[editing ? 'editing-file' : 'file', odd_index ? 'odd' : 'even']">
+      <div class="special">
+        <div :class="['pattern', {'editing-pattern': editing}]">
+          {{expected_student_file.pattern}}
+          <span v-if="editing" class="editing-message">(Editing)</span>
+        </div>
+
+        <div v-show="!editing" class="icon-holder">
+          <div class="delete-file"
+               :title="'Delete ' + expected_student_file.pattern"
+               @click="$refs.delete_expected_student_file_modal.open()">
+            <i class="fas fa-trash delete-file-icon"></i>
+          </div>
+          <div class="edit-file"
+               :title="'Edit ' + expected_student_file.pattern"
+               @click="editing = true">
+            <i class="fas fa-edit edit-file-icon"></i>
+          </div>
+        </div>
       </div>
-      <span v-if="editing" class="editing-message"> (Editing)</span>
+
+
       <span v-if="wildcard_is_present">
         <div class="matches-label">
           Minimum number of matches: {{expected_student_file.min_num_matches}}
@@ -16,20 +31,6 @@
           Maximum number of matches: {{expected_student_file.max_num_matches}}
         </div>
       </span>
-
-
-      <div v-if="!editing" class="icon-holder">
-        <div class="delete-file"
-             @click="$refs.delete_expected_student_file_modal.open()">
-          <span> Delete </span>
-          <i class="fas fa-trash delete-file-icon"></i>
-        </div>
-        <div class="edit-file"
-             @click="editing = true">
-          <span> Edit </span>
-          <i class="fas fa-edit edit-file-icon"></i>
-        </div>
-      </div>
     </div>
 
     <div v-if="editing"
@@ -180,7 +181,6 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 #single-expected-student-file {
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 12px;
   border-radius: 2px;
 }
 
@@ -190,87 +190,98 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .matches-label {
-  padding: 5px 0 0 0;
+  padding: 1px 0 5px 0;
+  color: lighten(black, 45);
 }
 
-.header-editing {
-  padding: 14px 100px 14px 15px;
-  background-image: linear-gradient(to bottom right, hsl(220, 20%, 37%), hsl(220, 20%, 39%));
-  border-bottom: none;
-  border-radius: 3px 3px 0 0;
-  position: relative;
+.editing-file, .file {
+  padding: 5px 5px 5px 10px;
+}
+
+.editing-file {
+  /*color: white;*/
+
+  /*background-color: hsl(220, 30%, 92%);*/
+  border-color: hsl(220, 30%, 92%);
+  /*border: 2px solid hsl(220, 30%, 92%);*/
+  background-color: hsl(212, 50%, 27%);
+  border: 2px solid hsl(212, 50%, 27%);
   color: white;
+  border-radius: 3px 3px 0 0;
 }
 
-.odd-header, .even-header {
-  padding: 14px 120px 14px 15px;
-  border-radius: 3px;
-  position: relative;
+.odd {
+
 }
 
-.odd-header {
-  background-image: linear-gradient(to bottom right, hsl(212, 100%, 90%), hsl(212, 100%, 85%));
+.even {
+
 }
 
-.even-header {
-  background-image: linear-gradient(to bottom right, hsl(212, 100%, 84%), hsl(212, 100%, 85%));
+.special {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 32px;
+}
+
+.file {
+  border-radius: 4px;
+  margin-bottom: 10px;
+  border: 2px solid hsl(210, 20%, 96%);
+}
+
+.file:hover {
+  /*background-color: hsl(212, 50%, 27%);*/
+  background-color: hsl(220, 30%, 95%);
+  border: 2px solid hsl(220, 30%, 94%);
+
 }
 
 .form-editing {
   color: black;
   padding: 15px 25px 25px 25px;
-  border: 2px solid hsl(220, 20%, 39%);
+  border: 2px solid hsl(212, 50%, 27%);
+  /*background-color: hsl(220, 30%, 95%);*/
+  /*border: 2px solid hsl(220, 30%, 94%);*/
   border-top: 0;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
+  border-radius: 0 0 3px 3px;
+  margin-bottom: 10px;
 }
 
 .pattern {
   font-size: 17px;
   display: inline-block;
-  max-width: 200px;
   word-wrap: break-word;
+  font-weight: bold;
 }
 
 .icon-holder {
-  position: absolute;
-  right: 10px;
-  top: 8px;
+  display: inline-block;
+  text-align: right;
 }
 
 .edit-file, .delete-file {
-  font-size: 15px;
   padding: 5px;
   display: inline-block;
-  color: hsl(220, 20%, 37%);
+  color: hsl(212, 50%, 27%);
   border-radius: 4px;
-  border: 2px solid hsl(212, 100%, 92%);
-  background-color: hsl(212, 100%, 92%);
-}
-
-.edit-file span, .delete-file span {
-  display: none;
+  border: 2px solid transparent;
 }
 
 .delete-file {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .edit-file-icon, .delete-file-icon {
-  font-size: 17px;
+  font-size: 15px;
 }
 
-.odd-header:hover, .even-header:hover {
-
-  .edit-file, .delete-file {
-    background-color: white;
-    border: 2px solid whitesmoke;
-  }
-
+.file:hover {
   .edit-file:hover, .delete-file:hover {
     background-color: white;
-    border: 2px solid hsl(220, 20%, 37%);
     cursor: pointer;
+    border: 2px solid hsl(212, 50%, 87%);
   }
 }
 
@@ -284,16 +295,13 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .save-button:disabled, .save-button:disabled:hover {
-  background-color: hsl(220, 30%, 85%);
-  border-color: hsl(220, 30%, 80%);
-  color: gray;
-  cursor: default;
+  @extend .gray-button;
 }
 
 .cancel-save-button {
-  @extend .white-button;
-  font-size: 15px;
+  @extend .light-gray-button;
   margin-left: 10px;
+  color: hsl(220, 30%, 25%);
 }
 
 /* ---------------- MODAL ---------------- */
@@ -330,19 +338,4 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
   margin-right: 20px;
 }
 
-@media only screen and (min-width: 800px) {
-  .edit-file span, .delete-file span {
-    display: inline-block;
-  }
-
-  .edit-file, .delete-file {
-    font-size: 15px;
-    padding: 5px 8px;
-    display: inline-block;
-  }
-
-  .edit-file-icon, .delete-file-icon {
-    display: none;
-  }
-}
 </style>
