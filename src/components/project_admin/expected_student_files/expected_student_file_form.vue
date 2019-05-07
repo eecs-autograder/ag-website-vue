@@ -141,7 +141,6 @@ export default class ExpectedStudentFileForm extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/button_styles.scss';
 
 #create-expected-student-file-component {
   border-radius: 2px;

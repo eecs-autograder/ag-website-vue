@@ -103,8 +103,6 @@ export default class ExpectedStudentFiles extends Vue implements ExpectedStudent
   color: black;
   padding: 10px 25px 10px 25px;
   border-radius: 5px;
-  /*border: 1px solid hsl(210, 20%, 95%);*/
-  /*background-color: hsl(210, 20%, 96%);*/
   background-color: hsl(220, 30%, 95%);
   border: 2px solid hsl(220, 30%, 94%);
 }

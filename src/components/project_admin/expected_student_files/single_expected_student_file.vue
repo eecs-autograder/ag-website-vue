@@ -179,19 +179,20 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 @import '@/styles/button_styles.scss';
 
 #single-expected-student-file {
-  width: 100%;
-  box-sizing: border-box;
   border-radius: 2px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .editing-message {
+  font-weight: normal;
   padding-left: 5px;
   vertical-align: top;
 }
 
 .matches-label {
   padding: 1px 0 5px 0;
-  color: lighten(black, 45);
+  color: lighten(black, 20);
 }
 
 .editing-file, .file {
@@ -199,61 +200,42 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .editing-file {
-  /*color: white;*/
-
-  /*background-color: hsl(220, 30%, 92%);*/
-  border-color: hsl(220, 30%, 92%);
-  /*border: 2px solid hsl(220, 30%, 92%);*/
-  background-color: hsl(212, 50%, 27%);
-  border: 2px solid hsl(212, 50%, 27%);
-  color: white;
+  background-color: hsl(212, 50%, 90%);
+  border: 2px solid hsl(212, 50%, 90%);
   border-radius: 3px 3px 0 0;
 }
 
-.odd {
-
-}
-
-.even {
-
-}
-
 .special {
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  align-items: center;
   min-height: 32px;
 }
 
 .file {
+  border: 2px solid hsl(210, 20%, 96%);
   border-radius: 4px;
   margin-bottom: 10px;
-  border: 2px solid hsl(210, 20%, 96%);
 }
 
 .file:hover {
-  /*background-color: hsl(212, 50%, 27%);*/
   background-color: hsl(220, 30%, 95%);
   border: 2px solid hsl(220, 30%, 94%);
-
 }
 
 .form-editing {
-  color: black;
-  padding: 15px 25px 25px 25px;
-  border: 2px solid hsl(212, 50%, 27%);
-  /*background-color: hsl(220, 30%, 95%);*/
-  /*border: 2px solid hsl(220, 30%, 94%);*/
-  border-top: 0;
+  border: 2px solid hsl(212, 50%, 90%);
+  border-top: none;
   border-radius: 0 0 3px 3px;
   margin-bottom: 10px;
+  padding: 15px 25px 25px 25px;
 }
 
 .pattern {
-  font-size: 17px;
   display: inline-block;
-  word-wrap: break-word;
+  font-size: 17px;
   font-weight: bold;
+  word-wrap: break-word;
 }
 
 .icon-holder {
@@ -262,11 +244,11 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .edit-file, .delete-file {
-  padding: 5px;
-  display: inline-block;
-  color: hsl(212, 50%, 27%);
   border-radius: 4px;
   border: 2px solid transparent;
+  color: hsl(212, 50%, 27%);
+  display: inline-block;
+  padding: 5px;
 }
 
 .delete-file {
@@ -300,8 +282,8 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 
 .cancel-save-button {
   @extend .light-gray-button;
-  margin-left: 10px;
   color: hsl(220, 30%, 25%);
+  margin-left: 10px;
 }
 
 /* ---------------- MODAL ---------------- */
@@ -314,13 +296,13 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .file-to-delete {
-  letter-spacing: 1px;
   color: $ocean-blue;
+  letter-spacing: 1px;
 }
 
 #modal-button-container {
-  text-align: right;
   padding: 10px;
+  text-align: right;
 }
 
 .modal-cancel-button, .modal-delete-button {
