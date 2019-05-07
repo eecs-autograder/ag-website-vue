@@ -1,7 +1,7 @@
 <template>
   <div id="single-expected-student-file">
 
-    <div :class="[editing ? 'editing-file' : 'file', odd_index ? 'odd' : 'even']">
+    <div :class="[editing ? 'editing-file' : 'file']">
       <div class="special">
         <div :class="['pattern', {'editing-pattern': editing}]">
           {{expected_student_file.pattern}}
@@ -101,9 +101,6 @@ export default class SingleExpectedStudentFile extends Vue {
 
   @Prop({required: true, type: Object})
   expected_student_file!: ExpectedStudentFile;
-
-  @Prop({required: false, default: true})
-  odd_index!: boolean;
 
   editing = false;
   d_delete_pending = false;
@@ -215,7 +212,7 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 .file {
   border: 2px solid hsl(210, 20%, 96%);
   border-radius: 4px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .file:hover {
@@ -227,7 +224,7 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
   border: 2px solid hsl(212, 50%, 90%);
   border-top: none;
   border-radius: 0 0 3px 3px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding: 15px 25px 25px 25px;
 }
 
@@ -287,6 +284,7 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 /* ---------------- MODAL ---------------- */
+
 #modal-header {
   padding: 5px 10px;
 }
@@ -303,12 +301,6 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 #modal-button-container {
   padding: 10px;
   text-align: right;
-}
-
-.modal-cancel-button, .modal-delete-button {
-  border-radius: 2px;
-  font-size: 15px;
-  font-weight: bold;
 }
 
 .modal-cancel-button {

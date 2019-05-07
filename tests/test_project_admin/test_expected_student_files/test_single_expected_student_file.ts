@@ -37,8 +37,7 @@ describe('ExpectedStudentFiles tests', () => {
 
         wrapper = mount(SingleExpectedStudentFile, {
            propsData: {
-               expected_student_file: file_with_wildcard,
-               odd_index: true
+               expected_student_file: file_with_wildcard
            }
         });
         component = wrapper.vm;

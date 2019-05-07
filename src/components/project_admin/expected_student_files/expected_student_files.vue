@@ -16,8 +16,7 @@
       <div class="list-of-patterns-container">
         <div v-for="(file, index) of expected_student_files"
              :key="file.pk">
-          <single-expected-student-file :expected_student_file="file"
-                                        :odd_index="index % 2 === 1">
+          <single-expected-student-file :expected_student_file="file">
           </single-expected-student-file>
         </div>
       </div>
