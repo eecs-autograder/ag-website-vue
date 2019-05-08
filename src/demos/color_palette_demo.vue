@@ -4,6 +4,11 @@
     <p class="color-announcement"> Grays </p>
 
     <div class="color">
+      <p class="color-name"> white-gray </p>
+      <p class="color-square white-gray"></p>
+    </div>
+
+    <div class="color">
       <p class="color-name"> pebble-light </p>
       <p class="color-square pebble-light"> </p>
     </div>
@@ -67,6 +72,11 @@
       <p class="color-square burnt-red"></p>
     </div>
 
+    <div class="color">
+      <p class="color-name"> dark-pink </p>
+      <p class="color-square dark-pink"></p>
+    </div>
+
     <div class="color-divider"></div>
 
     <p class="color-announcement"> Oranges </p>
@@ -99,6 +109,16 @@
     <p class="color-announcement"> Blues </p>
 
     <div class="color">
+      <p class="color-name"> gray-blue-1 </p>
+      <p class="color-square gray-blue-1"></p>
+    </div>
+
+    <div class="color">
+      <p class="color-name"> gray-blue-2 </p>
+      <p class="color-square gray-blue-2"></p>
+    </div>
+
+    <div class="color">
       <p class="color-name"> light-blue </p>
       <p class="color-square light-blue"></p>
     </div>
@@ -111,6 +131,16 @@
     <div class="color">
       <p class="color-name"> ocean-blue </p>
       <p class="color-square ocean-blue"></p>
+    </div>
+
+    <div class="color">
+      <p class="color-name"> navy-blue </p>
+      <p class="color-square navy-blue"></p>
+    </div>
+
+    <div class="color">
+      <p class="color-name"> dark-blue </p>
+      <p class="color-square dark-blue"></p>
     </div>
 
     <div class="color-divider"></div>
@@ -179,6 +209,10 @@
   background-color: $pebble-medium;
 }
 
+.white-gray {
+  background-color: $white-gray;
+}
+
 .pebble-light {
   background-color: $pebble-light;
 }
@@ -215,6 +249,10 @@
   background-color: $burnt-red;
 }
 
+.dark-pink {
+  background-color: $dark-pink;
+}
+
 .ballet-slipper {
   background-color: $ballet-slipper;
 }
@@ -243,12 +281,28 @@
   background-color: $sky-blue;
 }
 
+.gray-blue-1 {
+  background-color: $gray-blue-1;
+}
+
+.gray-blue-2 {
+  background-color: $gray-blue-2;
+}
+
 .light-blue {
   background-color: $light-blue;
 }
 
 .ocean-blue {
   background-color: $ocean-blue;
+}
+
+.navy-blue {
+  background-color: $navy-blue;
+}
+
+.dark-blue {
+  background-color: $dark-blue;
 }
 
 </style>

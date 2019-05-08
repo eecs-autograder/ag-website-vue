@@ -178,15 +178,8 @@
   @extend .green-button;
 }
 
-#add-users-button:disabled {
-  @extend .gray-button;
-}
-
 #add-users-button, #add-users-button:disabled {
-  display: block;
-  font-size: 16px;
   margin: 15px 0 15px 0;
-  padding: 10px 15px;
 }
 
 .enrollment-add-label {
@@ -250,7 +243,7 @@
 }
 
 .even-row {
-  background-color: hsl(210, 20%, 96%);
+  background-color: $white-gray;
 }
 
 .user-table-wrapper {
@@ -258,13 +251,12 @@
 }
 
 .remove-user {
-  /*color: hsl(200, 1%, 40%);*/
   color: hsl(212, 10%, 47%);
   cursor: pointer;
 }
 
 .remove-user:hover {
-  color: hsl(212, 50%, 22%);
+  color: $navy-blue;
 }
 
 ::-webkit-scrollbar {

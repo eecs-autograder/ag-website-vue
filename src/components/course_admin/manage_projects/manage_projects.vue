@@ -173,10 +173,6 @@
   @extend .green-button;
 }
 
-.add-project-button:disabled {
-  @extend .gray-button;
-}
-
 .add-project-button, .add-project-button:disabled {
   font-size: 16px;
   margin: 15px 0 20px 0;

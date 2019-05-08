@@ -172,20 +172,9 @@
   @extend .green-button;
 }
 
-#save-button:disabled {
-  @extend .gray-button;
-  cursor: default;
-}
-
 #save-button, #save-button:disabled {
   display: block;
-  font-size: 16px;
   margin: 15px 0 15px 0;
-  padding: 10px 15px;
-}
-
-#save-button:disabled:hover {
-  background-color: hsl(210, 13%, 63%);
 }
 
 .name-container, .year-container, .semester-container, .late-days-container {

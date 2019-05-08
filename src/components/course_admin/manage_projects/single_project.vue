@@ -313,10 +313,6 @@ a {
   @extend .green-button;
 }
 
-.clone-project-button:disabled {
-  @extend .gray-button;
-}
-
 .clone-project-button, .clone-project-button:disabled {
   font-size: 16px;
   margin: 30px 0 10px 0;

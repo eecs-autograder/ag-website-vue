@@ -300,7 +300,6 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 
 #modal-button-container {
   padding: 10px;
-  text-align: right;
 }
 
 .modal-cancel-button {

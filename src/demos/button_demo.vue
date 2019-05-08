@@ -1,28 +1,49 @@
 <template>
-  <div>
+  <div class="button-demo">
 
-    <button class="blue-button"> Click On Me </button>
+    <button class="light-gray-button"
+            @click="buttons_disabled = !buttons_disabled"> Toggle Button State</button>
     <br>
     <br>
-    <button class="green-button"> Save </button>
+    <button class="blue-button"
+            :disabled="buttons_disabled"> Submit </button>
     <br>
     <br>
-    <button class="red-button"> Delete
+
+    <button class="teal-button"
+            :disabled="buttons_disabled"> Create Group </button>
+    <br>
+    <br>
+
+
+    <button class="green-button"
+            :disabled="buttons_disabled"> Save Files </button>
+    <br>
+    <br>
+    <button class="red-button"
+            :disabled="buttons_disabled"> Delete
       <p class="trash-can fas fa-trash"></p>
     </button>
     <br>
     <br>
-    <button class="gray-button"> Cancel </button>
+    <button class="gray-button"
+            :disabled="buttons_disabled"> Choose Files </button>
     <br>
     <br>
-    <button class="orange-button"> Happy Halloween </button>
+    <button class="orange-button"
+            :disabled="buttons_disabled"> Cancel </button>
     <br>
     <br>
-    <button class="purple-button"> Enter Contest </button>
+    <button class="purple-button"
+            :disabled="buttons_disabled"> Go! </button>
     <br>
     <br>
-
-    <div class="button custom-button"> Hello </div>
+    <button class="light-gray-button"
+            :disabled="buttons_disabled"> Remove </button>
+    <br>
+    <br>
+    <button class="white-button"
+            :disabled="buttons_disabled"> Find File </button>
 
   </div>
 </template>
@@ -31,27 +52,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class ButtonDemo extends Vue {
+  buttons_disabled = false;
 }
 </script>
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
-.custom-button {
-  background-color: hsl(330, 100%, 65%);
-  border: 1px solid hsl(330, 100%, 81%);
-}
-
-.custom-button:hover {
-  background-color: hsl(330, 100%, 60%);
-}
-
-.custom-button:focus {
-  outline-color: hsl(330, 100%, 90%);
-}
-
 .trash-can {
   margin: 0 0 0 5px;
+}
+
+.button-demo {
+  padding: 20px;
 }
 
 </style>

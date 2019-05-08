@@ -2,85 +2,211 @@
 
 button {
     border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: 0 1px 5px $pebble-dark;
     cursor: pointer;
     color: white;
     display: inline-block;
-    font-size: 14px;
+    font-size: 15px;
     padding: 7px 12px;
+}
+
+button:focus {
+    outline: none;
 }
 
 .button:disabled {
     cursor: not-allowed;
+    text-shadow: none;
 }
 
 .red-button {
     @extend .button;
     background-color: hsl(0, 80%, 50%);
-    border: 1px solid hsl(0, 80%, 66%);
+    background-image: linear-gradient(hsl(0, 80%, 50%), hsl(0, 80%, 46%));
+    border-color: hsl(0, 80%, 46%);
+    text-shadow: 0 -0.5px 0.5px hsl(0, 80%, 25%);
 }
 
 .red-button:hover:enabled {
-    background-color: hsl(0, 80%, 45%);
+    background-color: hsl(0, 80%, 48%);
+    border-color: hsl(0, 80%, 48%);
+    background-image: linear-gradient(hsl(0, 80%, 52%), hsl(0, 80%, 48%));
+}
+
+.red-button:active:enabled {
+    background-color: hsl(0, 80%, 42%);
+    border-color: hsl(0, 80%, 42%);
+    background-image: linear-gradient(hsl(0, 80%, 46%), hsl(0, 80%, 42%));
+    box-shadow: none;
 }
 
 .red-button:focus {
-    outline-color: hsl(0.61, 80%, 85%);
+    box-shadow: 0 0 3pt 2pt hsl(0, 80%, 85%);
+}
+
+.red-button:disabled {
+    background-image: linear-gradient(hsla(0, 80%, 70%, .7), hsla(0, 80%, 68%, .7));
+    border-color: hsla(0, 80%, 46%, .1);
+    color: hsla(0, 0%, 100%, .75);
 }
 
 .orange-button {
     @extend .button;
     background-color: hsl(20, 100%, 55%);
-    border: 1px solid hsl(20, 100%, 71%);
+    background-image: linear-gradient(hsl(20, 100%, 55%), hsl(20, 100%, 51%));
+    border: 1px solid hsl(20, 100%, 55%);
+    text-shadow: 0 -0.5px 0.5px hsl(20, 100%, 35%);
 }
 
 .orange-button:hover:enabled {
-    background-color: hsl(20, 100%, 50%);
+    background-color: hsl(20, 100%, 53%);
+    border-color: hsla(20, 100%, 53%, 0.2);
+    background-image: linear-gradient(hsl(20, 100%, 57%), hsl(20, 100%, 53%));
+}
+
+.orange-button:active:enabled {
+    background-color: hsl(20, 100%, 47%);
+    border-color: hsla(20, 100%, 47%, 0.2);
+    background-image: linear-gradient(hsl(20, 100%, 51%), hsl(20, 100%, 47%));
+    box-shadow: none;
 }
 
 .orange-button:focus {
-    outline-color: hsl(20, 100%, 80%);
+    box-shadow: 0 0 3pt 2pt hsl(20, 100%, 85%);
+}
+
+.orange-button:disabled {
+    background-image: linear-gradient(hsla(20, 100%, 70%, .5), hsla(20, 100%, 68%, .5));
+    border-color: hsla(20, 100%, 55%, .1);
+    color: hsla(0, 0%, 100%, .75);
 }
 
 .green-button {
     @extend .button;
     background-color: $save-green;
-    border: 1px solid lighten($save-green, 14%);
+    background-image: linear-gradient(hsl(150, 55%, 44%), hsl(150, 55%, 40%));
+    border-color: hsl(150, 55%, 40%);
+    text-shadow: 0 -0.5px 0.5px hsl(150, 55%, 24%);
 }
 
 .green-button:hover:enabled {
-    background-color: darken($save-green, 5%);
+    background-color: darken($save-green, 10);
+    border-color: hsla(150, 55%, 42%, .9);
+    background-image: linear-gradient(hsl(150, 55%, 46%), hsl(150, 55%, 42%));
+}
+
+.green-button:active:enabled {
+    background-color: darken($save-green, 10);
+    border-color: hsla(150, 55%, 36%, .9);
+    background-image: linear-gradient(hsl(150, 55%, 40%), hsl(150, 55%, 36%));
+    box-shadow: none;
 }
 
 .green-button:focus {
-    outline-color: lighten($save-green, 35%);
+    box-shadow: 0 0 3pt 2pt hsl(150, 55%, 86%);
+}
+
+.green-button:disabled {
+    background-image: linear-gradient(hsla(150, 55%, 88%, .4), hsla(150, 55%, 86%, .4));
+    border-color: hsla(150, 55%, 40%, .2);
+    color: hsla(0, 0%, 100%, .75);
 }
 
 .blue-button {
     @extend .button;
-    background-color: hsl(208, 59%, 54%);
-    border: 1px solid hsl(208, 59%, 70%);
+    background-color: hsl(208, 59%, 50%);
+    background-image: linear-gradient(hsl(208, 59%, 54%), hsl(208, 59%, 50%));
+    border-color: hsl(208, 59%, 50%);
+    text-shadow: 0 -0.5px 0.5px $navy-blue;
 }
 
 .blue-button:hover:enabled {
+    background-color: hsl(208, 59%, 54%);
+    border-color: hsla(208, 59%, 52%, .9);
+    background-image: linear-gradient(hsl(208, 59%, 56%), hsl(208, 59%, 52%));
+}
+
+.blue-button:active:enabled {
     background-color: hsl(208, 59%, 49%);
+    border-color: hsla(208, 59%, 46%, .9);
+    background-image: linear-gradient(hsl(208, 59%, 50%), hsl(208, 59%, 46%));
+    box-shadow: none;
 }
 
 .blue-button:focus {
-    outline-color: hsl(208, 59%, 85%);
+    box-shadow: 0 0 3pt 2pt hsl(208, 59%, 86%);
+}
+
+.blue-button:disabled {
+    background-image: linear-gradient(hsla(208, 59%, 90%, .2), hsla(208, 59%, 88%, .2));
+    border-color: hsla(208, 59%, 54%, .2);
+    color: hsla(0, 0%, 100%, .75);
+}
+
+.teal-button {
+    @extend .button;
+    background-color: hsl(180, 100%, 25%);
+    background-image: linear-gradient(hsl(180, 100%, 29%), hsl(180, 100%, 25%));
+    border-color: hsl(180, 100%, 25%);
+    text-shadow: 0 -0.5px 0.5px hsl(180, 100%, 15%);
+}
+
+.teal-button:hover:enabled {
+    background-color: hsl(180, 100%, 27%);
+    background-image: linear-gradient(hsl(180, 100%, 31%), hsl(180, 100%, 27%));
+    border-color: hsla(180, 100%, 27%, .9);
+}
+
+.teal-button:active:enabled {
+    background-color: hsl(180, 100%, 21%);
+    background-image: linear-gradient(hsl(180, 100%, 25%), hsl(180, 100%, 21%));
+    border-color: hsla(180, 100%, 21%, .9);
+    box-shadow: none;
+}
+
+.teal-button:focus {
+    box-shadow: 0 0 3pt 2pt hsl(180, 100%, 90%);
+}
+
+.teal-button:disabled {
+    background-image: linear-gradient(hsla(180, 100%, 80%, .2), hsla(180, 100%, 78%, .2));
+    border-color: hsla(180, 100%, 78%, .2);
+    color: hsla(0, 0%, 100%, .75);
 }
 
 .purple-button {
     @extend .button;
     background-color: hsl(275, 48%, 63%);
-    border: 1px solid hsl(275, 48%, 79%);
+    background-image: linear-gradient(hsl(275, 48%, 63%), hsl(275, 48%, 59%));
+    border-color: hsl(275, 48%, 59%);
+    text-shadow: 0 -0.5px 0.5px hsl(275, 48%, 42%);
 }
 
+// up by 2
 .purple-button:hover:enabled {
-    background-color: hsl(275, 48%, 58%);
+    background-color: hsl(275, 48%, 59%);
+    border-color: hsla(275, 48%, 61%, .9);
+    background-image: linear-gradient(hsl(275, 48%, 65%), hsl(275, 48%, 61%));
+}
+
+// down by 4
+.purple-button:active:enabled {
+    background-color: hsl(275, 48%, 59%);
+    border-color: hsla(275, 48%, 55%, .9);
+    background-image: linear-gradient(hsl(275, 48%, 59%), hsl(275, 48%, 55%));
+    box-shadow: none;
 }
 
 .purple-button:focus {
-    outline-color: hsl(275, 48%, 88%);
+    box-shadow: 0 0 3pt 2pt hsl(275, 48%, 90%);
+}
+
+.purple-button:disabled {
+    background-image: linear-gradient(hsla(275, 48%, 77%, .2), hsla(275, 48%, 75%, .2));
+    border-color: hsla(275, 48%, 59%, .1);
+    color: hsla(0, 0%, 100%, .75);
 }
 
 .light-gray-button {
@@ -100,25 +226,90 @@ button {
 
 .gray-button {
     @extend .button;
-    background-color: hsl(210, 13%, 63%);
-    border: 1px solid hsl(210, 13%, 79%);
+    background-color: hsl(210, 13%, 69%);
+    background-image: linear-gradient(hsl(210, 13%, 69%), hsl(210, 13%, 65%));
+    border-color: hsl(210, 13%, 65%);
+    text-shadow: 0 -0.5px 0.5px hsl(210, 13%, 45%);
 }
 
 .gray-button:hover:enabled {
-    background-color: hsl(210, 13%, 58%);
+    background-color: hsl(210, 13%, 67%);
+    background-image: linear-gradient(hsl(210, 13%, 71%), hsl(210, 13%, 67%));
+    border-color: hsla(210, 13%, 67%, .1);
+}
+
+.gray-button:active:enabled {
+    background-color: hsl(210, 13%, 61%);
+    background-image: linear-gradient(hsl(210, 13%, 65%), hsl(210, 13%, 61%));
+    border-color: hsla(210, 13%, 61%, .1);
+    box-shadow: none;
 }
 
 .gray-button:focus {
-    outline-color: hsl(210, 13%, 88%);
+    box-shadow: 0 0 3pt 2pt hsl(208, 59%, 86%);
+}
+
+.gray-button:disabled {
+    background-image: linear-gradient(hsla(210, 13%, 69%, .2), hsla(210, 13%, 65%, .2));
+    border-color: hsla(210, 13%, 59%, .1);
+    color: hsla(0, 0%, 100%, .75);
+}
+
+.light-gray-button {
+    @extend .button;
+    background-color: hsl(220, 30%, 86%);
+    background-image: linear-gradient(hsl(220, 30%, 90%), hsl(220, 30%, 86%));
+    border-color: hsl(220, 30%, 86%);
+    color: hsl(220, 30%, 25%);
+    text-shadow: 0 -0.5px 0.5px hsl(220, 100%, 90%);
+    box-shadow: 0 1px 5px $pebble-medium;
+}
+
+.light-gray-button:hover:enabled {
+    background-color: hsl(220, 30%, 88%);
+    background-image: linear-gradient(hsl(220, 30%, 92%), hsl(220, 30%, 88%));
+    border-color: hsl(220, 30%, 88%);
+}
+
+.light-gray-button:active:enabled {
+    background-color: hsl(220, 30%, 82%);
+    background-image: linear-gradient(hsl(220, 30%, 86%), hsl(220, 30%, 82%));
+    border-color: hsl(220, 30%, 82%);
+    box-shadow: none;
+}
+
+.light-gray-button:focus {
+    box-shadow: 0 0 3pt 2pt hsl(208, 59%, 92%);
+}
+
+.light-gray-button:disabled {
+    border-color: hsla(220, 30%, 92%, .1);
+    background-image: linear-gradient(hsla(220, 30%, 96%, .4), hsla(220, 30%, 92%, .4));
+    color: hsla(220, 40%, 60%, .75);
 }
 
 .white-button {
     @extend .button;
     background-color: white;
-    border: 1px solid hsl(210, 13%, 79%);
+    border-color: hsl(220, 30%, 86%);
+    background-image: linear-gradient(hsl(200, 100%, 100%), hsl(200, 100%, 99%));
     color: black;
+    text-shadow: 0 -0.5px 0.5px hsl(220, 30%, 90%);
 }
 
-.white-button:hover:enabled {
-    background-color: $pebble-light;
+.white-button:active:enabled {
+    box-shadow: none;
 }
+
+.white-button:focus {
+    box-shadow: 0 0 3pt 2pt hsl(208, 59%, 86%);
+}
+
+.white-button:disabled {
+    border-color: hsl(220, 30%, 91%);
+    background-image: linear-gradient(hsla(200, 100%, 100%, .4), hsla(200, 100%, 99%, .4));
+    box-shadow: none;
+    color: hsla(0, 0%, 50%, 1);
+    text-shadow: 0 -0.5px 0.5px hsl(220, 30%, 90%);
+}
+
