@@ -76,7 +76,9 @@ $base-red: hsl(0, 80%, 46%);
 }
 
 .red-button:disabled {
-    @include disabled_state(hsla(0, 80%, 70%, .9), hsla(0, 80%, 68%, .9), hsla(0, 80%, 46%, .1));
+    @include disabled_state(rgba(lighten($base-red, 24), .9),
+                            rgba(lighten($base-red, 22), .9),
+                            rgba($base-red, .1));
 }
 
 // Orange Button -------------------------------------------------------------------
@@ -89,7 +91,7 @@ $base-orange: hsl(20, 100%, 51%);
 }
 
 .orange-button:hover:enabled {
-    @include hover_state(lighten($base-orange, 6), lighten($base-orange, 2));
+    @include hover_state(lighten($base-orange, 8), lighten($base-orange, 4));
 }
 
 .orange-button:active:enabled {
@@ -101,8 +103,9 @@ $base-orange: hsl(20, 100%, 51%);
 }
 
 .orange-button:disabled {
-    @include disabled_state(hsla(20, 100%, 70%, .6), hsla(20, 100%, 68%, .6),
-                            hsla(20, 100%, 55%, .1));
+    @include disabled_state(rgba(lighten($base-orange, 19), .6),
+                            rgba(lighten($base-orange, 17), .6),
+                            rgba(lighten($base-orange, 4), .1));
 }
 
 // Green Button --------------------------------------------------------------------
@@ -127,8 +130,9 @@ $base-green: darken($save-green, 4);
 }
 
 .green-button:disabled {
-    @include disabled_state(hsla(150, 55%, 88%, .3), hsla(150, 55%, 86%, .3),
-                            hsla(150, 55%, 40%, .2));
+    @include disabled_state(rgba(lighten($base-green, 44), .4),
+                            rgba(lighten($base-green, 42), .4),
+                            rgba(lighten($base-green, 4), .2));
 }
 
 // Blue Button ---------------------------------------------------------------------
@@ -153,8 +157,9 @@ $base-blue: hsl(208, 59%, 45%);
 }
 
 .blue-button:disabled {
-    @include disabled_state(hsla(208, 59%, 90%, .2), hsla(208, 59%, 88%, .2),
-                            hsla(208, 59%, 54%, .2));
+    @include disabled_state(rgba(lighten($base-blue, 45), .2),
+                            rgba(lighten($base-blue, 43), .2),
+                            rgba(lighten($base-blue, 9), .2));
 }
 
 // Teal Button ---------------------------------------------------------------------
@@ -179,8 +184,9 @@ $base-teal: hsl(180, 100%, 24%);
 }
 
 .teal-button:disabled {
-    @include disabled_state(hsla(180, 100%, 80%, .4), hsla(180, 100%, 78%, .4),
-                            hsla(180, 100%, 78%, .2));
+    @include disabled_state(rgba(lighten($base-teal, 56), .4),
+                            rgba(lighten($base-teal, 54), .4),
+                            rgba(lighten($base-teal, 54), .2));
 }
 
 // Purple Button -------------------------------------------------------------------
@@ -201,12 +207,13 @@ $base-purple: hsl(275, 48%, 56%);
 }
 
 .purple-button:focus {
-    @include focus_state(hsl(275, 48%, 90%));
+    @include focus_state(lighten($base-purple, 34));
 }
 
 .purple-button:disabled {
-    @include disabled_state(hsla(275, 48%, 77%, .5),  hsla(275, 48%, 75%, .5),
-                            hsla(275, 48%, 59%, .1));
+    @include disabled_state(rgba(lighten($base-purple, 21), .5),
+                            rgba(lighten($base-purple, 19), .5),
+                            rgba(lighten($base-purple, 4), .1));
 }
 
 // Periwinkle Button ---------------------------------------------------------------
@@ -227,17 +234,19 @@ $base-periwinkle: hsl(220, 30%, 56%);
 }
 
 .periwinkle-button:focus {
-    @include focus_state(hsl(220, 30%, 85%));
+    @include focus_state(lighten($base-periwinkle, 29));
 }
 
 .periwinkle-button:disabled {
-    @include disabled_state(hsla(220, 30%, 96%, .2), hsla(220, 30%, 92%, .2),
-                            hsla(220, 30%, 62%, .1));
+    @include disabled_state(rgba(lighten($base-periwinkle, 40), .2),
+                            rgba(lighten($base-periwinkle, 36), .2),
+                            rgba(lighten($base-periwinkle, 6), .1));
 }
 
 // Gray Button ---------------------------------------------------------------------
 
 $base-gray: darken($stormy-gray-light, 10);
+$blue-outline: hsl(208, 59%, 86%);
 
 .gray-button {
     @extend .button;
@@ -253,12 +262,13 @@ $base-gray: darken($stormy-gray-light, 10);
 }
 
 .gray-button:focus {
-    @include focus_state(hsl(208, 59%, 86%));
+    @include focus_state($blue-outline);
 }
 
 .gray-button:disabled {
-    @include disabled_state(hsla(210, 13%, 69%, .2), hsla(210, 13%, 65%, .2),
-                            hsla(210, 13%, 59%, .1));
+    @include disabled_state(rgba(lighten($base-gray, 14), .2),
+                            rgba(lighten($base-gray, 10), .2),
+                            rgba(lighten($base-gray, 4), .1));
 }
 
 // Light Gray Button ---------------------------------------------------------------
@@ -282,24 +292,28 @@ $base-light-gray: hsl(220, 30%, 85%);
 }
 
 .light-gray-button:focus {
-    @include focus_state(hsl(208, 59%, 92%));
+    @include focus_state($blue-outline);
 }
 
 .light-gray-button:disabled {
-    @include disabled_state(hsla(220, 30%, 96%, .4), hsla(220, 30%, 92%, .4),
-                            hsla(220, 30%, 80%, .1), hsla(220, 40%, 60%, .75));
+    @include disabled_state(rgba(lighten($base-light-gray, 11), .4),
+                            rgba(lighten($base-light-gray, 7), .4),
+                            rgba(darken($base-light-gray, 5), .1),
+                            hsla(220, 40%, 60%, .75));
 }
 
 // White Button --------------------------------------------------------------------
 
 $base-white: hsl(200, 100%, 99%);
+$white-shadow: hsl(220, 30%, 90%);
+$white-button-text: hsl(220, 12%, 20%);
 
 .white-button {
     @extend .button;
     @include enabled_state(lighten($base-white, 1), $base-white);
     border-color: hsl(220, 30%, 90%);
-    color: hsla(220, 12%, 20%, 1);
-    text-shadow: 0 -0.5px 0.5px hsl(220, 30%, 90%);
+    color: $white-button-text;
+    text-shadow: 0 -0.5px 0.5px $white-shadow;
 }
 
 .white-button:active:enabled {
@@ -307,12 +321,14 @@ $base-white: hsl(200, 100%, 99%);
 }
 
 .white-button:focus {
-    @include focus_state(hsl(208, 59%, 86%));
+    @include focus_state($blue-outline);
 }
 
 .white-button:disabled {
-    @include disabled_state(hsla(200, 100%, 100%, .4), hsla(200, 100%, 99%, .4),
-                            hsl(220, 30%, 70%), hsla(220, 12%, 20%, 0.4));
-    text-shadow: 0 -0.5px 0.5px hsl(220, 30%, 90%);
+    @include disabled_state(rgba(lighten($base-white, 1), .4),
+                            rgba($base-white, .4),
+                            rgba(darken($white-shadow, 1), 1),
+                            rgba($white-button-text, 0.4));
+    text-shadow: 0 -0.5px 0.5px $white-shadow;
 }
 
