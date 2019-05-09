@@ -172,7 +172,7 @@
   @extend .green-button;
 }
 
-#save-button, #save-button:disabled {
+#save-button {
   display: block;
   margin: 15px 0 15px 0;
 }

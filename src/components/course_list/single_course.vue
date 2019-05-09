@@ -302,10 +302,8 @@ a {
   @extend .green-button;
 }
 
-.create-clone-button, .create-clone-button:disabled {
-  font-size: 16px;
+.create-clone-button {
   margin: 12px 0 10px 0;
-  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 681px) {

@@ -178,7 +178,7 @@
   @extend .green-button;
 }
 
-#add-users-button, #add-users-button:disabled {
+#add-users-button {
   margin: 15px 0 15px 0;
 }
 
