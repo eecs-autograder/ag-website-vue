@@ -56,7 +56,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            <AGTestCases></AGTestCases>
+            <AGTestSuites :project="project"></AGTestSuites>
           </div>
         </template>
       </tab>
