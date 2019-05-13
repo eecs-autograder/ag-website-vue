@@ -5,8 +5,16 @@
     </FileUpload>
 
     <div id="instructor-files-label"> Uploaded Instructor Files
-      <div class="collapse-button"
-           @click="d_collapsed = !d_collapsed">( {{d_collapsed? 'Show' : 'Collapse'}} )</div>
+      <div class="collapse-show-area" @click="d_collapsed = !d_collapsed">
+        <div :class="['fas',
+                       d_collapsed ? 'fa-plus-square' : 'fa-minus-square',
+                      'collapse-show-icon']">
+        </div>
+        <button class="collapse-show-button"
+                type="button">
+          ( {{d_collapsed? 'Show' : 'Collapse'}} )
+        </button>
+      </div>
     </div>
 
     <div id="viewing-area">
@@ -22,7 +30,7 @@
         <MultiFileViewer ref="instructor_files_viewer"
                          height_of_view_file="600px"
                          @num_files_viewing_changed="num_files_currently_viewing = $event">
-          <div slot="view_files_message" style="min-width: 280px;">
+          <div v-if="!d_collapsed" slot="view_files_message" style="min-width: 280px;">
             Click on a file to view its contents.
           </div>
         </MultiFileViewer>
@@ -134,19 +142,8 @@
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 @import '@/styles/button_styles.scss';
-
-.collapse-button {
-  display: inline;
-  padding-left: 5px;
-  color: hsl(220, 30%, 60%);
-  cursor: pointer;
-}
-
-.collapse-button:hover {
-  color: hsl(220, 30%, 35%);
-}
 
 #instructor-files-component {
   box-sizing: border-box;
@@ -159,9 +156,10 @@
 #column-of-files {
   display: inline-block;
   vertical-align: top;
-  height: 665px;
+  max-height: 665px;
   overflow: scroll;
   border-radius: .25rem;
+  box-sizing: border-box;
 }
 
 #instructor-file-viewer-wrapper {
@@ -171,6 +169,7 @@
   top: -7px;
   margin-bottom: 100px;
   min-width: 50px;
+  box-sizing: border-box;
 }
 
 ::-webkit-scrollbar {
@@ -187,4 +186,48 @@
   font-weight: 600;
   font-size: 17px;
 }
+
+.collapse-show-area {
+  display: inline-block;
+  cursor: pointer;
+  padding-left: 5px;
+}
+
+.collapse-show-icon {
+  color: $ocean-blue;
+  font-size: 20px;
+  padding: 0 5px;
+  display: inline-block;
+  position: relative;
+  top: 2px;
+}
+
+.collapse-show-icon:hover {
+  color: darken($ocean-blue, 10);
+}
+
+.collapse-show-button {
+  display: none;
+}
+
+@media only screen and (min-width: 481px) {
+  .collapse-show-button {
+    background: white;
+    border: none;
+    color: $ocean-blue;
+    outline: none;
+    display: inline;
+    padding: 0 5px;
+    font-size: 16px;
+  }
+
+  .collapse-show-button:hover {
+    color: darken($ocean-blue, 10);
+  }
+
+  .collapse-show-icon {
+    display: none;
+  }
+}
+
 </style>

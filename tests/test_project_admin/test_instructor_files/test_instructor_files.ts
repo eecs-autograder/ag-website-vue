@@ -401,7 +401,7 @@ describe('InstructorFiles.vue', () => {
         let mfv_wrapper = wrapper.find('#instructor-file-viewer-wrapper');
         let instructor_files_column = wrapper.find('#column-of-files');
 
-        let toggle_collapse_button = wrapper.find('.collapse-button');
+        let toggle_collapse_button = wrapper.find('.collapse-show-area');
         expect(component.d_collapsed).toBe(false);
         expect(toggle_collapse_button.text()).toContain("Collapse");
         expect(instructor_files_column.element.style.display).toEqual('block');
