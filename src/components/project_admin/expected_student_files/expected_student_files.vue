@@ -16,8 +16,7 @@
       <div class="list-of-patterns-container">
         <div v-for="(file, index) of expected_student_files"
              :key="file.pk">
-          <single-expected-student-file :expected_student_file="file"
-                                        :odd_index="index % 2 === 1">
+          <single-expected-student-file :expected_student_file="file">
           </single-expected-student-file>
         </div>
       </div>
@@ -83,10 +82,7 @@ export default class ExpectedStudentFiles extends Vue implements ExpectedStudent
   sort_files() {
     this.expected_student_files.sort(
       (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
-        if (file_a.pattern <= file_b.pattern) {
-          return -1;
-        }
-        return 1;
+        return file_a.pattern.localeCompare(file_b.pattern, undefined, {numeric: true});
       }
     );
   }
@@ -95,20 +91,18 @@ export default class ExpectedStudentFiles extends Vue implements ExpectedStudent
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-language: "Quicksand";
 
 #expected-student-files-component {
-  font-family: $current-language;
   width: 95%;
   margin: 20px 2.5%;
 }
 
 #new-expected-file-pattern {
-  color: white;
+  color: black;
   padding: 10px 25px 10px 25px;
-  border-radius: 3px;
-  background-image: linear-gradient(to bottom right, hsl(220, 20%, 37%), hsl(220, 20%, 39%));
+  border-radius: 5px;
+  background-color: hsl(220, 30%, 95%);
+  border: 2px solid hsl(220, 30%, 94%);
 }
 
 .new-pattern-side, .existing-patterns {

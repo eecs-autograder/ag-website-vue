@@ -83,6 +83,21 @@ button {
     outline-color: hsl(275, 48%, 88%);
 }
 
+.light-gray-button {
+    @extend .button;
+    background-color: hsl(220, 30%, 95%);
+    border: 2px solid hsl(220, 30%, 94%);
+}
+
+.light-gray-button:hover:enabled {
+    background-color: hsl(220, 30%, 90%);
+    border: 2px solid hsl(220, 30%, 89%);
+}
+
+.light-gray-button:focus {
+    outline-color: hsl(220, 30%, 99%);
+}
+
 .gray-button {
     @extend .button;
     background-color: hsl(210, 13%, 63%);
@@ -99,6 +114,8 @@ button {
 
 .white-button {
     @extend .button;
+    background-color: white;
+    border: 1px solid hsl(210, 13%, 79%);
     color: black;
 }
 
