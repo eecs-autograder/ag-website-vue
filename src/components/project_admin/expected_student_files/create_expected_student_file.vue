@@ -69,7 +69,7 @@ export function handle_add_expected_student_file_error(component: CreateExpected
 }
 
 .add-file-button {
-  @extend .white-button;
+  @extend .green-button;
 }
 
 .add-file-button {
