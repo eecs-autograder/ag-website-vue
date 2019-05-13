@@ -79,7 +79,6 @@ export default class ExpectedStudentFiles extends Vue implements ExpectedStudent
     );
   }
 
-  // use local compare here
   sort_files() {
     this.expected_student_files.sort(
       (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
