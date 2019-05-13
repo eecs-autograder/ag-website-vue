@@ -178,7 +178,7 @@
   .error-ul {
     list-style-type: none; /* Remove bullets */
     padding-left: 0;
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
 
   .error-li:first-child {
