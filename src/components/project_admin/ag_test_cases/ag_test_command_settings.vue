@@ -15,34 +15,32 @@
               <validated-form id="command-settings-form"
                               autocomplete="off"
                               spellcheck="false"
-                              @submit.prevent="save_ag_test_command_settings"
+                              @submit.native.prevent="save_ag_test_command_settings"
                               @form_validity_changed="settings_form_is_valid = $event">
 
-                <div class="name-and-command-container">
-                  <div id="name-container">
-                    <label class="text-label"> Name </label>
-                    <validated-input ref="command_name"
-                                     id="input-name"
-                                     v-model="command.name"
-                                     :validators="[is_not_empty]">
-                    </validated-input>
-                  </div>
+                <div id="name-container">
+                  <label class="text-label"> Name </label>
+                  <validated-input ref="command_name"
+                                   id="input-name"
+                                   v-model="command.name"
+                                   :validators="[is_not_empty]">
+                  </validated-input>
+                </div>
 
-                  <div id="command-container">
-                    <label class="text-label"> Command </label>
-                    <validated-input ref="command_cmd"
-                                     id="input-cmd"
-                                     v-model="command.cmd"
-                                     :num_rows="5"
-                                     :validators="[is_not_empty]">
-                    </validated-input>
-                  </div>
+                <div id="command-container">
+                  <label class="text-label"> Command </label>
+                  <validated-input ref="command_cmd"
+                                   id="input-cmd"
+                                   v-model="command.cmd"
+                                   :num_rows="5"
+                                   :validators="[is_not_empty]">
+                  </validated-input>
                 </div>
 
                 <div class="section-container">
                   <fieldset>
                     <legend> Stdin </legend>
-                    <div class="command-input-container">
+                    <div class="command-input-container file-dropdown-adjacent">
                       <label class="text-label"> Stdin source: </label>
                       <div class="dropdown">
                         <dropdown ref="stdin_source_dropdown"
@@ -64,7 +62,8 @@
                       </div>
                     </div>
 
-                    <div class="text-container">
+                    <div v-if="command.stdin_source === 'Text'"
+                         class="text-container">
                       <label class="text-label"> Stdin source text: </label>
                       <validated-input placeholder="Enter the stdin input here."
                                        :num_rows="5"
@@ -73,7 +72,8 @@
                       </validated-input>
                     </div>
 
-                    <div class="file-dropdown-container">
+                    <div v-if="command.stdin_source === 'Project file content'"
+                         class="file-dropdown-container">
                       <label class="text-label"> File name: </label>
                       <div>
                         <dropdown ref="file_stdin_source_dropdown"
@@ -121,29 +121,30 @@
                       </div>
                     </div>
 
-                    <div class="point-assignment-container">
+                    <div v-if="command.expected_return_code != `Don't check`"
+                         class="point-assignment-container">
                       <div class="add-points-container">
                         <label class="text-label"> Correct return code </label>
-                        <i class="fas fa-plus plus-sign"
-                           @click="command.points_for_correct_return_code = parseInt(command.points_for_correct_return_code) + 1">
-                        </i>
-                        <input type="number"
-                               v-model="command.points_for_correct_return_code"
-                               class="command-settings-input"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <div>
+                          <i class="fas fa-plus plus-sign"></i>
+                          <input class="command-settings-input"
+                                 v-model="command.points_for_correct_return_code"
+                                 type="number"
+                                 min="0">
+                          <div class="unit-of-measurement"> points </div>
+                        </div>
                       </div>
 
                       <div class="subtract-points-container">
                         <label class="text-label"> Wrong return code </label>
-                        <i class="fas fa-minus minus-sign"
-                           @click="command.deduction_for_wrong_return_code = parseInt(command.deduction_for_wrong_return_code) + 1">
-                        </i>
-                        <input type="number"
-                               v-model="command.deduction_for_wrong_return_code"
-                               class="input-wrong"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <div>
+                          <i class="fas fa-minus minus-sign"></i>
+                          <input class="command-settings-input"
+                                 v-model="command.deduction_for_wrong_return_code"
+                                 type="number"
+                                 min="0">
+                          <div class="unit-of-measurement"> points </div>
+                        </div>
                       </div>
                     </div>
                   </fieldset>
@@ -152,7 +153,7 @@
                 <div class="section-container">
                   <fieldset>
                     <legend> Stdout </legend>
-                    <div class="command-input-container">
+                    <div class="command-input-container file-dropdown-adjacent">
                       <label class="text-label"> Check stdout against: </label>
                       <div class="dropdown">
                         <dropdown ref="expected_stdout_source_dropdown"
@@ -173,7 +174,8 @@
                       </div>
                     </div>
 
-                    <div class="text-container">
+                    <div v-if="command.expected_stdout_source === 'Text'"
+                         class="text-container">
                       <label class="text-label"> Expected stdout text: </label>
                       <validated-input placeholder="Enter the expected stdout output here."
                                        v-model="command.expected_stdout_text"
@@ -182,7 +184,8 @@
                       </validated-input>
                     </div>
 
-                    <div class="file-dropdown-container">
+                    <div v-if="command.expected_stdout_source === 'Project file content'"
+                         class="file-dropdown-container">
                       <label class="text-label"> File name: </label>
                       <div>
                         <dropdown ref="file_stdout_dropdown"
@@ -204,31 +207,30 @@
                       </div>
                     </div>
 
-                    <div class="point-assignment-container">
+                    <div v-if="command.expected_stdout_source != `Don't check`"
+                         class="point-assignment-container">
                       <div class="add-points-container">
                         <label class="text-label"> Correct stdout </label>
-                        <i class="fas fa-plus plus-sign"
-                           @click="command.points_for_correct_stdout
-                         = parseInt(command.points_for_correct_stdout) + 1">
-                        </i>
-                        <input type="number"
-                               v-model="command.points_for_correct_stdout"
-                               class="command-settings-input"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <div>
+                          <i class="fas fa-plus plus-sign"></i>
+                          <input class="command-settings-input"
+                                 v-model="command.points_for_correct_stdout"
+                                 type="number"
+                                 min="0">
+                          <div class="unit-of-measurement"> points </div>
+                        </div>
                       </div>
 
                       <div class="subtract-points-container">
-                        <label class="input-label-normal"> Wrong stdout</label>
-                        <i class="fas fa-minus minus-sign"
-                           @click="command.deduction_for_wrong_stdout
-                                   = parseInt(command.deduction_for_wrong_stdout) + 1">
-                        </i>
-                        <input type="number"
-                               v-model="command.deduction_for_wrong_stdout"
-                               class="input-wrong"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <label class="text-label"> Wrong stdout</label>
+                        <div>
+                          <i class="fas fa-minus minus-sign"></i>
+                          <input class="command-settings-input"
+                                 v-model="command.deduction_for_wrong_stdout"
+                                 type="number"
+                                 min="0">
+                          <div class="unit-of-measurement"> points </div>
+                        </div>
                       </div>
                     </div>
 
@@ -238,7 +240,7 @@
                 <div class="section-container">
                   <fieldset>
                     <legend> Stderr </legend>
-                    <div class="command-input-container">
+                    <div class="command-input-container file-dropdown-adjacent">
                       <label class="text-label"> Check stderr against: </label>
                       <div class="dropdown">
                         <dropdown ref="expected_stderr_source_dropdown"
@@ -260,7 +262,8 @@
                       </div>
                     </div>
 
-                    <div class="text-container">
+                    <div v-if="command.expected_stderr_source === 'Text'"
+                         class="text-container">
                       <label class="text-label"> Expected stderr text: </label>
                       <validated-input placeholder="Enter the expected stderr output here."
                                        v-model="command.expected_stderr_text"
@@ -269,8 +272,9 @@
                       </validated-input>
                     </div>
 
-                    <div class="file-dropdown-container">
-                      <label class="input-label-normal"> File name: </label>
+                    <div v-if="command.expected_stderr_source === 'Project file content'"
+                         class="file-dropdown-container">
+                      <label class="text-label"> File name: </label>
                       <div>
                         <dropdown ref="file_stderr_dropdown"
                                   :items="file_options"
@@ -291,38 +295,41 @@
                       </div>
                     </div>
 
-                    <div class="point-assignment-container">
+                    <div v-if="command.expected_stderr_source != `Don't check`"
+                         class="point-assignment-container">
                       <div class="add-points-container">
-                        <label class="input-label-normal"> Correct stderr </label>
-                        <i class="fas fa-plus plus-sign"
-                           @click="command.points_for_correct_stderr
-                         = parseInt(command.points_for_correct_stderr) + 1">
-                        </i>
-                        <input type="number"
-                               v-model="command.points_for_correct_stderr"
-                               class="command-settings-input"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <label class="text-label"> Correct stderr </label>
+                        <div>
+                          <i class="fas fa-plus plus-sign"></i>
+                          <input class="command-settings-input"
+                                 type="number"
+                                 v-model="command.points_for_correct_stderr"
+                                 min="0">
+                          <div class="unit-of-measurement"> points </div>
+                        </div>
                       </div>
 
                       <div class="subtract-points-container">
-                        <label class="input-label-normal">  Wrong stderr </label>
-                        <i class="fas fa-minus minus-sign"
-                           @click="command.deduction_for_wrong_stderr
-                         = parseInt(command.deduction_for_wrong_stderr) + 1">
-                        </i>
-                        <input type="number"
-                               v-model="command.deduction_for_wrong_stderr"
-                               class="command-settings-input"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <label class="text-label">  Wrong stderr </label>
+                        <div>
+                          <i class="fas fa-minus minus-sign"></i>
+                          <input class="command-settings-input"
+                                 type="number"
+                                 v-model="command.deduction_for_wrong_stderr"
+                                 min="0">
+                          <div class="unit-of-measurement"> points </div>
+                        </div>
                       </div>
                     </div>
 
                   </fieldset>
                 </div>
 
-                <div class="section-container">
+                <div v-if="command.expected_stdout_source === 'Project file content' ||
+                           command.expected_stdout_source === 'Text' ||
+                           command.expected_stderr_source === 'Project file content' ||
+                           command.expected_stderr_source === 'Text'"
+                     class="section-container">
                   <fieldset>
                     <legend> Diff Options </legend>
                     <div class="command-input-container">
@@ -366,64 +373,57 @@
                 <div class="section-container">
                   <fieldset>
                     <legend> Resource Settings </legend>
-                    <div class="command-input-container">
-
+                    <div id="time-and-virtual">
                       <div id="time-limit-container">
-                        <label class="input-label-normal"> Time limit </label>
+                        <label class="text-label"> Time limit </label>
                         <div class="resource-input">
                           <validated-input ref="command_time_limit"
+                                           id="input-time-limit"
                                            v-model="command.time_limit"
-                                           :num_rows="1"
                                            input_style="width: 150px;"
-                                           :validators="[]"
-                                           id="input-time-limit">
+                                           :validators="[]">
                             <div slot="suffix" class="unit-of-measurement"> seconds </div>
                           </validated-input>
                         </div>
                       </div>
 
                       <div id="virtual-memory-container">
-                        <label class="input-label-normal"> Virtual memory limit </label>
+                        <label class="text-label"> Virtual memory limit </label>
                         <div class="resource-input">
                           <validated-input ref="command_virtual_memory_limit"
+                                           id="input-virtual-memory-limit"
                                            v-model="command.virtual_memory_limit"
-                                           :num_rows="1"
                                            input_style="width: 150px;"
-                                           :validators="[]"
-                                           id="input-virtual-memory-limit">
+                                           :validators="[]">
                             <div slot="suffix" class="unit-of-measurement"> bytes </div>
                           </validated-input>
                         </div>
                       </div>
-
                     </div>
 
                     <div id="stack-and-process">
 
                       <div id="stack-size-container">
-                        <label class="input-label-normal"> Stack size limit </label>
+                        <label class="text-label"> Stack size limit </label>
                         <div class="resource-input">
                           <validated-input ref="command_stack_size_limit"
+                                           id="input-stack-size-limit"
                                            v-model="command.stack_size_limit"
-                                           :num_rows="1"
                                            input_style="width: 150px;"
-                                           :validators="[]"
-                                           id="input-stack-size-limit">
+                                           :validators="[]">
                             <div slot="suffix" class="unit-of-measurement"> bytes </div>
                           </validated-input>
                         </div>
                       </div>
 
                       <div id="process-spawn-container">
-                        <label class="input-label-normal"> Process spawn limit </label>
+                        <label class="text-label"> Process spawn limit </label>
                         <div class="resource-input">
                           <validated-input ref="command_process_spawn_limit"
-                                           v-model="command.process_spawn_limit"
-                                           :num_rows="1"
-                                           input_style="width: 150px;"
-                                           :validators="[]"
                                            id="input-process-spawn-limit"
-                                           class="resource-input">
+                                           v-model="command.process_spawn_limit"
+                                           input_style="width: 150px;"
+                                           :validators="[]">
                             <div slot="suffix" class="unit-of-measurement"> child processes </div>
                           </validated-input>
                         </div>
@@ -433,22 +433,24 @@
                   </fieldset>
                 </div>
 
-                <APIErrors ref="api_errors"></APIErrors>
+                <div class="bottom-of-form">
+                  <APIErrors ref="api_errors"></APIErrors>
 
-                <button type="submit"
-                        class="save-button"
-                        :disabled="!settings_form_is_valid"> Save Updates
-                </button>
+                  <button type="submit"
+                          class="save-button"
+                          :disabled="!settings_form_is_valid"> Save Updates
+                  </button>
 
-                <div v-if="!saving" class="last-saved-timestamp">
-                  <span> Last Saved: </span>
-                  {{(new Date(command.last_modified)).toLocaleString(
-                  'en-US', last_modified_format
-                  )}}
-                </div>
+                  <div v-if="!saving" class="last-saved-timestamp">
+                    <span> Last Saved: </span>
+                    {{(new Date(command.last_modified)).toLocaleString(
+                    'en-US', last_modified_format
+                    )}}
+                  </div>
 
-                <div v-else class="last-saved-spinner">
-                  <i class="fa fa-spinner fa-pulse"></i>
+                  <div v-else class="last-saved-spinner">
+                    <i class="fa fa-spinner fa-pulse"></i>
+                  </div>
                 </div>
 
               </validated-form>
@@ -481,7 +483,8 @@
 
               <button class="delete-command-button"
                       type="button"
-                      @click="$refs.delete_command_modal.open()"> Delete Command
+                      @click="$refs.delete_command_modal.open()">
+                Delete Command: <span> {{command.name}} </span>
               </button>
 
               <modal ref="delete_command_modal"
@@ -691,10 +694,12 @@
   @import '@/styles/colors.scss';
   $current-lang-choice: "Poppins";
 
-
   #ag-test-command-settings-component {
     font-family: $current-lang-choice;
-    padding: 0 10px;
+  }
+
+  .tab-body {
+    padding: 0 15px;
   }
 
   .command-to-delete {
@@ -702,17 +707,19 @@
     margin-left: 3px;
   }
 
-  .add-points-container {
-    display: inline-block;
-    width: 50%;
-  }
-
   .delete-command-button {
     @extend .red-button;
+    margin: 15px 0 0 0;
+  }
+
+  .delete-command-button span {
+    margin-left: 3px;
+    font-style: italic;
   }
 
   .save-button {
     @extend .green-button;
+    margin: 0 0 10px 0;
   }
 
   legend {
@@ -742,8 +749,28 @@
     padding: 10px 0 10px 3px;
   }
 
-  .name-and-command-container {
-    padding: 10px;
+  #name-container {
+    padding: 10px 12px 12px 12px;
+  }
+
+  #command-container {
+    padding: 10px 12px 22px 12px;
+  }
+
+  .file-dropdown-container {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 10px;
+  }
+
+  .file-dropdown-adjacent {
+    display: inline-block;
+    margin-right: 50px;
+    vertical-align: top;
+  }
+
+  .text-container {
+    margin-top: 10px;
   }
 
   .command-settings-input {
@@ -752,7 +779,7 @@
     border-radius: .25rem;
     box-sizing: border-box;
     color: #495057;
-    display: block;
+    display: inline-block;
     font-size: 1rem;
     line-height: 1.5;
     position: relative;
@@ -777,6 +804,10 @@
     font-weight: 700;
     margin: 0 0 7px 0;
     text-align: right;
+  }
+
+  .bottom-of-form {
+    padding: 0 14px 50px 14px;
   }
 
   // Start Modal Related ***********************************************************
@@ -831,7 +862,7 @@
     display: block;
     font-size: 1rem;
     line-height: 1.5;
-    min-height: 36px;
+    min-height: 38px;
     padding: .375rem .75rem;
     position: relative;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -881,8 +912,6 @@
     padding: 10px 0 10px 5px;
   }
 
-  // ----
-
   .saving-spinner {
     color: $ocean-blue;
     display: inline-block;
@@ -910,6 +939,21 @@
     display: inline-block;
   }
 
+  .point-assignment-container {
+    padding: 10px 0 0 0;
+  }
+
+  .add-points-container {
+    display: block;
+    box-sizing: border-box;
+    width: 300px;
+    margin-right: 50px;
+  }
+
+  .subtract-points-container {
+    display: block;
+  }
+
   .minus-sign {
     color: darkorange;
   }
@@ -919,177 +963,73 @@
   }
 
   .minus-sign, .plus-sign {
-    cursor: pointer;
-    display: none;
     margin-right: 10px;
   }
 
-  /*#name-container {*/
-  /*  padding: 0 4%;*/
-  /*  position: relative;*/
-  /*}*/
-  /*.point-assignment-container {*/
-  /*  padding: 15px 0 0 0;*/
-  /*}*/
-  /*.resource-input {*/
-  /*  display: inline-block;*/
-  /*}*/
-  /*.subtract-points-container {*/
-  /*  display: inline-block;*/
-  /*  width: 50%;*/
-  /*}*/
+  .unit-of-measurement {
+    display: inline-block;
+    vertical-align: top;
+    padding-left: 10px;
+    padding-top: 6px;
+  }
 
+  #time-limit-container {
+    display: inline-block;
+    margin-right: 50px;
+    padding-bottom: 20px;
+    vertical-align: top;
+  }
+  #virtual-memory-container {
+    display: inline-block;
+    padding-bottom: 20px;
+    vertical-align: top;
+  }
+  #stack-size-container {
+    display: inline-block;
+    margin-right: 50px;
+    padding-bottom: 20px;
+    vertical-align: top;
+  }
+  #process-spawn-container {
+    display: inline-block;
+    padding-bottom: 25px;
+    vertical-align: top;
+  }
 
-  /*#stdin-section-whole, #return-code-section-whole,*/
-  /*#stdout-section-whole, #stderr-section-whole,*/
-  /*#diff-settings-container {*/
-  /*  padding: 0 0 25px 0;*/
-  /*}*/
-  /*.unit-of-measurement {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: top;*/
-  /*  padding-left: 10px;*/
-  /*  padding-top: 6px;*/
-  /*}*/
-  /*.text-container {*/
-  /*  padding: 15px 0 0 0;*/
-  /*}*/
-  /*#time-limit-container {*/
-  /*  padding-bottom: 20px;*/
-  /*  display: inline-block;*/
-  /*  margin-right: 50px;*/
-  /*  vertical-align: top;*/
-  /*}*/
-  /*#virtual-memory-container {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: top;*/
-  /*  padding-bottom: 20px;*/
-  /*}*/
-  /*#stack-size-container {*/
-  /*  padding-bottom: 20px;*/
-  /*  display: inline-block;*/
-  /*  margin-right: 50px;*/
-  /*  vertical-align: top;*/
-  /*}*/
-  /*#process-spawn-container {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: top;*/
-  /*  padding-bottom: 25px;*/
-  /*}*/
-  /*#time-limit-and-stack-size {*/
-  /*  padding: 0 0 0 0;*/
-  /*}*/
+  #time-limit-and-stack-size {
+    padding: 0 0 0 0;
+  }
+
   @media only screen and (min-width: 481px) {
-    /*.add-points-container, .subtract-points-container {*/
-    /*  display: inline-block;*/
-    /*}*/
 
-    /*.add-points-container {*/
-    /*  margin-right: 82px;*/
-    /*  width: 170px;*/
-    /*}*/
+    .point-assignment-container {
+      padding: 10px 0 0 3px;
+      min-width: 500px;
+    }
 
-    /*#ag-test-command-settings-component {*/
-    /*  padding: 20px;*/
-    /*}*/
+    .add-points-container {
+      display: inline-block;
+    }
 
-    /*.checkbox-container {*/
-    /*  padding: 0 0 5px 0;*/
-    /*}*/
+    .subtract-points-container {
+      display: inline-block;
+    }
 
-    /*#command-container {*/
-    /*  padding: 0 0 15px 13.25px;*/
-    /*}*/
+    #time-limit-container {
+      width: 400px;
+    }
 
-    /*#command-settings-form {*/
-    /*  padding: 20px 0;*/
-    /*}*/
+    #virtual-memory-container {
+      width: 400px;
+    }
 
-    /*.delete-command-button {*/
-    /*  margin: 0 0 0 13.25px;*/
-    /*}*/
+    #stack-size-container {
+      width: 400px;
+    }
 
-    /*#diff-settings-container {*/
-    /*  padding: 0 0 20px 0;*/
-    /*}*/
-
-    /*.expected-dropdown {*/
-    /*  height: 25px;*/
-    /*  padding: 6px 9px;*/
-    /*  width: 200px;*/
-    /*  vertical-align: top;*/
-    /*}*/
-
-    /*.file-dropdown {*/
-    /*  height: 25px;*/
-    /*  margin: 0;*/
-    /*  padding: 6px 9px;*/
-    /*  vertical-align: top;*/
-    /*  width: 300px;*/
-    /*}*/
-
-    /*.file-dropdown-container {*/
-    /*  display: inline-block;*/
-    /*  padding: 0;*/
-    /*}*/
-
-    /*#name-container {*/
-    /*  padding: 0 0 15px 13.25px;*/
-    /*}*/
-
-    /*.point-assignment-container {*/
-    /*  padding: 15px 0 0 0;*/
-    /*}*/
-
-    /*.plus-sign, .minus-sign {*/
-    /*  display: inline-block;*/
-    /*}*/
-
-    /*#return-code-section-whole {*/
-    /*  padding: 10px 0 15px 0;*/
-    /*}*/
-
-    /*.save-button {*/
-    /*  margin: 10px 0 15px 13.25px;*/
-    /*}*/
-
-    /*#stderr-section-whole {*/
-    /*  padding: 10px 0 25px 0;*/
-    /*}*/
-
-    /*#stdin-section-whole {*/
-    /*  padding: 10px 0 15px 0;*/
-    /*}*/
-
-    /*#stdout-section-whole {*/
-    /*  padding: 10px 0 15px 0;*/
-    /*}*/
-
-    /*#stdin-container, #return-code-container, #stdout-container, #stderr-container {*/
-    /*  display: inline-block;*/
-    /*  margin-right: 32px;*/
-    /*  vertical-align: top;*/
-    /*}*/
-
-    /*.text-container {*/
-    /*  padding: 15px 0 0 0;*/
-    /*}*/
-
-    /*#time-limit-container {*/
-    /*  width: 300px;*/
-    /*}*/
-
-    /*#virtual-memory-container {*/
-    /*  width: 300px;*/
-    /*}*/
-
-    /*#stack-size-container {*/
-    /*  width: 300px;*/
-    /*}*/
-
-    /*#process-spawn-container {*/
-    /*  width: 300px;*/
-    /*}*/
+    #process-spawn-container {
+      width: 400px;
+    }
 
   }
 </style>
