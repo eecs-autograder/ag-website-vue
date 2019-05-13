@@ -104,93 +104,90 @@
 </template>
 
 <script lang="ts">
-  import APIErrors from '@/components/api_errors.vue';
-  import Dropdown from '@/components/dropdown.vue';
-  import Modal from '@/components/modal.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
-  import { handle_api_errors_async } from '@/utils';
-  import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
-  import { Course, Semester } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import APIErrors from '@/components/api_errors.vue';
+import Dropdown from '@/components/dropdown.vue';
+import Modal from '@/components/modal.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
+import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
+import { Course, Semester } from 'ag-client-typescript';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      APIErrors,
-      Dropdown,
-      Modal,
-      ValidatedForm,
-      ValidatedInput
+@Component({
+  components: {
+    APIErrors,
+    Dropdown,
+    Modal,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class SingleCourse extends Vue {
+
+  @Prop({required: true, type: Course})
+  course!: Course;
+
+  @Prop({default: false, type: Boolean})
+  is_admin!: boolean;
+
+  new_course_name = "";
+  new_course_semester: Semester = Semester.fall;
+  new_course_year: number = 2000;
+
+  semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
+  clone_course_form_is_valid = false;
+
+  clone_course_pending = false;
+
+  readonly is_not_empty = is_not_empty;
+  readonly is_number = is_number;
+  readonly is_valid_course_year = make_min_value_validator(2000);
+
+  created() {
+    this.new_course_name = this.course.name;
+    if (this.course.semester !== null) {
+      this.new_course_semester = this.course.semester;
     }
-  })
-  export default class SingleCourse extends Vue {
-
-    @Prop({required: true, type: Course})
-    course!: Course;
-
-    @Prop({default: false, type: Boolean})
-    is_admin!: boolean;
-
-    new_course_name = "";
-    new_course_semester: Semester = Semester.fall;
-    new_course_year: number = 2000;
-
-    semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
-    clone_course_form_is_valid = false;
-
-    clone_course_pending = false;
-
-    readonly is_not_empty = is_not_empty;
-    readonly is_number = is_number;
-    readonly is_valid_course_year = make_min_value_validator(2000);
-
-    created() {
-      this.new_course_name = this.course.name;
-      if (this.course.semester !== null) {
-        this.new_course_semester = this.course.semester;
-      }
-      let current_year = (new Date()).getFullYear();
-      this.new_course_year = this.course.year !== null ? this.course.year : current_year;
-    }
-
-    @handle_api_errors_async(handle_add_copied_course_error)
-    async make_copy_of_course() {
-      try {
-        this.clone_course_pending = true;
-        await this.course.copy(
-          this.new_course_name, this.new_course_semester, this.new_course_year
-        );
-        (<Modal> this.$refs.clone_course_modal).close();
-      }
-      finally {
-        this.clone_course_pending = false;
-      }
-    }
+    let current_year = (new Date()).getFullYear();
+    this.new_course_year = this.course.year !== null ? this.course.year : current_year;
   }
 
-  function handle_add_copied_course_error(component: SingleCourse, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  @handle_api_errors_async(handle_add_copied_course_error)
+  async make_copy_of_course() {
+    try {
+      this.clone_course_pending = true;
+      await this.course.copy(
+        this.new_course_name, this.new_course_semester, this.new_course_year
+      );
+      (<Modal> this.$refs.clone_course_modal).close();
+    }
+    finally {
+      this.clone_course_pending = false;
+    }
   }
+}
+
+function handle_add_copied_course_error(component: SingleCourse, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/course_admin.scss';
-
-.single-course-component { }
 
 .toolbox {
   background-color: hsl(212, 60%, 94%);
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   border-top: none;
-  text-align: right;
-  padding: 1px 10px;
   box-sizing: border-box;
+  padding: 1px 10px;
   min-height: 37px;
+  text-align: right;
 }
 
 a {
@@ -203,23 +200,19 @@ a {
   margin: 0;
 }
 
-.edit-settings-clickable {
-  background-color: firebrick;
-}
-
 .cog {
-  transform: rotate(0deg);
-  transition-duration: 1s;
   font-size: 18px;
+  transition-duration: 1s;
 }
 
 .copier {
-  transition-duration: 1s;
   font-size: 18px;
+  transition-duration: 1s;
 }
 
 .edit-course-settings, .clone-course {
   color: hsl(212, 50%, 27%);
+  cursor: pointer;
   display: inline-block;
   padding: 8px 10px;
 }
@@ -229,51 +222,45 @@ a {
 }
 
 .edit-course-settings:hover .cog  {
-  transform: rotate(365deg);
-  transition-duration: 1s;
   color: mediumvioletred;
+  transform: rotate(180deg);
 }
 
 .clone-course:hover .copier {
-  transition-duration: 1s;
   color: mediumvioletred;
 }
 
 .course {
   box-sizing: border-box;
-  color: black;
-  cursor: pointer;
   font-size: 23px;
   margin: 0 15px 15px 0;
   min-height: 75px;
   position: relative;
-  transition: box-shadow 1s;
 }
 
 .course-info {
-  padding: 15px;
   background-image: linear-gradient(to bottom right, hsl(212, 70%, 88%), hsl(212, 70%, 85%));
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   border-bottom: none;
+  cursor: pointer;
+  padding: 15px;
 }
 
-.course:hover { }
-
 .course-name {
+  color: hsl(220, 20%, 17%);
   font-size: 26px;
   font-weight: 500;
   line-height: 1.2;
   margin: 0;
-  color: hsl(220, 20%, 17%);
 }
 
 .course-subtitle {
   color: hsl(220, 20%, 17%);
   font-size: 14px;
   margin: 0;
-  padding-top: 2px;
   min-height: 21px;
+  padding-top: 2px;
 }
 
 /**** Modal *******************************************************************/
@@ -287,9 +274,9 @@ a {
 
 .name-container, .year-container,
 .semester-container {
-  padding-bottom: 16px;
   display: block;
   max-width: 500px;
+  padding-bottom: 16px;
 }
 
 .name-container {
@@ -301,14 +288,14 @@ a {
 }
 
 .semester-dropdown-header {
-  width: 140px;
   height: 39px;
+  width: 140px;
 }
 
 .course-to-copy {
+  color: $ocean-blue;
   letter-spacing: 1px;
   margin-left: 5px;
-  color: $ocean-blue;
 }
 
 .create-clone-button {
@@ -328,17 +315,17 @@ a {
 @media only screen and (min-width: 681px) {
   .single-course-component {
     display: inline-block;
-    width: 50%;
     vertical-align: top;
+    width: 50%;
   }
 }
 
 @media only screen and (min-width: 1081px) {
   .single-course-component {
     display: inline-block;
-    width: 40%;
     min-width: 400px;
     max-width: 450px;
+    width: 40%;
   }
 }
 
