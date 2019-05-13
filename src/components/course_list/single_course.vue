@@ -1,10 +1,12 @@
 <template>
   <div ref="single-course-component" class="single-course-component">
     <div class="course">
-      <div class="course-info">
+      <router-link tag="div"
+                   :to="`/web/course/${course.pk}`"
+                   class="course-info">
         <p class="course-name">{{course.name}} </p>
         <p class="course-subtitle">{{course.subtitle}}</p>
-      </div>
+      </router-link>
 
       <div class="toolbox">
         <div class="clone-course"
