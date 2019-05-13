@@ -211,7 +211,7 @@ a {
 }
 
 .edit-course-settings, .clone-course {
-  color: hsl(212, 50%, 27%);
+  color: $dark-blue;
   cursor: pointer;
   display: inline-block;
   padding: 8px 10px;
@@ -239,16 +239,16 @@ a {
 }
 
 .course-info {
-  background-image: linear-gradient(to bottom right, hsl(212, 70%, 88%), hsl(212, 70%, 85%));
+  padding: 15px;
+  background-image: linear-gradient(to bottom right, $gray-blue-1, $gray-blue-2);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   border-bottom: none;
   cursor: pointer;
-  padding: 15px;
 }
 
 .course-name {
-  color: hsl(220, 20%, 17%);
+  color: $dark-blue;
   font-size: 26px;
   font-weight: 500;
   line-height: 1.2;
@@ -256,7 +256,7 @@ a {
 }
 
 .course-subtitle {
-  color: hsl(220, 20%, 17%);
+  color: $dark-blue;
   font-size: 14px;
   margin: 0;
   min-height: 21px;
@@ -302,14 +302,8 @@ a {
   @extend .green-button;
 }
 
-.create-clone-button:disabled {
-  @extend .gray-button;
-}
-
-.create-clone-button, .create-clone-button:disabled {
-  font-size: 16px;
+.create-clone-button {
   margin: 12px 0 10px 0;
-  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 681px) {

@@ -1,124 +1,334 @@
 @import '@/styles/colors.scss';
 
-button {
+.button {
     border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: 0 1px 5px $pebble-dark;
     cursor: pointer;
     color: white;
     display: inline-block;
-    font-size: 14px;
+    font-size: 15px;
     padding: 7px 12px;
+}
+
+.button:focus {
+    outline: none;
 }
 
 .button:disabled {
     cursor: not-allowed;
+    text-shadow: none;
 }
+
+@mixin enabled_state($lighter-color: white, $darker-color: white,
+                     $text-shadow-darken-value: 10px) {
+    background-color: $darker-color;
+    background-image: linear-gradient($lighter-color, $darker-color);
+    border-color: $darker-color;
+    text-shadow: 0 -0.5px 0.5px darken($darker-color, $text-shadow-darken-value);
+}
+
+@mixin hover_state($lighter-color: white, $darker-color: white) {
+    background-color: $darker-color;
+    background-image: linear-gradient($lighter-color, $darker-color);
+    border-color: $darker-color;
+}
+
+@mixin active_state($lighter-color: white, $darker-color: white) {
+    background-color: $darker-color;
+    background-image: linear-gradient($lighter-color, $darker-color);
+    border-color: $darker-color;
+    box-shadow: none;
+}
+
+@mixin focus_state($color: white) {
+    box-shadow: 0 0 4px 2px $color;
+}
+
+@mixin disabled_state($lighter-color: white, $darker-color: white,
+                      $border-color: hsl(220, 30%, 91%), $text-color: hsla(0, 0%, 100%, .75)) {
+    background-image: linear-gradient($lighter-color, $darker-color);
+    border-color: $border-color;
+    color: $text-color;
+    box-shadow: none;
+}
+
+// Red Button ----------------------------------------------------------------------
+
+$base-red: hsl(0, 80%, 46%);
 
 .red-button {
     @extend .button;
-    background-color: hsl(0, 80%, 50%);
-    border: 1px solid hsl(0, 80%, 66%);
+    @include enabled_state(lighten($base-red, 4), $base-red, 22);
 }
 
 .red-button:hover:enabled {
-    background-color: hsl(0, 80%, 45%);
+    @include hover_state(lighten($base-red, 8), lighten($base-red, 4));
+}
+
+.red-button:active:enabled {
+    @include active_state($base-red, darken($base-red, 4));
 }
 
 .red-button:focus {
-    outline-color: hsl(0.61, 80%, 85%);
+    @include focus_state(lighten($base-red, 40));
 }
+
+.red-button:disabled {
+    @include disabled_state(rgba(lighten($base-red, 24), .9),
+                            rgba(lighten($base-red, 22), .9),
+                            rgba($base-red, .1));
+}
+
+// Orange Button -------------------------------------------------------------------
+
+$base-orange: hsl(20, 100%, 51%);
 
 .orange-button {
     @extend .button;
-    background-color: hsl(20, 100%, 55%);
-    border: 1px solid hsl(20, 100%, 71%);
+    @include enabled_state(lighten($base-orange, 4), $base-orange, 13);
 }
 
 .orange-button:hover:enabled {
-    background-color: hsl(20, 100%, 50%);
+    @include hover_state(lighten($base-orange, 8), lighten($base-orange, 4));
+}
+
+.orange-button:active:enabled {
+    @include active_state($base-orange, darken($base-orange, 4));
 }
 
 .orange-button:focus {
-    outline-color: hsl(20, 100%, 80%);
+    @include focus_state(lighten($base-orange, 34));
 }
+
+.orange-button:disabled {
+    @include disabled_state(rgba(lighten($base-orange, 19), .6),
+                            rgba(lighten($base-orange, 17), .6),
+                            rgba(lighten($base-orange, 4), .1));
+}
+
+// Green Button --------------------------------------------------------------------
+
+$base-green: darken($save-green, 4);
 
 .green-button {
     @extend .button;
-    background-color: $save-green;
-    border: 1px solid lighten($save-green, 14%);
+    @include enabled_state(lighten($base-green, 4), $base-green, 20);
 }
 
 .green-button:hover:enabled {
-    background-color: darken($save-green, 5%);
+    @include hover_state(lighten($base-green, 6), lighten($base-green, 2));
+}
+
+.green-button:active:enabled {
+    @include active_state($base-green, darken($base-green, 4));
 }
 
 .green-button:focus {
-    outline-color: lighten($save-green, 35%);
+    @include focus_state(lighten($base-green, 45));
 }
+
+.green-button:disabled {
+    @include disabled_state(rgba(lighten($base-green, 44), .4),
+                            rgba(lighten($base-green, 42), .4),
+                            rgba(lighten($base-green, 4), .2));
+}
+
+// Blue Button ---------------------------------------------------------------------
+
+$base-blue: hsl(208, 59%, 45%);
 
 .blue-button {
     @extend .button;
-    background-color: hsl(208, 59%, 54%);
-    border: 1px solid hsl(208, 59%, 70%);
+    @include enabled_state(lighten($base-blue, 4), $base-blue, 25);
 }
 
 .blue-button:hover:enabled {
-    background-color: hsl(208, 59%, 49%);
+    @include hover_state(lighten($base-blue, 6), lighten($base-blue, 2));
+}
+
+.blue-button:active:enabled {
+    @include active_state($base-blue, darken($base-blue, 4));
 }
 
 .blue-button:focus {
-    outline-color: hsl(208, 59%, 85%);
+    @include focus_state(lighten($base-blue, 40));
 }
+
+.blue-button:disabled {
+    @include disabled_state(rgba(lighten($base-blue, 45), .2),
+                            rgba(lighten($base-blue, 43), .2),
+                            rgba(lighten($base-blue, 9), .2));
+}
+
+// Teal Button ---------------------------------------------------------------------
+
+$base-teal: hsl(180, 100%, 24%);
+
+.teal-button {
+    @extend .button;
+    @include enabled_state(lighten($base-teal, 4), $base-teal, 10);
+}
+
+.teal-button:hover:enabled {
+    @include hover_state(lighten($base-teal, 6), lighten($base-teal, 2));
+}
+
+.teal-button:active:enabled {
+    @include active_state($base-teal, darken($base-teal, 4));
+}
+
+.teal-button:focus {
+    @include focus_state(lighten($base-teal, 65));
+}
+
+.teal-button:disabled {
+    @include disabled_state(rgba(lighten($base-teal, 56), .4),
+                            rgba(lighten($base-teal, 54), .4),
+                            rgba(lighten($base-teal, 54), .2));
+}
+
+// Purple Button -------------------------------------------------------------------
+
+$base-purple: hsl(275, 48%, 56%);
 
 .purple-button {
     @extend .button;
-    background-color: hsl(275, 48%, 63%);
-    border: 1px solid hsl(275, 48%, 79%);
+    @include enabled_state(lighten($base-purple, 4), $base-purple, 14);
 }
 
 .purple-button:hover:enabled {
-    background-color: hsl(275, 48%, 58%);
+    @include hover_state(lighten($base-purple, 6), lighten($base-purple, 2));
+}
+
+.purple-button:active:enabled {
+    @include active_state($base-purple, darken($base-purple, 4));
 }
 
 .purple-button:focus {
-    outline-color: hsl(275, 48%, 88%);
+    @include focus_state(lighten($base-purple, 34));
 }
 
-.light-gray-button {
+.purple-button:disabled {
+    @include disabled_state(rgba(lighten($base-purple, 21), .5),
+                            rgba(lighten($base-purple, 19), .5),
+                            rgba(lighten($base-purple, 4), .1));
+}
+
+// Periwinkle Button ---------------------------------------------------------------
+
+$base-periwinkle: hsl(220, 30%, 56%);
+
+.periwinkle-button {
     @extend .button;
-    background-color: hsl(220, 30%, 95%);
-    border: 2px solid hsl(220, 30%, 94%);
+    @include enabled_state(lighten($base-periwinkle, 4), $base-periwinkle, 16);
 }
 
-.light-gray-button:hover:enabled {
-    background-color: hsl(220, 30%, 90%);
-    border: 2px solid hsl(220, 30%, 89%);
+.periwinkle-button:hover:enabled {
+    @include hover_state(lighten($base-periwinkle, 6), lighten($base-periwinkle, 2));
 }
 
-.light-gray-button:focus {
-    outline-color: hsl(220, 30%, 99%);
+.periwinkle-button:active:enabled {
+    @include active_state($base-periwinkle, darken($base-periwinkle, 4));
 }
+
+.periwinkle-button:focus {
+    @include focus_state(lighten($base-periwinkle, 29));
+}
+
+.periwinkle-button:disabled {
+    @include disabled_state(rgba(lighten($base-periwinkle, 40), .2),
+                            rgba(lighten($base-periwinkle, 36), .2),
+                            rgba(lighten($base-periwinkle, 6), .1));
+}
+
+// Gray Button ---------------------------------------------------------------------
+
+$base-gray: darken($stormy-gray-light, 10);
+$blue-outline: hsl(208, 59%, 86%);
 
 .gray-button {
     @extend .button;
-    background-color: hsl(210, 13%, 63%);
-    border: 1px solid hsl(210, 13%, 79%);
+    @include enabled_state(lighten($base-gray, 4), $base-gray, 10);
 }
 
 .gray-button:hover:enabled {
-    background-color: hsl(210, 13%, 58%);
+    @include hover_state(lighten($base-gray, 6), lighten($base-gray, 2));
+}
+
+.gray-button:active:enabled {
+    @include active_state($base-gray, darken($base-gray, 4));
 }
 
 .gray-button:focus {
-    outline-color: hsl(210, 13%, 88%);
+    @include focus_state($blue-outline);
 }
+
+.gray-button:disabled {
+    @include disabled_state(rgba(lighten($base-gray, 14), .2),
+                            rgba(lighten($base-gray, 10), .2),
+                            rgba(lighten($base-gray, 4), .1));
+}
+
+// Light Gray Button ---------------------------------------------------------------
+
+$base-light-gray: hsl(220, 30%, 85%);
+
+.light-gray-button {
+    @extend .button;
+    @include enabled_state(lighten($base-light-gray, 5), $base-light-gray);
+    color: hsl(220, 30%, 25%);
+    text-shadow: 0 -0.5px 0.5px hsl(220, 100%, 90%);
+    box-shadow: 0 1px 5px $pebble-medium;
+}
+
+.light-gray-button:hover:enabled {
+    @include hover_state(lighten($base-light-gray, 5), lighten($base-light-gray, 3));
+}
+
+.light-gray-button:active:enabled {
+    @include active_state(lighten($base-light-gray, 1), darken($base-light-gray, 3));
+}
+
+.light-gray-button:focus {
+    @include focus_state($blue-outline);
+}
+
+.light-gray-button:disabled {
+    @include disabled_state(rgba(lighten($base-light-gray, 11), .4),
+                            rgba(lighten($base-light-gray, 7), .4),
+                            rgba(darken($base-light-gray, 5), .1),
+                            hsla(220, 40%, 60%, .75));
+}
+
+// White Button --------------------------------------------------------------------
+
+$base-white: hsl(200, 100%, 99%);
+$white-shadow: hsl(220, 30%, 90%);
+$white-button-text: hsl(220, 12%, 20%);
 
 .white-button {
     @extend .button;
-    background-color: white;
-    border: 1px solid hsl(210, 13%, 79%);
-    color: black;
+    @include enabled_state(lighten($base-white, 1), $base-white);
+    border-color: hsl(220, 30%, 90%);
+    color: $white-button-text;
+    text-shadow: 0 -0.5px 0.5px $white-shadow;
 }
 
-.white-button:hover:enabled {
-    background-color: $pebble-light;
+.white-button:active:enabled {
+    box-shadow: none;
 }
+
+.white-button:focus {
+    @include focus_state($blue-outline);
+}
+
+.white-button:disabled {
+    @include disabled_state(rgba(lighten($base-white, 1), .4),
+                            rgba($base-white, .4),
+                            rgba(darken($white-shadow, 1), 1),
+                            rgba($white-button-text, 0.4));
+    text-shadow: 0 -0.5px 0.5px $white-shadow;
+}
+

@@ -72,12 +72,7 @@ export function handle_add_expected_student_file_error(component: CreateExpected
   @extend .green-button;
 }
 
-.add-file-button:disabled {
-  @extend .gray-button;
-}
-
-.add-file-button, .add-file-button:disabled {
-  font-size: 15px;
+.add-file-button {
   margin-top: 12px;
 }
 

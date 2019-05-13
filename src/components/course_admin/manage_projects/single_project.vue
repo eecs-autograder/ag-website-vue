@@ -313,14 +313,8 @@ a {
   @extend .green-button;
 }
 
-.clone-project-button:disabled {
-  @extend .gray-button;
-}
-
-.clone-project-button, .clone-project-button:disabled {
-  font-size: 16px;
+.clone-project-button {
   margin: 30px 0 10px 0;
-  padding: 10px 15px;
 }
 
 @media only screen and (min-width: 960px) {

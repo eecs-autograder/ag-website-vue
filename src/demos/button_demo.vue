@@ -1,57 +1,90 @@
 <template>
-  <div>
+  <div id="button-demo">
 
-    <button class="blue-button"> Click On Me </button>
-    <br>
-    <br>
-    <button class="green-button"> Save </button>
-    <br>
-    <br>
-    <button class="red-button"> Delete
-      <p class="trash-can fas fa-trash"></p>
-    </button>
-    <br>
-    <br>
-    <button class="gray-button"> Cancel </button>
-    <br>
-    <br>
-    <button class="orange-button"> Happy Halloween </button>
-    <br>
-    <br>
-    <button class="purple-button"> Enter Contest </button>
-    <br>
-    <br>
+    <div class="button-box">
+      <Toggle v-model="buttons_disabled">
+        <div slot="on">
+          <p> Disable Buttons </p>
+        </div>
+        <div slot="off">
+          <p> Enable Buttons </p>
+        </div>
+      </Toggle>
+    </div>
 
-    <div class="button custom-button"> Hello </div>
+    <div class="button-box">
+      <button class="blue-button" :disabled="buttons_disabled"> Submit </button>
+    </div>
+
+    <div class="button-box">
+      <button class="teal-button" :disabled="buttons_disabled"> Create Group </button>
+    </div>
+
+    <div class="button-box">
+      <button class="green-button" :disabled="buttons_disabled"> Save Files </button>
+    </div>
+
+    <div class="button-box">
+      <button class="red-button" :disabled="buttons_disabled"> Delete
+        <span class="trash-can fas fa-trash"></span>
+      </button>
+    </div>
+
+    <div class="button-box">
+      <button class="gray-button" :disabled="buttons_disabled"> Choose Files </button>
+    </div>
+
+    <div class="button-box">
+      <button class="orange-button" :disabled="buttons_disabled"> Cancel </button>
+    </div>
+
+    <div class="button-box">
+      <button class="purple-button" :disabled="buttons_disabled"> Go! </button>
+    </div>
+
+    <div class="button-box">
+      <button class="periwinkle-button" :disabled="buttons_disabled"> Update </button>
+    </div>
+
+    <div class="button-box">
+      <button class="light-gray-button" :disabled="buttons_disabled"> Remove </button>
+    </div>
+
+    <div class="button-box">
+      <button class="white-button" :disabled="buttons_disabled"> Find File </button>
+    </div>
 
   </div>
 </template>
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+
+import Toggle from '@/components/toggle.vue';
+
+@Component({
+  components: {
+    Toggle
+  }
+})
 export default class ButtonDemo extends Vue {
+  buttons_disabled = false;
 }
 </script>
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
-.custom-button {
-  background-color: hsl(330, 100%, 65%);
-  border: 1px solid hsl(330, 100%, 81%);
-}
-
-.custom-button:hover {
-  background-color: hsl(330, 100%, 60%);
-}
-
-.custom-button:focus {
-  outline-color: hsl(330, 100%, 90%);
-}
-
 .trash-can {
   margin: 0 0 0 5px;
+}
+
+#button-demo {
+  padding: 0 20px;
+}
+
+.button-box {
+  margin: 25px 0;
 }
 
 </style>

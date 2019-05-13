@@ -173,14 +173,8 @@
   @extend .green-button;
 }
 
-.add-project-button:disabled {
-  @extend .gray-button;
-}
-
-.add-project-button, .add-project-button:disabled {
-  font-size: 16px;
+.add-project-button {
   margin: 15px 0 20px 0;
-  padding: 10px 15px;
 }
 
 #existing-projects-side {
