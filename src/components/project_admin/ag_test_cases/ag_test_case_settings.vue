@@ -163,6 +163,13 @@
                }
              })
   export default class AGCaseSettings extends Vue {
+
+    readonly is_non_negative = is_non_negative;
+    readonly is_not_empty = is_not_empty;
+    readonly is_integer = is_integer;
+    readonly is_number = is_number;
+    readonly string_to_num = string_to_num;
+
     current_tab_index = 0;
     saving = false;
     loading = true;

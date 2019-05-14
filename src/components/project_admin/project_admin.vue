@@ -240,6 +240,10 @@ export default class ProjectAdmin extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+#project-admin {
+  height: 100%;
+}
+
 .loading-spinner {
   color: $ocean-blue;
   font-size: 55px;

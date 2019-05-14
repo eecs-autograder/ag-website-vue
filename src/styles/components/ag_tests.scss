@@ -86,8 +86,15 @@ fieldset {
 
 // Other *******************************************************************
 
+::-webkit-scrollbar {
+    background: transparent;
+    width: 0;
+}
+
 .tab-body {
     padding: 0 15px;
+    max-height: 86vh;
+    overflow: scroll;
 }
 
 .input-tooltip {
@@ -131,7 +138,6 @@ fieldset {
 }
 
 .modal-body {
-    //padding: 10px 10px 0 10px;
 }
 
 .modal-cancel-button {

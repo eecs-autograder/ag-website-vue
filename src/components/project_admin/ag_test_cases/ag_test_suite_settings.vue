@@ -100,6 +100,7 @@
                       <dropdown-typeahead ref="project_files_typeahead"
                                           placeholder_text="Enter a filename"
                                           :choices="instructor_files"
+                                          :filter_fn="instructor_file_filter_fn"
                                           @update_item_chosen="$emit('update_group_selected', $event)">
                         <template slot-scope="{item}">
                           <span class="typeahead-row">
@@ -124,6 +125,7 @@
                       <dropdown-typeahead ref="project_files_typeahead"
                                           placeholder_text="Enter a filename"
                                           :choices="expected_student_files"
+                                          :filter_fn="expected_student_file_filter_fn"
                                           @update_item_chosen="$emit('update_group_selected', $event)">
                         <template slot-scope="{item}">
                           <span class="typeahead-row">
@@ -348,6 +350,14 @@
 
     }
 
+    instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
+      return file.name.indexOf(filter_text) >= 0;
+    }
+
+    expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
+      return file.pattern.indexOf(filter_text) >= 0;
+    }
+
     async save_ag_test_suite_settings() {
       this.saving = true;
       try {
@@ -403,6 +413,8 @@ $current-lang-choice: "Poppins";
 
 .tab-body {
   padding: 0 15px;
+  height: 90vh;
+  overflow: scroll;
 }
 
 .suite-to-delete {
@@ -425,7 +437,7 @@ $current-lang-choice: "Poppins";
 }
 
 #name-container {
-  padding: 10px 12px 12px 12px;
+  padding: 10px 12px 22px 12px;
 }
 
 .file-dropdown-container {
@@ -460,7 +472,7 @@ $current-lang-choice: "Poppins";
 }
 
 .bottom-of-form {
-  padding: 0 14px 50px 14px;
+  padding: 0 14px 0px 14px;
 }
 
 // Checkbox related ************************************************************

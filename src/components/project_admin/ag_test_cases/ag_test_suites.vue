@@ -10,17 +10,17 @@
       </div>
       <div class="all-suites">
         <div :class="['suite-container', {'active-suite-container': test_suite === active_suite}]"
-             v-for="test_suite of suites">
+             v-for="(test_suite, index) of suites">
           <div :class="['test-suite',
                        {'active-suite': test_suite === active_suite && level_selected === 'Suite'},
                        {'suite-in-active-container': test_suite === active_suite}]"
                @click="update_active_suite(test_suite)">
-            <div class="suite-name"> {{test_suite.name}} </div>
+            <div class="suite-name"> {{test_suite.name}} {{index}}</div>
 
             <div v-if="test_suite === active_suite"
                  class="add-case"
                  title="Add a Case"
-                 @click="$refs.new_case_modal.open()">
+                 @click.stop="$refs.new_case_modal.open()">
               <i class="far fa-plus-square"></i>
             </div>
 
@@ -54,6 +54,7 @@
             </div>
           </div>
         </div>
+        <div class="nav-bottom"></div>
       </div>
     </div>
     <div id="viewing-window">
@@ -68,7 +69,7 @@
 
     <modal ref="new_suite_modal"
            click_outside_to_close
-           size="large">
+           size="medium">
       <div class="modal-header"> New Suite </div>
       <hr>
       <div class="modal-body">
@@ -88,7 +89,7 @@
 
     <modal ref="new_case_modal"
            click_outside_to_close
-           size="large">
+           size="medium">
       <div class="modal-header"> New Case </div>
       <hr>
       <div class="modal-body">
@@ -108,7 +109,7 @@
 
     <modal ref="new_command_modal"
            click_outside_to_close
-           size="large">
+           size="medium">
       <div class="modal-header"> New Command </div>
       <hr>
       <div class="modal-body">
@@ -272,6 +273,138 @@ export default class AGTestSuites extends Vue {
         }
       ],
     },
+    {
+      name: "Player Public Tests",
+      pk: 4,
+      test_cases: [
+        { name: "Player Public Test",
+          pk: 7,
+          test_commands: [
+            { name: "Compile", pk: 10},
+            { name: "Run", pk: 11 },
+            { name: "Valgrind", pk: 12 }
+          ]
+        },
+        { name: "Student Player tests on student Player",
+          pk: 8,
+          test_commands: [
+            { name: "Compile", pk: 13 },
+            { name: "Run", pk: 14 },
+            { name: "Valgrind", pk: 14 }
+          ]
+        }
+      ],
+    },
+    {
+      name: "Player Public Tests",
+      pk: 5,
+      test_cases: [
+        { name: "Student Player tests on student Player",
+          pk: 8,
+          test_commands: [
+            { name: "Compile", pk: 13 },
+            { name: "Run", pk: 14 },
+            { name: "Valgrind", pk: 14 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Player Public Tests",
+      pk: 6,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 7,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 8,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: []
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: [
+        { name: "Student Player tests on student Player",
+          pk: 8,
+          test_commands: [
+            { name: "Compile", pk: 13 },
+            { name: "Run", pk: 14 },
+            { name: "Valgrind", pk: 14 }
+          ]
+        },
+      ]
+    },
+    {
+      name: "Player Public Tests",
+      pk: 9,
+      test_cases: [
+        { name: "Student Player tests on student Player",
+          pk: 8,
+          test_commands: [
+            { name: "Compile", pk: 13 },
+            { name: "Run", pk: 14 },
+            { name: "Valgrind", pk: 14 }
+          ]
+        },
+        { name: "Student Player tests on student Player",
+          pk: 8,
+          test_commands: [
+            { name: "Compile", pk: 13 },
+            { name: "Run", pk: 14 },
+            { name: "Valgrind", pk: 14 }
+          ]
+        }
+      ]
+    }
   ];
 
   active_suite: TestSuite | null = null;
@@ -288,10 +421,15 @@ export default class AGTestSuites extends Vue {
   level_selected = "";
 
   update_active_suite(suite: TestSuite) {
-    this.active_suite = suite;
-    this.active_command = null;
-    this.active_case = null;
-    this.level_selected = "Suite";
+    if (this.active_suite === suite) {
+      this.active_suite = null;
+    }
+    else {
+      this.active_suite = suite;
+      this.active_command = null;
+      this.active_case = null;
+      this.level_selected = "Suite";
+    }
   }
 
   update_active_case(test_case: TestCase) {
@@ -323,9 +461,9 @@ $parent-of-active-command-color: lighten(mediumvioletred, 40);
 $suite-in-active-container-color: lighten(mediumvioletred, 50);
 
 #suites-title {
-  font-weight: bold;
   font-size: 20px;
-  padding: 20px 0 7px 10px;
+  padding: 5px 0 0 10px;
+  margin: 0 0 0 0;
 }
 
 #name-and-command {
@@ -360,8 +498,7 @@ $suite-in-active-container-color: lighten(mediumvioletred, 50);
 }
 
 .all-suites {
-  border: 1px solid hsl(210, 20%, 90%);
-  border-bottom: none;
+  border: 2px solid #ebedef;
 }
 
 .test-suite {
@@ -421,19 +558,34 @@ $suite-in-active-container-color: lighten(mediumvioletred, 50);
   margin-bottom: 20px;
 }
 
-#viewing-window {
-
-}
-
 @media only screen and (min-width: 481px) {
+
+  #ag-test-cases-component {
+    position: relative;
+  }
+
   #suite-navigation-bar {
     width: 400px;
+    padding-top: 2px;
+    margin: 0;
+  }
+
+  .nav-bottom {
+    background-color: #ebedef;
+    height: 20px;
+    width: 100%;
+  }
+
+  .all-suites {
+    max-height: 86vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
   }
 
   #viewing-window {
     position: absolute;
-    left: 400px;
-    top: 15px;
+    left: 398px;
+    top: 0;
     right: 0;
   }
 }
