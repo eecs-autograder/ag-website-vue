@@ -12,6 +12,16 @@
           </tab-header>
           <template slot="body">
             <div class="tab-body">
+
+<!--              <div class="section-container">-->
+<!--                <fieldset>-->
+<!--                  <legend> Add a new Case </legend>-->
+<!--                  <div class="add-case-container">-->
+<!--                    <button class="teal-button"> Add Case </button>-->
+<!--                  </div>-->
+<!--                </fieldset>-->
+<!--              </div>-->
+
               <validated-form id="suite-settings-form"
                               autocomplete="off"
                               spellcheck="false"
@@ -225,7 +235,7 @@
                             @click="delete_ag_test_suite()"> Delete </button>
 
                     <button class="modal-cancel-button"
-                            @click="$refs.delete_command_modal.close()"> Cancel </button>
+                            @click="$refs.delete_suite_modal.close()"> Cancel </button>
                   </div>
                 </div>
               </modal>
@@ -355,11 +365,11 @@
 @import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
+@import '@/styles/components/ag_tests.scss';
 $current-lang-choice: "Poppins";
 
-.save-button {
-  @extend .green-button;
-  margin: 0 0 10px 0;
+.add-case-container {
+  padding: 15px 10px;
 }
 
 #ag-test-suite-settings-component {
@@ -395,12 +405,12 @@ $current-lang-choice: "Poppins";
   padding: 0 15px;
 }
 
-.command-to-delete {
+.suite-to-delete {
   color: $ocean-blue;
   margin-left: 3px;
 }
 
-.delete-command-button {
+.delete-suite-button {
   @extend .red-button;
   margin: 15px 0 0 0;
 }
@@ -408,29 +418,6 @@ $current-lang-choice: "Poppins";
 .delete-suite-button span {
   margin-left: 3px;
   font-style: italic;
-}
-
-legend {
-  color: $ocean-blue;
-  font-size: 18px;
-}
-
-fieldset {
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  border-width: 2px;
-}
-
-.input-tooltip {
-  color: mediumvioletred;
-  font-size: 15px;
-  margin-left: 8px;
-}
-
-.section-container {
-  padding: 0 0 10px 0;
 }
 
 .command-input-container {
@@ -472,96 +459,8 @@ fieldset {
   width: 80px;
 }
 
-.checkbox-label {
-  color: lighten(black, 10);
-  display: inline-block;
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 0 0 0;
-  text-align: right;
-}
-
-.text-label {
-  color: lighten(black, 10);
-  display: inline-block;
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 0 7px 0;
-  text-align: right;
-}
-
 .bottom-of-form {
   padding: 0 14px 50px 14px;
-}
-
-// Start Modal Related ***********************************************************
-
-.modal-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-  padding: 5px 0;
-}
-
-.modal-body {
-  padding: 10px 10px 0 10px;
-}
-
-.modal-cancel-button {
-  @extend .gray-button;
-}
-
-.modal-delete-button {
-  @extend .red-button;
-}
-
-
-// Dropdown related ************************************************************
-
-.small-dropdown {
-  width: 100px;
-}
-
-.medium-dropdown {
-  width: 200px;
-}
-
-.large-dropdown {
-  width: 300px;
-}
-
-.dropdown-header-wrapper {
-  display: inline-block;
-  margin: 0;
-  position: relative;
-}
-
-.dropdown-header {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-  cursor: default;
-  display: block;
-  font-size: 1rem;
-  line-height: 1.5;
-  min-height: 38px;
-  padding: .375rem .75rem;
-  position: relative;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.dropdown-header:focus {
-  border-color: $ocean-blue;
-}
-
-.dropdown-caret {
-  cursor: pointer;
-  font-size: 30px;
-  position: absolute;
-  right: 18px;
-  top: 3px;
 }
 
 // Checkbox related ************************************************************
@@ -594,33 +493,6 @@ input[type=checkbox] {
 
 .checkbox-input-container {
   padding: 10px 0 10px 5px;
-}
-
-.saving-spinner {
-  color: $ocean-blue;
-  display: inline-block;
-  padding-left: 10px;
-  font-size: 18px;
-}
-
-.loading-spinner {
-  color: $ocean-blue;
-  display: inline-block;
-  padding-left: 10px;
-  font-size: 18px;
-}
-
-.last-saved-timestamp {
-  color: lighten(#495057, 40);
-  font-size: 15px;
-}
-
-.last-saved-spinner {
-  font-size: 18px;
-  color: $ocean-blue;
-  margin-top: 15px;
-  margin-left: 24px;
-  display: inline-block;
 }
 
 .point-assignment-container {

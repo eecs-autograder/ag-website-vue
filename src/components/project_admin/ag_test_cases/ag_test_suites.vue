@@ -1,30 +1,55 @@
 <template>
   <div id="ag-test-cases-component">
     <div id="suite-navigation-bar">
-      <div id="suites-title"> Suites </div>
-      <div :class="['suite-container', {'active-suite-container': test_suite === active_suite}]"
-           v-for="test_suite of suites">
-        <div :class="['test-suite',
-                     {'active-suite': test_suite === active_suite && level_selected === 'Suite'},
-                     {'suite-in-active-container': test_suite === active_suite}]"
-             @click="update_active_suite(test_suite)">
-          {{test_suite.name}}
+      <div id="suites-title"> Suites
+        <div class="add-suite"
+             title="Add a Suite"
+             @click="$refs.new_suite_modal.open()">
+          <i class="far fa-plus-square"></i>
         </div>
-        <div class="cases-container" v-if="active_suite === test_suite">
-          <div v-for="test_case of test_suite.test_cases">
+      </div>
+      <div class="all-suites">
+        <div :class="['suite-container', {'active-suite-container': test_suite === active_suite}]"
+             v-for="test_suite of suites">
+          <div :class="['test-suite',
+                       {'active-suite': test_suite === active_suite && level_selected === 'Suite'},
+                       {'suite-in-active-container': test_suite === active_suite}]"
+               @click="update_active_suite(test_suite)">
+            <div class="suite-name"> {{test_suite.name}} </div>
 
-            <div :class="['test-case',
-                         {'active-case' : test_case === active_case && level_selected === 'Case'},
-                         {'parent-of-active-case': test_case === active_case}]"
-                 @click="update_active_case(test_case)"> {{test_case.name}}
+            <div v-if="test_suite === active_suite"
+                 class="add-case"
+                 title="Add a Case"
+                 @click="$refs.new_case_modal.open()">
+              <i class="far fa-plus-square"></i>
             </div>
 
-            <div class="commands-container">
-              <div v-for="test_command of test_case.test_commands"
-                   :class="['test-command',
-                           {'active-command' : test_command === active_command && level_selected === 'Command'}]"
-                   @click="update_active_command(test_case, test_command)">
-                {{test_command.name}}
+          </div>
+          <div class="cases-container" v-if="active_suite === test_suite">
+            <div v-for="test_case of test_suite.test_cases">
+
+              <div :class="['test-case',
+                           {'active-case' : test_case === active_case && level_selected === 'Case'},
+                           {'parent-of-active-case': test_case === active_case}]"
+                   @click="update_active_case(test_case)">
+                <div class="case-name"> {{test_case.name}} </div>
+
+                <div v-if="test_case === active_case"
+                     class="add-command"
+                     title="Add a Command"
+                     @click="$refs.new_command_modal.open()">
+                  <i class="far fa-plus-square"></i>
+                </div>
+
+              </div>
+
+              <div class="commands-container">
+                <div v-for="test_command of test_case.test_commands"
+                     :class="['test-command',
+                             {'active-command' : test_command === active_command && level_selected === 'Command'}]"
+                     @click="update_active_command(test_case, test_command)">
+                  {{test_command.name}}
+                </div>
               </div>
             </div>
           </div>
@@ -33,42 +58,81 @@
     </div>
     <div id="viewing-window">
 
-      <div v-if="level_selected === 'Suite'">
-        <AGSuiteSettings> </AGSuiteSettings>
-      </div>
-      <div v-if="level_selected === 'Case'"> {{active_case.name}} </div>
-      <div v-if="level_selected === 'Command'">
-        <AGCommandSettings> </AGCommandSettings>
-      </div>
+      <div v-if="level_selected === 'Suite'"> <AGSuiteSettings> </AGSuiteSettings> </div>
+
+      <div v-if="level_selected === 'Case'"> <AGCaseSettings></AGCaseSettings> </div>
+
+      <div v-if="level_selected === 'Command'"> <AGCommandSettings> </AGCommandSettings> </div>
+
     </div>
 
-    <modal ref="create_suite_modal"
+    <modal ref="new_suite_modal"
            click_outside_to_close
            size="large">
-      <div class="modal-header"> Create a new suite: </div>
+      <div class="modal-header"> New Suite </div>
       <hr>
       <div class="modal-body">
-        <div> New suite name: </div>
+        <div class="name-container">
+          <label class="text-label"> Suite Name </label>
+          <validated-input ref="new_suite_name"
+                           v-model="new_suite_name"
+                           :validators="[is_not_empty]">
+          </validated-input>
+        </div>
+
+        <button class="green-button modal-create-button"> Add Suite </button>
       </div>
     </modal>
 
-    <modal ref="create_case_modal"
+
+
+    <modal ref="new_case_modal"
            click_outside_to_close
            size="large">
-      <div class="modal-header"> Create a new case: </div>
+      <div class="modal-header"> New Case </div>
       <hr>
       <div class="modal-body">
-        <div> New case name: </div>
+        <div class="name-container">
+          <label class="text-label"> Case Name </label>
+          <validated-input ref="new_case_name"
+                           v-model="new_case_name"
+                           :validators="[is_not_empty]">
+          </validated-input>
+        </div>
+
+        <button class="green-button modal-create-button"> Add Case </button>
       </div>
     </modal>
 
-    <modal ref="create_command_modal"
+
+
+    <modal ref="new_command_modal"
            click_outside_to_close
            size="large">
-      <div class="modal-header"> Create a new command: </div>
+      <div class="modal-header"> New Command </div>
       <hr>
       <div class="modal-body">
-        <div> New command name: </div>
+
+        <div id="name-and-command">
+          <div class="name-container">
+            <label class="text-label"> Command Name </label>
+            <validated-input ref="new_command_name"
+                             v-model="new_command_name"
+                             :validators="[is_not_empty]">
+            </validated-input>
+          </div>
+
+          <div class="command-container">
+            <label class="text-label"> Command </label>
+            <validated-input ref="new_command_name"
+                             v-model="new_command"
+                             :validators="[is_not_empty]">
+            </validated-input>
+          </div>
+        </div>
+
+
+        <button class="green-button modal-create-button"> Add Command </button>
       </div>
     </modal>
 
@@ -79,9 +143,15 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import AGCaseSettings from '@/components/project_admin/ag_test_cases/ag_test_case_settings.vue';
 import AGCommandSettings from '@/components/project_admin/ag_test_cases/ag_test_command_settings.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_test_cases/ag_test_suite_settings.vue';
 import Modal from '@/components/modal.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+
+import {
+  is_not_empty,
+} from '@/validators';
 
 import { Project } from 'ag-client-typescript';
 
@@ -104,9 +174,11 @@ interface TestSuite {
 
 @Component({
   components: {
+    AGCaseSettings,
     AGCommandSettings,
     AGSuiteSettings,
-    Modal
+    Modal,
+    ValidatedInput
   }
 })
 
@@ -114,6 +186,8 @@ export default class AGTestSuites extends Vue {
 
   @Prop({required: true, type: Project})
   project!: Project;
+
+  readonly is_not_empty = is_not_empty;
 
   suites: TestSuite[] = [
     {
@@ -150,21 +224,50 @@ export default class AGTestSuites extends Vue {
       ],
     },
     {
-      name: "Euchre Public Tests with Solution Card Pack Player",
+      name: "Euchre Public Tests with Solution Card, Pack, Player",
       pk: 3,
       test_cases: [
-        { name: "Test Case 1",
+        {
+          name: "Remove Sources",
           pk: 4,
           test_commands: [
-            { name: "Test command 1", pk: 6 },
-            { name: "Test command 2", pk: 7 }
+            { name: "Remove Sources", pk: 6 }
           ]
         },
-        { name: "Test Case 2",
+        {
+          name: "euchre_test00 with solution Card, Pack, Player",
           pk: 5,
           test_commands: [
-            { name: "Test command 1", pk: 8 },
-            { name: "Test command 2", pk: 9 }
+            { name: "euchre_test00 with solution Card, Pack, Player", pk: 7 }
+          ]
+        },
+        {
+          name: "euchre_test01 with solution Card, Pack, Player",
+          pk: 6,
+          test_commands: [
+            { name: "euchre_test01 with solution Card, Pack, Player", pk: 8 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Player Public Tests",
+      pk: 4,
+      test_cases: [
+        { name: "Player Public Test",
+          pk: 7,
+          test_commands: [
+            { name: "Compile", pk: 10},
+            { name: "Run", pk: 11 },
+            { name: "Valgrind", pk: 12 }
+          ]
+        },
+        { name: "Student Player tests on student Player",
+          pk: 8,
+          test_commands: [
+            { name: "Compile", pk: 13 },
+            { name: "Run", pk: 14 },
+            { name: "Valgrind", pk: 14 }
           ]
         }
       ],
@@ -180,6 +283,7 @@ export default class AGTestSuites extends Vue {
   new_suite_name = "";
   new_case_name = "";
   new_command_name = "";
+  new_command = "";
 
   level_selected = "";
 
@@ -208,6 +312,7 @@ export default class AGTestSuites extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/components/ag_tests.scss';
 
 #ag-test-cases-component {
   font-family: "Poppins";
@@ -218,49 +323,75 @@ $parent-of-active-command-color: lighten(mediumvioletred, 40);
 $suite-in-active-container-color: lighten(mediumvioletred, 50);
 
 #suites-title {
-  font-size: 18px;
-  padding: 22px 0 15px 10px;
-  font-weight: 500;
+  font-weight: bold;
+  font-size: 20px;
+  padding: 20px 0 7px 10px;
+}
+
+#name-and-command {
+  padding: 10px 0 20px 0;
+}
+
+.name-container, .command-container {
+  padding: 0 0 22px 0;
+}
+
+.suite-name, .case-name {
+  display: inline-block;
+  padding: 10px 10px 10px 10px;
+  max-width: 80%;
+}
+
+.add-suite, .add-case, .add-command {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 25px;
+  margin-left: 2px;
+  cursor: pointer;
+  vertical-align: top;
+}
+
+.add-suite {
+  vertical-align: middle;
+}
+
+.modal-create-button {
+  float: right;
+}
+
+.all-suites {
+  border: 1px solid hsl(210, 20%, 90%);
+  border-bottom: none;
 }
 
 .test-suite {
   background-color: hsl(210, 20%, 99%);
-  padding: 10px;
   border-bottom: 1px solid hsl(210, 20%, 90%);
   cursor: pointer;
+  font-size: 15px;
+  box-sizing: border-box;
 }
-
-/*.test-suite:hover {*/
-/*  background-color: lavender;*/
-/*}*/
 
 .test-case {
-  background-color: hsl(210, 20%, 95%);
+  background-color: hsl(210, 20%, 96%);
   box-sizing: border-box;
-  padding: 10px;
   border-bottom: 1px solid hsl(210, 20%, 90%);
   cursor: pointer;
-  width: 92.5%;
-  margin-left: 7.5%;
+  width: 95%;
+  margin-left: 5%;
+  font-size: 15px;
 }
-
-/*.test-case:hover {*/
-/*  background-color: lavender;*/
-/*}*/
 
 .test-command {
-  background-color: hsl(210, 20%, 95%);
+  background-color: hsl(210, 20%, 96%);
   box-sizing: border-box;
-  padding: 10px;
   border-bottom: 1px solid hsl(210, 20%, 90%);
   cursor: pointer;
-  width: 85%;
-  margin-left: 15%;
+  padding: 10px;
+  width: 90%;
+  margin-left: 10%;
+  font-size: 15px;
 }
-
-/*.test-command:hover {*/
-/*  background-color: lavender;*/
-/*}*/
 
 .suite-in-active-container {
   background-color: $suite-in-active-container-color;
@@ -276,25 +407,14 @@ $suite-in-active-container-color: lighten(mediumvioletred, 50);
 
 .active-suite, .active-suite:hover {
   background-color: $active-color;
-  /*color: white;*/
 }
 
 .active-case, .active-case:hover {
   background-color: $active-color;
-  /*color: white;*/
 }
 
 .active-command, .active-command:hover {
   background-color: $active-color;
-  /*color: white;*/
-}
-
-.cases-container {
-
-}
-
-.commands-container {
-
 }
 
 #suite-navigation-bar {
@@ -307,12 +427,12 @@ $suite-in-active-container-color: lighten(mediumvioletred, 50);
 
 @media only screen and (min-width: 481px) {
   #suite-navigation-bar {
-    width: 350px;
+    width: 400px;
   }
 
   #viewing-window {
     position: absolute;
-    left: 350px;
+    left: 400px;
     top: 15px;
     right: 0;
   }

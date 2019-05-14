@@ -692,6 +692,7 @@
   @import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
   @import '@/styles/button_styles.scss';
   @import '@/styles/colors.scss';
+  @import '@/styles/components/ag_tests.scss';
   $current-lang-choice: "Poppins";
 
   #ag-test-command-settings-component {
@@ -720,19 +721,6 @@
   .save-button {
     @extend .green-button;
     margin: 0 0 10px 0;
-  }
-
-  legend {
-    color: $ocean-blue;
-    font-size: 18px;
-  }
-
-  fieldset {
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-    border-color: rgba(255, 255, 255, 0.3);
-    border-width: 2px;
   }
 
   .input-tooltip {
@@ -830,7 +818,6 @@
   .modal-delete-button {
     @extend .red-button;
   }
-
 
   // Dropdown related ************************************************************
 
