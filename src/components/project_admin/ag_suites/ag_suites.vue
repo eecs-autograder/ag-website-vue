@@ -8,7 +8,8 @@
           <i class="far fa-plus-square"></i>
         </div>
       </div>
-      <div class="all-suites">
+      <div class="all-suites"
+           @wheel.stop>
         <div :class="['suite-container', {'active-suite-container': test_suite === active_suite}]"
              v-for="(test_suite, index) of suites">
           <div :class="['test-suite',
@@ -144,9 +145,9 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import AGCaseSettings from '@/components/project_admin/ag_test_cases/ag_test_case_settings.vue';
-import AGCommandSettings from '@/components/project_admin/ag_test_cases/ag_test_command_settings.vue';
-import AGSuiteSettings from '@/components/project_admin/ag_test_cases/ag_test_suite_settings.vue';
+import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
+import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
+import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
@@ -183,7 +184,7 @@ interface TestSuite {
   }
 })
 
-export default class AGTestSuites extends Vue {
+export default class AGSuites extends Vue {
 
   @Prop({required: true, type: Project})
   project!: Project;
@@ -294,134 +295,29 @@ export default class AGTestSuites extends Vue {
           ]
         }
       ],
-    },
-    {
-      name: "Player Public Tests",
-      pk: 5,
-      test_cases: [
-        { name: "Student Player tests on student Player",
-          pk: 8,
-          test_commands: [
-            { name: "Compile", pk: 13 },
-            { name: "Run", pk: 14 },
-            { name: "Valgrind", pk: 14 }
-          ]
-        }
-      ]
-    },
-    {
-      name: "Player Public Tests",
-      pk: 6,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 7,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 8,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: []
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: [
-        { name: "Student Player tests on student Player",
-          pk: 8,
-          test_commands: [
-            { name: "Compile", pk: 13 },
-            { name: "Run", pk: 14 },
-            { name: "Valgrind", pk: 14 }
-          ]
-        },
-      ]
-    },
-    {
-      name: "Player Public Tests",
-      pk: 9,
-      test_cases: [
-        { name: "Student Player tests on student Player",
-          pk: 8,
-          test_commands: [
-            { name: "Compile", pk: 13 },
-            { name: "Run", pk: 14 },
-            { name: "Valgrind", pk: 14 }
-          ]
-        },
-        { name: "Student Player tests on student Player",
-          pk: 8,
-          test_commands: [
-            { name: "Compile", pk: 13 },
-            { name: "Run", pk: 14 },
-            { name: "Valgrind", pk: 14 }
-          ]
-        }
-      ]
     }
   ];
 
   active_suite: TestSuite | null = null;
   active_case: TestCase | null = null;
   active_command: TestCommand | null = null;
-
   d_project!: Project;
-
+  loading = true;
   new_suite_name = "";
   new_case_name = "";
   new_command_name = "";
   new_command = "";
-
   level_selected = "";
 
+  async created() {
+    this.d_project = this.project;
+    // call to get all suites
+    this.loading = false;
+  }
+
   update_active_suite(suite: TestSuite) {
-    if (this.active_suite === suite) {
+    // to collapse
+    if (this.active_suite === suite && this.level_selected === "Suite") {
       this.active_suite = null;
     }
     else {
@@ -446,8 +342,8 @@ export default class AGTestSuites extends Vue {
 }
 </script>
 
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 <style scoped lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
@@ -499,6 +395,7 @@ $suite-in-active-container-color: lighten(mediumvioletred, 50);
 
 .all-suites {
   border: 2px solid #ebedef;
+  border-bottom: 1px solid #ebedef;
 }
 
 .test-suite {
@@ -570,14 +467,8 @@ $suite-in-active-container-color: lighten(mediumvioletred, 50);
     margin: 0;
   }
 
-  .nav-bottom {
-    background-color: #ebedef;
-    height: 20px;
-    width: 100%;
-  }
-
   .all-suites {
-    max-height: 86vh;
+    max-height: 87vh;
     overflow-y: scroll;
     scroll-behavior: smooth;
   }

@@ -12,16 +12,6 @@
           </tab-header>
           <template slot="body">
             <div class="tab-body">
-
-<!--              <div class="section-container">-->
-<!--                <fieldset>-->
-<!--                  <legend> Add a new Case </legend>-->
-<!--                  <div class="add-case-container">-->
-<!--                    <button class="teal-button"> Add Case </button>-->
-<!--                  </div>-->
-<!--                </fieldset>-->
-<!--              </div>-->
-
               <validated-form id="suite-settings-form"
                               autocomplete="off"
                               spellcheck="false"
@@ -29,7 +19,7 @@
                               @form_validity_changed="settings_form_is_valid = $event">
 
                 <div id="name-container">
-                  <label class="text-label"> Name </label>
+                  <label class="text-label"> Suite name </label>
                   <validated-input ref="suite_name"
                                    id="input-name"
                                    v-model="suite.name"
@@ -40,7 +30,7 @@
                 <div class="section-container">
                   <fieldset>
                     <legend> Grading </legend>
-                    <div class="command-input-container">
+                    <div class="sandbox-container">
                       <label class="text-label"> Sandbox environment: </label>
                       <div class="dropdown">
                         <dropdown ref="sandbox_environment_dropdown"
@@ -254,121 +244,117 @@
 </template>
 
 <script lang="ts">
-  import { ExpectedStudentFile, InstructorFile } from 'ag-client-typescript';
-  import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-  import APIErrors from '@/components/api_errors.vue';
-  import Dropdown from '@/components/dropdown.vue';
-  import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-  import Modal from '@/components/modal.vue';
-  import Tab from '@/components/tabs/tab.vue';
-  import TabHeader from '@/components/tabs/tab_header.vue';
-  import Tabs from '@/components/tabs/tabs.vue';
-  import Toggle from '@/components/toggle.vue';
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
+import APIErrors from '@/components/api_errors.vue';
+import Dropdown from '@/components/dropdown.vue';
+import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import Modal from '@/components/modal.vue';
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import Toggle from '@/components/toggle.vue';
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedForm from '@/components/validated_form.vue';
 
-  import {
-    is_integer,
-    is_non_negative,
-    is_not_empty,
-    is_number,
-    string_to_num
-  } from '@/validators';
+import { ExpectedStudentFile, InstructorFile } from 'ag-client-typescript';
+import { is_not_empty } from '@/validators';
+import { handle_api_errors_async } from '@/utils';
 
-  interface AGTestSuite {
-    pk: number;
-    name: string;
-    project: number;
-    instructor_files_needed: string[];
-    student_files_needed: string[];
-    setup_suite_cmd: string;
-    setup_suite_cmd_name: string;
-    sandbox_docker_image: string;
-    allow_network_access: boolean;
-    deferred: boolean;
-    last_modified: string;
+interface AGTestSuite {
+  pk: number;
+  name: string;
+  project: number;
+  instructor_files_needed: string[];
+  student_files_needed: string[];
+  setup_suite_cmd: string;
+  setup_suite_cmd_name: string;
+  sandbox_docker_image: string;
+  allow_network_access: boolean;
+  deferred: boolean;
+  last_modified: string;
+}
+
+@Component({
+  components: {
+    APIErrors,
+    Dropdown,
+    DropdownTypeahead,
+    Modal,
+    Tab,
+    TabHeader,
+    Tabs,
+    Toggle,
+    Tooltip,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class AGSuiteSettings extends Vue {
+  current_tab_index = 0;
+
+  saving = false;
+  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+  docker_images = [
+    "Default",
+    "EECS 280",
+    "EECS 280"
+  ];
+  instructor_files = ["Card.h", "Pack.h"];
+  expected_student_files = ["Card.cpp", "Pack.cpp"];
+  settings_form_is_valid = false;
+
+  // will be a prop
+  suite: AGTestSuite = {
+    pk: 1,
+    name: "AG Test Suite",
+    project: 1,
+    instructor_files_needed: ["euchre_test50.in", "pack.in"],
+    student_files_needed: ["Player_tests.cpp", "euchre.cpp", "Player.cpp"],
+    setup_suite_cmd: "",
+    setup_suite_cmd_name: "",
+    sandbox_docker_image: "Default",
+    allow_network_access: false,
+    deferred: false,
+    last_modified: ""
+  };
+  d_suite!: AGTestSuite;
+
+  readonly is_not_empty = is_not_empty;
+
+  async created() {
+    this.d_suite = this.suite;
   }
 
-  @Component({
-    components: {
-      APIErrors,
-      Dropdown,
-      DropdownTypeahead,
-      Modal,
-      Tab,
-      TabHeader,
-      Tabs,
-      Toggle,
-      Tooltip,
-      ValidatedForm,
-      ValidatedInput
-    }
-  })
-  export default class AGSuiteSettings extends Vue {
-    current_tab_index = 0;
-    saving = false;
-    last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-      hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    loading = true;
-    docker_images = [
-      "Default",
-      "EECS 280",
-      "EECS 280"
-    ];
-
-    instructor_files = ["Card.h", "Pack.h"];
-    expected_student_files = ["Card.cpp", "Pack.cpp"];
-    settings_form_is_valid = false;
-
-    suite: AGTestSuite = {
-      pk: 1,
-      name: "AG Test Suite",
-      project: 1,
-      instructor_files_needed: ["euchre_test50.in", "pack.in"],
-      student_files_needed: ["Player_tests.cpp", "euchre.cpp", "Player.cpp"],
-      setup_suite_cmd: "",
-      setup_suite_cmd_name: "",
-      sandbox_docker_image: "Default",
-      allow_network_access: false,
-      deferred: false,
-      last_modified: ""
-    };
-
-    readonly is_non_negative = is_non_negative;
-    readonly is_not_empty = is_not_empty;
-    readonly is_integer = is_integer;
-    readonly is_number = is_number;
-    readonly string_to_num = string_to_num;
-
-    async created() {
-      this.loading = false;
-    }
-
-    delete_ag_test_suite() {
-
-    }
-
-    instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-      return file.name.indexOf(filter_text) >= 0;
-    }
-
-    expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-      return file.pattern.indexOf(filter_text) >= 0;
-    }
-
-    async save_ag_test_suite_settings() {
-      this.saving = true;
-      try {
-
-      }
-      finally {
-        this.saving = false;
-      }
-    }
-
+  async delete_ag_test_suite() {
+    // call to delete suite
   }
+
+  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
+    return file.name.indexOf(filter_text) >= 0;
+  }
+
+  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
+    return file.pattern.indexOf(filter_text) >= 0;
+  }
+
+  @handle_api_errors_async(handle_save_ag_suite_settings_error)
+  async save_ag_test_suite_settings() {
+    this.saving = true;
+    try {
+      // call to save
+    }
+    finally {
+      this.saving = false;
+    }
+  }
+}
+
+function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 </script>
 
 <style scoped lang="scss">
@@ -378,16 +364,12 @@
 @import '@/styles/components/ag_tests.scss';
 $current-lang-choice: "Poppins";
 
-.add-case-container {
-  padding: 15px 10px;
-}
-
 #ag-test-suite-settings-component {
   font-family: $current-lang-choice;
 }
 
 #setup-command-container {
-  margin: 15px 0 0 0;
+  margin: 15px 0 10px 0;
 }
 
 .toggle-container {
@@ -399,7 +381,7 @@ $current-lang-choice: "Poppins";
 
 .instructor-files, .student-files {
   margin: 10px 0;
-  border: 1px solid hsl(210, 20%, 94%);
+  border: 1px solid hsl(210, 20%, 90%);
   display: inline-block;
 }
 
@@ -411,149 +393,24 @@ $current-lang-choice: "Poppins";
   background-color: hsl(210, 20%, 96%);
 }
 
-.tab-body {
-  padding: 0 15px;
-  height: 90vh;
-  overflow: scroll;
-}
-
 .suite-to-delete {
-  color: $ocean-blue;
-  margin-left: 3px;
+  @extend .item-to-delete;
 }
 
 .delete-suite-button {
-  @extend .red-button;
-  margin: 15px 0 0 0;
+  @extend .delete-level-button;
 }
 
 .delete-suite-button span {
-  margin-left: 3px;
-  font-style: italic;
+  margin-left: 5px;
 }
 
-.command-input-container {
+.sandbox-container {
   padding: 10px 0 10px 3px;
 }
 
 #name-container {
   padding: 10px 12px 22px 12px;
-}
-
-.file-dropdown-container {
-  display: inline-block;
-  vertical-align: top;
-  margin-top: 10px;
-}
-
-.file-dropdown-adjacent {
-  display: inline-block;
-  margin-right: 50px;
-  vertical-align: top;
-}
-
-.text-container {
-  margin-top: 10px;
-}
-
-.suite-settings-input {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-  display: inline-block;
-  font-size: 1rem;
-  line-height: 1.5;
-  position: relative;
-  padding: .375rem .75rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  width: 80px;
-}
-
-.bottom-of-form {
-  padding: 0 14px 0px 14px;
-}
-
-// Checkbox related ************************************************************
-
-input[type=checkbox] + label::before {
-  border-radius: 2px;
-  color: hsl(210, 20%, 86%);
-  content: '\f0c8';
-  display: inline-block;
-  font-family: "Font Awesome 5 Free";
-  font-size: 18px;
-  height: 18px;
-  margin-right: 10px;
-  width: 12px;
-}
-
-input[type=checkbox]:checked + label::before {
-  background: transparent;
-  content: '\f14a';
-  color: $ocean-blue;
-  font-family: "Font Awesome 5 Free";
-  height: 18px;
-  width: 12px;
-}
-
-input[type=checkbox] {
-  clip: rect(0,0,0,0);
-  position: absolute;
-}
-
-.checkbox-input-container {
-  padding: 10px 0 10px 5px;
-}
-
-.point-assignment-container {
-  padding: 10px 0 0 0;
-}
-
-.add-points-container {
-  display: block;
-  box-sizing: border-box;
-  width: 300px;
-  margin-right: 50px;
-}
-
-.subtract-points-container {
-  display: block;
-}
-
-.minus-sign {
-  color: darkorange;
-}
-
-.plus-sign {
-  color: $ocean-blue;
-}
-
-.minus-sign, .plus-sign {
-  margin-right: 10px;
-}
-
-.unit-of-measurement {
-  display: inline-block;
-  vertical-align: top;
-  padding-left: 10px;
-  padding-top: 6px;
-}
-
-@media only screen and (min-width: 481px) {
-  .point-assignment-container {
-    padding: 10px 0 0 3px;
-    min-width: 500px;
-  }
-
-  .add-points-container {
-    display: inline-block;
-  }
-
-  .subtract-points-container {
-    display: inline-block;
-  }
 }
 
 </style>

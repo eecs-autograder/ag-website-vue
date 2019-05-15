@@ -13,15 +13,6 @@ fieldset {
     border-width: 2px;
 }
 
-.checkbox-label {
-    color: lighten(black, 10);
-    display: inline-block;
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0 0 0 0;
-    text-align: right;
-}
-
 .text-label {
     color: lighten(black, 10);
     display: inline-block;
@@ -35,6 +26,46 @@ fieldset {
     padding: 0 0 10px 0;
 }
 
+// Checkbox related ************************************************************
+
+input[type=checkbox] + label::before {
+    border-radius: 2px;
+    color: hsl(210, 20%, 86%);
+    content: '\f0c8';
+    display: inline-block;
+    font-family: "Font Awesome 5 Free";
+    font-size: 18px;
+    height: 18px;
+    margin-right: 10px;
+    width: 12px;
+}
+
+input[type=checkbox]:checked + label::before {
+    background: transparent;
+    content: '\f14a';
+    color: $ocean-blue;
+    font-family: "Font Awesome 5 Free";
+    height: 18px;
+    width: 12px;
+}
+
+input[type=checkbox] {
+    clip: rect(0,0,0,0);
+    position: absolute;
+}
+
+.checkbox-input-container {
+    padding: 10px 0 10px 5px;
+}
+
+.checkbox-label {
+    color: lighten(black, 10);
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 0 0;
+    text-align: right;
+}
 
 // Dropdown related ************************************************************
 
@@ -110,6 +141,10 @@ fieldset {
     font-size: 18px;
 }
 
+.bottom-of-form {
+    padding: 0 10px 10px 13px;
+}
+
 .save-button {
     @extend .green-button;
     margin: 0 0 10px 0;
@@ -128,16 +163,27 @@ fieldset {
     display: inline-block;
 }
 
+.delete-level-button {
+    @extend .red-button;
+    margin: 15px 0 0 0;
+}
+
+.delete-level-button span {
+    margin-left: 5px;
+}
+
 // Modal Related ***********************************************************
+
+.item-to-delete {
+    color: $ocean-blue;
+    margin-left: 3px;
+}
 
 .modal-header {
     font-size: 24px;
     font-weight: bold;
     margin: 0;
     padding: 5px 0;
-}
-
-.modal-body {
 }
 
 .modal-cancel-button {

@@ -19,7 +19,7 @@
                               @form_validity_changed="settings_form_is_valid = $event">
 
                 <div id="name-container">
-                  <label class="text-label"> Name </label>
+                  <label class="text-label"> Command name </label>
                   <validated-input ref="command_name"
                                    id="input-name"
                                    v-model="command.name"
@@ -520,503 +520,331 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+import { handle_api_errors_async } from '@/utils';
+import { Component, Vue } from 'vue-property-decorator';
 
-  import APIErrors from '@/components/api_errors.vue';
-  import Dropdown from '@/components/dropdown.vue';
-  import Modal from '@/components/modal.vue';
-  import Tab from '@/components/tabs/tab.vue';
-  import TabHeader from '@/components/tabs/tab_header.vue';
-  import Tabs from '@/components/tabs/tabs.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
+import APIErrors from '@/components/api_errors.vue';
+import Dropdown from '@/components/dropdown.vue';
+import Modal from '@/components/modal.vue';
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedForm from '@/components/validated_form.vue';
 
-  import {
-    is_integer,
-    is_non_negative,
-    is_not_empty,
-    is_number,
-    string_to_num
-  } from '@/validators';
+import {
+  is_integer,
+  is_non_negative,
+  is_not_empty,
+  is_number,
+  string_to_num
+} from '@/validators';
 
-  interface AGTestCommand {
-    pk: number;
-    name: string;
-    ag_test_case: number;
-    last_modified: number;
-    cmd: string;
-    stdin_source: string;
-    stdin_text: string;
-    stdin_instructor_file: string;
-    expected_return_code: string;
-    expected_stdout_source: string;
-    expected_stdout_text: string;
-    expected_stdout_instructor_file: string;
-    expected_stderr_source: string;
-    expected_stderr_text: string;
-    expected_stderr_instructor_file: string;
-    ignore_case: boolean;
-    ignore_whitespace: boolean;
-    ignore_whitespace_changes: boolean;
-    ignore_blank_lines: boolean;
-    points_for_correct_return_code: number;
-    points_for_correct_stdout: number;
-    points_for_correct_stderr: number;
-    deduction_for_wrong_return_code: number;
-    deduction_for_wrong_stdout: number;
-    deduction_for_wrong_stderr: number;
-    normal_feedback_config: null;
-    first_failed_test_normal_fdbk_config: null;
-    ultimate_submission_fdbk_config: null;
-    past_limit_submission_fdbk_config: null;
-    staff_viewer_fdbk_config: null;
-    time_limit: number;
-    stack_size_limit: number;
-    virtual_memory_limit: number;
-    process_spawn_limit: number;
+interface AGTestCommand {
+  pk: number;
+  name: string;
+  ag_test_case: number;
+  last_modified: number;
+  cmd: string;
+  stdin_source: string;
+  stdin_text: string;
+  stdin_instructor_file: string;
+  expected_return_code: string;
+  expected_stdout_source: string;
+  expected_stdout_text: string;
+  expected_stdout_instructor_file: string;
+  expected_stderr_source: string;
+  expected_stderr_text: string;
+  expected_stderr_instructor_file: string;
+  ignore_case: boolean;
+  ignore_whitespace: boolean;
+  ignore_whitespace_changes: boolean;
+  ignore_blank_lines: boolean;
+  points_for_correct_return_code: number;
+  points_for_correct_stdout: number;
+  points_for_correct_stderr: number;
+  deduction_for_wrong_return_code: number;
+  deduction_for_wrong_stdout: number;
+  deduction_for_wrong_stderr: number;
+  normal_feedback_config: null;
+  first_failed_test_normal_fdbk_config: null;
+  ultimate_submission_fdbk_config: null;
+  past_limit_submission_fdbk_config: null;
+  staff_viewer_fdbk_config: null;
+  time_limit: number;
+  stack_size_limit: number;
+  virtual_memory_limit: number;
+  process_spawn_limit: number;
+}
+@Component({
+  components: {
+    APIErrors,
+    Dropdown,
+    Modal,
+    Tab,
+    TabHeader,
+    Tabs,
+    ValidatedForm,
+    ValidatedInput
   }
-  @Component({
-    components: {
-      APIErrors,
-      Dropdown,
-      Modal,
-      Tab,
-      TabHeader,
-      Tabs,
-      ValidatedForm,
-      ValidatedInput
-    }
-  })
-  export default class AGCommandSettings extends Vue {
-    current_tab_index = 0;
-    saving = false;
-    last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                            hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    existing_command_names: string[] = [];
-    loading = true;
+})
+export default class AGCommandSettings extends Vue {
+  current_tab_index = 0;
+  saving = false;
+  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+  existing_command_names: string[] = [];
+  loading = true;
 
-    settings_form_is_valid = false;
+  settings_form_is_valid = false;
 
-    command: AGTestCommand = {
-      pk: 1,
-      name: "Star Command",
-      ag_test_case: 2,
-      last_modified: 712,
-      cmd: "g++ BinarySearchTree_compile_check.cpp -Wall " +
-           "-Werror -Wno-sign-compare -Wno-comment -pedantic --std=c++11 -g",
-      stdin_source: "No input",
-      stdin_text: "",
-      stdin_instructor_file: "",
-      expected_return_code: "Don't check",
-      expected_stdout_source: "Don't check",
-      expected_stdout_text: "",
-      expected_stdout_instructor_file: "",
-      expected_stderr_source: "Don't check",
-      expected_stderr_text: "",
-      expected_stderr_instructor_file: "",
-      ignore_case: false,
-      ignore_whitespace: false,
-      ignore_whitespace_changes: false,
-      ignore_blank_lines: false,
-      points_for_correct_return_code: 0,
-      points_for_correct_stdout: 0,
-      points_for_correct_stderr: 0,
-      deduction_for_wrong_return_code: 0,
-      deduction_for_wrong_stdout: 0,
-      deduction_for_wrong_stderr: 0,
-      normal_feedback_config: null,
-      first_failed_test_normal_fdbk_config: null,
-      ultimate_submission_fdbk_config: null,
-      past_limit_submission_fdbk_config: null,
-      staff_viewer_fdbk_config: null,
-      time_limit: 10,
-      stack_size_limit: 10000000,
-      virtual_memory_limit: 500000000,
-      process_spawn_limit: 0
-    };
+  command: AGTestCommand = {
+    pk: 1,
+    name: "Star Command",
+    ag_test_case: 2,
+    last_modified: 712,
+    cmd: "g++ BinarySearchTree_compile_check.cpp -Wall " +
+         "-Werror -Wno-sign-compare -Wno-comment -pedantic --std=c++11 -g",
+    stdin_source: "No input",
+    stdin_text: "",
+    stdin_instructor_file: "",
+    expected_return_code: "Don't check",
+    expected_stdout_source: "Don't check",
+    expected_stdout_text: "",
+    expected_stdout_instructor_file: "",
+    expected_stderr_source: "Don't check",
+    expected_stderr_text: "",
+    expected_stderr_instructor_file: "",
+    ignore_case: false,
+    ignore_whitespace: false,
+    ignore_whitespace_changes: false,
+    ignore_blank_lines: false,
+    points_for_correct_return_code: 0,
+    points_for_correct_stdout: 0,
+    points_for_correct_stderr: 0,
+    deduction_for_wrong_return_code: 0,
+    deduction_for_wrong_stdout: 0,
+    deduction_for_wrong_stderr: 0,
+    normal_feedback_config: null,
+    first_failed_test_normal_fdbk_config: null,
+    ultimate_submission_fdbk_config: null,
+    past_limit_submission_fdbk_config: null,
+    staff_viewer_fdbk_config: null,
+    time_limit: 10,
+    stack_size_limit: 10000000,
+    virtual_memory_limit: 500000000,
+    process_spawn_limit: 0
+  };
 
-    readonly is_non_negative = is_non_negative;
-    readonly is_not_empty = is_not_empty;
-    readonly is_integer = is_integer;
-    readonly is_number = is_number;
-    readonly string_to_num = string_to_num;
+  readonly is_non_negative = is_non_negative;
+  readonly is_not_empty = is_not_empty;
+  readonly is_integer = is_integer;
+  readonly is_number = is_number;
+  readonly string_to_num = string_to_num;
 
-    async created() {
-      this.loading = false;
-    }
-
-    delete_ag_test_command() {
-
-    }
-
-    async save_ag_test_command_settings() {
-      this.saving = true;
-      try {
-
-      }
-      finally {
-        this.saving = false;
-      }
-    }
-    stdin_source_options = [
-      "No input",
-      "Text",
-      "Project file content",
-      "Stdout from setup",
-      "Stderr from setup"
-    ];
-    expected_return_code_options = [
-      "Don't check",
-      "Zero",
-      "Nonzero"
-    ];
-    expected_stdout_source_options = [
-      "Don't check",
-      "Text",
-      "Project file content"
-    ];
-    expected_stderr_source_options = [
-      "Don't check",
-      "Text",
-      "Project file content"
-    ];
-    file_options = [
-      "Card.h",
-      "Pack.h",
-      "Card.cpp"
-    ];
+  async created() {
+    this.loading = false;
   }
+
+  async delete_ag_test_command() {
+    // call to delete command 4ever
+  }
+
+  @handle_api_errors_async(handle_save_ag_suite_settings_error)
+  async save_ag_test_command_settings() {
+    this.saving = true;
+    try {
+      // call to save test command
+    }
+    finally {
+      this.saving = false;
+    }
+  }
+  stdin_source_options = [
+    "No input",
+    "Text",
+    "Project file content",
+    "Stdout from setup",
+    "Stderr from setup"
+  ];
+  expected_return_code_options = [
+    "Don't check",
+    "Zero",
+    "Nonzero"
+  ];
+  expected_stdout_source_options = [
+    "Don't check",
+    "Text",
+    "Project file content"
+  ];
+  expected_stderr_source_options = [
+    "Don't check",
+    "Text",
+    "Project file content"
+  ];
+  file_options = [
+    "Card.h",
+    "Pack.h",
+    "Card.cpp"
+  ];
+}
+
+function handle_save_ag_suite_settings_error(component: AGCommandSettings, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 </script>
 
 <style scoped lang="scss">
-  @import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
-  @import '@/styles/button_styles.scss';
-  @import '@/styles/colors.scss';
-  @import '@/styles/components/ag_tests.scss';
-  $current-lang-choice: "Poppins";
+@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/components/ag_tests.scss';
+$current-lang-choice: "Poppins";
 
-  #ag-test-command-settings-component {
-    font-family: $current-lang-choice;
-  }
+#ag-test-command-settings-component {
+  font-family: $current-lang-choice;
+}
 
-  .tab-body {
-    padding: 0 15px;
-  }
+.command-to-delete {
+  @extend .item-to-delete;
+}
 
-  .command-to-delete {
-    color: $ocean-blue;
-    margin-left: 3px;
-  }
+.delete-command-button {
+  @extend .delete-level-button;
+}
 
-  .delete-command-button {
-    @extend .red-button;
-    margin: 15px 0 0 0;
-  }
+.command-input-container {
+  padding: 10px 0 10px 3px;
+}
 
-  .delete-command-button span {
-    margin-left: 3px;
-    font-style: italic;
-  }
+#name-container {
+  padding: 10px 12px 12px 12px;
+}
 
-  .save-button {
-    @extend .green-button;
-    margin: 0 0 10px 0;
-  }
+#command-container {
+  padding: 10px 12px 22px 12px;
+}
 
-  .input-tooltip {
-    color: mediumvioletred;
-    font-size: 15px;
-    margin-left: 8px;
-  }
+.file-dropdown-container {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 10px;
+}
 
-  .section-container {
-    padding: 0 0 10px 0;
-  }
+.file-dropdown-adjacent {
+  display: inline-block;
+  margin-right: 50px;
+  vertical-align: top;
+}
 
-  .command-input-container {
-    padding: 10px 0 10px 3px;
-  }
+.text-container {
+  margin-top: 10px;
+}
 
-  #name-container {
-    padding: 10px 12px 12px 12px;
-  }
+.command-settings-input {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  box-sizing: border-box;
+  color: #495057;
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1.5;
+  position: relative;
+  padding: .375rem .75rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  width: 80px;
+}
 
-  #command-container {
-    padding: 10px 12px 22px 12px;
-  }
+.point-assignment-container {
+  padding: 10px 0 0 0;
+}
 
-  .file-dropdown-container {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 10px;
-  }
+.add-points-container {
+  display: block;
+  box-sizing: border-box;
+  width: 300px;
+  margin-right: 50px;
+}
 
-  .file-dropdown-adjacent {
-    display: inline-block;
-    margin-right: 50px;
-    vertical-align: top;
-  }
+.subtract-points-container {
+  display: block;
+}
 
-  .text-container {
-    margin-top: 10px;
-  }
+.minus-sign {
+  color: darkorange;
+}
 
-  .command-settings-input {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    box-sizing: border-box;
-    color: #495057;
-    display: inline-block;
-    font-size: 1rem;
-    line-height: 1.5;
-    position: relative;
-    padding: .375rem .75rem;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    width: 80px;
-  }
+.plus-sign {
+  color: $ocean-blue;
+}
 
-  .checkbox-label {
-    color: lighten(black, 10);
-    display: inline-block;
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0 0 0 0;
-    text-align: right;
-  }
+.minus-sign, .plus-sign {
+  margin-right: 10px;
+}
 
-  .text-label {
-    color: lighten(black, 10);
-    display: inline-block;
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0 0 7px 0;
-    text-align: right;
-  }
+.unit-of-measurement {
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 10px;
+  padding-top: 6px;
+}
 
-  .bottom-of-form {
-    padding: 0 14px 50px 14px;
-  }
+#time-limit-container {
+  display: inline-block;
+  margin-right: 50px;
+  padding-bottom: 20px;
+  vertical-align: top;
+}
+#virtual-memory-container {
+  display: inline-block;
+  padding-bottom: 20px;
+  vertical-align: top;
+}
+#stack-size-container {
+  display: inline-block;
+  margin-right: 50px;
+  padding-bottom: 20px;
+  vertical-align: top;
+}
+#process-spawn-container {
+  display: inline-block;
+  padding-bottom: 25px;
+  vertical-align: top;
+}
 
-  // Start Modal Related ***********************************************************
+#time-limit-and-stack-size {
+  padding: 0 0 0 0;
+}
 
-  .modal-header {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
-    padding: 5px 0;
-  }
-
-  .modal-body {
-    padding: 10px 10px 0 10px;
-  }
-
-  .modal-cancel-button {
-    @extend .gray-button;
-  }
-
-  .modal-delete-button {
-    @extend .red-button;
-  }
-
-  // Dropdown related ************************************************************
-
-  .small-dropdown {
-    width: 100px;
-  }
-
-  .medium-dropdown {
-    width: 200px;
-  }
-
-  .large-dropdown {
-    width: 300px;
-  }
-
-  .dropdown-header-wrapper {
-    display: inline-block;
-    margin: 0;
-    position: relative;
-  }
-
-  .dropdown-header {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    box-sizing: border-box;
-    color: #495057;
-    cursor: default;
-    display: block;
-    font-size: 1rem;
-    line-height: 1.5;
-    min-height: 38px;
-    padding: .375rem .75rem;
-    position: relative;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  }
-
-  .dropdown-header:focus {
-    border-color: $ocean-blue;
-  }
-
-  .dropdown-caret {
-    cursor: pointer;
-    font-size: 30px;
-    position: absolute;
-    right: 18px;
-    top: 3px;
-  }
-
-  // Checkbox related ************************************************************
-
-  input[type=checkbox] + label::before {
-    border-radius: 2px;
-    color: hsl(210, 20%, 86%);
-    content: '\f0c8';
-    display: inline-block;
-    font-family: "Font Awesome 5 Free";
-    font-size: 18px;
-    height: 18px;
-    margin-right: 10px;
-    width: 12px;
-  }
-
-  input[type=checkbox]:checked + label::before {
-    background: transparent;
-    content: '\f14a';
-    color: $ocean-blue;
-    font-family: "Font Awesome 5 Free";
-    height: 18px;
-    width: 12px;
-  }
-
-  input[type=checkbox] {
-    clip: rect(0,0,0,0);
-    position: absolute;
-  }
-
-  .checkbox-input-container {
-    padding: 10px 0 10px 5px;
-  }
-
-  .saving-spinner {
-    color: $ocean-blue;
-    display: inline-block;
-    padding-left: 10px;
-    font-size: 18px;
-  }
-
-  .loading-spinner {
-    color: $ocean-blue;
-    display: inline-block;
-    padding-left: 10px;
-    font-size: 18px;
-  }
-
-  .last-saved-timestamp {
-    color: lighten(#495057, 40);
-    font-size: 15px;
-  }
-
-  .last-saved-spinner {
-    font-size: 18px;
-    color: $ocean-blue;
-    margin-top: 15px;
-    margin-left: 24px;
-    display: inline-block;
-  }
-
+@media only screen and (min-width: 481px) {
   .point-assignment-container {
-    padding: 10px 0 0 0;
+    padding: 10px 0 0 3px;
+    min-width: 500px;
   }
 
   .add-points-container {
-    display: block;
-    box-sizing: border-box;
-    width: 300px;
-    margin-right: 50px;
+    display: inline-block;
   }
 
   .subtract-points-container {
-    display: block;
-  }
-
-  .minus-sign {
-    color: darkorange;
-  }
-
-  .plus-sign {
-    color: $ocean-blue;
-  }
-
-  .minus-sign, .plus-sign {
-    margin-right: 10px;
-  }
-
-  .unit-of-measurement {
     display: inline-block;
-    vertical-align: top;
-    padding-left: 10px;
-    padding-top: 6px;
   }
 
   #time-limit-container {
-    display: inline-block;
-    margin-right: 50px;
-    padding-bottom: 20px;
-    vertical-align: top;
+    width: 400px;
   }
+
   #virtual-memory-container {
-    display: inline-block;
-    padding-bottom: 20px;
-    vertical-align: top;
+    width: 400px;
   }
+
   #stack-size-container {
-    display: inline-block;
-    margin-right: 50px;
-    padding-bottom: 20px;
-    vertical-align: top;
+    width: 400px;
   }
+
   #process-spawn-container {
-    display: inline-block;
-    padding-bottom: 25px;
-    vertical-align: top;
+    width: 400px;
   }
-
-  #time-limit-and-stack-size {
-    padding: 0 0 0 0;
-  }
-
-  @media only screen and (min-width: 481px) {
-
-    .point-assignment-container {
-      padding: 10px 0 0 3px;
-      min-width: 500px;
-    }
-
-    .add-points-container {
-      display: inline-block;
-    }
-
-    .subtract-points-container {
-      display: inline-block;
-    }
-
-    #time-limit-container {
-      width: 400px;
-    }
-
-    #virtual-memory-container {
-      width: 400px;
-    }
-
-    #stack-size-container {
-      width: 400px;
-    }
-
-    #process-spawn-container {
-      width: 400px;
-    }
-
-  }
+}
 </style>
