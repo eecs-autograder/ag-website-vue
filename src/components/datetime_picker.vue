@@ -49,8 +49,7 @@
             <input type="text"
                    id="hour-input"
                    v-model="hours_str"
-                   @keydown="validate_hours"
-                   @blur="fix_hours">
+                   @keydown="update_hours">
           </div>
           <button @click="go_to_prev_hour" class="down-button">
             <i class="fas fa-chevron-down down-arrow"></i>
@@ -67,8 +66,7 @@
             <input type="text"
                    id="minute-input"
                    v-model="minutes_str"
-                   @keydown="validate_minutes"
-                   @blur="fix_minutes"/>
+                   @keydown="update_minutes"/>
           </div>
           <button @click="go_to_prev_minute" class="down-button">
             <i class="fas fa-chevron-down down-arrow"></i>
@@ -120,6 +118,17 @@
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
   import Dropdown from '@/components/dropdown.vue';
+
+  enum HourInputState {
+    awaiting_first_digit,
+    first_digit_was_one,
+    first_digit_was_zero
+  }
+
+  enum MinuteInputState {
+    awaiting_first_digit,
+    awaiting_second_digit
+  }
 
 @Component({
   components: {
@@ -178,10 +187,12 @@ export default class DatetimePicker extends Vue {
   year = 2000;
   selected_year = 0;
 
+  hour_input_state: HourInputState = HourInputState.awaiting_first_digit;
+  minute_input_state: MinuteInputState = MinuteInputState.awaiting_first_digit;
+
   hours_str = '12';
   minutes_str = '00';
   period_str = "PM";
-
   timezone_selected = this.timezones[0];
 
   calender = [
@@ -249,20 +260,7 @@ export default class DatetimePicker extends Vue {
     this.update_time_selected();
   }
 
-  fix_hours() {
-    if (!this.is_number(this.hours_str) || Number(this.hours_str) <= 0) {
-      this.hours_str = "01";
-    }
-    else if (Number(this.hours_str) >= 13) {
-      this.hours_str = "12";
-    }
-    else if (Number(this.hours_str) < 10 && this.hours_str.length <= 1) {
-      this.hours_str = '0' + this.hours_str;
-    }
-    this.update_time_selected();
-  }
-
-  validate_minutes(event: KeyboardEvent) {
+  update_minutes(event: KeyboardEvent) {
     if (event.key === "ArrowUp") {
       this.go_to_next_minute();
     }
@@ -272,8 +270,16 @@ export default class DatetimePicker extends Vue {
     else if (this.is_number(event.key) || event.key === "Backspace"
         || event.key === "ArrowLeft" || event.key === "ArrowRight") {
       if (this.is_number(event.key)) {
-        if (this.minutes_str.length == 2) {
-          event.preventDefault();
+        event.preventDefault();
+        if (this.minute_input_state === MinuteInputState.awaiting_first_digit) {
+          this.minutes_str = "0" + event.key;
+          if (Number(event.key) <= 5) {
+            this.minute_input_state = MinuteInputState.awaiting_second_digit;
+          }
+        }
+        else if (this.minute_input_state === MinuteInputState.awaiting_second_digit) {
+          this.minutes_str = (Number(this.minutes_str) + event.key).toString();
+          this.minute_input_state = MinuteInputState.awaiting_first_digit;
         }
       }
     }
@@ -282,7 +288,7 @@ export default class DatetimePicker extends Vue {
     }
   }
 
-  validate_hours(event: KeyboardEvent) {
+  update_hours(event: KeyboardEvent) {
     if (event.key === "ArrowUp") {
       this.go_to_next_hour();
     }
@@ -292,27 +298,35 @@ export default class DatetimePicker extends Vue {
     else if (this.is_number(event.key) || event.key === "Backspace"
         || event.key === "ArrowLeft" || event.key === "ArrowRight") {
       if (this.is_number(event.key)) {
-        if (this.hours_str.length >= 2) {
-          event.preventDefault();
+        event.preventDefault();
+        if (this.hour_input_state === HourInputState.awaiting_first_digit) {
+          this.hours_str = "0" + event.key;
+          if (event.key === '0') {
+            this.hour_input_state = HourInputState.first_digit_was_zero;
+          }
+          else if (event.key === '1') {
+            this.hour_input_state = HourInputState.first_digit_was_one;
+          }
+        }
+        else if (this.hour_input_state === HourInputState.first_digit_was_zero) {
+          this.hours_str = "0" + event.key;
+          if (Number(this.hours_str) === 0) {
+            this.hours_str = "01";
+          }
+          this.hour_input_state = HourInputState.awaiting_first_digit;
+        }
+        else if (this.hour_input_state === HourInputState.first_digit_was_one) {
+          this.hours_str = Number(this.hours_str) + event.key;
+          if (Number(this.hours_str) > 12) {
+            this.hours_str = "12";
+          }
+          this.hour_input_state = HourInputState.awaiting_first_digit;
         }
       }
     }
     else {
       event.preventDefault();
     }
-  }
-
-  fix_minutes() {
-    if (!this.is_number(this.minutes_str) || Number(this.minutes_str) < 0) {
-      this.minutes_str = "00";
-    }
-    else if (Number(this.minutes_str) >= 60) {
-      this.minutes_str = "59";
-    }
-    else if (Number(this.minutes_str) < 10 && this.minutes_str.length <= 1) {
-      this.minutes_str = '0' + this.minutes_str;
-    }
-    this.update_time_selected();
   }
 
   go_to_next_month() {
