@@ -49,7 +49,8 @@
                    ref="hour_input"
                    id="hour-input"
                    v-model="hours_str"
-                   @keydown="update_hours">
+                   @keydown="update_hours"
+                   @blur="fix_hours">
           </div>
           <button ref="prev_hour_button"
                   @click="go_to_prev_hour"
@@ -162,7 +163,7 @@ export default class DatetimePicker extends Vue {
   selected_year = 0;
   hours_str = '12';
   minutes_str = '00';
-  period_str = "PM";
+  period_str = 'PM';
   calender: number[][] = [
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
@@ -230,6 +231,7 @@ export default class DatetimePicker extends Vue {
   }
 
   update_minutes(event: KeyboardEvent) {
+    event.preventDefault();
     if (event.code === "ArrowUp") {
       this.go_to_next_minute();
     }
@@ -237,10 +239,9 @@ export default class DatetimePicker extends Vue {
       this.go_to_prev_minute();
     }
     else if (event.code === "Backspace") {
-      this.minutes_str = "";
+      this.minutes_str = "00";
     }
     else if (this.is_number(event.key)) {
-      event.preventDefault();
       if (this.minute_input_state === MinuteInputState.awaiting_first_digit) {
         this.minutes_str = "0" + event.key;
         this.update_time_selected();
@@ -254,12 +255,10 @@ export default class DatetimePicker extends Vue {
         this.update_time_selected();
       }
     }
-    else {
-      event.preventDefault();
-    }
   }
 
   update_hours(event: KeyboardEvent) {
+    event.preventDefault();
     if (event.code === "ArrowUp") {
       this.go_to_next_hour();
     }
@@ -267,10 +266,9 @@ export default class DatetimePicker extends Vue {
       this.go_to_prev_hour();
     }
     else if (event.code === "Backspace") {
-      this.hours_str = "";
+      this.hours_str = "00";
     }
     else if (this.is_number(event.key)) {
-      event.preventDefault();
       if (this.hour_input_state === HourInputState.awaiting_first_digit) {
         this.hours_str = "0" + event.key;
         this.update_time_selected();
@@ -298,8 +296,12 @@ export default class DatetimePicker extends Vue {
         this.update_time_selected();
       }
     }
-    else {
-      event.preventDefault();
+  }
+
+  fix_hours() {
+    if (this.hours_str === "00") {
+      this.hours_str = "12";
+      this.hour_input_state = HourInputState.awaiting_first_digit;
     }
   }
 

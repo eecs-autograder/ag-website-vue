@@ -49,7 +49,6 @@ export default class DatetimePickerDemo extends Vue {
   date_1 = "2019-12-25T15:36:37.746189Z";
   date_display_format = { year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric'};
-
   date_2 = null;
 }
 </script>
@@ -75,6 +74,7 @@ export default class DatetimePickerDemo extends Vue {
   border: 1px solid darken($white-gray, 2);
   border-radius: 4px;
   padding: 10px;
+  display: inline-block;
 }
 
 legend {
