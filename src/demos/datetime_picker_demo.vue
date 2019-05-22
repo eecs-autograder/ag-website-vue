@@ -7,31 +7,31 @@
         <div class="explanation"> Date string initial value: NOT NULL </div>
         <div class="modeling"
              @click="$refs.datetime_picker_1.toggle_show_hide()">
-          Modeling: {{(new Date(date_1)).toLocaleString('en-US', date_display_format)}}
+          {{(new Date(date_1)).toLocaleString('en-US', date_display_format)}}
           <i class="far fa-calendar-alt calender-icon"></i>
         </div>
         <datetime-picker v-model="date_1"
-                         ref="datetime_picker_1"></datetime-picker>
+                         ref="datetime_picker_1"
+                         @timezone_changed="date_1_timezone=$event">
+        </datetime-picker>
       </div>
 
       <div class="example">
-        <div class="explanation"> Date string initial value: NULL</div>
-        <div class="modeling" v-if="date_2 !== null">
-          Modeling: {{(new Date(date_2)).toLocaleString('en-US', date_display_format)}}
+        <div class="explanation"> Date string initial value: NULL </div>
+        <div class="modeling"
+             @click="$refs.datetime_picker_2.toggle_show_hide()">
+          {{date_2 !== null
+          ? new Date(date_2).toLocaleString('en-US', date_display_format)
+          : new Date().toLocaleString('en-US', date_display_format)}}
+          <i class="far fa-calendar-alt calender-icon"></i>
         </div>
-        <datetime-picker v-model="date_2"></datetime-picker>
+        <datetime-picker v-model="date_2"
+                         ref="datetime_picker_2"
+                         @timezone_changed="date_2_timezone=$event">
+        </datetime-picker>
       </div>
+
     </fieldset>
-
-    <fieldset>
-      <legend> TimePicker </legend>
-    </fieldset>
-
-
-    <fieldset>
-      <legend> DatetimePicker </legend>
-    </fieldset>
-
   </div>
 </template>
 
@@ -41,10 +41,12 @@ import { Component, Vue } from 'vue-property-decorator';
 import DatetimePicker from '@/components/datetime_picker.vue';
 
 @Component({
-  components: { DatetimePicker }
+  components: {
+    DatetimePicker
+  }
 })
 export default class DatetimePickerDemo extends Vue {
-  date_1 = "2019-12-25T18:36:37.746189Z";
+  date_1 = "2019-12-25T15:36:37.746189Z";
   date_display_format = { year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric'};
 
@@ -64,12 +66,14 @@ export default class DatetimePickerDemo extends Vue {
 }
 
 .explanation {
-  padding: 10px 0 0 0;
+  padding: 10px 0 0 10px;
 }
 
 .modeling {
-  margin: 5px 0 10px 0;
-  background-color: $pebble-light;
+  margin: 10px 0 10px 0;
+  background-color: $white-gray;
+  border: 1px solid darken($white-gray, 2);
+  border-radius: 4px;
   padding: 10px;
 }
 

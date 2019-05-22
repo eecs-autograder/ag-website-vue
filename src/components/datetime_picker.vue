@@ -2,56 +2,58 @@
   <div id="datetime-picker" v-if="is_open">
 
     <div id="calender">
-
       <div class="calender-header">
         <button @click="go_to_prev_month" class="prev-month-button">
           <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="display-month-and-year"> {{months[month]}} <span> {{year}} </span> </div>
+        <div class="display-month-and-year">
+          {{months[month]}} <span>{{year}}</span>
+        </div>
         <button @click="go_to_next_month" class="next-month-button">
           <i class="fas fa-chevron-right"></i>
         </button>
       </div>
-
       <div class="calender-body">
         <table>
           <tr class="days-of-the-week">
-            <th v-for="day of days"> {{day}} </th>
+            <th v-for="day of days_of_the_week">{{day}}</th>
           </tr>
           <tr class="week" v-for="(row, row_num) of num_rows">
-            <td :class="{'empty-week': calender[row_num][col_num] === 0}"
-                v-for="(col, col_num) of num_cols">
-              <div class="date">
-                <div v-if="calender[row_num][col_num] !== 0"
-                     :class="[{'select-date': calender[row_num][col_num] !== 0},
-                             {'active-day': calender[row_num][col_num] === selected_day
-                                            && year === selected_year && month === selected_month}]"
-                     @click="update_day_selected(calender[row_num][col_num])">
-                    {{calender[row_num][col_num] === 0 ? ' ' : calender[row_num][col_num]}}
-                </div>
+            <td v-for="(col, col_num) of num_cols"
+                :class="{'unavailable-day': calender[row_num][col_num] === 0}">
+              <div v-if="calender[row_num][col_num] !== 0"
+                   :class="['available-day',
+                           {'selected-day': calender[row_num][col_num] === selected_day
+                                           && year === selected_year
+                                           && month === selected_month}]"
+                   @click="update_day_selected(calender[row_num][col_num])">
+                  {{calender[row_num][col_num]}}
               </div>
             </td>
           </tr>
         </table>
       </div>
-
     </div>
 
     <div id="timepicker">
       <div class="timepicker-header">
 
         <div class="time-unit-col">
-          <button @click="go_to_next_hour" class="up-button">
+          <button ref="next_hour_button"
+                  @click="go_to_next_hour"
+                  class="up-button">
             <i class="fas fa-chevron-up up-arrow"></i>
           </button>
-
           <div>
             <input type="text"
+                   ref="hour_input"
                    id="hour-input"
                    v-model="hours_str"
                    @keydown="update_hours">
           </div>
-          <button @click="go_to_prev_hour" class="down-button">
+          <button ref="prev_hour_button"
+                  @click="go_to_prev_hour"
+                  class="down-button">
             <i class="fas fa-chevron-down down-arrow"></i>
           </button>
         </div>
@@ -59,76 +61,55 @@
         <div> : </div>
 
         <div class="time-unit-col">
-          <button @click="go_to_next_minute" class="up-button">
+          <button ref="next_minute_button"
+                  @click="go_to_next_minute"
+                  class="up-button">
             <i class="fas fa-chevron-up up-arrow"></i>
           </button>
           <div>
             <input type="text"
+                   ref="minute_input"
                    id="minute-input"
                    v-model="minutes_str"
                    @keydown="update_minutes"/>
           </div>
-          <button @click="go_to_prev_minute" class="down-button">
+          <button ref="prev_minute_button"
+                  @click="go_to_prev_minute"
+                  class="down-button">
             <i class="fas fa-chevron-down down-arrow"></i>
           </button>
         </div>
+
+        <div></div>
 
         <div class="time-unit-col">
-          <button @click="toggle_period_value" class="up-button">
-            <i class="fas fa-chevron-up up-arrow"></i>
-          </button>
           <div>
-            <input type="text"
-                   id="period-input"
+            <input id="period-input"
+                   type="button"
                    v-model="period_str"
-                   @keydown.prevent/>
+                   @click="toggle_period_value"/>
           </div>
-
-          <button @click="toggle_period_value" class="down-button">
-            <i class="fas fa-chevron-down down-arrow"></i>
-          </button>
-        </div>
-
-      </div>
-
-      <div class="timepicker-footer">
-        <div class="timezone">
-          <dropdown ref="dropdown_timezone"
-                    :items="timezones"
-                    @update_item_selected="timezone_selected = $event">
-            <template slot="header">
-              <div tabindex="1" class="dropdown-header-wrapper">
-                <div id="timezone-dropdown" class="dropdown-header">
-                  {{timezone_selected}}
-                  <i class="fas fa-caret-down dropdown-caret"></i>
-                </div>
-              </div>
-            </template>
-            <span slot-scope="{item}">
-              <span class="timezone-item">{{item}}</span>
-            </span>
-          </dropdown>
         </div>
       </div>
     </div>
   </div>
-</template>2
+</template>
 
 <script lang="ts">
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  import Dropdown from '@/components/dropdown.vue';
+import Dropdown from '@/components/dropdown.vue';
 
-  enum HourInputState {
-    awaiting_first_digit,
-    first_digit_was_one,
-    first_digit_was_zero
-  }
+export enum HourInputState {
+  awaiting_first_digit,
+  first_digit_was_one,
+  first_digit_was_zero
+}
 
-  enum MinuteInputState {
-    awaiting_first_digit,
-    awaiting_second_digit
-  }
+export enum MinuteInputState {
+  awaiting_first_digit,
+  awaiting_second_digit
+}
 
 @Component({
   components: {
@@ -160,7 +141,7 @@ export default class DatetimePicker extends Vue {
     "December"
   ];
 
-  days = [
+  days_of_the_week = [
     "Su",
     "M",
     "Tu",
@@ -170,14 +151,7 @@ export default class DatetimePicker extends Vue {
     "Sa"
   ];
 
-  timezones = [
-    'US/Central',
-    'US/Eastern',
-    'US/Mountain',
-    'US/Pacific',
-    'UTC'
-  ];
-
+  d_date!: Date;
   is_open = false;
   num_rows = 6;
   num_cols = 7;
@@ -186,25 +160,20 @@ export default class DatetimePicker extends Vue {
   selected_month = 0;
   year = 2000;
   selected_year = 0;
-
-  hour_input_state: HourInputState = HourInputState.awaiting_first_digit;
-  minute_input_state: MinuteInputState = MinuteInputState.awaiting_first_digit;
-
   hours_str = '12';
   minutes_str = '00';
   period_str = "PM";
-  timezone_selected = this.timezones[0];
-
-  calender = [
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0]
+  calender: number[][] = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0]
   ];
 
-  d_date!: Date;
+  hour_input_state: HourInputState = HourInputState.awaiting_first_digit;
+  minute_input_state: MinuteInputState = MinuteInputState.awaiting_first_digit;
 
   toggle_show_hide() {
     this.is_open = !this.is_open;
@@ -261,26 +230,28 @@ export default class DatetimePicker extends Vue {
   }
 
   update_minutes(event: KeyboardEvent) {
-    if (event.key === "ArrowUp") {
+    if (event.code === "ArrowUp") {
       this.go_to_next_minute();
     }
-    else if (event.key === "ArrowDown") {
+    else if (event.code === "ArrowDown") {
       this.go_to_prev_minute();
     }
-    else if (this.is_number(event.key) || event.key === "Backspace"
-        || event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      if (this.is_number(event.key)) {
-        event.preventDefault();
-        if (this.minute_input_state === MinuteInputState.awaiting_first_digit) {
-          this.minutes_str = "0" + event.key;
-          if (Number(event.key) <= 5) {
-            this.minute_input_state = MinuteInputState.awaiting_second_digit;
-          }
+    else if (event.code === "Backspace") {
+      this.minutes_str = "";
+    }
+    else if (this.is_number(event.key)) {
+      event.preventDefault();
+      if (this.minute_input_state === MinuteInputState.awaiting_first_digit) {
+        this.minutes_str = "0" + event.key;
+        this.update_time_selected();
+        if (Number(event.key) <= 5) {
+          this.minute_input_state = MinuteInputState.awaiting_second_digit;
         }
-        else if (this.minute_input_state === MinuteInputState.awaiting_second_digit) {
-          this.minutes_str = (Number(this.minutes_str) + event.key).toString();
-          this.minute_input_state = MinuteInputState.awaiting_first_digit;
-        }
+      }
+      else if (this.minute_input_state === MinuteInputState.awaiting_second_digit) {
+        this.minutes_str = (Number(this.minutes_str) + event.key).toString();
+        this.minute_input_state = MinuteInputState.awaiting_first_digit;
+        this.update_time_selected();
       }
     }
     else {
@@ -289,39 +260,42 @@ export default class DatetimePicker extends Vue {
   }
 
   update_hours(event: KeyboardEvent) {
-    if (event.key === "ArrowUp") {
+    if (event.code === "ArrowUp") {
       this.go_to_next_hour();
     }
-    else if (event.key === "ArrowDown") {
+    else if (event.code === "ArrowDown") {
       this.go_to_prev_hour();
     }
-    else if (this.is_number(event.key) || event.key === "Backspace"
-        || event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      if (this.is_number(event.key)) {
-        event.preventDefault();
-        if (this.hour_input_state === HourInputState.awaiting_first_digit) {
-          this.hours_str = "0" + event.key;
-          if (event.key === '0') {
-            this.hour_input_state = HourInputState.first_digit_was_zero;
-          }
-          else if (event.key === '1') {
-            this.hour_input_state = HourInputState.first_digit_was_one;
-          }
+    else if (event.code === "Backspace") {
+      this.hours_str = "";
+    }
+    else if (this.is_number(event.key)) {
+      event.preventDefault();
+      if (this.hour_input_state === HourInputState.awaiting_first_digit) {
+        this.hours_str = "0" + event.key;
+        this.update_time_selected();
+        if (event.key === '0') {
+          this.hour_input_state = HourInputState.first_digit_was_zero;
         }
-        else if (this.hour_input_state === HourInputState.first_digit_was_zero) {
-          this.hours_str = "0" + event.key;
-          if (Number(this.hours_str) === 0) {
-            this.hours_str = "01";
-          }
-          this.hour_input_state = HourInputState.awaiting_first_digit;
+        else if (event.key === '1') {
+          this.hour_input_state = HourInputState.first_digit_was_one;
         }
-        else if (this.hour_input_state === HourInputState.first_digit_was_one) {
-          this.hours_str = Number(this.hours_str) + event.key;
-          if (Number(this.hours_str) > 12) {
-            this.hours_str = "12";
-          }
-          this.hour_input_state = HourInputState.awaiting_first_digit;
+      }
+      else if (this.hour_input_state === HourInputState.first_digit_was_zero) {
+        this.hours_str = "0" + event.key;
+        if (Number(this.hours_str) === 0) {
+          this.hours_str = "01";
         }
+        this.hour_input_state = HourInputState.awaiting_first_digit;
+        this.update_time_selected();
+      }
+      else if (this.hour_input_state === HourInputState.first_digit_was_one) {
+        this.hours_str = Number(this.hours_str) + event.key;
+        if (Number(this.hours_str) > 12) {
+          this.hours_str = "12";
+        }
+        this.hour_input_state = HourInputState.awaiting_first_digit;
+        this.update_time_selected();
       }
     }
     else {
@@ -330,7 +304,7 @@ export default class DatetimePicker extends Vue {
   }
 
   go_to_next_month() {
-    if (this.month == 11) {
+    if (this.month === 11) {
       this.year += 1;
     }
     this.month = (this.month + 1) % this.months.length;
@@ -338,7 +312,7 @@ export default class DatetimePicker extends Vue {
   }
 
   go_to_prev_month() {
-    if (this.month == 0) {
+    if (this.month === 0) {
       this.month = this.months.length - 1;
       this.year -= 1;
     }
@@ -351,26 +325,13 @@ export default class DatetimePicker extends Vue {
   calculate_days() {
     let first_day = new Date(this.year, this.month, 1);
     let last_day = new Date(this.year, this.month + 1, 0);
-
     let offset = first_day.getDay();
     let day_count = 1;
-
-    this.calender = [
-      [0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0]
-    ];
 
     for (let row = 0; row < this.num_rows; ++row) {
       for (let col = 0; col < this.num_cols; ++col) {
         if (offset === 0) {
-          if (day_count > last_day.getDate()) {
-            break;
-          }
-          this.calender[row][col] = day_count;
+          this.calender[row][col] = day_count > last_day.getDate() ? 0 : day_count;
           day_count += 1;
         }
         else {
@@ -391,7 +352,7 @@ export default class DatetimePicker extends Vue {
 
   update_time_selected() {
     let hours = this.period_str === "AM" ? Number(this.hours_str) % 12
-                                              : (Number(this.hours_str) % 12) + 12;
+                                         : (Number(this.hours_str) % 12) + 12;
     this.d_date.setHours(hours, Number(this.minutes_str));
     this.$emit('input', this.d_date.toISOString());
   }
@@ -406,14 +367,19 @@ export default class DatetimePicker extends Vue {
     this.year = this.d_date.getFullYear();
     this.month = this.d_date.getMonth();
     this.calculate_days();
+    let hours = this.d_date.getHours() % 12;
+    this.hours_str = (hours % 12 === 0) ? "12" : hours < 10 ? "0" + hours : hours.toString();
+    let minutes = this.d_date.getMinutes();
+    this.minutes_str = minutes < 10 ? "0" + minutes : minutes.toString();
+    this.period_str = this.d_date.getHours() >= 12 ? "PM" : "AM";
   }
-
 }
 </script>
 
 <style scoped lang="scss">
 @import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
 
 $current-lang-choice: "Poppins";
 
@@ -490,7 +456,7 @@ th {
   border: 1px solid transparent;
   color: lighten(black, 32);
   font-weight: normal;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
 }
 
 td {
@@ -499,22 +465,22 @@ td {
   text-align: center;
 }
 
-.empty-week {
+.unavailable-day {
   padding: 0;
   border: none;
 }
 
-.select-date {
+.available-day {
   border: 2px solid transparent;
   border-radius: 10px;
   cursor: pointer;
 }
 
-.select-date:hover {
+.available-day:hover {
   background-color: $white-gray;
 }
 
-.active-day, .active-day:hover {
+.selected-day, .selected-day:hover {
   background-color: $dark-pink;
   color: white;
 }
@@ -544,7 +510,7 @@ td {
   text-align: center;
 }
 
-#hour-input, #minute-input, #period-input {
+#hour-input, #minute-input {
   background-color: #fff;
   border-radius: .25rem;
   border: 1px solid #ced4da;
@@ -553,17 +519,10 @@ td {
   font-family: $current-lang-choice;
   font-size: 1rem;
   line-height: 1;
-  padding: 5px 5px;
+  padding: 5px;
   text-align: center;
   width: 40px;
-}
-
-#period-input {
-  cursor: default;
-}
-
-#period-input:focus {
-  cursor: default;
+  height: 38px;
 }
 
 #hour-input:focus, #minute-input:focus, #period-input:focus {
@@ -571,9 +530,22 @@ td {
   box-shadow: 0 0 2px 1px teal;
 }
 
+#period-input {
+  @extend .teal-button;
+  color: white;
+  /*font-size: 1rem;*/
+  width: 40px;
+  height: 38px;
+  padding: 0;
+}
+
+#period-input:focus {
+  box-shadow: none;
+}
+
 .up-button, .down-button {
-  background-color: lighten($white-gray, 2);
-  border: 1px solid lighten($white-gray, 1);
+  background-color: $white-gray;
+  border: 1px solid darken($white-gray, 1);
   border-radius: 5px;
   box-sizing: border-box;
   cursor: pointer;
@@ -595,63 +567,14 @@ td {
 }
 
 .up-button:hover, .down-button:hover {
-  background-color: $white-gray;
+  background-color: darken($white-gray, 1);
+  border: 1px solid darken($white-gray, 2);
   border-radius: 5px;
 }
 
 .up-button:active, .down-button:active {
   background-color: darken($white-gray, 5);
-}
-
-.timepicker-footer {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding: 0 0 30px 0;
-}
-
-// TIMEZONE DROPDOWN ****************************************************
-
-#timezone-dropdown {
-  width: 160px;
-}
-
-.dropdown-header-wrapper {
-  display: inline-block;
-  margin: 0;
-  position: relative;
-}
-
-.dropdown-header {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-  cursor: default;
-  display: block;
-  font-size: .92rem;
-  line-height: 1.5;
-  padding: .375rem .75rem;
-  position: relative;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.dropdown-header:focus {
-  border-color: $ocean-blue;
-}
-
-.dropdown-caret {
-  cursor: pointer;
-  font-size: 30px;
-  position: absolute;
-  right: 18px;
-  top: 3px;
-}
-
-.timezone-item {
-  font-size: 14px;
-  padding: 0;
+  border: 1px solid darken($white-gray, 6);
 }
 
 </style>
