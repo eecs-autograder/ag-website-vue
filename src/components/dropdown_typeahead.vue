@@ -50,7 +50,7 @@ export default class DropdownTypeahead extends Vue {
 
   @Prop({default: "search-field", type: String})
   typeahead_class!: string;
-
+  
   filter_text: string = "";
   private _filtered_choices: object[] = [];
   private d_mounted_called = false;

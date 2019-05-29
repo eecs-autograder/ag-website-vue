@@ -1,3 +1,11 @@
+//$active-color: lighten($ocean-blue, 0);
+//$parent-of-active-color: lighten($ocean-blue, 40);
+//$suite-in-active-container-color: lighten($ocean-blue, 45);
+
+$active-color: $ocean-blue;
+$parent-of-active-color: white;
+$suite-in-active-container-color: white;
+
 // Input Related ***********************************************************
 
 legend {
@@ -147,7 +155,8 @@ input[type=checkbox] {
 
 .save-button {
     @extend .green-button;
-    margin: 0 0 10px 0;
+    display: block;
+    margin: 0 10px 10px 0;
 }
 
 .last-saved-timestamp {
@@ -156,11 +165,9 @@ input[type=checkbox] {
 }
 
 .last-saved-spinner {
-    font-size: 18px;
     color: $ocean-blue;
-    margin-top: 15px;
-    margin-left: 24px;
     display: inline-block;
+    font-size: 18px;
 }
 
 .delete-level-button {
@@ -184,6 +191,11 @@ input[type=checkbox] {
     font-weight: bold;
     margin: 0;
     padding: 5px 0;
+}
+
+.modal-create-button {
+    @extend .green-button;
+    float: right;
 }
 
 .modal-cancel-button {
