@@ -11,8 +11,7 @@
           <i class="far fa-calendar-alt calender-icon"></i>
         </div>
         <datetime-picker v-model="date_1"
-                         ref="datetime_picker_1"
-                         @timezone_changed="date_1_timezone=$event">
+                         ref="datetime_picker_1">
         </datetime-picker>
       </div>
 
@@ -22,12 +21,11 @@
              @click="$refs.datetime_picker_2.toggle_show_hide()">
           {{date_2 !== null
           ? new Date(date_2).toLocaleString('en-US', date_display_format)
-          : new Date().toLocaleString('en-US', date_display_format)}}
+          : '--- --, ----, --:-- --'}}
           <i class="far fa-calendar-alt calender-icon"></i>
         </div>
         <datetime-picker v-model="date_2"
-                         ref="datetime_picker_2"
-                         @timezone_changed="date_2_timezone=$event">
+                         ref="datetime_picker_2">
         </datetime-picker>
       </div>
 
@@ -38,7 +36,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import DatetimePicker from '@/components/datetime_picker.vue';
+import DatetimePicker from '@/components/datetime/datetime_picker.vue';
 
 @Component({
   components: {

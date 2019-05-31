@@ -1,4 +1,4 @@
-import DatetimePicker from '@/components/datetime_picker.vue';
+import DatetimePicker from '@/components/datetime/datetime_picker.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 
 // @ts-ignore
