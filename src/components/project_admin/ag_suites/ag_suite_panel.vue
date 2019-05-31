@@ -86,7 +86,12 @@ import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue'
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-import { AGTestCase, AGTestCaseObserver, AGTestCommand, AGTestSuite } from 'ag-client-typescript';
+import {
+  AGTestCase,
+  AGTestCaseObserver,
+  AGTestCommand,
+  AGTestSuite
+} from 'ag-client-typescript';
 
 import { deep_copy, handle_api_errors_async } from '@/utils';
 import {

@@ -14,6 +14,9 @@ import {
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 
+// tslint:disable-next-line:no-duplicate-imports
+import * as ag_cli from 'ag-client-typescript';
+
 import * as sinon from "sinon";
 
 beforeAll(() => {
@@ -154,7 +157,7 @@ describe('AGSuiteSettings tests', () => {
             instructor_files: [instructor_file_2, instructor_file_1, instructor_file_3]
         });
 
-        // sinon.stub(get_sandbox_docker_images, 'apply').returns(Promise.resolve([]));
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
 
         wrapper = mount(AGSuiteSettings, {
             propsData: {

@@ -239,7 +239,7 @@ describe('AGCommandSettings tests', () => {
         expect(correct_return_code_points_validator.is_valid).toBe(false);
     });
 
-    test.skip('error - points_for_correct_return_code must be >= 0', async () => {
+    test('error - points_for_correct_return_code must be >= 0', async () => {
         component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
@@ -285,7 +285,7 @@ describe('AGCommandSettings tests', () => {
         expect(wrong_return_code_points_validator.is_valid).toBe(false);
     });
 
-    test.skip('error - deduction_for_wrong_return_code must be >= 0', async () => {
+    test('error - deduction_for_wrong_return_code must be >= 0', async () => {
         component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
@@ -354,6 +354,26 @@ describe('AGCommandSettings tests', () => {
         expect(correct_stdout_points_validator.is_valid).toBe(false);
     });
 
+    test('error - points_for_correct_stdout must be >= 0', async () => {
+        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_test_command!.expected_stdout_text = "Hi there";
+
+        let correct_stdout_points_input = wrapper.find(
+            {ref: "points_for_correct_stdout"}
+        ).find('#input');
+        let correct_stdout_points_validator = <ValidatedInput> wrapper.find(
+            {ref: "points_for_correct_stdout"}
+        ).vm;
+
+        expect(correct_stdout_points_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> correct_stdout_points_input.element).value = "-1";
+        correct_stdout_points_input.trigger('input');
+        await component.$nextTick();
+
+        expect(correct_stdout_points_validator.is_valid).toBe(false);
+    });
+
     test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
         component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         component.d_test_command!.expected_stdout_text = "Hi there";
@@ -374,6 +394,26 @@ describe('AGCommandSettings tests', () => {
         expect(wrong_stdout_points_validator.is_valid).toBe(false);
 
         (<HTMLInputElement> wrong_stdout_points_input.element).value = "Mystery Machine";
+        wrong_stdout_points_input.trigger('input');
+        await component.$nextTick();
+
+        expect(wrong_stdout_points_validator.is_valid).toBe(false);
+    });
+
+    test('error - deduction_for_wrong_stdout must be >= 0', async () => {
+        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_test_command!.expected_stdout_text = "Hi there";
+
+        let wrong_stdout_points_input = wrapper.find(
+            {ref: "deduction_for_wrong_stdout"}
+        ).find('#input');
+        let wrong_stdout_points_validator = <ValidatedInput> wrapper.find(
+            {ref: "deduction_for_wrong_stdout"}
+        ).vm;
+
+        expect(wrong_stdout_points_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> wrong_stdout_points_input.element).value = "-1";
         wrong_stdout_points_input.trigger('input');
         await component.$nextTick();
 
@@ -430,6 +470,27 @@ describe('AGCommandSettings tests', () => {
         expect(correct_stderr_points_validator.is_valid).toBe(false);
     });
 
+    test('error - points_for_correct_stderr must be >= 0', async () => {
+        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_test_command!.expected_stderr_text = "Hi there";
+        await component.$nextTick();
+
+        let correct_stderr_points_input = wrapper.find(
+            {ref: "points_for_correct_stderr"}
+        ).find('#input');
+        let correct_stderr_points_validator = <ValidatedInput> wrapper.find(
+            {ref: "points_for_correct_stderr"}
+        ).vm;
+
+        expect(correct_stderr_points_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> correct_stderr_points_input.element).value = "-1";
+        correct_stderr_points_input.trigger('input');
+        await component.$nextTick();
+
+        expect(correct_stderr_points_validator.is_valid).toBe(false);
+    });
+
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
         component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
         component.d_test_command!.expected_stderr_text = "Hi there";
@@ -457,6 +518,27 @@ describe('AGCommandSettings tests', () => {
         expect(wrong_stderr_points_validator.is_valid).toBe(false);
     });
 
+    test('error - deduction_for_wrong_stderr must be >= 0', async () => {
+        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_test_command!.expected_stderr_text = "Hi there";
+        await component.$nextTick();
+
+        let wrong_stderr_points_input = wrapper.find(
+            {ref: "deduction_for_wrong_stderr"}
+        ).find('#input');
+        let wrong_stderr_points_validator = <ValidatedInput> wrapper.find(
+            {ref: "deduction_for_wrong_stderr"}
+        ).vm;
+
+        expect(wrong_stderr_points_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> wrong_stderr_points_input.element).value = "-1";
+        wrong_stderr_points_input.trigger('input');
+        await component.$nextTick();
+
+        expect(wrong_stderr_points_validator.is_valid).toBe(false);
+    });
+
     test('error - time_limit is blank or not an integer', async () => {
         let time_limit_input = wrapper.find({ref: 'time_limit'}).find('#input');
         let time_limit_validator = <ValidatedInput> wrapper.find({ref: 'time_limit'}).vm;
@@ -474,6 +556,25 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(time_limit_validator.is_valid).toBe(false);
+    });
+
+    test('error - time_limit must be >= 1', async () => {
+        let time_limit_input = wrapper.find({ref: 'time_limit'}).find('#input');
+        let time_limit_validator = <ValidatedInput> wrapper.find({ref: 'time_limit'}).vm;
+
+        expect(time_limit_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> time_limit_input.element).value = "0";
+        time_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(time_limit_validator.is_valid).toBe(false);
+
+        (<HTMLInputElement> time_limit_input.element).value = "1";
+        time_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(time_limit_validator.is_valid).toBe(true);
     });
 
     test('error - virtual_memory_limit is blank or not an integer', async () => {
@@ -499,6 +600,29 @@ describe('AGCommandSettings tests', () => {
         expect(virtual_memory_limit_validator.is_valid).toBe(false);
     });
 
+    test('error - virtual_memory_limit must be >= 1', async () => {
+        let virtual_memory_limit_input = wrapper.find(
+            {ref: 'virtual_memory_limit'}
+        ).find('#input');
+        let virtual_memory_limit_validator = <ValidatedInput> wrapper.find(
+            {ref: 'virtual_memory_limit'}
+        ).vm;
+
+        expect(virtual_memory_limit_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> virtual_memory_limit_input.element).value = "0";
+        virtual_memory_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(virtual_memory_limit_validator.is_valid).toBe(false);
+
+        (<HTMLInputElement> virtual_memory_limit_input.element).value = "1";
+        virtual_memory_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(virtual_memory_limit_validator.is_valid).toBe(true);
+    });
+
     test('error - stack_size_limit is blank or not an integer', async () => {
         let stack_size_limit_input = wrapper.find(
             {ref: 'stack_size_limit'}
@@ -522,6 +646,29 @@ describe('AGCommandSettings tests', () => {
         expect(stack_size_limit_validator.is_valid).toBe(false);
     });
 
+    test('error - stack_size_limit must be >= 1', async () => {
+        let stack_size_limit_input = wrapper.find(
+            {ref: 'stack_size_limit'}
+        ).find('#input');
+        let stack_size_limit_validator = <ValidatedInput> wrapper.find(
+            {ref: 'stack_size_limit'}
+        ).vm;
+
+        expect(stack_size_limit_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> stack_size_limit_input.element).value = "0";
+        stack_size_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(stack_size_limit_validator.is_valid).toBe(false);
+
+        (<HTMLInputElement> stack_size_limit_input.element).value = "1";
+        stack_size_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(stack_size_limit_validator.is_valid).toBe(true);
+    });
+
     test('error - process_spawn_limit is blank or not an integer', async () => {
         let process_spawn_limit_input = wrapper.find(
             {ref: 'process_spawn_limit'}
@@ -543,6 +690,29 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(process_spawn_limit_validator.is_valid).toBe(false);
+    });
+
+    test('error - process_spawn_limit must be >= 0', async () => {
+        let process_spawn_limit_input = wrapper.find(
+            {ref: 'process_spawn_limit'}
+        ).find('#input');
+        let process_spawn_limit_validator = <ValidatedInput> wrapper.find(
+            {ref: 'process_spawn_limit'}
+        ).vm;
+
+        expect(process_spawn_limit_validator.is_valid).toBe(true);
+
+        (<HTMLInputElement> process_spawn_limit_input.element).value = "-1";
+        process_spawn_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(process_spawn_limit_validator.is_valid).toBe(false);
+
+        (<HTMLInputElement> process_spawn_limit_input.element).value = "0";
+        process_spawn_limit_input.trigger('input');
+        await component.$nextTick();
+
+        expect(process_spawn_limit_validator.is_valid).toBe(true);
     });
 
     test('Stdin_source getter', async () => {

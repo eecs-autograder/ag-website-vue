@@ -326,8 +326,7 @@ export default class AGSuiteSettings extends Vue {
 
   async created() {
     this.d_test_suite = this.test_suite;
-    // this.docker_images = await get_sandbox_docker_images();
-    this.docker_images = [];
+    this.docker_images = await get_sandbox_docker_images();
     this.sort_instructor_files();
     this.sort_student_files();
     this.loading = false;

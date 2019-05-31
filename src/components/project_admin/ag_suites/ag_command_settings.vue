@@ -132,7 +132,11 @@
                       <div>
                         <validated-input ref="points_for_correct_return_code"
                                          v-model="d_test_command.points_for_correct_return_code"
-                                         :validators="[is_not_empty, is_integer]"
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]"
                                          input_style="width: 80px;">
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
@@ -144,7 +148,11 @@
                       <div>
                         <validated-input ref="deduction_for_wrong_return_code"
                                          v-model="d_test_command.deduction_for_wrong_return_code"
-                                         :validators="[is_not_empty, is_integer]"
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]"
                                          input_style="width: 80px;">
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
@@ -223,7 +231,11 @@
                       <div>
                         <validated-input ref="points_for_correct_stdout"
                                          v-model="d_test_command.points_for_correct_stdout"
-                                         :validators="[is_not_empty, is_integer]"
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]"
                                          input_style="width: 80px;">
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
@@ -235,7 +247,11 @@
                       <div>
                         <validated-input ref="deduction_for_wrong_stdout"
                                          v-model="d_test_command.deduction_for_wrong_stdout"
-                                         :validators="[is_not_empty, is_integer]"
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]"
                                          input_style="width: 80px;">
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
@@ -316,7 +332,11 @@
                       <div>
                         <validated-input ref="points_for_correct_stderr"
                                          v-model="d_test_command.points_for_correct_stderr"
-                                         :validators="[is_not_empty, is_integer]"
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]"
                                          input_style="width: 80px;">
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
@@ -328,7 +348,11 @@
                       <div>
                         <validated-input ref="deduction_for_wrong_stderr"
                                          v-model="d_test_command.deduction_for_wrong_stderr"
-                                         :validators="[is_not_empty, is_integer]"
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]"
                                          input_style="width: 80px;">
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
@@ -397,7 +421,11 @@
                                          id="input-time-limit"
                                          v-model="d_test_command.time_limit"
                                          input_style="width: 150px;"
-                                         :validators="[is_not_empty, is_integer]">
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]">
                           <div slot="suffix" class="unit-of-measurement"> seconds </div>
                         </validated-input>
                       </div>
@@ -410,7 +438,11 @@
                                          id="input-virtual-memory-limit"
                                          v-model="d_test_command.virtual_memory_limit"
                                          input_style="width: 150px;"
-                                         :validators="[is_not_empty, is_integer]">
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]">
                           <div slot="suffix" class="unit-of-measurement"> bytes </div>
                         </validated-input>
                       </div>
@@ -426,7 +458,11 @@
                                          id="input-stack-size-limit"
                                          v-model="d_test_command.stack_size_limit"
                                          input_style="width: 150px;"
-                                         :validators="[is_not_empty, is_integer]">
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_one
+                                         ]">
                           <div slot="suffix" class="unit-of-measurement"> bytes </div>
                         </validated-input>
                       </div>
@@ -439,7 +475,11 @@
                                          id="input-process-spawn-limit"
                                          v-model="d_test_command.process_spawn_limit"
                                          input_style="width: 150px;"
-                                         :validators="[is_not_empty, is_integer]">
+                                         :validators="[
+                                           is_not_empty,
+                                           is_integer,
+                                           is_greater_than_or_equal_to_zero
+                                         ]">
                           <div slot="suffix" class="unit-of-measurement"> child processes </div>
                         </validated-input>
                       </div>
@@ -545,9 +585,7 @@ import { handle_api_errors_async } from '@/utils';
 import {
   is_integer,
   is_not_empty,
-  string_to_num,
-  is_non_negative,
-  is_number
+  make_min_value_validator
 } from '@/validators';
 import {
   AGTestCommand,
@@ -559,7 +597,7 @@ import {
 } from 'ag-client-typescript';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  @Component({
+@Component({
   components: {
     APIErrors,
     Dropdown,
@@ -652,11 +690,10 @@ export default class AGCommandSettings extends Vue {
   saving = false;
   settings_form_is_valid = true;
 
-  readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
-  readonly is_number = is_number;
-  readonly string_to_num = string_to_num;
+  readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
+  readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
@@ -664,15 +701,6 @@ export default class AGCommandSettings extends Vue {
   async created() {
     this.d_test_command = this.test_command;
     this.sort_instructor_files();
-    // if (this.d_test_command.stdin_instructor_file === null) {
-    //   this.d_test_command.stdin_instructor_file = this.project!.instructor_files[0];
-    // }
-    // if (this.d_test_command.expected_stdout_instructor_file === null) {
-    //   this.d_test_command.stdin_instructor_file = this.project!.instructor_files[0];
-    // }
-    // if (this.d_test_command.expected_stderr_instructor_file === null) {
-    //   this.d_test_command.stdin_instructor_file = this.project!.instructor_files[0];
-    // }
   }
 
   async delete_ag_test_command() {
