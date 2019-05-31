@@ -5,8 +5,9 @@
                  {'active-case' : is_active_case},
                  {'parent-of-active-command': command_is_active_level}]"
          @click="$emit('update_active_case', test_case)">
-        <div> {{test_case.name}} </div>
-        <div @click="$refs.new_command_modal.open()">
+        <div>{{test_case.name}}</div>
+        <div class="new-command-button"
+             @click="$refs.new_command_modal.open()">
           <i class="fas fa-ellipsis-v command-menu"></i>
         </div>
     </div>
@@ -45,14 +46,14 @@
             </div>
             <div class="command-container">
               <label class="text-label"> Command </label>
-              <validated-input ref="new_command_name"
+              <validated-input ref="new_command"
                                v-model="new_command"
                                :validators="[is_not_empty]">
               </validated-input>
             </div>
           </div>
 
-          <APIErrors ref="api_errors_command_modal"></APIErrors>
+          <APIErrors ref="api_errors"></APIErrors>
 
           <button class="modal-create-button"
                   :disabled="!add_command_form_is_valid || adding_command">
@@ -122,8 +123,7 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
 
   get is_active_case() {
     return this.active_case !== null
-           && this.active_case.pk === this.test_case.pk
-           && this.active_command === null;
+           && this.active_case.pk === this.test_case.pk;
   }
 
   get command_is_active_level() {
@@ -147,11 +147,12 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
   }
 
   update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
-    console.log("A command changed");
-    let index = this.test_case.ag_test_commands.findIndex(
-      (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
-    );
-    Vue.set(this.test_case.ag_test_commands, index, deep_copy(ag_test_command, AGTestCommand));
+    if (ag_test_command.ag_test_case === this.test_case.pk) {
+      let index = this.test_case.ag_test_commands.findIndex(
+        (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
+      );
+      Vue.set(this.test_case.ag_test_commands, index, deep_copy(ag_test_command, AGTestCommand));
+    }
   }
 
   update_ag_test_command_created(ag_test_command: AGTestCommand): void {
@@ -190,7 +191,7 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
 }
 
 function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
-  (<APIErrors> component.$refs.api_errors_new_command).show_errors_from_response(error);
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 
 </script>

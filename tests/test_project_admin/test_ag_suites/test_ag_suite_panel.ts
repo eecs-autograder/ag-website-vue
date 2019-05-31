@@ -1,3 +1,4 @@
+import APIErrors from '@/components/api_errors.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
@@ -258,19 +259,7 @@ describe('AGSuitePanel tests', () => {
         expect(component.new_command).toEqual("");
     });
 
-    test('Add case (and first command) - unsuccessful', async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
+    test.skip('Add case (and first command) - unsuccessful', async () => {
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -290,6 +279,7 @@ describe('AGSuitePanel tests', () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(
             Promise.reject(axios_response_instance)
         );
+        let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
@@ -302,7 +292,11 @@ describe('AGSuitePanel tests', () => {
         component.new_command = "Stand up";
 
         wrapper.find('#add-case-form').trigger('submit.native');
-        expect(create_case_stub.calledOnce).toBe(true);
+        expect(create_case_stub.callCount).toEqual(1);
+        expect(create_command_stub.callCount).toEqual(0);
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
     });
 
     test('is_active_suite getter', async () => {

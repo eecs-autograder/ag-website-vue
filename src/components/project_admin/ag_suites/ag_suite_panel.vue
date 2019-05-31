@@ -61,7 +61,7 @@
               </validated-input>
             </div>
 
-            <APIErrors ref="api_errors_new_case"></APIErrors>
+            <APIErrors ref="api_errors"></APIErrors>
 
             <button class="modal-create-button"
                     :disabled="!add_case_form_is_valid || adding_case">
@@ -148,7 +148,6 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
     return this.is_active_suite && this.active_case !== null;
   }
 
-
   @handle_api_errors_async(handle_add_ag_case_error)
   async add_case() {
     try {
@@ -157,10 +156,10 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
       await AGTestCommand.create(
         test_case.pk, { name: this.new_command_name, cmd: this.new_command }
       );
-      (<Modal> this.$refs.new_case_modal).close();
       this.new_command_name = "";
       this.new_command = "";
       this.new_case_name = "";
+      (<Modal> this.$refs.new_case_modal).close();
     }
     finally {
       this.adding_case = false;
@@ -205,7 +204,7 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
 }
 
 function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
-  (<APIErrors> component.$refs.api_errors_new_case).show_errors_from_response(error);
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 
 </script>
