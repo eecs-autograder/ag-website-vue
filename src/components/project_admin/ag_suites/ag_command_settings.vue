@@ -29,10 +29,10 @@
 
               <div id="command-container">
                 <label class="text-label"> Command </label>
-                <validated-input ref="command_cmd"
+                <validated-input ref="cmd"
                                  id="input-cmd"
                                  v-model="d_test_command.cmd"
-                                 :num_rows="5"
+                                 :num_rows="2"
                                  :validators="[is_not_empty]">
                 </validated-input>
               </div>
@@ -44,52 +44,55 @@
                     <label class="text-label"> Stdin source: </label>
                     <div class="dropdown">
                       <dropdown ref="stdin_source_dropdown"
-                                :items="stdin_source_options"
-                                @update_item_selected="d_test_command.stdin_source = $event">
-
+                                :items="stdin_source_labels"
+                                @update_item_selected="d_test_command.stdin_source
+                                                       = $event.option">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.stdin_source}}
+                            <div class="dropdown-header medium-dropdown">
+                              {{stdin_source}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.label}}</span>
                         </div>
                       </dropdown>
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.stdin_source === 'Text'"
+                  <div v-if="d_test_command.stdin_source === StdinSource.text"
                        class="text-container">
                     <label class="text-label"> Stdin source text: </label>
-                    <validated-input placeholder="Enter the stdin input here."
+                    <validated-input ref="stdin_text"
+                                     placeholder="Enter the stdin input here."
                                      :num_rows="5"
                                      v-model="d_test_command.stdin_text"
-                                     :validators="[]">
+                                     :validators="[is_not_empty]">
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.stdin_source === 'Project file content'"
+                  <div v-if="d_test_command.stdin_source === StdinSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
                     <div>
                       <dropdown ref="file_stdin_source_dropdown"
-                                :items="file_options"
+                                :items="project.instructor_files"
                                 :initial_highlighted_index="0"
-                                @update_item_selected="command.stdin_instructor_file = $event">
+                                @update_item_selected="d_test_command.stdin_instructor_file
+                                                       = $event">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
                             <div class="dropdown-header large-dropdown">
-                              {{d_test_command.stdin_instructor_file}}
+                              {{d_test_command.stdin_instructor_file !== null ?
+                                d_test_command.stdin_instructor_file.name : ""}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.name}}</span>
                         </div>
                       </dropdown>
                     </div>
@@ -104,47 +107,47 @@
                     <label class="text-label"> Expected Return Code: </label>
                     <div class="dropdown">
                       <dropdown ref="expected_return_code_dropdown"
-                                :items="expected_return_code_options"
+                                :items="expected_return_code_labels"
                                 @update_item_selected="d_test_command.expected_return_code
-                                                       = $event">
+                                                       = $event.option;">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_return_code}}
+                            <div class="dropdown-header medium-dropdown">
+                              {{expected_return_code}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.label}}</span>
                         </div>
                       </dropdown>
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_return_code != `Don't check`"
+                  <div v-if="d_test_command.expected_return_code !== ExpectedReturnCode.none"
                        class="point-assignment-container">
                     <div class="add-points-container">
                       <label class="text-label"> Correct return code </label>
                       <div>
-                        <i class="fas fa-plus plus-sign"></i>
-                        <input class="command-settings-input"
-                               v-model="d_test_command.points_for_correct_return_code"
-                               type="number"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <validated-input ref="points_for_correct_return_code"
+                                         v-model="d_test_command.points_for_correct_return_code"
+                                         :validators="[is_not_empty, is_integer]"
+                                         input_style="width: 80px;">
+                          <div slot="suffix" class="unit-of-measurement"> points </div>
+                        </validated-input>
                       </div>
                     </div>
 
                     <div class="subtract-points-container">
                       <label class="text-label"> Wrong return code </label>
                       <div>
-                        <i class="fas fa-minus minus-sign"></i>
-                        <input class="command-settings-input"
-                               v-model="d_test_command.deduction_for_wrong_return_code"
-                               type="number"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <validated-input ref="deduction_for_wrong_return_code"
+                                         v-model="d_test_command.deduction_for_wrong_return_code"
+                                         :validators="[is_not_empty, is_integer]"
+                                         input_style="width: 80px;">
+                          <div slot="suffix" class="unit-of-measurement"> points </div>
+                        </validated-input>
                       </div>
                     </div>
                   </div>
@@ -158,81 +161,84 @@
                     <label class="text-label"> Check stdout against: </label>
                     <div class="dropdown">
                       <dropdown ref="expected_stdout_source_dropdown"
-                                :items="expected_stdout_source_options"
+                                :items="expected_output_source_labels"
                                 @update_item_selected="d_test_command.expected_stdout_source
-                                                       = $event">
+                                                       = $event.option">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_stdout_source}}
+                            <div class="dropdown-header medium-dropdown">
+                              {{expected_stdout_source}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.label}}</span>
                         </div>
                       </dropdown>
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source === 'Text'"
+                  <div v-if="d_test_command.expected_stdout_source === ExpectedOutputSource.text"
                        class="text-container">
                     <label class="text-label"> Expected stdout text: </label>
-                    <validated-input placeholder="Enter the expected stdout output here."
+                    <validated-input ref="expected_stdout_text"
+                                     placeholder="Enter the expected stdout output here."
                                      v-model="d_test_command.expected_stdout_text"
                                      :num_rows="5"
-                                     :validators="[]">
+                                     :validators="[is_not_empty]">
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source === 'Project file content'"
+                  <div v-if="d_test_command.expected_stdout_source
+                             === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
                     <div>
                       <dropdown ref="file_stdout_dropdown"
-                                :items="file_options"
+                                :items="project.instructor_files"
                                 :initial_highlighted_index="0"
                                 @update_item_selected="
                                 d_test_command.expected_stdout_instructor_file = $event">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
                             <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_stdout_instructor_file}}
+                              {{d_test_command.expected_stdout_instructor_file !== null ?
+                                d_test_command.expected_stdout_instructor_file.name : ""}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.name}}</span>
                         </div>
                       </dropdown>
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source != `Don't check`"
+                  <div v-if="d_test_command.expected_stdout_source !== ExpectedOutputSource.none"
                        class="point-assignment-container">
                     <div class="add-points-container">
                       <label class="text-label"> Correct stdout </label>
                       <div>
-                        <i class="fas fa-plus plus-sign"></i>
-                        <input class="command-settings-input"
-                               v-model="d_test_command.points_for_correct_stdout"
-                               type="number"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <validated-input ref="points_for_correct_stdout"
+                                         v-model="d_test_command.points_for_correct_stdout"
+                                         :validators="[is_not_empty, is_integer]"
+                                         input_style="width: 80px;">
+                          <div slot="suffix" class="unit-of-measurement"> points </div>
+                        </validated-input>
                       </div>
                     </div>
 
                     <div class="subtract-points-container">
                       <label class="text-label"> Wrong stdout</label>
                       <div>
-                        <i class="fas fa-minus minus-sign"></i>
-                        <input class="command-settings-input"
-                               v-model="d_test_command.deduction_for_wrong_stdout"
-                               type="number"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <validated-input ref="deduction_for_wrong_stdout"
+                                         v-model="d_test_command.deduction_for_wrong_stdout"
+                                         :validators="[is_not_empty, is_integer]"
+                                         input_style="width: 80px;">
+                          <div slot="suffix" class="unit-of-measurement"> points </div>
+                        </validated-input>
                       </div>
                     </div>
                   </div>
@@ -247,82 +253,85 @@
                     <label class="text-label"> Check stderr against: </label>
                     <div class="dropdown">
                       <dropdown ref="expected_stderr_source_dropdown"
-                                :items="expected_stderr_source_options"
+                                :items="expected_output_source_labels"
                                 :initial_highlighted_index="0"
                                 @update_item_selected="
-                                d_test_command.expected_stderr_source = $event">
+                                d_test_command.expected_stderr_source = $event.option">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_stderr_source}}
+                            <div class="dropdown-header medium-dropdown">
+                              {{expected_stderr_source}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.label}}</span>
                         </div>
                       </dropdown>
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stderr_source === 'Text'"
+                  <div v-if="d_test_command.expected_stderr_source === ExpectedOutputSource.text"
                        class="text-container">
                     <label class="text-label"> Expected stderr text: </label>
-                    <validated-input placeholder="Enter the expected stderr output here."
+                    <validated-input ref="expected_stderr_text"
+                                     placeholder="Enter the expected stderr output here."
                                      v-model="d_test_command.expected_stderr_text"
                                      :num_rows="5"
-                                     :validators="[]">
+                                     :validators="[is_not_empty]">
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.expected_stderr_source === 'Project file content'"
+                  <div v-if="d_test_command.expected_stderr_source
+                             === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
                     <div>
                       <dropdown ref="file_stderr_dropdown"
-                                :items="file_options"
+                                :items="project.instructor_files"
                                 :initial_highlighted_index="0"
                                 @update_item_selected="
                                 d_test_command.expected_stderr_instructor_file = $event">
                         <template slot="header">
                           <div tabindex="1" class="dropdown-header-wrapper">
                             <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_stderr_instructor_file}}
+                              {{d_test_command.expected_stderr_instructor_file !== null ?
+                                d_test_command.expected_stderr_instructor_file.name : ""}}
                               <i class="fas fa-caret-down dropdown-caret"></i>
                             </div>
                           </div>
                         </template>
                         <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item}}</span>
+                          <span class="dropdown-item">{{item.name}}</span>
                         </div>
                       </dropdown>
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stderr_source != `Don't check`"
+                  <div v-if="d_test_command.expected_stderr_source !== ExpectedOutputSource.none"
                        class="point-assignment-container">
                     <div class="add-points-container">
                       <label class="text-label"> Correct stderr </label>
                       <div>
-                        <i class="fas fa-plus plus-sign"></i>
-                        <input class="command-settings-input"
-                               type="number"
-                               v-model="d_test_command.points_for_correct_stderr"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <validated-input ref="points_for_correct_stderr"
+                                         v-model="d_test_command.points_for_correct_stderr"
+                                         :validators="[is_not_empty, is_integer]"
+                                         input_style="width: 80px;">
+                          <div slot="suffix" class="unit-of-measurement"> points </div>
+                        </validated-input>
                       </div>
                     </div>
 
                     <div class="subtract-points-container">
                       <label class="text-label">  Wrong stderr </label>
                       <div>
-                        <i class="fas fa-minus minus-sign"></i>
-                        <input class="command-settings-input"
-                               type="number"
-                               v-model="d_test_command.deduction_for_wrong_stderr"
-                               min="0">
-                        <div class="unit-of-measurement"> points </div>
+                        <validated-input ref="deduction_for_wrong_stderr"
+                                         v-model="d_test_command.deduction_for_wrong_stderr"
+                                         :validators="[is_not_empty, is_integer]"
+                                         input_style="width: 80px;">
+                          <div slot="suffix" class="unit-of-measurement"> points </div>
+                        </validated-input>
                       </div>
                     </div>
                   </div>
@@ -330,10 +339,12 @@
                 </fieldset>
               </div>
 
-              <div v-if="d_test_command.expected_stdout_source === 'Project file content' ||
-                         d_test_command.expected_stdout_source === 'Text' ||
-                         d_test_command.expected_stderr_source === 'Project file content' ||
-                         d_test_command.expected_stderr_source === 'Text'"
+              <div v-if="d_test_command.expected_stdout_source === ExpectedOutputSource.text ||
+                         d_test_command.expected_stdout_source
+                         === ExpectedOutputSource.instructor_file  ||
+                         d_test_command.expected_stderr_source === ExpectedOutputSource.text  ||
+                         d_test_command.expected_stderr_source
+                         === ExpectedOutputSource.instructor_file"
                    class="section-container">
                 <fieldset>
                   <legend> Diff Options </legend>
@@ -382,11 +393,11 @@
                     <div id="time-limit-container">
                       <label class="text-label"> Time limit </label>
                       <div class="resource-input">
-                        <validated-input ref="command_time_limit"
+                        <validated-input ref="time_limit"
                                          id="input-time-limit"
                                          v-model="d_test_command.time_limit"
                                          input_style="width: 150px;"
-                                         :validators="[]">
+                                         :validators="[is_not_empty, is_integer]">
                           <div slot="suffix" class="unit-of-measurement"> seconds </div>
                         </validated-input>
                       </div>
@@ -395,11 +406,11 @@
                     <div id="virtual-memory-container">
                       <label class="text-label"> Virtual memory limit </label>
                       <div class="resource-input">
-                        <validated-input ref="command_virtual_memory_limit"
+                        <validated-input ref="virtual_memory_limit"
                                          id="input-virtual-memory-limit"
                                          v-model="d_test_command.virtual_memory_limit"
                                          input_style="width: 150px;"
-                                         :validators="[]">
+                                         :validators="[is_not_empty, is_integer]">
                           <div slot="suffix" class="unit-of-measurement"> bytes </div>
                         </validated-input>
                       </div>
@@ -411,11 +422,11 @@
                     <div id="stack-size-container">
                       <label class="text-label"> Stack size limit </label>
                       <div class="resource-input">
-                        <validated-input ref="command_stack_size_limit"
+                        <validated-input ref="stack_size_limit"
                                          id="input-stack-size-limit"
                                          v-model="d_test_command.stack_size_limit"
                                          input_style="width: 150px;"
-                                         :validators="[]">
+                                         :validators="[is_not_empty, is_integer]">
                           <div slot="suffix" class="unit-of-measurement"> bytes </div>
                         </validated-input>
                       </div>
@@ -424,11 +435,11 @@
                     <div id="process-spawn-container">
                       <label class="text-label"> Process spawn limit </label>
                       <div class="resource-input">
-                        <validated-input ref="command_process_spawn_limit"
+                        <validated-input ref="process_spawn_limit"
                                          id="input-process-spawn-limit"
                                          v-model="d_test_command.process_spawn_limit"
                                          input_style="width: 150px;"
-                                         :validators="[]">
+                                         :validators="[is_not_empty, is_integer]">
                           <div slot="suffix" class="unit-of-measurement"> child processes </div>
                         </validated-input>
                       </div>
@@ -521,10 +532,6 @@
 </template>
 
 <script lang="ts">
-import { handle_api_errors_async } from '@/utils';
-import { AGTestCommand } from 'ag-client-typescript';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
@@ -532,15 +539,27 @@ import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
 
 import {
   is_integer,
   is_not_empty,
-  string_to_num
+  string_to_num,
+  is_non_negative,
+  is_number
 } from '@/validators';
+import {
+  AGTestCommand,
+  ExpectedOutputSource,
+  ExpectedReturnCode,
+  InstructorFile,
+  Project,
+  StdinSource
+} from 'ag-client-typescript';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-@Component({
+  @Component({
   components: {
     APIErrors,
     Dropdown,
@@ -557,6 +576,9 @@ export default class AGCommandSettings extends Vue {
   @Prop({required: true, type: AGTestCommand})
   test_command!: AGTestCommand;
 
+  @Prop({required: true, type: Project})
+  project!: Project;
+
   @Watch('test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
     this.d_test_command = new AGTestCommand(new_test_command);
@@ -565,63 +587,117 @@ export default class AGCommandSettings extends Vue {
     }
   }
 
+  stdin_source_labels = [
+    {option: StdinSource.none, label: "No input"},
+    {option: StdinSource.text, label: "Text"},
+    {option: StdinSource.instructor_file, label: "Project file content"},
+    {option: StdinSource.setup_stdout, label: "Stdout from setup"},
+    {option: StdinSource.setup_stderr, label: "Stderr from setup"}
+  ];
+
+  expected_return_code_labels = [
+    {option: ExpectedReturnCode.none, label: "Don't check"},
+    {option: ExpectedReturnCode.zero, label: "Zero"},
+    {option: ExpectedReturnCode.nonzero, label: "Nonzero"}
+  ];
+
+  expected_output_source_labels = [
+    {option: ExpectedOutputSource.none, label: "Don't check"},
+    {option: ExpectedOutputSource.text, label: "Text"},
+    {option: ExpectedOutputSource.instructor_file, label: "Project file content"}
+  ];
+
+  get stdin_source() {
+    if (this.d_test_command!.stdin_source === StdinSource.none) {
+      return "No input";
+    }
+    else if (this.d_test_command!.stdin_source === StdinSource.text) {
+      return "Text";
+    }
+    else if (this.d_test_command!.stdin_source === StdinSource.instructor_file) {
+      return "Project file content";
+    }
+    return this.d_test_command!.stdin_source === StdinSource.setup_stdout
+      ? "Stdout from setup" : "Stderr from setup";
+  }
+
+  get expected_return_code() {
+    if (this.d_test_command!.expected_return_code === ExpectedReturnCode.none) {
+      return "Don't check";
+    }
+    return this.d_test_command!.expected_return_code === ExpectedReturnCode.zero
+      ? "Zero" : "Nonzero";
+  }
+
+  get expected_stdout_source() {
+    if (this.d_test_command!.expected_stdout_source === ExpectedOutputSource.none) {
+      return "Don't check";
+    }
+    return this.d_test_command!.expected_stdout_source === ExpectedOutputSource.text
+      ? "Text" : "Project file content";
+  }
+
+  get expected_stderr_source() {
+    if (this.d_test_command!.expected_stderr_source === ExpectedOutputSource.none) {
+      return "Don't check";
+    }
+    return this.d_test_command!.expected_stderr_source === ExpectedOutputSource.text
+      ? "Text" : "Project file content";
+  }
+
   current_tab_index = 0;
   d_test_command: AGTestCommand | null = null;
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   saving = false;
-  settings_form_is_valid = false;
+  settings_form_is_valid = true;
 
+  readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
+  readonly is_number = is_number;
   readonly string_to_num = string_to_num;
+  readonly StdinSource = StdinSource;
+  readonly ExpectedOutputSource = ExpectedOutputSource;
+  readonly ExpectedReturnCode = ExpectedReturnCode;
 
   async created() {
     this.d_test_command = this.test_command;
+    this.sort_instructor_files();
+    // if (this.d_test_command.stdin_instructor_file === null) {
+    //   this.d_test_command.stdin_instructor_file = this.project!.instructor_files[0];
+    // }
+    // if (this.d_test_command.expected_stdout_instructor_file === null) {
+    //   this.d_test_command.stdin_instructor_file = this.project!.instructor_files[0];
+    // }
+    // if (this.d_test_command.expected_stderr_instructor_file === null) {
+    //   this.d_test_command.stdin_instructor_file = this.project!.instructor_files[0];
+    // }
   }
 
   async delete_ag_test_command() {
     await this.d_test_command!.delete();
   }
 
+  sort_instructor_files() {
+    this.project.instructor_files!.sort(
+      (file_a: InstructorFile, file_b: InstructorFile) => {
+        return file_a.name.localeCompare(file_b.name, undefined, {numeric: true});
+      }
+    );
+  }
+
   @handle_api_errors_async(handle_save_ag_suite_settings_error)
   async save_ag_test_command_settings() {
-    this.saving = true;
     try {
-      console.log("Saving command settings");
+      this.saving = true;
+      (<APIErrors> this.$refs.api_errors).clear();
       await this.d_test_command!.save();
     }
     finally {
       this.saving = false;
     }
   }
-  stdin_source_options = [
-    "No input",
-    "Text",
-    "Project file content",
-    "Stdout from setup",
-    "Stderr from setup"
-  ];
-  expected_return_code_options = [
-    "Don't check",
-    "Zero",
-    "Nonzero"
-  ];
-  expected_stdout_source_options = [
-    "Don't check",
-    "Text",
-    "Project file content"
-  ];
-  expected_stderr_source_options = [
-    "Don't check",
-    "Text",
-    "Project file content"
-  ];
-  file_options = [
-    "Card.h",
-    "Pack.h",
-    "Card.cpp"
-  ];
 }
 
 function handle_save_ag_suite_settings_error(component: AGCommandSettings, error: unknown) {
@@ -700,6 +776,7 @@ $current-lang-choice: "Poppins";
   box-sizing: border-box;
   width: 300px;
   margin-right: 50px;
+  vertical-align: top;
 }
 
 .subtract-points-container {

@@ -7,7 +7,7 @@
                      && active_suite.pk === test_suite.pk}]"
          @click="$emit('update_active_suite', test_suite)">
 
-        <div class="suite-name"> {{test_suite.name}} </div>
+        <div class="suite-name">{{test_suite.name}}</div>
       </div>
 
       <div class="cases-container" v-if="active_suite !== null
@@ -238,10 +238,9 @@ function handle_add_ag_command_error(component: AGSuitePanel, error: unknown) {
 }
 
 .new-case-button {
-  @extend .white-button;
   padding: 5px 10px;
   width: 92.5%;
-  margin: 4px 0px 4px 7.5%;
+  margin: 4px 0 4px 7.5%;
 }
 
 .plus-sign {
@@ -251,13 +250,10 @@ function handle_add_ag_command_error(component: AGSuitePanel, error: unknown) {
 
 .suite-in-active-container {
   background-color: $suite-in-active-container-color;
-  //border: 1px solid darken($suite-in-active-container-color, 2);
-  //border-top: 1px solid $navy-blue;
 }
 
 .parent-of-active-case {
   background-color: $parent-of-active-color;
-  //border: 1px solid darken($parent-of-active-color, 2);
 }
 
 .active-suite, .active-suite:hover {

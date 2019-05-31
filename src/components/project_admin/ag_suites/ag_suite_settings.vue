@@ -46,7 +46,7 @@
                             </div>
                           </template>
                           <div slot-scope="{item}">
-                            <span class="dropdown-item">{{item}}</span>
+                            <span class="dropdown-item">{{item.display_name}}</span>
                           </div>
                         </dropdown>
                       </div>
@@ -120,7 +120,7 @@
                   <fieldset>
                     <legend> Student Files </legend>
                     <div class="typeahead-search-bar">
-                      <dropdown-typeahead ref="project_files_typeahead"
+                      <dropdown-typeahead ref="student_files_typeahead"
                                           placeholder_text="Enter a filename"
                                           :choices="expected_student_files_available"
                                           :filter_fn="expected_student_file_filter_fn"
@@ -270,7 +270,14 @@ import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-import { AGTestSuite, ExpectedStudentFile, InstructorFile, Project } from 'ag-client-typescript';
+import {
+  AGTestSuite,
+  ExpectedStudentFile,
+  get_sandbox_docker_images,
+  InstructorFile,
+  Project,
+  SandboxDockerImageData
+} from 'ag-client-typescript';
 
 import { deep_copy, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -308,10 +315,7 @@ export default class AGSuiteSettings extends Vue {
 
   current_tab_index = 0;
   d_test_suite: AGTestSuite | null = null;
-  docker_images = [
-    "Default",
-    "EECS 280"
-  ];
+  docker_images: SandboxDockerImageData[] = [];
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   loading = true;
@@ -320,18 +324,17 @@ export default class AGSuiteSettings extends Vue {
 
   readonly is_not_empty = is_not_empty;
 
-  created() {
+  async created() {
     this.d_test_suite = this.test_suite;
+    // this.docker_images = await get_sandbox_docker_images();
+    this.docker_images = [];
     this.sort_instructor_files();
     this.sort_student_files();
     this.loading = false;
   }
 
   get instructor_files_available() {
-    if (this.project.instructor_files === undefined) {
-      return [];
-    }
-    return this.project.instructor_files.filter((instructor_file: InstructorFile) => {
+    return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
       return this.d_test_suite!.instructor_files_needed.findIndex(
         (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
     });

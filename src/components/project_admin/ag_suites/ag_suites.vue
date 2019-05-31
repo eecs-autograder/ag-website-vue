@@ -37,7 +37,9 @@
       </div>
 
       <div v-if="level_selected === 'Command' && active_command !== null">
-        <AGCommandSettings :test_command="active_command"></AGCommandSettings>
+        <AGCommandSettings :test_command="active_command"
+                           :project="project">
+        </AGCommandSettings>
       </div>
     </div>
 
@@ -117,6 +119,32 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
+  async created() {
+    AGTestSuite.subscribe(this);
+    this.d_project = this.project;
+    this.test_suites = await AGTestSuite.get_all_from_project(this.d_project.pk);
+    this.loading = false;
+  }
+
+  beforeDestroy() {
+    AGTestSuite.unsubscribe(this);
+  }
+
+  readonly is_not_empty = is_not_empty;
+
+  level_selected: string = "Suite";
+  active_suite: AGTestSuite | null = null;
+  active_case: AGTestCase | null = null;
+  active_command: AGTestCommand | null = null;
+
+  d_project!: Project;
+  test_suites: AGTestSuite[] = [];
+  loading = true;
+
+  add_suite_form_is_valid = false;
+  adding_suite = false;
+  new_suite_name = "";
+
   update_active_suite(ag_test_suite: AGTestSuite) {
     console.log("Updating suite");
     if (this.active_suite !== null && this.active_suite.pk === ag_test_suite.pk
@@ -140,33 +168,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   update_active_command(ag_test_command: AGTestCommand) {
     this.active_command = deep_copy(ag_test_command, AGTestCommand);
     this.level_selected = "Command";
-  }
-
-  readonly is_not_empty = is_not_empty;
-
-  level_selected: string = "Suite";
-  active_suite: AGTestSuite | null = null;
-  active_case: AGTestCase | null = null;
-  active_command: AGTestCommand | null = null;
-
-  d_project!: Project;
-  test_suites: AGTestSuite[] = [];
-  loading = true;
-
-  add_suite_form_is_valid = false;
-  adding_suite = false;
-  new_suite_name = "";
-
-  async created() {
-    AGTestSuite.subscribe(this);
-    this.d_project = this.project;
-    this.test_suites = await AGTestSuite.get_all_from_project(this.d_project.pk);
-    this.loading = false;
-    console.log(this.test_suites.length);
-  }
-
-  beforeDestroy() {
-    AGTestSuite.unsubscribe(this);
   }
 
   // SuiteObserver --------------------------------------------------------------------------------
