@@ -7,15 +7,12 @@
       </button>
       <div class="all-suites" @wheel.stop>
         <div v-for="(test_suite, index) of test_suites"
-             :class="['suite-container',
-                     {'active-suite-container': active_suite !== null &&
-                       test_suite.pk === active_suite.pk}]"
+             :class="['suite-container']"
              :key="test_suite.pk">
           <AGSuitePanel :test_suite="test_suite"
                         :active_suite="active_suite"
                         :active_case="active_case"
                         :active_command="active_command"
-                        :level_selected="level_selected"
                         :last_suite="index === test_suites.length - 1"
                         @update_active_suite="update_active_suite($event)"
                         @update_active_case="update_active_case($event)"
@@ -113,7 +110,6 @@ import {
   }
 })
 
-// CaseObserver, CommandObserver
 export default class AGSuites extends Vue implements AGTestSuiteObserver {
 
   @Prop({required: true, type: Project})

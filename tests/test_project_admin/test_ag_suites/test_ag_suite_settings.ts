@@ -194,7 +194,7 @@ describe('AGSuiteSettings tests', () => {
     test('Suite name cannot be empty - violates condition', async () => {
         expect(component.settings_form_is_valid).toBe(true);
 
-        component.d_test_suite.name = " ";
+        component.d_test_suite!.name = " ";
         await component.$nextTick();
 
         expect(component.settings_form_is_valid).toBe(false);
@@ -220,7 +220,7 @@ describe('AGSuiteSettings tests', () => {
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(component.d_test_suite.student_files_needed.length).toEqual(3);
+        expect(component.d_test_suite!.student_files_needed.length).toEqual(3);
         expect(component.d_test_suite!.student_files_needed[0]).toEqual(student_file_1);
         expect(component.d_test_suite!.student_files_needed[1]).toEqual(student_file_2);
         expect(component.d_test_suite!.student_files_needed[2]).toEqual(student_file_3);
@@ -261,7 +261,7 @@ describe('AGSuiteSettings tests', () => {
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(component.d_test_suite.instructor_files_needed.length).toEqual(3);
+        expect(component.d_test_suite!.instructor_files_needed.length).toEqual(3);
         expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
         expect(component.d_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
         expect(component.d_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
@@ -452,13 +452,13 @@ describe('AGSuiteSettings tests', () => {
             student_files_needed: [student_file_2, student_file_1]
         });
 
-        expect(component.d_test_suite.pk).toEqual(ag_suite.pk);
+        expect(component.d_test_suite!.pk).toEqual(ag_suite.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setProps({'test_suite': another_ag_suite});
         await component.$nextTick();
 
-        expect(component.d_test_suite.pk).toEqual(another_ag_suite.pk);
+        expect(component.d_test_suite!.pk).toEqual(another_ag_suite.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setData({current_tab_index: 2});
@@ -469,7 +469,7 @@ describe('AGSuiteSettings tests', () => {
         wrapper.setProps({'test_suite': ag_suite});
         await component.$nextTick();
 
-        expect(component.d_test_suite.pk).toEqual(ag_suite.pk);
+        expect(component.d_test_suite!.pk).toEqual(ag_suite.pk);
         expect(component.current_tab_index).toEqual(0);
     });
 });

@@ -2,24 +2,22 @@
   <div v-if="!loading">
 
     <div :class="['test-case', {'last-case': test_case.ag_test_commands.length === 0},
-                 {'active-case' : level_selected === 'Case'
-                                  && active_case !== null
-                                  && active_case.pk === test_case.pk},
-                 {'parent-of-active-command': active_case !== null
-                                              && active_case.pk === test_case.pk
-                                              && level_selected === 'Command'}]"
+                 {'active-case' : is_active_case},
+                 {'parent-of-active-command': command_is_active_level}]"
          @click="$emit('update_active_case', test_case)">
         <div> {{test_case.name}} </div>
-        <div @click="$refs.new_command_modal.open()"
-          ><i class="fas fa-ellipsis-v command-menu"></i></div>
+        <div @click="$refs.new_command_modal.open()">
+          <i class="fas fa-ellipsis-v command-menu"></i>
+        </div>
     </div>
 
     <div class="commands-container">
       <div v-for="(test_command, index) of test_case.ag_test_commands"
            :class="['test-command',
                    {'last-command': index === test_case.ag_test_commands.length - 1},
-           {'active-command' : level_selected === 'Command' && active_command !== null
-                               && active_command.pk === test_command.pk}]"
+                   {'active-command' : active_command !== null
+                     && active_command.pk === test_command.pk}
+           ]"
            @click="$emit('update_active_case', test_case);
                    $emit('update_active_command', test_command)">
         {{test_command.name}}
@@ -105,9 +103,6 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
   @Prop({required: true})
   active_command!: AGTestCommand | null;
 
-  @Prop({required: true, type: String})
-  level_selected!: string;
-
   readonly is_not_empty = is_not_empty;
 
   add_command_form_is_valid = false;
@@ -123,6 +118,16 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
 
   beforeDestroy() {
     AGTestCommand.unsubscribe(this);
+  }
+
+  get is_active_case() {
+    return this.active_case !== null
+           && this.active_case.pk === this.test_case.pk
+           && this.active_command === null;
+  }
+
+  get command_is_active_level() {
+    return this.is_active_case && this.active_command !== null;
   }
 
   @handle_api_errors_async(handle_add_ag_command_error)

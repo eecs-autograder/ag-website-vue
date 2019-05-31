@@ -163,10 +163,10 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Instructor files from the project get sorted', async () => {
-        expect(component.project.instructor_files.length).toEqual(3);
-        expect(component.project.instructor_files[0]).toEqual(instructor_file_2);
-        expect(component.project.instructor_files[1]).toEqual(instructor_file_1);
-        expect(component.project.instructor_files[2]).toEqual(instructor_file_3);
+        expect(component.project.instructor_files!.length).toEqual(3);
+        expect(component.project.instructor_files![0]).toEqual(instructor_file_2);
+        expect(component.project.instructor_files![1]).toEqual(instructor_file_1);
+        expect(component.project.instructor_files![2]).toEqual(instructor_file_3);
     });
 
     test('error - command name is blank', async () => {
@@ -855,13 +855,13 @@ describe('AGCommandSettings tests', () => {
             process_spawn_limit: 1
         });
 
-        expect(component.d_test_command.pk).toEqual(ag_command.pk);
+        expect(component.d_test_command!.pk).toEqual(ag_command.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setProps({'test_command': another_ag_command});
         await component.$nextTick();
 
-        expect(component.d_test_command.pk).toEqual(another_ag_command.pk);
+        expect(component.d_test_command!.pk).toEqual(another_ag_command.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setData({current_tab_index: 2});
@@ -872,7 +872,7 @@ describe('AGCommandSettings tests', () => {
         wrapper.setProps({'test_command': ag_command});
         await component.$nextTick();
 
-        expect(component.d_test_command.pk).toEqual(ag_command.pk);
+        expect(component.d_test_command!.pk).toEqual(ag_command.pk);
         expect(component.current_tab_index).toEqual(0);
     });
 });

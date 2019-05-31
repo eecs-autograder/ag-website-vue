@@ -1,23 +1,22 @@
 <template>
   <div>
       <div :class="['test-suite', {'last-suite': last_suite},
-                   {'active-suite': level_selected === 'Suite'
-                     && active_suite !== null && active_suite.pk === test_suite.pk},
-                   {'suite-in-active-container': active_suite !== null
-                     && active_suite.pk === test_suite.pk}]"
+                   {'active-suite': is_active_suite},
+                   {'suite-in-active-container': case_or_command_is_active_level}]"
          @click="$emit('update_active_suite', test_suite)">
 
         <div class="suite-name">{{test_suite.name}}</div>
       </div>
 
-      <div class="cases-container" v-if="active_suite !== null
-                                         && active_suite.pk === test_suite.pk">
-        <div v-if="active_suite !== null && active_suite.pk === test_suite.pk"
-             class="new-case-button"><i class="fas fa-plus plus-sign"></i> Add Case  </div>
+      <div class="cases-container" v-if="is_active_suite">
+        <div class="new-case-button"
+             @click="$refs.new_case_modal.open()">
+          <i class="fas fa-plus plus-sign"></i>
+          Add Case
+        </div>
         <div v-for="(test_case, index) of test_suite.ag_test_cases"
              :key="test_case.pk">
           <AGCasePanel :test_case="test_case"
-                       :level_selected="level_selected"
                        :active_case="active_case"
                        :active_command="active_command"
                        :last_case="index === test_suite.ag_test_cases.length - 1"
@@ -56,7 +55,7 @@
             </div>
             <div class="command-container">
               <label class="text-label"> Command </label>
-              <validated-input ref="new_command_name"
+              <validated-input ref="new_command"
                                v-model="new_command"
                                :validators="[is_not_empty]">
               </validated-input>
@@ -124,9 +123,6 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
   @Prop({required: true})
   active_command!: AGTestCommand | null;
 
-  @Prop({required: true, type: String})
-  level_selected!: string;
-
   readonly is_not_empty = is_not_empty;
 
   add_case_form_is_valid = false;
@@ -144,13 +140,26 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
     AGTestCase.unsubscribe(this);
   }
 
+  get is_active_suite() {
+    return this.active_suite !== null && this.active_suite.pk === this.test_suite.pk;
+  }
+
+  get case_or_command_is_active_level() {
+    return this.is_active_suite && this.active_case !== null;
+  }
+
+
   @handle_api_errors_async(handle_add_ag_case_error)
   async add_case() {
     try {
       this.adding_case = true;
       let test_case = await AGTestCase.create(this.test_suite!.pk, { name: this.new_case_name });
-      this.add_command(test_case.pk);
+      await AGTestCommand.create(
+        test_case.pk, { name: this.new_command_name, cmd: this.new_command }
+      );
       (<Modal> this.$refs.new_case_modal).close();
+      this.new_command_name = "";
+      this.new_command = "";
       this.new_case_name = "";
     }
     finally {
@@ -158,31 +167,16 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
     }
   }
 
-  @handle_api_errors_async(handle_add_ag_command_error)
-  async add_command(test_case_pk: number) {
-    try {
-      this.adding_case = true;
-      await AGTestCommand.create(
-        test_case_pk, { name: this.new_command_name, cmd: this.new_command }
-      );
-      this.new_command_name = "";
-      this.new_command = "";
-    }
-    finally {
-      this.adding_case = false;
-    }
-  }
-
   update_ag_test_case_changed(ag_test_case: AGTestCase): void {
-    console.log("A case changed");
-    let index = this.test_suite.ag_test_cases.findIndex(
-      (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
-    );
-    Vue.set(this.test_suite.ag_test_cases, index, deep_copy(ag_test_case, AGTestCase));
+    if (ag_test_case.ag_test_suite === this.test_suite.pk) {
+      let index = this.test_suite.ag_test_cases.findIndex(
+        (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
+      );
+      Vue.set(this.test_suite.ag_test_cases, index, deep_copy(ag_test_case, AGTestCase));
+    }
   }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    console.log("A Test Case Was Created");
     if (ag_test_case.ag_test_suite === this.test_suite.pk) {
       this.test_suite.ag_test_cases.push(ag_test_case);
     }
@@ -214,9 +208,6 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
   (<APIErrors> component.$refs.api_errors_new_case).show_errors_from_response(error);
 }
 
-function handle_add_ag_command_error(component: AGSuitePanel, error: unknown) {
-  (<APIErrors> component.$refs.api_errors_new_command).show_errors_from_response(error);
-}
 </script>
 
 <style scoped lang="scss">
