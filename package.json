@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
-    "@types/lodash": "^4.14.120",
     "ag-client-typescript": "0.0.0-dev.14",
     "file-saver": "^2.0.1",
     "lodash": "^4.17.11",
@@ -21,6 +20,7 @@
   "devDependencies": {
     "@types/file-saver": "^2.0.0",
     "@types/jest": "^23.1.4",
+    "@types/lodash": "^4.14.120",
     "@types/sinon": "^7.0.10",
     "@vue/cli-plugin-typescript": "^3.0.0-rc.10",
     "@vue/cli-plugin-unit-jest": "^3.0.0-rc.10",
@@ -29,6 +29,7 @@
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "sinon": "^7.3.0",
+    "timezone-mock": "^1.0.5",
     "ts-jest": "^23.0.0",
     "tslint-consistent-codestyle": "^1.13.3",
     "tslint-eslint-rules": "^5.3.1",

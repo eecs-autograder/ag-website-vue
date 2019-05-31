@@ -1,6 +1,8 @@
 import DatetimePicker from '@/components/datetime_picker.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 
+import * as timezone_mock from 'timezone-mock';
+
 beforeAll(() => {
   config.logModifiedComponents = false;
 });
@@ -16,6 +18,14 @@ export enum MinuteInputState {
   awaiting_second_digit
 }
 
+beforeEach(() => {
+   timezone_mock.register('US/Eastern');
+});
+
+afterEach(() => {
+   timezone_mock.unregister();
+});
+
 describe('TimePicker Tests', () => {
   let wrapper: Wrapper<DatetimePicker>;
   let component: DatetimePicker;
@@ -23,7 +33,7 @@ describe('TimePicker Tests', () => {
   beforeEach(() => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-12-25T18:58:40.746189Z"
+        value: "2019-12-25T18:58:40.746Z"
       }
     });
     component = wrapper.vm;
@@ -268,7 +278,7 @@ describe('TimePicker HourInputState tests', () => {
   beforeEach(() => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-12-25T18:36:37.746189Z"
+        value: "2019-12-25T18:36:37.746Z"
       }
     });
     component = wrapper.vm;
@@ -423,7 +433,7 @@ describe('TimePicker MinuteInputState tests', () => {
   beforeEach(() => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-12-25T18:36:37.746189Z"
+        value: "2019-12-25T18:36:37.746Z"
       }
     });
     component = wrapper.vm;
@@ -503,7 +513,7 @@ describe('DatePicker Tests', () => {
   beforeEach(() => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-12-25T18:36:37.746189Z"
+        value: "2019-12-25T18:36:37.746Z"
       }
     });
     component = wrapper.vm;
@@ -528,7 +538,7 @@ describe('DatePicker Tests', () => {
        'was previously January',
        async () => {
     wrapper.setData({'is_open': true});
-    wrapper.setData({'d_date': "2019-01-25T18:36:37.746189Z"});
+    wrapper.setData({'d_date': "2019-01-25T18:36:37.746Z"});
     wrapper.setData({'month': 0});
 
     expect(component.month).toEqual(0);
@@ -596,7 +606,7 @@ describe('DatetimePicker Tests', () => {
   test('Hours and minutes are less than 10', async () => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-12-25T09:06:37.746189Z"
+        value: "2019-12-25T09:06:37.746Z"
       }
     });
     component = wrapper.vm;
@@ -608,7 +618,7 @@ describe('DatetimePicker Tests', () => {
   test('Hours and minutes are greater than 10', async () => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-12-25T17:16:37.746189Z"
+        value: "2019-12-25T17:16:37.746Z"
       }
     });
     component = wrapper.vm;
@@ -637,7 +647,7 @@ describe('DatetimePicker Tests', () => {
   });
 
   test("Value passed into 'value' prop changed by parent component", async () => {
-    let orig_date_string = "2019-07-21T12:20:40.746189Z";
+    let orig_date_string = "2019-07-21T12:20:40.746Z";
     wrapper = mount(DatetimePicker, {
       propsData: {
         value: orig_date_string
@@ -648,7 +658,7 @@ describe('DatetimePicker Tests', () => {
     let orig_date = new Date(orig_date_string);
     expect(component.d_date).toEqual(orig_date);
 
-    wrapper.setProps({'value': "2019-03-08T23:20:40.746189Z"});
+    wrapper.setProps({'value': "2019-03-08T23:20:40.746Z"});
 
     expect(component.d_date).not.toEqual(orig_date);
   });
@@ -656,7 +666,7 @@ describe('DatetimePicker Tests', () => {
   test("Toggle visibility of the DatetimePicker", async () => {
     wrapper = mount(DatetimePicker, {
       propsData: {
-        value: "2019-03-08T23:20:40.746189Z"
+        value: "2019-03-08T23:20:40.746Z"
       }
     });
     component = wrapper.vm;
