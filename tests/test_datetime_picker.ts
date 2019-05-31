@@ -224,7 +224,7 @@ describe('TimePicker Tests', () => {
     expect(component.period_str).toEqual("PM");
   });
 
-  test('Pressing backspace in the hours input sets the value to "00"',
+  test('Pressing backspace in the hours input sets the value to "12"',
        async () => {
     let hours_input = wrapper.find('#hour-input');
     expect(component.hours_str).toEqual("01");
@@ -232,32 +232,8 @@ describe('TimePicker Tests', () => {
     hours_input.trigger('click');
     hours_input.trigger('keydown', {code: "Backspace"});
 
-    expect(component.hours_str).toEqual("00");
-  });
-
-  test("If the hours input loses focus after pressing Backspace (and no digit or " +
-       "arrow keys), the hours input gets set to '12'",
-       async () => {
-    let hours_input = wrapper.find('#hour-input');
-    expect(component.hours_str).toEqual("01");
-
-    hours_input.trigger('click');
-    hours_input.trigger('keydown', {code: "Backspace"});
-
-    expect(component.hours_str).toEqual("00");
-
-    hours_input.trigger('blur');
     expect(component.hours_str).toEqual("12");
-
-    hours_input.trigger('click');
-    hours_input.trigger('keydown', {code: "Backspace"});
-
-    expect(component.hours_str).toEqual("00");
-
-    hours_input.trigger("keydown", {code: "Digit1", key: "1"});
-    hours_input.trigger('blur');
-
-    expect(component.hours_str).toEqual("01");
+    expect(component.d_date.getHours()).toEqual(12);
   });
 
   test('Pressing backspace in the minutes input sets the value to "00"',
@@ -269,6 +245,7 @@ describe('TimePicker Tests', () => {
     minutes_input.trigger('keydown', {code: "Backspace"});
 
     expect(component.minutes_str).toEqual("00");
+    expect(component.d_date.getMinutes()).toEqual(0);
   });
 });
 

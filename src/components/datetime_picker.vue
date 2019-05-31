@@ -49,8 +49,7 @@
                    ref="hour_input"
                    id="hour-input"
                    v-model="hours_str"
-                   @keydown="update_hours"
-                   @blur="fix_hours">
+                   @keydown="update_hours">
           </div>
           <button ref="prev_hour_button"
                   @click="go_to_prev_hour"
@@ -240,6 +239,7 @@ export default class DatetimePicker extends Vue {
     }
     else if (event.code === "Backspace") {
       this.minutes_str = "00";
+      this.update_time_selected();
     }
     else if (this.is_number(event.key)) {
       if (this.minute_input_state === MinuteInputState.awaiting_first_digit) {
@@ -266,7 +266,8 @@ export default class DatetimePicker extends Vue {
       this.go_to_prev_hour();
     }
     else if (event.code === "Backspace") {
-      this.hours_str = "00";
+      this.hours_str = "12";
+      this.update_time_selected()
     }
     else if (this.is_number(event.key)) {
       if (this.hour_input_state === HourInputState.awaiting_first_digit) {
@@ -295,13 +296,6 @@ export default class DatetimePicker extends Vue {
         this.hour_input_state = HourInputState.awaiting_first_digit;
         this.update_time_selected();
       }
-    }
-  }
-
-  fix_hours() {
-    if (this.hours_str === "00") {
-      this.hours_str = "12";
-      this.hour_input_state = HourInputState.awaiting_first_digit;
     }
   }
 
