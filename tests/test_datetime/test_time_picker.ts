@@ -29,7 +29,7 @@ describe('TimePicker Tests', () => {
         wrapper = mount(TimePicker);
         expect(wrapper.vm.hours_str).toEqual('12');
         expect(wrapper.vm.minutes_str).toEqual('00');
-        expect(component.period_str).toEqual('PM');
+        expect(component.am_pm_str).toEqual('PM');
         expect(wrapper.vm.d_time.hours).toEqual(12);
         expect(wrapper.vm.d_time.minutes).toEqual(0);
     });
@@ -66,22 +66,22 @@ describe('TimePicker Tests', () => {
 
     test('Pressing the up and down buttons increases/decreases hours_str', () => {
         expect(component.hours_str).toEqual("01");
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(13);
 
         wrapper.find({ref: 'prev_hour_button'}).trigger('click');
         expect(component.hours_str).toEqual("12");
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(12);
 
         wrapper.find({ref: 'prev_hour_button'}).trigger('click');
         expect(component.hours_str).toEqual("11");
-        expect(component.period_str).toEqual("AM");
+        expect(component.am_pm_str).toEqual("AM");
         expect(component.d_time.hours).toEqual(11);
 
         wrapper.find({ref: 'next_hour_button'}).trigger('click');
         expect(component.hours_str).toEqual("12");
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(12);
 
         wrapper.find({ref: 'next_hour_button'}).trigger('click');
@@ -91,17 +91,17 @@ describe('TimePicker Tests', () => {
 
         wrapper.setProps({value: '23:00'});
         expect(component.hours_str).toEqual("11");
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(23);
 
         wrapper.find({ref: 'next_hour_button'}).trigger('click');
         expect(component.hours_str).toEqual("12");
-        expect(component.period_str).toEqual("AM");
+        expect(component.am_pm_str).toEqual("AM");
         expect(component.d_time.hours).toEqual(0);
 
         wrapper.find({ref: 'prev_hour_button'}).trigger('click');
         expect(component.hours_str).toEqual("11");
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(23);
     });
 
@@ -239,13 +239,13 @@ describe('TimePicker Tests', () => {
 
     test('Clicking on the period input toggles the value of period_str', () => {
         let period_input = wrapper.find('#period-input');
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
 
         period_input.trigger('click');
-        expect(component.period_str).toEqual("AM");
+        expect(component.am_pm_str).toEqual("AM");
 
         period_input.trigger('click');
-        expect(component.period_str).toEqual("PM");
+        expect(component.am_pm_str).toEqual("PM");
     });
 
     test('Pressing backspace in the hours input sets the value to "12"', () => {

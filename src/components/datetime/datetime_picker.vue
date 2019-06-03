@@ -1,5 +1,5 @@
 <template>
-  <div id="datetime-picker" v-if="is_open">
+  <div id="datetime-picker" v-if="d_is_open">
 
     <div id="calender">
       <div class="calender-header">
@@ -7,7 +7,7 @@
           <i class="fas fa-chevron-left"></i>
         </button>
         <div class="display-month-and-year">
-          {{months[month]}} <span>{{year}}</span>
+          {{months[d_month]}} <span>{{d_year}}</span>
         </div>
         <button @click="go_to_next_month" class="next-month-button">
           <i class="fas fa-chevron-right"></i>
@@ -20,14 +20,14 @@
           </tr>
           <tr class="week" v-for="(row, row_num) of num_rows">
             <td v-for="(col, col_num) of num_cols"
-                :class="{'unavailable-day': calender[row_num][col_num] === 0}">
-              <div v-if="calender[row_num][col_num] !== 0"
+                :class="{'unavailable-day': calendar[row_num][col_num] === 0}">
+              <div v-if="calendar[row_num][col_num] !== 0"
                    :class="['available-day',
-                           {'selected-day': calender[row_num][col_num] === selected_day
-                                           && year === selected_year
-                                           && month === selected_month}]"
-                   @click="update_day_selected(calender[row_num][col_num])">
-                  {{calender[row_num][col_num]}}
+                            {'selected-day': calendar[row_num][col_num] === d_selected_day
+                                             && d_year === d_selected_year
+                                             && d_month === d_selected_month}]"
+                   @click="update_day_selected(calendar[row_num][col_num])">
+                {{calendar[row_num][col_num]}}
               </div>
             </td>
           </tr>
@@ -35,25 +35,15 @@
       </div>
     </div>
 
-    <time-picker v-model="d_time" @input="update_time_selected"></time-picker>
+    <time-picker v-model="d_time" @input="update_time_selected" ref="time_picker"></time-picker>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import moment from 'moment';
 
-import TimePicker, { Time } from "@/components/datetime/time_picker.vue";
-
-export enum HourInputState {
-  awaiting_first_digit,
-  first_digit_was_one,
-  first_digit_was_zero
-}
-
-export enum MinuteInputState {
-  awaiting_first_digit,
-  awaiting_second_digit
-}
+import TimePicker from "@/components/datetime/time_picker.vue";
 
 @Component({
   components: {
@@ -62,16 +52,133 @@ export enum MinuteInputState {
 })
 export default class DatetimePicker extends Vue {
 
-  @Prop({default: '', type: String})
+  @Prop({default: null, type: String})
   value!: string;
 
   @Watch('value')
-  on_value_changed(new_value: string, old_value: string) {
-    this.d_date = new Date(new_value);
-    this.d_time = new Time(this.d_date.getHours(), this.d_date.getMinutes());
+  on_value_changed(new_value: string | null, old_value: string | null) {
+    this.set_date_and_time(new_value);
   }
 
-  months = [
+  d_date: moment.Moment = moment();
+  d_time: string = '12:00';
+
+  d_is_open = false;
+
+  d_selected_day: number | null = null;
+  d_selected_month: number | null = null;
+  d_selected_year: number | null = null;
+
+  d_month = moment().month();  // The current month shown on the calendar
+  d_year = moment().year();  // The current year shown on the calendar
+
+  calendar: number[][] = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0]
+  ];
+
+  get num_rows() {
+    return this.calendar.length;
+  }
+  get num_cols() {
+    return this.calendar[0].length;
+  }
+
+  created() {
+    this.set_date_and_time(this.value);
+
+    this.d_year = this.d_date.year();
+    this.d_month = this.d_date.month();
+    this.calculate_days();
+  }
+
+  set_date_and_time(value: string | null) {
+    if (value === null) {
+      this.d_date = moment();
+    }
+    else {
+      this.d_date = moment(value);
+      if (!this.d_date.isValid()) {
+        throw new InvalidDatetimeStrError(`Invalid datetime string: ${value}`);
+      }
+
+      this.d_selected_day = this.d_date.date();
+      this.d_selected_month = this.d_date.month();
+      this.d_selected_year = this.d_date.year();
+
+      this.d_time = moment({hours: this.d_date.hours(),
+                            minutes: this.d_date.minutes()}).format('HH:mm');
+    }
+  }
+
+  toggle_visibility() {
+    this.d_is_open = !this.d_is_open;
+  }
+
+  go_to_next_month() {
+    if (this.d_month === 11) {
+      this.d_year += 1;
+    }
+    this.d_month = (this.d_month + 1) % this.months.length;
+    this.calculate_days();
+  }
+
+  go_to_prev_month() {
+    if (this.d_month === 0) {
+      this.d_month = this.months.length - 1;
+      this.d_year -= 1;
+    }
+    else {
+      this.d_month = this.d_month - 1;
+    }
+    this.calculate_days();
+  }
+
+  calculate_days() {
+    let first_day = new Date(this.d_year, this.d_month, 1);
+    let last_day = new Date(this.d_year, this.d_month + 1, 0);
+    let offset = first_day.getDay();
+    let day_count = 1;
+
+    for (let row = 0; row < this.num_rows; ++row) {
+      for (let col = 0; col < this.num_cols; ++col) {
+        if (offset === 0) {
+          this.calendar[row][col] = day_count > last_day.getDate() ? 0 : day_count;
+          day_count += 1;
+        }
+        else {
+          this.calendar[row][col] = 0;
+          offset--;
+        }
+      }
+    }
+  }
+
+  update_day_selected(day: number) {
+    this.d_selected_day = day;
+    this.d_selected_month = this.d_month;
+    this.d_selected_year = this.d_year;
+    this.d_date = this.d_date.clone().set({
+      year: this.d_selected_year,
+      month: this.d_selected_month,
+      date: this.d_selected_day,
+    });
+    this.$emit('input', this.d_date.format());
+  }
+
+  update_time_selected() {
+    let time = moment(this.d_time, 'HH:mm');
+    this.d_date = this.d_date.clone().set({hours: time.hours(), minutes: time.minutes()});
+    if (this.d_selected_day) {
+      this.$emit('input', this.d_date.format());
+    }
+  }
+
+  readonly months = [
     "January",
     "February",
     "March",
@@ -86,7 +193,7 @@ export default class DatetimePicker extends Vue {
     "December"
   ];
 
-  days_of_the_week = [
+  readonly days_of_the_week = [
     "Su",
     "M",
     "Tu",
@@ -95,104 +202,16 @@ export default class DatetimePicker extends Vue {
     "F",
     "Sa"
   ];
+}
 
-  d_date!: Date;
-  d_time: Time = new Time();
-  is_open = false;
+export class InvalidDatetimeStrError extends Error {
+  // See https://github.com/Microsoft/TypeScript/issues/13965
+  __proto__: Error; // tslint:disable-line
 
-  selected_day = 0;
-
-  month = 0;
-  selected_month = 0;
-
-  year = 2000;
-  selected_year = 0;
-
-  calender: number[][] = [
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0]
-  ];
-
-  num_rows = 6;
-  num_cols = 7;
-
-  hour_input_state: HourInputState = HourInputState.awaiting_first_digit;
-  minute_input_state: MinuteInputState = MinuteInputState.awaiting_first_digit;
-
-  created() {
-    if (this.value === null) {
-      this.d_date = new Date();
-    }
-    else {
-      this.d_date = new Date(this.value);
-    }
-    this.year = this.d_date.getFullYear();
-    this.month = this.d_date.getMonth();
-    this.calculate_days();
-
-    this.d_time = new Time(this.d_date.getHours(), this.d_date.getMinutes());
-  }
-
-  toggle_show_hide() {
-    this.is_open = !this.is_open;
-  }
-
-  go_to_next_month() {
-    if (this.month === 11) {
-      this.year += 1;
-    }
-    this.month = (this.month + 1) % this.months.length;
-    this.calculate_days();
-  }
-
-  go_to_prev_month() {
-    if (this.month === 0) {
-      this.month = this.months.length - 1;
-      this.year -= 1;
-    }
-    else {
-      this.month = this.month - 1;
-    }
-    this.calculate_days();
-  }
-
-  calculate_days() {
-    let first_day = new Date(this.year, this.month, 1);
-    let last_day = new Date(this.year, this.month + 1, 0);
-    let offset = first_day.getDay();
-    let day_count = 1;
-
-    for (let row = 0; row < this.num_rows; ++row) {
-      for (let col = 0; col < this.num_cols; ++col) {
-        if (offset === 0) {
-          this.calender[row][col] = day_count > last_day.getDate() ? 0 : day_count;
-          day_count += 1;
-        }
-        else {
-          this.calender[row][col] = 0;
-          offset--;
-        }
-      }
-    }
-  }
-
-  update_day_selected(day: number) {
-    this.selected_day = day;
-    this.selected_month = this.month;
-    this.selected_year = this.year;
-    this.d_date.setFullYear(this.selected_year, this.selected_month, this.selected_day);
-    this.$emit('input', this.d_date.toISOString());
-  }
-
-  update_time_selected() {
-    this.d_date.setHours(this.d_time.hours, this.d_time.minutes);
-    if (this.selected_day) {
-      this.$emit('input', this.d_date.toISOString());
-    }
+  constructor(msg?: string) {
+    const actual_proto = new.target.prototype;
+    super(msg);
+    this.__proto__ = actual_proto;
   }
 }
 </script>
@@ -304,93 +323,17 @@ td {
 
 // TIMEPICKER ***********************************************************
 
-#timepicker {
-  border: 1px solid white;
-  border-radius: 2px;
-  box-sizing: border-box;
-  box-shadow: 0 0 2px 1px $pebble-dark;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-left: 5px;
-  position: relative;
-  width: 210px;
-}
-
-.timepicker-header {
-  align-items: center;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  padding: 15px;
-  text-align: center;
-}
-
-#hour-input, #minute-input {
-  background-color: #fff;
-  border-radius: .25rem;
-  border: 1px solid #ced4da;
-  box-sizing: border-box;
-  color: #495057;
-  font-size: 1rem;
-  line-height: 1;
-  padding: 5px;
-  text-align: center;
-  width: 40px;
-  height: 38px;
-}
-
-#hour-input:focus, #minute-input:focus, #period-input:focus {
-  outline: none;
-  box-shadow: 0 0 2px 1px teal;
-}
-
-#period-input {
-  @extend .teal-button;
-  color: white;
-  /*font-size: 1rem;*/
-  width: 40px;
-  height: 38px;
-  padding: 0;
-}
-
-#period-input:focus {
-  box-shadow: none;
-}
-
-.up-button, .down-button {
-  background-color: $white-gray;
-  border: 1px solid darken($white-gray, 1);
-  border-radius: 5px;
-  box-sizing: border-box;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 5px 0;
-  width: 100%;
-}
-
-.up-button {
-  margin-bottom: 10px;
-}
-
-.down-button {
-  margin-top: 10px;
-}
-
-.up-button:focus, .down-button:focus {
-  outline: none;
-}
-
-.up-button:hover, .down-button:hover {
-  background-color: darken($white-gray, 1);
-  border: 1px solid darken($white-gray, 2);
-  border-radius: 5px;
-}
-
-.up-button:active, .down-button:active {
-  background-color: darken($white-gray, 5);
-  border: 1px solid darken($white-gray, 6);
-}
+// #timepicker {
+//   border: 1px solid white;
+//   border-radius: 2px;
+//   box-sizing: border-box;
+//   box-shadow: 0 0 2px 1px $pebble-dark;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   margin-left: 5px;
+//   position: relative;
+//   width: 210px;
+// }
 
 </style>

@@ -4,9 +4,9 @@
     <fieldset>
       <legend> DatePicker </legend>
       <div class="example">
-        <div class="explanation"> Date string initial value: NOT NULL </div>
+        <div class="explanation"> Date string with bound input </div>
         <div class="modeling"
-             @click="$refs.datetime_picker_1.toggle_show_hide()">
+             @click="$refs.datetime_picker_1.toggle_visibility()">
           {{(new Date(date_1)).toLocaleString('en-US', date_display_format)}}
           <i class="far fa-calendar-alt calender-icon"></i>
         </div>
@@ -16,9 +16,9 @@
       </div>
 
       <div class="example">
-        <div class="explanation"> Date string initial value: NULL </div>
+        <div class="explanation"> Date string without bound input (null) </div>
         <div class="modeling"
-             @click="$refs.datetime_picker_2.toggle_show_hide()">
+             @click="$refs.datetime_picker_2.toggle_visibility()">
           {{date_2 !== null
           ? new Date(date_2).toLocaleString('en-US', date_display_format)
           : '--- --, ----, --:-- --'}}
@@ -30,6 +30,19 @@
       </div>
 
     </fieldset>
+
+    <fieldset>
+      <legend>TimePicker</legend>
+      <div class="example">
+        <div class="explanation">TimePicker with no bound input</div>
+        <time-picker></time-picker>
+      </div>
+
+      <div class="example">
+        <div class="explanation">TimePicker with bound input</div>
+        <time-picker v-model="time"></time-picker>
+      </div>
+    </fieldset>
   </div>
 </template>
 
@@ -37,10 +50,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import DatetimePicker from '@/components/datetime/datetime_picker.vue';
+import TimePicker from "@/components/datetime/time_picker.vue";
 
 @Component({
   components: {
-    DatetimePicker
+    DatetimePicker,
+    TimePicker
   }
 })
 export default class DatetimePickerDemo extends Vue {
@@ -48,6 +63,8 @@ export default class DatetimePickerDemo extends Vue {
   date_display_format = { year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric'};
   date_2 = null;
+
+  time = '14:00';
 }
 </script>
 

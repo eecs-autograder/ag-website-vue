@@ -50,7 +50,7 @@
         <div>
           <input id="period-input"
                  type="button"
-                 v-model="period_str"
+                 v-model="am_pm_str"
                  @click="toggle_period_value"/>
         </div>
       </div>
@@ -136,7 +136,7 @@
       return this.d_time.as_moment().format('mm');
     }
 
-    get period_str() {  // FIXME rename
+    get am_pm_str() {
       return this.d_time.as_moment().format('A')
     }
 
@@ -234,7 +234,7 @@
     }
 
     toggle_period_value() {
-      if (this.period_str === "AM") {
+      if (this.am_pm_str === "AM") {
         this.d_time = Time.from_moment(this.d_time.as_moment().add(12, 'hours'));
       }
       else {
