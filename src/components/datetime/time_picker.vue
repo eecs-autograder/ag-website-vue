@@ -3,7 +3,8 @@
     <div class="timepicker-header">
 
       <div class="time-unit-col">
-        <button ref="next_hour_button"
+        <button type="button"
+                ref="next_hour_button"
                 @click="go_to_next_hour"
                 class="up-button">
           <i class="fas fa-chevron-up up-arrow"></i>
@@ -15,7 +16,8 @@
                  :value="hours_str"
                  @keydown="update_hours">
         </div>
-        <button ref="prev_hour_button"
+        <button type="button"
+                ref="prev_hour_button"
                 @click="go_to_prev_hour"
                 class="down-button">
           <i class="fas fa-chevron-down down-arrow"></i>
@@ -25,7 +27,8 @@
       <div> : </div>
 
       <div class="time-unit-col">
-        <button ref="next_minute_button"
+        <button type="button"
+                ref="next_minute_button"
                 @click="go_to_next_minute"
                 class="up-button">
           <i class="fas fa-chevron-up up-arrow"></i>
@@ -37,7 +40,8 @@
                  :value="minutes_str"
                  @keydown="update_minutes"/>
         </div>
-        <button ref="prev_minute_button"
+        <button type="button"
+                ref="prev_minute_button"
                 @click="go_to_prev_minute"
                 class="down-button">
           <i class="fas fa-chevron-down down-arrow"></i>
