@@ -135,7 +135,6 @@
 
     created() {
       this.d_course = this.course;
-      console.log(this.d_course.last_modified);
     }
 
     @handle_api_errors_async(handle_save_course_settings_error)
