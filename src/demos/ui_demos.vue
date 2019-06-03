@@ -30,6 +30,12 @@
         </template>
       </tab>
       <tab>
+        <tab-header>Datetime Picker</tab-header>
+        <template slot="body">
+          <DatetimePickerDemo></DatetimePickerDemo>
+        </template>
+      </tab>
+      <tab>
         <tab-header>Diff</tab-header>
         <template slot="body">
           <DiffDemo></DiffDemo>
@@ -119,6 +125,7 @@ import ViewFile from '@/components/view_file.vue';
 import ButtonDemo from './button_demo.vue';
 import ColorPaletteDemo from './color_palette_demo.vue';
 import ContextMenuDemo from './context_menu_demo.vue';
+import DatetimePickerDemo from './datetime_picker_demo.vue';
 import DiffDemo from './diff_demo.vue';
 import DropdownDemo from './dropdown_demo.vue';
 import DropdownTypeaheadDemo from './dropdown_typeahead_demo.vue';
@@ -137,6 +144,7 @@ import ViewFileDemo from './view_file_demo.vue';
     ButtonDemo,
     ColorPaletteDemo,
     ContextMenuDemo,
+    DatetimePickerDemo,
     DiffDemo,
     Dropdown,
     DropdownDemo,
