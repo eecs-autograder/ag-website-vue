@@ -265,15 +265,9 @@ export class InvalidTimeStrError extends Error {
 @import '@/styles/button_styles.scss';
 
 #timepicker {
-  border: 1px solid white;
-  border-radius: 2px;
-  box-sizing: border-box;
-  box-shadow: 0 0 2px 1px $pebble-dark;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-left: 5px;
-  position: relative;
   width: 210px;
 }
 

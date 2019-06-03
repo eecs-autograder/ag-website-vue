@@ -35,7 +35,10 @@
       </div>
     </div>
 
-    <time-picker v-model="d_time" @input="update_time_selected" ref="time_picker"></time-picker>
+    <time-picker v-model="d_time"
+                 @input="update_time_selected"
+                 ref="time_picker"
+                 id="time-picker"></time-picker>
   </div>
 </template>
 
@@ -324,17 +327,16 @@ td {
 
 // TIMEPICKER ***********************************************************
 
-// #timepicker {
-//   border: 1px solid white;
-//   border-radius: 2px;
-//   box-sizing: border-box;
-//   box-shadow: 0 0 2px 1px $pebble-dark;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   margin-left: 5px;
-//   position: relative;
-//   width: 210px;
-// }
+#time-picker {
+  border: 1px solid white;
+  border-radius: 2px;
+  box-sizing: border-box;
+  box-shadow: 0 0 2px 1px $pebble-dark;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 5px;
+  width: 210px;
+}
 
 </style>
