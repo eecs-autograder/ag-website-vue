@@ -1,4 +1,9 @@
-import TimePicker, { HourInputState, MinuteInputState, Time} from "@/components/datetime/time_picker.vue";
+import TimePicker, {
+    HourInputState,
+    InvalidTimeStrError,
+    MinuteInputState,
+    Time
+} from "@/components/datetime/time_picker.vue";
 import { mount, Wrapper } from "@vue/test-utils";
 
 describe('TimePicker Tests', () => {
@@ -8,7 +13,7 @@ describe('TimePicker Tests', () => {
     beforeEach(() => {
         wrapper = mount(TimePicker, {
             propsData: {
-                value: new Time(13, 58)
+                value: '13:58'
             }
         });
         component = wrapper.vm;
@@ -20,7 +25,46 @@ describe('TimePicker Tests', () => {
         }
     });
 
-    test('Pressing the up and down buttons increases/decreases hours_str', async () => {
+    test('Default input value', () => {
+        wrapper = mount(TimePicker);
+        expect(wrapper.vm.hours_str).toEqual('12');
+        expect(wrapper.vm.minutes_str).toEqual('00');
+        expect(component.period_str).toEqual('PM');
+        expect(wrapper.vm.d_time.hours).toEqual(12);
+        expect(wrapper.vm.d_time.minutes).toEqual(0);
+    });
+
+    test('Input watcher', () => {
+        expect(component.d_time.hours).toEqual(13);
+        expect(component.d_time.minutes).toEqual(58);
+
+        wrapper.setProps({value: '04:22'});
+
+        expect(component.d_time.hours).toEqual(4);
+        expect(component.d_time.minutes).toEqual(22);
+    });
+
+    test('Invalid time str throws exception', () => {
+        expect(() => {
+            mount(TimePicker, {
+                propsData: {
+                    value: 'invalid'
+                }
+            });
+        }).toThrow(InvalidTimeStrError);
+    });
+
+    test('Valid time string formats', () => {
+        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.minutes).toEqual(58);
+
+        wrapper.setProps({value: '05:21:00'});
+
+        expect(wrapper.vm.d_time.hours).toEqual(5);
+        expect(wrapper.vm.d_time.minutes).toEqual(21);
+    });
+
+    test('Pressing the up and down buttons increases/decreases hours_str', () => {
         expect(component.hours_str).toEqual("01");
         expect(component.period_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(13);
@@ -45,7 +89,7 @@ describe('TimePicker Tests', () => {
         expect(component.d_time.hours).toEqual(13);
         expect(wrapper.emitted().input.length).toBe(4);
 
-        wrapper.setProps({value: new Time(23, 0)});
+        wrapper.setProps({value: '23:00'});
         expect(component.hours_str).toEqual("11");
         expect(component.period_str).toEqual("PM");
         expect(component.d_time.hours).toEqual(23);
@@ -61,7 +105,7 @@ describe('TimePicker Tests', () => {
         expect(component.d_time.hours).toEqual(23);
     });
 
-    test('Pressing the up arrow while the hours input has focus', async () => {
+    test('Pressing the up arrow while the hours input has focus', () => {
         let hours_input = wrapper.find('#hour-input');
         expect(component.hours_str).toEqual("01");
         expect(component.d_time.hours).toEqual(13);
@@ -78,13 +122,12 @@ describe('TimePicker Tests', () => {
         expect(wrapper.emitted().input.length).toBe(2);
     });
 
-    test('Pressing the down arrow while the hours input has focus', async () => {
+    test('Pressing the down arrow while the hours input has focus', () => {
         let hours_input = wrapper.find('#hour-input');
         expect(component.hours_str).toEqual("01");
         expect(component.d_time.hours).toEqual(13);
 
         hours_input.trigger('keydown', {code: "ArrowDown"});
-        await component.$nextTick();
 
         expect(component.hours_str).toEqual("12");
         expect(component.d_time.hours).toEqual(12);
@@ -99,7 +142,7 @@ describe('TimePicker Tests', () => {
     });
 
 
-    test('Pressing key besides digit, backspace, up arrow has no effect on hours', async () => {
+    test('Pressing key besides digit, backspace, up arrow has no effect on hours', () => {
         let hours_input = wrapper.find('#hour-input');
         expect(component.hours_str).toEqual("01");
         expect(component.d_time.hours).toEqual(13);
@@ -117,7 +160,7 @@ describe('TimePicker Tests', () => {
         expect(wrapper.emitted().input).toBeFalsy();
     });
 
-    test('Pressing the up and down buttons increases/decreases the minutes_str', async () => {
+    test('Pressing the up and down buttons increases/decreases the minutes_str', () => {
         expect(component.minutes_str).toEqual("58");
         expect(component.d_time.minutes).toEqual(58);
 
@@ -143,7 +186,7 @@ describe('TimePicker Tests', () => {
         expect(wrapper.emitted().input.length).toBe(5);
     });
 
-    test('Pressing the up arrow while the minutes input has focus', async () => {
+    test('Pressing the up arrow while the minutes input has focus', () => {
         let minute_input = wrapper.find('#minute-input');
         expect(component.minutes_str).toEqual("58");
         expect(component.d_time.minutes).toEqual(58);
@@ -160,7 +203,7 @@ describe('TimePicker Tests', () => {
         expect(wrapper.emitted().input.length).toBe(2);
     });
 
-    test('Pressing the down arrow while the minutes input has focus', async () => {
+    test('Pressing the down arrow while the minutes input has focus', () => {
         let minute_input = wrapper.find('#minute-input');
         expect(component.minutes_str).toEqual("58");
         expect(component.d_time.minutes).toEqual(58);
@@ -177,7 +220,7 @@ describe('TimePicker Tests', () => {
         expect(wrapper.emitted().input.length).toBe(2);
     });
 
-    test('Pressing key besides digit, backspace, up arrow has no effect on minutes', async () => {
+    test('Pressing key besides digit, backspace, up arrow has no effect on minutes', () => {
         let minutes_input = wrapper.find('#minute-input');
         expect(component.minutes_str).toEqual("58");
         expect(component.d_time.minutes).toEqual(58);
@@ -194,7 +237,7 @@ describe('TimePicker Tests', () => {
         expect(wrapper.emitted().input).toBeFalsy();
     });
 
-    test('Clicking on the period input toggles the value of period_str', async () => {
+    test('Clicking on the period input toggles the value of period_str', () => {
         let period_input = wrapper.find('#period-input');
         expect(component.period_str).toEqual("PM");
 
@@ -205,7 +248,7 @@ describe('TimePicker Tests', () => {
         expect(component.period_str).toEqual("PM");
     });
 
-    test('Pressing backspace in the hours input sets the value to "12"', async () => {
+    test('Pressing backspace in the hours input sets the value to "12"', () => {
         let hours_input = wrapper.find('#hour-input');
         expect(component.hours_str).toEqual("01");
 
@@ -216,7 +259,7 @@ describe('TimePicker Tests', () => {
         expect(component.d_time.hours).toEqual(12);
     });
 
-    test('Pressing backspace in the minutes input sets the value to "00"', async () => {
+    test('Pressing backspace in the minutes input sets the value to "00"', () => {
         let minutes_input = wrapper.find('#minute-input');
         expect(component.minutes_str).toEqual("58");
 
@@ -235,7 +278,7 @@ describe('TimePicker HourInputState tests', () => {
     beforeEach(() => {
         wrapper = mount(TimePicker, {
             propsData: {
-                value: new Time(1, 58)
+                value: '1:58'
             }
         });
         component = wrapper.vm;
@@ -247,14 +290,14 @@ describe('TimePicker HourInputState tests', () => {
         }
     });
 
-    test("The hour_input_state begins in the 'awaiting_first_digit' state", async () => {
+    test("The hour_input_state begins in the 'awaiting_first_digit' state", () => {
         expect(component.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
         expect(wrapper.emitted().input).toBeFalsy();
     });
 
     test("The hour_input_state remains in the 'awaiting_first_digit' state if a number" +
          " greater than 1 is entered",
-         async () => {
+         () => {
         expect(component.hours_str).toEqual("01");
         expect(component.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
@@ -274,7 +317,7 @@ describe('TimePicker HourInputState tests', () => {
 
     test("The hour_input_state changes from the 'awaiting_first_digit' state to the " +
          "'first_digit_was_one' state when 1 is entered",
-         async () => {
+         () => {
         expect(component.hours_str).toEqual("01");
         expect(component.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
@@ -288,7 +331,7 @@ describe('TimePicker HourInputState tests', () => {
 
     test("When the hour_input_state is 'awaiting_first_digit' and the user enters a zero," +
          "nothing happens",
-         async () => {
+         () => {
 
         expect(component.hours_str).toEqual("01");
         expect(component.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
@@ -303,7 +346,7 @@ describe('TimePicker HourInputState tests', () => {
 
     test("The hour_input_state changes from the 'first_digit_was_one' state to the " +
          "'awaiting_first_input' state when any number is entered",
-         async () => {
+         () => {
 
         expect(component.hours_str).toEqual("01");
         expect(component.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
@@ -324,7 +367,7 @@ describe('TimePicker HourInputState tests', () => {
 
     test("When the hour_input_state is 'first_digit_was_one' and the user enters a digit," +
          "greater than 2, hours is set to that number",
-         async () => {
+         () => {
         expect(component.hours_str).toEqual("01");
         expect(component.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
@@ -350,7 +393,7 @@ describe('TimePicker MinuteInputState tests', () => {
     beforeEach(() => {
         wrapper = mount(TimePicker, {
             propsData: {
-                value: new Time(18, 36)
+                value: '18:36'
             }
         });
         component = wrapper.vm;
@@ -362,13 +405,13 @@ describe('TimePicker MinuteInputState tests', () => {
         }
     });
 
-    test("The minute_input_state begins in the 'awaiting_first_digit' state", async () => {
+    test("The minute_input_state begins in the 'awaiting_first_digit' state", () => {
         expect(component.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
     });
 
     test("The minute_input_state stays in the 'awaiting_first_digit' state if a digit " +
          "greater than 6 is entered",
-        async () => {
+         () => {
             expect(component.minutes_str).toEqual("36");
             expect(component.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
 
@@ -388,7 +431,7 @@ describe('TimePicker MinuteInputState tests', () => {
 
     test("The minute_input_state changes from the 'awaiting_first_digit' state if a digit " +
          "less than 6 is entered",
-        async () => {
+         () => {
             expect(component.minutes_str).toEqual("36");
             expect(component.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
 
@@ -402,7 +445,7 @@ describe('TimePicker MinuteInputState tests', () => {
 
     test("The minute_input_state changes from the 'awaiting_second_digit' state if any " +
          "digit is entered",
-        async () => {
+         () => {
             expect(component.minutes_str).toEqual("36");
             expect(component.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
 

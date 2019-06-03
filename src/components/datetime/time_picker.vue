@@ -60,6 +60,7 @@
 
 <script lang="ts">
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+  import moment from 'moment';
 
   export class Time {
     readonly hours: number;
@@ -77,6 +78,14 @@
     with_minutes(minutes: number) {
       return new Time(this.hours, minutes);
     }
+
+    static from_moment(moment_: moment.Moment): Time {
+      return new Time(moment_.hours(), moment_.minutes());
+    }
+
+    as_moment() {
+      return moment({hours: this.hours, minutes: this.minutes});
+    }
   }
 
   export enum HourInputState {
@@ -92,48 +101,47 @@
   @Component
   export default class TimePicker extends Vue {
 
-    @Prop({type: Time, default: () => new Time()})
-    value!: Time;
+    @Prop({type: String, default: '12:00'})
+    value!: string;
 
     @Watch('value')
-    on_value_changed(new_value: Time, old_value: Time) {
-      this.d_time = new Time(new_value.hours, new_value.minutes);
+    on_value_changed(new_value: string, old_value: string) {
+      this.set_d_time(new_value);
     }
 
     d_time: Time = new Time();
-
-    // hours_str = '12';
-    // minutes_str = '00';
-    // period_str: "AM" | "PM" = 'PM';
 
     hour_input_state: HourInputState = HourInputState.awaiting_first_digit;
     minute_input_state: MinuteInputState = MinuteInputState.awaiting_first_digit;
 
     created() {
-      this.d_time = new Time(this.value.hours, this.value.minutes);
+      this.set_d_time(this.value);
+    }
+
+    set_d_time(value: string) {
+      let time = moment(this.value, ['HH:mm', 'HH:mm:ss']);
+      if (!time.isValid()) {
+        console.log(value);
+        throw new InvalidTimeStrError(`Invalid time string: ${value}`);
+      }
+
+      this.d_time = new Time(time.hours(), time.minutes());
     }
 
     get hours_str(): string {
-      let hours = this.d_time.hours % 12;
-      if (hours === 0) {
-        return "12";
-      }
-      if (hours < 10) {
-        return "0" + hours.toString();
-      }
-
-      return hours.toString();
+      return this.d_time.as_moment().format('hh');
     }
 
     get minutes_str(): string {
-      return this.d_time.minutes < 10 ? '0' + this.d_time.minutes.toString()
-                                      : this.d_time.minutes.toString();
+      return this.d_time.as_moment().format('mm');
     }
 
-    get period_str() {
-      return this.d_time.hours < 12 ? "AM" : "PM";
+    get period_str() {  // FIXME rename
+      return this.d_time.as_moment().format('A')
     }
 
+    // Note: When incrementing/decrementing hours and minutes, we don't want changing
+    // minutes to change hours, so we won't use moment's add or subtract methods.
     go_to_next_minute() {
       this.d_time = this.d_time.with_minutes((this.d_time.minutes + 1) % 60);
       this.update_time_selected();
@@ -177,7 +185,8 @@
           }
         }
         else if (this.minute_input_state === MinuteInputState.awaiting_second_digit) {
-          this.d_time = this.d_time.with_minutes(this.d_time.minutes * 10 + Number(event.key));
+          this.d_time = this.d_time.with_minutes(
+            this.d_time.minutes * 10 + Number(event.key));
           this.minute_input_state = MinuteInputState.awaiting_first_digit;
           this.update_time_selected();
         }
@@ -226,20 +235,27 @@
 
     toggle_period_value() {
       if (this.period_str === "AM") {
-        this.d_time = this.d_time.with_hours(this.d_time.hours + 12);
+        this.d_time = Time.from_moment(this.d_time.as_moment().add(12, 'hours'));
       }
       else {
-        this.d_time = this.d_time.with_hours(this.d_time.hours - 12);
+        this.d_time = Time.from_moment(this.d_time.as_moment().subtract(12, 'hours'));
       }
       this.update_time_selected();
     }
 
     update_time_selected() {
-      this.$emit('input', this.d_time);
-      // let hours = this.period_str === "AM" ? Number(this.hours_str) % 12
-      //   : (Number(this.hours_str) % 12) + 12;
-      // this.d_date.setHours(hours, Number(this.minutes_str));
-      // this.$emit('input', this.d_date.toISOString());
+      this.$emit('input', this.d_time.as_moment().format('HH:mm'));
+    }
+  }
+
+  export class InvalidTimeStrError extends Error {
+    // See https://github.com/Microsoft/TypeScript/issues/13965
+    __proto__: Error; // tslint:disable-line
+
+    constructor(msg?: string) {
+      const actual_proto = new.target.prototype;
+      super(msg);
+      this.__proto__ = actual_proto;
     }
   }
 </script>
