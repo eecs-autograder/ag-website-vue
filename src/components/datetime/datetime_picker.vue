@@ -40,8 +40,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+// @ts-ignore
 import moment from 'moment';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import TimePicker from "@/components/datetime/time_picker.vue";
 
