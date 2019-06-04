@@ -347,7 +347,7 @@ describe('EditSingleGroup tests', () => {
         expect(component.d_group.extended_due_date).toEqual(now.format());
     });
 
-    test('Group member must be enrolled in course - violates condition', async () => {
+    test('API errors displayed on submit', async () => {
         let save_group_stub = sinon.stub(component.d_group, 'save');
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
