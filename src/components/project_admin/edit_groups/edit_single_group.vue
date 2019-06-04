@@ -35,8 +35,9 @@
         </div>
         <div class="add-member-container">
           <button class="add-member-button"
-               :disabled="d_group.member_names.length >= project.max_group_size"
-               @click="add_group_member">
+                  :disabled="d_group.member_names.length >= project.max_group_size"
+                  type="button"
+                  @click="add_group_member">
             <i class="fas fa-plus"></i>
             Add Another Member
           </button>
@@ -51,6 +52,7 @@
           <i class="far fa-calendar-alt calender-icon"></i>
         </span>
         <button type="button" id="revoke-extension"
+                class="flat-white-button"
                 @click.stop="d_group.extended_due_date = null"
                 :disabled="d_group.extended_due_date === null">
           <i class="fas fa-times"></i>
@@ -269,18 +271,27 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   display: inline-block;
 }
 
-/*.datetime-input:hover {*/
-/*  cursor: pointer;*/
-/*}*/
-
 .datetime-input i {
   padding: 0 4px;
 }
 
 #revoke-extension {
-  @extend .white-button;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.flat-white-button {
+  @extend .button;
+
   box-shadow: none;
   margin-left: 3px;
+
+  color: black;
+  background: white;
+}
+
+.flat-white-button:hover:enabled {
+  @include hover_state($pebble-medium, $pebble-medium);
 }
 
 </style>
