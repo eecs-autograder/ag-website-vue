@@ -137,16 +137,4 @@ describe('GroupLookup.vue', () => {
 
         expect(wrapper.emitted().update_group_selected.length).toEqual(1);
     });
-
-    test("When the prop 'groups' changes in the parent component, d_groups is updated",
-         async () => {
-        await component.$nextTick();
-
-        expect(component.d_groups).toEqual(groups);
-
-        wrapper.setProps({groups: [group1, group3]});
-        await component.$nextTick();
-
-        expect(component.d_groups).toEqual([group1, group3]);
-    });
 });

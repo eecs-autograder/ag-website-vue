@@ -3,7 +3,7 @@
     <div class="group-lookup-search-bar">
       <dropdown-typeahead ref="group_typeahead"
                           placeholder_text="Enter a username"
-                          :choices="d_groups"
+                          :choices="groups"
                           @update_item_chosen="$emit('update_group_selected', $event)"
                           :filter_fn="group_filter_fn">
         <template slot-scope="{item}">
@@ -32,17 +32,6 @@ export default class GroupLookup extends Vue {
 
   @Prop({required: true, type: Array})
   groups!: Group[];
-
-  d_groups: Group[] = [];
-
-  @Watch('groups')
-  on_groups_changed(new_groups: Group[], old_groups: Group[]) {
-    this.d_groups = this.groups.slice(0);
-  }
-
-  created() {
-    this.d_groups = this.groups.slice(0);
-  }
 
   group_filter_fn(group: Group, filter_text: string) {
     for (let member_name of group.member_names) {
