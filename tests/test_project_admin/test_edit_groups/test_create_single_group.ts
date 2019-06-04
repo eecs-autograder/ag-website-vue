@@ -1,6 +1,5 @@
 import APIErrors from '@/components/api_errors.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,

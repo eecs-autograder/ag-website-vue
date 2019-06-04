@@ -145,8 +145,8 @@ describe('EditGroups tests', () => {
     });
 
     test('groups_with_extensions sorted by extension ASC, first group member name ASC ' +
-              '(groups are sorted by first group member name ASC - server side)',
-              async () => {
+         '(groups are sorted by first group member name ASC - server side)',
+         async () => {
         expect(component.d_loading).toBe(false);
         expect(component.groups_by_members.size()).toEqual(groups.length);
         expect(component.groups_by_members.data[0]).toEqual(group_1);
