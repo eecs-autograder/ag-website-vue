@@ -77,7 +77,7 @@
       <tab>
         <tab-header ref="edit_groups_tab">
           <div class="tab-label">
-            <p class="tab-header"> Edit Groups </p>
+            <p class="tab-header"> Groups & Extensions </p>
           </div>
         </tab-header>
         <template slot="body">
