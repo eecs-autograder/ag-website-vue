@@ -77,7 +77,7 @@ import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 
-import { array_remove_unique, deep_copy, format_datetime } from "@/utils";
+import { deep_copy, format_datetime } from "@/utils";
 import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 
 function member_names_less(first: HasMemberNames, second: HasMemberNames) {
@@ -115,7 +115,7 @@ export default class EditGroups extends Vue implements GroupObserver {
   selected_group: Group | null = null;
 
   async created() {
-    this.course = await Course.get_by_pk(this.project.pk);
+    this.course = await Course.get_by_pk(this.project.course);
 
     let groups = await Group.get_all_from_project(this.project.pk);
 
@@ -127,7 +127,6 @@ export default class EditGroups extends Vue implements GroupObserver {
       groups.filter(group => group.extended_due_date !== null),
       {less_func: pk_less}
     );
-    // this.sort_groups_with_extensions();
     this.d_loading = false;
   }
 
@@ -178,27 +177,7 @@ export default class EditGroups extends Vue implements GroupObserver {
     }
   }
 
-  update_group_merged(new_group: Group, group1_pk: number, group2_pk: number): void {
-    let original1 = this.groups_by_pk.get({pk: group1_pk});
-    let original2 = this.groups_by_pk.get({pk: group2_pk});
-
-    this.groups_by_members.remove(original1);
-    this.groups_by_members.remove(original2);
-
-    this.groups_by_pk.remove(original1);
-    this.groups_by_pk.remove(original2);
-
-    this.d_groups_with_extensions.remove(original1, false);
-    this.d_groups_with_extensions.remove(original2, false);
-
-    let copy = deep_copy(new_group, Group);
-
-    this.groups_by_pk.insert(copy);
-    this.groups_by_members.insert(copy);
-    if (copy.extended_due_date !== null) {
-      this.d_groups_with_extensions.insert(copy);
-    }
-  }
+  update_group_merged(group: Group): void { }
 
   get format_datetime() {
     return format_datetime;
