@@ -4,8 +4,8 @@
       <div class="edit-limits">
         <div class="edit-title"> Edit Existing Group </div>
         <group-lookup ref="group_lookup"
-                      :groups="groups"
-                      @update_group_selected="update_group_selected"> </group-lookup>
+                      :groups="groups_by_members.data"
+                      @update_group_selected="selected_group = $event"> </group-lookup>
         <edit-single-group v-if="selected_group !== null"
                            :course="course"
                            :project="project"
@@ -69,6 +69,7 @@
 </template>
 
 <script lang="ts">
+import { ArraySet } from "@/array_set";
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import GroupLookup from '@/components/group_lookup.vue';
@@ -78,6 +79,18 @@ import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_
 
 import { array_remove_unique, deep_copy, format_datetime } from "@/utils";
 import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
+
+function member_names_less(first: HasMemberNames, second: HasMemberNames) {
+  return first.member_names[0] < second.member_names[0];
+}
+
+type HasMemberNames = {member_names: string[]};
+
+function pk_less(first: HasPK, second: HasPK) {
+  return first.pk < second.pk;
+}
+
+type HasPK = {pk: number};
 
 @Component({
   components: {
@@ -96,16 +109,25 @@ export default class EditGroups extends Vue implements GroupObserver {
 
   course!: Course;
 
-  groups: Group[] = [];
-  groups_with_extensions: Group[] = [];
+  groups_by_members = new ArraySet<Group, HasMemberNames>([], {less_func: member_names_less});
+  groups_by_pk = new ArraySet<Group, HasPK>([], {less_func: pk_less});
+  private d_groups_with_extensions = new ArraySet<Group, HasPK>([], {less_func: pk_less});
   selected_group: Group | null = null;
 
   async created() {
     this.course = await Course.get_by_pk(this.project.pk);
 
-    this.groups = await Group.get_all_from_project(this.project.pk);
-    this.groups_with_extensions = this.groups.filter(group => group.extended_due_date !== null);
-    this.sort_groups_with_extensions();
+    let groups = await Group.get_all_from_project(this.project.pk);
+
+    this.groups_by_members = new ArraySet<Group, HasMemberNames>(
+      groups.slice(), {less_func: member_names_less});
+    this.groups_by_pk = new ArraySet<Group, HasPK>(groups.slice(), {less_func: pk_less});
+
+    this.d_groups_with_extensions = new ArraySet<Group, HasPK>(
+      groups.filter(group => group.extended_due_date !== null),
+      {less_func: pk_less}
+    );
+    // this.sort_groups_with_extensions();
     this.d_loading = false;
   }
 
@@ -117,61 +139,66 @@ export default class EditGroups extends Vue implements GroupObserver {
     Group.unsubscribe(this);
   }
 
-  update_group_selected(group: Group) {
-    let deep_copy_of_group: Group = new Group(group);
-    this.selected_group = deep_copy_of_group;
-  }
-
-  sort_groups_with_extensions() {
-    this.groups_with_extensions.sort((group_a: Group, group_b: Group) => {
-      let group_a_date = new Date(group_a.extended_due_date!);
-      let group_b_date = new Date(group_b.extended_due_date!);
-
-      if (group_a_date < group_b_date) {
-        return -1;
+  get groups_with_extensions() {
+    let groups = this.d_groups_with_extensions.data.slice();
+    groups.sort((group_a: Group, group_b: Group) => {
+      if (group_a.extended_due_date === group_b.extended_due_date) {
+        return group_a.member_names[0].localeCompare(group_b.member_names[0]);
       }
-      else if (group_a_date > group_b_date) {
-        return 1;
-      }
-      return group_a.member_names[0].localeCompare(group_b.member_names[0]);
+      return group_a.extended_due_date!.localeCompare(group_b.extended_due_date!);
+
     });
+
+    return groups;
   }
 
   update_group_created(group: Group): void {
-    let deep_copy_of_group = new Group(group);
-    let index_to_insert = this.groups.findIndex(
-      (group_a) => group_a.member_names[0].localeCompare(group.member_names[0]) > 0
-    );
-    index_to_insert = index_to_insert < 0 ? this.groups.length : index_to_insert;
-    this.groups.splice(index_to_insert, 0, deep_copy_of_group);
-    this.selected_group = deep_copy_of_group;
+    let copy = deep_copy(group, Group);
+    this.groups_by_pk.insert(copy);
+    this.groups_by_members.insert(copy);
+
+    // Note: A newly created group won't have an extension.
+
+    this.selected_group = copy;
     (<Modal> this.$refs.create_group_modal).close();
   }
 
   update_group_changed(group: Group): void {
-    let deep_copy_of_group = deep_copy(group, Group);
+    let original = this.groups_by_pk.get(group);
+    this.groups_by_members.remove(original);
+    this.groups_by_pk.remove(original);
 
-    let current_index = this.groups.findIndex((item: Group) => item.pk === group.pk);
-    let old_extension = this.groups[current_index].extended_due_date;
-    this.groups.splice(current_index, 1);
-    let new_index = this.groups.findIndex(
-      (group_a) => group_a.member_names[0].localeCompare(group.member_names[0]) > 0
-    );
-    new_index = new_index === -1 ? this.groups.length : new_index;
-    this.groups.splice(new_index, 0, deep_copy_of_group);
+    let copy = deep_copy(group, Group);
+    this.groups_by_pk.insert(copy);
+    this.groups_by_members.insert(copy);
 
-    if (old_extension !== null) {
-      array_remove_unique(this.groups_with_extensions, group.pk,
-                          (group_a: Group, pk) => group_a.pk === pk
-      );
-    }
-    if (group.extended_due_date !== null) {
-      this.groups_with_extensions.push(deep_copy_of_group);
-      this.sort_groups_with_extensions();
+    this.d_groups_with_extensions.remove(original, false);
+    if (copy.extended_due_date !== null) {
+      this.d_groups_with_extensions.insert(copy);
     }
   }
 
-  update_group_merged(group: Group): void { }
+  update_group_merged(new_group: Group, group1_pk: number, group2_pk: number): void {
+    let original1 = this.groups_by_pk.get({pk: group1_pk});
+    let original2 = this.groups_by_pk.get({pk: group2_pk});
+
+    this.groups_by_members.remove(original1);
+    this.groups_by_members.remove(original2);
+
+    this.groups_by_pk.remove(original1);
+    this.groups_by_pk.remove(original2);
+
+    this.d_groups_with_extensions.remove(original1, false);
+    this.d_groups_with_extensions.remove(original2, false);
+
+    let copy = deep_copy(new_group, Group);
+
+    this.groups_by_pk.insert(copy);
+    this.groups_by_members.insert(copy);
+    if (copy.extended_due_date !== null) {
+      this.d_groups_with_extensions.insert(copy);
+    }
+  }
 
   get format_datetime() {
     return format_datetime;

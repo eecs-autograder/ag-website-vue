@@ -145,14 +145,14 @@ describe('EditGroups tests', () => {
     });
 
     test('groups_with_extensions sorted by extension ASC, first group member name ASC ' +
-         '(groups are sorted by first group member name ASC - server side)',
-         async () => {
+              '(groups are sorted by first group member name ASC - server side)',
+              async () => {
         expect(component.d_loading).toBe(false);
-        expect(component.groups.length).toEqual(groups.length);
-        expect(component.groups[0]).toEqual(group_1);
-        expect(component.groups[1]).toEqual(group_2);
-        expect(component.groups[2]).toEqual(group_3);
-        expect(component.groups[3]).toEqual(group_4);
+        expect(component.groups_by_members.size()).toEqual(groups.length);
+        expect(component.groups_by_members.data[0]).toEqual(group_1);
+        expect(component.groups_by_members.data[1]).toEqual(group_2);
+        expect(component.groups_by_members.data[2]).toEqual(group_3);
+        expect(component.groups_by_members.data[3]).toEqual(group_4);
 
         expect(component.groups_with_extensions.length).toEqual(3);
         expect(component.groups_with_extensions[0]).toEqual(group_4);
@@ -179,37 +179,41 @@ describe('EditGroups tests', () => {
             last_modified: "10am"
         });
 
-        expect(component.groups.length).toEqual(4);
+        expect(component.groups_by_members.size()).toEqual(4);
+        expect(component.groups_by_pk.size()).toEqual(4);
 
         Group.notify_group_created(new_group);
-        expect(component.groups.length).toEqual(5);
+        expect(component.groups_by_members.size()).toEqual(5);
+        expect(component.groups_by_pk.size()).toEqual(5);
         expect(component.selected_group).toEqual(new_group);
     });
 
     test('selected_group set to new group on successful creation and new group inserted ' +
          'at an index === groups.length',
          async () => {
-            let new_group = new Group({
-                pk: 5,
-                project: 2,
-                extended_due_date: null,
-                member_names: [
-                    "toby@cornell.edu"
-                ],
-                bonus_submissions_remaining: 0,
-                late_days_used: {},
-                num_submissions: 3,
-                num_submits_towards_limit: 2,
-                created_at: "9am",
-                last_modified: "10am"
-            });
+        let new_group = new Group({
+            pk: 5,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+                "toby@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
 
-            expect(component.groups.length).toEqual(4);
+        expect(component.groups_by_members.size()).toEqual(4);
+        expect(component.groups_by_pk.size()).toEqual(4);
 
-            Group.notify_group_created(new_group);
-            expect(component.groups.length).toEqual(5);
-            expect(component.selected_group).toEqual(new_group);
-         });
+        Group.notify_group_created(new_group);
+        expect(component.groups_by_members.size()).toEqual(5);
+        expect(component.groups_by_pk.size()).toEqual(5);
+        expect(component.selected_group).toEqual(new_group);
+     });
 
     test('Selected group set to group selected in GroupLookup',
          async () => {
@@ -229,11 +233,11 @@ describe('EditGroups tests', () => {
         Group.notify_group_changed(group_3);
         await component.$nextTick();
 
-        expect(component.groups.length).toEqual(groups.length);
-        expect(component.groups[0]).toEqual(group_1);
-        expect(component.groups[1]).toEqual(group_3);
-        expect(component.groups[2]).toEqual(group_2);
-        expect(component.groups[3]).toEqual(group_4);
+        expect(component.groups_by_members.size()).toEqual(groups.length);
+        expect(component.groups_by_members.data[0]).toEqual(group_1);
+        expect(component.groups_by_members.data[1]).toEqual(group_3);
+        expect(component.groups_by_members.data[2]).toEqual(group_2);
+        expect(component.groups_by_members.data[3]).toEqual(group_4);
     });
 
     test('Remove a group member from a group - groups stays sorted',
@@ -242,11 +246,11 @@ describe('EditGroups tests', () => {
         Group.notify_group_changed(group_1);
         await component.$nextTick();
 
-        expect(component.groups.length).toEqual(groups.length);
-        expect(component.groups[0]).toEqual(group_2);
-        expect(component.groups[1]).toEqual(group_3);
-        expect(component.groups[2]).toEqual(group_4);
-        expect(component.groups[3]).toEqual(group_1);
+        expect(component.groups_by_members.size()).toEqual(groups.length);
+        expect(component.groups_by_members.data[0]).toEqual(group_2);
+        expect(component.groups_by_members.data[1]).toEqual(group_3);
+        expect(component.groups_by_members.data[2]).toEqual(group_4);
+        expect(component.groups_by_members.data[3]).toEqual(group_1);
     });
 
     test('Give a group an extension - extension list gets updated', async () => {
@@ -316,5 +320,13 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions.length).toEqual(2);
         expect(component.groups_with_extensions[0]).toEqual(group_4);
         expect(component.groups_with_extensions[1]).toEqual(group_3);
+    });
+
+    test('Groups with extension merged', () => {
+        fail();
+    });
+
+    test('Groups without extension merged', () => {
+        fail();
     });
 });
