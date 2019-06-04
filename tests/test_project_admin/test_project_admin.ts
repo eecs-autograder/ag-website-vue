@@ -1,9 +1,12 @@
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 import {
+    Course,
     ExpectedStudentFile,
+    Group,
     InstructorFile,
     Project,
+    Semester,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -11,6 +14,25 @@ import VueRouter from 'vue-router';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+});
+
+let course = new Course({
+   pk: 4,
+   name: 'A Course',
+   semester: Semester.fall,
+   year: 2018,
+   subtitle: '',
+   num_late_days: 0,
+   allowed_guest_domain: '@llama.edu',
+   last_modified: ''
+});
+
+beforeEach(() => {
+   sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+});
+
+afterEach(() => {
+    sinon.restore();
 });
 
 // As child components of the ProjectAdmin component get merged, their methods that make api calls
@@ -68,6 +90,9 @@ describe('Changing tabs in project admin', () => {
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
+        sinon.stub(Group, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
 
         wrapper = mount(ProjectAdmin, {
             localVue,
@@ -171,6 +196,9 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Edit Groups tab', async () => {
+        // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
+        //     Promise.resolve([])
+        // );
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -182,6 +210,7 @@ describe('Changing tabs in project admin', () => {
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'edit_groups'}})
         ).toBe(true);
+        // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
 
     test('Clicking on Download Grades tab', async () => {
@@ -227,7 +256,6 @@ describe('Changing tabs in project admin', () => {
     });
 });
 
-
 describe('select_tab function called with different values associated with "current_tab" ' +
          'key on create',
          () => {
@@ -271,6 +299,9 @@ describe('select_tab function called with different values associated with "curr
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
+        sinon.stub(Group, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
 
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
@@ -372,6 +403,9 @@ describe('select_tab function called with different values associated with "curr
 
 
     test('current tab parameter value = edit_groups', async () => {
+        // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
+        //     Promise.resolve([])
+        // );
         $route.query = { current_tab: 'edit_groups' };
         wrapper = mount(ProjectAdmin, {
             mocks: {
@@ -383,6 +417,7 @@ describe('select_tab function called with different values associated with "curr
 
         expect(component.project).toEqual(project_1);
         expect(component.current_tab_index).toEqual(5);
+        // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
 
 

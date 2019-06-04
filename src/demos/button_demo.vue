@@ -53,7 +53,6 @@
     <div class="button-box">
       <button class="white-button" :disabled="buttons_disabled"> Find File </button>
     </div>
-
   </div>
 </template>
 

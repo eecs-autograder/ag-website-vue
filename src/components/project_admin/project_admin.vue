@@ -77,12 +77,12 @@
       <tab>
         <tab-header ref="edit_groups_tab">
           <div class="tab-label">
-            <p class="tab-header"> Edit Groups </p>
+            <p class="tab-header"> Groups & Extensions </p>
           </div>
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            EDIT GROUPS- TODO (branch exists)
+            <edit-groups :project="project"></edit-groups>
           </div>
         </template>
       </tab>
@@ -131,6 +131,7 @@
 </template>
 
 <script lang="ts">
+import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -143,6 +144,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
   components: {
+    EditGroups,
     ExpectedStudentFiles,
     InstructorFiles,
     Tab,
@@ -250,8 +252,8 @@ export default class ProjectAdmin extends Vue {
 
 .tab-body {
   text-align: left;
-  position: relative;
-  padding-top: 10px;
+  /*position: relative;*/
+  padding-top: 0;
 }
 
 .tab-label {

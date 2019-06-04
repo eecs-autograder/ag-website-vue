@@ -3,13 +3,13 @@
 
     <div id="calender">
       <div class="calender-header">
-        <button @click="go_to_prev_month" class="prev-month-button">
+        <button type="button" @click="go_to_prev_month" class="prev-month-button">
           <i class="fas fa-chevron-left"></i>
         </button>
         <div class="display-month-and-year">
           {{months[d_month]}} <span>{{d_year}}</span>
         </div>
-        <button @click="go_to_next_month" class="next-month-button">
+        <button type="button" @click="go_to_next_month" class="next-month-button">
           <i class="fas fa-chevron-right"></i>
         </button>
       </div>
@@ -113,10 +113,10 @@ export default class DatetimePicker extends Vue {
       this.d_selected_day = this.d_date.date();
       this.d_selected_month = this.d_date.month();
       this.d_selected_year = this.d_date.year();
-
-      this.d_time = moment({hours: this.d_date.hours(),
-                            minutes: this.d_date.minutes()}).format('HH:mm');
     }
+
+    this.d_time = moment({hours: this.d_date.hours(),
+                          minutes: this.d_date.minutes()}).format('HH:mm');
   }
 
   toggle_visibility() {

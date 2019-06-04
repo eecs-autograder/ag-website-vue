@@ -1,7 +1,7 @@
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
-import { Group, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { Group } from 'ag-client-typescript';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -15,7 +15,6 @@ describe('GroupLookup.vue', () => {
     let group3: Group;
     let group4: Group;
     let groups: Group[];
-    let project: Project;
 
     beforeEach(() => {
         group1 = new Group({
@@ -81,37 +80,11 @@ describe('GroupLookup.vue', () => {
             last_modified: "2:45pm"
         });
 
-        project = new Project({
-            pk: 2,
-            name: "Project 1 - Statistics",
-            last_modified: "today",
-            course: 1,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false
-        });
-
         groups = [group1, group2, group3, group4];
 
         wrapper = mount(GroupLookup, {
             propsData: {
-                groups: groups,
-                project: project
+                groups: groups
             }
         });
         component = wrapper.vm;
@@ -160,20 +133,8 @@ describe('GroupLookup.vue', () => {
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(group4);
 
         search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
+        await component.$nextTick();
 
         expect(wrapper.emitted().update_group_selected.length).toEqual(1);
-    });
-
-    test("When the prop 'groups' changes in the parent component, d_groups is updated",
-         async () => {
-        await component.$nextTick();
-
-        expect(component.d_groups).toEqual(groups);
-
-        wrapper.setProps({groups: [group1, group3]});
-        await component.$nextTick();
-
-        expect(component.d_groups).toEqual([group1, group3]);
     });
 });

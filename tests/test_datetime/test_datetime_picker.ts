@@ -26,7 +26,6 @@ describe('DatetimePicker tests', () => {
 
         });
         let component = wrapper.vm;
-
         wrapper.setData({'d_is_open': true});
 
         expect(component.d_month).toEqual(11);
@@ -48,6 +47,7 @@ describe('DatetimePicker tests', () => {
     test('Initial value null, no day highlighted until day selected', () => {
         let wrapper = mount(DatetimePicker);
         let component = wrapper.vm;
+        wrapper.setData({'d_is_open': true});
 
         let now = new Date();
 
@@ -57,6 +57,15 @@ describe('DatetimePicker tests', () => {
         expect(component.d_selected_day).toBeNull();
         expect(component.d_selected_month).toBeNull();
         expect(component.d_selected_year).toBeNull();
+
+        expect(component.d_date.date()).toEqual(now.getDate());
+        expect(component.d_date.month()).toEqual(now.getMonth());
+        expect(component.d_date.year()).toEqual(now.getFullYear());
+
+        let time_picker = <Wrapper<TimePicker>> wrapper.find({ref: 'time_picker'});
+        expect(time_picker.vm.d_time.hours).toEqual(now.getHours());
+        let minutes_diff = Math.abs(time_picker.vm.d_time.minutes - now.getMinutes());
+        expect(minutes_diff).toBeLessThan(1);
 
         wrapper.setData({'d_is_open': true});
 

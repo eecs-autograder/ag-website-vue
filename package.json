@@ -15,8 +15,12 @@
     "moment": "^2.24.0",
     "vue": "^2.6.10",
     "vue-class-component": "^6.0.0",
+    "vue-ctk-date-time-picker": "^2.1.0",
+    "vue-datetime": "^1.0.0-beta.10",
+    "vue-flatpickr-component": "^8.1.2",
     "vue-property-decorator": "^7.0.0",
-    "vue-router": "^3.0.2"
+    "vue-router": "^3.0.2",
+    "weekstart": "^1.0.0"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.0",

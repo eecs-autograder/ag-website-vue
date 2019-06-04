@@ -1,11 +1,28 @@
-// A wrapper around Object.assign that adds type checking to enforce
-// that "to" is a derived class of "from".
-// Also limits "from" to a single value.
 import { AxiosError, AxiosResponse } from 'axios';
 import { Dictionary } from 'vue-router/types/router';
 
+// @ts-ignore
+import moment from "moment";
+
+// A wrapper around Object.assign that adds type checking to enforce
+// that "to" is a derived class of "from".
+// Also limits "from" to a single value.
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
     Object.assign(to, from);
+}
+
+// export function deep_copy<T>(obj: T): T {
+//     let my_obj: T =  JSON.parse(JSON.stringify(obj));
+//     return my_obj;
+// }
+
+// Used to make a deep copy of an object whose constructor takes an object
+// of the same type as its only argument.
+// This is needed to get around the fact that the "JSON.parse(JSON.stringify(...))"
+// deep copy gives us an object with no methods.
+export function deep_copy<T, Constructor extends {new(args: T): T}>(instance: T,
+                                                                    ctor: Constructor): T {
+    return new ctor(JSON.parse(JSON.stringify(instance)));
 }
 
 type IterableType<T> = Iterable<T> | IterableIterator<T>;
@@ -125,4 +142,11 @@ export function get_query_param(query_params: Dictionary<string | string[]>, key
         return query_value[0];
     }
     return query_value === undefined ? null : query_value;
+}
+
+export function format_datetime(datetime: string | null): string {
+    if (datetime === null) {
+        return '--- --, ----, --:-- --';
+    }
+    return moment(datetime).format('MMMM DD, YYYY, hh:mm A');
 }
