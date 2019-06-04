@@ -26,7 +26,6 @@ describe('EditSingleGroup tests', () => {
     let course: Course;
     let group: Group;
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
         course = new Course({
@@ -75,18 +74,9 @@ describe('EditSingleGroup tests', () => {
             hide_ultimate_submission_fdbk: false
         });
 
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
-        get_course_by_pk_stub.returns(Promise.resolve(course));
-
         wrapper = mount(EditSingleGroup, {
             propsData: {
+                course: course,
                 project: project,
                 group: group
             }
@@ -95,15 +85,7 @@ describe('EditSingleGroup tests', () => {
     });
 
     afterEach(() => {
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
         sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('A group must have at most max_group_size members and at least one member', async () => {
@@ -294,7 +276,7 @@ describe('EditSingleGroup tests', () => {
 
         expect(save_group_stub.callCount).toEqual(0);
         expect(component.d_group.member_names.length).toEqual(1);
-        expect(component.d_group.member_names[0]).toEqual(component.allowed_guest_domain);
+        expect(component.d_group.member_names[0]).toEqual(component.course.allowed_guest_domain);
     });
 
     test('When a member name field contains just the allowed guest domain, the ' +
@@ -303,8 +285,8 @@ describe('EditSingleGroup tests', () => {
         let save_group_stub = sinon.stub(component.d_group, 'save');
         let group_members = [
             "jim@cornell.edu",
-            component.allowed_guest_domain,
-            component.allowed_guest_domain
+            component.course.allowed_guest_domain,
+            component.course.allowed_guest_domain
         ];
 
         wrapper.find(".add-member-button").trigger('click');

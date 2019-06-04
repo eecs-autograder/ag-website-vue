@@ -7,6 +7,7 @@
                       :groups="groups"
                       @update_group_selected="update_group_selected"> </group-lookup>
         <edit-single-group v-if="selected_group !== null"
+                           :course="course"
                            :project="project"
                            :group="selected_group">
         </edit-single-group>
@@ -43,7 +44,7 @@
       <div class="modal-header"> Creating a New Group </div>
       <hr>
       <div class="modal-body">
-        <create-single-group :project="project"> </create-single-group>
+        <create-single-group :course="course" :project="project"> </create-single-group>
       </div>
     </modal>
 
@@ -76,7 +77,7 @@ import CreateSingleGroup from '@/components/project_admin/edit_groups/create_sin
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 
 import { array_remove_unique, deep_copy, format_datetime } from "@/utils";
-import { Group, GroupObserver, Project } from 'ag-client-typescript';
+import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 
 @Component({
   components: {
@@ -92,13 +93,16 @@ export default class EditGroups extends Vue implements GroupObserver {
   project!: Project;
 
   d_loading = true;
-  extended_due_date_format = {year: 'numeric', month: 'short', day: 'numeric',
-                              hour: 'numeric', minute: 'numeric'};
+
+  course!: Course;
+
   groups: Group[] = [];
   groups_with_extensions: Group[] = [];
   selected_group: Group | null = null;
 
   async created() {
+    this.course = await Course.get_by_pk(this.project.pk);
+
     this.groups = await Group.get_all_from_project(this.project.pk);
     this.groups_with_extensions = this.groups.filter(group => group.extended_due_date !== null);
     this.sort_groups_with_extensions();

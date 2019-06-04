@@ -12,7 +12,7 @@
             <div class="username-container">
               <input :class="['member-name-input',
                               {'error-input': incomplete_input_present
-                                              && member === allowed_guest_domain}]"
+                                              && member === course.allowed_guest_domain}]"
                      type="text"
                      v-model="d_group.member_names[index]"/>
               <button slot="suffix"
@@ -25,7 +25,7 @@
               </button>
               <div>
                 <div v-if="incomplete_input_present
-                            && member === allowed_guest_domain"
+                            && member === course.allowed_guest_domain"
                      class="incomplete-input-msg">
                   Incomplete member name
                 </div>
@@ -117,13 +117,15 @@ export default class EditSingleGroup extends Vue {
   readonly is_integer = is_integer;
   readonly string_to_num = string_to_num;
 
+  @Prop({required: true, type: Course})
+  course!: Course;
+
   @Prop({required: true, type: Group})
   group!: Group;
 
   @Prop({required: true, type: Project})
   project!: Project;
 
-  allowed_guest_domain = "";
   d_group: Group = new Group({
     pk: 0,
     project: 0,
@@ -150,8 +152,6 @@ export default class EditSingleGroup extends Vue {
 
   async created() {
     this.d_group = deep_copy(this.group, Group);
-    let course = await Course.get_by_pk(this.project.course);
-    this.allowed_guest_domain = course.allowed_guest_domain;
   }
 
   remove_group_member(index: number) {
@@ -159,7 +159,7 @@ export default class EditSingleGroup extends Vue {
   }
 
   add_group_member() {
-    this.d_group.member_names.push(this.allowed_guest_domain);
+    this.d_group.member_names.push(this.course.allowed_guest_domain);
   }
 
   @handle_api_errors_async(handle_save_group_error)
@@ -178,7 +178,7 @@ export default class EditSingleGroup extends Vue {
       }
 
       for (let i = 0; i < this.d_group.member_names.length; ++i) {
-        if (this.d_group.member_names[i] === this.allowed_guest_domain) {
+        if (this.d_group.member_names[i] === this.course.allowed_guest_domain) {
           this.incomplete_input_present = true;
           return;
         }

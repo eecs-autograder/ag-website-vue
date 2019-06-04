@@ -12,7 +12,7 @@
               <div class="username-container">
                 <input :class="['member-name-input',
                                {'error-input': incomplete_input_present
-                                 && member.username === allowed_guest_domain}]"
+                                 && member.username === course.allowed_guest_domain}]"
                        v-model="member.username"/>
                 <button slot="suffix"
                         class="remove-member-button"
@@ -23,7 +23,8 @@
                   <i class="fas fa-times"></i>
                 </button>
                 <div>
-                  <div v-if="incomplete_input_present && member.username === allowed_guest_domain"
+                  <div v-if="incomplete_input_present
+                             && member.username === course.allowed_guest_domain"
                        class="incomplete-input-msg">
                     Incomplete member name
                   </div>
@@ -34,7 +35,7 @@
           <div class="add-member-container">
             <button class="add-member-button"
                     type="button"
-                    :disabled="group_members.length >= max_group_size"
+                    :disabled="group_members.length >= project.max_group_size"
                     @click="add_group_member">
               <i class="fas fa-plus"></i>
               Add Another Member
@@ -75,27 +76,22 @@ interface GroupMember {
   }
 })
 export default class CreateSingleGroup extends Vue {
+  @Prop({required: true, type: Course})
+  course!: Course;
 
   @Prop({required: true, type: Project})
   project!: Project;
 
-  allowed_guest_domain = "";
   d_creating_group = false;
   group_members: GroupMember[] = [];
-  max_group_size = 1;
-  min_group_size = 1;
   incomplete_input_present = false;
 
   async created() {
-    this.min_group_size = this.project.min_group_size;
-    this.max_group_size = this.project.max_group_size;
-    let course = await Course.get_by_pk(this.project.course);
-    this.allowed_guest_domain = course.allowed_guest_domain;
-    for (let i = 0; i < this.min_group_size; ++i) {
+    for (let i = 0; i < this.project.min_group_size; ++i) {
       this.group_members.push(
         {
           id: i + 1,
-          username: this.allowed_guest_domain
+          username: this.course.allowed_guest_domain
         }
       );
     }
@@ -118,7 +114,7 @@ export default class CreateSingleGroup extends Vue {
       }
 
       for (let i = 0; i < this.group_members.length; ++i) {
-        if (this.group_members[i].username.trim() === this.allowed_guest_domain) {
+        if (this.group_members[i].username.trim() === this.course.allowed_guest_domain) {
           this.incomplete_input_present = true;
           return;
         }
@@ -142,7 +138,7 @@ export default class CreateSingleGroup extends Vue {
   add_group_member() {
     this.group_members.push({
         id: this.group_members.length,
-        username: this.allowed_guest_domain
+        username: this.course.allowed_guest_domain
     });
   }
 }

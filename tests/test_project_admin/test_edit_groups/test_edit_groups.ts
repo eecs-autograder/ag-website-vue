@@ -23,7 +23,6 @@ describe('EditGroups tests', () => {
     let group_4: Group;
     let groups: Group[];
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
 
@@ -123,13 +122,6 @@ describe('EditGroups tests', () => {
             hide_ultimate_submission_fdbk: false
         });
 
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project');
         get_all_groups_stub.returns(Promise.resolve(groups));
 
@@ -145,10 +137,6 @@ describe('EditGroups tests', () => {
     });
 
     afterEach(() => {
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
         sinon.restore();
 
         if (wrapper.exists()) {

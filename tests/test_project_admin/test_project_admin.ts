@@ -1,10 +1,12 @@
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 import {
+    Course,
     ExpectedStudentFile,
     Group,
     InstructorFile,
     Project,
+    Semester,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -12,6 +14,25 @@ import VueRouter from 'vue-router';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+});
+
+let course = new Course({
+   pk: 4,
+   name: 'A Course',
+   semester: Semester.fall,
+   year: 2018,
+   subtitle: '',
+   num_late_days: 0,
+   allowed_guest_domain: '@llama.edu',
+   last_modified: ''
+});
+
+beforeEach(() => {
+   sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+});
+
+afterEach(() => {
+    sinon.restore();
 });
 
 // As child components of the ProjectAdmin component get merged, their methods that make api calls

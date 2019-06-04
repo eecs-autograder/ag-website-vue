@@ -22,7 +22,6 @@ describe('CreateSingleGroup tests', () => {
     let component: CreateSingleGroup;
     let course: Course;
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
 
@@ -56,18 +55,9 @@ describe('CreateSingleGroup tests', () => {
             hide_ultimate_submission_fdbk: false
         });
 
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
-        get_course_by_pk_stub.returns(Promise.resolve(course));
-
         wrapper = mount(CreateSingleGroup, {
             propsData: {
+                course: course,
                 project: project
             }
         });
@@ -75,25 +65,16 @@ describe('CreateSingleGroup tests', () => {
     });
 
     afterEach(() => {
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
         sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('There are min_group_size number of editable member name fields at the time of ' +
          'creation',
          async () => {
-        expect(component.min_group_size).toEqual(project.min_group_size);
-        expect(component.max_group_size).toEqual(project.max_group_size);
+        expect(component.project).toEqual(project);
         expect(component.group_members.length).toEqual(project.min_group_size);
-        expect(component.allowed_guest_domain).toEqual(course.allowed_guest_domain);
-        for (let i = 0; i < component.min_group_size; ++i) {
+        expect(component.course.allowed_guest_domain).toEqual(course.allowed_guest_domain);
+        for (let i = 0; i < project.min_group_size; ++i) {
             expect(component.group_members[i].id).toEqual(i + 1);
             expect(component.group_members[i].username).toEqual(course.allowed_guest_domain);
         }
@@ -277,7 +258,7 @@ describe('CreateSingleGroup tests', () => {
 
         expect(create_group_stub.callCount).toEqual(0);
         expect(component.group_members.length).toEqual(1);
-        expect(component.group_members[0].username).toEqual(component.allowed_guest_domain);
+        expect(component.group_members[0].username).toEqual(component.course.allowed_guest_domain);
     });
 
     test('When a member name field contains just the allowed guest domain, the ' +
@@ -287,8 +268,8 @@ describe('CreateSingleGroup tests', () => {
 
         let group_members = [
             "jim@cornell.edu",
-            component.allowed_guest_domain,
-            component.allowed_guest_domain
+            component.course.allowed_guest_domain,
+            component.course.allowed_guest_domain
         ];
 
         wrapper.find(".add-member-button").trigger('click');
