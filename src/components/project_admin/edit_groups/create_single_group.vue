@@ -35,7 +35,9 @@
             <button class="add-member-button"
                     type="button"
                     :disabled="group_members.length >= max_group_size"
-                    @click="add_group_member"> Add Another Member
+                    @click="add_group_member">
+              <i class="fas fa-plus"></i>
+              Add Another Member
             </button>
           </div>
         </div>

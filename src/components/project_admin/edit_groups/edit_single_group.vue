@@ -35,34 +35,31 @@
         </div>
         <div class="add-member-container">
           <button class="add-member-button"
-                  type="button"
-                  :disabled="d_group.member_names.length >= max_group_size"
-                  @click="add_group_member"> Add Another Member
+               :disabled="d_group.member_names.length >= project.max_group_size"
+               @click="add_group_member">
+            <i class="fas fa-plus"></i>
+            Add Another Member
           </button>
-        </div>
-
-        <div id="extension-toggle">
-          <toggle v-model="has_extension">
-            <div slot="on">
-              <p class="toggle-on">
-                {{has_extension !== null ? 'Has extension' : 'Grant extension'}}
-              </p>
-            </div>
-            <div slot="off">
-              <p class="toggle-off">
-                {{has_extension !== null ? 'Revoke Extension' : 'No extension'}}
-              </p>
-            </div>
-          </toggle>
         </div>
       </div>
 
-      <div id="datetime-picker-container" v-if="has_extension">
-        <div class="datetime-picker">
-          <vue-ctk-date-time-picker v-model="extension_datetime"
-                                    input-size="lg">
-          </vue-ctk-date-time-picker>
-        </div>
+      <div id="datetime-picker-container">
+        <div class="extension-label">Extension</div>
+        <span id="extension" class="datetime-input"
+             @click="$refs.extension_datetime_picker.toggle_visibility()">
+          {{format_datetime(d_group.extended_due_date)}}
+          <i class="far fa-calendar-alt calender-icon"></i>
+        </span>
+        <button type="button" id="revoke-extension"
+                @click.stop="d_group.extended_due_date = null"
+                :disabled="d_group.extended_due_date === null">
+          <i class="fas fa-times"></i>
+          Revoke
+        </button>
+
+        <datetime-picker v-model="d_group.extended_due_date"
+                         ref="extension_datetime_picker">
+        </datetime-picker>
       </div>
 
       <div id="bonus-submissions-container">
@@ -89,17 +86,16 @@
 </template>
 
 <script lang="ts">
+import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import APIErrors from '@/components/api_errors.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
 
 import { Course, Group, Project } from 'ag-client-typescript';
-import moment from 'moment';
 
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
@@ -109,7 +105,7 @@ import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/vali
     Toggle,
     ValidatedForm,
     ValidatedInput,
-    VueCtkDateTimePicker
+    DatetimePicker
   }
 })
 export default class EditSingleGroup extends Vue {
@@ -138,31 +134,22 @@ export default class EditSingleGroup extends Vue {
     created_at: "",
     last_modified: ""
   });
+
   d_saving = false;
-  has_extension = false;
-  min_group_size = 1;
-  max_group_size = 1;
+
   edit_group_form_is_valid = true;
-  extension_datetime = "";
   incomplete_input_present = false;
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
     this.incomplete_input_present = false;
     this.d_group = deep_copy(new_group, Group);
-    this.has_extension = this.d_group.extended_due_date !== null;
   }
 
   async created() {
     this.d_group = deep_copy(this.group, Group);
     let course = await Course.get_by_pk(this.project.course);
     this.allowed_guest_domain = course.allowed_guest_domain;
-    this.min_group_size = this.project.min_group_size;
-    this.max_group_size = this.project.max_group_size;
-    this.has_extension = this.d_group.extended_due_date !== null;
-    this.extension_datetime = this.has_extension
-                              ? moment(this.d_group.extended_due_date).format("YYYY-MM-DD hh:mm a")
-                              : moment().format("YYYY-MM-DD hh:mm a");
   }
 
   remove_group_member(index: number) {
@@ -196,14 +183,16 @@ export default class EditSingleGroup extends Vue {
         Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
       }
 
-      this.d_group.extended_due_date = this.has_extension
-                                       ? new Date(this.extension_datetime).toISOString() : null;
       await this.d_group.save();
       (<ValidatedForm> this.$refs.edit_group_form).reset_warning_state();
     }
     finally {
       this.d_saving = false;
     }
+  }
+
+  get format_datetime() {
+    return format_datetime;
   }
 }
 
@@ -216,7 +205,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
-@import '~vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 
 #edit-single-group-component {
   font-size: 15px;
@@ -234,13 +222,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 .member-name-input {
   width: 240px;
 }
-#extension-toggle {
-  padding-top: 10px;
-}
-
-.toggle-on, .toggle-off {
-  font-size: 15px;
-}
 
 #datetime-picker-container {
   padding: 16px 0 0 0;
@@ -254,12 +235,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   padding-bottom: 6px;
 }
 
-.datetime-picker {
-  margin-top: 5px;
-  width: 50%;
-  min-width: 260px;
-}
-
 .saving-spinner {
   color: $ocean-blue;
   display: inline-block;
@@ -268,12 +243,44 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 }
 
 .update-group-button {
-  @extend .teal-button;
+  @extend .green-button;
   margin-top: 15px;
 }
 
-.update-group-button:disabled {
-  @extend .gray-button;
+.extension-label {
+  color: lighten(black, 25);
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+}
+
+#extension:hover {
+  cursor: pointer;
+}
+
+.datetime-input {
+  margin: 10px 0 10px 0;
+  background-color: $white-gray;
+  border: 1px solid darken($white-gray, 2);
+  border-radius: 4px;
+  padding: 8px;
+  display: inline-block;
+}
+
+/*.datetime-input:hover {*/
+/*  cursor: pointer;*/
+/*}*/
+
+.datetime-input i {
+  padding: 0 4px;
+}
+
+#revoke-extension {
+  @extend .white-button;
+  box-shadow: none;
+  margin-left: 3px;
 }
 
 </style>

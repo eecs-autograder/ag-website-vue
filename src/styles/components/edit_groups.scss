@@ -45,17 +45,12 @@
 }
 
 .add-member-container {
-    cursor: pointer;
-    display: block;
-    padding: 2px 0 8px 0;
+    margin-bottom: 8px;
 }
 
 .add-member-button {
-    @extend .purple-button;
-}
-
-.add-member-button:disabled {
-    @extend .gray-button;
+    @extend .white-button;
+    box-shadow: none;
 }
 
 .error-input {

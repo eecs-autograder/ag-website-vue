@@ -1,16 +1,20 @@
 import APIErrors from '@/components/api_errors.vue';
+import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,
-    Group, NewGroupData,
+    Group,
     Project,
     Semester,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 import * as sinon from "sinon";
+
+// @ts-ignore
+import moment from 'moment';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -100,21 +104,6 @@ describe('EditSingleGroup tests', () => {
         if (wrapper.exists()) {
             wrapper.destroy();
         }
-    });
-
-    test('If the extended due date of the group passed in is not null, has_extension is ' +
-         'set to true',
-         async () => {
-        expect(component.min_group_size).toEqual(project.min_group_size);
-        expect(component.max_group_size).toEqual(project.max_group_size);
-        expect(component.d_group!.member_names[0]).toEqual(group.member_names[0]);
-        expect(component.d_group!.member_names[1]).toEqual(group.member_names[1]);
-        expect(component.d_group!.bonus_submissions_remaining).toEqual(
-            group.bonus_submissions_remaining
-        );
-        expect(component.allowed_guest_domain).toEqual(course.allowed_guest_domain);
-        expect(component.incomplete_input_present).toBe(false);
-        expect(component.has_extension).toBe(true);
     });
 
     test('A group must have at most max_group_size members and at least one member', async () => {
@@ -349,21 +338,31 @@ describe('EditSingleGroup tests', () => {
         expect(wrapper.findAll('.incomplete-input-msg').length).toEqual(2);
     });
 
-    test('Call to save without an extension', async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
+    test('Clicking extension display opens datetime picker', () => {
+        let extension_display = wrapper.find('#extension');
+        let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
 
-        wrapper.setData({has_extension: true});
-        component.extension_datetime = "2019-05-09 09:54 pm";
-        await component.$nextTick();
+        expect(picker.vm.d_is_open).toEqual(false);
 
-        wrapper.setData({has_extension: false});
-        await component.$nextTick();
+        extension_display.trigger('click');
+        expect(picker.vm.d_is_open).toEqual(true);
+    });
 
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
-        await component.$nextTick();
+    test('Revoking and granting extension', async () => {
+        expect(component.d_group.extended_due_date).not.toBeNull();
 
-        expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue.extended_due_date).toBeNull();
+        let revoke_button = wrapper.find('#revoke-extension');
+        revoke_button.trigger('click');
+        expect(component.d_group.extended_due_date).toBeNull();
+
+        let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
+        picker.vm.toggle_visibility();
+        expect(picker.vm.d_is_open).toEqual(true);
+
+        let now = moment();
+        picker.vm.set_date_and_time(now.format());
+        picker.vm.update_time_selected();
+        expect(component.d_group.extended_due_date).toEqual(now.format());
     });
 
     test('Group member must be enrolled in course - violates condition', async () => {
@@ -438,115 +437,6 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(component.d_group).toEqual(different_group);
-        expect(component.has_extension).toBe(false);
         expect(component.incomplete_input_present).toBe(false);
-    });
-});
-
-describe('EditSingleGroup without an extension initially', () => {
-    let wrapper: Wrapper<EditSingleGroup>;
-    let component: EditSingleGroup;
-    let course: Course;
-    let group: Group;
-    let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
-
-
-    beforeEach(() => {
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '@cornell.edu', last_modified: ''
-        });
-
-        group = new Group({
-            pk: 1,
-            project: 2,
-            extended_due_date: null,
-            member_names: [
-                "kevin@cornell.edu",
-                "oscar@cornell.edu"
-            ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {"oscar@cornell.edu": 2},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
-        });
-
-        project = new Project({
-            pk: 2,
-            name: "Project 1 - Statistics",
-            last_modified: "today",
-            course: 1,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 2,
-            max_group_size: 3,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false
-        });
-
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
-        get_course_by_pk_stub.returns(Promise.resolve(course));
-
-        wrapper = mount(EditSingleGroup, {
-            propsData: {
-                project: project,
-                group: group
-            }
-        });
-        component = wrapper.vm;
-    });
-
-    afterEach(() => {
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-
-    test('Call to save with an extension', async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
-        expect(component.has_extension).toBe(false);
-
-        wrapper.setData({has_extension: true});
-        component.extension_datetime = "2019-05-09 09:54 pm";
-        await component.$nextTick();
-
-        expect(component.has_extension).toBe(true);
-
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
-        await component.$nextTick();
-
-        expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue.extended_due_date).toEqual(
-            "2019-05-10T01:54:00.000Z"
-        );
     });
 });

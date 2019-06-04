@@ -28,7 +28,7 @@
             </div>
           </td>
         <td class="extension-date">
-          {{new Date(group.extended_due_date).toLocaleString('en-US', extended_due_date_format)}}
+          {{format_datetime(group.extended_due_date)}}
         </td>
         </tr>
       </table>
@@ -75,7 +75,7 @@ import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 
-import { array_remove_unique, deep_copy } from "@/utils";
+import { array_remove_unique, deep_copy, format_datetime } from "@/utils";
 import { Group, GroupObserver, Project } from 'ag-client-typescript';
 
 @Component({
@@ -168,6 +168,10 @@ export default class EditGroups extends Vue implements GroupObserver {
   }
 
   update_group_merged(group: Group): void { }
+
+  get format_datetime() {
+    return format_datetime;
+  }
 }
 </script>
 

@@ -1,9 +1,12 @@
-// A wrapper around Object.assign that adds type checking to enforce
-// that "to" is a derived class of "from".
-// Also limits "from" to a single value.
 import { AxiosError, AxiosResponse } from 'axios';
 import { Dictionary } from 'vue-router/types/router';
 
+// @ts-ignore
+import moment from "moment";
+
+// A wrapper around Object.assign that adds type checking to enforce
+// that "to" is a derived class of "from".
+// Also limits "from" to a single value.
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
     Object.assign(to, from);
 }
@@ -139,4 +142,11 @@ export function get_query_param(query_params: Dictionary<string | string[]>, key
         return query_value[0];
     }
     return query_value === undefined ? null : query_value;
+}
+
+export function format_datetime(datetime: string | null): string {
+    if (datetime === null) {
+        return '--- --, ----, --:-- --';
+    }
+    return moment(datetime).format('MMMM DD, YYYY, hh:mm A');
 }
