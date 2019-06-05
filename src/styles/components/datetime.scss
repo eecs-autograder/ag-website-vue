@@ -1,0 +1,79 @@
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+
+/* TODO: Move into button_styles.scss */
+.flat-white-button {
+    @extend .button;
+
+    box-shadow: none;
+    color: black;
+    background: white;
+}
+
+.flat-white-button:hover:enabled {
+    @include hover_state($pebble-medium, $pebble-medium);
+}
+
+.flat-white-button:disabled {
+    color: $stormy-gray-light;
+}
+
+// USAGE for .clearable-datetime-picker
+// Note: replace *datetime* with a variable name
+//
+//  <div class="clearable-datetime-picker">
+//    <div class="extension-label">Extension</div>
+//    <div class="datetime-input">
+//      {{format_datetime(*datetime*)}}
+//      <i class="far fa-calendar-alt calender-icon"></i>
+//    </div>
+//    <button type="button" class="clear-button"
+//            @click.stop="*datetime* = null"
+//            :disabled="*datetime* === null">
+//      <i class="fas fa-times"></i>
+//      <span class="clear-text">Clear</span>
+//    </button>
+//
+//    <datetime-picker v-model="*datetime*"></datetime-picker>
+//  </div>
+
+.clearable-datetime-picker {
+    .label {
+        color: lighten(black, 25);
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+        vertical-align: top;
+    }
+
+    .datetime-input {
+        margin: 10px 0 10px 0;
+        background-color: $white-gray;
+        border: 1px solid darken($white-gray, 2);
+        border-radius: 4px;
+        padding: 8px;
+        display: inline-block;
+
+        i {
+            padding: 0 4px;
+        }
+    }
+    
+    .datetime-input:hover {
+        cursor: pointer;
+    }
+
+    .clear-button {
+        @extend .flat-white-button;
+
+        padding-top: 8px;
+        padding-bottom: 8px;
+
+        margin-left: 4px;
+
+        .clear-text {
+            margin-left: 5px;
+        }
+    }
+}

@@ -44,19 +44,19 @@
         </div>
       </div>
 
-      <div id="datetime-picker-container">
+      <div id="datetime-picker-container" class="clearable-datetime-picker">
         <div class="extension-label">Extension</div>
-        <span id="extension" class="datetime-input"
+        <div id="extension" class="datetime-input"
              @click="$refs.extension_datetime_picker.toggle_visibility()">
           {{format_datetime(d_group.extended_due_date)}}
           <i class="far fa-calendar-alt calender-icon"></i>
-        </span>
+        </div>
         <button type="button" id="revoke-extension"
-                class="flat-white-button"
+                class="clear-button"
                 @click.stop="d_group.extended_due_date = null"
                 :disabled="d_group.extended_due_date === null">
           <i class="fas fa-times"></i>
-          Revoke
+          <span class="clear-text">Revoke</span>
         </button>
 
         <datetime-picker v-model="d_group.extended_due_date"
@@ -207,6 +207,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
+@import '@/styles/components/datetime.scss';
 
 #edit-single-group-component {
   font-size: 15px;
@@ -216,7 +217,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   padding-top: 16px;
 }
 
-/*FIXME*/
 .username-container {
   min-width: 400px;
 }
@@ -247,51 +247,6 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 .update-group-button {
   @extend .green-button;
   margin-top: 15px;
-}
-
-.extension-label {
-  color: lighten(black, 25);
-  font-size: 16px;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  vertical-align: top;
-}
-
-#extension:hover {
-  cursor: pointer;
-}
-
-.datetime-input {
-  margin: 10px 0 10px 0;
-  background-color: $white-gray;
-  border: 1px solid darken($white-gray, 2);
-  border-radius: 4px;
-  padding: 8px;
-  display: inline-block;
-}
-
-.datetime-input i {
-  padding: 0 4px;
-}
-
-#revoke-extension {
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
-.flat-white-button {
-  @extend .button;
-
-  box-shadow: none;
-  margin-left: 3px;
-
-  color: black;
-  background: white;
-}
-
-.flat-white-button:hover:enabled {
-  @include hover_state($pebble-medium, $pebble-medium);
 }
 
 </style>
