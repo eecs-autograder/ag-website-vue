@@ -1,4 +1,3 @@
-import {UltimateSubmissionPolicy} from "ag-client-typescript";
 <template>
   <div id="project-settings-component">
 
@@ -18,7 +17,7 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
 
       <div class="section-container">
         <fieldset>
-          <legend> Accessibility </legend>
+          <legend> Access </legend>
           <div class="toggle-container">
             <toggle v-model="d_project.hide_ultimate_submission_fdbk">
               <div slot="on">
@@ -158,7 +157,7 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
                    class="project-settings-input"
                    type="number"
                    min="1"
-                   v-model="submission_limit_per_day"/>
+                   v-model="d_submission_limit_per_day"/>
           </div>
 
           <div v-if="submission_limit_per_day_exists"
@@ -204,35 +203,37 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
             <label class="text-label">
               Reset submissions per day at:
             </label>
-            <div>
-              <div class="timepicker">
-                <vue-ctk-date-time-picker id="TimePicker"
-                                          :only-time="true"
-                                          v-model="submission_limit_reset_time"
-                                          label="Select time"
-                                          format="hh:mm a"
-                                          formatted="hh:mm a"
-                                          input-size="lg">
-                </vue-ctk-date-time-picker>
-              </div>
-              <div class="timezone">
-                <dropdown ref="dropdown_timezone"
-                          :items="timezones"
-                          @update_item_selected="d_project.submission_limit_reset_timezone
-                                                 = $event">
-                  <template slot="header">
-                    <div tabindex="1" class="dropdown-header-wrapper">
-                      <div id="timezone-dropdown" class="dropdown-header">
+            <div id="reset-time-picker-container">
+              <div class="clearable-datetime-picker">
+                <div class="datetime-input" ref="submission_limit_reset_time"
+                     @click="d_show_reset_time_picker = !d_show_reset_time_picker">
+                  {{format_time(d_project.submission_limit_reset_time)}}
+                  <i class="far fa-clock"></i>
+                </div>
+
+                <div class="timezone">
+                  <dropdown ref="dropdown_timezone"
+                            :items="timezones"
+                            @update_item_selected="
+                                d_project.submission_limit_reset_timezone = $event">
+                    <template slot="header">
+                      <div tabindex="1" class="dropdown-header-wrapper">
+                        <div id="timezone-dropdown" class="dropdown-header">
                           {{d_project.submission_limit_reset_timezone}}
-                        <i class="fas fa-caret-down dropdown-caret"></i>
+                          <i class="fas fa-caret-down dropdown-caret"></i>
+                        </div>
                       </div>
-                    </div>
-                  </template>
-                  <span slot-scope="{item}">
-                    <span class="submission-policy">{{item}}</span>
-                  </span>
-                </dropdown>
+                    </template>
+                    <span slot-scope="{item}">
+                      <span class="submission-policy">{{item}}</span>
+                    </span>
+                  </dropdown>
+                </div>
               </div>
+
+              <time-picker v-model="d_project.submission_limit_reset_time"
+                           v-if="d_show_reset_time_picker"
+                           ref="submission_limit_reset_time_picker"></time-picker>
             </div>
           </div>
 
@@ -271,60 +272,57 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
         <fieldset>
           <legend> Project Deadline </legend>
           <div class="project-input-container">
-            <div class="soft-deadline">
-              <label class="text-label"> Soft deadline </label>
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="medium" placement="right">
-                  The deadline shown to students.
-                </tooltip>
-              </i>
-              <div class="toggle-container">
-                <toggle v-model="has_soft_closing_time">
-                  <div slot="on">
-                    Yes
-                  </div>
-                  <div slot="off">
-                    No
-                  </div>
-                </toggle>
+
+            <div class="clearable-datetime-picker soft-deadline">
+              <div class="label">
+                Soft Deadline
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="medium" placement="right">
+                    The deadline shown to students.
+                  </tooltip>
+                </i>
               </div>
-              <div v-if="has_soft_closing_time"
-                   class="datetime-picker-container">
-                <div class="datetime-picker">
-                  <vue-ctk-date-time-picker v-model="soft_closing_time"
-                                            input-size="lg">
-                  </vue-ctk-date-time-picker>
-                </div>
+              <div class="datetime-input"
+                   @click="$refs.soft_closing_time.toggle_visibility()">
+                {{format_datetime(d_project.soft_closing_time)}}
+                <i class="far fa-calendar-alt"></i>
               </div>
+              <button type="button" class="clear-button" ref="clear_soft_closing_time"
+                      @click.stop="d_project.soft_closing_time = null"
+                      :disabled="d_project.soft_closing_time === null">
+                <i class="fas fa-times"></i>
+                <span class="clear-text">Clear</span>
+              </button>
+
+              <datetime-picker v-model="d_project.soft_closing_time"
+                               ref="soft_closing_time"></datetime-picker>
             </div>
 
-            <div class="hard-deadline">
-              <label class="text-label"> Hard deadline </label>
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="medium" placement="right">
-                  The actual deadline. Submissions will not be accepted after this time (and late
-                  days will come into effect if applicable). This date is not shown to students.
-                </tooltip>
-              </i>
-              <div class="toggle-container">
-                <toggle v-model="has_closing_time">
-                  <div slot="on">
-                    Yes
-                  </div>
-                  <div slot="off">
-                    No
-                  </div>
-                </toggle>
+            <div class="clearable-datetime-picker hard-deadline">
+              <div class="label">
+                Hard Deadline
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="medium" placement="right">
+                    The deadline shown to students.
+                  </tooltip>
+                </i>
               </div>
-              <div v-if=has_closing_time
-                   class="datetime-picker-container">
-                <div class="datetime-picker">
-                  <vue-ctk-date-time-picker v-model="closing_time"
-                                            input-size="lg">
-                  </vue-ctk-date-time-picker>
-                </div>
+              <div class="datetime-input"
+                   @click="$refs.closing_time.toggle_visibility()">
+                {{format_datetime(d_project.closing_time)}}
+                <i class="far fa-calendar-alt"></i>
               </div>
+              <button type="button" class="clear-button" ref="clear_closing_time"
+                      @click.stop="d_project.closing_time = null"
+                      :disabled="d_project.closing_time === null">
+                <i class="fas fa-times"></i>
+                <span class="clear-text">Clear</span>
+              </button>
+
+              <datetime-picker v-model="d_project.closing_time"
+                               ref="closing_time"></datetime-picker>
             </div>
+
           </div>
         </fieldset>
       </div>
@@ -347,13 +345,15 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
 
 <script lang="ts">
   import APIErrors from '@/components/api_errors.vue';
+  import DatetimePicker from "@/components/datetime/datetime_picker.vue";
+  import TimePicker from "@/components/datetime/time_picker.vue";
   import Dropdown from '@/components/dropdown.vue';
   import Toggle from '@/components/toggle.vue';
   import Tooltip from '@/components/tooltip.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput from '@/components/validated_input.vue';
 
-  import { handle_api_errors_async } from "@/utils";
+  import { deep_copy, format_datetime, format_time, handle_api_errors_async } from "@/utils";
   import {
     is_integer,
     is_non_negative,
@@ -362,8 +362,6 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
     string_to_num
   } from '@/validators';
   import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-  import moment from 'moment';
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
   import { Component, Prop, Vue } from 'vue-property-decorator';
 
   interface UltimateSubmissionPolicyOption {
@@ -374,15 +372,15 @@ import {UltimateSubmissionPolicy} from "ag-client-typescript";
   @Component({
   components: {
     APIErrors,
+    DatetimePicker,
     Dropdown,
+    TimePicker,
     Toggle,
     Tooltip,
     ValidatedForm,
     ValidatedInput,
-    VueCtkDateTimePicker
   }
 })
-
 export default class ProjectSettings extends Vue {
 
   @Prop({required: true, type: Project})
@@ -411,15 +409,12 @@ export default class ProjectSettings extends Vue {
     'UTC'
   ];
 
-  d_project!: Project;
+  d_project: Project = make_empty_project();
   d_saving = false;
   settings_form_is_valid = true;
-  has_soft_closing_time = false;
-  has_closing_time = false;
-  submission_limit_per_day = "";
-  submission_limit_reset_time = "";
-  soft_closing_time = "";
-  closing_time = "";
+
+  d_submission_limit_per_day = '';
+  d_show_reset_time_picker = false;
 
   readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
@@ -428,21 +423,10 @@ export default class ProjectSettings extends Vue {
   readonly string_to_num = string_to_num;
 
   async created() {
-    this.d_project = this.project;
-    this.submission_limit_per_day = this.d_project.submission_limit_per_day === null ? ""
-      : this.d_project.submission_limit_per_day.toString();
-    this.submission_limit_reset_time = moment(this.d_project.submission_limit_reset_time,
-                                              'HH:mm:ss').format("LT");
-    this.has_soft_closing_time = this.d_project.soft_closing_time !== null;
-    this.soft_closing_time = this.has_soft_closing_time
-                             ? moment(this.d_project.soft_closing_time!).format(
-                               "YYYY-MM-DD hh:mm a"
-                             )
-                             : moment().format("YYYY-MM-DD hh:mm a");
-    this.has_closing_time = this.d_project.closing_time !== null;
-    this.closing_time = this.has_closing_time
-                        ? moment(this.d_project.closing_time!).format("YYYY-MM-DD hh:mm a")
-                        : moment().format("YYYY-MM-DD hh:mm a");
+    this.d_project = deep_copy(this.project, Project);
+    if (this.d_project.submission_limit_per_day !== null) {
+      this.d_submission_limit_per_day = this.d_project.submission_limit_per_day.toString();
+    }
   }
 
   get submission_policy_selected() {
@@ -453,7 +437,7 @@ export default class ProjectSettings extends Vue {
   }
 
   get submission_limit_per_day_exists() {
-    return this.submission_limit_per_day.toString().match('^[0-9]+$') !== null;
+    return this.d_submission_limit_per_day.toString().match('^[0-9]+$') !== null;
   }
 
   @handle_api_errors_async(handle_save_project_settings_error)
@@ -461,33 +445,62 @@ export default class ProjectSettings extends Vue {
     try {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
-      let reset_time = moment(this.submission_limit_reset_time, 'HH:mm a');
-      this.d_project.submission_limit_reset_time = reset_time.hours() + ":"
-                                                   + reset_time.minutes() + ":00";
       this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
-                                                ? Number(this.submission_limit_per_day) : null;
-      this.d_project.soft_closing_time = this.has_soft_closing_time
-                                         ? new Date(this.soft_closing_time).toISOString() : null;
-      this.d_project.closing_time = this.has_closing_time
-                                    ? new Date(this.closing_time).toISOString() : null;
+                                                ? Number(this.d_submission_limit_per_day) : null;
+
       await this.d_project!.save();
     }
     finally {
       this.d_saving = false;
     }
   }
+
+  get format_datetime() {
+    return format_datetime;
+  }
+
+  get format_time() {
+    return format_time;
+  }
 }
 
-  export function handle_save_project_settings_error(component: ProjectSettings, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
-  }
+export function handle_save_project_settings_error(component: ProjectSettings, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
+
+function make_empty_project(): Project {
+  return new Project({
+    pk: 0,
+    name: '',
+    last_modified: '',
+    course: 0,
+    visible_to_students: false,
+    closing_time: null,
+    soft_closing_time: null,
+    disallow_student_submissions: false,
+    disallow_group_registration: false,
+    guests_can_submit: false,
+    min_group_size: 0,
+    max_group_size: 0,
+    submission_limit_per_day: null,
+    allow_submissions_past_limit: false,
+    groups_combine_daily_submissions: false,
+    submission_limit_reset_time: '12:00',
+    submission_limit_reset_timezone: 'UTC',
+    num_bonus_submissions: 0,
+    total_submission_limit: 0,
+    allow_late_days: false,
+    ultimate_submission_policy: UltimateSubmissionPolicy.most_recent,
+    hide_ultimate_submission_fdbk: false,
+  });
+}
 
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '~vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
+@import '@/styles/components/datetime.scss';
 
 #project-settings-component {
   padding: 10px;
@@ -681,21 +694,28 @@ input[type=checkbox] {
 }
 
 // Datetime related ************************************************************
-.datetime-picker-container {
-  padding: 6px 0 10px 0;
-  max-width: 300px;
-}
 
-.timepicker {
+#reset-time-picker-container {
   border-radius: 5px;
-  display: inline-block;
-  margin: 0 30px 0 0;
-  width: 250px;
+
+  .clearable-datetime-picker {
+    display: flex;
+    align-items: center;
+
+    .datetime-input {
+      padding: 10px 20px;
+      margin-right: 4px;
+
+      i {
+        margin-left: 5px;
+      }
+    }
+
+    .clear-button {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  }
 }
 
-.timezone {
-  display: inline-block;
-  margin: 0 0 0 0;
-  vertical-align: top;
-}
 </style>

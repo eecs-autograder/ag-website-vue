@@ -45,11 +45,11 @@
       </div>
 
       <div id="datetime-picker-container" class="clearable-datetime-picker">
-        <div class="extension-label">Extension</div>
+        <div class="label">Extension</div>
         <div id="extension" class="datetime-input"
              @click="$refs.extension_datetime_picker.toggle_visibility()">
           {{format_datetime(d_group.extended_due_date)}}
-          <i class="far fa-calendar-alt calender-icon"></i>
+          <i class="far fa-calendar-alt"></i>
         </div>
         <button type="button" id="revoke-extension"
                 class="clear-button"

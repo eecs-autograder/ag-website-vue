@@ -2,7 +2,7 @@ import {
     array_add_unique,
     array_get_unique,
     array_has_unique,
-    array_remove_unique,
+    array_remove_unique, format_datetime, format_time,
     safe_assign,
     UniqueArrayError,
     zip
@@ -62,6 +62,26 @@ describe('zip function tests', () => {
             expect(spam.spam).toEqual(42);
             expect(egg.egg).toEqual(43);
         }
+    });
+});
+
+describe('Datetime format tests', () => {
+    test('format_datetime null', () => {
+        expect(format_datetime(null)).toEqual('--- --, ----, --:-- --');
+    });
+
+    test('format_datetime non-null', () => {
+        let datetime = new Date(2020, 3, 28, 17, 42).toISOString();
+        expect(format_datetime(datetime)).toEqual('April 28, 2020, 05:42 PM');
+    });
+
+    test('format_time null', () => {
+        expect(format_time(null)).toEqual('--:-- --');
+    });
+
+    test('format_time non-null', () => {
+        expect(format_time('15:32')).toEqual('03:32 PM');
+        expect(format_time('15:32:00')).toEqual('03:32 PM');
     });
 });
 

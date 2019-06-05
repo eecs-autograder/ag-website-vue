@@ -67,7 +67,7 @@ export default class DatetimePicker extends Vue {
   d_date: moment.Moment = moment();
   d_time: string = '12:00';
 
-  d_is_open = false;
+  private d_is_open = false;
 
   d_selected_day: number | null = null;
   d_selected_month: number | null = null;
@@ -119,8 +119,20 @@ export default class DatetimePicker extends Vue {
                           minutes: this.d_date.minutes()}).format('HH:mm');
   }
 
+  get is_visible() {
+    return this.d_is_open;
+  }
+
   toggle_visibility() {
     this.d_is_open = !this.d_is_open;
+  }
+
+  show() {
+    this.d_is_open = true;
+  }
+
+  hide() {
+    this.d_is_open = false;
   }
 
   go_to_next_month() {

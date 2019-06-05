@@ -20,12 +20,14 @@
 
 // USAGE for .clearable-datetime-picker
 // Note: replace *datetime* with a variable name
+// Note: The datetime-picker can be replaced with a time-picker
 //
 //  <div class="clearable-datetime-picker">
-//    <div class="extension-label">Extension</div>
-//    <div class="datetime-input">
+//    <div class="label">Label</div>
+//    <div class="datetime-input"
+//         @click="$refs.*ref*.toggle_visibility()">
 //      {{format_datetime(*datetime*)}}
-//      <i class="far fa-calendar-alt calender-icon"></i>
+//      <i class="far fa-calendar-alt"></i>
 //    </div>
 //    <button type="button" class="clear-button"
 //            @click.stop="*datetime* = null"
@@ -34,7 +36,8 @@
 //      <span class="clear-text">Clear</span>
 //    </button>
 //
-//    <datetime-picker v-model="*datetime*"></datetime-picker>
+//    <datetime-picker v-model="*datetime*"
+//                     ref="*ref*"></datetime-picker>
 //  </div>
 
 .clearable-datetime-picker {
