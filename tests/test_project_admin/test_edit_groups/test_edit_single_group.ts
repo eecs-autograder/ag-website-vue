@@ -324,10 +324,10 @@ describe('EditSingleGroup tests', () => {
         let extension_display = wrapper.find('#extension');
         let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
 
-        expect(picker.vm.d_is_open).toEqual(false);
+        expect(picker.vm.is_visible).toEqual(false);
 
         extension_display.trigger('click');
-        expect(picker.vm.d_is_open).toEqual(true);
+        expect(picker.vm.is_visible).toEqual(true);
     });
 
     test('Revoking and granting extension', async () => {
@@ -339,7 +339,7 @@ describe('EditSingleGroup tests', () => {
 
         let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
         picker.vm.toggle_visibility();
-        expect(picker.vm.d_is_open).toEqual(true);
+        expect(picker.vm.is_visible).toEqual(true);
 
         let now = moment();
         picker.vm.set_date_and_time(now.format());

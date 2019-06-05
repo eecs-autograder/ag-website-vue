@@ -344,32 +344,32 @@
 </template>
 
 <script lang="ts">
-  import APIErrors from '@/components/api_errors.vue';
-  import DatetimePicker from "@/components/datetime/datetime_picker.vue";
-  import TimePicker from "@/components/datetime/time_picker.vue";
-  import Dropdown from '@/components/dropdown.vue';
-  import Toggle from '@/components/toggle.vue';
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
+import APIErrors from '@/components/api_errors.vue';
+import DatetimePicker from "@/components/datetime/datetime_picker.vue";
+import TimePicker from "@/components/datetime/time_picker.vue";
+import Dropdown from '@/components/dropdown.vue';
+import Toggle from '@/components/toggle.vue';
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 
-  import { deep_copy, format_datetime, format_time, handle_api_errors_async } from "@/utils";
-  import {
-    is_integer,
-    is_non_negative,
-    is_not_empty,
-    is_number,
-    string_to_num
-  } from '@/validators';
-  import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { deep_copy, format_datetime, format_time, handle_api_errors_async } from "@/utils";
+import {
+  is_integer,
+  is_non_negative,
+  is_not_empty,
+  is_number,
+  string_to_num
+} from '@/validators';
+import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  interface UltimateSubmissionPolicyOption {
-    label: string;
-    policy: UltimateSubmissionPolicy;
-  }
+interface UltimateSubmissionPolicyOption {
+  label: string;
+  policy: UltimateSubmissionPolicy;
+}
 
-  @Component({
+@Component({
   components: {
     APIErrors,
     DatetimePicker,

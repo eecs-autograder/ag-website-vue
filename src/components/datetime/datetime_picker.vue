@@ -189,7 +189,7 @@ export default class DatetimePicker extends Vue {
   update_time_selected() {
     let time = moment(this.d_time, 'HH:mm');
     this.d_date = this.d_date.clone().set({hours: time.hours(), minutes: time.minutes()});
-    if (this.d_selected_day) {
+    if (this.d_selected_day !== null) {
       this.$emit('input', this.d_date.format());
     }
   }

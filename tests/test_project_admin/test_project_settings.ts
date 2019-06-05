@@ -1,4 +1,5 @@
 import APIErrors from '@/components/api_errors.vue';
+import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
@@ -194,7 +195,7 @@ describe('ProjectSettings tests', () => {
 
     test('Clicking soft closing time toggles time picker visibility', async () => {
         let time = wrapper.find('.soft-deadline .datetime-input');
-        let picker = wrapper.find({ref: 'soft_closing_time'});
+        let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'soft_closing_time'});
 
         expect(picker.vm.is_visible).toEqual(false);
 
@@ -226,7 +227,7 @@ describe('ProjectSettings tests', () => {
 
     test('Clicking closing time toggles time picker visibility', async () => {
         let time = wrapper.find('.hard-deadline .datetime-input');
-        let picker = wrapper.find({ref: 'closing_time'});
+        let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'closing_time'});
 
         expect(picker.vm.is_visible).toEqual(false);
 
