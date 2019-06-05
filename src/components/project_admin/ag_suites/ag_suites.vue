@@ -299,7 +299,6 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
   display: inline-block;
   @extend .periwinkle-button;
   margin-right: 10px;
-  /*box-shadow: none;*/
 }
 
 .plus {
@@ -314,12 +313,12 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 }
 
 .tool-bar {
-  padding: 10px 5px;
+  padding: 10px 0 10px 8px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin: 10px 0 5px 0;
 }
 
 </style>
