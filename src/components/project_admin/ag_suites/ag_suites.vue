@@ -1,10 +1,34 @@
 <template>
   <div id="ag-test-suites-component">
     <div id="suite-navigation-bar">
-      <button class="new-suite"
-           @click="$refs.new_suite_modal.open()">
-        <i class="fas fa-plus plus-sign"></i> Add Suite
-      </button>
+      <div class="tool-bar">
+        <div class="suites-title"> Suites </div>
+                <button type="button"
+                        class="add-suite-button"
+                        @click="$refs.new_suite_modal.open()">
+                  <i class="fas fa-plus plus"></i> Add Suite
+                </button>
+<!--        <button type="button"-->
+<!--                class="add-suite-button">-->
+<!--           Add Suite-->
+<!--        </button>-->
+<!--        <button type="button"-->
+<!--                class="add-suite-button">-->
+<!--           Add Case-->
+<!--        </button>-->
+<!--        <button type="button"-->
+<!--                class="add-suite-button">-->
+<!--           Add Command-->
+<!--        </button>-->
+      </div>
+      <div class="nav-bar-header">
+<!--        <div class="suites-title"> Suites </div>-->
+<!--        <button type="button"-->
+<!--                class="add-suite-button">-->
+<!--          <i class="fas fa-plus plus"></i> Add Suite-->
+<!--        </button>-->
+      </div>
+
       <div class="all-suites" @wheel.stop>
         <div v-for="(test_suite, index) of test_suites"
              :class="['suite-container']"
@@ -13,7 +37,6 @@
                         :active_suite="active_suite"
                         :active_case="active_case"
                         :active_command="active_command"
-                        :last_suite="index === test_suites.length - 1"
                         @update_active_suite="update_active_suite($event)"
                         @update_active_case="update_active_case($event)"
                         @update_active_command="update_active_command($event)">
@@ -23,18 +46,25 @@
     </div>
 
     <div id="viewing-window">
-      <div v-if="level_selected === 'Suite' && active_suite !== null">
+<!--      <div> {{active_suite !== null ? active_suite.name : "Null"}}</div>-->
+<!--      <div> {{active_case !== null ? active_case.name : "Null"}}</div>-->
+<!--      <div> {{active_command !== null ? active_command.name : "Null"}}</div>-->
+
+      <div v-if="active_level_is_suite">
         <AGSuiteSettings :test_suite="active_suite"
                          :project="project">
         </AGSuiteSettings>
       </div>
 
-      <div v-if="level_selected === 'Case' && active_case !== null">
-        <AGCaseSettings :test_case="active_case"></AGCaseSettings>
+      <div v-if="active_level_is_case">
+<!--        <AGCaseSettings :test_case="active_case"-->
+<!--                        :project="project">-->
+<!--        </AGCaseSettings>-->
       </div>
 
-      <div v-if="level_selected === 'Command' && active_command !== null">
+      <div v-else-if="active_level_is_command">
         <AGCommandSettings :test_command="active_command"
+                           :test_case="active_case"
                            :project="project">
         </AGCommandSettings>
       </div>
@@ -59,7 +89,7 @@
             </validated-input>
           </div>
 
-          <APIErrors ref="api_errors_new_suite"></APIErrors>
+          <APIErrors ref="api_errors"></APIErrors>
 
           <button class="modal-create-button"
                   :disabled="!add_suite_form_is_valid || adding_suite"> Add Suite
@@ -115,20 +145,8 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  async created() {
-    AGTestSuite.subscribe(this);
-    this.d_project = this.project;
-    this.test_suites = await AGTestSuite.get_all_from_project(this.d_project.pk);
-    this.loading = false;
-  }
-
-  beforeDestroy() {
-    AGTestSuite.unsubscribe(this);
-  }
-
   readonly is_not_empty = is_not_empty;
 
-  level_selected: string = "Suite";
   active_suite: AGTestSuite | null = null;
   active_case: AGTestCase | null = null;
   active_command: AGTestCommand | null = null;
@@ -141,40 +159,65 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   adding_suite = false;
   new_suite_name = "";
 
+  async created() {
+    AGTestSuite.subscribe(this);
+    this.d_project = this.project;
+    this.test_suites = await AGTestSuite.get_all_from_project(this.d_project.pk);
+    this.loading = false;
+  }
+
+  beforeDestroy() {
+    AGTestSuite.unsubscribe(this);
+  }
+
+  get active_level_is_suite() {
+    return this.active_suite !== null && this.active_case === null;
+  }
+
+  get active_level_is_case() {
+    return this.active_case !== null && this.active_command === null;
+  }
+
+  get active_level_is_command() {
+    return this.active_command !== null;
+  }
+
   update_active_suite(ag_test_suite: AGTestSuite) {
-    console.log("Updating suite");
     if (this.active_suite !== null && this.active_suite.pk === ag_test_suite.pk
-        && this.level_selected === "Suite") {
+        && this.active_case === null && this.active_command === null) {
       this.active_suite = null;
     }
     else {
       this.active_suite = deep_copy(ag_test_suite, AGTestSuite);
       this.active_case = null;
       this.active_command = null;
-      this.level_selected = "Suite";
     }
   }
 
   update_active_case(ag_test_case: AGTestCase) {
-    this.active_case = deep_copy(ag_test_case, AGTestCase);
-    this.active_command = null;
-    this.level_selected = "Case";
+    if (this.active_case !== null && this.active_case.pk === ag_test_case.pk
+        && this.active_command === null) {
+      this.active_case = null;
+    }
+    else {
+      this.active_case = deep_copy(ag_test_case, AGTestCase);
+      this.active_command = null;
+    }
   }
 
   update_active_command(ag_test_command: AGTestCommand) {
     this.active_command = deep_copy(ag_test_command, AGTestCommand);
-    this.level_selected = "Command";
   }
 
   // SuiteObserver --------------------------------------------------------------------------------
   update_ag_test_suite_changed(ag_test_suite: AGTestSuite): void {
-    console.log("A suite changed");
     let index = this.test_suites.findIndex((suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
     Vue.set(this.test_suites, index, deep_copy(ag_test_suite, AGTestSuite));
   }
 
   update_ag_test_suite_created(ag_test_suite: AGTestSuite): void {
     this.test_suites.push(ag_test_suite);
+    this.active_suite = ag_test_suite;
   }
 
   update_ag_test_suite_deleted(ag_test_suite: AGTestSuite): void {
@@ -208,7 +251,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
 }
 
 function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
-  (<APIErrors> component.$refs.api_errors_new_suite).show_errors_from_response(error);
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -220,20 +263,21 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 
 #ag-test-suites-component {
   font-family: "Poppins";
-  margin-top: 10px;
-  position: relative;
+  display: flex;
+  flex-direction: row;
 }
 
-.new-suite {
-  @extend .white-button;
-  box-sizing: border-box;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 10px;
+#suite-navigation-bar {
+  overflow-y: scroll;
+  width: 420px;
+  min-width: 420px;
+  padding-left: 10px;
 }
 
-.active-suite-container {
-  //border-right: 1px solid $navy-blue;
+#viewing-window {
+  max-width: 65%;
+  min-width: 65%;
+  padding-left:20px;
 }
 
 #name-and-command {
@@ -244,42 +288,38 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
   padding: 0 0 22px 0;
 }
 
-.all-suites {
-  border: 2px solid $white-gray;
-  /*border-right: none;*/
-  border-top: none;
-  border-left: none;
+.suites-title {
+  box-sizing: border-box;
+  font-size: 24px;
+  padding: 0 10px;
+  display: inline-block;
 }
 
-.plus-sign {
-  padding: 0 10px 0 0;
-  color: $navy-blue;
+.add-suite-button {
+  display: inline-block;
+  @extend .periwinkle-button;
+  margin-right: 10px;
+  /*box-shadow: none;*/
 }
 
-@media only screen and (min-width: 481px) {
+.plus {
+  padding-right: 5px;
+}
 
-  #ag-test-cases-component {
-    position: relative;
-  }
+.nav-bar-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  #suite-navigation-bar {
-    width: 370px;
-    padding-top: 0;
-    margin: 0;
-  }
-
-  .all-suites {
-    max-height: 87vh;
-    overflow-y: scroll;
-    scroll-behavior: smooth;
-  }
-
-  #viewing-window {
-    position: absolute;
-    left: 368px;
-    top: 0;
-    right: 0;
-  }
+.tool-bar {
+  padding: 10px 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 </style>

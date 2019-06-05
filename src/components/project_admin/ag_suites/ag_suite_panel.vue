@@ -1,25 +1,30 @@
 <template>
-  <div>
-      <div :class="['test-suite', {'last-suite': last_suite},
+  <div id="ag-suite-panel">
+      <div :class="['test-suite',
                    {'active-suite': is_active_suite},
                    {'suite-in-active-container': case_or_command_is_active_level}]"
          @click="$emit('update_active_suite', test_suite)">
 
-        <div class="suite-name">{{test_suite.name}}</div>
+        <div class="test-suite-name">
+          <i v-if="is_active_suite" class="fas fa-folder-open suite-symbol"></i>
+          <i v-else class="fas fa-folder suite-symbol"></i>
+          <span>{{test_suite.name}}</span>
+        </div>
+
+        <div v-if="is_active_suite"
+             class="suite-menu"
+             title="Add Case"
+             @click.stop="open_new_case_modal">
+          <i class="fas fa-plus"></i>
+        </div>
       </div>
 
       <div class="cases-container" v-if="is_active_suite">
-        <div class="new-case-button"
-             @click="$refs.new_case_modal.open()">
-          <i class="fas fa-plus plus-sign"></i>
-          Add Case
-        </div>
         <div v-for="(test_case, index) of test_suite.ag_test_cases"
              :key="test_case.pk">
           <AGCasePanel :test_case="test_case"
                        :active_case="active_case"
                        :active_command="active_command"
-                       :last_case="index === test_suite.ag_test_cases.length - 1"
                        @update_active_case="$emit('update_active_case', $event)"
                        @update_active_command="$emit('update_active_command', $event)">
           </AGCasePanel>
@@ -28,31 +33,51 @@
 
     <modal ref="new_case_modal"
            click_outside_to_close
-           size="medium">
+           size="large">
       <div class="modal-header"> New Case </div>
       <hr>
       <div class="modal-body">
         <div class="name-container">
-          <label class="text-label"> Case Name </label>
           <validated-form id="add-case-form"
                           autocomplete="off"
                           spellcheck="false"
                           @submit.native.prevent="add_case"
                           @form_validity_changed="add_case_form_is_valid = $event">
-            <div class="name-container">
+
+            <div class="checkbox-container">
+              <input id="ignore-case"
+                     type="checkbox"
+                     v-model="intend_on_having_more_than_one_command">
+              <label class="checkbox-label"
+                     for="ignore-case"> Case will eventually have more than one command
+              </label>
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="medium" placement="right">
+                  By default, the first command in a case shares the same name as the test case it
+                  is created in. If you intend to have more than one command in this case, checking
+                  this box will allow you to supply a different name than the test case name for
+                  the first command in the case.
+                </tooltip>
+              </i>
+            </div>
+
+            <div class="case-name-container">
+              <label class="text-label"> Case Name </label>
               <validated-input ref="new_case_name"
                                v-model="new_case_name"
                                :validators="[is_not_empty]">
               </validated-input>
             </div>
 
-            <div class="name-container">
-              <label class="text-label"> Command Name </label>
+            <div class="command-name-container" v-if="intend_on_having_more_than_one_command">
+              <label class="text-label"> Command Name</label>
               <validated-input ref="new_command_name"
                                v-model="new_command_name"
                                :validators="[is_not_empty]">
               </validated-input>
             </div>
+
+
             <div class="command-container">
               <label class="text-label"> Command </label>
               <validated-input ref="new_command"
@@ -61,7 +86,7 @@
               </validated-input>
             </div>
 
-            <APIErrors ref="api_errors"></APIErrors>
+            <APIErrors ref="new_case_api_errors"></APIErrors>
 
             <button class="modal-create-button"
                     :disabled="!add_case_form_is_valid || adding_case">
@@ -82,6 +107,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
+import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
@@ -102,14 +128,12 @@ import {
     AGCasePanel,
     APIErrors,
     Modal,
+    Tooltip,
     ValidatedForm,
     ValidatedInput
   }
 })
 export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
-
-  @Prop({default: false, type: Boolean})
-  last_suite!: boolean;
 
   @Prop({required: true, type: AGTestSuite})
   test_suite!: AGTestSuite;
@@ -131,6 +155,7 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
   new_case_name = "";
   new_command_name = "";
   new_command = "";
+  intend_on_having_more_than_one_command = false;
 
   created() {
     AGTestCase.subscribe(this);
@@ -148,17 +173,28 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
     return this.is_active_suite && this.active_case !== null;
   }
 
+  open_new_case_modal() {
+    this.new_command_name = "";
+    this.new_command = "";
+    this.new_case_name = "";
+    this.intend_on_having_more_than_one_command = false;
+    (<Modal> this.$refs.new_case_modal).open();
+  }
+
   @handle_api_errors_async(handle_add_ag_case_error)
   async add_case() {
     try {
       this.adding_case = true;
-      let test_case = await AGTestCase.create(this.test_suite!.pk, { name: this.new_case_name });
-      await AGTestCommand.create(
-        test_case.pk, { name: this.new_command_name, cmd: this.new_command }
+      (<APIErrors> this.$refs.new_case_api_errors).clear();
+      let created_case = await AGTestCase.create(
+        this.test_suite!.pk, { name: this.new_case_name }
       );
-      this.new_command_name = "";
-      this.new_command = "";
-      this.new_case_name = "";
+
+      this.new_command_name = this.intend_on_having_more_than_one_command ?
+        this.new_command_name : this.new_case_name;
+      await AGTestCommand.create(
+        created_case.pk, { name: this.new_command_name, cmd: this.new_command }
+      );
       (<Modal> this.$refs.new_case_modal).close();
     }
     finally {
@@ -179,6 +215,7 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
     if (ag_test_case.ag_test_suite === this.test_suite.pk) {
       this.test_suite.ag_test_cases.push(ag_test_case);
     }
+    this.$emit('update_active_case', ag_test_case);
   }
 
   update_ag_test_case_deleted(ag_test_case: AGTestCase): void {
@@ -204,7 +241,7 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
 }
 
 function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.new_case_api_errors).show_errors_from_response(error);
 }
 
 </script>
@@ -216,60 +253,78 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
 @import '@/styles/components/ag_tests.scss';
 
 .test-suite {
-  cursor: pointer;
-  border: 1px solid darken($white-gray, 3);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: none;
-  background-color: white;
+  @extend .panel;
+  padding: 0 5px 0 15px;
+
+  .suite-symbol {
+    padding-right: 8px;
+    font-size: 16px;
+    color: darken($stormy-gray-dark, 10);
+  }
 }
 
-.last-suite {
-  border-bottom: none;
+.test-suite-name {
+  padding: 5px;
 }
 
 .new-case-button {
-  padding: 5px 10px;
-  width: 92.5%;
-  margin: 4px 0 4px 7.5%;
+  padding-right: 10px;
 }
 
-.plus-sign {
-  padding: 0 10px 0 0;
-  color: black;
+.case-name-container {
+  padding: 0 0 22px 0;
+}
+
+.command-name-container {
+  padding: 0 0 22px 0;
+}
+
+.command-container {
+  padding: 0 0 22px 0;
+}
+
+.checkbox-container {
+  padding: 12px 0 12px 0;
+}
+
+.active-suite {
+  @extend .active-level;
+
+  .suite-symbol {
+    color: white;
+  }
+
+  .suite-menu {
+    color: white;
+    padding: 5px;
+  }
+
+  .suite-menu:hover {
+    color: darken($stormy-gray-dark, 10);
+  }
 }
 
 .suite-in-active-container {
-  background-color: $suite-in-active-container-color;
+  @extend .parent-of-active-level;
+  //background-color: hsl(210, 20%, 96%);
+  background-color: white;
+
+  .suite-symbol {
+    color: darken(teal, 10);
+  }
+
+  .suite-menu {
+    color: darken(teal, 10);
+  }
 }
 
-.parent-of-active-case {
-  background-color: $parent-of-active-color;
+.suite-symbol {
+  padding-right: 8px;
+  font-size: 16px;
 }
 
-.active-suite, .active-suite:hover {
-  background-color: $active-color;
+.plus-sign {
+    font-size: 14px;
 }
 
-.case-name {
-  display: inline-block;
-  padding: 10px;
-  max-width: 80%;
-}
-
-.add-case {
-  display: inline-block;
-  padding: 4px 8px;
-  font-size: 25px;
-  margin-left: 2px;
-  cursor: pointer;
-}
-
-.name-container, .command-container {
-  padding: 0 0 22px 0;
-}
 </style>

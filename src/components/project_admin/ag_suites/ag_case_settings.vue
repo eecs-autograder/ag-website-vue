@@ -58,7 +58,7 @@
         <tab>
           <tab-header>
             <div class="tab-heading">
-              Feedback
+              Case Feedback
             </div>
           </tab-header>
           <template slot="body">

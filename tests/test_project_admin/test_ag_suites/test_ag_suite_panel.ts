@@ -182,7 +182,6 @@ describe('AGSuitePanel tests', () => {
             student_files_needed: []
         });
 
-
         wrapper = mount(AGSuitePanel, {
             propsData: {
                 test_suite: ag_suite,
@@ -215,12 +214,12 @@ describe('AGSuitePanel tests', () => {
     });
 
     test('An "Add Case" button appears when the test_suite is active', async () => {
-        expect(wrapper.findAll('.new-case-button').length).toEqual(0);
+        expect(wrapper.findAll('.suite-menu').length).toEqual(0);
 
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        expect(wrapper.findAll('.new-case-button').length).toEqual(1);
+        expect(wrapper.findAll('.suite-menu').length).toEqual(1);
     });
 
     test('Add case (and first command) - successful', async () => {
@@ -241,7 +240,44 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.new-case-button').trigger('click');
+        wrapper.find('.suite-menu').trigger('click');
+        await component.$nextTick();
+
+        expect(component.new_case_name).toEqual("");
+        expect(component.new_command).toEqual("");
+
+        component.new_case_name = "Case 2";
+        component.new_command = "Sit down";
+
+        wrapper.find('#add-case-form').trigger('submit.native');
+        await component.$nextTick();
+
+        expect(create_case_stub.calledOnce).toBe(true);
+        expect(create_command_stub.calledOnce).toBe(true);
+    });
+
+    test('Add case (and first command with differing name) - successful', async () => {
+        let new_case = new AGTestCase({
+            pk: 4,
+            name: "New Case",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: []
+        });
+        let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
+        let create_command_stub = sinon.stub(AGTestCommand, 'create');
+
+        wrapper.setProps({active_suite: ag_suite});
+        await component.$nextTick();
+
+        wrapper.find('.suite-menu').trigger('click');
+        await component.$nextTick();
+
+        wrapper.setData({intend_on_having_more_than_one_command: true});
         await component.$nextTick();
 
         component.new_case_name = "Case 2";
@@ -253,13 +289,9 @@ describe('AGSuitePanel tests', () => {
 
         expect(create_case_stub.calledOnce).toBe(true);
         expect(create_command_stub.calledOnce).toBe(true);
-
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_command_name).toEqual("");
-        expect(component.new_command).toEqual("");
     });
 
-    test.skip('Add case (and first command) - unsuccessful', async () => {
+    test('Add case (and first command) - unsuccessful', async () => {
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -279,12 +311,12 @@ describe('AGSuitePanel tests', () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(
             Promise.reject(axios_response_instance)
         );
-        let create_command_stub = sinon.stub(AGTestCommand, 'create');
+        sinon.stub(AGTestCommand, 'create');
 
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.new-case-button').trigger('click');
+        wrapper.find('.suite-menu').trigger('click');
         await component.$nextTick();
 
         component.new_case_name = "Case A";
@@ -292,10 +324,11 @@ describe('AGSuitePanel tests', () => {
         component.new_command = "Stand up";
 
         wrapper.find('#add-case-form').trigger('submit.native');
-        expect(create_case_stub.callCount).toEqual(1);
-        expect(create_command_stub.callCount).toEqual(0);
+        await component.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(create_case_stub.callCount).toEqual(1);
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'new_case_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
@@ -551,7 +584,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.new-case-button').trigger('click');
+        wrapper.find('.suite-menu').trigger('click');
 
         let new_case_name_input = wrapper.find({ref: 'new_case_name'}).find('#input');
         let new_case_name_validator = <ValidatedInput> wrapper.find({ref: 'new_case_name'}).vm;
@@ -575,7 +608,11 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.new-case-button').trigger('click');
+        wrapper.find('.suite-menu').trigger('click');
+        await component.$nextTick();
+
+        wrapper.setData({intend_on_having_more_than_one_command: true});
+        await component.$nextTick();
 
         let new_command_name_input = wrapper.find(
             {ref: 'new_command_name'}
@@ -603,7 +640,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.new-case-button').trigger('click');
+        wrapper.find('.suite-menu').trigger('click');
 
         let new_command_input = wrapper.find({ref: 'new_command'}).find('#input');
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_command'}).vm;

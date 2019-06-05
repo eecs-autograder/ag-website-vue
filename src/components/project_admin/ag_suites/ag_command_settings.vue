@@ -518,7 +518,7 @@
       <tab>
         <tab-header>
           <div class="tab-heading">
-            Feedback
+            Command Feedback
           </div>
         </tab-header>
         <template slot="body">
@@ -527,6 +527,20 @@
           </div>
         </template>
       </tab>
+
+<!------------------------ Case Feedback Tab ------------------------------------->
+<!--      <tab>-->
+<!--        <tab-header>-->
+<!--          <div class="tab-heading">-->
+<!--            Case Feedback-->
+<!--          </div>-->
+<!--        </tab-header>-->
+<!--        <template slot="body">-->
+<!--          <div class="tab-body">-->
+
+<!--          </div>-->
+<!--        </template>-->
+<!--      </tab>-->
 <!--------------------------- Danger Zone Tab --------------------------------------->
       <tab>
         <tab-header>
@@ -540,19 +554,34 @@
             <button class="delete-command-button"
                     type="button"
                     @click="$refs.delete_command_modal.open()">
-              Delete Command: <span> {{d_test_command.name}} </span>
+              {{case_has_exactly_one_command ? 'Delete Case' : 'Delete Command'}}:
+              <span>
+                {{case_has_exactly_one_command ? d_test_case.name : d_test_command.name}}
+              </span>
             </button>
 
             <modal ref="delete_command_modal"
                    :size="'large'"
                    :include_closing_x="false">
               <div class="modal-header">
-                Are you sure you want to delete the command:
-                <span class="command-to-delete">{{d_test_command.name}}</span>?
+                Confirm Delete
               </div>
               <hr>
               <div class="modal-body">
-                <p> This action cannot be reversed! </p>
+                <p>
+                Are you sure you want to delete the test {{case_has_exactly_one_command
+                                                           ? 'case' : 'command'}} :
+                <span class="command-to-delete">
+                  {{case_has_exactly_one_command ? d_test_case.name : d_test_command.name}}
+                </span>?
+
+                <span v-if="case_has_exactly_one_command"> This will delete all associated test
+                  cases and run results. THIS ACTION CANNOT BE UNDONE.</span>
+
+                <span v-if="!case_has_exactly_one_command">
+                  This will delete all associated commands and run results.
+                  THIS ACTION CANNOT BE UNDONE. </span>
+                </p>
                 <div id="modal-button-container">
                   <button class="modal-delete-button"
                           @click="delete_ag_test_command()"> Delete </button>
@@ -588,6 +617,7 @@ import {
   make_min_value_validator
 } from '@/validators';
 import {
+  AGTestCase,
   AGTestCommand,
   ExpectedOutputSource,
   ExpectedReturnCode,
@@ -614,11 +644,15 @@ export default class AGCommandSettings extends Vue {
   @Prop({required: true, type: AGTestCommand})
   test_command!: AGTestCommand;
 
+  @Prop({required: true, type: AGTestCase})
+  test_case!: AGTestCase;
+
   @Prop({required: true, type: Project})
   project!: Project;
 
   @Watch('test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
+    console.log("Command changed");
     this.d_test_command = new AGTestCommand(new_test_command);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
@@ -644,6 +678,32 @@ export default class AGCommandSettings extends Vue {
     {option: ExpectedOutputSource.text, label: "Text"},
     {option: ExpectedOutputSource.instructor_file, label: "Project file content"}
   ];
+
+  current_tab_index = 0;
+  d_test_command: AGTestCommand | null = null;
+  d_test_case: AGTestCase | null = null;
+  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+  saving = false;
+  settings_form_is_valid = true;
+
+  readonly is_not_empty = is_not_empty;
+  readonly is_integer = is_integer;
+  readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
+  readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
+  readonly StdinSource = StdinSource;
+  readonly ExpectedOutputSource = ExpectedOutputSource;
+  readonly ExpectedReturnCode = ExpectedReturnCode;
+
+  async created() {
+    this.d_test_command = this.test_command;
+    this.d_test_case = this.test_case;
+    this.sort_instructor_files();
+  }
+
+  get case_has_exactly_one_command() {
+    return this.d_test_case!.ag_test_commands.length === 1;
+  }
 
   get stdin_source() {
     if (this.d_test_command!.stdin_source === StdinSource.none) {
@@ -683,28 +743,15 @@ export default class AGCommandSettings extends Vue {
       ? "Text" : "Project file content";
   }
 
-  current_tab_index = 0;
-  d_test_command: AGTestCommand | null = null;
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
-  saving = false;
-  settings_form_is_valid = true;
-
-  readonly is_not_empty = is_not_empty;
-  readonly is_integer = is_integer;
-  readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
-  readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
-  readonly StdinSource = StdinSource;
-  readonly ExpectedOutputSource = ExpectedOutputSource;
-  readonly ExpectedReturnCode = ExpectedReturnCode;
-
-  async created() {
-    this.d_test_command = this.test_command;
-    this.sort_instructor_files();
-  }
-
   async delete_ag_test_command() {
-    await this.d_test_command!.delete();
+    if (this.case_has_exactly_one_command) {
+      console.log("Deleting case");
+      await this.d_test_case!.delete();
+    }
+    else {
+      console.log("Deleting command");
+      await this.d_test_command!.delete();
+    }
   }
 
   sort_instructor_files() {
@@ -721,6 +768,10 @@ export default class AGCommandSettings extends Vue {
       this.saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
       await this.d_test_command!.save();
+      if (this.d_test_case!.ag_test_commands.length === 1) {
+        this.d_test_case!.name = this.d_test_command!.name;
+        await this.d_test_case!.save();
+      }
     }
     finally {
       this.saving = false;

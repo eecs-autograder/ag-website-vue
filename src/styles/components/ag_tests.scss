@@ -1,8 +1,4 @@
-//$active-color: lighten($ocean-blue, 0);
-//$parent-of-active-color: lighten($ocean-blue, 40);
-//$suite-in-active-container-color: lighten($ocean-blue, 45);
-
-$active-color: $ocean-blue;
+$active-color: teal;
 $parent-of-active-color: white;
 $suite-in-active-container-color: white;
 
@@ -72,7 +68,6 @@ input[type=checkbox] {
     font-size: 15px;
     font-weight: 700;
     margin: 0 0 0 0;
-    text-align: right;
 }
 
 // Dropdown related ************************************************************
@@ -124,6 +119,17 @@ input[type=checkbox] {
 }
 
 // Other *******************************************************************
+
+.panel {
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
 
 ::-webkit-scrollbar {
     background: transparent;
@@ -177,6 +183,22 @@ input[type=checkbox] {
 
 .delete-level-button span {
     margin-left: 5px;
+}
+
+.add-level-button {
+    color: lighten(black, 25);
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.active-level {
+    background-color: $active-color;
+    color: white;
+}
+
+.parent-of-active-level {
+    background-color: inherit;
+    color: black;
 }
 
 // Modal Related ***********************************************************

@@ -4,6 +4,7 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
+    AGTestCase, AGTestCaseFeedbackConfig,
     AGTestCommand,
     AGTestCommandFeedbackConfig,
     ExpectedOutputSource,
@@ -25,12 +26,14 @@ beforeAll(() => {
 describe('AGCommandSettings tests', () => {
     let wrapper: Wrapper<AGCommandSettings>;
     let component: AGCommandSettings;
+    let ag_case: AGTestCase;
     let ag_command: AGTestCommand;
     let instructor_file_1: InstructorFile;
     let instructor_file_2: InstructorFile;
     let instructor_file_3: InstructorFile;
     let project: Project;
-    let default_feedback_config: AGTestCommandFeedbackConfig;
+    let default_case_feedback_config: AGTestCaseFeedbackConfig;
+    let default_command_feedback_config: AGTestCommandFeedbackConfig;
     let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
@@ -41,7 +44,7 @@ describe('AGCommandSettings tests', () => {
             })
         });
 
-        default_feedback_config = {
+        default_command_feedback_config = {
             visible: false,
             return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
             stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
@@ -51,6 +54,11 @@ describe('AGCommandSettings tests', () => {
             show_actual_stdout: false,
             show_actual_stderr: false,
             show_whether_timed_out: false
+        };
+
+        default_case_feedback_config = {
+            visible: false,
+            show_individual_commands: false
         };
 
         ag_command = new AGTestCommand({
@@ -79,15 +87,27 @@ describe('AGCommandSettings tests', () => {
             deduction_for_wrong_return_code: 1,
             deduction_for_wrong_stdout: 1,
             deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_feedback_config,
-            first_failed_test_normal_fdbk_config: default_feedback_config,
-            ultimate_submission_fdbk_config: default_feedback_config,
-            past_limit_submission_fdbk_config: default_feedback_config,
-            staff_viewer_fdbk_config: default_feedback_config,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
             time_limit: 1,
             stack_size_limit: 1,
             virtual_memory_limit: 1,
             process_spawn_limit: 1
+        });
+
+        ag_case = new AGTestCase({
+            pk: 1,
+            name: "Case A",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: []
         });
 
         instructor_file_1 = new InstructorFile({
@@ -143,6 +163,7 @@ describe('AGCommandSettings tests', () => {
 
         wrapper = mount(AGCommandSettings, {
             propsData: {
+                test_case: ag_case,
                 test_command: ag_command,
                 project: project
             }
@@ -844,11 +865,11 @@ describe('AGCommandSettings tests', () => {
             deduction_for_wrong_return_code: 1,
             deduction_for_wrong_stdout: 1,
             deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_feedback_config,
-            first_failed_test_normal_fdbk_config: default_feedback_config,
-            ultimate_submission_fdbk_config: default_feedback_config,
-            past_limit_submission_fdbk_config: default_feedback_config,
-            staff_viewer_fdbk_config: default_feedback_config,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
             time_limit: 1,
             stack_size_limit: 2,
             virtual_memory_limit: 1,

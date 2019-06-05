@@ -201,7 +201,7 @@
         <tab>
           <tab-header>
             <div class="tab-heading">
-              Feedback
+              Suite Feedback
             </div>
           </tab-header>
           <template slot="body">
@@ -235,7 +235,9 @@
                 </div>
                 <hr>
                 <div class="modal-body">
-                  <p> This action cannot be reversed! </p>
+                  <p> Are you sure you want to delete the suite Cheat Checking Database?
+                    This will delete all associated test cases and run results.
+                    THIS ACTION CANNOT BE UNDONE. </p>
                   <div id="modal-button-container">
                     <button class="modal-delete-button"
                             :disabled="saving"
