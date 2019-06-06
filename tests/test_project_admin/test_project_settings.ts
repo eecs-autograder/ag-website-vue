@@ -11,9 +11,7 @@ import {
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
-import { max } from "moment";
 import * as sinon from 'sinon';
-import set = Reflect.set;
 
 beforeAll(() => {
     config.logModifiedComponents = false;
