@@ -138,10 +138,10 @@ describe('ProjectSettings tests', () => {
         checkbox.setChecked(true);
         expect(component.d_project.visible_to_students).toEqual(true);
 
-        wrapper.setData({d_project: {visible_to_students: false}});
+        component.d_project.visible_to_students = false;
         expect(checkbox_is_checked(checkbox)).toEqual(false);
 
-        wrapper.setData({d_project: {visible_to_students: true}});
+        component.d_project.visible_to_students = true;
         expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
@@ -157,10 +157,10 @@ describe('ProjectSettings tests', () => {
         checkbox.setChecked(true);
         expect(component.d_project.guests_can_submit).toEqual(true);
 
-        wrapper.setData({d_project: {guests_can_submit: false}});
+        component.d_project.guests_can_submit = false;
         expect(checkbox_is_checked(checkbox)).toEqual(false);
 
-        wrapper.setData({d_project: {guests_can_submit: true}});
+        component.d_project.guests_can_submit = true;
         expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
@@ -176,10 +176,10 @@ describe('ProjectSettings tests', () => {
         checkbox.setChecked(true);
         expect(component.d_project.disallow_student_submissions).toEqual(true);
 
-        wrapper.setData({d_project: {disallow_student_submissions: false}});
+        component.d_project.disallow_student_submissions = false;
         expect(checkbox_is_checked(checkbox)).toEqual(false);
 
-        wrapper.setData({d_project: {disallow_student_submissions: true}});
+        component.d_project.disallow_student_submissions = true;
         expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
@@ -195,15 +195,16 @@ describe('ProjectSettings tests', () => {
         checkbox.setChecked(true);
         expect(component.d_project.disallow_group_registration).toEqual(true);
 
-        wrapper.setData({d_project: {disallow_group_registration: false}});
+        component.d_project.disallow_group_registration = false;
         expect(checkbox_is_checked(checkbox)).toEqual(false);
 
-        wrapper.setData({d_project: {disallow_group_registration: true}});
+        component.d_project.disallow_group_registration = true;
         expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
     test('min and max group size binding', () => {
-        wrapper.setData({d_project: {min_group_size: 4, max_group_size: 5}});
+        component.d_project.min_group_size = 4;
+        component.d_project.max_group_size = 5;
 
         let min_group_size_input = wrapper.find('#min-group-size');
         let max_group_size_input = wrapper.find('#max-group-size');
@@ -236,10 +237,10 @@ describe('ProjectSettings tests', () => {
 
         expect(checkbox_is_checked(publish_grades)).toEqual(true);
 
-        wrapper.setData({d_project: {hide_ultimate_submission_fdbk: true}});
+        component.d_project.hide_ultimate_submission_fdbk = true;
         expect(checkbox_is_checked(publish_grades)).toEqual(false);
 
-        wrapper.setData({d_project: {hide_ultimate_submission_fdbk: false}});
+        component.d_project.hide_ultimate_submission_fdbk = false;
         expect(checkbox_is_checked(publish_grades)).toEqual(true);
     });
 
@@ -298,14 +299,14 @@ describe('ProjectSettings tests', () => {
 
     test('d_project.submission_limit_per_day nullable form input',
          async () => {
-        wrapper.setData({d_project: {submission_limit_per_day: 42}});
+        component.d_project.submission_limit_per_day = 42;
         await component.$nextTick();
         let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
         expect(get_validated_input_text(daily_submission_limit_input)).toEqual('42');
 
         expect(component.settings_form_is_valid).toBe(true);
 
-        wrapper.setData({d_project: {submission_limit_per_day: null}});
+        component.d_project.submission_limit_per_day = null;
         await component.$nextTick();
         expect(get_validated_input_text(daily_submission_limit_input)).toEqual('');
 
@@ -359,7 +360,7 @@ describe('ProjectSettings tests', () => {
         await component.$nextTick();
 
         let time = <Wrapper<TimePicker>> wrapper.find({ref: 'submission_limit_reset_time_picker'});
-        wrapper.setData({d_project: {submission_limit_reset_time: '08:00'}});
+        component.d_project.submission_limit_reset_time = '08:00';
         expect(time.vm.value).toEqual('08:00');
 
         time.vm.go_to_next_minute();
@@ -367,29 +368,80 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Submission limit reset timezone binding', () => {
-        fail();
+        let submission_limit_reset_timezone_input = wrapper.find(
+            '#submission-limit-reset-timezone');
+
+        submission_limit_reset_timezone_input.setValue('US/Mountain');
+        expect(component.d_project.submission_limit_reset_timezone).toEqual('US/Mountain');
+
+        submission_limit_reset_timezone_input.setValue('US/Eastern');
+        expect(component.d_project.submission_limit_reset_timezone).toEqual('US/Eastern');
+
+        component.d_project.submission_limit_reset_timezone = 'UTC';
+        expect(submission_limit_reset_timezone_input.element.value).toEqual('UTC');
+
+        component.d_project.submission_limit_reset_timezone = 'US/Pacific';
+        expect(submission_limit_reset_timezone_input.element.value).toEqual('US/Pacific');
     });
 
-    test('Groups get more submissions binding', () => {
-        fail();
+    test('Groups get more submissions binding', async () => {
+        component.d_project.max_group_size = 2;
+        await component.$nextTick();
+
+        let checkbox = wrapper.find('#groups-combine-daily-submissions');
+        expect(checkbox.is('[disabled]')).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.groups_combine_daily_submissions).toEqual(true);
+
+        checkbox.setChecked(false);
+        expect(component.d_project.groups_combine_daily_submissions).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.groups_combine_daily_submissions).toEqual(true);
+
+        component.d_project.groups_combine_daily_submissions = false;
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        component.d_project.groups_combine_daily_submissions = true;
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
-    test('Groups get more submissions disabled when max group size is 1', () => {
-        fail();
+    test('Groups get more submissions disabled when max group size is 1', async () => {
+        component.d_project.max_group_size = 1;
+        await component.$nextTick();
+
+        let checkbox = wrapper.find('#groups-combine-daily-submissions');
+        expect(checkbox.is('[disabled]')).toEqual(true);
     });
 
     test('Allow late days binding', () => {
-        fail();
+        let checkbox = wrapper.find('#allow-late-days');
+
+        checkbox.setChecked(true);
+        expect(component.d_project.allow_late_days).toEqual(true);
+
+        checkbox.setChecked(false);
+        expect(component.d_project.allow_late_days).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.allow_late_days).toEqual(true);
+
+        component.d_project.allow_late_days = false;
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        component.d_project.allow_late_days = true;
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
     test('d_project.total_submission_limit nullable form input', () => {
-        wrapper.setData({d_project: {total_submission_limit: 42}});
+        component.d_project.total_submission_limit = 42;
         let daily_submission_limit_input = wrapper.find('#total-submission-limit');
         expect(get_validated_input_text(daily_submission_limit_input)).toEqual('42');
 
         expect(component.settings_form_is_valid).toBe(true);
 
-        wrapper.setData({d_project: {total_submission_limit: null}});
+        component.d_project.total_submission_limit = null;
         expect(get_validated_input_text(daily_submission_limit_input)).toEqual('');
 
         expect(component.settings_form_is_valid).toBe(true);

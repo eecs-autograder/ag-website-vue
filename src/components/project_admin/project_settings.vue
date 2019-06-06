@@ -144,21 +144,18 @@
           <legend> Groups </legend>
 
           <div class="project-input-container">
-            <div class="min-group-size-container">
-              <div class="side-by-side">
-                <label class="text-label"> Min group size </label>
-                <validated-input id="min-group-size"
-                                 v-model="d_project.min_group_size"
-                                 :validators="[is_integer, is_not_empty, is_positive]"
-                                 :from_string_fn="string_to_num"
+            <div class="group-size-container">
+              <label class="text-label"> Min group size </label>
+              <validated-input id="min-group-size"
+                               v-model="d_project.min_group_size"
+                               :validators="[is_integer, is_not_empty, is_positive]"
+                               :from_string_fn="string_to_num"
 
-                                 input_style="width: 80px;">
-                </validated-input>
-              </div>
+                               input_style="width: 80px;">
+              </validated-input>
             </div>
 
-            <div class="max-group-size-container">
-              <div class="side-by-side">
+            <div class="group-size-container">
               <label class="text-label"> Max group size </label>
               <i class="fas fa-question-circle input-tooltip">
                 <tooltip width="large" placement="right">
@@ -173,7 +170,6 @@
 
                                input_style="width: 80px;">
               </validated-input>
-              </div>
             </div>
           </div>
 
@@ -288,7 +284,8 @@
           <div class="checkbox-input-container">
             <input id="groups-combine-daily-submissions"
                    type="checkbox"
-                   v-model="d_project.groups_combine_daily_submissions"/>
+                   v-model="d_project.groups_combine_daily_submissions"
+                   :disabled="d_project.max_group_size === 1"/>
             <label class="checkbox-label"
                    for="groups-combine-daily-submissions">
               Groups get more submissions than individuals
@@ -541,15 +538,11 @@ legend {
   padding: 10px 12px 22px 12px;
 }
 
-.min-group-size-container, .max-group-size-container {
+.group-size-container {
   display: inline-block;
+  min-width: 150px;
   max-width: 250px;
   vertical-align: top;
-}
-
-.side-by-side {
-  display: inline-block;
-  max-width: 80%;
 }
 
 .soft-deadline, .hard-deadline {
