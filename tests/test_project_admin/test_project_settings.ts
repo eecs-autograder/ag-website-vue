@@ -1,11 +1,19 @@
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
+import TimePicker from "@/components/datetime/time_picker.vue";
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import {
+    checkbox_is_checked,
+    get_validated_input_text,
+    set_validated_input_text
+} from "@/tests/utils";
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
+import { max } from "moment";
 import * as sinon from 'sinon';
+import set = Reflect.set;
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -53,132 +61,6 @@ describe('ProjectSettings tests', () => {
 
     afterEach(() => {
         sinon.restore();
-    });
-
-    test('Data members assigned correct values in created() - all are null', async () => {
-        wrapper = mount(ProjectSettings, {
-            propsData: {
-                project: project
-            }
-        });
-        component = wrapper.vm;
-
-        expect(component.d_project).toEqual(project);
-        expect(component.d_project.submission_limit_per_day).toBeNull();
-        expect(component.d_submission_limit_per_day).toEqual("");
-    });
-
-    test('Data members assigned correct values in created() - all are NOT null', async () => {
-        project.submission_limit_per_day = 2;
-
-        wrapper = mount(ProjectSettings, {
-            propsData: {
-                project: project
-            }
-        });
-        component = wrapper.vm;
-
-        expect(component.d_project).toEqual(project);
-        expect(component.d_project.submission_limit_per_day).toEqual(2);
-        expect(component.d_submission_limit_per_day).toEqual("2");
-    });
-
-    test('v-model form bindings', () => {
-        fail();
-    });
-
-    test('When submission_limit_per_day is non-null, the allow_submissions_past_limit input is ' +
-         'enabled ',
-         async () => {
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(true);
-
-        let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "7";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.d_submission_limit_per_day).not.toBeNull();
-        expect(component.submission_limit_per_day_exists).toBe(true);
-        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(false);
-    });
-
-    test('submission_policy_selected', async () => {
-        expect(component.d_project.ultimate_submission_policy).toEqual(
-            project.ultimate_submission_policy
-        );
-        expect(component.submission_policy_selected).toEqual(
-            component.final_graded_submission_policy_options[2].label
-        );
-
-        component.d_project.ultimate_submission_policy
-            = UltimateSubmissionPolicy.best_with_normal_fdbk;
-        await component.$nextTick();
-        expect(component.submission_policy_selected).toEqual(
-            component.final_graded_submission_policy_options[1].label
-        );
-
-        component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.most_recent;
-        await component.$nextTick();
-        expect(component.submission_policy_selected).toEqual(
-            component.final_graded_submission_policy_options[0].label
-        );
-    });
-
-    test('d_project.submission_limit_per_day is assigned a non null value in ' +
-         'save_project_settings() when the user has entered a numeric input',
-         async () => {
-        let save_settings_stub = sinon.stub(component.d_project, 'save');
-
-        let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "7";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(true);
-        expect(component.settings_form_is_valid).toBe(true);
-
-        wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
-        await component.$nextTick();
-
-        expect(save_settings_stub.firstCall.thisValue.submission_limit_per_day).toEqual(7);
-    });
-
-    test('d_project.submission_limit_per_day is assigned a null value in ' +
-         'save_project_settings() when the user has entered a non-numeric input',
-         async () => {
-        let save_settings_stub = sinon.stub(component.d_project, 'save');
-
-        let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "blah";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-        expect(component.settings_form_is_valid).toBe(true);
-
-        wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
-        await component.$nextTick();
-
-        expect(save_settings_stub.firstCall.thisValue.submission_limit_per_day).toBeNull();
-    });
-
-    test('Clicking submission limit reset time toggles time picker visibility', async () => {
-        let time = wrapper.find({ref: 'submission_limit_reset_time'});
-
-        expect(component.d_show_reset_time_picker).toEqual(false);
-        expect(wrapper.find({ref: 'submission_limit_reset_time_picker'}).exists()).toEqual(false);
-
-        time.trigger('click');
-        await component.$nextTick();
-        expect(component.d_show_reset_time_picker).toEqual(true);
-        expect(wrapper.find({ref: 'submission_limit_reset_time_picker'}).exists()).toEqual(true);
-
-        time.trigger('click');
-        await component.$nextTick();
-        expect(component.d_show_reset_time_picker).toEqual(false);
-        expect(wrapper.find({ref: 'submission_limit_reset_time_picker'}).exists()).toEqual(false);
     });
 
     test('soft_closing_time clear button sets field to null', async () => {
@@ -242,6 +124,285 @@ describe('ProjectSettings tests', () => {
         time.trigger('click');
         await component.$nextTick();
         expect(picker.vm.is_visible).toEqual(false);
+    });
+
+    test('visible_to_students binding', () => {
+        let checkbox = wrapper.find('#visible-to-students');
+
+        checkbox.setChecked(true);
+        expect(component.d_project.visible_to_students).toEqual(true);
+
+        checkbox.setChecked(false);
+        expect(component.d_project.visible_to_students).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.visible_to_students).toEqual(true);
+
+        wrapper.setData({d_project: {visible_to_students: false}});
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.setData({d_project: {visible_to_students: true}});
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+    });
+
+    test('guests_can_submit binding', () => {
+        let checkbox = wrapper.find('#guests-can-submit');
+
+        checkbox.setChecked(true);
+        expect(component.d_project.guests_can_submit).toEqual(true);
+
+        checkbox.setChecked(false);
+        expect(component.d_project.guests_can_submit).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.guests_can_submit).toEqual(true);
+
+        wrapper.setData({d_project: {guests_can_submit: false}});
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.setData({d_project: {guests_can_submit: true}});
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+    });
+
+    test('disallow_student_submissions binding', () => {
+        let checkbox = wrapper.find('#disallow-student-submissions');
+
+        checkbox.setChecked(true);
+        expect(component.d_project.disallow_student_submissions).toEqual(true);
+
+        checkbox.setChecked(false);
+        expect(component.d_project.disallow_student_submissions).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.disallow_student_submissions).toEqual(true);
+
+        wrapper.setData({d_project: {disallow_student_submissions: false}});
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.setData({d_project: {disallow_student_submissions: true}});
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+    });
+
+    test('disallow_group_registration binding', () => {
+        let checkbox = wrapper.find('#disallow-group-registration');
+
+        checkbox.setChecked(true);
+        expect(component.d_project.disallow_group_registration).toEqual(true);
+
+        checkbox.setChecked(false);
+        expect(component.d_project.disallow_group_registration).toEqual(false);
+
+        checkbox.setChecked(true);
+        expect(component.d_project.disallow_group_registration).toEqual(true);
+
+        wrapper.setData({d_project: {disallow_group_registration: false}});
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.setData({d_project: {disallow_group_registration: true}});
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+    });
+
+    test('min and max group size binding', () => {
+        wrapper.setData({d_project: {min_group_size: 4, max_group_size: 5}});
+
+        let min_group_size_input = wrapper.find('#min-group-size');
+        let max_group_size_input = wrapper.find('#max-group-size');
+
+        expect(get_validated_input_text(min_group_size_input)).toEqual('4');
+        expect(get_validated_input_text(max_group_size_input)).toEqual('5');
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        set_validated_input_text(min_group_size_input, '1');
+        set_validated_input_text(max_group_size_input, '3');
+
+        expect(component.d_project.min_group_size).toEqual(1);
+        expect(component.d_project.max_group_size).toEqual(3);
+
+        expect(component.settings_form_is_valid).toBe(true);
+    });
+
+    test('Publish final grades binding', () => {
+        let publish_grades = wrapper.find('#publish-final-grades');
+
+        publish_grades.setChecked(true);
+        expect(component.d_project.hide_ultimate_submission_fdbk).toEqual(false);
+
+        publish_grades.setChecked(false);
+        expect(component.d_project.hide_ultimate_submission_fdbk).toEqual(true);
+
+        publish_grades.setChecked(true);
+        expect(component.d_project.hide_ultimate_submission_fdbk).toEqual(false);
+
+        expect(checkbox_is_checked(publish_grades)).toEqual(true);
+
+        wrapper.setData({d_project: {hide_ultimate_submission_fdbk: true}});
+        expect(checkbox_is_checked(publish_grades)).toEqual(false);
+
+        wrapper.setData({d_project: {hide_ultimate_submission_fdbk: false}});
+        expect(checkbox_is_checked(publish_grades)).toEqual(true);
+    });
+
+    test('ultimate_submission_policy binding', async () => {
+        let ultimate_submission_policy_input = wrapper.find('#ultimate-submission-policy');
+
+        ultimate_submission_policy_input.setValue(UltimateSubmissionPolicy.most_recent);
+        expect(component.d_project.ultimate_submission_policy).toEqual(
+            UltimateSubmissionPolicy.most_recent
+        );
+
+        ultimate_submission_policy_input.setValue(UltimateSubmissionPolicy.best);
+        expect(component.d_project.ultimate_submission_policy).toEqual(
+            UltimateSubmissionPolicy.best
+        );
+
+        component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.most_recent;
+        expect(ultimate_submission_policy_input.element.value).toEqual(
+            UltimateSubmissionPolicy.most_recent
+        );
+
+        component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.best;
+        expect(ultimate_submission_policy_input.element.value).toEqual(
+            UltimateSubmissionPolicy.best
+        );
+    });
+
+    test('Best submission with normal feedback disabled, only visible if in use', async () => {
+        component.d_project.ultimate_submission_policy
+            = UltimateSubmissionPolicy.best_with_normal_fdbk;
+        await component.$nextTick();
+
+        let ultimate_submission_policy_input = wrapper.find('#ultimate-submission-policy');
+
+        expect(ultimate_submission_policy_input.findAll('option').at(2).is('[disabled]')).toEqual(
+            true
+        );
+        expect(ultimate_submission_policy_input.element.value).toEqual(
+            UltimateSubmissionPolicy.best_with_normal_fdbk
+        );
+
+        component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.best;
+        await component.$nextTick();
+
+        let option_tags = wrapper.find('#ultimate-submission-policy').findAll('option');
+        expect(option_tags.length).toEqual(2);
+
+        expect(option_tags.at(0).element.value).toEqual(
+            UltimateSubmissionPolicy.most_recent
+        );
+
+        expect(option_tags.at(1).element.value).toEqual(
+            UltimateSubmissionPolicy.best
+        );
+    });
+
+    test('d_project.submission_limit_per_day nullable form input',
+         async () => {
+        wrapper.setData({d_project: {submission_limit_per_day: 42}});
+        await component.$nextTick();
+        let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
+        expect(get_validated_input_text(daily_submission_limit_input)).toEqual('42');
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        wrapper.setData({d_project: {submission_limit_per_day: null}});
+        await component.$nextTick();
+        expect(get_validated_input_text(daily_submission_limit_input)).toEqual('');
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        set_validated_input_text(daily_submission_limit_input, '7');
+        await component.$nextTick();
+        expect(component.d_project.submission_limit_per_day).toEqual(7);
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        set_validated_input_text(daily_submission_limit_input, '');
+        await component.$nextTick();
+        expect(component.d_project.submission_limit_per_day).toEqual(null);
+
+        expect(component.settings_form_is_valid).toBe(true);
+    });
+
+    test('allow_submissions_past_limit checkbox disabled when submission_limit_per_day is null',
+         async () => {
+        expect(component.d_project.submission_limit_per_day).toBeNull();
+        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(true);
+
+        set_validated_input_text(wrapper.find('#submission-limit-per-day'), '7');
+
+        await component.$nextTick();
+
+        expect(component.d_project.submission_limit_per_day).not.toBeNull();
+        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(false);
+    });
+
+    test('Clicking submission limit reset time toggles time picker visibility', async () => {
+        let time = wrapper.find({ref: 'submission_limit_reset_time'});
+
+        expect(component.d_show_reset_time_picker).toEqual(false);
+        expect(wrapper.find({ref: 'submission_limit_reset_time_picker'}).exists()).toEqual(false);
+
+        time.trigger('click');
+        await component.$nextTick();
+        expect(component.d_show_reset_time_picker).toEqual(true);
+        expect(wrapper.find({ref: 'submission_limit_reset_time_picker'}).exists()).toEqual(true);
+
+        time.trigger('click');
+        await component.$nextTick();
+        expect(component.d_show_reset_time_picker).toEqual(false);
+        expect(wrapper.find({ref: 'submission_limit_reset_time_picker'}).exists()).toEqual(false);
+    });
+
+    test('Submission limit reset time binding', async () => {
+        component.d_show_reset_time_picker = true;
+        await component.$nextTick();
+
+        let time = <Wrapper<TimePicker>> wrapper.find({ref: 'submission_limit_reset_time_picker'});
+        wrapper.setData({d_project: {submission_limit_reset_time: '08:00'}});
+        expect(time.vm.value).toEqual('08:00');
+
+        time.vm.go_to_next_minute();
+        expect(component.d_project.submission_limit_reset_time).toEqual('08:01');
+    });
+
+    test('Submission limit reset timezone binding', () => {
+        fail();
+    });
+
+    test('Groups get more submissions binding', () => {
+        fail();
+    });
+
+    test('Groups get more submissions disabled when max group size is 1', () => {
+        fail();
+    });
+
+    test('Allow late days binding', () => {
+        fail();
+    });
+
+    test('d_project.total_submission_limit nullable form input', () => {
+        wrapper.setData({d_project: {total_submission_limit: 42}});
+        let daily_submission_limit_input = wrapper.find('#total-submission-limit');
+        expect(get_validated_input_text(daily_submission_limit_input)).toEqual('42');
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        wrapper.setData({d_project: {total_submission_limit: null}});
+        expect(get_validated_input_text(daily_submission_limit_input)).toEqual('');
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        set_validated_input_text(daily_submission_limit_input, '7');
+        expect(component.d_project.total_submission_limit).toEqual(7);
+
+        expect(component.settings_form_is_valid).toBe(true);
+
+        set_validated_input_text(daily_submission_limit_input, '');
+        expect(component.d_project.total_submission_limit).toEqual(null);
+
+        expect(component.settings_form_is_valid).toBe(true);
     });
 
     test('Successful attempt to save project settings', async () => {
@@ -367,130 +528,71 @@ describe('Invalid input tests', () => {
         expect(project_name_validator.is_valid).toBe(false);
     });
 
-    test('min_group_size is blank or not a number', async () => {
-        let min_num_matches_input = wrapper.find({ref: "min_group_size_input"}).find('#input');
-        let min_num_matches_validator = <ValidatedInput> wrapper.find(
-            {ref: "min_group_size_input"}
-            ).vm;
+    test('min_group_size is blank or not a number', () => {
+        let min_num_matches_input = wrapper.find('#min-group-size');
 
-        expect(min_num_matches_validator.is_valid).toBe(true);
+        expect(min_num_matches_input.vm.is_valid).toBe(true);
 
-        (<HTMLInputElement> min_num_matches_input.element).value = "   ";
-        min_num_matches_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(min_num_matches_input, '    ');
+        expect(min_num_matches_input.vm.is_valid).toBe(false);
 
-        expect(min_num_matches_validator.is_valid).toBe(false);
-
-        (<HTMLInputElement> min_num_matches_input.element).value = "Winterfell";
-        min_num_matches_input.trigger('input');
-        await component.$nextTick();
-
-        expect(min_num_matches_validator.is_valid).toBe(false);
+        set_validated_input_text(min_num_matches_input, 'Winterfell');
+        expect(min_num_matches_input.vm.is_valid).toBe(false);
     });
 
-    test('min_group_size is negative', async () => {
-        let min_num_matches_input = wrapper.find(
-            {ref: "min_group_size_input"}
-        ).find('#input');
-        let min_num_matches_validator = <ValidatedInput> wrapper.find(
-            {ref: "min_group_size_input"}
-        ).vm;
+    test('min_group_size is zero or negative', () => {
+        let min_num_matches_input = wrapper.find('#min-group-size');
+        expect(min_num_matches_input.vm.is_valid).toBe(true);
 
-        expect(min_num_matches_validator.is_valid).toBe(true);
+        set_validated_input_text(min_num_matches_input, '-8');
+        expect(min_num_matches_input.vm.is_valid).toBe(false);
 
-        (<HTMLInputElement> min_num_matches_input.element).value = "-8";
-        min_num_matches_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(min_num_matches_input, '1');
+        expect(min_num_matches_input.vm.is_valid).toBe(true);
 
-        expect(min_num_matches_validator.is_valid).toBe(false);
+        set_validated_input_text(min_num_matches_input, '0');
+        expect(min_num_matches_input.vm.is_valid).toBe(false);
     });
 
-    test('max_group_size is blank or not a number', async () => {
-        let max_num_matches_input = wrapper.find({ref: "max_group_size_input"}).find('#input');
-        let max_num_matches_validator = <ValidatedInput> wrapper.find(
-            {ref: "max_group_size_input"}
-        ).vm;
+    test('max_group_size is blank or not a number', () => {
+        let max_num_matches_input = wrapper.find('#max-group-size');
 
-        expect(max_num_matches_validator.is_valid).toBe(true);
+        expect(max_num_matches_input.vm.is_valid).toBe(true);
 
-        (<HTMLInputElement> max_num_matches_input.element).value = "   ";
-        max_num_matches_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(max_num_matches_input, '    ');
+        expect(max_num_matches_input.vm.is_valid).toBe(false);
 
-        expect(max_num_matches_validator.is_valid).toBe(false);
-
-        (<HTMLInputElement> max_num_matches_input.element).value = "Horn Hill";
-        max_num_matches_input.trigger('input');
-        await component.$nextTick();
-
-        expect(max_num_matches_validator.is_valid).toBe(false);
+        set_validated_input_text(max_num_matches_input, 'Waluigi');
+        expect(max_num_matches_input.vm.is_valid).toBe(false);
     });
 
-    test('max_group_size is negative', async () => {
-        let max_num_matches_input = wrapper.find(
-            {ref: "max_group_size_input"}
-        ).find('#input');
-        let max_num_matches_validator = <ValidatedInput> wrapper.find(
-            {ref: "max_group_size_input"}
-        ).vm;
+    test('max_group_size is zero or negative', async () => {
+        let max_num_matches_input = wrapper.find('#max-group-size');
+        expect(max_num_matches_input.vm.is_valid).toBe(true);
 
-        expect(max_num_matches_validator.is_valid).toBe(true);
+        set_validated_input_text(max_num_matches_input, '-8');
+        expect(max_num_matches_input.vm.is_valid).toBe(false);
 
-        (<HTMLInputElement> max_num_matches_input.element).value = "-8";
-        max_num_matches_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(max_num_matches_input, '1');
+        expect(max_num_matches_input.vm.is_valid).toBe(true);
 
-        expect(max_num_matches_validator.is_valid).toBe(false);
+        set_validated_input_text(max_num_matches_input, '0');
+        expect(max_num_matches_input.vm.is_valid).toBe(false);
     });
 
-    test('Submission_limit_per_day_exists only returns true when the input only consists ' +
-         'of numbers',
-         async () => {
+    test('submission_limit_per_day less than 1 or not a number', async () => {
         let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
+        set_validated_input_text(daily_submission_limit_input, '');
+        expect(daily_submission_limit_input.vm.is_valid).toEqual(true);
 
-        expect(component.submission_limit_per_day_exists).toBe(false);
+        set_validated_input_text(daily_submission_limit_input, '-3');
+        expect(daily_submission_limit_input.vm.is_valid).toEqual(false);
 
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "2";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(daily_submission_limit_input, '0');
+        expect(daily_submission_limit_input.vm.is_valid).toEqual(false);
 
-        expect(component.submission_limit_per_day_exists).toBe(true);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "2abc";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "abc2";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "4abc5";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "  ";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = ".?4";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(false);
-
-        (<HTMLInputElement> daily_submission_limit_input.element).value = "100";
-        daily_submission_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.submission_limit_per_day_exists).toBe(true);
+        set_validated_input_text(daily_submission_limit_input, '1');
+        expect(daily_submission_limit_input.vm.is_valid).toEqual(true);
     });
 
     test('num_bonus_submissions is empty or not a number', async () => {

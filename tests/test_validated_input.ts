@@ -1,7 +1,7 @@
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { config, mount } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { sleep } from './utils';
+import { set_validated_input_text, sleep } from './utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -483,5 +483,44 @@ describe('ValidatedInput.vue', () => {
         expect(
             (<HTMLInputElement> wrapper.find('#input').element).value
         ).toBe("invalid value here!");
+    });
+});
+
+
+function is_number_or_null(value: string): ValidatorResponse {
+    return {
+        is_valid: value === "" || !isNaN(Number(value)),
+        error_msg: "Invalid number!"
+    };
+}
+
+describe('Custom from_string_fn and to_string_fn allow null tests', () => {
+    let wrapper: Wrapper<ValidatedInput>;
+
+    beforeEach(() => {
+        wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: '42',
+                validators: [is_number_or_null],
+                from_string_fn: (val: string) => val === '' ? null : parseInt(val, 10),
+                to_string_fn: (val: number | null) => val === null ? '' : val.toString()
+            }
+        });
+
+        expect(wrapper.vm.is_valid).toEqual(true);
+    });
+
+    test('Empty string converted to null', () => {
+        set_validated_input_text(wrapper, '');
+        expect(wrapper.vm.is_valid).toEqual(true);
+        expect(wrapper.emitted('input').length).toEqual(1);
+        expect(wrapper.emitted('input')[0][0]).toBeNull();
+    });
+
+    test('null converted to empty string', () => {
+        expect(wrapper.find('#input').element.value).toEqual('42');
+        wrapper.setProps({value: null});
+        expect(wrapper.vm.is_valid).toEqual(true);
+        expect(wrapper.text()).toEqual('');
     });
 });

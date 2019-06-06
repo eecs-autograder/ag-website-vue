@@ -15,7 +15,6 @@
         </validated-input>
       </div>
 
-
       <div>
         <fieldset>
           <legend> Project Deadline </legend>
@@ -78,22 +77,6 @@
       <div class="section-container">
         <fieldset>
           <legend> Access </legend>
-          <div class="checkbox-input-container">
-            <input id="publish-final-grades"
-                   type="checkbox"
-                   :value="!d_project.hide_ultimate_submission_fdbk"
-                   @change="d_project.hide_ultimate_submission_fdbk = !$event"/>
-            <label class="checkbox-label"
-                   for="publish-final-grades">
-              Publish final grades
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="medium" placement="right">
-                  When the hard deadline has passed and scores are published,
-                  students will see their final grade for the project on the submit page.
-                </tooltip>
-              </i>
-            </label>
-          </div>
 
           <div class="checkbox-input-container">
             <input id="visible-to-students"
@@ -101,7 +84,7 @@
                    v-model="d_project.visible_to_students"/>
             <label class="checkbox-label"
                    for="visible-to-students">
-              Visible to students
+              Publish project
             </label>
           </div>
 
@@ -127,7 +110,7 @@
                    v-model="d_project.disallow_student_submissions"/>
             <label class="checkbox-label"
                    for="disallow-student-submissions">
-              Disallow student submissions
+              Disable submitting
             </label>
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="large" placement="right">
@@ -136,19 +119,39 @@
               </tooltip>
             </i>
           </div>
+
+          <div class="checkbox-input-container">
+            <input id="publish-final-grades"
+                   type="checkbox"
+                   :checked="!d_project.hide_ultimate_submission_fdbk"
+                   @change="d_project.hide_ultimate_submission_fdbk = !$event.target.checked"/>
+            <label class="checkbox-label"
+                   for="publish-final-grades">
+              Publish final grades
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="medium" placement="right">
+                  When the hard deadline has passed and scores are published,
+                  students will see their final grade for the project on the submit page.
+                </tooltip>
+              </i>
+            </label>
+          </div>
         </fieldset>
       </div>
 
       <div class="section-container">
         <fieldset>
-          <legend> Group Size </legend>
+          <legend> Groups </legend>
+
           <div class="project-input-container">
             <div class="min-group-size-container">
               <div class="side-by-side">
                 <label class="text-label"> Min group size </label>
-                <validated-input ref="min_group_size_input"
+                <validated-input id="min-group-size"
                                  v-model="d_project.min_group_size"
-                                 :validators="[is_integer, is_not_empty, is_non_negative]"
+                                 :validators="[is_integer, is_not_empty, is_positive]"
+                                 :from_string_fn="string_to_num"
+
                                  input_style="width: 80px;">
                 </validated-input>
               </div>
@@ -163,13 +166,33 @@
                   members the first time they visit the project page.
                 </tooltip>
               </i>
-              <validated-input ref="max_group_size_input"
+              <validated-input id="max-group-size"
                                v-model="d_project.max_group_size"
-                               :validators="[is_integer, is_not_empty, is_non_negative]"
+                               :validators="[is_integer, is_not_empty, is_positive]"
+                               :from_string_fn="string_to_num"
+
                                input_style="width: 80px;">
               </validated-input>
               </div>
             </div>
+          </div>
+
+          <div class="checkbox-input-container">
+            <input id="disallow-group-registration"
+                   type="checkbox"
+                   v-model="d_project.disallow_group_registration"/>
+            <label class="checkbox-label"
+                   for="disallow-group-registration">
+              Disable group registration
+            </label>
+            <i class="fas fa-question-circle input-tooltip">
+              <tooltip width="large" placement="right">
+                Temporarily prevent students registering new groups.
+                Groups already registered will be unaffected. <br>
+                NOTE: This will effectively prevent unregistered students
+                from submitting.
+              </tooltip>
+            </i>
           </div>
         </fieldset>
       </div>
@@ -178,30 +201,30 @@
         <fieldset>
           <legend> Grading Policy </legend>
           <div class="project-input-container">
-            <label class="text-label"> Final graded submission policy </label>
+            <label class="text-label"
+                   for="ultimate-submission-policy"> Final graded submission policy </label>
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="large" placement="right">
                 Use students' most recent or best submission for their final score.
               </tooltip>
             </i>
             <div>
-              <dropdown ref="dropdown_final_graded_submission_policy"
-                        :items="final_graded_submission_policy_options"
-                        :initial_highlighted_index="0"
-                        @update_item_selected="d_project.ultimate_submission_policy
-                                               = $event.policy">
-                <template slot="header">
-                  <div tabindex="1" class="dropdown-header-wrapper">
-                    <div id="final-graded-submission-policy" class="dropdown-header">
-                      {{submission_policy_selected}}
-                      <i class="fas fa-caret-down dropdown-caret"></i>
-                    </div>
-                  </div>
-                </template>
-                <span slot-scope="{item}">
-                  <span class="submission-policy">{{item.label}}</span>
-                </span>
-              </dropdown>
+              <select id="ultimate-submission-policy"
+                      v-model="d_project.ultimate_submission_policy"
+                      class="select">
+                <option :value="UltimateSubmissionPolicy.most_recent">
+                  Most recent submission
+                </option>
+                <option :value="UltimateSubmissionPolicy.best">
+                  Best score
+                </option>
+                <option disabled
+                        v-if="d_project.ultimate_submission_policy
+                                === UltimateSubmissionPolicy.best_with_normal_fdbk"
+                        :value="UltimateSubmissionPolicy.best_with_normal_fdbk">
+                  Best score using Normal feedback (deprecated)
+                </option>
+              </select>
             </div>
           </div>
         </fieldset>
@@ -211,24 +234,28 @@
         <fieldset>
           <legend> Submission Limits </legend>
           <div class="project-input-container">
-            <label class="text-label"> Submissions per day </label>
+              <label class="text-label"> Submissions per day </label>
+              <validated-input id="submission-limit-per-day"
 
-            <div class="horizontal-flex">
-              <input id="submission-limit-per-day"
-                     class="project-settings-input"
-                     type="number"
-                     min="1"
-                     v-model="d_submission_limit_per_day"/>
+                               v-model="d_project.submission_limit_per_day"
 
-              <input id="allow-submissions-past-limit"
-                     type="checkbox"
-                     :disabled="!submission_limit_per_day_exists"
-                     v-model="d_project.allow_submissions_past_limit"/>
-              <label class="checkbox-label"
-                     for="allow-submissions-past-limit">
-                Allow submissions past limit
-              </label>
-            </div>
+                               :validators="[is_positive_int_or_empty_str]"
+                               :to_string_fn="(num) => num === null ? '' : num.toString()"
+                               :from_string_fn="(val) => val.trim() === '' ? null : Number(val)"
+
+                               input_style="width: 80px;">
+              </validated-input>
+
+          </div>
+          <div class="checkbox-input-container">
+            <input id="allow-submissions-past-limit"
+                   type="checkbox"
+                   :disabled="d_project.submission_limit_per_day === null"
+                   v-model="d_project.allow_submissions_past_limit"/>
+            <label class="checkbox-label"
+                   for="allow-submissions-past-limit">
+              Allow submissions past limit
+            </label>
           </div>
 
           <div class="project-input-container">
@@ -244,22 +271,11 @@
                 </div>
 
                 <div class="timezone">
-                  <dropdown ref="dropdown_timezone"
-                            :items="timezones"
-                            @update_item_selected="
-                                d_project.submission_limit_reset_timezone = $event">
-                    <template slot="header">
-                      <div tabindex="1" class="dropdown-header-wrapper">
-                        <div id="timezone-dropdown" class="dropdown-header">
-                          {{d_project.submission_limit_reset_timezone}}
-                          <i class="fas fa-caret-down dropdown-caret"></i>
-                        </div>
-                      </div>
-                    </template>
-                    <span slot-scope="{item}">
-                      <span class="submission-policy">{{item}}</span>
-                    </span>
-                  </dropdown>
+                  <select id="submission-limit-reset-timezone"
+                          class="select"
+                          v-model="d_project.submission_limit_reset_timezone">
+                    <option v-for="timezone of timezones" :value="timezone">{{timezone}}</option>
+                  </select>
                 </div>
               </div>
 
@@ -320,12 +336,17 @@
                 A hard limit on how many times students can submit ever.
               </tooltip>
             </i>
-            <input ref="total_submissions_input"
-                   id="total-submission-limit"
-                   class="project-settings-input"
-                   type="number"
-                   min="1"
-                   v-model="d_project.total_submission_limit"/>
+            <validated-input ref="total_submissions_input"
+                             id="total-submission-limit"
+
+                             v-model="d_project.total_submission_limit"
+
+                             :validators="[is_positive_int_or_empty_str]"
+                             :to_string_fn="(num) => num === null ? '' : num.toString()"
+                             :from_string_fn="(val) => val.trim() === '' ? null : Number(val)"
+
+                             input_style="width: 80px;">
+            </validated-input>
           </div>
         </fieldset>
       </div>
@@ -354,7 +375,7 @@ import Dropdown from '@/components/dropdown.vue';
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
 import { deep_copy, format_datetime, format_time, handle_api_errors_async } from "@/utils";
 import {
@@ -362,6 +383,7 @@ import {
   is_non_negative,
   is_not_empty,
   is_number,
+  make_min_value_validator,
   string_to_num
 } from '@/validators';
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
@@ -389,22 +411,7 @@ export default class ProjectSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  final_graded_submission_policy_options: UltimateSubmissionPolicyOption[] = [
-    {
-      label: "Most recent submission",
-      policy: UltimateSubmissionPolicy.most_recent
-    },
-    {
-      label: "Best score using Normal feedback",
-      policy: UltimateSubmissionPolicy.best_with_normal_fdbk
-    },
-    {
-      label: "Best score",
-      policy: UltimateSubmissionPolicy.best
-    }
-  ];
-
-  timezones = [
+  readonly timezones: ReadonlyArray<string> = [
     'US/Central',
     'US/Eastern',
     'US/Mountain',
@@ -416,7 +423,6 @@ export default class ProjectSettings extends Vue {
   d_saving = false;
   settings_form_is_valid = true;
 
-  d_submission_limit_per_day = '';
   d_show_reset_time_picker = false;
 
   readonly is_non_negative = is_non_negative;
@@ -424,23 +430,13 @@ export default class ProjectSettings extends Vue {
   readonly is_number = is_number;
   readonly is_integer = is_integer;
   readonly string_to_num = string_to_num;
+  readonly is_positive_int_or_empty_str = is_positive_int_or_empty_str;
+  readonly is_positive = make_min_value_validator(1);
+
+  readonly UltimateSubmissionPolicy = UltimateSubmissionPolicy;
 
   async created() {
     this.d_project = deep_copy(this.project, Project);
-    if (this.d_project.submission_limit_per_day !== null) {
-      this.d_submission_limit_per_day = this.d_project.submission_limit_per_day.toString();
-    }
-  }
-
-  get submission_policy_selected() {
-    let index = this.final_graded_submission_policy_options.findIndex((policy_option) =>
-      policy_option.policy === this.d_project.ultimate_submission_policy
-    );
-    return this.final_graded_submission_policy_options[index].label;
-  }
-
-  get submission_limit_per_day_exists() {
-    return this.d_submission_limit_per_day.toString().match('^[0-9]+$') !== null;
   }
 
   @handle_api_errors_async(handle_save_project_settings_error)
@@ -448,8 +444,6 @@ export default class ProjectSettings extends Vue {
     try {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
-      this.d_project.submission_limit_per_day = this.submission_limit_per_day_exists
-                                                ? Number(this.d_submission_limit_per_day) : null;
 
       await this.d_project!.save();
     }
@@ -469,6 +463,15 @@ export default class ProjectSettings extends Vue {
 
 export function handle_save_project_settings_error(component: ProjectSettings, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
+
+function is_positive_int_or_empty_str(value: string): ValidatorResponse {
+  value = value.trim();
+  if (value === '') {
+    return {is_valid: true, error_msg: ''};
+  }
+
+  return make_min_value_validator(1)(value);
 }
 
 function make_empty_project(): Project {
@@ -491,7 +494,7 @@ function make_empty_project(): Project {
     submission_limit_reset_time: '12:00',
     submission_limit_reset_timezone: 'UTC',
     num_bonus_submissions: 0,
-    total_submission_limit: 0,
+    total_submission_limit: null,
     allow_late_days: false,
     ultimate_submission_policy: UltimateSubmissionPolicy.most_recent,
     hide_ultimate_submission_fdbk: false,
@@ -563,10 +566,6 @@ legend {
   padding-bottom: 10px;
 }
 
-#allow-submissions-past-limit {
-  margin-left: 20px;
-}
-
 .footer {
   padding: 0 12px 22px 15px;
 }
@@ -621,38 +620,10 @@ legend {
 input[type=checkbox]:disabled + label {
   color: $stormy-gray-dark;
 }
-//input[type=checkbox] + label::before {
-//  border-radius: 2px;
-//  color: hsl(210, 20%, 86%);
-//  content: '\f0c8';
-//  display: inline-block;
-//  font-family: "Font Awesome 5 Free";
-//  font-size: 18px;
-//  height: 18px;
-//  margin-right: 10px;
-//  width: 12px;
-//}
-//
-//input[type=checkbox]:checked + label::before {
-//  background: transparent;
-//  content: '\f14a';
-//  color: $ocean-blue;
-//  font-family: "Font Awesome 5 Free";
-//  height: 18px;
-//  width: 12px;
-//}
-//
-/*input[type=checkbox] {*/
-  /*clip: rect(0,0,0,0);*/
-  /*position: absolute;*/
-/*}*/
 
 #save-button {
   @extend .green-button;
-}
-
-#save-button:disabled {
-  @extend .gray-button;
+  margin-top: 5px;
 }
 
 .saving-spinner {
@@ -664,44 +635,24 @@ input[type=checkbox]:disabled + label {
 
 // Dropdown related ************************************************************
 #final-graded-submission-policy {
-  width: 350px;
+  max-width: 400px;
 }
 
-#timezone-dropdown {
-  width: 200px;
-}
-
-.dropdown-header-wrapper {
-  display: inline-block;
-  margin: 0;
-  position: relative;
-}
-
-.dropdown-header {
-  background-color: #fff;
+.select {
+  background-color: white;
   border: 1px solid #ced4da;
   border-radius: .25rem;
   box-sizing: border-box;
   color: #495057;
-  cursor: default;
-  display: block;
+
   font-size: 1rem;
-  line-height: 1.5;
-  padding: .375rem .75rem;
-  position: relative;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  padding: 6px 4px;
 }
 
-.dropdown-header:focus {
-  border-color: $ocean-blue;
-}
-
-.dropdown-caret {
-  cursor: pointer;
-  font-size: 30px;
-  position: absolute;
-  right: 18px;
-  top: 3px;
+#submission-limit-reset-timezone {
+  width: 200px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 // Datetime related ************************************************************

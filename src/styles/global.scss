@@ -1,8 +1,2 @@
-// This file is for SCSS variables, mixins, classes, etc. that need to be available globally.
+// This file is for SCSS variables, mixins, etc. that need to be available globally.
 // It is NOT for global style rules. Those should go in App.vue
-
-
-.horizontal-flex {
-    display: flex;
-    align-items: center;
-}

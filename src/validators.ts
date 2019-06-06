@@ -2,8 +2,8 @@ import { ValidatorResponse } from '@/components/validated_input.vue';
 
 export function is_non_negative(value: string): ValidatorResponse {
     return {
-        is_valid: is_number(value).is_valid && value[0] !== "-",
-        error_msg: "The number entered must be greater than or equal to zero."
+        is_valid: is_number(value).is_valid && string_to_num(value) >= 0,
+        error_msg: "Please enter a number >= zero."
     };
 }
 
