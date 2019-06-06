@@ -15,24 +15,84 @@
         </validated-input>
       </div>
 
+
+      <div>
+        <fieldset>
+          <legend> Project Deadline </legend>
+          <div class="project-input-container">
+
+            <div class="clearable-datetime-picker soft-deadline">
+              <div class="label">
+                Soft Deadline
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="medium" placement="right">
+                    The deadline shown to students.
+                  </tooltip>
+                </i>
+              </div>
+              <div class="datetime-input"
+                   @click="$refs.soft_closing_time.toggle_visibility()">
+                {{format_datetime(d_project.soft_closing_time)}}
+                <i class="far fa-calendar-alt"></i>
+              </div>
+              <button type="button" class="clear-button" ref="clear_soft_closing_time"
+                      @click.stop="d_project.soft_closing_time = null"
+                      :disabled="d_project.soft_closing_time === null">
+                <i class="fas fa-times"></i>
+                <span class="clear-text">Clear</span>
+              </button>
+
+              <datetime-picker v-model="d_project.soft_closing_time"
+                               ref="soft_closing_time"></datetime-picker>
+            </div>
+
+            <div class="clearable-datetime-picker hard-deadline">
+              <div class="label">
+                Hard Deadline
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="medium" placement="right">
+                    The deadline shown to students.
+                  </tooltip>
+                </i>
+              </div>
+              <div class="datetime-input"
+                   @click="$refs.closing_time.toggle_visibility()">
+                {{format_datetime(d_project.closing_time)}}
+                <i class="far fa-calendar-alt"></i>
+              </div>
+              <button type="button" class="clear-button" ref="clear_closing_time"
+                      @click.stop="d_project.closing_time = null"
+                      :disabled="d_project.closing_time === null">
+                <i class="fas fa-times"></i>
+                <span class="clear-text">Clear</span>
+              </button>
+
+              <datetime-picker v-model="d_project.closing_time"
+                               ref="closing_time"></datetime-picker>
+            </div>
+
+          </div>
+        </fieldset>
+      </div>
+
       <div class="section-container">
         <fieldset>
           <legend> Access </legend>
-          <div class="toggle-container">
-            <toggle v-model="d_project.hide_ultimate_submission_fdbk">
-              <div slot="on">
-                Hide Final Grades
-              </div>
-              <div slot="off">
-                Publish Final Grades
-              </div>
-            </toggle>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="medium" placement="right">
-                When the hard deadline has passed and scores are published,
-                students will see their final grade for the project on the submit page.
-              </tooltip>
-            </i>
+          <div class="checkbox-input-container">
+            <input id="publish-final-grades"
+                   type="checkbox"
+                   :value="!d_project.hide_ultimate_submission_fdbk"
+                   @change="d_project.hide_ultimate_submission_fdbk = !$event"/>
+            <label class="checkbox-label"
+                   for="publish-final-grades">
+              Publish final grades
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="medium" placement="right">
+                  When the hard deadline has passed and scores are published,
+                  students will see their final grade for the project on the submit page.
+                </tooltip>
+              </i>
+            </label>
           </div>
 
           <div class="checkbox-input-container">
@@ -51,11 +111,10 @@
                    v-model="d_project.guests_can_submit"/>
             <label class="checkbox-label"
                    for="guests-can-submit">
-              Guests can submit
+              Anyone with the link can submit
             </label>
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="large" placement="right">
-                Anyone with the link can submit.
                 This can be restricted to users with a specific email domain
                 in the course settings.
               </tooltip>
@@ -150,53 +209,26 @@
 
       <div class="section-container">
         <fieldset>
-          <legend> Submissions </legend>
+          <legend> Submission Limits </legend>
           <div class="project-input-container">
-            <label class="text-label"> Submission limit per day </label>
-            <input id="submission-limit-per-day"
-                   class="project-settings-input"
-                   type="number"
-                   min="1"
-                   v-model="d_submission_limit_per_day"/>
-          </div>
+            <label class="text-label"> Submissions per day </label>
 
-          <div v-if="submission_limit_per_day_exists"
-               class="checkbox-input-container">
-            <input id="allow-submissions-past-limit"
-                   type="checkbox"
-                   v-model="d_project.allow_submissions_past_limit"/>
-            <label class="checkbox-label"
-                   for="allow-submissions-past-limit">
-              Allow submissions past limit
-            </label>
-          </div>
+            <div class="horizontal-flex">
+              <input id="submission-limit-per-day"
+                     class="project-settings-input"
+                     type="number"
+                     min="1"
+                     v-model="d_submission_limit_per_day"/>
 
-          <div class="project-input-container">
-            <label class="text-label"> Bonus submissions per group </label>
-            <validated-input ref="bonus_submissions_input"
-                             v-model="d_project.num_bonus_submissions"
-                             :validators="[is_integer, is_not_empty, is_non_negative]"
-                             input_style="width: 80px;">
-            </validated-input>
-          </div>
-
-          <div class="checkbox-input-container">
-            <input id="groups-combine-daily-submissions"
-                   type="checkbox"
-                   v-model="d_project.groups_combine_daily_submissions"/>
-            <label class="checkbox-label"
-                   for="groups-combine-daily-submissions">
-              Groups get more submissions than individuals
-            </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                When unchecked, individuals and groups receive the same number of
-                submissions per day. When checked, the daily limit for a group
-                is multiplied by the number of users in that group.
-                For example, if the daily limit is 2, a group with 3 members would
-                receive 6 submissions per day with this box checked.
-              </tooltip>
-            </i>
+              <input id="allow-submissions-past-limit"
+                     type="checkbox"
+                     :disabled="!submission_limit_per_day_exists"
+                     v-model="d_project.allow_submissions_past_limit"/>
+              <label class="checkbox-label"
+                     for="allow-submissions-past-limit">
+                Allow submissions past limit
+              </label>
+            </div>
           </div>
 
           <div class="project-input-container">
@@ -238,6 +270,34 @@
           </div>
 
           <div class="checkbox-input-container">
+            <input id="groups-combine-daily-submissions"
+                   type="checkbox"
+                   v-model="d_project.groups_combine_daily_submissions"/>
+            <label class="checkbox-label"
+                   for="groups-combine-daily-submissions">
+              Groups get more submissions than individuals
+            </label>
+            <i class="fas fa-question-circle input-tooltip">
+              <tooltip width="large" placement="right">
+                When unchecked, individuals and groups receive the same number of
+                submissions per day. When checked, the daily limit for a group
+                is multiplied by the number of users in that group.
+                For example, if the daily limit is 2, a group with 3 members would
+                receive 6 submissions per day with this box checked.
+              </tooltip>
+            </i>
+          </div>
+
+          <div class="project-input-container">
+            <label class="text-label"> Bonus submissions per group </label>
+            <validated-input ref="bonus_submissions_input"
+                             v-model="d_project.num_bonus_submissions"
+                             :validators="[is_integer, is_not_empty, is_non_negative]"
+                             input_style="width: 80px;">
+            </validated-input>
+          </div>
+
+          <div class="checkbox-input-container">
             <input id="allow-late-days"
                    type="checkbox"
                    v-model="d_project.allow_late_days"/>
@@ -253,76 +313,19 @@
           </div>
 
           <div class="project-input-container">
-            <label class="text-label"> Total submission limit (Ever!) </label>
+            <label for="total-submission-limit"
+                   class="text-label"> Total submission limit (Ever!) </label>
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="medium" placement="right">
                 A hard limit on how many times students can submit ever.
               </tooltip>
             </i>
             <input ref="total_submissions_input"
+                   id="total-submission-limit"
                    class="project-settings-input"
                    type="number"
                    min="1"
                    v-model="d_project.total_submission_limit"/>
-          </div>
-        </fieldset>
-      </div>
-
-      <div>
-        <fieldset>
-          <legend> Project Deadline </legend>
-          <div class="project-input-container">
-
-            <div class="clearable-datetime-picker soft-deadline">
-              <div class="label">
-                Soft Deadline
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="medium" placement="right">
-                    The deadline shown to students.
-                  </tooltip>
-                </i>
-              </div>
-              <div class="datetime-input"
-                   @click="$refs.soft_closing_time.toggle_visibility()">
-                {{format_datetime(d_project.soft_closing_time)}}
-                <i class="far fa-calendar-alt"></i>
-              </div>
-              <button type="button" class="clear-button" ref="clear_soft_closing_time"
-                      @click.stop="d_project.soft_closing_time = null"
-                      :disabled="d_project.soft_closing_time === null">
-                <i class="fas fa-times"></i>
-                <span class="clear-text">Clear</span>
-              </button>
-
-              <datetime-picker v-model="d_project.soft_closing_time"
-                               ref="soft_closing_time"></datetime-picker>
-            </div>
-
-            <div class="clearable-datetime-picker hard-deadline">
-              <div class="label">
-                Hard Deadline
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="medium" placement="right">
-                    The deadline shown to students.
-                  </tooltip>
-                </i>
-              </div>
-              <div class="datetime-input"
-                   @click="$refs.closing_time.toggle_visibility()">
-                {{format_datetime(d_project.closing_time)}}
-                <i class="far fa-calendar-alt"></i>
-              </div>
-              <button type="button" class="clear-button" ref="clear_closing_time"
-                      @click.stop="d_project.closing_time = null"
-                      :disabled="d_project.closing_time === null">
-                <i class="fas fa-times"></i>
-                <span class="clear-text">Clear</span>
-              </button>
-
-              <datetime-picker v-model="d_project.closing_time"
-                               ref="closing_time"></datetime-picker>
-            </div>
-
           </div>
         </fieldset>
       </div>
@@ -501,6 +504,7 @@ function make_empty_project(): Project {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/datetime.scss';
+@import '@/styles/global.scss';
 
 #project-settings-component {
   padding: 10px;
@@ -559,6 +563,10 @@ legend {
   padding-bottom: 10px;
 }
 
+#allow-submissions-past-limit {
+  margin-left: 20px;
+}
+
 .footer {
   padding: 0 12px 22px 15px;
 }
@@ -610,31 +618,34 @@ legend {
   padding-bottom: 10px;
 }
 
-input[type=checkbox] + label::before {
-  border-radius: 2px;
-  color: hsl(210, 20%, 86%);
-  content: '\f0c8';
-  display: inline-block;
-  font-family: "Font Awesome 5 Free";
-  font-size: 18px;
-  height: 18px;
-  margin-right: 10px;
-  width: 12px;
+input[type=checkbox]:disabled + label {
+  color: $stormy-gray-dark;
 }
-
-input[type=checkbox]:checked + label::before {
-  background: transparent;
-  content: '\f14a';
-  color: $ocean-blue;
-  font-family: "Font Awesome 5 Free";
-  height: 18px;
-  width: 12px;
-}
-
-input[type=checkbox] {
-  clip: rect(0,0,0,0);
-  position: absolute;
-}
+//input[type=checkbox] + label::before {
+//  border-radius: 2px;
+//  color: hsl(210, 20%, 86%);
+//  content: '\f0c8';
+//  display: inline-block;
+//  font-family: "Font Awesome 5 Free";
+//  font-size: 18px;
+//  height: 18px;
+//  margin-right: 10px;
+//  width: 12px;
+//}
+//
+//input[type=checkbox]:checked + label::before {
+//  background: transparent;
+//  content: '\f14a';
+//  color: $ocean-blue;
+//  font-family: "Font Awesome 5 Free";
+//  height: 18px;
+//  width: 12px;
+//}
+//
+/*input[type=checkbox] {*/
+  /*clip: rect(0,0,0,0);*/
+  /*position: absolute;*/
+/*}*/
 
 #save-button {
   @extend .green-button;

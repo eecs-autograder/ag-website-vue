@@ -83,12 +83,16 @@ describe('ProjectSettings tests', () => {
         expect(component.d_submission_limit_per_day).toEqual("2");
     });
 
+    test('v-model form bindings', () => {
+        fail();
+    });
+
     test('When submission_limit_per_day is non-null, the allow_submissions_past_limit input is ' +
-         'visible ',
+         'enabled ',
          async () => {
 
         expect(component.submission_limit_per_day_exists).toBe(false);
-        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(0);
+        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(true);
 
         let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
         (<HTMLInputElement> daily_submission_limit_input.element).value = "7";
@@ -97,7 +101,7 @@ describe('ProjectSettings tests', () => {
 
         expect(component.d_submission_limit_per_day).not.toBeNull();
         expect(component.submission_limit_per_day_exists).toBe(true);
-        expect(wrapper.findAll('#allow-submissions-past-limit').length).toEqual(1);
+        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(false);
     });
 
     test('submission_policy_selected', async () => {
