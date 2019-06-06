@@ -5,8 +5,9 @@ import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import {
     checkbox_is_checked,
+    expect_html_element_has_value,
     get_validated_input_text,
-    set_validated_input_text
+    set_validated_input_text, validated_input_is_valid
 } from "@/tests/utils";
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
@@ -256,14 +257,12 @@ describe('ProjectSettings tests', () => {
         );
 
         component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.most_recent;
-        expect(ultimate_submission_policy_input.element.value).toEqual(
-            UltimateSubmissionPolicy.most_recent
-        );
+        expect_html_element_has_value(ultimate_submission_policy_input,
+                                      UltimateSubmissionPolicy.most_recent);
 
         component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.best;
-        expect(ultimate_submission_policy_input.element.value).toEqual(
-            UltimateSubmissionPolicy.best
-        );
+        expect_html_element_has_value(ultimate_submission_policy_input,
+                                      UltimateSubmissionPolicy.best);
     });
 
     test('Best submission with normal feedback disabled, only visible if in use', async () => {
@@ -276,9 +275,8 @@ describe('ProjectSettings tests', () => {
         expect(ultimate_submission_policy_input.findAll('option').at(2).is('[disabled]')).toEqual(
             true
         );
-        expect(ultimate_submission_policy_input.element.value).toEqual(
-            UltimateSubmissionPolicy.best_with_normal_fdbk
-        );
+        expect_html_element_has_value(ultimate_submission_policy_input,
+                                      UltimateSubmissionPolicy.best_with_normal_fdbk);
 
         component.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.best;
         await component.$nextTick();
@@ -286,13 +284,8 @@ describe('ProjectSettings tests', () => {
         let option_tags = wrapper.find('#ultimate-submission-policy').findAll('option');
         expect(option_tags.length).toEqual(2);
 
-        expect(option_tags.at(0).element.value).toEqual(
-            UltimateSubmissionPolicy.most_recent
-        );
-
-        expect(option_tags.at(1).element.value).toEqual(
-            UltimateSubmissionPolicy.best
-        );
+        expect_html_element_has_value(option_tags.at(0), UltimateSubmissionPolicy.most_recent);
+        expect_html_element_has_value(option_tags.at(1), UltimateSubmissionPolicy.best);
     });
 
     test('d_project.submission_limit_per_day nullable form input',
@@ -376,10 +369,10 @@ describe('ProjectSettings tests', () => {
         expect(component.d_project.submission_limit_reset_timezone).toEqual('US/Eastern');
 
         component.d_project.submission_limit_reset_timezone = 'UTC';
-        expect(submission_limit_reset_timezone_input.element.value).toEqual('UTC');
+        expect_html_element_has_value(submission_limit_reset_timezone_input, 'UTC');
 
         component.d_project.submission_limit_reset_timezone = 'US/Pacific';
-        expect(submission_limit_reset_timezone_input.element.value).toEqual('US/Pacific');
+        expect_html_element_has_value(submission_limit_reset_timezone_input, 'US/Pacific');
     });
 
     test('Groups get more submissions binding', async () => {
@@ -581,68 +574,68 @@ describe('Invalid input tests', () => {
     test('min_group_size is blank or not a number', () => {
         let min_num_matches_input = wrapper.find('#min-group-size');
 
-        expect(min_num_matches_input.vm.is_valid).toBe(true);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(true);
 
         set_validated_input_text(min_num_matches_input, '    ');
-        expect(min_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(false);
 
         set_validated_input_text(min_num_matches_input, 'Winterfell');
-        expect(min_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(false);
     });
 
     test('min_group_size is zero or negative', () => {
         let min_num_matches_input = wrapper.find('#min-group-size');
-        expect(min_num_matches_input.vm.is_valid).toBe(true);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(true);
 
         set_validated_input_text(min_num_matches_input, '-8');
-        expect(min_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(false);
 
         set_validated_input_text(min_num_matches_input, '1');
-        expect(min_num_matches_input.vm.is_valid).toBe(true);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(true);
 
         set_validated_input_text(min_num_matches_input, '0');
-        expect(min_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(min_num_matches_input)).toBe(false);
     });
 
     test('max_group_size is blank or not a number', () => {
         let max_num_matches_input = wrapper.find('#max-group-size');
 
-        expect(max_num_matches_input.vm.is_valid).toBe(true);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(true);
 
         set_validated_input_text(max_num_matches_input, '    ');
-        expect(max_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(false);
 
         set_validated_input_text(max_num_matches_input, 'Waluigi');
-        expect(max_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(false);
     });
 
     test('max_group_size is zero or negative', async () => {
         let max_num_matches_input = wrapper.find('#max-group-size');
-        expect(max_num_matches_input.vm.is_valid).toBe(true);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(true);
 
         set_validated_input_text(max_num_matches_input, '-8');
-        expect(max_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(false);
 
         set_validated_input_text(max_num_matches_input, '1');
-        expect(max_num_matches_input.vm.is_valid).toBe(true);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(true);
 
         set_validated_input_text(max_num_matches_input, '0');
-        expect(max_num_matches_input.vm.is_valid).toBe(false);
+        expect(validated_input_is_valid(max_num_matches_input)).toBe(false);
     });
 
     test('submission_limit_per_day less than 1 or not a number', async () => {
         let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
         set_validated_input_text(daily_submission_limit_input, '');
-        expect(daily_submission_limit_input.vm.is_valid).toEqual(true);
+        expect(validated_input_is_valid(daily_submission_limit_input)).toEqual(true);
 
         set_validated_input_text(daily_submission_limit_input, '-3');
-        expect(daily_submission_limit_input.vm.is_valid).toEqual(false);
+        expect(validated_input_is_valid(daily_submission_limit_input)).toEqual(false);
 
         set_validated_input_text(daily_submission_limit_input, '0');
-        expect(daily_submission_limit_input.vm.is_valid).toEqual(false);
+        expect(validated_input_is_valid(daily_submission_limit_input)).toEqual(false);
 
         set_validated_input_text(daily_submission_limit_input, '1');
-        expect(daily_submission_limit_input.vm.is_valid).toEqual(true);
+        expect(validated_input_is_valid(daily_submission_limit_input)).toEqual(true);
     });
 
     test('num_bonus_submissions is empty or not a number', async () => {
