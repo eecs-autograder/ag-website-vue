@@ -2,16 +2,20 @@
 A re-implementation of autograder-website using Vue.
 
 ## Setup
+First, install Docker Community Edition: https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce-1
+
+Then, clone the repo, install dependencies, and build the Docker images. 
 ```
 git clone --recursive https://github.com/eecs-autograder/ag-website-vue.git
 cd ag-website-vue
 npm install
+docker-compose build
 ```
 
 ## Dev commands
 To run the dev server (runs on localhost:8080):
 ```
-npm run serve
+docker-compose up -d
 ```
 
 To run the unit tests (with coverage):
@@ -20,14 +24,48 @@ npm test
 ```
 
 ## Coding Standards
-When `npm run serve` is running, it will check for style issues using tslint. All code must be free of tslint errors.
+Run `npm run build` to check for style issues using TSLint. All code must be free of TSLint errors.
+Note: Not all of the items below are enforcable with TSLint, but they must still be followed.
 
 - Indentation:
     - Indent using 2 spaces in .vue, .html, and .yml/.yaml files.
     - Indent using 4 spaces in .json, .js, .ts, and .md files.
         - Note that npm will overwrite the formatting to 2 spaces on package.json when you use `npm install --save <package>`. Don't bother trying to format package.json yourself.
     - Since .vue files have typescript, html, and css in them, we will use 2 spaces for all of their contents. HTML benefits the most from 2-space indentation.
-- Use Java/Egyptian style curly braces. (Opening braces are on the same line as the class/function/loop/conditional/try-catch they start, closing braces are on their own line):
+    - In Vue single-file components, indent one level inside the `<template>` tag, but not in the `<script>` or `<style>` tags.
+        
+        **Yes:**
+        ```
+        <template>
+          <div>...</div>
+        </template>
+        
+        <script lang="ts">
+        @Component
+        class MyComponent { ... }
+        </script>
+        
+        <style scoped lang="scss">
+        .my-class { ... }
+        </style>
+        ```
+    
+        **No:**
+        ```
+        <template>
+          <div>...</div>
+        </template>
+        
+        <script lang="ts">
+          @Component
+          class MyComponent { ... }
+        </script>
+        
+        <style scoped lang="scss">
+          .my-class { ... }
+        </style>
+        ```
+- Use Java/"Egyptian" style curly braces. (Opening braces are on the same line as the class/function/loop/conditional/try-catch they start, closing braces are on their own line):
     ```
     class Spam {
 
@@ -54,7 +92,6 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
     - Use `snake_case` for variable, function, method, and file names.
     - Do not start names with a leading underscore. Vue reserves these names for its implementation, and collisions can cause bugs that are hard to diagnose.
     - Start all Vue "data" members (declared as default-initialized member variables in Typescript component classes) with a leading "d_".
-        - Note: If a data member is publically accessible and modifiable, you do not need to use this naming convention.
         - These members that start with "d_" should only be accessed by the component itself and the test cases for that specific component. If possible, add a property getter and make the data member private.
         ```
         @Component
@@ -98,18 +135,17 @@ When `npm run serve` is running, it will check for style issues using tslint. Al
         static readonly CLASS_VAR = 43;
     }
     ```
-    - In Vue (with vue-class-component), private member variables and member variables starting
-      with a leading underscore are not registered as data members. If you need to distinguish
-      between the name of an input property and its corresponding internal data member, you may
-      add a trailing underscore to the data member name:
+    - When an imported function, class, enum, etc. needs to be made available to a component
+      template, add a readonly variable with the same name to the class.
     ```
-    class Diff extends Vue {
-        @Prop({default: false, type: Boolean})
-        show_whitespace!: boolean;
-
-        show_whitespace_: boolean = false;
+    import { MyEnum, my_func } from 'utils'; 
+    @Component
+    class MyComponent {
+        readonly MyEnum = MyEnum;
+        readonly my_func = my_func;
     }
     ```
+    
 - When wrapping a line at an operator, break _before_ the operator:
 ```
 // Yes
@@ -155,15 +191,25 @@ let my_list = [
 - Imports
     - In imports, you may use `./` to import from a module in the same directory as the current one.
     - Avoid using `../` relative imports. Prefer an absolute import in those cases.
-    - To use an absolute import of a module in the `src` folder, begin the import with `@`:
+    - To use an absolute import of a module in the `src` folder, begin the import with `@` (also works for scss imports):
     ```
     // There is a mapping defined in tsconfig.json so that we can say
     // "@" instead of "src".
     import { spam } from "@/my/module";
     ```
-        - Note: This same method works for scss imports.
     - Similarly, absolute imports in the `test` folder should begin with `@/tests`:
     ```
     // "@/tests" is mapped to "tests" in tsconfig.json.
     import { egg } from "@/tests/utils";
     ```
+    
+    - Group imports in the following order:
+        - Vue libraries whose paths start with 'vue'
+        - Vue libraries whose paths start with '@vue'
+        - 3rd-party libraries 
+        - Imports from this project
+        - Imports from this project's `@/test` directory.
+        - Parent directory relative imports
+        - Current directory relative imports.
+    - Separate each group with a blank line.
+    - Note: TSLint will enforce these rules.
