@@ -2,6 +2,12 @@ import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import {
+    expect_html_element_has_value,
+    get_validated_input_text,
+    set_validated_input_text,
+    validated_input_is_valid
+} from "@/tests/utils";
 import { config, mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
@@ -14,26 +20,17 @@ beforeAll(() => {
 describe('CourseSettings.vue', () => {
     let wrapper: Wrapper<CourseSettings>;
     let component: CourseSettings;
-    let course_1: Course;
-    let original_match_media: (query: string) => MediaQueryList;
+    let course: Course;
 
     beforeEach(() => {
-        course_1 = new Course({
+        course = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
 
-        original_match_media = window.matchMedia;
-
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         wrapper = mount(CourseSettings, {
             propsData: {
-                course: course_1,
+                course: course,
             }
         });
         component = wrapper.vm;
@@ -41,21 +38,13 @@ describe('CourseSettings.vue', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('Course name is not the empty string - violates condition', async () => {
         let validated_name_input = <ValidatedInput> wrapper.find({ref: 'course_name_input'}).vm;
         let name_input = wrapper.find({ref: 'course_name_input'}).find('#input');
 
-        expect(component.d_course.name).toEqual(course_1.name);
+        expect(component.d_course.name).toEqual(course.name);
         expect(validated_name_input.is_valid).toBe(true);
 
         (<HTMLInputElement> name_input.element).value = "     ";
@@ -65,11 +54,24 @@ describe('CourseSettings.vue', () => {
         expect(validated_name_input.is_valid).toBe(false);
     });
 
+    test('Semester binding', () => {
+        let semester_select = wrapper.find('#semester');
+
+        semester_select.setValue(Semester.summer);
+        expect(component.d_course.semester).toEqual(Semester.summer);
+
+        semester_select.setValue(Semester.winter);
+        expect(component.d_course.semester).toEqual(Semester.winter);
+
+        component.d_course.semester = Semester.spring;
+        expect_html_element_has_value(semester_select, Semester.spring);
+    });
+
     test('Year must be a number - violates condition', async () => {
         let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
         let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
 
-        expect(component.course.year).toEqual(2019);
+        expect(component.d_course.year).toEqual(2019);
         expect(validated_year_input.is_valid).toBe(true);
 
         (<HTMLInputElement> year_input.element).value = "twenty-nineteen";
@@ -82,7 +84,7 @@ describe('CourseSettings.vue', () => {
         let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
         let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
 
-        expect(component.course.year).toEqual(2019);
+        expect(component.d_course.year).toEqual(2019);
         expect(validated_year_input.is_valid).toBe(true);
 
         (<HTMLInputElement> year_input.element).value = "2020.5";
@@ -95,7 +97,7 @@ describe('CourseSettings.vue', () => {
         let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
         let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
 
-        expect(component.course.year).toEqual(2019);
+        expect(component.d_course.year).toEqual(2019);
         expect(validated_year_input.is_valid).toBe(true);
 
         (<HTMLInputElement> year_input.element).value = "1999";
@@ -108,7 +110,7 @@ describe('CourseSettings.vue', () => {
         let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
         let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
 
-        expect(component.course.year).toEqual(2019);
+        expect(component.d_course.year).toEqual(2019);
         expect(validated_year_input.is_valid).toBe(true);
 
         (<HTMLInputElement> year_input.element).value = "2000";
@@ -121,7 +123,7 @@ describe('CourseSettings.vue', () => {
         let validated_year_input = <ValidatedInput> wrapper.find({ref: 'course_year_input'}).vm;
         let year_input = wrapper.find({ref: 'course_year_input'}).find('#input');
 
-        expect(component.course.year).toEqual(2019);
+        expect(component.d_course.year).toEqual(2019);
         expect(validated_year_input.is_valid).toBe(true);
 
         (<HTMLInputElement> year_input.element).value = "";
@@ -135,7 +137,7 @@ describe('CourseSettings.vue', () => {
             {ref: 'course_late_days_input'}).vm;
         let late_days_input = wrapper.find({ref: 'course_late_days_input'}).find('#input');
 
-        expect(component.course.num_late_days).toEqual(0);
+        expect(component.d_course.num_late_days).toEqual(0);
         expect(validated_late_days_input.is_valid).toBe(true);
 
         (<HTMLInputElement> late_days_input.element).value = "-1";
@@ -149,7 +151,7 @@ describe('CourseSettings.vue', () => {
             {ref: 'course_late_days_input'}).vm;
         let late_days_input = wrapper.find({ref: 'course_late_days_input'}).find('#input');
 
-        expect(component.course.num_late_days).toEqual(0);
+        expect(component.d_course.num_late_days).toEqual(0);
         expect(validated_late_days_input.is_valid).toBe(true);
 
         (<HTMLInputElement> late_days_input.element).value = "0";
@@ -163,7 +165,7 @@ describe('CourseSettings.vue', () => {
             {ref: 'course_late_days_input'}).vm;
         let late_days_input = wrapper.find({ref: 'course_late_days_input'}).find('#input');
 
-        expect(component.course.num_late_days).toEqual(0);
+        expect(component.d_course.num_late_days).toEqual(0);
         expect(validated_late_days_input.is_valid).toBe(true);
 
         (<HTMLInputElement> late_days_input.element).value = "zero";
@@ -177,7 +179,7 @@ describe('CourseSettings.vue', () => {
             {ref: 'course_late_days_input'}).vm;
         let late_days_input = wrapper.find({ref: 'course_late_days_input'}).find('#input');
 
-        expect(component.course.num_late_days).toEqual(0);
+        expect(component.d_course.num_late_days).toEqual(0);
         expect(validated_late_days_input.is_valid).toBe(true);
 
         (<HTMLInputElement> late_days_input.element).value = "1.5";
@@ -191,7 +193,7 @@ describe('CourseSettings.vue', () => {
             {ref: 'course_late_days_input'}).vm;
         let late_days_input = wrapper.find({ref: 'course_late_days_input'}).find('#input');
 
-        expect(component.course.num_late_days).toEqual(0);
+        expect(component.d_course.num_late_days).toEqual(0);
         expect(validated_late_days_input.is_valid).toBe(true);
 
         (<HTMLInputElement> late_days_input.element).value = "";
@@ -200,8 +202,32 @@ describe('CourseSettings.vue', () => {
         expect(validated_late_days_input.is_valid).toBe(false);
     });
 
+    test('Allowed guest domain binding', () => {
+        let allowed_guest_domain_input = wrapper.find('#allowed-guest-domain');
+
+        set_validated_input_text(allowed_guest_domain_input, '@llama.net');
+        expect(component.d_course.allowed_guest_domain).toEqual('@llama.net');
+
+        expect(validated_input_is_valid(allowed_guest_domain_input)).toEqual(true);
+
+        set_validated_input_text(allowed_guest_domain_input, '');
+        expect(component.d_course.allowed_guest_domain).toEqual('');
+
+        expect(validated_input_is_valid(allowed_guest_domain_input)).toEqual(true);
+
+        component.d_course.allowed_guest_domain = '@spam.spam';
+        expect(get_validated_input_text(allowed_guest_domain_input)).toEqual('@spam.spam');
+
+        expect(validated_input_is_valid(allowed_guest_domain_input)).toEqual(true);
+
+        component.d_course.allowed_guest_domain = '';
+        expect(get_validated_input_text(allowed_guest_domain_input)).toEqual('');
+
+        expect(validated_input_is_valid(allowed_guest_domain_input)).toEqual(true);
+    });
+
     test('Clicking on the save updates button calls course.save', async () => {
-        let save_settings_stub = sinon.stub(course_1, 'save');
+        let save_settings_stub = sinon.stub(component.d_course, 'save');
 
         let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
 
@@ -231,7 +257,7 @@ describe('CourseSettings.vue', () => {
             },
             config: {},
         };
-        sinon.stub(course_1, 'save').returns(Promise.reject(axios_response_instance));
+        sinon.stub(component.d_course, 'save').returns(Promise.reject(axios_response_instance));
 
         let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
 
