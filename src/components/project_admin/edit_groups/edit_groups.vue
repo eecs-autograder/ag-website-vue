@@ -51,17 +51,25 @@
     <modal ref="merge_groups_modal"
            click_outside_to_close
            size="large">
-      <div class="modal-header"> Merging existing groups </div>
+      <div class="modal-header">Choose groups to merge:</div>
       <hr>
-      <div class="modal-body"> </div>
+      <div class="modal-body">
+        <merge-groups :project="project"
+                      :groups="groups_by_members.data"
+                      ref="merge_groups">
+        </merge-groups>
+      </div>
     </modal>
 
     <div class="button-footer">
       <button class="create-group-button"
+              type="button"
               @click="$refs.create_group_modal.open()"> Create New Group
       </button>
 
       <button class="merge-groups-button"
+              type="button"
+              :disabled="groups_by_pk.data.length < 2"
               @click="$refs.merge_groups_modal.open()"> Merge Existing Groups
       </button>
     </div>
@@ -76,6 +84,7 @@ import GroupLookup from '@/components/group_lookup.vue';
 import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
+import MergeGroups from '@/components/project_admin/edit_groups/merge_groups.vue';
 
 import { deep_copy, format_datetime } from "@/utils";
 import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
@@ -97,6 +106,7 @@ type HasPK = {pk: number};
     CreateSingleGroup,
     EditSingleGroup,
     GroupLookup,
+    MergeGroups,
     Modal
   }
 })
@@ -113,6 +123,8 @@ export default class EditGroups extends Vue implements GroupObserver {
   groups_by_pk = new ArraySet<Group, HasPK>([], {less_func: pk_less});
   private d_groups_with_extensions = new ArraySet<Group, HasPK>([], {less_func: pk_less});
   selected_group: Group | null = null;
+
+  readonly format_datetime = format_datetime;
 
   async created() {
     this.course = await Course.get_by_pk(this.project.course);
@@ -177,10 +189,28 @@ export default class EditGroups extends Vue implements GroupObserver {
     }
   }
 
-  update_group_merged(group: Group): void { }
+  update_group_merged(new_group: Group, group1_pk: number, group2_pk: number): void {
+    let original1 = this.groups_by_pk.get({pk: group1_pk});
+    let original2 = this.groups_by_pk.get({pk: group2_pk});
 
-  get format_datetime() {
-    return format_datetime;
+    this.groups_by_members.remove(original1);
+    this.groups_by_members.remove(original2);
+
+    this.groups_by_pk.remove(original1);
+    this.groups_by_pk.remove(original2);
+
+    this.d_groups_with_extensions.remove(original1, false);
+    this.d_groups_with_extensions.remove(original2, false);
+
+    let copy = deep_copy(new_group, Group);
+
+    this.groups_by_pk.insert(copy);
+    this.groups_by_members.insert(copy);
+    if (copy.extended_due_date !== null) {
+      this.d_groups_with_extensions.insert(copy);
+    }
+
+    (<Modal> this.$refs.merge_groups_modal).close();
   }
 }
 </script>
