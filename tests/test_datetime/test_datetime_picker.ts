@@ -26,7 +26,7 @@ describe('DatetimePicker tests', () => {
 
         });
         let component = wrapper.vm;
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         expect(component.d_month).toEqual(11);
         expect(component.d_year).toEqual(2019);
@@ -47,7 +47,7 @@ describe('DatetimePicker tests', () => {
     test('Initial value null, no day highlighted until day selected', () => {
         let wrapper = mount(DatetimePicker);
         let component = wrapper.vm;
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         let now = new Date();
 
@@ -67,7 +67,7 @@ describe('DatetimePicker tests', () => {
         let minutes_diff = Math.abs(time_picker.vm.d_time.minutes - now.getMinutes());
         expect(minutes_diff).toBeLessThan(1);
 
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         let selected_day = wrapper.findAll('.selected-day');
         expect(selected_day.length).toEqual(0);
@@ -88,7 +88,7 @@ describe('DatetimePicker tests', () => {
 
     test('Initial value null, time change before day selected does not emit', () => {
         let wrapper = mount(DatetimePicker);
-        wrapper.setData({'d_is_open': true});
+        wrapper.vm.show();
 
         let time_picker = <Wrapper<TimePicker>> wrapper.find({ref: 'time_picker'});
         time_picker.vm.go_to_prev_minute();
@@ -123,7 +123,7 @@ describe('DatetimePicker tests', () => {
 
         });
         let component = wrapper.vm;
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         expect(component.d_date.month()).toEqual(11);
         wrapper.find('.next-month-button').trigger('click');
@@ -158,7 +158,7 @@ describe('DatetimePicker tests', () => {
             }
         });
         let component = wrapper.vm;
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         expect(component.d_selected_day).toEqual(21);
         expect(component.d_selected_month).toEqual(6);
@@ -194,11 +194,21 @@ describe('DatetimePicker tests', () => {
         });
         let component = wrapper.vm;
 
-        expect(component.d_is_open).toBe(false);
+        expect(component.is_visible).toBe(false);
+        expect(wrapper.find('#datetime-picker').exists()).toEqual(false);
 
         component.toggle_visibility();
 
-        expect(component.d_is_open).toBe(true);
+        expect(component.is_visible).toBe(true);
+        expect(wrapper.find('#datetime-picker').exists()).toEqual(true);
+
+        component.hide();
+        expect(component.is_visible).toBe(false);
+        expect(wrapper.find('#datetime-picker').exists()).toEqual(false);
+
+        component.show();
+        expect(component.is_visible).toBe(true);
+        expect(wrapper.find('#datetime-picker').exists()).toEqual(true);
     });
 });
 
@@ -210,7 +220,7 @@ describe('DatetimePicker keyboard inputs', () => {
             }
         });
         let component = wrapper.vm;
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         expect(component.d_month).toEqual(0);
         expect(component.d_year).toEqual(2019);
@@ -231,7 +241,7 @@ describe('DatetimePicker keyboard inputs', () => {
             }
         });
         let component = wrapper.vm;
-        wrapper.setData({'d_is_open': true});
+        component.show();
 
         expect(component.d_month).toEqual(11);
         expect(component.d_year).toEqual(2019);

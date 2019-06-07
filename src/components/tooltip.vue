@@ -137,11 +137,10 @@
 
   #tooltip {
     background-color: $stormy-gray-dark;
-    border-radius: 4px;
+    border-radius: 6px;
     color: white;
     display: inline-block;
-    font-family: "Helvetica Neue", Helvetica;
-    font-size: 14px;
+    line-height: 16px;
     padding: 10px;
     position: absolute;
     text-align: center;

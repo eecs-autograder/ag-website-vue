@@ -150,3 +150,10 @@ export function format_datetime(datetime: string | null): string {
     }
     return moment(datetime).format('MMMM DD, YYYY, hh:mm A');
 }
+
+export function format_time(time: string | null): string {
+    if (time === null) {
+        return '--:-- --';
+    }
+    return moment(time, ['HH:mm', 'HH:mm:ss']).format('hh:mm A');
+}

@@ -122,10 +122,14 @@ export default class TimePicker extends Vue {
     this.set_d_time(this.value);
   }
 
-  set_d_time(value: string) {
+  set_d_time(value: string | null) {
+    if (value === null) {
+      this.d_time = new Time();
+      return;
+    }
+
     let time = moment(this.value, ['HH:mm', 'HH:mm:ss']);
     if (!time.isValid()) {
-      console.log(value);
       throw new InvalidTimeStrError(`Invalid time string: ${value}`);
     }
 
