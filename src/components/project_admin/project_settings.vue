@@ -432,6 +432,9 @@ export default class ProjectSettings extends Vue {
 
   readonly UltimateSubmissionPolicy = UltimateSubmissionPolicy;
 
+  readonly format_datetime = format_datetime;
+  readonly format_time = format_time;
+
   async created() {
     this.d_project = deep_copy(this.project, Project);
   }
@@ -447,14 +450,6 @@ export default class ProjectSettings extends Vue {
     finally {
       this.d_saving = false;
     }
-  }
-
-  get format_datetime() {
-    return format_datetime;
-  }
-
-  get format_time() {
-    return format_time;
   }
 }
 
@@ -504,7 +499,7 @@ function make_empty_project(): Project {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/datetime.scss';
-@import '@/styles/global.scss';
+@import '@/styles/forms.scss';
 
 #project-settings-component {
   padding: 10px;
@@ -629,17 +624,6 @@ input[type=checkbox]:disabled + label {
 // Dropdown related ************************************************************
 #final-graded-submission-policy {
   max-width: 400px;
-}
-
-.select {
-  background-color: white;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-
-  font-size: 1rem;
-  padding: 6px 4px;
 }
 
 #submission-limit-reset-timezone {
