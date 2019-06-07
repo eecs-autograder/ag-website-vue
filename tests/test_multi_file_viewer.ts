@@ -1,5 +1,6 @@
-import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
+import MultiFileViewer from '@/components/multi_file_viewer.vue';
 
 describe('MultiFileViewer.vue', () => {
     let wrapper: Wrapper<MultiFileViewer>;

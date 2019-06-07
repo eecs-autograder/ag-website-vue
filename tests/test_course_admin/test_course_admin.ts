@@ -1,8 +1,11 @@
-import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
+import VueRouter from 'vue-router';
+
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
+
 import { Course, Project, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
-import VueRouter from 'vue-router';
+
+import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

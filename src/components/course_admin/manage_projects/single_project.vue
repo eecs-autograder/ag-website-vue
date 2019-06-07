@@ -88,84 +88,84 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import { Course, Project, User } from 'ag-client-typescript';
+import { Course, Project, User } from 'ag-client-typescript';
 
-  import APIErrors from "@/components/api_errors.vue";
-  import Dropdown from '@/components/dropdown.vue';
-  import Modal from '@/components/modal.vue';
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
-  import { handle_api_errors_async } from '@/utils';
-  import { is_not_empty } from '@/validators';
+import APIErrors from "@/components/api_errors.vue";
+import Dropdown from '@/components/dropdown.vue';
+import Modal from '@/components/modal.vue';
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
+import { is_not_empty } from '@/validators';
 
-  @Component({
-    components: {
-      APIErrors,
-      Dropdown,
-      Modal,
-      Tooltip,
-      ValidatedForm,
-      ValidatedInput
-    }
-  })
-  export default class SingleProject extends Vue {
+@Component({
+  components: {
+    APIErrors,
+    Dropdown,
+    Modal,
+    Tooltip,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class SingleProject extends Vue {
 
-    @Prop({required: true, type: Course})
-    course!: Course;
+  @Prop({required: true, type: Course})
+  course!: Course;
 
-    @Prop({required: false, default: false})
-    odd_index!: boolean;
+  @Prop({required: false, default: false})
+  odd_index!: boolean;
 
-    @Prop({required: true, type: Project})
-    project!: Project;
+  @Prop({required: true, type: Project})
+  project!: Project;
 
-    readonly is_not_empty = is_not_empty;
+  readonly is_not_empty = is_not_empty;
 
-    cloning_destinations: Course[] = [];
-    api_errors: string[] = [];
-    course_to_clone_to: Course | null = null;
-    cloned_project_name: string = "";
-    cloned_project_name_is_valid = false;
+  cloning_destinations: Course[] = [];
+  api_errors: string[] = [];
+  course_to_clone_to: Course | null = null;
+  cloned_project_name: string = "";
+  cloned_project_name_is_valid = false;
 
-    course_index: number = 0;
+  course_index: number = 0;
 
-    async created() {
-      this.course_to_clone_to = this.course;
+  async created() {
+    this.course_to_clone_to = this.course;
 
-      let user = await User.get_current();
-      this.cloning_destinations = await user.courses_is_admin_for();
-      this.course_index = this.cloning_destinations.findIndex(
-        course => course.pk === this.course.pk);
-    }
-
-    async clone_project() {
-      this.api_errors = [];
-      this.cloned_project_name = "";
-      this.course_to_clone_to = this.course;
-      (<Modal> this.$refs.clone_project_modal).open();
-    }
-
-    @handle_api_errors_async(handle_add_cloned_project_error)
-    async add_cloned_project() {
-      this.api_errors = [];
-      let new_project = await this.project.copy_to_course(
-        this.course_to_clone_to!.pk, this.cloned_project_name
-      );
-      (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
-      let clone_project_modal = <Modal> this.$refs.clone_project_modal;
-      clone_project_modal.close();
-      if (this.course_to_clone_to!.pk === this.course.pk) {
-        this.$emit('add_cloned_project', new_project);
-      }
-    }
+    let user = await User.get_current();
+    this.cloning_destinations = await user.courses_is_admin_for();
+    this.course_index = this.cloning_destinations.findIndex(
+      course => course.pk === this.course.pk);
   }
 
-  export function handle_add_cloned_project_error(component: SingleProject, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  async clone_project() {
+    this.api_errors = [];
+    this.cloned_project_name = "";
+    this.course_to_clone_to = this.course;
+    (<Modal> this.$refs.clone_project_modal).open();
   }
+
+  @handle_api_errors_async(handle_add_cloned_project_error)
+  async add_cloned_project() {
+    this.api_errors = [];
+    let new_project = await this.project.copy_to_course(
+      this.course_to_clone_to!.pk, this.cloned_project_name
+    );
+    (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
+    let clone_project_modal = <Modal> this.$refs.clone_project_modal;
+    clone_project_modal.close();
+    if (this.course_to_clone_to!.pk === this.course.pk) {
+      this.$emit('add_cloned_project', new_project);
+    }
+  }
+}
+
+export function handle_add_cloned_project_error(component: SingleProject, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 
 </script>
 

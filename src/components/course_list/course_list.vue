@@ -32,140 +32,139 @@
 
 <script lang="ts">
 
-  import SingleCourse from '@/components/course_list/single_course.vue';
+import { Component, Vue } from 'vue-property-decorator';
 
-  import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
-  import { AllCourses } from 'ag-client-typescript/src/course';
+import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
+import { AllCourses } from 'ag-client-typescript/src/course';
 
-  import {
-    array_add_unique,
-    array_get_unique,
-    array_has_unique,
-  } from '@/utils';
+import SingleCourse from '@/components/course_list/single_course.vue';
+import {
+  array_add_unique,
+  array_get_unique,
+  array_has_unique,
+} from '@/utils';
 
-  import { Component, Vue } from 'vue-property-decorator';
+interface Term {
+  semester: Semester | null;
+  year: number | null;
+}
 
-  interface Term {
-    semester: Semester | null;
-    year: number | null;
+interface TermCourses {
+  term: Term;
+  course_list: Course[];
+}
+
+@Component({
+  components: {
+    SingleCourse
+  }
+})
+export default class CourseList extends Vue implements CourseObserver {
+
+  all_courses: AllCourses | null = null;
+  courses_by_term: TermCourses[] = [];
+  loading = true;
+
+  beforeDestroy() {
+    Course.unsubscribe(this);
   }
 
-  interface TermCourses {
-    term: Term;
-    course_list: Course[];
+  async created() {
+    Course.subscribe(this);
+    await this.get_and_sort_courses();
+    this.loading = false;
   }
 
-  @Component({
-    components: {
-      SingleCourse
-    }
-  })
-  export default class CourseList extends Vue implements CourseObserver {
+  is_admin(course: Course) {
+    return array_has_unique(
+      this.all_courses!.courses_is_admin_for,
+      course,
+      (course_a: Course, course_b: Course) => {
+        return course_a.name === course_b.name
+               && course_a.semester === course_b.semester
+               && course_a.year === course_b.year;
+      }
+    );
+  }
 
-    all_courses: AllCourses | null = null;
-    courses_by_term: TermCourses[] = [];
-    loading = true;
-
-    beforeDestroy() {
-      Course.unsubscribe(this);
-    }
-
-    async created() {
-      Course.subscribe(this);
-      await this.get_and_sort_courses();
-      this.loading = false;
-    }
-
-    is_admin(course: Course) {
-      return array_has_unique(
-        this.all_courses!.courses_is_admin_for,
-        course,
-        (course_a: Course, course_b: Course) => {
-          return course_a.name === course_b.name
-                 && course_a.semester === course_b.semester
-                 && course_a.year === course_b.year;
-        }
+  sort_into_terms(courses: Course[]) {
+    for (let course of courses) {
+      let current_term: Term = {semester: course.semester, year: course.year};
+      let term_exists = array_has_unique(
+        this.courses_by_term, current_term,
+        (item: TermCourses, term: Term) => terms_equal(item.term, term)
       );
-    }
-
-    sort_into_terms(courses: Course[]) {
-      for (let course of courses) {
-        let current_term: Term = {semester: course.semester, year: course.year};
-        let term_exists = array_has_unique(
+      if (term_exists) {
+        let term_courses: TermCourses = array_get_unique(
           this.courses_by_term, current_term,
           (item: TermCourses, term: Term) => terms_equal(item.term, term)
         );
-        if (term_exists) {
-          let term_courses: TermCourses = array_get_unique(
-            this.courses_by_term, current_term,
-            (item: TermCourses, term: Term) => terms_equal(item.term, term)
-          );
-          term_courses.course_list.push(course);
-        }
-        else {
-          array_add_unique(
-            this.courses_by_term,
-            {term: current_term, course_list: [course]},
-            (first: TermCourses, second: TermCourses) => {
-              return terms_equal(first.term, second.term);
-            }
-          );
-        }
+        term_courses.course_list.push(course);
       }
-    }
-
-    async get_and_sort_courses() {
-      let user = await User.get_current();
-      this.all_courses = await Course.get_courses_for_user(user);
-      for (let [role, courses] of Object.entries(this.all_courses)) {
-        this.sort_into_terms(courses);
-      }
-      this.courses_by_term.sort(term_descending);
-      for (let term_courses of this.courses_by_term) {
-        term_courses.course_list.sort((course_a: Course, course_b: Course) =>
-          course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
+      else {
+        array_add_unique(
+          this.courses_by_term,
+          {term: current_term, course_list: [course]},
+          (first: TermCourses, second: TermCourses) => {
+            return terms_equal(first.term, second.term);
+          }
         );
       }
     }
+  }
 
-    update_course_changed(course: Course): void { }
-
-    update_course_created(course: Course): void {
-      this.all_courses!.courses_is_admin_for.push(course);
-      this.sort_into_terms([course]);
-      this.courses_by_term.sort(term_descending);
-      let index = this.courses_by_term.findIndex((term) => term.term.semester === course.semester
-                                                           && term.term.year === course.year);
-      this.courses_by_term[index].course_list.sort((course_a: Course, course_b: Course) =>
+  async get_and_sort_courses() {
+    let user = await User.get_current();
+    this.all_courses = await Course.get_courses_for_user(user);
+    for (let [role, courses] of Object.entries(this.all_courses)) {
+      this.sort_into_terms(courses);
+    }
+    this.courses_by_term.sort(term_descending);
+    for (let term_courses of this.courses_by_term) {
+      term_courses.course_list.sort((course_a: Course, course_b: Course) =>
         course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
       );
     }
   }
 
-  function terms_equal(first: Term, second: Term) {
-    return first.year === second.year && first.semester === second.semester;
+  update_course_changed(course: Course): void { }
+
+  update_course_created(course: Course): void {
+    this.all_courses!.courses_is_admin_for.push(course);
+    this.sort_into_terms([course]);
+    this.courses_by_term.sort(term_descending);
+    let index = this.courses_by_term.findIndex((term) => term.term.semester === course.semester
+                                                         && term.term.year === course.year);
+    this.courses_by_term[index].course_list.sort((course_a: Course, course_b: Course) =>
+      course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
+    );
+  }
+}
+
+function terms_equal(first: Term, second: Term) {
+  return first.year === second.year && first.semester === second.semester;
+}
+
+function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourses) {
+  let semester_ordering = {
+    [Semester.winter]: 1,
+    [Semester.spring]: 2,
+    [Semester.summer]: 3,
+    [Semester.fall]: 4
+  };
+
+  if (term_courses_a.term.year === term_courses_b.term.year) {
+    let semester_a = term_courses_a.term.semester === null
+      ? 0 : semester_ordering[term_courses_a.term.semester];
+    let semester_b = term_courses_b.term.semester === null
+      ? 0 : semester_ordering[term_courses_b.term.semester];
+    return semester_b - semester_a;
   }
 
-  function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourses) {
-    let semester_ordering = {
-      [Semester.winter]: 1,
-      [Semester.spring]: 2,
-      [Semester.summer]: 3,
-      [Semester.fall]: 4
-    };
-
-    if (term_courses_a.term.year === term_courses_b.term.year) {
-      let semester_a = term_courses_a.term.semester === null
-        ? 0 : semester_ordering[term_courses_a.term.semester];
-      let semester_b = term_courses_b.term.semester === null
-        ? 0 : semester_ordering[term_courses_b.term.semester];
-      return semester_b - semester_a;
-    }
-
-    let year_a = term_courses_a.term.year === null ? 0 : term_courses_a.term.year;
-    let year_b = term_courses_b.term.year === null ? 0 : term_courses_b.term.year;
-    return year_b - year_a;
-  }
+  let year_a = term_courses_a.term.year === null ? 0 : term_courses_a.term.year;
+  let year_b = term_courses_b.term.year === null ? 0 : term_courses_b.term.year;
+  return year_b - year_a;
+}
 
 </script>
 

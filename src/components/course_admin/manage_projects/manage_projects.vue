@@ -60,84 +60,84 @@
 </template>
 
 <script lang="ts">
-  import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import APIErrors from "@/components/api_errors.vue";
-  import { handle_api_errors_async } from '@/utils';
-  import { is_not_empty } from '@/validators';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Course, Project } from 'ag-client-typescript';
 
-  import { Course, Project } from 'ag-client-typescript';
+import APIErrors from "@/components/api_errors.vue";
+import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
+import { is_not_empty } from '@/validators';
 
-  @Component({
-    components: {
-      APIErrors,
-      SingleProject,
-      Tooltip,
-      ValidatedForm,
-      ValidatedInput
-    }
-  })
-  export default class ManageProjects extends Vue {
+@Component({
+  components: {
+    APIErrors,
+    SingleProject,
+    Tooltip,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class ManageProjects extends Vue {
 
-    @Prop({required: true, type: Course})
-    course!: Course;
+  @Prop({required: true, type: Course})
+  course!: Course;
 
-    readonly is_not_empty = is_not_empty;
+  readonly is_not_empty = is_not_empty;
 
-    loading = true;
-    projects: Project[] = [];
-    new_project_name = "";
-    new_project_name_is_valid = false;
-    d_course!: Course;
+  loading = true;
+  projects: Project[] = [];
+  new_project_name = "";
+  new_project_name_is_valid = false;
+  d_course!: Course;
 
-    d_adding_project = false;
+  d_adding_project = false;
 
-    async created() {
-      this.d_course = this.course;
-      this.projects = await Project.get_all_from_course(this.d_course.pk);
-      this.loading = false;
-    }
+  async created() {
+    this.d_course = this.course;
+    this.projects = await Project.get_all_from_course(this.d_course.pk);
+    this.loading = false;
+  }
 
-    sort_projects() {
-      this.projects.sort((project_a: Project, project_b: Project) => {
-        if (project_a.name <= project_b.name) {
-          return -1;
-        }
-        return 1;
-      });
-    }
+  sort_projects() {
+    this.projects.sort((project_a: Project, project_b: Project) => {
+      if (project_a.name <= project_b.name) {
+        return -1;
+      }
+      return 1;
+    });
+  }
 
-    add_cloned_project(new_project: Project) {
+  add_cloned_project(new_project: Project) {
+    this.projects.push(new_project);
+    this.sort_projects();
+  }
+
+  @handle_api_errors_async(handle_add_project_error)
+  async add_project() {
+    try {
+      this.d_adding_project = true;
+      this.new_project_name.trim();
+      let new_project: Project = await Project.create(
+        this.d_course.pk, {name: this.new_project_name}
+      );
       this.projects.push(new_project);
       this.sort_projects();
+      this.new_project_name = "";
+      (<ValidatedInput> this.$refs.new_project_name).reset_warning_state();
     }
-
-    @handle_api_errors_async(handle_add_project_error)
-    async add_project() {
-      try {
-        this.d_adding_project = true;
-        this.new_project_name.trim();
-        let new_project: Project = await Project.create(
-          this.d_course.pk, {name: this.new_project_name}
-        );
-        this.projects.push(new_project);
-        this.sort_projects();
-        this.new_project_name = "";
-        (<ValidatedInput> this.$refs.new_project_name).reset_warning_state();
-      }
-      finally {
-        this.d_adding_project = false;
-      }
+    finally {
+      this.d_adding_project = false;
     }
   }
+}
 
-  export function handle_add_project_error(component: ManageProjects, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
-  }
+export function handle_add_project_error(component: ManageProjects, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 
 </script>
 

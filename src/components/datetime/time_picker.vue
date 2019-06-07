@@ -63,9 +63,10 @@
 </template>
 
 <script lang="ts">
-// @ts-ignore
-import moment from 'moment';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+// @ts-ignore
+
+import moment from 'moment';
 
 export class Time {
   readonly hours: number;

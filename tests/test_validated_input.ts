@@ -1,5 +1,6 @@
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
 import { expect_html_element_has_value, set_validated_input_text, sleep } from './utils';
 

@@ -1,7 +1,9 @@
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import { Group } from 'ag-client-typescript';
+
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import GroupLookup from '@/components/group_lookup.vue';
-import { config, mount, Wrapper } from '@vue/test-utils';
-import { Group } from 'ag-client-typescript';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

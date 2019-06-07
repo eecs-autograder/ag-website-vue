@@ -1,8 +1,5 @@
-import APIErrors from '@/components/api_errors.vue';
-import DatetimePicker from "@/components/datetime/datetime_picker.vue";
-import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import {
     Course,
     Group,
@@ -11,10 +8,14 @@ import {
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
-import * as sinon from "sinon";
-
 // @ts-ignore
 import moment from 'moment';
+import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import DatetimePicker from "@/components/datetime/datetime_picker.vue";
+import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

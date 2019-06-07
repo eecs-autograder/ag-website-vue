@@ -1,6 +1,8 @@
-import ValidatedInput from "@/components/validated_input.vue";
-import { Wrapper } from "@vue/test-utils";
 import { Vue } from "vue-property-decorator";
+
+import { Wrapper } from "@vue/test-utils";
+
+import ValidatedInput from "@/components/validated_input.vue";
 
 export function sleep(seconds: number) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000));

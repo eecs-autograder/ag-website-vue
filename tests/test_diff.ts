@@ -1,5 +1,6 @@
-import Diff from '@/components/diff.vue';
 import { config, mount } from '@vue/test-utils';
+
+import Diff from '@/components/diff.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

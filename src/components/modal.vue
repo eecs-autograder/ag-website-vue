@@ -13,36 +13,36 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  @Component
-  export default class Modal extends Vue {
-    @Prop({default: false, type: Boolean})
-    click_outside_to_close!: boolean;
+@Component
+export default class Modal extends Vue {
+  @Prop({default: false, type: Boolean})
+  click_outside_to_close!: boolean;
 
-    @Prop({default: true, type: Boolean})
-    include_closing_x!: boolean;
+  @Prop({default: true, type: Boolean})
+  include_closing_x!: boolean;
 
-    @Prop()
-    size!: string;
+  @Prop()
+  size!: string;
 
-    @Prop()
-    custom_width!: number;
+  @Prop()
+  custom_width!: number;
 
-    is_open: boolean = false;
+  is_open: boolean = false;
 
-    close() {
-      this.is_open = false;
-    }
-
-    open() {
-      this.is_open = true;
-    }
-
-    toggle() {
-      this.is_open = !this.is_open;
-    }
+  close() {
+    this.is_open = false;
   }
+
+  open() {
+    this.is_open = true;
+  }
+
+  toggle() {
+    this.is_open = !this.is_open;
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

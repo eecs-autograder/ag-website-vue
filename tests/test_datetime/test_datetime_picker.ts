@@ -1,9 +1,10 @@
-import DatetimePicker, { InvalidDatetimeStrError } from '@/components/datetime/datetime_picker.vue';
-import TimePicker from "@/components/datetime/time_picker.vue";
 import { config, mount, Wrapper } from '@vue/test-utils';
 
 // @ts-ignore
 import * as timezone_mock from 'timezone-mock';
+
+import DatetimePicker, { InvalidDatetimeStrError } from '@/components/datetime/datetime_picker.vue';
+import TimePicker from "@/components/datetime/time_picker.vue";
 
 beforeAll(() => {
     config.logModifiedComponents = false;

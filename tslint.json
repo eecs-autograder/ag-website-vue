@@ -124,12 +124,7 @@
         "no-reference-import": true,
         "no-unnecessary-callback-wrapper": true,
         "one-variable-per-declaration": true,
-//        "ordered-imports": [true, {
-//            "grouped-imports": true,
-//            "import-sources-order": "case-insensitive",
-//            "named-imports-order": "case-insensitive",
-//            "module-source-path": "full"
-//        }],
+
         "ordered-imports": [
             true,
             {
@@ -137,11 +132,13 @@
                 "named-imports-order": "case-insensitive",
                 "grouped-imports": true,
                 "groups": [
-                    { "name": "Vue libraries", "match": ".?vue.*", "order": 5 },
-                    { "name": "Project absolute imports", "match": "^@[/]", "order": 20 },
-                    { "name": "Relative parent dir", "match": "^[.][.]", "order": 40 },
-                    { "name": "Relative current dir", "match": "^[.]", "order": 50 },
-                    { "name": "Libraries", "match": null, "order": 10 }
+                    {"name": "Vue libraries", "match": "^vue.*", "order": 4},
+                    {"name": "Vue @ libraries", "match": "^@?vue.*", "order": 5},
+                    {"name": "Project absolute test imports", "match": "^@[/]tests", "order": 25},
+                    {"name": "Project absolute imports", "match": "^@[/]", "order": 20},
+                    {"name": "Relative parent dir", "match": "^[.][.]", "order": 40},
+                    {"name": "Relative current dir", "match": "^[.]", "order": 50},
+                    {"name": "Libraries", "match": ".*", "order": 10}
                 ]
             }
         ],

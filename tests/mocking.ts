@@ -1,5 +1,6 @@
-import { Wrapper } from '@vue/test-utils';
 import Vue from "vue";
+
+import { Wrapper } from '@vue/test-utils';
 
 export function patch_object_prototype(obj: object, new_prototype: object, body: () => void) {
     let original_prototype = Object.getPrototypeOf(obj);

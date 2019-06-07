@@ -73,69 +73,70 @@
 </template>
 
 <script lang="ts">
-  import { InstructorFile } from 'ag-client-typescript';
-  import * as FileSaver from 'file-saver';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import APIErrors from '@/components/api_errors.vue';
-  import Modal from '@/components/modal.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput from '@/components/validated_input.vue';
-  import { handle_api_errors_async } from '@/utils';
-  import { is_not_empty } from '@/validators';
+import { InstructorFile } from 'ag-client-typescript';
+import * as FileSaver from 'file-saver';
 
-  @Component({
-    components: {
-      APIErrors,
-      Modal,
-      ValidatedForm,
-      ValidatedInput
+import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
+import { is_not_empty } from '@/validators';
+
+@Component({
+  components: {
+    APIErrors,
+    Modal,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class SingleInstructorFile extends Vue {
+
+  @Prop({required: true, type: InstructorFile})
+  file!: InstructorFile;
+
+  readonly is_not_empty = is_not_empty;
+
+  d_delete_pending = false;
+  editing = false;
+  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+  new_file_name: string = "";
+  new_name_is_valid = true;
+
+  @handle_api_errors_async(handle_rename_file_error)
+  async rename_file() {
+    if (this.new_file_name !== this.file.name) {
+      await this.file.rename(this.new_file_name);
     }
-  })
-  export default class SingleInstructorFile extends Vue {
-
-    @Prop({required: true, type: InstructorFile})
-    file!: InstructorFile;
-
-    readonly is_not_empty = is_not_empty;
-
-    d_delete_pending = false;
-    editing = false;
-    last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                            hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    new_file_name: string = "";
-    new_name_is_valid = true;
-
-    @handle_api_errors_async(handle_rename_file_error)
-    async rename_file() {
-      if (this.new_file_name !== this.file.name) {
-        await this.file.rename(this.new_file_name);
-      }
-      this.editing = false;
-    }
-
-    cancel_renaming_file() {
-      this.editing = false;
-    }
-
-    async download_file() {
-      FileSaver.saveAs(new File([await this.file.get_content()], this.file.name));
-    }
-
-    async delete_file_permanently() {
-      try {
-        this.d_delete_pending = true;
-        await this.file.delete();
-      }
-      finally {
-        this.d_delete_pending = false;
-      }
-    }
+    this.editing = false;
   }
 
-  export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  cancel_renaming_file() {
+    this.editing = false;
   }
+
+  async download_file() {
+    FileSaver.saveAs(new File([await this.file.get_content()], this.file.name));
+  }
+
+  async delete_file_permanently() {
+    try {
+      this.d_delete_pending = true;
+      await this.file.delete();
+    }
+    finally {
+      this.d_delete_pending = false;
+    }
+  }
+}
+
+export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
 
 </script>
 

@@ -1,8 +1,11 @@
+import Vue from 'vue';
+
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import * as sinon from 'sinon';
+
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
-import { config, mount, Wrapper } from '@vue/test-utils';
-import * as sinon from 'sinon';
-import Vue from 'vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

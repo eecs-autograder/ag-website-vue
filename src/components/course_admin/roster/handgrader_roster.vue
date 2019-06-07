@@ -11,36 +11,38 @@
 </template>
 
 <script lang="ts">
-  import Roster from '@/components/course_admin/roster/roster.vue';
-  import { Course, User } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      Roster
-    }
-  })
-  export default class HandgraderRoster extends Vue {
-    @Prop({required: true, type: Course})
-    course!: Course;
+import { Course, User } from 'ag-client-typescript';
 
-    d_course!: Course;
-    handgraders: User[] = [];
+import Roster from '@/components/course_admin/roster/roster.vue';
 
-    async created() {
-      this.d_course = this.course;
-      this.handgraders = await this.d_course.get_handgraders();
-    }
-
-    async add_handgraders_to_roster(new_handgraders: string[]) {
-      await this.d_course.add_handgraders(new_handgraders);
-      this.handgraders = await this.d_course.get_handgraders();
-    }
-
-    async remove_handgrader_from_roster(handgraders_to_delete: User[]) {
-      await this.d_course.remove_handgraders(handgraders_to_delete);
-    }
+@Component({
+  components: {
+    Roster
   }
+})
+export default class HandgraderRoster extends Vue {
+  @Prop({required: true, type: Course})
+  course!: Course;
+
+  d_course!: Course;
+  handgraders: User[] = [];
+
+  async created() {
+    this.d_course = this.course;
+    this.handgraders = await this.d_course.get_handgraders();
+  }
+
+  async add_handgraders_to_roster(new_handgraders: string[]) {
+    await this.d_course.add_handgraders(new_handgraders);
+    this.handgraders = await this.d_course.get_handgraders();
+  }
+
+  async remove_handgrader_from_roster(handgraders_to_delete: User[]) {
+    await this.d_course.remove_handgraders(handgraders_to_delete);
+  }
+}
 </script>
 
 <style scoped lang="scss"> </style>

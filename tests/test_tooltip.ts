@@ -1,6 +1,6 @@
-import Tooltip from '@/components/tooltip.vue';
 import { config, mount } from '@vue/test-utils';
-import { Component, Vue } from 'vue-property-decorator';
+
+import Tooltip from '@/components/tooltip.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

@@ -54,61 +54,63 @@
 
 
 <script lang="ts">
-  import Tab from '@/components/tabs/tab.vue';
-  import TabHeader from '@/components/tabs/tab_header.vue';
-  import Tabs from '@/components/tabs/tabs.vue';
-  import { get_query_param } from '@/utils';
-  import { Project } from 'ag-client-typescript';
-  import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      Tab,
-      TabHeader,
-      Tabs
-    }
-  })
-  export default class ProjectSubmission extends Vue {
-    current_tab_index = 0;
-    d_loading = true;
-    project: Project | null = null;
+import { Project } from 'ag-client-typescript';
 
-    async created() {
-      this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
-      this.d_loading = false;
-    }
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import { get_query_param } from '@/utils';
 
-    mounted() {
-      this.select_tab(get_query_param(this.$route.query, "current_tab"));
-    }
+@Component({
+  components: {
+    Tab,
+    TabHeader,
+    Tabs
+  }
+})
+export default class ProjectSubmission extends Vue {
+  current_tab_index = 0;
+  d_loading = true;
+  project: Project | null = null;
 
-    on_tab_changed(index: number) {
-      switch (index) {
-        case 0:
-          this.$router.replace({query: {current_tab: "submit"}});
-          break;
-        case 1:
-          this.$router.replace({query: {current_tab: "my_submissions"}});
-          break;
-        case 2:
-          this.$router.replace({query: {current_tab: "student_lookup"}});
-      }
-    }
-    select_tab(tab_name: string | null) {
-      switch (tab_name) {
-        case "submit":
-          break;
-        case "my_submissions":
-          this.current_tab_index = 1;
-          break;
-        case "student_lookup":
-          this.current_tab_index = 2;
-          break;
-        default:
-          this.current_tab_index = 0;
-      }
+  async created() {
+    this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
+    this.d_loading = false;
+  }
+
+  mounted() {
+    this.select_tab(get_query_param(this.$route.query, "current_tab"));
+  }
+
+  on_tab_changed(index: number) {
+    switch (index) {
+      case 0:
+        this.$router.replace({query: {current_tab: "submit"}});
+        break;
+      case 1:
+        this.$router.replace({query: {current_tab: "my_submissions"}});
+        break;
+      case 2:
+        this.$router.replace({query: {current_tab: "student_lookup"}});
     }
   }
+  select_tab(tab_name: string | null) {
+    switch (tab_name) {
+      case "submit":
+        break;
+      case "my_submissions":
+        this.current_tab_index = 1;
+        break;
+      case "student_lookup":
+        this.current_tab_index = 2;
+        break;
+      default:
+        this.current_tab_index = 0;
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

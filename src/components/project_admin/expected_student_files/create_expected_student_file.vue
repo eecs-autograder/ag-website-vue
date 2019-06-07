@@ -17,11 +17,11 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-
 import { handle_api_errors_async } from '@/utils';
-import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
 @Component({
   components: {

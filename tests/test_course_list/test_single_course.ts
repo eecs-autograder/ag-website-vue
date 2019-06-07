@@ -1,11 +1,13 @@
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import { Course, Semester } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
+import * as sinon from 'sinon';
+
 import APIErrors from '@/components/api_errors.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { config, mount, Wrapper } from '@vue/test-utils';
-import { Course, Semester } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
-import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

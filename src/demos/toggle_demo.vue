@@ -49,9 +49,9 @@
 </template>
 
 <script lang="ts">
+  import { Component, Vue } from 'vue-property-decorator';
 
   import Toggle from '@/components/toggle.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
 
   @Component({
     components: { Toggle }

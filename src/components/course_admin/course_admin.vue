@@ -97,124 +97,127 @@
 </template>
 
 <script lang="ts">
-  import CourseSettings from '@/components/course_admin/course_settings.vue';
-  import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
-  import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
-  import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
-  import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
-  import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
-  import Dropdown from '@/components/dropdown.vue';
-  import Tab from '@/components/tabs/tab.vue';
-  import TabHeader from '@/components/tabs/tab_header.vue';
-  import Tabs from '@/components/tabs/tabs.vue';
-  import { get_query_param } from "@/utils";
-  import { Course } from 'ag-client-typescript';
-  import { Component, Vue } from 'vue-property-decorator';
-  @Component({
-    components: {
-      AdminRoster,
-      HandgraderRoster,
-      StaffRoster,
-      StudentRoster,
-      ManageProjects,
-      CourseSettings,
-      Dropdown,
-      Tab,
-      TabHeader,
-      Tabs,
-    }
-  })
-  export default class CourseAdmin extends Vue {
+import { Component, Vue } from 'vue-property-decorator';
 
-    current_tab_index = 0;
-    loading = true;
-    role_selected = "";
-    roles = [
-      RosterChoice.admin,
-      RosterChoice.staff,
-      RosterChoice.student,
-      RosterChoice.handgrader
-    ];
-    course: Course | null = null;
+import { Course } from 'ag-client-typescript';
 
-    async created() {
-      this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
-      this.loading = false;
-    }
+import CourseSettings from '@/components/course_admin/course_settings.vue';
+import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
+import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
+import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
+import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
+import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
+import Dropdown from '@/components/dropdown.vue';
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import { get_query_param } from "@/utils";
 
-    mounted() {
-      this.select_tab(get_query_param(this.$route.query, "current_tab"));
-    }
+@Component({
+  components: {
+    AdminRoster,
+    HandgraderRoster,
+    StaffRoster,
+    StudentRoster,
+    ManageProjects,
+    CourseSettings,
+    Dropdown,
+    Tab,
+    TabHeader,
+    Tabs,
+  }
+})
+export default class CourseAdmin extends Vue {
 
-    show_roster_tab_dropdown_menu(event: Event) {
-      let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
-      roster_dropdown.show_the_dropdown_menu();
-      event.stopPropagation();
-    }
+  current_tab_index = 0;
+  loading = true;
+  role_selected = "";
+  roles = [
+    RosterChoice.admin,
+    RosterChoice.staff,
+    RosterChoice.student,
+    RosterChoice.handgrader
+  ];
+  course: Course | null = null;
 
-    on_tab_changed(index: number) {
-      if (this.current_tab_index !== 1) {
-        this.role_selected = "";
-      }
-      switch (index) {
-        case 0:
-          this.$router.replace({query: {current_tab: "settings"}});
-          break;
-        case 1:
-          if (this.role_selected === RosterChoice.admin) {
-            this.$router.replace({query: {current_tab: "admin_roster"}});
-          }
-          else if (this.role_selected === RosterChoice.staff) {
-            this.$router.replace({query: {current_tab: "staff_roster"}});
-          }
-          else if (this.role_selected === RosterChoice.student) {
-            this.$router.replace({query: {current_tab: "student_roster"}});
-          }
-          else {
-            this.$router.replace({query: {current_tab: "handgrader_roster"}});
-          }
-          break;
-        case 2:
-          this.$router.replace(({query: {current_tab: "manage_projects"}}));
-      }
-    }
-
-    select_tab(tab_name: string | null) {
-      switch (tab_name) {
-        case "settings":
-          break;
-        case "admin_roster":
-          this.current_tab_index = 1;
-          this.role_selected = RosterChoice.admin;
-          break;
-        case "staff_roster":
-          this.current_tab_index = 1;
-          this.role_selected = RosterChoice.staff;
-          break;
-        case "student_roster":
-          this.current_tab_index = 1;
-          this.role_selected = RosterChoice.student;
-          break;
-        case "handgrader_roster":
-          this.current_tab_index = 1;
-          this.role_selected = RosterChoice.handgrader;
-          break;
-        case "manage_projects":
-          this.current_tab_index = 2;
-          break;
-        default:
-          this.current_tab_index = 0;
-      }
-    }
-    readonly RosterChoice = RosterChoice;
+  async created() {
+    this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
+    this.loading = false;
   }
 
-  export enum RosterChoice {
-    admin = "Admin",
-    staff = "Staff",
-    student = "Student",
-    handgrader = "Handgrader"
+  mounted() {
+    this.select_tab(get_query_param(this.$route.query, "current_tab"));
   }
+
+  show_roster_tab_dropdown_menu(event: Event) {
+    let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
+    roster_dropdown.show_the_dropdown_menu();
+    event.stopPropagation();
+  }
+
+  on_tab_changed(index: number) {
+    if (this.current_tab_index !== 1) {
+      this.role_selected = "";
+    }
+    switch (index) {
+      case 0:
+        this.$router.replace({query: {current_tab: "settings"}});
+        break;
+      case 1:
+        if (this.role_selected === RosterChoice.admin) {
+          this.$router.replace({query: {current_tab: "admin_roster"}});
+        }
+        else if (this.role_selected === RosterChoice.staff) {
+          this.$router.replace({query: {current_tab: "staff_roster"}});
+        }
+        else if (this.role_selected === RosterChoice.student) {
+          this.$router.replace({query: {current_tab: "student_roster"}});
+        }
+        else {
+          this.$router.replace({query: {current_tab: "handgrader_roster"}});
+        }
+        break;
+      case 2:
+        this.$router.replace(({query: {current_tab: "manage_projects"}}));
+    }
+  }
+
+  select_tab(tab_name: string | null) {
+    switch (tab_name) {
+      case "settings":
+        break;
+      case "admin_roster":
+        this.current_tab_index = 1;
+        this.role_selected = RosterChoice.admin;
+        break;
+      case "staff_roster":
+        this.current_tab_index = 1;
+        this.role_selected = RosterChoice.staff;
+        break;
+      case "student_roster":
+        this.current_tab_index = 1;
+        this.role_selected = RosterChoice.student;
+        break;
+      case "handgrader_roster":
+        this.current_tab_index = 1;
+        this.role_selected = RosterChoice.handgrader;
+        break;
+      case "manage_projects":
+        this.current_tab_index = 2;
+        break;
+      default:
+        this.current_tab_index = 0;
+    }
+  }
+  readonly RosterChoice = RosterChoice;
+}
+
+export enum RosterChoice {
+  admin = "Admin",
+  staff = "Staff",
+  student = "Student",
+  handgrader = "Handgrader"
+}
 </script>
 
 <style scoped lang="scss">

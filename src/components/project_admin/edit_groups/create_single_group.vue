@@ -57,11 +57,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import APIErrors from '@/components/api_errors.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-
 import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
 
+import APIErrors from '@/components/api_errors.vue';
+import ValidatedForm from '@/components/validated_form.vue';
 import { handle_api_errors_async } from '@/utils';
 
 interface GroupMember {

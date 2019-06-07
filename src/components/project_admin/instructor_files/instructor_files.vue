@@ -41,103 +41,104 @@
 </template>
 
 <script lang="ts">
-  import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import FileUpload from '@/components/file_upload.vue';
-  import MultiFileViewer from '@/components/multi_file_viewer.vue';
-  import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
+import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
-  import SingleInstructorFile from './single_instructor_file.vue';
+import FileUpload from '@/components/file_upload.vue';
+import MultiFileViewer from '@/components/multi_file_viewer.vue';
+import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
 
-  @Component({
-    components: {
-      FileUpload,
-      MultiFileViewer,
-      SingleInstructorFile
-    }
-  })
-  export default class InstructorFiles extends Vue implements InstructorFileObserver {
+import SingleInstructorFile from './single_instructor_file.vue';
 
-    d_collapsed = false;
-    instructor_files: InstructorFile[] = [];
-    last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                            hour: 'numeric', minute: 'numeric', second: 'numeric'};
-    num_files_currently_viewing = 0;
+@Component({
+  components: {
+    FileUpload,
+    MultiFileViewer,
+    SingleInstructorFile
+  }
+})
+export default class InstructorFiles extends Vue implements InstructorFileObserver {
 
-    @Prop({required: true, type: Project})
-    project!: Project;
+  d_collapsed = false;
+  instructor_files: InstructorFile[] = [];
+  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
+                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+  num_files_currently_viewing = 0;
 
-    async created() {
-      InstructorFile.subscribe(this);
-      this.instructor_files = await InstructorFile.get_all_from_project(this.project.pk);
-      this.sort_files();
-    }
+  @Prop({required: true, type: Project})
+  project!: Project;
 
-    destroyed() {
-      InstructorFile.unsubscribe(this);
-    }
+  async created() {
+    InstructorFile.subscribe(this);
+    this.instructor_files = await InstructorFile.get_all_from_project(this.project.pk);
+    this.sort_files();
+  }
 
-    sort_files() {
-      this.instructor_files.sort(
-        (file_a: InstructorFile, file_b: InstructorFile) =>
-          file_a.name.localeCompare(file_b.name));
-    }
+  destroyed() {
+    InstructorFile.unsubscribe(this);
+  }
 
-    async view_file(file: InstructorFile) {
-      (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
-        file.name, file.get_content(), file.pk
+  sort_files() {
+    this.instructor_files.sort(
+      (file_a: InstructorFile, file_b: InstructorFile) =>
+        file_a.name.localeCompare(file_b.name));
+  }
+
+  async view_file(file: InstructorFile) {
+    (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
+      file.name, file.get_content(), file.pk
+    );
+  }
+
+  async add_instructor_files(files: File[]) {
+    for (let file of files) {
+      let file_already_exists = array_has_unique(
+        this.instructor_files,
+        file.name,
+        (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
       );
-    }
 
-    async add_instructor_files(files: File[]) {
-      for (let file of files) {
-        let file_already_exists = array_has_unique(
+      if (file_already_exists) {
+        let file_to_update = array_get_unique(
           this.instructor_files,
           file.name,
           (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
         );
-
-        if (file_already_exists) {
-          let file_to_update = array_get_unique(
-            this.instructor_files,
-            file.name,
-            (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
-          );
-          await file_to_update.set_content(file);
-        }
-        else {
-            let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
-            this.instructor_files.push(file_to_add);
-        }
+        await file_to_update.set_content(file);
       }
-      (<FileUpload> this.$refs.instructor_files_upload).clear_files();
-      this.sort_files();
+      else {
+          let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
+          this.instructor_files.push(file_to_add);
+      }
     }
-
-    update_instructor_file_content_changed(instructor_file: InstructorFile,
-                                           file_content: string) {
-      (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
-        instructor_file.name, Promise.resolve(file_content)
-      );
-    }
-
-    update_instructor_file_created(instructor_file: InstructorFile) { }
-
-    update_instructor_file_deleted(instructor_file: InstructorFile) {
-      array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
-      (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
-    }
-
-    update_instructor_file_renamed(instructor_file: InstructorFile) {
-      let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
-      Vue.set(this.instructor_files, index, instructor_file);
-      (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
-        instructor_file.pk, instructor_file.name
-      );
-      this.sort_files();
-    }
+    (<FileUpload> this.$refs.instructor_files_upload).clear_files();
+    this.sort_files();
   }
+
+  update_instructor_file_content_changed(instructor_file: InstructorFile,
+                                         file_content: string) {
+    (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
+      instructor_file.name, Promise.resolve(file_content)
+    );
+  }
+
+  update_instructor_file_created(instructor_file: InstructorFile) { }
+
+  update_instructor_file_deleted(instructor_file: InstructorFile) {
+    array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
+    (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
+  }
+
+  update_instructor_file_renamed(instructor_file: InstructorFile) {
+    let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
+    Vue.set(this.instructor_files, index, instructor_file);
+    (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
+      instructor_file.pk, instructor_file.name
+    );
+    this.sort_files();
+  }
+}
 
 </script>
 
