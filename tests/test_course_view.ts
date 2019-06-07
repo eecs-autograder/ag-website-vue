@@ -1,7 +1,9 @@
-import CourseView from '@/components/course_view.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
+
+import CourseView from '@/components/course_view.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

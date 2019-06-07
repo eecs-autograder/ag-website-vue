@@ -19,9 +19,11 @@
 </template>
 
 <script lang="ts">
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
 import { Group } from 'ag-client-typescript';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 
 @Component({
   components: {

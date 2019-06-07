@@ -14,42 +14,42 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-  @Component
-  export default class ViewFile extends Vue {
+@Component
+export default class ViewFile extends Vue {
 
-    @Prop({required: true, type: String})
-    filename!: string;
+  @Prop({required: true, type: String})
+  filename!: string;
 
-    @Prop({required: true, type: Promise})
-    file_contents!: Promise<string>;
+  @Prop({required: true, type: Promise})
+  file_contents!: Promise<string>;
 
-    @Prop({default: "", type: String})
-    view_file_height!: string;
+  @Prop({default: "", type: String})
+  view_file_height!: string;
 
-    @Watch('file_contents')
-    async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {
-      this.d_loading = true;
-      this.d_file_contents = await new_content;
-      this.d_loading = false;
-    }
-
-    @Watch('filename')
-    on_filename_change(new_file_name: string, old_file_name: string) {
-      this.d_filename = new_file_name;
-    }
-
-    d_filename: string = "";
-    d_file_contents: string = "";
-    d_loading = true;
-
-    async created() {
-      this.d_file_contents = await this.file_contents;
-      this.d_filename = this.filename;
-      this.d_loading = false;
-    }
+  @Watch('file_contents')
+  async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {
+    this.d_loading = true;
+    this.d_file_contents = await new_content;
+    this.d_loading = false;
   }
+
+  @Watch('filename')
+  on_filename_change(new_file_name: string, old_file_name: string) {
+    this.d_filename = new_file_name;
+  }
+
+  d_filename: string = "";
+  d_file_contents: string = "";
+  d_loading = true;
+
+  async created() {
+    this.d_file_contents = await this.file_contents;
+    this.d_filename = this.filename;
+    this.d_loading = false;
+  }
+}
 </script>
 
 <style scoped lang="scss">

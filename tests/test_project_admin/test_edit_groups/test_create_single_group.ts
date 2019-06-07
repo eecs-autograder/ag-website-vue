@@ -1,6 +1,5 @@
-import APIErrors from '@/components/api_errors.vue';
-import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import {
     Course,
     Group,
@@ -11,6 +10,9 @@ import {
 } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

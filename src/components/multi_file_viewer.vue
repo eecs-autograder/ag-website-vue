@@ -32,83 +32,83 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-  import Tab from '@/components/tabs/tab.vue';
-  import TabHeader from '@/components/tabs/tab_header.vue';
-  import Tabs from '@/components/tabs/tabs.vue';
-  import ViewFile from '@/components/view_file.vue';
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import ViewFile from '@/components/view_file.vue';
 
-  interface OpenFile {
-    name: string;
-    content: Promise<string>;
-    id: number | null;
+interface OpenFile {
+  name: string;
+  content: Promise<string>;
+  id: number | null;
+}
+
+@Component({
+  components: { Tab, Tabs, TabHeader, ViewFile }
+})
+export default class MultiFileViewer extends Vue {
+
+  @Prop({default: "", type: String})
+  height_of_view_file!: string;
+
+  files_currently_viewing: OpenFile[] = [];
+  active_tab_index = 0;
+
+  add_to_viewing(filename: string, file_contents: Promise<string>, id: number | null = null) {
+    let file_exists = this.files_currently_viewing.find(
+      open_file => open_file.name === filename
+    ) !== undefined;
+    if (file_exists) {
+      this.active_tab_index = this.files_currently_viewing.findIndex(
+        (open_file) => open_file.name === filename
+      );
+      return;
+    }
+
+    this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
+    this.active_tab_index = this.files_currently_viewing.length - 1;
+    this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
   }
 
-  @Component({
-    components: { Tab, Tabs, TabHeader, ViewFile }
-  })
-  export default class MultiFileViewer extends Vue {
-
-    @Prop({default: "", type: String})
-    height_of_view_file!: string;
-
-    files_currently_viewing: OpenFile[] = [];
-    active_tab_index = 0;
-
-    add_to_viewing(filename: string, file_contents: Promise<string>, id: number | null = null) {
-      let file_exists = this.files_currently_viewing.find(
-        open_file => open_file.name === filename
-      ) !== undefined;
-      if (file_exists) {
-        this.active_tab_index = this.files_currently_viewing.findIndex(
-          (open_file) => open_file.name === filename
-        );
-        return;
-      }
-
-      this.files_currently_viewing.push({name: filename, content: file_contents, id: id});
-      this.active_tab_index = this.files_currently_viewing.length - 1;
-      this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
-    }
-
-    rename_file(id: number, new_name: string) {
-      let index = this.files_currently_viewing.findIndex((open_file) => open_file.id === id);
-      if (index !== -1) {
-        Vue.set(this.files_currently_viewing, index, {
-          name: new_name,
-          content: this.files_currently_viewing[index].content,
-          id: id
-        });
-      }
-    }
-
-    remove_from_viewing(tab_index: number) {
-      if (tab_index < this.active_tab_index) {
-        this.active_tab_index -= 1;
-      }
-      this.files_currently_viewing.splice(tab_index, 1);
-      this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
-    }
-
-    update_contents_by_name(name: string, new_content: Promise<string>) {
-      let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
-      if (index !== -1) {
-        Vue.set(this.files_currently_viewing, index, {
-          name: name,
-          content: new_content,
-          id: this.files_currently_viewing[index].id
-        });
-      }
-    }
-
-    remove_by_name(name: string) {
-      let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
-      if (index !== -1) {
-        this.remove_from_viewing(index);
-      }
+  rename_file(id: number, new_name: string) {
+    let index = this.files_currently_viewing.findIndex((open_file) => open_file.id === id);
+    if (index !== -1) {
+      Vue.set(this.files_currently_viewing, index, {
+        name: new_name,
+        content: this.files_currently_viewing[index].content,
+        id: id
+      });
     }
   }
+
+  remove_from_viewing(tab_index: number) {
+    if (tab_index < this.active_tab_index) {
+      this.active_tab_index -= 1;
+    }
+    this.files_currently_viewing.splice(tab_index, 1);
+    this.$emit('num_files_viewing_changed', this.files_currently_viewing.length);
+  }
+
+  update_contents_by_name(name: string, new_content: Promise<string>) {
+    let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
+    if (index !== -1) {
+      Vue.set(this.files_currently_viewing, index, {
+        name: name,
+        content: new_content,
+        id: this.files_currently_viewing[index].id
+      });
+    }
+  }
+
+  remove_by_name(name: string) {
+    let index = this.files_currently_viewing.findIndex((open_file) => open_file.name === name);
+    if (index !== -1) {
+      this.remove_from_viewing(index);
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

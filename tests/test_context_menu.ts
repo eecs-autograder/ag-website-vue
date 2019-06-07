@@ -1,9 +1,12 @@
-import ContextMenu from '@/components/context_menu/context_menu.vue';
-import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
-import { config, mount } from '@vue/test-utils';
-import * as sinon from 'sinon';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+
+import { config, mount } from '@vue/test-utils';
+
+import * as sinon from 'sinon';
+
+import ContextMenu from '@/components/context_menu/context_menu.vue';
+import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

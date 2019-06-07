@@ -1,5 +1,6 @@
-import ViewFile from '@/components/view_file.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
+import ViewFile from '@/components/view_file.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

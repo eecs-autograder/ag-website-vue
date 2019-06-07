@@ -365,6 +365,10 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import TimePicker from "@/components/datetime/time_picker.vue";
@@ -373,7 +377,6 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-
 import { deep_copy, format_datetime, format_time, handle_api_errors_async } from "@/utils";
 import {
   is_integer,
@@ -383,8 +386,6 @@ import {
   make_min_value_validator,
   string_to_num
 } from '@/validators';
-import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-import { Component, Prop, Vue } from 'vue-property-decorator';
 
 interface UltimateSubmissionPolicyOption {
   label: string;

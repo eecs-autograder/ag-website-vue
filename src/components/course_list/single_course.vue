@@ -104,6 +104,10 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import { Course, Semester } from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
@@ -111,8 +115,6 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async } from '@/utils';
 import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
-import { Course, Semester } from 'ag-client-typescript';
-import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component({
   components: {

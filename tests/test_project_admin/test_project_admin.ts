@@ -1,5 +1,7 @@
-import ProjectAdmin from '@/components/project_admin/project_admin.vue';
+import VueRouter from 'vue-router';
+
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
+
 import {
     Course,
     ExpectedStudentFile,
@@ -10,7 +12,8 @@ import {
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
-import VueRouter from 'vue-router';
+
+import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

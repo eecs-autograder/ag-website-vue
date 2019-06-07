@@ -1,5 +1,6 @@
-import Modal from '@/components/modal.vue';
 import { mount } from '@vue/test-utils';
+
+import Modal from '@/components/modal.vue';
 
 describe('Modal.vue', () => {
     test('Modal open, close, and toggle methods open and close modal', () => {

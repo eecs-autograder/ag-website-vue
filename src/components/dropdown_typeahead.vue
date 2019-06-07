@@ -30,9 +30,10 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
 import Dropdown from '@/components/dropdown.vue';
 
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 @Component({
   components: { Dropdown }
 })

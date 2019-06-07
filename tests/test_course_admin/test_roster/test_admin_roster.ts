@@ -1,8 +1,10 @@
-import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
-import Roster from '@/components/course_admin/roster/roster.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import { Course, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
+
+import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
+import Roster from '@/components/course_admin/roster/roster.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

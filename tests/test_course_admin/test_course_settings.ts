@@ -1,17 +1,20 @@
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import { Course, Semester } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
+import * as sinon from 'sinon';
+
 import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+
 import {
     expect_html_element_has_value,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
 } from "@/tests/utils";
-import { config, mount, Wrapper } from '@vue/test-utils';
-import { Course, Semester } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
-import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

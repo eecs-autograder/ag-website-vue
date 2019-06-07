@@ -1,18 +1,21 @@
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
+import * as sinon from 'sinon';
+
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import TimePicker from "@/components/datetime/time_picker.vue";
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+
 import {
     checkbox_is_checked,
     expect_html_element_has_value,
     get_validated_input_text,
     set_validated_input_text, validated_input_is_valid
 } from "@/tests/utils";
-import { config, mount, Wrapper } from '@vue/test-utils';
-import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
-import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

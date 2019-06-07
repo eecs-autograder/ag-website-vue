@@ -41,9 +41,10 @@
 </template>
 
 <script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import { SafeMap } from "@/safe_map";
-import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
   components: { MultiFileViewer }

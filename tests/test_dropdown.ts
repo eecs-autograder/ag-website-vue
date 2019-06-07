@@ -1,8 +1,9 @@
+import Vue from 'vue';
+
+import { config, mount, Wrapper } from '@vue/test-utils';
+
 import Dropdown from '@/components/dropdown.vue';
 import { zip } from '@/utils';
-import { config, mount, Wrapper } from '@vue/test-utils';
-import Vue from 'vue';
-import Component from 'vue-class-component';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

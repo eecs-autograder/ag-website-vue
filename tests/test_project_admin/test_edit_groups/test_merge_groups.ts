@@ -1,6 +1,5 @@
-import APIErrors from '@/components/api_errors.vue';
-import MergeGroups from '@/components/project_admin/edit_groups/merge_groups.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import {
     Group,
     Project,
@@ -8,6 +7,9 @@ import {
 } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import MergeGroups from '@/components/project_admin/edit_groups/merge_groups.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

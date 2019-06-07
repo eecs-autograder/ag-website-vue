@@ -116,32 +116,33 @@
 </template>
 
 <script lang="ts">
-  import ContextMenu from '@/components/context_menu/context_menu.vue';
-  import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-  @Component({
-    components: {ContextMenu, ContextMenuItem}
-  })
-  export default class ContextMenuDemo extends Vue {
+import ContextMenu from '@/components/context_menu/context_menu.vue';
+import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 
-    choice_alert(word: string) {
-      alert('You have clicked on: ' + word);
-    }
+@Component({
+  components: {ContextMenu, ContextMenuItem}
+})
+export default class ContextMenuDemo extends Vue {
 
-    change_color(word: string) {
-      let text = <HTMLElement> this.$el.getElementsByClassName('area-of-focus-1')[0];
-      text.style.color = word;
-    }
-
-    items = [
-      {name: 'Option 1', disabled: false},
-      {name: 'Option 2', disabled: false},
-      {name: 'Option 3', disabled: false},
-      {name: 'Option 4', disabled: true}
-    ];
-
+  choice_alert(word: string) {
+    alert('You have clicked on: ' + word);
   }
+
+  change_color(word: string) {
+    let text = <HTMLElement> this.$el.getElementsByClassName('area-of-focus-1')[0];
+    text.style.color = word;
+  }
+
+  items = [
+    {name: 'Option 1', disabled: false},
+    {name: 'Option 2', disabled: false},
+    {name: 'Option 3', disabled: false},
+    {name: 'Option 4', disabled: true}
+  ];
+
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

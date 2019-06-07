@@ -58,95 +58,98 @@
 </template>
 
 <script lang="ts">
-  import Tooltip from '@/components/tooltip.vue';
-  import ValidatedForm from '@/components/validated_form.vue';
-  import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-  import { User } from 'ag-client-typescript';
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-  @Component({
-    components: {
-      Tooltip,
-      ValidatedForm,
-      ValidatedInput
-    }
-  })
-  export default class Roster extends Vue {
-    @Prop({required: true, type: String})
-    role!: string;
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-    @Prop({required: true, type: Array})
-    roster!: User[];
+import { User } from 'ag-client-typescript';
 
-    first_invalid_email: string | null = null;
-    add_users_form_is_valid = false;
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-    @Watch('roster')
-    on_roster_change(new_users_array: User[], old_users_array: User[]) {
-      this.d_roster = new_users_array.slice(0);
-      this.sort_users(this.d_roster);
-    }
+@Component({
+  components: {
+    Tooltip,
+    ValidatedForm,
+    ValidatedInput
+  }
+})
+export default class Roster extends Vue {
+  @Prop({required: true, type: String})
+  role!: string;
 
-    saving = false;
-    users_to_add = '';
-    d_roster: User[] = [];
+  @Prop({required: true, type: Array})
+  roster!: User[];
 
-    async created() {
-      this.d_roster = this.roster.slice(0);
-      this.sort_users(this.d_roster);
-    }
+  first_invalid_email: string | null = null;
+  add_users_form_is_valid = false;
 
-    sort_users(users: User[]) {
-      users.sort((user_a: User, user_b: User) => {
-        if (user_a.username <= user_b.username) {
-          return -1;
-        }
-        return 1;
-      });
-    }
+  @Watch('roster')
+  on_roster_change(new_users_array: User[], old_users_array: User[]) {
+    this.d_roster = new_users_array.slice(0);
+    this.sort_users(this.d_roster);
+  }
 
-    contains_valid_emails(value: string): ValidatorResponse {
-      this.check_for_invalid_emails(value, []);
-      return {
-        is_valid: this.first_invalid_email === null,
-        error_msg: this.first_invalid_email + " is not a valid email."
-      };
-    }
+  saving = false;
+  users_to_add = '';
+  d_roster: User[] = [];
 
-    check_for_invalid_emails(string_of_emails: string, valid_usernames: string[]) {
-      this.first_invalid_email = null;
-      string_of_emails = string_of_emails.replace(/,+/g, " ");
-      let split_regex = /\s+/g;
-      let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-      let trimmed_input = string_of_emails.trim();
-      let usernames = trimmed_input.split(split_regex);
-      for (let username of usernames) {
-        if (valid_email_regex.test(username)) {
-          valid_usernames.push(username);
-        }
-        else {
-          this.first_invalid_email = username;
-          return;
-        }
+  async created() {
+    this.d_roster = this.roster.slice(0);
+    this.sort_users(this.d_roster);
+  }
+
+  sort_users(users: User[]) {
+    users.sort((user_a: User, user_b: User) => {
+      if (user_a.username <= user_b.username) {
+        return -1;
       }
-    }
+      return 1;
+    });
+  }
 
-    add_users() {
-      let valid_usernames: string[] = [];
-      this.check_for_invalid_emails(this.users_to_add, valid_usernames);
-      if (this.first_invalid_email === null) {
-        this.$emit('add_users', valid_usernames);
-        this.users_to_add = "";
-        let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
-        validated_input.reset_warning_state();
-        this.add_users_form_is_valid = false;
+  contains_valid_emails(value: string): ValidatorResponse {
+    this.check_for_invalid_emails(value, []);
+    return {
+      is_valid: this.first_invalid_email === null,
+      error_msg: this.first_invalid_email + " is not a valid email."
+    };
+  }
+
+  check_for_invalid_emails(string_of_emails: string, valid_usernames: string[]) {
+    this.first_invalid_email = null;
+    string_of_emails = string_of_emails.replace(/,+/g, " ");
+    let split_regex = /\s+/g;
+    let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    let trimmed_input = string_of_emails.trim();
+    let usernames = trimmed_input.split(split_regex);
+    for (let username of usernames) {
+      if (valid_email_regex.test(username)) {
+        valid_usernames.push(username);
       }
-    }
-
-    remove_person_from_roster(person_to_delete: User[], index: number) {
-      this.$emit('remove_user', person_to_delete);
-      this.d_roster.splice(index, 1);
+      else {
+        this.first_invalid_email = username;
+        return;
+      }
     }
   }
+
+  add_users() {
+    let valid_usernames: string[] = [];
+    this.check_for_invalid_emails(this.users_to_add, valid_usernames);
+    if (this.first_invalid_email === null) {
+      this.$emit('add_users', valid_usernames);
+      this.users_to_add = "";
+      let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
+      validated_input.reset_warning_state();
+      this.add_users_form_is_valid = false;
+    }
+  }
+
+  remove_person_from_roster(person_to_delete: User[], index: number) {
+    this.$emit('remove_user', person_to_delete);
+    this.d_roster.splice(index, 1);
+  }
+}
 </script>
 
 <style scoped lang="scss">

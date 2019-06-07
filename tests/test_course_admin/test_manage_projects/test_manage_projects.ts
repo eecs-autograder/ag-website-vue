@@ -1,12 +1,13 @@
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
+import { AxiosError } from 'axios';
+import * as sinon from 'sinon';
+
 import APIErrors from '@/componenets/api_errors.vue';
 import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-
-import { config, mount, Wrapper } from '@vue/test-utils';
-import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
-import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

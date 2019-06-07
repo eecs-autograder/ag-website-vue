@@ -1,9 +1,10 @@
+import { mount, Wrapper } from "@vue/test-utils";
+
 import TimePicker, {
     HourInputState,
     InvalidTimeStrError,
     MinuteInputState,
 } from "@/components/datetime/time_picker.vue";
-import { mount, Wrapper } from "@vue/test-utils";
 
 describe('TimePicker Tests', () => {
     let wrapper: Wrapper<TimePicker>;

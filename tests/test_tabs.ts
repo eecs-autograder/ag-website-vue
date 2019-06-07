@@ -1,7 +1,7 @@
 import Vue from 'vue';
+import Component from 'vue-class-component';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
-import Component from 'vue-class-component';
 
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';

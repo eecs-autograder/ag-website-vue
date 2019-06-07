@@ -83,12 +83,12 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import { ExpectedStudentFile } from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-
 import { handle_api_errors_async, safe_assign } from '@/utils';
-import { ExpectedStudentFile } from 'ag-client-typescript';
 
 @Component({
   components: {

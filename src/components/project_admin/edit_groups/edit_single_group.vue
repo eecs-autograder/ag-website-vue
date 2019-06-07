@@ -88,17 +88,16 @@
 </template>
 
 <script lang="ts">
-import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import { Course, Group, Project } from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
+import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
-
-import { Course, Group, Project } from 'ag-client-typescript';
-
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
 @Component({

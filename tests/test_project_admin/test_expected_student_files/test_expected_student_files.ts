@@ -1,11 +1,13 @@
-import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import {
     ExpectedStudentFile,
     Project,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
+
+import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

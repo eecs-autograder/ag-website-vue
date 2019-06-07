@@ -1,7 +1,5 @@
-import Modal from "@/components/modal.vue";
-import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
-import MergeGroups from "@/components/project_admin/edit_groups/merge_groups.vue";
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import {
     Course,
     Group,
@@ -10,6 +8,10 @@ import {
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
+
+import Modal from "@/components/modal.vue";
+import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
+import MergeGroups from "@/components/project_admin/edit_groups/merge_groups.vue";
 
 beforeAll(() => {
     config.logModifiedComponents = false;

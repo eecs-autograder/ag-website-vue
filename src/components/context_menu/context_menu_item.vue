@@ -7,8 +7,9 @@
 </template>
 
 <script lang="ts">
-  import ContextMenu from '@/components/context_menu/context_menu.vue';
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+  import ContextMenu from '@/components/context_menu/context_menu.vue';
 
   @Component
   export default class ContextMenuItem extends Vue {

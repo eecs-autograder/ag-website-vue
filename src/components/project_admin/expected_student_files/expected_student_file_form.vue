@@ -68,12 +68,12 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import { NewExpectedStudentFileData } from 'ag-client-typescript';
+
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-
 import { is_non_negative, is_not_empty, is_number } from '@/validators';
-import { NewExpectedStudentFileData } from 'ag-client-typescript';
 
 export class ExpectedStudentFileFormData implements NewExpectedStudentFileData {
   pattern: string;

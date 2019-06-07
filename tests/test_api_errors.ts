@@ -1,8 +1,8 @@
-import { mount, Wrapper, WrapperArray } from "@vue/test-utils";
+import { mount, Wrapper } from "@vue/test-utils";
+
 import { AxiosError } from 'axios';
 
 import APIErrors from "@/components/api_errors.vue";
-import { Vue } from "vue/types/vue";
 
 
 describe('APIErrors component tests', () => {

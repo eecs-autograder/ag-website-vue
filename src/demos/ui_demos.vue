@@ -113,11 +113,11 @@
 </template>
 
 <script lang="ts">
-import TabHeader from "@/components/tabs/tab_header.vue";
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
 import Tab from '@/components/tabs/tab.vue';
+import TabHeader from "@/components/tabs/tab_header.vue";
 import Tabs from '@/components/tabs/tabs.vue';
 import Toggle from '@/components/toggle.vue';
 import ViewFile from '@/components/view_file.vue';

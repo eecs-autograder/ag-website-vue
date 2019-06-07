@@ -1,12 +1,13 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
-import { AllCourses } from 'ag-client-typescript/src/course';
 import Vue from 'vue';
 
+import { config, mount, Wrapper } from '@vue/test-utils';
+
 import { Course, Semester, User } from 'ag-client-typescript';
+import { AllCourses } from 'ag-client-typescript/src/course';
 import { AxiosError } from 'axios';
+import * as sinon from 'sinon';
 
 import CourseList from '@/components/course_list/course_list.vue';
-import * as sinon from 'sinon';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

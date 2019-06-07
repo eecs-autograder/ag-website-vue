@@ -1,6 +1,7 @@
+import { config, mount } from '@vue/test-utils';
+
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { config, mount } from '@vue/test-utils';
 
 import { sleep } from './utils';
 

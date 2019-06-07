@@ -82,111 +82,109 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-  import { ArraySet } from '@/array_set';
-  import Modal from '@/components/modal.vue';
+import { ArraySet } from '@/array_set';
+import Modal from '@/components/modal.vue';
 
-  interface HTMLInputEvent extends Event {
-    target: HTMLInputElement & EventTarget;
+interface HTMLInputEvent extends Event {
+  target: HTMLInputElement & EventTarget;
+}
+
+type HasName = {name: string};
+function name_less(first: HasName, second: HasName) {
+  return first.name < second.name;
+}
+
+@Component({
+  components: { Modal }
+})
+export default class FileUpload extends Vue {
+  d_files: ArraySet<File, HasName> = new ArraySet<File, HasName>([], {less_func: name_less});
+  d_files_dragged_over = false;
+  d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
+
+  table_row_styling(file_in: File, row_index: number): string {
+    if (file_in.size === 0) {
+      return "file-empty-row";
+    }
+    if (row_index % 2 !== 0) {
+      return "file-not-empty-row-odd";
+    }
+    return "file-not-empty-row-even";
   }
 
-  type HasName = {name: string};
-  function name_less(first: HasName, second: HasName) {
-    return first.name < second.name;
+  add_files_from_button(event: HTMLInputEvent) {
+    if (event.target === null) {
+      throw new Error("Target is null");
+    }
+    if (event.target.files === null) {
+      throw new Error("Files property of event target is unexpectedly null");
+    }
+    for (let file of event.target.files) {
+      this.add_or_update_file(file);
+      this.check_for_emptiness(file);
+    }
+    event.target.value = '';
   }
 
-  @Component({
-    components: { Modal }
-  })
-  export default class FileUpload extends Vue {
-
-    d_files: ArraySet<File, HasName> = new ArraySet<File, HasName>([], {less_func: name_less});
-    d_files_dragged_over = false;
-    d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
-
-    table_row_styling(file_in: File, row_index: number): string {
-      if (file_in.size === 0) {
-        return "file-empty-row";
-      }
-      if (row_index % 2 !== 0) {
-        return "file-not-empty-row-odd";
-      }
-      return "file-not-empty-row-even";
+  add_dropped_files(event: DragEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (event.target === null) {
+      throw new Error("Target is null");
     }
-
-    add_files_from_button(event: HTMLInputEvent) {
-      if (event.target === null) {
-        throw new Error("Target is null");
-      }
-      if (event.target.files === null) {
-        throw new Error("Files property of event target is unexpectedly null");
-      }
-      for (let file of event.target.files) {
-        this.add_or_update_file(file);
-        this.check_for_emptiness(file);
-      }
-      event.target.value = '';
+    for (let file of event.dataTransfer.files) {
+      this.add_or_update_file(file);
+      this.check_for_emptiness(file);
     }
+    this.d_files_dragged_over = false;
+  }
 
-    add_dropped_files(event: DragEvent) {
-      event.stopPropagation();
-      event.preventDefault();
-      if (event.target === null) {
-        throw new Error("Target is null");
-      }
-      for (let file of event.dataTransfer.files) {
-        this.add_or_update_file(file);
-        this.check_for_emptiness(file);
-      }
-      this.d_files_dragged_over = false;
-    }
+  remove_file_from_upload(filename: string, file_index: number) {
+    this.d_files.remove({name: filename});
+    this.d_empty_filenames.remove(filename, false);
+  }
 
-    remove_file_from_upload(filename: string, file_index: number) {
-      this.d_files.remove({name: filename});
-      this.d_empty_filenames.remove(filename, false);
-    }
-
-    attempt_to_upload() {
-      if (!this.d_empty_filenames.empty()) {
-        let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
-        empty_files_modal.open();
-      }
-      else {
-        this.$emit('upload_files', this.d_files.data);
-      }
-    }
-
-    continue_with_upload_despite_empty_files() {
-      this.$emit('upload_files', this.d_files.data);
+  attempt_to_upload() {
+    if (!this.d_empty_filenames.empty()) {
       let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
-      empty_files_modal.close();
+      empty_files_modal.open();
     }
-
-    add_or_update_file(uploaded_file: File) {
-      this.d_files.remove(uploaded_file, false);
-      this.d_empty_filenames.remove(uploaded_file.name, false);
-      this.d_files.insert(uploaded_file);
-    }
-
-    check_for_emptiness(file: File) {
-      if (file.size === 0) {
-        this.d_empty_filenames.insert(file.name);
-      }
-    }
-
-    on_file_hover(event: DragEvent) {
-      event.stopPropagation();
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'copy';
-    }
-
-    clear_files() {
-      this.d_files = new ArraySet<File, HasName>([], {less_func: name_less});
-      this.d_empty_filenames = new ArraySet<string>([]);
+    else {
+      this.$emit('upload_files', this.d_files.data);
     }
   }
 
+  continue_with_upload_despite_empty_files() {
+    this.$emit('upload_files', this.d_files.data);
+    let empty_files_modal = <Modal> this.$refs.empty_file_found_in_upload_attempt;
+    empty_files_modal.close();
+  }
+
+  add_or_update_file(uploaded_file: File) {
+    this.d_files.remove(uploaded_file, false);
+    this.d_empty_filenames.remove(uploaded_file.name, false);
+    this.d_files.insert(uploaded_file);
+  }
+
+  check_for_emptiness(file: File) {
+    if (file.size === 0) {
+      this.d_empty_filenames.insert(file.name);
+    }
+  }
+
+  on_file_hover(event: DragEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  clear_files() {
+    this.d_files = new ArraySet<File, HasName>([], {less_func: name_less});
+    this.d_empty_filenames = new ArraySet<string>([]);
+  }
+}
 
 </script>
 

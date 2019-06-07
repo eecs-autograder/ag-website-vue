@@ -1,8 +1,11 @@
-import ProjectSubmission from '@/components/project_submission/project_submission.vue';
+import VueRouter from 'vue-router';
+
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
+
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import * as sinon from 'sinon';
-import VueRouter from 'vue-router';
+
+import ProjectSubmission from '@/components/project_submission/project_submission.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

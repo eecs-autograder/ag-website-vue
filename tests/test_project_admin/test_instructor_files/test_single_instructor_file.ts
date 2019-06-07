@@ -1,11 +1,13 @@
-import APIErrors from '@/components/api_errors.vue';
-import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
+
 import { InstructorFile } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 import * as FileSaver from 'file-saver';
 import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
