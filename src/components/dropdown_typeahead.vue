@@ -50,14 +50,9 @@ export default class DropdownTypeahead extends Vue {
   @Prop({default: "search-field", type: String})
   typeahead_class!: string;
 
-  d_choices: object[] = [];
   filter_text: string = "";
   private _filtered_choices: object[] = [];
   private d_mounted_called = false;
-
-  created() {
-    this.d_choices = this.choices;
-  }
 
   mounted() {
     // When this is true, we can safely access $refs in the template.
@@ -80,9 +75,9 @@ export default class DropdownTypeahead extends Vue {
 
   get filtered_choices() {
     if (this.filter_text === "") {
-      return this.d_choices;
+      return this.choices;
     }
-    this._filtered_choices = this.d_choices.filter(
+    this._filtered_choices = this.choices.filter(
       (item) => this.filter_fn(item, this.filter_text));
     return this._filtered_choices;
   }

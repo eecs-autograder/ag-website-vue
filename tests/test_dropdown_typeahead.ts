@@ -652,4 +652,28 @@ describe('DropdownTypeahead.vue', () => {
             "No Matching Results"
         );
     });
+
+    test("'choices' changed by parent component", async () => {
+        let choices = [
+            "1",
+            "2",
+            "3",
+        ];
+
+        let wrapper = mount(DropdownTypeahead, {
+            propsData: {
+                choices: choices,
+                filter_fn: () => true,
+                placeholder_text: 'Spam'
+            }
+        });
+
+        expect(wrapper.vm.filtered_choices).toEqual(choices);
+
+        choices.push('4');
+        expect(wrapper.vm.filtered_choices).toEqual(choices);
+
+        wrapper.setProps({choices: ['new1', 'new2']});
+        expect(wrapper.vm.filtered_choices).toEqual(['new1', 'new2']);
+    });
 });

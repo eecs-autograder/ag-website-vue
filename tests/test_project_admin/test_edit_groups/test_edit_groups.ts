@@ -1,4 +1,6 @@
+import Modal from "@/components/modal.vue";
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
+import MergeGroups from "@/components/project_admin/edit_groups/merge_groups.vue";
 import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,
@@ -320,5 +322,144 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions.length).toEqual(2);
         expect(component.groups_with_extensions[0]).toEqual(group_4);
         expect(component.groups_with_extensions[1]).toEqual(group_3);
+    });
+
+    test('groups_by_members passed to merge-groups', async () => {
+        (<Modal> wrapper.find({ref: 'merge_groups_modal'}).vm).open();
+
+        await component.$nextTick();
+
+        let merge_groups = <Wrapper<MergeGroups>> wrapper.find({ref: 'merge_groups'});
+        expect(merge_groups.vm.groups).toEqual(component.groups_by_members.data);
+    });
+
+    test('merge groups - one group has an extension', async () => {
+        let new_group_from_merge = new Group({
+            pk: 5,
+            project: 2,
+            extended_due_date: group_3.extended_due_date,
+            member_names: [
+                "andy@cornell.edu",
+                "kevin@cornell.edu",
+                "oscar@cornell.edu",
+                "roy@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        expect(component.groups_by_pk.size()).toEqual(4);
+        expect(component.groups_by_pk.has(group_1)).toEqual(true);
+        expect(component.groups_by_pk.has(group_3)).toEqual(true);
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions).toContainEqual(group_3);
+
+        Group.notify_group_merged(new_group_from_merge, group_1.pk, group_3.pk);
+        await component.$nextTick();
+
+        expect(component.groups_by_pk.size()).toEqual(3);
+        expect(component.groups_by_pk.has(group_1)).toEqual(false);
+        expect(component.groups_by_pk.has(group_3)).toEqual(false);
+        expect(component.groups_by_pk.has(new_group_from_merge)).toEqual(true);
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions).not.toContainEqual(group_3);
+        expect(component.groups_with_extensions).toContainEqual(new_group_from_merge);
+    });
+
+    test('merge groups - both groups have an extension', async () => {
+        let new_group_from_merge = new Group({
+            pk: 5,
+            project: 2,
+            extended_due_date: group_4.extended_due_date,
+            member_names: [
+                "kevin@cornell.edu",
+                "oscar@cornell.edu",
+                "phyllis@cornell.edu",
+                "stanley@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        expect(component.groups_by_pk.size()).toEqual(4);
+        expect(component.groups_by_pk.has(group_3)).toEqual(true);
+        expect(component.groups_by_pk.has(group_4)).toEqual(true);
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions).toContainEqual(group_3);
+        expect(component.groups_with_extensions).toContainEqual(group_4);
+
+        Group.notify_group_merged(new_group_from_merge, group_3.pk, group_4.pk);
+        await component.$nextTick();
+
+        expect(component.groups_by_pk.size()).toEqual(3);
+        expect(component.groups_by_pk.has(group_3)).toEqual(false);
+        expect(component.groups_by_pk.has(group_4)).toEqual(false);
+        expect(component.groups_by_pk.has(new_group_from_merge)).toEqual(true);
+        expect(component.groups_with_extensions.length).toEqual(2);
+        expect(component.groups_with_extensions).not.toContainEqual(group_3);
+        expect(component.groups_with_extensions).not.toContainEqual(group_4);
+        expect(component.groups_with_extensions).toContainEqual(new_group_from_merge);
+    });
+
+    test('merge groups - neither group has an extension', async () => {
+        let group_without_an_extension = new Group({
+            pk: 5,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+                "toby@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        let new_group_from_merge = new Group({
+            pk: 6,
+            project: 2,
+            extended_due_date: null,
+            member_names: [
+                "andy@cornell.edu",
+                "roy@cornell.edu",
+                "toby@cornell.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        Group.notify_group_created(group_without_an_extension);
+        await component.$nextTick();
+
+        expect(component.groups_by_pk.size()).toEqual(5);
+        expect(component.groups_by_pk.has(group_without_an_extension)).toEqual(true);
+        expect(component.groups_by_pk.has(group_1)).toEqual(true);
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions).not.toContainEqual(group_1);
+        expect(component.groups_with_extensions).not.toContainEqual(group_without_an_extension);
+
+        Group.notify_group_merged(new_group_from_merge, group_1.pk, group_without_an_extension.pk);
+        await component.$nextTick();
+
+        expect(component.groups_by_pk.size()).toEqual(4);
+        expect(component.groups_by_pk.has(group_without_an_extension)).toEqual(false);
+        expect(component.groups_by_pk.has(group_1)).toEqual(false);
+        expect(component.groups_by_pk.has(new_group_from_merge)).toEqual(true);
+        expect(component.groups_with_extensions.length).toEqual(3);
+        expect(component.groups_with_extensions).not.toContainEqual(new_group_from_merge);
     });
 });
