@@ -41,6 +41,8 @@ import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { debounce } from 'lodash';
 
+import { Created, Destroyed } from "@/lifecycle";
+
 export interface ValidatorResponse {
   is_valid: boolean;
   error_msg: string;
@@ -58,13 +60,15 @@ function default_from_string_func(value: string): unknown {
   return value;
 }
 
-// If register is not provided, by default the function should do nothing
-function default_register_func(v_input: ValidatedInput): void {}
+function do_nothing(...args: unknown[]): void {}
 
 @Component
-export default class ValidatedInput extends Vue {
-  @Inject({from: 'register', default: () => default_register_func})
-  register!: (v_input: ValidatedInput) => void;
+export default class ValidatedInput extends Vue implements Created, Destroyed {
+  @Inject({from: 'register', default: () => do_nothing})
+  register!: (input: ValidatedInput) => void;
+
+  @Inject({from: 'unregister', default: () => do_nothing})
+  unregister!: (input: ValidatedInput) => void;
 
   @Prop({required: true})
   value!: unknown;
@@ -94,8 +98,18 @@ export default class ValidatedInput extends Vue {
 
   private debounced_enable_warnings!: (...args: unknown[]) => unknown;
 
-  // Note: This assumes "value" provided will not throw exception when running _to_string_fn
+  // We need a way to uniquely identify validated inputs for registering and unregistering
+  // them with validated forms.
+  private static _NEXT_UID = 1;
+  get uid() {
+    return this.input_uid;
+  }
+  private input_uid!: number;
+
+  // Note: This assumes "value" provided will not throw exception when running this.to_string_fn
   created() {
+    this.input_uid = ValidatedInput._NEXT_UID++;
+
     // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
     this.register(this);
     this.update_and_validate(this.to_string_fn(this.value));
@@ -103,6 +117,10 @@ export default class ValidatedInput extends Vue {
     this.$emit('input_validity_changed', this.is_valid);
 
     this.debounced_enable_warnings = debounce(() => this.d_show_warnings = true, 500);
+  }
+
+  destroyed() {
+    this.unregister(this);
   }
 
   get is_valid(): boolean {
@@ -113,11 +131,9 @@ export default class ValidatedInput extends Vue {
     this.d_show_warnings = false;
   }
 
-  // Note: This assumes "value" provided will not throw exception when running _to_string_fn
+  // Note: This assumes "value" provided will not throw exception when running this.to_string_fn
   @Watch('value')
   on_value_change(new_value: unknown, old_value: unknown) {
-    // console.log(old_value);
-    // console.log(new_value);
     const str_value = this.to_string_fn(new_value);
 
     if (str_value !== this.d_input_value) {

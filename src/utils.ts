@@ -81,7 +81,7 @@ export function array_has_unique<ItemType, SentinelType>(
 export function array_get_unique<ItemType, SentinelType>(
         array: ItemType[], value: SentinelType,
         eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
-    let item = array.find((item: ItemType) => eq_func(item, value));
+    let item = array.find((elt: ItemType) => eq_func(elt, value));
     if (item === undefined) {
         throw new UniqueArrayError(`Item not found in array: ${value}`);
     }
