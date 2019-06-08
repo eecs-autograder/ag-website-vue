@@ -237,7 +237,7 @@ describe('CourseSettings.vue', () => {
         expect(settings_form.is_valid).toBe(true);
         expect(component.settings_form_is_valid).toBe(true);
 
-        wrapper.find('#course-settings-form').trigger('submit.native');
+        wrapper.find('#course-settings-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_settings_stub.calledOnce).toBe(true);
@@ -267,7 +267,7 @@ describe('CourseSettings.vue', () => {
         expect(settings_form.is_valid).toBe(true);
         expect(component.settings_form_is_valid).toBe(true);
 
-        wrapper.find('#course-settings-form').trigger('submit.native');
+        wrapper.find('#course-settings-form').trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;

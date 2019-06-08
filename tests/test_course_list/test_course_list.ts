@@ -129,7 +129,7 @@ describe('Course_List.vue', () => {
         clone_year_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('#clone-course-form').trigger('submit.native');
+        wrapper.find('#clone-course-form').trigger('submit');
         await component.$nextTick();
 
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
@@ -180,7 +180,7 @@ describe('Course_List.vue', () => {
         clone_year_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('#clone-course-form').trigger('submit.native');
+        wrapper.find('#clone-course-form').trigger('submit');
         await component.$nextTick();
 
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
@@ -245,7 +245,7 @@ describe('Course_List.vue', () => {
         clone_year_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('#clone-course-form').trigger('submit.native');
+        wrapper.find('#clone-course-form').trigger('submit');
         await component.$nextTick();
 
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);

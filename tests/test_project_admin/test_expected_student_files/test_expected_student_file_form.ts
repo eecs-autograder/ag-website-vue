@@ -58,7 +58,7 @@ describe('Valid form submit tests', () => {
         component.d_expected_student_file.pattern = "tomato.cpp";
         await component.$nextTick();
 
-        wrapper.find({ref: 'expected_student_file_form'}).trigger('submit.native');
+        wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(wrapper.emitted().on_submit.length).toEqual(1);
@@ -74,7 +74,7 @@ describe('Valid form submit tests', () => {
         component.d_expected_student_file.pattern = "cabbage.cpp";
         await component.$nextTick();
 
-        wrapper.find({ref: 'expected_student_file_form'}).trigger('submit.native');
+        wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(wrapper.emitted().on_submit.length).toEqual(1);
@@ -91,7 +91,7 @@ describe('Valid form submit tests', () => {
         component.d_expected_student_file.min_num_matches = 3;
         component.d_expected_student_file.max_num_matches = 5;
 
-        wrapper.find({ref: 'expected_student_file_form'}).trigger('submit.native');
+        wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(wrapper.emitted().on_submit.length).toEqual(1);

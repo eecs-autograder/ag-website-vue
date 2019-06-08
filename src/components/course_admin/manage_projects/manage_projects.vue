@@ -10,7 +10,7 @@
             <ValidatedForm ref="new_project_form"
                            autocomplete="off"
                            spellcheck="false"
-                           @submit.native.prevent="add_project">
+                           @submit="add_project">
               <ValidatedInput ref="new_project_name"
                               v-model="new_project_name"
                               :validators="[is_not_empty]"

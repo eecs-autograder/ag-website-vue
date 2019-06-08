@@ -3,7 +3,7 @@
     <validated-form ref="edit_group_form"
                     autocomplete="off"
                     spellcheck="false"
-                    @submit.native.prevent="update_group"
+                    @submit="update_group"
                     @form_validity_changed="edit_group_form_is_valid = $event">
       <div class="edit-group-members-container">
         <p class="group-members-label"> Group members: </p>

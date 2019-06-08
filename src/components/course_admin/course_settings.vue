@@ -4,7 +4,7 @@
       <ValidatedForm id="course-settings-form"
                      autocomplete="off"
                      spellcheck="false"
-                     @submit.native.prevent="save_course_settings"
+                     @submit="save_course_settings"
                      @form_validity_changed="settings_form_is_valid = $event">
 
         <div class="input-container">

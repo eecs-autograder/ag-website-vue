@@ -195,7 +195,7 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_group_stub.firstCall.thisValue.member_names).toEqual(trimmed_group_members);
@@ -234,7 +234,7 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_group_stub.calledOnce);
@@ -272,7 +272,7 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_group_stub.callCount).toEqual(0);
@@ -311,7 +311,7 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_group_stub.callCount).toEqual(0);
@@ -380,7 +380,7 @@ describe('EditSingleGroup tests', () => {
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;

@@ -456,7 +456,7 @@ describe('ProjectSettings tests', () => {
 
         expect(component.settings_form_is_valid).toBe(true);
 
-        wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
+        wrapper.find({ref: 'project_settings_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_settings_stub.firstCall.thisValue).toEqual(component.d_project);
@@ -491,7 +491,7 @@ describe('ProjectSettings tests', () => {
 
         expect(component.settings_form_is_valid).toBe(true);
 
-        wrapper.find({ref: 'project_settings_form'}).trigger('submit.native');
+        wrapper.find({ref: 'project_settings_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_settings_stub.calledOnce).toBe(true);

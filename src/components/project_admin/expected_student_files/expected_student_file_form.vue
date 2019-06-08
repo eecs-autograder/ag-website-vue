@@ -4,7 +4,7 @@
                     ref="expected_student_file_form"
                     autocomplete="off"
                     spellcheck="false"
-                    @submit.native.prevent="submit_form"
+                    @submit="submit_form"
                     @form_validity_changed="$emit('on_form_validity_changed', $event)">
 
       <div class="input-wrapper">

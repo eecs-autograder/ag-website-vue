@@ -73,12 +73,10 @@ export default class ValidatedForm extends Vue {
   private get event_listeners() {
     let listeners = {...this.$listeners};
     listeners.submit = (event: Event) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (this.is_valid) {
-        this.$emit('submit', {...event});
-      }
-      else {
-        event.preventDefault();
-        event.stopPropagation();
+        this.$emit('submit');
       }
     };
 
