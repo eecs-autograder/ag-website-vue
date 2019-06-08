@@ -1,5 +1,5 @@
 <template>
-  <form v-bind="$props">
+  <form v-bind="$props" v-on="event_listeners">
     <slot></slot>
   </form>
 </template>
@@ -55,6 +55,20 @@ export default class ValidatedForm extends Vue {
     for (const validated_input of this.d_validated_inputs) {
       validated_input.reset_warning_state();
     }
+  }
+
+  private get event_listeners() {
+    return Object.assign({}, this.$listeners, {
+      submit: (event: Event) => {
+        if (this.is_valid) {
+          this.$emit('submit', Object.assign({}, event));
+        }
+        else { 
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+    });
   }
 }
 </script>
