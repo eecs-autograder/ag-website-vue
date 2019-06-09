@@ -18,7 +18,8 @@
                               input_style="width: 100%;
                                            max-width: 500px;
                                            border: 1px solid #ced4da;"
-                              @input_validity_changed="new_project_name_is_valid = $event">
+                              @input_validity_changed="new_project_name_is_valid = $event"
+                              :show_warnings_on_blur="true">
               </ValidatedInput>
 
               <APIErrors ref="api_errors"></APIErrors>

@@ -10,7 +10,8 @@
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
                      placeholder="Enter a negative, even integer"
-                     @input_validity_changed="validated_input_1_valid = $event"></validated-input>
+                     @input_validity_changed="validated_input_1_valid = $event"
+                     :show_warnings_on_blur="true"></validated-input>
 
     <p>
       is_valid() result:
@@ -18,7 +19,8 @@
     </p>
 
     <p>
-      Last emitted value (note: it will not be updated until inputted value is valid):
+      Last emitted value (Note: it will not be updated until inputted value is valid. Also note:
+      warnings will show up if you click on the input and then click away without editing):
       <span style="font-weight: bold">{{number_input}}</span>
     </p>
 

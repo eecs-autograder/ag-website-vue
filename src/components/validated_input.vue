@@ -11,10 +11,11 @@
              type="text"
              :value="d_input_value"
              :placeholder="placeholder"
+             @blur="on_blur"
              @input="$e => change_input($e.target.value)"/>
 
       <textarea id="textarea"
-                v-if="num_rows > 1"
+                v-else
                 :rows="num_rows"
                 :style="input_style"
                 class="input"
@@ -23,6 +24,7 @@
                 }"
                 :value="d_input_value"
                 :placeholder="placeholder"
+                @blur="on_blur"
                 @input="$e => change_input($e.target.value)"></textarea>
       <slot name="suffix"> </slot>
     </div>
@@ -90,6 +92,9 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
   @Prop({required: false, type: String})
   placeholder!: string;
+
+  @Prop({default: false})
+  show_warnings_on_blur!: boolean;
 
   d_input_value: string = "";
   private d_is_valid: boolean = false;
@@ -184,6 +189,12 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
   private get show_errors(): boolean {
     return this.d_error_msg !== '' && this.d_show_warnings;
+  }
+
+  private on_blur() {
+    if (this.show_warnings_on_blur) {
+      this.d_show_warnings = true;
+    }
   }
 }
 </script>

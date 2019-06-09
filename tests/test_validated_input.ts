@@ -485,6 +485,44 @@ describe('ValidatedInput.vue', () => {
             (<HTMLInputElement> wrapper.find('#input').element).value
         ).toBe("invalid value here!");
     });
+
+    test('show_warnings_on_blur', async () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: "not number",
+                validators: [IS_NUMBER],
+                from_string_fn: (val: string) => parseInt(val, 10),
+                show_warnings_on_blur: true
+            }
+        });
+
+        let input_wrapper = wrapper.find('.input');
+
+        await sleep(0.75);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.is_valid).toBe(false);
+        expect(wrapper.vm.d_show_warnings).toBe(false);
+        expect(wrapper.find('#error-text').exists()).toBe(false);
+
+        input_wrapper.trigger('click');
+
+        await sleep(0.75);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.is_valid).toBe(false);
+        expect(wrapper.vm.d_show_warnings).toBe(false);
+        expect(wrapper.find('#error-text').exists()).toBe(false);
+
+        input_wrapper.trigger('blur');
+
+        await sleep(0.75);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.is_valid).toBe(false);
+        expect(wrapper.vm.d_show_warnings).toBe(true);
+        expect(wrapper.find('#error-text').exists()).toBe(true);
+    });
 });
 
 
