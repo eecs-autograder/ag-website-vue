@@ -4,7 +4,7 @@
       <validated-form ref="create_group_form"
                       autocomplete="off"
                       spellcheck="false"
-                      @submit.native.prevent="create_group">
+                      @submit="create_group">
         <p class="group-members-label"> Group members: </p>
         <div class="add-group-members-container">
           <div v-for="(member, index) of group_members">

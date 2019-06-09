@@ -348,7 +348,7 @@ describe('SingleCourse.vue', () => {
             Promise.reject(axios_response_instance)
         );
 
-        wrapper.find('#clone-course-form').trigger('submit.native');
+        wrapper.find('#clone-course-form').trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
@@ -394,7 +394,7 @@ describe('SingleCourse.vue', () => {
         expect(component.clone_course_form_is_valid).toBe(true);
 
         let copy_course_stub = sinon.stub(component.course, 'copy');
-        wrapper.find('#clone-course-form').trigger('submit.native');
+        wrapper.find('#clone-course-form').trigger('submit');
         await component.$nextTick();
 
         expect(copy_course_stub.firstCall.calledWith(
@@ -443,7 +443,7 @@ describe('SingleCourse.vue', () => {
         expect(component.clone_course_form_is_valid).toBe(true);
 
         let copy_course_stub = sinon.stub(component.course, 'copy');
-        wrapper.find('#clone-course-form').trigger('submit.native');
+        wrapper.find('#clone-course-form').trigger('submit');
         await component.$nextTick();
 
         expect(copy_course_stub.firstCall.calledWith(

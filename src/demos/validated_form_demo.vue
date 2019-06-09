@@ -10,16 +10,29 @@
                        :validators="[is_number]"
                        :from_string_fn="(val) => parseInt(val, 10)"></validated-input>
 
-      <div id="hello">
-        <h3>Validated Input 2</h3>
-        <p>Has to be the string "mars"</p>
-        <validated-input v-model="d_data.name" :validators="[(val) => {
-                                                            return {
-                                                              is_valid: val === 'mars',
-                                                              error_msg: 'not mars'
-                                                            }
-                                                           }]"></validated-input>
-      </div>
+      <h3>Validated Input 2</h3>
+      <p>Has to be the string "mars"</p>
+      <validated-input v-model="d_data.name" :validators="[(val) => {
+                                                          return {
+                                                            is_valid: val === 'mars',
+                                                            error_msg: 'not mars'
+                                                          }
+                                                         }]"></validated-input>
+
+      <h3>Toggleable Validated Input</h3>
+      <p>
+        If you make this input invalid (not a number) and then toggle it away, it won't
+        count towards the form's validity. <br>
+        Note: When the input comes back, it should have its previously valid value still.
+      </p>
+      <toggle v-model="show_toggleable_input">
+        <div slot="on">Show</div>
+        <div slot="off">Hide</div>
+      </toggle>
+      <validated-input v-model="toggleable_input_value"
+                       v-if="show_toggleable_input"
+                       :validators="[is_number]"
+                       :from_string_fn="(val) => parseInt(val, 10)"></validated-input>
 
       <p>
         The save button below is disabled (red) if any of the above inputs are invalid.
@@ -40,11 +53,12 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
+  import Toggle from '@/components/toggle.vue';
   import ValidatedForm from '@/components/validated_form.vue';
   import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
   @Component({
-    components: { ValidatedForm, ValidatedInput }
+    components: { Toggle, ValidatedForm, ValidatedInput }
   })
   export default class ValidatedFormDemo extends Vue {
     d_data = {
@@ -63,6 +77,9 @@
         error_msg:  "Invalid number!",
       };
     }
+
+    toggleable_input_value = 42;
+    show_toggleable_input = true;
   }
 </script>
 

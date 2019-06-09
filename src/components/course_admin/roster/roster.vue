@@ -3,7 +3,7 @@
     <div class="adding-container">
       <validated-form id="add-users-form"
                       autocomplete="off"
-                      @submit.native.prevent="add_users"
+                      @submit="add_users"
                       @form_validity_changed="add_users_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
           <i class="fas fa-question-circle add-users-tooltip">

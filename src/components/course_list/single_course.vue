@@ -45,7 +45,7 @@
           <ValidatedForm ref="clone_course_form"
                          id="clone-course-form"
                          autocomplete="off"
-                         @submit.native.prevent="make_copy_of_course">
+                         @submit="make_copy_of_course">
 
             <div class="name-container">
               <label class="input-label"> Course name: </label>

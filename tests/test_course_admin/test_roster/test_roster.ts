@@ -198,7 +198,7 @@ describe('Roster tests', () => {
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe("         ");
 
-        roster_form_wrapper.trigger('submit.native');
+        roster_form_wrapper.trigger('submit');
         await roster.$nextTick();
 
         expect(wrapper.emitted('add_users')).not.toBeTruthy();
@@ -365,7 +365,7 @@ describe('Roster tests', () => {
          );
          expect(roster.add_users_form_is_valid).toBe(true);
 
-         roster_form_wrapper.trigger('submit.native');
+         roster_form_wrapper.trigger('submit');
          await roster.$nextTick();
 
          expect(wrapper.emitted().add_users.length).toBe(1);
@@ -456,7 +456,7 @@ describe('Roster tests', () => {
          expect(add_users_button.is('[disabled]')).toBe(true);
          expect(roster.add_users_form_is_valid).toEqual(false);
 
-         roster_form_wrapper.trigger('submit.native');
+         roster_form_wrapper.trigger('submit');
          await roster.$nextTick();
 
          expect(wrapper.emitted('add_users')).not.toBeTruthy();
@@ -482,7 +482,7 @@ describe('Roster tests', () => {
          expect(validated_input_component.d_input_value).toBe(username_input);
          expect(roster_form_component.is_valid).toBe(true);
 
-         roster_form_wrapper.trigger('submit.native');
+         roster_form_wrapper.trigger('submit');
          await roster.$nextTick();
 
          expect(wrapper.emitted().add_users.length).toBe(1);

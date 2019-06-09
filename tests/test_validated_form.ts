@@ -1,7 +1,12 @@
-import { config, mount } from '@vue/test-utils';
+import { Component, Vue } from "vue-property-decorator";
+
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import * as sinon from 'sinon';
 
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { is_number } from "@/validators";
 
 import { sleep } from './utils';
 
@@ -338,5 +343,127 @@ describe('ValidatedForm.vue', () => {
         expect(vinput2.find('#error-text').exists()).toBe(false);
         expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
         expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("invalid value 2");
+    });
+
+    test('Validated inputs unregister with their form when destroyed', async () => {
+        @Component({
+            template: `<validated-form ref="form">
+                          <validated-input class="validated-input"
+                                           v-model="value"
+                                           :validators="[]"/>
+                          <validated-input class="validated-input"
+                                           v-model="value"
+                                           :validators="[is_valid]"
+                                           v-if="include_invalid_input"/>
+                        </validated-form>`,
+            components: {
+                'validated-form': ValidatedForm,
+                'validated-input': ValidatedInput
+            }
+        })
+        class WrapperComponent extends Vue {
+            include_invalid_input = true;
+            value = 'invalid';
+            is_valid = (value: string) => {
+                return {is_valid: value === 'valid', error_msg: ''};
+            }
+        }
+
+        const wrapper = mount(WrapperComponent);
+
+        let form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
+        expect(form.vm.is_valid).toEqual(false);
+        expect(wrapper.findAll('.validated-input').length).toEqual(2);
+
+        wrapper.vm.value = 'valid';
+        await wrapper.vm.$nextTick();
+        expect(form.vm.is_valid).toEqual(true);
+
+        wrapper.vm.value = 'invalid';
+        await wrapper.vm.$nextTick();
+        expect(form.vm.is_valid).toEqual(false);
+
+        // Removing the input should make the form valid
+        wrapper.setData({include_invalid_input: false});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.validated-input').length).toEqual(1);
+        expect(form.vm.is_valid).toEqual(true);
+
+        // Putting the input back should make the form invalid
+        wrapper.vm.include_invalid_input = true;
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.validated-input').length).toEqual(2);
+        expect(form.vm.is_valid).toEqual(false);
+    });
+
+    test('Submit event not emitted when form invalid', () => {
+        let submit_handler = sinon.stub();
+
+        const component = {
+            template:  `<validated-form ref="form" @submit="on_submit">
+                          <validated-input ref="validated_input" v-model="value"
+                                           :validators="[is_number]"/>
+                        </validated-form>`,
+            components: {
+                'validated-form': ValidatedForm,
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    value: "42",
+                    is_number: is_number
+                };
+            },
+            methods: {
+                on_submit: () => {
+                    submit_handler();
+                }
+            }
+        };
+
+        const wrapper = mount(component);
+        let form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
+
+        expect(form.vm.is_valid).toEqual(true);
+
+        form.find('form').trigger('submit');
+        expect(submit_handler.calledOnce).toEqual(true);
+
+        wrapper.setData({value: 'not number'});
+
+        expect(form.vm.is_valid).toEqual(false);
+
+        form.find('form').trigger('submit');
+        expect(submit_handler.calledTwice).toEqual(false);
+    });
+
+    test("Submit event binding doesn't need .native modifier", () => {
+        let submit_handler = sinon.stub();
+
+        const component = {
+            template:  `<validated-form ref="form" @submit="on_submit">
+                          <validated-input ref="validated_input" v-model="value"
+                                           :validators="[]"/>
+                        </validated-form>`,
+            components: {
+                'validated-form': ValidatedForm,
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    value: "spam",
+                };
+            },
+            methods: {
+               on_submit: () => {
+                   submit_handler();
+               }
+            }
+        };
+
+        const wrapper = mount(component);
+        wrapper.find({ref: 'form'}).find('form').trigger('submit');
+
+        expect(submit_handler.calledOnce).toEqual(true);
     });
 });

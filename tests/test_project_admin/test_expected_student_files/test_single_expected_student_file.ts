@@ -69,7 +69,7 @@ describe('ExpectedStudentFiles tests', () => {
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        wrapper.find('#expected-student-file-form').trigger('submit.native');
+        wrapper.find('#expected-student-file-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
@@ -113,7 +113,7 @@ describe('ExpectedStudentFiles tests', () => {
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        wrapper.find('#expected-student-file-form').trigger('submit.native');
+        wrapper.find('#expected-student-file-form').trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;

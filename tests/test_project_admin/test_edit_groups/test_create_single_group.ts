@@ -133,7 +133,7 @@ describe('CreateSingleGroup tests', () => {
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_group_stub.firstCall.calledWith(
@@ -176,7 +176,7 @@ describe('CreateSingleGroup tests', () => {
         member_3_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_group_stub.firstCall.calledWith(
@@ -216,7 +216,7 @@ describe('CreateSingleGroup tests', () => {
         member_3_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_group_stub.firstCall.calledWith(
@@ -254,7 +254,7 @@ describe('CreateSingleGroup tests', () => {
         member_3_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_group_stub.callCount).toEqual(0);
@@ -293,7 +293,7 @@ describe('CreateSingleGroup tests', () => {
         member_3_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_group_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_group_stub.callCount).toEqual(0);
@@ -335,7 +335,7 @@ describe('CreateSingleGroup tests', () => {
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find({ref: 'create_group_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_group_form'}).trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;

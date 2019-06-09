@@ -6,7 +6,7 @@
           <div @click.stop>
             <validated-form autocomplete="off"
                             spellcheck="false"
-                            @submit.native.prevent>
+                            @submit>
               <validated-input ref='file_name'
                                v-model="new_file_name"
                                :validators="[is_not_empty]"

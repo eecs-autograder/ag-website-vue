@@ -70,7 +70,7 @@ describe('CreateExpectedStudentFile tests', () => {
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
         await component.$nextTick();
 
-        wrapper.find('#expected-student-file-form').trigger('submit.native');
+        wrapper.find('#expected-student-file-form').trigger('submit');
         await component.$nextTick();
 
         expect(create_stub.getCall(0).args[0]).toEqual(project_1.pk);
@@ -105,7 +105,7 @@ describe('CreateExpectedStudentFile tests', () => {
         await component.$nextTick();
 
         sinon.stub(ExpectedStudentFile, 'create').rejects(axios_response_instance);
-        wrapper.find('#expected-student-file-form').trigger('submit.native');
+        wrapper.find('#expected-student-file-form').trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;

@@ -4,7 +4,7 @@
     <validated-form ref="project_settings_form"
                     autocomplete="off"
                     spellcheck="false"
-                    @submit.native.prevent="save_project_settings"
+                    @submit="save_project_settings"
                     @form_validity_changed="settings_form_is_valid = $event">
       <div id="project-name-container">
         <label class="text-label"> Project Name </label>
