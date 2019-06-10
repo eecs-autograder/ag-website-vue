@@ -48,7 +48,7 @@
                          @submit="make_copy_of_course">
 
             <div class="name-container">
-              <label class="input-label"> Course name: </label>
+              <label class="text-label"> Course name: </label>
               <ValidatedInput ref="copy_of_course_name"
                               v-model="new_course_name"
                               input_style="width: 100%; max-width: 500px;"
@@ -59,7 +59,7 @@
             </div>
 
             <div class="semester-container">
-              <label class="input-label"> Semester: </label>
+              <label class="text-label"> Semester: </label>
               <div>
                 <dropdown ref="semester_dropdown"
                           :items="semesters"
@@ -79,7 +79,7 @@
             </div>
 
             <div class="year-container">
-              <label class="input-label"> Year: </label>
+              <label class="text-label"> Year: </label>
               <ValidatedInput ref="copy_of_course_year"
                               v-model="new_course_year"
                               :num_rows="1"
@@ -179,7 +179,6 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
 
 .toolbox {
   background-color: hsl(212, 60%, 94%);

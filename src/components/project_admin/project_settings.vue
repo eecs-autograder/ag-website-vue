@@ -505,25 +505,7 @@ function make_empty_project(): Project {
 #project-settings-component {
   padding: 10px;
   min-width: 100%;
-}
-
-fieldset {
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  border-width: 2px;
-}
-
-legend {
-  color: $ocean-blue;
-  font-size: 18px;
-}
-
-.input-tooltip {
-  color: mediumvioletred;
-  font-size: 15px;
-  margin-left: 8px;
+  box-sizing: border-box;
 }
 
 .section-container {
@@ -574,40 +556,14 @@ legend {
   width: 80px;
 }
 
-.checkbox-label {
-  color: lighten(black, 10);
-  display: inline-block;
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 0 0 0;
-  text-align: right;
-}
-
-.text-label {
-  color: lighten(black, 10);
-  display: inline-block;
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 0 7px 0;
-  text-align: right;
-}
-
 .project-input-container {
   padding: 10px 0 10px 3px;
-}
-
-.checkbox-input-container {
-  padding: 10px 0 10px 5px;
 }
 
 .toggle-container {
   font-size: 14px;
   margin: 3px 5px 3px 0;
   padding-bottom: 10px;
-}
-
-input[type=checkbox]:disabled + label {
-  color: $stormy-gray-dark;
 }
 
 #save-button {

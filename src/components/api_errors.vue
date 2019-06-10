@@ -59,7 +59,6 @@ export default class APIErrors extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/components/course_admin.scss';
 @import '@/styles/button_styles.scss';
 
 .error-msg-container {

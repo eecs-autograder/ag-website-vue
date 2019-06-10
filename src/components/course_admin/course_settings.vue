@@ -8,7 +8,7 @@
                      @form_validity_changed="settings_form_is_valid = $event">
 
         <div class="input-container">
-          <label class="input-label"> Course name </label>
+          <label class="text-label"> Course name </label>
           <ValidatedInput ref="course_name_input"
                           v-model="d_course.name"
                           input_style="width: 100%;
@@ -18,7 +18,7 @@
         </div>
 
         <div class="input-container">
-          <label class="input-label" for="semester"> Semester </label>
+          <label class="text-label" for="semester"> Semester </label>
           <div>
             <select id="semester" v-model="d_course.semester" class="select">
               <option :value="Semester.fall">{{Semester.fall}}</option>
@@ -30,7 +30,7 @@
         </div>
 
         <div class="input-container">
-          <label class="input-label"> Year </label>
+          <label class="text-label"> Year </label>
           <ValidatedInput ref="course_year_input"
                           v-model="d_course.year"
                           input_style="width: 65px;"
@@ -40,7 +40,7 @@
         </div>
 
         <div class="input-container">
-          <label class="input-label"> Late days per student </label>
+          <label class="text-label"> Late days per student </label>
           <ValidatedInput ref="course_late_days_input"
                           v-model="d_course.num_late_days"
                           input_style="width: 50px;"
@@ -54,10 +54,10 @@
         </div>
 
         <div class="input-container">
-          <label class="input-label">
+          <label class="text-label">
             Guest usernames must end with
             <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="medium" placement="right">
+              <tooltip width="large" placement="right">
                 If "Anyone with the link can submit" is checked in a project's settings,
                 users not in the roster (guests) can only submit if their username ends with
                 the string here. <br>
@@ -176,7 +176,6 @@ function handle_save_course_settings_error(component: CourseSettings, error: unk
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/components/course_admin.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
@@ -202,12 +201,6 @@ function handle_save_course_settings_error(component: CourseSettings, error: unk
   display: block;
   max-width: 500px;
   padding-bottom: 16px;
-}
-
-.input-tooltip {
-  color: mediumvioletred;
-  font-size: 15px;
-  margin-left: 8px;
 }
 
 #input-course-semester {
@@ -236,6 +229,7 @@ function handle_save_course_settings_error(component: CourseSettings, error: unk
   padding-top: 8px;
   vertical-align: top;
 }
+
 @media only screen and (min-width: 481px) {
   #settings-container {
     margin: 0 2.5%;

@@ -70,6 +70,7 @@ export default class DatetimePickerDemo extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 
 #datetime-picker-demo {
   display: inline-block;
@@ -90,19 +91,6 @@ export default class DatetimePickerDemo extends Vue {
   border-radius: 4px;
   padding: 10px;
   display: inline-block;
-}
-
-legend {
-  color: $ocean-blue;
-  font-size: 18px;
-}
-
-fieldset {
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  border-width: 2px;
 }
 
 .calender-icon {

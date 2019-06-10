@@ -37,7 +37,7 @@
         <hr>
         <div>
           <div class="cloned-project-name">
-            <label class="input-label"> New project name </label>
+            <label class="text-label"> New project name </label>
             <validated-input ref="cloned_project_name"
                              v-model="cloned_project_name"
                              :validators="[is_not_empty]"
@@ -49,7 +49,7 @@
           </div>
 
           <div class="cloned-project-destination">
-            <label class="input-label"> Clone project to course: </label>
+            <label class="text-label"> Clone project to course: </label>
             <div>
               <dropdown ref="copy_course_dropdown"
                         :items="cloning_destinations"
@@ -171,8 +171,8 @@ export function handle_add_cloned_project_error(component: SingleProject, error:
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
 
 .project-div {
   display: block;

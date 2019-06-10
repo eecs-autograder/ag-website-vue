@@ -144,7 +144,6 @@ export function handle_add_project_error(component: ManageProjects, error: unkno
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
 
 .no-projects-message {
   padding: 8px 0;
@@ -162,7 +161,7 @@ export function handle_add_project_error(component: ManageProjects, error: unkno
 }
 
 #new-project-label, #existing-projects-label {
-  font-size: $title-size;
+  font-size: 20px;
   font-weight: 600;
 }
 

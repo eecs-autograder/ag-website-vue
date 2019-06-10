@@ -1,3 +1,5 @@
+@import '@/styles/colors.scss';
+
 .select {
     background-color: white;
     border: 1px solid #ced4da;
@@ -7,4 +9,114 @@
 
     font-size: 1rem;
     padding: 6px 4px;
+}
+
+// Organization -----------------------------------
+
+legend {
+    color: $ocean-blue;
+    font-size: 18px;
+}
+
+fieldset {
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    border-width: 2px;
+}
+
+.input-tooltip {
+    color: mediumvioletred;
+    font-size: 15px;
+    margin-left: 8px;
+}
+
+.text-label {
+    color: lighten(black, 10);
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 7px 0;
+    text-align: right;
+}
+
+// Checkbox ---------------------------------------
+
+.checkbox-label {
+    color: lighten(black, 10);
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 0 0;
+}
+
+.checkbox-input-container {
+    padding: 10px 0 10px 5px;
+}
+
+input[type=checkbox] + label::before {
+    border-radius: 2px;
+    color: hsl(210, 20%, 86%);
+    content: '\f0c8';
+    display: inline-block;
+    font-family: "Font Awesome 5 Free";
+    font-size: 18px;
+    height: 18px;
+    margin-right: 10px;
+    width: 12px;
+}
+
+input[type=checkbox]:checked + label::before {
+    background: transparent;
+    content: '\f14a';
+    color: $ocean-blue;
+    font-family: "Font Awesome 5 Free";
+    height: 18px;
+    width: 12px;
+}
+
+input[type=checkbox] {
+    clip: rect(0,0,0,0);
+    position: absolute;
+}
+
+input[type=checkbox]:disabled + label {
+    color: $stormy-gray-dark;
+}
+
+// Dropdown ---------------------------------------
+
+.dropdown-header-wrapper {
+    display: inline-block;
+    margin: 0;
+    position: relative;
+}
+
+.dropdown-header {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    box-sizing: border-box;
+    color: #495057;
+    cursor: default;
+    display: block;
+    font-size: 1rem;
+    line-height: 1.5;
+    min-height: 38px;
+    padding: .375rem .75rem;
+    position: relative;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.dropdown-header:focus {
+    border-color: $ocean-blue;
+}
+
+.dropdown-caret {
+    cursor: pointer;
+    font-size: 30px;
+    position: absolute;
+    right: 18px;
+    top: 3px;
 }
