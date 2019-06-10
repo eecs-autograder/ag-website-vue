@@ -1,115 +1,50 @@
 <template>
   <div id="ag-test-case-settings-component" v-if="d_test_case !== null">
+
     <div>
-      <tabs ref="tabs-gray"
-            v-model="current_tab_index"
-            tab_active_class="gray-white-theme-active"
-            tab_inactive_class="gray-white-theme-inactive">
+      <validated-form id="command-settings-form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit.native.prevent="save_ag_test_case_settings"
+                      @form_validity_changed="settings_form_is_valid = $event">
 
-        <!------------------------ Case Settings Tab ------------------------------------->
+        <div id="name-container">
+          <label class="text-label"> Case name </label>
+          <validated-input ref="case_name"
+                           v-model="d_test_case.name"
+                           :validators="[is_not_empty]">
+          </validated-input>
+        </div>
 
-        <tab>
-          <tab-header>
-            <div class="tab-heading"> Case Settings </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-              <validated-form id="command-settings-form"
-                              autocomplete="off"
-                              spellcheck="false"
-                              @submit.native.prevent="save_ag_test_case_settings"
-                              @form_validity_changed="settings_form_is_valid = $event">
+        <div class="bottom-of-form">
+          <APIErrors ref="api_errors"></APIErrors>
 
-                <div id="name-container">
-                  <label class="text-label"> Case name </label>
-                  <validated-input ref="case_name"
-                                   v-model="d_test_case.name"
-                                   :validators="[is_not_empty]">
-                  </validated-input>
-                </div>
+          <button type="submit"
+                  class="save-button"
+                  :disabled="!settings_form_is_valid || saving"> Save Updates
+          </button>
 
-                <div class="bottom-of-form">
-                  <APIErrors ref="api_errors"></APIErrors>
+          <div v-if="!saving" class="last-saved-timestamp">
+          <span> Last Saved: </span>
+            {{(new Date(d_test_case.last_modified)).toLocaleString(
+            'en-US', last_modified_format
+            )}}
+          </div>
 
-                  <button type="submit"
-                          class="save-button"
-                          :disabled="!settings_form_is_valid || saving"> Save Updates
-                  </button>
+          <div v-else class="last-saved-spinner">
+            <i class="fa fa-spinner fa-pulse"></i>
+          </div>
+        </div>
 
-                  <div v-if="!saving" class="last-saved-timestamp">
-                    <span> Last Saved: </span>
-                    {{(new Date(d_test_case.last_modified)).toLocaleString(
-                    'en-US', last_modified_format
-                    )}}
-                  </div>
+      </validated-form>
+    </div>
 
-                  <div v-else class="last-saved-spinner">
-                    <i class="fa fa-spinner fa-pulse"></i>
-                  </div>
-                </div>
+    <hr>
 
-              </validated-form>
-            </div>
-          </template>
-        </tab>
+    <div id="feedback-container"> Feedback </div>
+
 
         <!------------------------ Case Feedback Tab ------------------------------------->
-
-        <tab>
-          <tab-header>
-            <div class="tab-heading">
-              Case Feedback
-            </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-
-            </div>
-          </template>
-        </tab>
-
-        <!--------------------------- Danger Zone Tab --------------------------------------->
-
-        <tab>
-          <tab-header>
-            <div class="tab-heading">
-              Danger Zone
-            </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-
-              <button class="delete-case-button"
-                      type="button"
-                      @click="$refs.delete_case_modal.open()">
-                Delete Case: <span> {{d_test_case.name}} </span>
-              </button>
-
-              <modal ref="delete_case_modal"
-                     :size="'large'"
-                     :include_closing_x="false">
-                <div class="modal-header">
-                  Are you sure you want to delete the case:
-                  <span class="case-to-delete">{{d_test_case.name}}</span>?
-                </div>
-                <hr>
-                <div class="modal-body">
-                  <p> This action cannot be reversed! </p>
-                  <div id="modal-button-container">
-                    <button class="modal-delete-button"
-                            @click="delete_ag_case()"> Delete </button>
-
-                    <button class="modal-cancel-button"
-                            @click="$refs.delete_case_modal.close()"> Cancel </button>
-                  </div>
-                </div>
-              </modal>
-            </div>
-          </template>
-        </tab>
-
-      </tabs>
-    </div>
   </div>
 </template>
 
@@ -200,6 +135,10 @@ $current-lang-choice: "Poppins";
 }
 
 #name-container {
+  padding: 10px 12px 22px 12px;
+}
+
+#feedback-container {
   padding: 10px 12px 22px 12px;
 }
 

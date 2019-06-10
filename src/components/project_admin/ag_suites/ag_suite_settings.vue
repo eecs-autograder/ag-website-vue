@@ -9,7 +9,7 @@
         <!------------------------ Suite Settings Tab ------------------------------------->
         <tab>
           <tab-header>
-            <div class="tab-heading"> Suite Settings </div>
+            <div class="tab-heading"> Settings </div>
           </tab-header>
           <template slot="body">
             <div class="tab-body">
@@ -71,7 +71,6 @@
                     </div>
 
                     <div class="toggle-container">
-<!--                      <label class="text-label network-label"> Network access: </label>-->
                       <toggle v-model="d_test_suite.allow_network_access">
                         <div slot="on">
                           Allow network access
@@ -201,7 +200,7 @@
         <tab>
           <tab-header>
             <div class="tab-heading">
-              Suite Feedback
+              Feedback
             </div>
           </tab-header>
           <template slot="body">
@@ -427,12 +426,20 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/components/ag_tests.scss';
 $current-lang-choice: "Poppins";
 
+.tab-body {
+  padding: 10px 15px;
+  overflow-y: scroll;
+  height: 50%;
+}
+
 .network-label {
   padding-right: 15px;
 }
 
 #ag-test-suite-settings-component {
   font-family: $current-lang-choice;
+  border: 1px solid purple;
+  height: 100%;
 }
 
 #setup-command-container {

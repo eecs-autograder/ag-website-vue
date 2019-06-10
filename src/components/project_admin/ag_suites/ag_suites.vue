@@ -1,73 +1,72 @@
 <template>
   <div id="ag-test-suites-component">
-    <div id="suite-navigation-bar">
-      <div class="tool-bar">
-        <div class="suites-title"> Suites </div>
-                <button type="button"
-                        class="add-suite-button"
-                        @click="$refs.new_suite_modal.open()">
-                  <i class="fas fa-plus plus"></i> Add Suite
-                </button>
-<!--        <button type="button"-->
-<!--                class="add-suite-button">-->
-<!--           Add Suite-->
-<!--        </button>-->
-<!--        <button type="button"-->
-<!--                class="add-suite-button">-->
-<!--           Add Case-->
-<!--        </button>-->
-<!--        <button type="button"-->
-<!--                class="add-suite-button">-->
-<!--           Add Command-->
-<!--        </button>-->
-      </div>
-      <div class="nav-bar-header">
-<!--        <div class="suites-title"> Suites </div>-->
-<!--        <button type="button"-->
-<!--                class="add-suite-button">-->
-<!--          <i class="fas fa-plus plus"></i> Add Suite-->
-<!--        </button>-->
-      </div>
 
-      <div class="all-suites" @wheel.stop>
-        <div v-for="(test_suite, index) of test_suites"
-             :class="['suite-container']"
-             :key="test_suite.pk">
-          <AGSuitePanel :test_suite="test_suite"
-                        :active_suite="active_suite"
-                        :active_case="active_case"
-                        :active_command="active_command"
-                        @update_active_suite="update_active_suite($event)"
-                        @update_active_case="update_active_case($event)"
-                        @update_active_command="update_active_command($event)">
-          </AGSuitePanel>
+    <div class="main">
+
+    <div class="main">
+      <div id="suite-nav-bar">
+        <div class="nav-bar-header">
+          <div class="suites-title"> Suites </div>
+          <button type="button"
+                  class="add-suite-button"
+                  @click="$refs.new_suite_modal.open()">
+            <i class="fas fa-plus plus"></i> Add Suite
+          </button>
         </div>
-      </div>
+
+        <div class="nav-bar-body" @wheel.stop>
+          <div class="all-suites">
+            <div v-for="test_suite of test_suites"
+                 :class="['suite-container']"
+                 :key="test_suite.pk">
+              <AGSuitePanel :test_suite="test_suite"
+                            :active_suite="active_suite"
+                            :active_case="active_case"
+                            :active_command="active_command"
+                            @update_active_suite="update_active_suite($event)"
+                            @update_active_case="update_active_case($event)"
+                            @update_active_command="update_active_command($event)">
+              </AGSuitePanel>
+            </div>
+          </div>
+        </div>
+
+<!--        <div class="nav-bar-footer"> </div>-->
+      </div> <!--suite-navigation-bar-->
+
+      <div id="viewing-window">
+        <div v-if="active_level_is_suite">
+          <AGSuiteSettings :test_suite="active_suite"
+                           :project="project">
+          </AGSuiteSettings>
+        </div>
+
+        <div v-else-if="active_level_is_command">
+          <AGCommandSettings :test_command="active_command"
+                             :test_case="active_case"
+                             :project="project">
+          </AGCommandSettings>
+        </div>
+      </div> <!--viewing-window-->
     </div>
 
-    <div id="viewing-window">
-<!--      <div> {{active_suite !== null ? active_suite.name : "Null"}}</div>-->
-<!--      <div> {{active_case !== null ? active_case.name : "Null"}}</div>-->
-<!--      <div> {{active_command !== null ? active_command.name : "Null"}}</div>-->
+    <div class="button-footer">
+      <span v-if="active_level_is_command">
+        <button type="button"
+                @click="go_to_prev_command"
+                class="prev-command-button"
+                :disabled="prev_command_is_available">
+          <i class="fas fa-angle-double-left prev"> </i> Previous Command
+        </button>
 
-      <div v-if="active_level_is_suite">
-        <AGSuiteSettings :test_suite="active_suite"
-                         :project="project">
-        </AGSuiteSettings>
-      </div>
-
-      <div v-if="active_level_is_case">
-<!--        <AGCaseSettings :test_case="active_case"-->
-<!--                        :project="project">-->
-<!--        </AGCaseSettings>-->
-      </div>
-
-      <div v-else-if="active_level_is_command">
-        <AGCommandSettings :test_command="active_command"
-                           :test_case="active_case"
-                           :project="project">
-        </AGCommandSettings>
-      </div>
+        <button type="button"
+                @click="go_to_next_command"
+                class="next-command-button"
+                :disabled="next_command_is_available">
+          Next Command <i class="fas fa-angle-double-right next"></i>
+        </button>
+      </span>
+    </div>
     </div>
 
     <modal ref="new_suite_modal"
@@ -170,16 +169,36 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
     AGTestSuite.unsubscribe(this);
   }
 
+  get prev_command_is_available() {
+    return this.active_case!.ag_test_commands.length === 0 ? true
+      : this.active_case!.ag_test_commands[0].pk === this.active_command!.pk;
+  }
+
+  get next_command_is_available() {
+    return this.active_case!.ag_test_commands.length === 0 ? true
+      : this.active_case!.ag_test_commands[this.active_case!.ag_test_commands.length - 1].pk === this.active_command!.pk;
+  }
+
   get active_level_is_suite() {
     return this.active_suite !== null && this.active_case === null;
   }
 
-  get active_level_is_case() {
-    return this.active_case !== null && this.active_command === null;
-  }
-
   get active_level_is_command() {
     return this.active_command !== null;
+  }
+
+  go_to_prev_command() {
+    let index = this.active_case!.ag_test_commands.findIndex(
+      (ag_command : AGTestCommand) => ag_command.pk === this.active_command!.pk
+    );
+    this.update_active_command(this.active_case!.ag_test_commands[index - 1]);
+  }
+
+  go_to_next_command() {
+    let index = this.active_case!.ag_test_commands.findIndex(
+      (ag_command : AGTestCommand) => ag_command.pk === this.active_command!.pk
+    );
+    this.update_active_command(this.active_case!.ag_test_commands[index + 1]);
   }
 
   update_active_suite(ag_test_suite: AGTestSuite) {
@@ -263,22 +282,132 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 
 #ag-test-suites-component {
   font-family: "Poppins";
-  display: flex;
-  flex-direction: row;
+  /*border: 1px solid purple;*/
+  /*display: flex;*/
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  top: 63px;
+  /*background-color: lightblue;*/
 }
 
-#suite-navigation-bar {
+.main {
+  flex: 1;
+  display: flex;
+  height: 100%;
+}
+
+.aside, .article {
   overflow-y: scroll;
+  padding: 2em;
+}
+
+.aside {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  /*flex: 1;*/
+  background: lightblue;
+}
+
+.article {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /*flex: 3;*/
+  background: pink;
+}
+
+#suite-nav-bar {
+  box-sizing: border-box;
   width: 420px;
-  min-width: 420px;
-  padding-left: 10px;
+  /*flex: 1;*/
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /*overflow-y: scroll;*/
 }
 
 #viewing-window {
-  max-width: 65%;
-  min-width: 65%;
-  padding-left:20px;
+  flex: 1;
+  padding-bottom: 55px;
 }
+
+.nav-bar-header {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-left: none;
+  border-bottom: none;
+  margin-top: 10px;
+}
+
+.suites-title {
+  font-size: 25px;
+  display: inline-block;
+}
+
+.add-suite-button {
+  @extend .white-button;
+  box-shadow: none;
+}
+
+.plus {
+  padding-right: 5px;
+}
+
+.nav-bar-body {
+  overflow-y: scroll;
+  border: 3px solid $white-gray;
+  border-left: none;
+  border-top: none;
+  border-bottom: none;
+  padding-bottom: 10px;
+  flex: 2;
+}
+
+.nav-bar-footer {
+  background-color: white;
+  /*background-color: hsl(220, 30%, 56%);*/
+  /*border-top: 1px solid hsl(220, 30%, 66%);*/
+  box-sizing: border-box;
+  min-height: 10px;
+  padding: 10px 10px 10px 10px;
+}
+
+.button-footer {
+  background-color: $white-gray;
+  border-top: 1px solid hsl(210, 20%, 94%);
+  bottom: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  left: 420px;
+  right: 0;
+  min-height: 55px;
+  min-width: 370px;
+  padding: 10px 10px 10px 10px;
+  position: fixed;
+}
+
+.next-suite-button, .next-case-button, .next-command-button, .prev-command-button {
+  @extend .white-button;
+  margin-left: 15px;
+}
+
+.next {
+  padding-left: 5px;
+}
+
+.prev {
+  padding-right: 5px;
+}
+
+// Modal **************************************************************
 
 #name-and-command {
   padding: 10px 0 20px 0;
@@ -286,39 +415,6 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 
 .name-container, .command-container {
   padding: 0 0 22px 0;
-}
-
-.suites-title {
-  box-sizing: border-box;
-  font-size: 24px;
-  padding: 0 10px;
-  display: inline-block;
-}
-
-.add-suite-button {
-  display: inline-block;
-  @extend .periwinkle-button;
-  margin-right: 10px;
-}
-
-.plus {
-  padding-right: 5px;
-}
-
-.nav-bar-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tool-bar {
-  padding: 10px 0 10px 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0 5px 0;
 }
 
 </style>

@@ -12,9 +12,10 @@
                  @click="update_case_and_command">
 
       <div class="test-case-name">
-        <i v-if="test_case.ag_test_commands.length === 1" class="far fa-star case-symbol"></i>
-        <i v-else class="fas fa-briefcase case-symbol"></i>
-        <span>{{test_case.name}}</span>
+<!--        <i v-if="test_case.ag_test_commands.length === 1" class="far fa-star n"></i>-->
+        <i v-if="test_case.ag_test_commands.length > 1 && !is_active_case" class="fas fa-caret-right case-symbol-right"></i>
+        <i v-else-if="test_case.ag_test_commands.length > 1 && is_active_case" class="fas fa-caret-down case-symbol-down"></i>
+        <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">{{test_case.name}}</span>
       </div>
 
       <div v-if="is_active_case"
@@ -58,7 +59,6 @@
            @click="$emit('update_active_command', test_command)">
 
         <div class="test-command-name">
-            <i class="fas fa-star command-symbol"></i>
           <span>{{test_command.name}}</span>
         </div>
 
@@ -136,46 +136,7 @@
       </div>
       <hr>
       <div class="modal-body">
-
-        <validated-form id="case-settings-form"
-                        autocomplete="off"
-                        spellcheck="false"
-                        @submit.native.prevent="save_ag_test_case_settings"
-                        @form_validity_changed="case_settings_form_is_valid = $event">
-
-          <div id="case-name-container">
-            <label class="text-label"> Case name </label>
-            <validated-input ref="case_name"
-                             v-model="d_test_case.name"
-                             :validators="[is_not_empty]">
-            </validated-input>
-          </div>
-
-          <div class="bottom-of-form">
-            <APIErrors ref="api_errors"></APIErrors>
-
-            <button type="submit"
-                    class="save-button"
-                    :disabled="!case_settings_form_is_valid || saving"> Save Updates
-            </button>
-
-            <div v-if="!saving" class="last-saved-timestamp">
-              <span> Last Saved: </span>
-              {{(new Date(d_test_case.last_modified)).toLocaleString(
-              'en-US', last_modified_format
-              )}}
-            </div>
-
-            <div v-else class="last-saved-spinner">
-              <i class="fa fa-spinner fa-pulse"></i>
-            </div>
-          </div>
-
-          <hr class="case-settings-divider">
-
-          <div class="case-feedback-title"> Case Feedback </div>
-
-        </validated-form>
+        <AGCaseSettings :test_case="test_case"></AGCaseSettings>
       </div>
     </modal>
 
@@ -186,9 +147,9 @@
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import APIErrors from '@/components/api_errors.vue';
+import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
-
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -204,6 +165,7 @@ import {
 @Component({
   components: {
     APIErrors,
+    AGCaseSettings,
     ContextMenu,
     ContextMenuItem,
     Dropdown,
@@ -226,7 +188,6 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
   readonly is_not_empty = is_not_empty;
 
   add_command_form_is_valid = false;
-  d_test_case: AGTestCase | null = null;
   adding_command = false;
   loading = true;
   new_command_name = "";
@@ -240,7 +201,6 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
 
   async created() {
     AGTestCommand.subscribe(this);
-    this.d_test_case = deep_copy(this.test_case, AGTestCase);
     this.loading = false;
   }
 
@@ -325,23 +285,6 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
                                         ag_test_command_order: number[]): void {
 
   }
-
-  @handle_api_errors_async(handle_save_ag_suite_settings_error)
-  async save_ag_test_case_settings() {
-    try {
-      this.saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_test_case!.save();
-    }
-    finally {
-      this.saving = false;
-    }
-  }
-
-}
-
-function handle_save_ag_suite_settings_error(component: AGCasePanel, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 
 function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
@@ -359,10 +302,22 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 
 .test-case {
   @extend .panel;
-  padding: 0 5px 0 42px;
+  padding: 0 5px 0 25px;
 
   .case-symbol {
     font-size: 15px;
+    padding: 0 8px 0 0;
+    color: $stormy-gray-dark;
+  }
+
+  .case-symbol-right {
+    font-size: 18px;
+    padding: 0 10px 0 3px;
+    color: $stormy-gray-dark;
+  }
+
+  .case-symbol-down {
+    font-size: 18px;
     padding: 0 8px 0 0;
     color: $stormy-gray-dark;
   }
@@ -383,31 +338,17 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 
 .test-command {
   @extend .panel;
-  padding: 0 5px 0 67px;
-
-  .command-symbol {
-    padding-right: 10px;
-    font-size: 15px;
-    color: darken($stormy-gray-light, 5);
-  }
+  padding: 0 5px 0 50px;
 }
 
 .test-command-name {
-  padding: 5px;
-}
-
-#name-container, #command-container {
-  padding: 0 0 22px 0;
-}
-
-#name-and-command {
-  padding: 10px 0 10px 0;
+  padding: 5px 5px 5px 15px;
 }
 
 .active-case {
   @extend .active-level;
 
-  .case-symbol {
+  .case-symbol, .case-symbol-right, .case-symbol-down {
     color: white;
   }
 }
@@ -422,17 +363,15 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 
 .parent-of-active-command {
   @extend .parent-of-active-level;
-  //background-color: lighten($white-gray, 3);
   background-color: white;
 
-  .case-symbol {
-    color: darken(teal, 10);
-  }
-
-  .case-menu {
+  .case-symbol, .case-menu, .case-symbol-right, .case-symbol-down {
     color: darken(teal, 10);
   }
 }
+
+
+// Modal **************************************************************
 
 #case-name-container {
   padding: 10px 13px 22px 13px;
@@ -445,4 +384,13 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 .case-settings-divider {
   margin: 2px 13px 13px 13px;
 }
+
+#name-container, #command-container {
+  padding: 0 0 22px 0;
+}
+
+#name-and-command {
+  padding: 10px 0 10px 0;
+}
+
 </style>

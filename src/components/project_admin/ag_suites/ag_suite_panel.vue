@@ -6,8 +6,8 @@
          @click="$emit('update_active_suite', test_suite)">
 
         <div class="test-suite-name">
-          <i v-if="is_active_suite" class="fas fa-folder-open suite-symbol"></i>
-          <i v-else class="fas fa-folder suite-symbol"></i>
+          <i v-if="is_active_suite" class="fas fa-caret-down suite-symbol-down"></i>
+          <i v-else class="fas fa-caret-right suite-symbol-right"></i>
           <span>{{test_suite.name}}</span>
         </div>
 
@@ -20,7 +20,7 @@
       </div>
 
       <div class="cases-container" v-if="is_active_suite">
-        <div v-for="(test_case, index) of test_suite.ag_test_cases"
+        <div v-for="test_case of test_suite.ag_test_cases"
              :key="test_case.pk">
           <AGCasePanel :test_case="test_case"
                        :active_case="active_case"
@@ -254,37 +254,30 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
 
 .test-suite {
   @extend .panel;
-  padding: 0 5px 0 15px;
+  padding: 0 5px 0 5px;
+  //background-color: $white-gray;
 
   .suite-symbol {
     padding-right: 8px;
     font-size: 16px;
     color: darken($stormy-gray-dark, 10);
   }
+
+  .suite-symbol-right {
+    padding: 0 10px 0 3px;
+    font-size: 18px;
+    color: darken($stormy-gray-dark, 10);
+  }
+
+  .suite-symbol-down {
+    padding: 0 8px 0 0;
+    font-size: 18px;
+    color: darken($stormy-gray-dark, 10);
+  }
 }
 
 .test-suite-name {
   padding: 5px;
-}
-
-.new-case-button {
-  padding-right: 10px;
-}
-
-.case-name-container {
-  padding: 0 0 22px 0;
-}
-
-.command-name-container {
-  padding: 0 0 22px 0;
-}
-
-.command-container {
-  padding: 0 0 22px 0;
-}
-
-.checkbox-container {
-  padding: 12px 0 12px 0;
 }
 
 .active-suite {
@@ -302,18 +295,17 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
   .suite-menu:hover {
     color: darken($stormy-gray-dark, 10);
   }
+
+  .suite-symbol-right, .suite-symbol-down {
+    color: white;
+  }
 }
 
 .suite-in-active-container {
   @extend .parent-of-active-level;
-  //background-color: hsl(210, 20%, 96%);
   background-color: white;
 
-  .suite-symbol {
-    color: darken(teal, 10);
-  }
-
-  .suite-menu {
+  .suite-symbol, .suite-menu, .suite-symbol-right, .suite-symbol-down {
     color: darken(teal, 10);
   }
 }
@@ -323,8 +315,21 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
   font-size: 16px;
 }
 
-.plus-sign {
-    font-size: 14px;
+// Modal **************************************************************
+.case-name-container {
+  padding: 0 0 22px 0;
+}
+
+.command-name-container {
+  padding: 0 0 22px 0;
+}
+
+.command-container {
+  padding: 0 0 22px 0;
+}
+
+.checkbox-container {
+  padding: 12px 0 12px 0;
 }
 
 </style>

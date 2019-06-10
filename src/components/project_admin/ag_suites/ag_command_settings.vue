@@ -8,7 +8,7 @@
 <!------------------------ Command Settings Tab ------------------------------------->
       <tab>
         <tab-header>
-          <div class="tab-heading"> Command Settings </div>
+          <div class="tab-heading"> Settings </div>
         </tab-header>
         <template slot="body">
           <div class="tab-body">
@@ -518,7 +518,7 @@
       <tab>
         <tab-header>
           <div class="tab-heading">
-            Command Feedback
+            Feedback
           </div>
         </tab-header>
         <template slot="body">
@@ -528,19 +528,6 @@
         </template>
       </tab>
 
-<!------------------------ Case Feedback Tab ------------------------------------->
-<!--      <tab>-->
-<!--        <tab-header>-->
-<!--          <div class="tab-heading">-->
-<!--            Case Feedback-->
-<!--          </div>-->
-<!--        </tab-header>-->
-<!--        <template slot="body">-->
-<!--          <div class="tab-body">-->
-
-<!--          </div>-->
-<!--        </template>-->
-<!--      </tab>-->
 <!--------------------------- Danger Zone Tab --------------------------------------->
       <tab>
         <tab-header>
@@ -793,6 +780,10 @@ $current-lang-choice: "Poppins";
 
 #ag-test-command-settings-component {
   font-family: $current-lang-choice;
+}
+
+.tab-body {
+  padding: 10px 15px;
 }
 
 .command-to-delete {

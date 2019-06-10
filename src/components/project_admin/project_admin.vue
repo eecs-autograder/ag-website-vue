@@ -241,7 +241,9 @@ export default class ProjectAdmin extends Vue {
 @import '@/styles/colors.scss';
 
 #project-admin {
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
 }
 
 .loading-spinner {
@@ -261,7 +263,7 @@ export default class ProjectAdmin extends Vue {
 
 .tab-body {
   text-align: left;
-  /*position: relative;*/
+  width: 100%;
   padding-top: 0;
 }
 
