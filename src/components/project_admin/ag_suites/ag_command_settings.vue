@@ -2,8 +2,8 @@
   <div id="ag-test-command-settings-component" v-if="d_test_command !== null">
     <tabs ref="tabs-gray"
           v-model="current_tab_index"
-          tab_active_class="gray-white-theme-active"
-          tab_inactive_class="gray-white-theme-inactive">
+          tab_active_class="white-theme-active"
+          tab_inactive_class="white-theme-inactive">
 
 <!------------------------ Command Settings Tab ------------------------------------->
       <tab>
@@ -588,21 +588,9 @@
 </template>
 
 <script lang="ts">
-import APIErrors from '@/components/api_errors.vue';
-import Dropdown from '@/components/dropdown.vue';
-import Modal from '@/components/modal.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
 
-import {
-  is_integer,
-  is_not_empty,
-  make_min_value_validator
-} from '@/validators';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
 import {
   AGTestCase,
   AGTestCommand,
@@ -612,7 +600,21 @@ import {
   Project,
   StdinSource
 } from 'ag-client-typescript';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+import APIErrors from '@/components/api_errors.vue';
+import Dropdown from '@/components/dropdown.vue';
+import Modal from '@/components/modal.vue';
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
+import { handle_api_errors_async } from '@/utils';
+import {
+  is_integer,
+  is_not_empty,
+  make_min_value_validator
+} from '@/validators';
 
 @Component({
   components: {
@@ -783,7 +785,11 @@ $current-lang-choice: "Poppins";
 }
 
 .tab-body {
-  padding: 10px 15px;
+  box-sizing: border-box;
+  padding: 15px;
+  height: 700px;
+  overflow-y: scroll;
+  border-left: 2px solid darken($pebble-light, 1);
 }
 
 .command-to-delete {
@@ -799,7 +805,7 @@ $current-lang-choice: "Poppins";
 }
 
 #name-container {
-  padding: 10px 12px 12px 12px;
+  padding: 15px 12px 12px 12px;
 }
 
 #command-container {
@@ -878,17 +884,20 @@ $current-lang-choice: "Poppins";
   padding-bottom: 20px;
   vertical-align: top;
 }
+
 #virtual-memory-container {
   display: inline-block;
   padding-bottom: 20px;
   vertical-align: top;
 }
+
 #stack-size-container {
   display: inline-block;
   margin-right: 50px;
   padding-bottom: 20px;
   vertical-align: top;
 }
+
 #process-spawn-container {
   display: inline-block;
   padding-bottom: 25px;

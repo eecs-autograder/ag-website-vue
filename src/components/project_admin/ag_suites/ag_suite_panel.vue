@@ -11,8 +11,7 @@
           <span>{{test_suite.name}}</span>
         </div>
 
-        <div v-if="is_active_suite"
-             class="suite-menu"
+        <div id="suite-menu"
              title="Add Case"
              @click.stop="open_new_case_modal">
           <i class="fas fa-plus"></i>
@@ -104,13 +103,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import APIErrors from '@/components/api_errors.vue';
-import Modal from '@/components/modal.vue';
-import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
-import Tooltip from '@/components/tooltip.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-
 import {
   AGTestCase,
   AGTestCaseObserver,
@@ -118,10 +110,14 @@ import {
   AGTestSuite
 } from 'ag-client-typescript';
 
+import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
+import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
+import Tooltip from '@/components/tooltip.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
-import {
-  is_not_empty,
-} from '@/validators';
+import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
@@ -179,6 +175,9 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
     this.new_case_name = "";
     this.intend_on_having_more_than_one_command = false;
     (<Modal> this.$refs.new_case_modal).open();
+    Vue.nextTick(() => {
+      (<ValidatedInput> this.$refs.new_case_name).invoke_focus();
+    });
   }
 
   @handle_api_errors_async(handle_add_ag_case_error)
@@ -255,13 +254,6 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
 .test-suite {
   @extend .panel;
   padding: 0 5px 0 5px;
-  //background-color: $white-gray;
-
-  .suite-symbol {
-    padding-right: 8px;
-    font-size: 16px;
-    color: darken($stormy-gray-dark, 10);
-  }
 
   .suite-symbol-right {
     padding: 0 10px 0 3px;
@@ -274,6 +266,18 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
     font-size: 18px;
     color: darken($stormy-gray-dark, 10);
   }
+
+  #suite-menu {
+    padding: 5px;
+    visibility: hidden;
+  }
+}
+
+.test-suite:hover {
+  #suite-menu {
+    visibility: visible;
+    color: darken($stormy-gray-dark, 10);
+  }
 }
 
 .test-suite-name {
@@ -283,20 +287,18 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
 .active-suite {
   @extend .active-level;
 
-  .suite-symbol {
+  #suite-menu, #suite-menu:hover {
+    visibility: visible;
     color: white;
-  }
-
-  .suite-menu {
-    color: white;
-    padding: 5px;
-  }
-
-  .suite-menu:hover {
-    color: darken($stormy-gray-dark, 10);
   }
 
   .suite-symbol-right, .suite-symbol-down {
+    color: white;
+  }
+}
+
+.active-suite:hover {
+  #suite-menu {
     color: white;
   }
 }
@@ -305,14 +307,19 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
   @extend .parent-of-active-level;
   background-color: white;
 
-  .suite-symbol, .suite-menu, .suite-symbol-right, .suite-symbol-down {
+  #suite-menu, .suite-symbol-right, .suite-symbol-down {
     color: darken(teal, 10);
+  }
+
+  #suite-menu {
+    visibility: visible;
   }
 }
 
-.suite-symbol {
-  padding-right: 8px;
-  font-size: 16px;
+.suite-in-active-container:hover {
+  #suite-menu {
+    color: darken(teal, 10);
+  }
 }
 
 // Modal **************************************************************

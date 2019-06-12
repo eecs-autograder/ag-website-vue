@@ -17,8 +17,8 @@ export default class App extends Vue {}
   body, #app {
     margin: 0;
     padding: 0;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
   }
 
   html {

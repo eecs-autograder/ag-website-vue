@@ -1,8 +1,4 @@
-import APIErrors from '@/components/api_errors.vue';
-import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
-import { AxiosError } from 'axios';
 
 import {
     AGTestCase,
@@ -17,8 +13,12 @@ import {
     StdinSource,
     ValueFeedbackLevel
 } from 'ag-client-typescript';
-
+import { AxiosError } from 'axios';
 import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

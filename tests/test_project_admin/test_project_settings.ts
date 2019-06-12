@@ -49,8 +49,13 @@ describe('ProjectSettings tests', () => {
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
+<<<<<<< 6d0a960b0b601e1fc8359ce7d3ed7a3e868699fc
             instructor_files: [],
             expected_student_files: []
+=======
+            expected_student_files: [],
+            instructor_files: []
+>>>>>>> Added an invoke_focus method to the ValidatedInput component.
         });
 
         wrapper = mount(ProjectSettings, {

@@ -12,14 +12,16 @@
                  @click="update_case_and_command">
 
       <div class="test-case-name">
-<!--        <i v-if="test_case.ag_test_commands.length === 1" class="far fa-star n"></i>-->
-        <i v-if="test_case.ag_test_commands.length > 1 && !is_active_case" class="fas fa-caret-right case-symbol-right"></i>
-        <i v-else-if="test_case.ag_test_commands.length > 1 && is_active_case" class="fas fa-caret-down case-symbol-down"></i>
-        <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">{{test_case.name}}</span>
+        <i v-if="test_case.ag_test_commands.length > 1 && !is_active_case"
+           class="fas fa-caret-right case-symbol-right"></i>
+        <i v-else-if="test_case.ag_test_commands.length > 1 && is_active_case"
+           class="fas fa-caret-down case-symbol-down"></i>
+        <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">
+          {{test_case.name}}
+        </span>
       </div>
 
-      <div v-if="is_active_case"
-           class="case-menu"
+      <div id="case-menu"
            @click.stop="$refs.case_context_menu.show_context_menu($event.pageX, $event.pageY)">
         <i class="fas fa-ellipsis-v"></i>
       </div>
@@ -42,7 +44,7 @@
           <context-menu-item ref="delete_case_menu_item"
                              @context_menu_item_clicked="$refs.delete_case_modal.open()">
             <template slot="label">
-              Delete case
+              <span id="delete-case-label"> Delete case </span>
             </template>
           </context-menu-item>
         </template>
@@ -53,8 +55,8 @@
     <div class="commands-container" v-if="is_active_case && test_case.ag_test_commands.length > 1">
       <div v-for="test_command of test_case.ag_test_commands"
            :class="['test-command',
-                   {'active-command' : active_command !== null
-                                       && active_command.pk === test_command.pk}
+                   {'active-command': active_command !== null
+                                      && active_command.pk === test_command.pk}
            ]"
            @click="$emit('update_active_command', test_command)">
 
@@ -144,23 +146,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import { AGTestCase, AGTestCommand, AGTestCommandObserver } from 'ag-client-typescript';
+
 
 import APIErrors from '@/components/api_errors.vue';
-import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
+import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-
-import { AGTestCase, AGTestCommand, AGTestCommandObserver } from 'ag-client-typescript';
-
 import { deep_copy, handle_api_errors_async } from '@/utils';
-import {
-  is_not_empty,
-} from '@/validators';
+import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
@@ -300,15 +300,13 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/context_menu_styles.scss';
 
+#delete-case-label {
+  color: $warning-red;
+}
+
 .test-case {
   @extend .panel;
   padding: 0 5px 0 25px;
-
-  .case-symbol {
-    font-size: 15px;
-    padding: 0 8px 0 0;
-    color: $stormy-gray-dark;
-  }
 
   .case-symbol-right {
     font-size: 18px;
@@ -321,19 +319,42 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
     padding: 0 8px 0 0;
     color: $stormy-gray-dark;
   }
+
+  #case-menu {
+    padding: 5px 9px;
+    position: relative;
+    visibility: hidden;
+  }
+}
+
+.test-case:hover {
+  #case-menu {
+    visibility: visible;
+    color: darken($stormy-gray-dark, 10);
+  }
 }
 
 .test-case-name {
   padding: 5px;
 }
 
-.case-menu {
-  padding: 5px 9px;
-  position: relative;
+.active-case {
+  @extend .active-level;
+
+  #case-menu, #case-menu:hover {
+    visibility: visible;
+    color: white;
+  }
+
+  .case-symbol-right, .case-symbol-down {
+    color: white;
+  }
 }
 
-.case-menu:hover {
-  color: darken($stormy-gray-dark, 10);
+.active-case:hover {
+  #case-menu {
+    color: white;
+  }
 }
 
 .test-command {
@@ -345,34 +366,31 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
   padding: 5px 5px 5px 15px;
 }
 
-.active-case {
-  @extend .active-level;
-
-  .case-symbol, .case-symbol-right, .case-symbol-down {
-    color: white;
-  }
-}
-
 .active-command, .active-single-command {
   @extend .active-level;
 
-  .command-symbol {
-    color: white;
-  }
 }
 
 .parent-of-active-command {
   @extend .parent-of-active-level;
   background-color: white;
 
-  .case-symbol, .case-menu, .case-symbol-right, .case-symbol-down {
+  #case-menu, .case-symbol-right, .case-symbol-down {
+    color: darken(teal, 10);
+  }
+
+  #case-menu {
+    visibility: visible;
+  }
+}
+
+.parent-of-active-command:hover {
+  #case-menu {
     color: darken(teal, 10);
   }
 }
 
-
 // Modal **************************************************************
-
 #case-name-container {
   padding: 10px 13px 22px 13px;
 }

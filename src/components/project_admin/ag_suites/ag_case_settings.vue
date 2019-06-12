@@ -51,6 +51,8 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import { AGTestCase } from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -58,9 +60,6 @@ import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-
-import { AGTestCase } from 'ag-client-typescript';
-
 import { deep_copy, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 

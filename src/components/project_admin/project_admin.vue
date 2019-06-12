@@ -135,8 +135,8 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { Project } from 'ag-client-typescript';
 
-import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import ProjectSettings from '@/components/project_admin/project_settings.vue';

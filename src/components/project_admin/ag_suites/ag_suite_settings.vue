@@ -3,8 +3,8 @@
     <div v-if="!loading">
       <tabs ref="tabs-gray"
             v-model="current_tab_index"
-            tab_active_class="gray-white-theme-active"
-            tab_inactive_class="gray-white-theme-inactive">
+            tab_active_class="white-theme-active"
+            tab_inactive_class="white-theme-inactive">
 
         <!------------------------ Suite Settings Tab ------------------------------------->
         <tab>
@@ -259,6 +259,15 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import {
+  AGTestSuite,
+  ExpectedStudentFile,
+  get_sandbox_docker_images,
+  InstructorFile,
+  Project,
+  SandboxDockerImageData
+} from 'ag-client-typescript';
+
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
@@ -270,16 +279,6 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-
-import {
-  AGTestSuite,
-  ExpectedStudentFile,
-  get_sandbox_docker_images,
-  InstructorFile,
-  Project,
-  SandboxDockerImageData
-} from 'ag-client-typescript';
-
 import { deep_copy, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -308,6 +307,8 @@ export default class AGSuiteSettings extends Vue {
 
   @Watch('test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
+    console.log(old_test_suite);
+    console.log(new_test_suite);
     this.d_test_suite = deep_copy(new_test_suite, AGTestSuite);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
@@ -427,9 +428,11 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 $current-lang-choice: "Poppins";
 
 .tab-body {
-  padding: 10px 15px;
+  box-sizing: border-box;
+  padding: 15px;
+  height: 700px;
   overflow-y: scroll;
-  height: 50%;
+  border-left: 2px solid darken($pebble-light, 1);
 }
 
 .network-label {
@@ -438,7 +441,6 @@ $current-lang-choice: "Poppins";
 
 #ag-test-suite-settings-component {
   font-family: $current-lang-choice;
-  border: 1px solid purple;
   height: 100%;
 }
 
@@ -509,7 +511,7 @@ $current-lang-choice: "Poppins";
 }
 
 #name-container {
-  padding: 10px 12px 22px 12px;
+  padding: 15px 12px 22px 12px;
 }
 
 </style>

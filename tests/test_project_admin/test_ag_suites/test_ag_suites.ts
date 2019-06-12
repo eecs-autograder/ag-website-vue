@@ -1,7 +1,4 @@
-import APIErrors from '@/components/api_errors.vue';
-import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
-import { AxiosError } from 'axios';
 
 import {
     AGTestCase,
@@ -18,11 +15,13 @@ import {
     StdinSource, UltimateSubmissionPolicy,
     ValueFeedbackLevel
 } from 'ag-client-typescript';
-
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
-
+import { AxiosError } from 'axios';
 import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -504,7 +503,7 @@ describe('AGSuites tests', () => {
             student_files_needed: []
         });
 
-        wrapper.find('.add-suite-button').trigger('click');
+        wrapper.find('#add-suite-button').trigger('click');
         await component.$nextTick();
 
         component.new_suite_name = "Sweet";
@@ -521,6 +520,7 @@ describe('AGSuites tests', () => {
         expect(create_suite_stub.calledOnce).toBe(true);
         expect(component.new_suite_name).toBe("");
         expect(component.test_suites.length).toEqual(4);
+        expect(component.active_suite).toEqual(new_suite);
     });
 
     test('Creating a suite - unsuccessfully', async () => {
@@ -544,7 +544,7 @@ describe('AGSuites tests', () => {
             Promise.reject(axios_response_instance)
         );
 
-        wrapper.find('.add-suite-button').trigger('click');
+        wrapper.find('#add-suite-button').trigger('click');
         await component.$nextTick();
 
         component.new_suite_name = "Sweet";
@@ -558,7 +558,7 @@ describe('AGSuites tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
-    test('Delete all suites - active_suite gets set to null', async () => {
+    test.only('Delete all suites - active_suite gets set to null', async () => {
         expect(component.test_suites.length).toEqual(3);
 
         wrapper.setData({active_suite: ag_suite_colors});
@@ -763,40 +763,6 @@ describe('AGSuites tests', () => {
 
         expect(component.active_level_is_suite).toBe(false);
         expect(component.active_suite).toBeNull();
-        expect(component.active_case).toBeNull();
-        expect(component.active_command).toBeNull();
-    });
-
-    // warning case is null in ag_command_settings
-    test('active_level_is_case getter', async () => {
-        expect(component.active_level_is_case).toBe(false);
-
-        wrapper.findAll('.test-suite').at(0).trigger('click');
-        await component.$nextTick();
-
-        expect(component.active_level_is_case).toBe(false);
-        expect(component.active_suite).toEqual(ag_suite_colors);
-        expect(component.active_case).toBeNull();
-        expect(component.active_command).toBeNull();
-
-        wrapper.findAll('.test-case').at(0).trigger('click');
-
-        expect(component.active_level_is_case).toBe(true);
-        expect(component.active_suite).toEqual(ag_suite_colors);
-        expect(component.active_case).toEqual(ag_case_purple);
-        expect(component.active_command).toBeNull();
-
-        wrapper.findAll('.test-case').at(1).trigger('click');
-
-        expect(component.active_level_is_case).toBe(false);
-        expect(component.active_suite).toEqual(ag_suite_colors);
-        expect(component.active_case).toEqual(ag_case_blue);
-        expect(component.active_command).toEqual(ag_command_blue_1);
-
-        wrapper.findAll('.test-suite').at(0).trigger('click');
-
-        expect(component.active_level_is_case).toBe(false);
-        expect(component.active_suite).toEqual(ag_suite_colors);
         expect(component.active_case).toBeNull();
         expect(component.active_command).toBeNull();
     });

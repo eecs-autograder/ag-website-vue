@@ -1,8 +1,4 @@
-import APIErrors from '@/components/api_errors.vue';
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import { config, mount, Wrapper } from '@vue/test-utils';
-import { AxiosError } from 'axios';
 
 import {
     AGTestSuite,
@@ -13,11 +9,14 @@ import {
     Project,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
-
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
-
+import { AxiosError } from 'axios';
 import * as sinon from "sinon";
+
+import APIErrors from '@/components/api_errors.vue';
+import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
