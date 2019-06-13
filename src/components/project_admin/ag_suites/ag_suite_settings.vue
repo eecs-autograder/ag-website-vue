@@ -399,7 +399,9 @@ export default class AGSuiteSettings extends Vue {
     try {
       this.saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
+      console.log("trying to save");
       await this.d_test_suite!.save();
+      console.log("Success");
     }
     finally {
       this.saving = false;
@@ -408,6 +410,7 @@ export default class AGSuiteSettings extends Vue {
 }
 
 function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: unknown) {
+  console.log("Something went wrong");
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
@@ -504,7 +507,7 @@ $current-lang-choice: "Poppins";
 }
 
 #name-container {
-  padding: 15px 12px 22px 12px;
+  padding: 0 12px 22px 12px;
 }
 
 </style>

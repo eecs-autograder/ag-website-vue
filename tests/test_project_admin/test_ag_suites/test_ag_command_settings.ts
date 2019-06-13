@@ -28,6 +28,8 @@ describe('AGCommandSettings tests', () => {
     let component: AGCommandSettings;
     let ag_case: AGTestCase;
     let ag_command: AGTestCommand;
+    let another_command: AGTestCommand;
+    let case_with_two_commands: AGTestCase;
     let instructor_file_1: InstructorFile;
     let instructor_file_2: InstructorFile;
     let instructor_file_3: InstructorFile;
@@ -98,6 +100,43 @@ describe('AGCommandSettings tests', () => {
             process_spawn_limit: 1
         });
 
+        another_command = new AGTestCommand({
+            pk: 2,
+            name: "Command 2",
+            ag_test_case: 1,
+            last_modified: "",
+            cmd: "Say sorry",
+            stdin_source: StdinSource.none,
+            stdin_text: "",
+            stdin_instructor_file: null,
+            expected_return_code: ExpectedReturnCode.none,
+            expected_stdout_source: ExpectedOutputSource.none,
+            expected_stdout_text: "",
+            expected_stdout_instructor_file: null,
+            expected_stderr_source: ExpectedOutputSource.none,
+            expected_stderr_text: "",
+            expected_stderr_instructor_file: null,
+            ignore_case: false,
+            ignore_whitespace: false,
+            ignore_whitespace_changes: false,
+            ignore_blank_lines: false,
+            points_for_correct_return_code: 1,
+            points_for_correct_stdout: 1,
+            points_for_correct_stderr: 1,
+            deduction_for_wrong_return_code: 1,
+            deduction_for_wrong_stdout: 1,
+            deduction_for_wrong_stderr: 1,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
+            time_limit: 1,
+            stack_size_limit: 1,
+            virtual_memory_limit: 1,
+            process_spawn_limit: 1
+        });
+
         ag_case = new AGTestCase({
             pk: 1,
             name: "Case A",
@@ -107,7 +146,19 @@ describe('AGCommandSettings tests', () => {
             past_limit_submission_fdbk_config: default_case_feedback_config,
             staff_viewer_fdbk_config: default_case_feedback_config,
             last_modified: '',
-            ag_test_commands: []
+            ag_test_commands: [ag_command]
+        });
+
+        case_with_two_commands = new AGTestCase({
+            pk: 1,
+            name: "Case A",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: [ag_command, another_command]
         });
 
         instructor_file_1 = new InstructorFile({
@@ -201,6 +252,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(name_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - cmd is blank', async () => {
@@ -214,6 +266,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(cmd_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - stdin_text is blank', async () => {
@@ -232,6 +285,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(stdin_text_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - points_for_correct_return_code is blank or not an integer', async () => {
@@ -258,6 +312,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(correct_return_code_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - points_for_correct_return_code must be >= 0', async () => {
@@ -278,6 +333,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(correct_return_code_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
@@ -304,6 +360,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(wrong_return_code_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - deduction_for_wrong_return_code must be >= 0', async () => {
@@ -324,6 +381,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(wrong_return_code_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - expected_stdout_text is blank', async () => {
@@ -347,6 +405,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(expected_stdout_text_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - points_for_correct_stdout is blank or not an integer', async () => {
@@ -367,12 +426,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(correct_stdout_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> correct_stdout_points_input.element).value = "Scooby Doo";
         correct_stdout_points_input.trigger('input');
         await component.$nextTick();
 
         expect(correct_stdout_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - points_for_correct_stdout must be >= 0', async () => {
@@ -393,6 +454,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(correct_stdout_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
@@ -413,12 +475,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(wrong_stdout_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> wrong_stdout_points_input.element).value = "Mystery Machine";
         wrong_stdout_points_input.trigger('input');
         await component.$nextTick();
 
         expect(wrong_stdout_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - deduction_for_wrong_stdout must be >= 0', async () => {
@@ -439,6 +503,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(wrong_stdout_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - expected_stderr_text is blank', async () => {
@@ -462,6 +527,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(expected_stderr_text_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - points_for_correct_stderr is blank or not an integer', async () => {
@@ -483,12 +549,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(correct_stderr_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> correct_stderr_points_input.element).value = "Scooby Doo";
         correct_stderr_points_input.trigger('input');
         await component.$nextTick();
 
         expect(correct_stderr_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - points_for_correct_stderr must be >= 0', async () => {
@@ -510,6 +578,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(correct_stderr_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
@@ -531,12 +600,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(wrong_stderr_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> wrong_stderr_points_input.element).value = "Scooby Doo";
         wrong_stderr_points_input.trigger('input');
         await component.$nextTick();
 
         expect(wrong_stderr_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - deduction_for_wrong_stderr must be >= 0', async () => {
@@ -558,6 +629,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(wrong_stderr_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - time_limit is blank or not an integer', async () => {
@@ -571,12 +643,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(time_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> time_limit_input.element).value = "cupcake";
         time_limit_input.trigger('input');
         await component.$nextTick();
 
         expect(time_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - time_limit must be >= 1', async () => {
@@ -590,6 +664,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(time_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> time_limit_input.element).value = "1";
         time_limit_input.trigger('input');
@@ -613,12 +688,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(virtual_memory_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> virtual_memory_limit_input.element).value = "cheesecake";
         virtual_memory_limit_input.trigger('input');
         await component.$nextTick();
 
         expect(virtual_memory_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - virtual_memory_limit must be >= 1', async () => {
@@ -636,6 +713,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(virtual_memory_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> virtual_memory_limit_input.element).value = "1";
         virtual_memory_limit_input.trigger('input');
@@ -659,12 +737,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(stack_size_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> stack_size_limit_input.element).value = "pudding";
         stack_size_limit_input.trigger('input');
         await component.$nextTick();
 
         expect(stack_size_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - stack_size_limit must be >= 1', async () => {
@@ -682,6 +762,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(stack_size_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> stack_size_limit_input.element).value = "1";
         stack_size_limit_input.trigger('input');
@@ -705,12 +786,14 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(process_spawn_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> process_spawn_limit_input.element).value = "jello";
         process_spawn_limit_input.trigger('input');
         await component.$nextTick();
 
         expect(process_spawn_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('error - process_spawn_limit must be >= 0', async () => {
@@ -728,62 +811,13 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(process_spawn_limit_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> process_spawn_limit_input.element).value = "0";
         process_spawn_limit_input.trigger('input');
         await component.$nextTick();
 
         expect(process_spawn_limit_validator.is_valid).toBe(true);
-    });
-
-    test('Stdin_source getter', async () => {
-        component.d_test_command!.stdin_source = StdinSource.none;
-        expect(component.stdin_source).toEqual("No input");
-
-        component.d_test_command!.stdin_source = StdinSource.text;
-        expect(component.stdin_source).toEqual("Text");
-
-        component.d_test_command!.stdin_source = StdinSource.instructor_file;
-        expect(component.stdin_source).toEqual("Project file content");
-
-        component.d_test_command!.stdin_source = StdinSource.setup_stdout;
-        expect(component.stdin_source).toEqual("Stdout from setup");
-
-        component.d_test_command!.stdin_source = StdinSource.setup_stderr;
-        expect(component.stdin_source).toEqual("Stderr from setup");
-    });
-
-    test('expected_return_code getter', async () => {
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.none;
-        expect(component.expected_return_code).toEqual("Don't check");
-
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        expect(component.expected_return_code).toEqual("Zero");
-
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.nonzero;
-        expect(component.expected_return_code).toEqual("Nonzero");
-    });
-
-    test('expected_stdout_source getter', async () => {
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.none;
-        expect(component.expected_stdout_source).toEqual("Don't check");
-
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        expect(component.expected_stdout_source).toEqual("Text");
-
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        expect(component.expected_stdout_source).toEqual("Project file content");
-    });
-
-    test('expected_stderr_source getter', async () => {
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-        expect(component.expected_stderr_source).toEqual("Don't check");
-
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        expect(component.expected_stderr_source).toEqual("Text");
-
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
-        expect(component.expected_stderr_source).toEqual("Project file content");
     });
 
     test('Save command settings - successful', async () => {
@@ -796,7 +830,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Save command settings - unsuccessful', async () => {
-        let save_stub = sinon.stub(ag_command, 'save');
+        let save_stub = sinon.stub(component.d_test_command!, 'save');
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -813,6 +847,7 @@ describe('AGCommandSettings tests', () => {
             config: {},
         };
         save_stub.returns(Promise.reject(axios_response_instance));
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#command-settings-form').trigger('submit.native');
         await component.$nextTick();
@@ -824,7 +859,9 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Delete command', async () => {
-        let delete_stub = sinon.stub(component.d_test_command!, 'delete');
+        wrapper.setProps({test_case: case_with_two_commands})
+
+        let delete_command_stub = sinon.stub(component.d_test_command!, 'delete');
 
         wrapper.setData({current_tab_index: 2});
         await component.$nextTick();
@@ -835,54 +872,32 @@ describe('AGCommandSettings tests', () => {
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
-        expect(delete_stub.calledOnce).toBe(true);
+        expect(delete_command_stub.calledOnce).toBe(true);
+    });
+
+    test('Delete case with exactly one command', async () => {
+        let delete_case_stub = sinon.stub(component.d_test_case!, 'delete');
+
+        wrapper.setData({current_tab_index: 2});
+        await component.$nextTick();
+
+        wrapper.find('.delete-command-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await component.$nextTick();
+
+        expect(delete_case_stub.calledOnce).toBe(true);
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {
-        let another_ag_command = new AGTestCommand({
-            pk: 2,
-            name: "Another One",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Major Key",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 2,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
-
         expect(component.d_test_command!.pk).toEqual(ag_command.pk);
         expect(component.current_tab_index).toEqual(0);
 
-        wrapper.setProps({'test_command': another_ag_command});
+        wrapper.setProps({'test_command': another_command});
         await component.$nextTick();
 
-        expect(component.d_test_command!.pk).toEqual(another_ag_command.pk);
+        expect(component.d_test_command!.pk).toEqual(another_command.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setData({current_tab_index: 2});
@@ -891,6 +906,28 @@ describe('AGCommandSettings tests', () => {
         expect(component.current_tab_index).toEqual(2);
 
         wrapper.setProps({'test_command': ag_command});
+        await component.$nextTick();
+
+        expect(component.d_test_command!.pk).toEqual(ag_command.pk);
+        expect(component.current_tab_index).toEqual(0);
+    });
+
+    test('Parent component changes the value supplied to the test_case prop', async () => {
+        expect(component.d_test_case!.pk).toEqual(ag_case.pk);
+        expect(component.current_tab_index).toEqual(0);
+
+        wrapper.setProps({'test_case': case_with_two_commands});
+        await component.$nextTick();
+
+        expect(component.d_test_case!.pk).toEqual(case_with_two_commands.pk);
+        expect(component.current_tab_index).toEqual(0);
+
+        wrapper.setData({current_tab_index: 2});
+        await component.$nextTick();
+
+        expect(component.current_tab_index).toEqual(2);
+
+        wrapper.setProps({'test_case': ag_case});
         await component.$nextTick();
 
         expect(component.d_test_command!.pk).toEqual(ag_command.pk);

@@ -650,14 +650,12 @@ export default class AGCommandSettings extends Vue {
 
   async delete_ag_test_command() {
     if (this.case_has_exactly_one_command) {
-      console.log("Deleting case");
       await this.d_test_case!.delete();
     }
     else {
-      console.log("Deleting command");
       await this.d_test_command!.delete();
     }
-    // (<Modal> this.$refs.delete_command_modal).close();
+    // dont delete the modal here
   }
 
   sort_instructor_files() {
@@ -723,7 +721,7 @@ $current-lang-choice: "Poppins";
 }
 
 #name-container {
-  padding: 15px 12px 12px 12px;
+  padding: 0 12px 12px 12px;
 }
 
 #command-container {

@@ -180,7 +180,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Student files & Instructor files get sorted', async () => {
-        expect(component.d_test_suite).toEqual(ag_suite);
+        expect(component.d_test_suite.pk).toEqual(ag_suite.pk);
         expect(component.project).toEqual(project);
 
         expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
@@ -383,7 +383,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Save suite settings - unsuccessful', async () => {
-        let save_stub = sinon.stub(ag_suite, 'save');
+        let save_stub = sinon.stub(component.d_test_suite!, 'save');
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -401,7 +401,7 @@ describe('AGSuiteSettings tests', () => {
         };
         save_stub.returns(Promise.reject(axios_response_instance));
 
-        wrapper.find('#suite-settings-form').trigger('submit.native');
+        wrapper.find('#suite-settings-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);

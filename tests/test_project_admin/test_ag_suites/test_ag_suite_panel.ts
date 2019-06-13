@@ -185,7 +185,6 @@ describe('AGSuitePanel tests', () => {
         wrapper = mount(AGSuitePanel, {
             propsData: {
                 test_suite: ag_suite,
-                last_suite: false,
                 active_suite: null,
                 active_case: null,
                 active_command: null
@@ -213,16 +212,18 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.emitted('update_active_suite').length).toEqual(1);
     });
 
-    test('An "Add Case" button appears when the test_suite is active', async () => {
-        expect(wrapper.findAll('.suite-menu').length).toEqual(0);
+    test('Clicking on the suite-menu when the suite is not active prompts an event ' +
+         'to be emitted',
+         async () => {
+        expect(component.active_suite).toBeNull();
 
-        wrapper.setProps({active_suite: ag_suite});
+        wrapper.find('#suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.findAll('.suite-menu').length).toEqual(1);
+        expect(wrapper.emitted('update_active_suite').length).toEqual(1);
     });
 
-    test('Add case (and first command) - successful', async () => {
+    test('Add case (and first command of the same name) - successful', async () => {
         let new_case = new AGTestCase({
             pk: 4,
             name: "New Case",
@@ -240,7 +241,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.suite-menu').trigger('click');
+        wrapper.find('#suite-menu').trigger('click');
         await component.$nextTick();
 
         expect(component.new_case_name).toEqual("");
@@ -253,10 +254,12 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(create_case_stub.calledOnce).toBe(true);
+        expect(create_case_stub.firstCall.args[1].name).toEqual("Case 2");
         expect(create_command_stub.calledOnce).toBe(true);
+        expect(create_command_stub.firstCall.args[1].name).toEqual("Case 2");
     });
 
-    test('Add case (and first command with differing name) - successful', async () => {
+    test('Add case (and first command of a different name) - successful', async () => {
         let new_case = new AGTestCase({
             pk: 4,
             name: "New Case",
@@ -274,21 +277,26 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.suite-menu').trigger('click');
+        wrapper.find('#suite-menu').trigger('click');
         await component.$nextTick();
 
-        wrapper.setData({intend_on_having_more_than_one_command: true});
+        expect(component.new_case_name).toEqual("");
+        expect(component.new_command).toEqual("");
+
+        wrapper.setData({compound_case: true});
         await component.$nextTick();
 
         component.new_case_name = "Case 2";
-        component.new_command_name = "Command 2a";
+        component.new_command_name = "Command 1";
         component.new_command = "Sit down";
 
         wrapper.find('#add-case-form').trigger('submit.native');
         await component.$nextTick();
 
         expect(create_case_stub.calledOnce).toBe(true);
+        expect(create_case_stub.firstCall.args[1].name).toEqual("Case 2");
         expect(create_command_stub.calledOnce).toBe(true);
+        expect(create_command_stub.firstCall.args[1].name).toEqual("Command 1");
     });
 
     test('Add case (and first command) - unsuccessful', async () => {
@@ -316,7 +324,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.suite-menu').trigger('click');
+        wrapper.find('#suite-menu').trigger('click');
         await component.$nextTick();
 
         component.new_case_name = "Case A";
@@ -415,176 +423,11 @@ describe('AGSuitePanel tests', () => {
         expect(component.case_or_command_is_active_level).toBe(false);
     });
 
-    test('delete all cases from this suite - suite becomes active', async () => {
-        wrapper.setProps({active_suite: ag_suite});
-        wrapper.setProps({active_case: ag_case_b});
-        await component.$nextTick();
-
-        expect(component.is_active_suite).toBe(true);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_b);
-        await component.$nextTick();
-
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(ag_case_c);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(2);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_a);
-        await component.$nextTick();
-
-        expect(wrapper.emitted().update_active_case[1][0]).toEqual(ag_case_c);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(1);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_c);
-        await component.$nextTick();
-
-        expect(wrapper.emitted().update_active_suite[0][0]).toEqual(ag_suite);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(0);
-        expect(component.is_active_suite).toBe(true);
-    });
-
-    test('delete last case in suite (order-wise)', async () => {
-        wrapper.setProps({active_suite: ag_suite});
-        wrapper.setProps({active_case: ag_case_c});
-        await component.$nextTick();
-
-        expect(component.is_active_suite).toBe(true);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_c);
-        await component.$nextTick();
-
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(ag_case_b);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(2);
-    });
-
-    test('delete case in the middle of the suite (order-wise)', async () => {
-        wrapper.setProps({active_suite: ag_suite});
-        wrapper.setProps({active_case: ag_case_b});
-        await component.$nextTick();
-
-        expect(component.is_active_suite).toBe(true);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_b);
-        await component.$nextTick();
-
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(ag_case_c);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(2);
-    });
-
-    test('delete first case in suite (order-wise)', async () => {
-        wrapper.setProps({active_suite: ag_suite});
-        wrapper.setProps({active_case: ag_case_a});
-        await component.$nextTick();
-
-        expect(component.is_active_suite).toBe(true);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_a);
-        await component.$nextTick();
-
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(ag_case_b);
-        expect(component.test_suite!.ag_test_cases.length).toEqual(2);
-    });
-
-    test('case gets deleted from a different suite', async () => {
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-        AGTestCase.notify_ag_test_case_deleted(case_from_different_suite);
-
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-    });
-
-    test('case in this suite gets changed', async () => {
-        let updated_ag_case_a = new AGTestCase({
-            pk: 1,
-            name: "Case A: Changed",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-        expect(component.test_suite!.ag_test_cases[0].name).toEqual(ag_case_a.name);
-
-        AGTestCase.notify_ag_test_case_changed(updated_ag_case_a);
-        expect(component.test_suite!.ag_test_cases[0].name).toEqual(updated_ag_case_a.name);
-        expect(ag_case_a.name).not.toEqual(updated_ag_case_a.name);
-    });
-
-    test('case in a different suite gets changed', async () => {
-        let updated_case_in_different_suite = new AGTestCase({
-            pk: 4,
-            name: "Casey's Corner: Changed",
-            ag_test_suite: 2,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-        expect(component.test_suite!.ag_test_cases[0].name).toEqual(ag_case_a.name);
-        expect(component.test_suite!.ag_test_cases[1].name).toEqual(ag_case_b.name);
-        expect(component.test_suite!.ag_test_cases[2].name).toEqual(ag_case_c.name);
-
-        AGTestCase.notify_ag_test_case_changed(updated_case_in_different_suite);
-        await component.$nextTick();
-
-        expect(component.test_suite!.ag_test_cases[0].name).toEqual(ag_case_a.name);
-        expect(component.test_suite!.ag_test_cases[1].name).toEqual(ag_case_b.name);
-        expect(component.test_suite!.ag_test_cases[2].name).toEqual(ag_case_c.name);
-    });
-
-    test('case was created in this suite', async () => {
-        let ag_case_d = new AGTestCase({
-            pk: 4,
-            name: "Case D",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_created(ag_case_d);
-        await component.$nextTick();
-
-        expect(component.test_suite!.ag_test_cases.length).toEqual(4);
-    });
-
-    test('case was created in a different suite', async () => {
-        let ag_case_e = new AGTestCase({
-            pk: 8,
-            name: "Case E",
-            ag_test_suite: 2,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_created(ag_case_e);
-        await component.$nextTick();
-
-        expect(component.test_suite!.ag_test_cases.length).toEqual(3);
-    });
-
     test('error - new case name is blank', async () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.suite-menu').trigger('click');
+        wrapper.find('#suite-menu').trigger('click');
 
         let new_case_name_input = wrapper.find({ref: 'new_case_name'}).find('#input');
         let new_case_name_validator = <ValidatedInput> wrapper.find({ref: 'new_case_name'}).vm;
@@ -608,10 +451,10 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.suite-menu').trigger('click');
+        wrapper.find('#suite-menu').trigger('click');
         await component.$nextTick();
 
-        wrapper.setData({intend_on_having_more_than_one_command: true});
+        wrapper.setData({compound_case: true});
         await component.$nextTick();
 
         let new_command_name_input = wrapper.find(
@@ -640,7 +483,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('.suite-menu').trigger('click');
+        wrapper.find('#suite-menu').trigger('click');
 
         let new_command_input = wrapper.find({ref: 'new_command'}).find('#input');
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_command'}).vm;

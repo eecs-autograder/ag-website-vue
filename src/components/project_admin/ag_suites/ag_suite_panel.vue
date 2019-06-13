@@ -69,7 +69,7 @@
             </div>
 
             <div class="command-name-container" v-if="compound_case">
-              <label class="text-label"> Command Name</label>
+              <label class="text-label"> Command Name </label>
               <validated-input ref="new_command_name"
                                v-model="new_command_name"
                                :validators="[is_not_empty]">
@@ -182,7 +182,6 @@ export default class AGSuitePanel extends Vue {
       let created_case = await AGTestCase.create(
         this.test_suite!.pk, { name: this.new_case_name }
       );
-
       this.new_command_name = this.compound_case ? this.new_command_name : this.new_case_name;
       await AGTestCommand.create(
         created_case.pk, { name: this.new_command_name, cmd: this.new_command }
