@@ -609,7 +609,7 @@ import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { deep_copy, handle_api_errors_async } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -641,12 +641,20 @@ export default class AGCommandSettings extends Vue {
 
   @Watch('test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
-    console.log("Command changed");
-    this.d_test_command = new AGTestCommand(new_test_command);
+    this.d_test_command = deep_copy(new_test_command, AGTestCommand);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
     }
   }
+
+  @Watch('test_case')
+  on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
+    this.d_test_case = deep_copy(new_test_case, AGTestCase);
+    if (this.current_tab_index === 2) {
+      this.current_tab_index = 0;
+    }
+  }
+
 
   stdin_source_labels = [
     {option: StdinSource.none, label: "No input"},
@@ -741,6 +749,7 @@ export default class AGCommandSettings extends Vue {
       console.log("Deleting command");
       await this.d_test_command!.delete();
     }
+    // (<Modal> this.$refs.delete_command_modal).close();
   }
 
   sort_instructor_files() {

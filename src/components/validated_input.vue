@@ -129,10 +129,6 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
     (<HTMLInputElement> this.$el.getElementsByClassName(class_name)[0]).focus();
   }
 
-  mounted() {
-    console.log("Mounted");
-  }
-
   destroyed() {
     this.unregister(this);
   }

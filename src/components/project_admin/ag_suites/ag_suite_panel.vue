@@ -1,5 +1,5 @@
 <template>
-  <div id="ag-suite-panel">
+  <div id="ag-suite-panel" v-if="test_suite !== null">
       <div :class="['test-suite',
                    {'active-suite': is_active_suite},
                    {'suite-in-active-container': case_or_command_is_active_level}]"
@@ -19,7 +19,7 @@
       </div>
 
       <div class="cases-container" v-if="is_active_suite">
-        <div v-for="test_case of test_suite.ag_test_cases"
+        <div v-for="(test_case, index) of test_suite.ag_test_cases"
              :key="test_case.pk">
           <AGCasePanel :test_case="test_case"
                        :active_case="active_case"
@@ -46,12 +46,12 @@
             <div class="checkbox-container">
               <input id="ignore-case"
                      type="checkbox"
-                     v-model="intend_on_having_more_than_one_command">
+                     v-model="compound_case">
               <label class="checkbox-label"
-                     for="ignore-case"> Case will eventually have more than one command
+                     for="ignore-case"> Compound Case
               </label>
               <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="medium" placement="right">
+                <tooltip width="large" placement="right">
                   By default, the first command in a case shares the same name as the test case it
                   is created in. If you intend to have more than one command in this case, checking
                   this box will allow you to supply a different name than the test case name for
@@ -68,7 +68,7 @@
               </validated-input>
             </div>
 
-            <div class="command-name-container" v-if="intend_on_having_more_than_one_command">
+            <div class="command-name-container" v-if="compound_case">
               <label class="text-label"> Command Name</label>
               <validated-input ref="new_command_name"
                                v-model="new_command_name"
@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   AGTestCase,
@@ -129,10 +129,7 @@ import { is_not_empty } from '@/validators';
     ValidatedInput
   }
 })
-export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
-
-  @Prop({required: true, type: AGTestSuite})
-  test_suite!: AGTestSuite;
+export default class AGSuitePanel extends Vue {
 
   @Prop({default: null, type: AGTestSuite})
   active_suite!: AGTestSuite | null;
@@ -143,6 +140,9 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
   @Prop({required: true})
   active_command!: AGTestCommand | null;
 
+  @Prop({required: true, type: AGTestSuite})
+  test_suite!: AGTestSuite;
+
   readonly is_not_empty = is_not_empty;
 
   add_case_form_is_valid = false;
@@ -151,18 +151,10 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
   new_case_name = "";
   new_command_name = "";
   new_command = "";
-  intend_on_having_more_than_one_command = false;
-
-  created() {
-    AGTestCase.subscribe(this);
-  }
-
-  beforeDestroy() {
-    AGTestCase.unsubscribe(this);
-  }
+  compound_case = false;
 
   get is_active_suite() {
-    return this.active_suite !== null && this.active_suite.pk === this.test_suite.pk;
+    return this.active_suite !== null && this.active_suite.pk === this.test_suite!.pk;
   }
 
   get case_or_command_is_active_level() {
@@ -170,10 +162,13 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
   }
 
   open_new_case_modal() {
+    if (this.active_suite === null || this.active_suite.pk !== this.test_suite!.pk) {
+      this.$emit('update_active_suite', this.test_suite);
+    }
     this.new_command_name = "";
     this.new_command = "";
     this.new_case_name = "";
-    this.intend_on_having_more_than_one_command = false;
+    this.compound_case = false;
     (<Modal> this.$refs.new_case_modal).open();
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_case_name).invoke_focus();
@@ -189,8 +184,7 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
         this.test_suite!.pk, { name: this.new_case_name }
       );
 
-      this.new_command_name = this.intend_on_having_more_than_one_command ?
-        this.new_command_name : this.new_case_name;
+      this.new_command_name = this.compound_case ? this.new_command_name : this.new_case_name;
       await AGTestCommand.create(
         created_case.pk, { name: this.new_command_name, cmd: this.new_command }
       );
@@ -200,43 +194,6 @@ export default class AGSuitePanel extends Vue implements AGTestCaseObserver {
       this.adding_case = false;
     }
   }
-
-  update_ag_test_case_changed(ag_test_case: AGTestCase): void {
-    if (ag_test_case.ag_test_suite === this.test_suite.pk) {
-      let index = this.test_suite.ag_test_cases.findIndex(
-        (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
-      );
-      Vue.set(this.test_suite.ag_test_cases, index, deep_copy(ag_test_case, AGTestCase));
-    }
-  }
-
-  update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    if (ag_test_case.ag_test_suite === this.test_suite.pk) {
-      this.test_suite.ag_test_cases.push(ag_test_case);
-    }
-    this.$emit('update_active_case', ag_test_case);
-  }
-
-  update_ag_test_case_deleted(ag_test_case: AGTestCase): void {
-    if (ag_test_case.ag_test_suite === this.test_suite.pk) {
-      let index = this.test_suite.ag_test_cases.findIndex(
-        (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
-      );
-      this.test_suite.ag_test_cases.splice(index, 1);
-      if (this.test_suite.ag_test_cases.length === 0) {
-        this.$emit('update_active_suite', this.test_suite);
-      }
-      else if (index === this.test_suite.ag_test_cases.length) {
-        this.$emit('update_active_case', this.test_suite.ag_test_cases[index - 1]);
-      }
-      else {
-        this.$emit('update_active_case', this.test_suite.ag_test_cases[index]);
-      }
-    }
-  }
-
-  update_ag_test_cases_order_changed(ag_test_suite_pk: number,
-                                     ag_test_case_order: number[]): void {}
 }
 
 function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {

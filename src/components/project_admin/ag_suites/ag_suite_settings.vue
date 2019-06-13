@@ -148,7 +148,7 @@
 
                 <div class="section-container">
                   <fieldset>
-                    <legend>  Setup </legend>
+                    <legend> Setup </legend>
 
                     <div id="setup-command-label-container">
                       <label class="text-label"> Setup command label </label>
@@ -222,7 +222,7 @@
               <button class="delete-suite-button"
                       type="button"
                       @click="$refs.delete_suite_modal.open()">
-                Delete Suite: <span> {{d_test_suite.name}} </span>
+                Delete Suite: <span>{{d_test_suite.name}}</span>
               </button>
 
               <modal ref="delete_suite_modal"
@@ -307,8 +307,8 @@ export default class AGSuiteSettings extends Vue {
 
   @Watch('test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
-    console.log(old_test_suite);
-    console.log(new_test_suite);
+    // console.log(old_test_suite);
+    // console.log(new_test_suite);
     this.d_test_suite = deep_copy(new_test_suite, AGTestSuite);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
@@ -392,6 +392,7 @@ export default class AGSuiteSettings extends Vue {
 
   async delete_ag_test_suite() {
     await this.d_test_suite!.delete();
+    // (<Modal> this.$refs.delete_suite_modal).close();
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {

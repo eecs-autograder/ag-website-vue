@@ -1,6 +1,5 @@
 <template>
   <div id="ag-test-case-settings-component" v-if="d_test_case !== null">
-
     <div>
       <validated-form id="command-settings-form"
                       autocomplete="off"
@@ -35,7 +34,6 @@
             <i class="fa fa-spinner fa-pulse"></i>
           </div>
         </div>
-
       </validated-form>
     </div>
 
@@ -139,14 +137,6 @@ $current-lang-choice: "Poppins";
 
 #feedback-container {
   padding: 10px 12px 22px 12px;
-}
-
-.delete-case-button {
-  @extend .delete-level-button;
-}
-
-.case-to-delete {
-  @extend .item-to-delete;
 }
 
 </style>

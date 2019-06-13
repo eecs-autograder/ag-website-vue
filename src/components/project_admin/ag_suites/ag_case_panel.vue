@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!loading">
+  <div v-if="test_case !== null">
 
     <div :class="['test-case',
                  {'active-case' : is_active_case},
@@ -9,7 +9,7 @@
                                               === active_command.pk},
                  {'parent-of-active-command': command_is_active_level
                                               && test_case.ag_test_commands.length > 1}]"
-                 @click="update_case_and_command">
+                 @click="$emit('update_active_case', test_case)">
 
       <div class="test-case-name">
         <i v-if="test_case.ag_test_commands.length > 1 && !is_active_case"
@@ -22,7 +22,8 @@
       </div>
 
       <div id="case-menu"
-           @click.stop="$refs.case_context_menu.show_context_menu($event.pageX, $event.pageY)">
+           @click.stop="$refs.case_context_menu.show_context_menu($event.pageX, $event.pageY);
+                        $emit('update_active_case', test_case)">
         <i class="fas fa-ellipsis-v"></i>
       </div>
       <context-menu ref="case_context_menu">
@@ -116,8 +117,8 @@
         <p>
           Are you sure you want to delete the case:
           <span class="case-to-delete">{{test_case.name}}</span>?
-          This will delete all associated test
-          cases and run results. THIS ACTION CANNOT BE UNDONE.
+          This will delete all associated test cases and run results.
+          THIS ACTION CANNOT BE UNDONE.
         </p>
         <div id="modal-button-container">
           <button class="modal-delete-button"
@@ -146,10 +147,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestCase, AGTestCommand, AGTestCommandObserver } from 'ag-client-typescript';
-
 
 import APIErrors from '@/components/api_errors.vue';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
@@ -175,7 +175,8 @@ import { is_not_empty } from '@/validators';
   }
 })
 
-export default class AGCasePanel extends Vue implements AGTestCommandObserver {
+export default class AGCasePanel extends Vue {
+
   @Prop({required: true, type: AGTestCase})
   test_case!: AGTestCase;
 
@@ -189,38 +190,15 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
 
   add_command_form_is_valid = false;
   adding_command = false;
-  loading = true;
   new_command_name = "";
   new_command = "";
   saving = false;
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
-
   case_settings_form_is_valid = false;
 
-
-  async created() {
-    AGTestCommand.subscribe(this);
-    this.loading = false;
-  }
-
-  beforeDestroy() {
-    AGTestCommand.unsubscribe(this);
-  }
-
-  update_case_and_command() {
-    if (this.test_case.ag_test_commands.length === 1) {
-      this.$emit('update_active_case', this.test_case);
-      this.$emit('update_active_command', this.test_case.ag_test_commands[0]);
-    }
-    else {
-      this.$emit('update_active_case', this.test_case);
-    }
-  }
-
   get is_active_case() {
-    return this.active_case !== null
-           && this.active_case.pk === this.test_case.pk;
+    return this.active_case !== null && this.active_case.pk === this.test_case!.pk;
   }
 
   get command_is_active_level() {
@@ -231,10 +209,14 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
     this.new_command = "";
     this.new_command_name = "";
     (<Modal> this.$refs.new_command_modal).open();
+    Vue.nextTick(() => {
+      (<ValidatedInput> this.$refs.new_command_name).invoke_focus();
+    });
   }
 
   async delete_ag_case() {
     await this.test_case!.delete();
+    // don't close modal here
   }
 
   @handle_api_errors_async(handle_add_ag_command_error)
@@ -249,41 +231,6 @@ export default class AGCasePanel extends Vue implements AGTestCommandObserver {
     finally {
       this.adding_command = false;
     }
-  }
-
-  update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
-    if (ag_test_command.ag_test_case === this.test_case.pk) {
-      let index = this.test_case.ag_test_commands.findIndex(
-        (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
-      );
-      Vue.set(this.test_case.ag_test_commands, index, deep_copy(ag_test_command, AGTestCommand));
-    }
-  }
-
-  update_ag_test_command_created(ag_test_command: AGTestCommand): void {
-    if (ag_test_command.ag_test_case === this.test_case.pk) {
-      this.test_case.ag_test_commands.push(ag_test_command);
-    }
-  }
-
-  update_ag_test_command_deleted(ag_test_command: AGTestCommand): void {
-    if (ag_test_command.ag_test_case === this.test_case.pk) {
-      let index = this.test_case.ag_test_commands.findIndex(
-        (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
-      );
-      this.test_case.ag_test_commands.splice(index, 1);
-      if (index === this.test_case.ag_test_commands.length) {
-        this.$emit('update_active_command', this.test_case.ag_test_commands[index - 1]);
-      }
-      else {
-        this.$emit('update_active_command', this.test_case.ag_test_commands[index]);
-      }
-    }
-  }
-
-  update_ag_test_commands_order_changed(ag_test_case_pk: number,
-                                        ag_test_command_order: number[]): void {
-
   }
 }
 
@@ -368,7 +315,6 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 
 .active-command, .active-single-command {
   @extend .active-level;
-
 }
 
 .parent-of-active-command {

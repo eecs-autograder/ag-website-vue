@@ -14,7 +14,7 @@
 
       <div id="nav-bar-body" @wheel.stop>
         <div id="all-suites">
-          <div v-for="test_suite of test_suites"
+          <div v-for="(test_suite, index) of test_suites"
                class="suite-container"
                :key="test_suite.pk">
             <AGSuitePanel :test_suite="test_suite"
@@ -31,7 +31,11 @@
     </div>
 
     <div id="viewing-window">
-      <div> {{index_active_suite}}</div>
+
+      <div> {{active_suite !== null ? active_suite.name : "Null"}} </div>
+      <div> {{active_case !== null ? active_case.name : "Null"}} </div>
+      <div> {{active_command !== null ? active_command.name : "Null"}} </div>
+
       <div v-if="active_level_is_suite"
            class="settings-wrapper">
         <AGSuiteSettings :test_suite="active_suite"
@@ -105,7 +109,8 @@ import {
   AGTestCommand,
   AGTestSuite,
   AGTestSuiteObserver,
-  Project
+  Project,
+  AGTestCaseObserver, AGTestCommandObserver
 } from 'ag-client-typescript';
 import { ID } from 'ag-client-typescript/dist/src/base';
 
@@ -133,7 +138,7 @@ import { is_not_empty } from '@/validators';
   }
 })
 
-export default class AGSuites extends Vue implements AGTestSuiteObserver {
+export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTestCaseObserver, AGTestCommandObserver {
 
   @Prop({required: true, type: Project})
   project!: Project;
@@ -154,12 +159,16 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
 
   async created() {
     AGTestSuite.subscribe(this);
+    AGTestCase.subscribe(this);
+    AGTestCommand.subscribe(this);
     this.test_suites = await AGTestSuite.get_all_from_project(this.project.pk);
     this.loading = false;
   }
 
   beforeDestroy() {
     AGTestSuite.unsubscribe(this);
+    AGTestCase.unsubscribe(this);
+    AGTestCommand.unsubscribe(this);
   }
 
   open_new_suite_modal() {
@@ -170,22 +179,20 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   }
 
   get prev_command_is_available() {
-    if (this.active_command !== null && this.active_case !== null) {
+    if (this.active_case !== null && this.active_command !== null) {
+      // if there is a command at the same index in the previous case
       if (this.index_active_case !== 0) {
-        let num_commands =
-          this.active_suite!.ag_test_cases[this.index_active_case - 1].ag_test_commands.length - 1;
-        return num_commands >= this.index_active_command;
+        let num_commands = this.active_suite!.ag_test_cases[
+          this.index_active_case - 1].ag_test_commands.length;
+        return num_commands > this.index_active_command;
       }
-      else {
-        if (this.index_active_suite !== 0) {
-          let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
-          if (num_cases > 0) {
-            let num_commands = this.test_suites[this.index_active_suite - 1]
-              .ag_test_cases[num_cases - 1].ag_test_commands.length;
-            if (num_commands >= this.index_active_command) {
-              return num_commands >= this.index_active_command;
-            }
-          }
+      // you can go to the previous suite
+      else if (this.index_active_suite !== 0) {
+        let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
+        if (num_cases > 0) {
+          let num_commands = this.test_suites[this.index_active_suite - 1].ag_test_cases[
+            num_cases - 1].ag_test_commands.length;
+          return num_commands >= this.index_active_command;
         }
       }
     }
@@ -193,41 +200,36 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   }
 
   go_to_prev_command() {
+    let command_index = this.index_active_command;
     if (this.index_active_case !== 0) {
-      let num_commands = this.active_suite!.ag_test_cases[this.index_active_case - 1]
-                           .ag_test_commands.length - 1;
-      if (num_commands >= this.index_active_command) {
-        this.index_active_case -= 1;
-      }
+      console.log("Go to prev case");
+      this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case - 1]);
     }
     else {
-      if (this.index_active_suite !== 0) {
-        let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
-        if (num_cases > 0) {
-          let num_commands = this.test_suites[this.index_active_suite - 1]
-            .ag_test_cases[num_cases - 1].ag_test_commands.length;
-          if (num_commands >= this.index_active_command) {
-            this.index_active_suite -= 1;
-            this.index_active_case = num_cases - 1;
-          }
-        }
-      }
+      let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
+      console.log("Go to prev suite");
+      this.update_active_suite(this.test_suites[this.index_active_suite - 1]);
+      console.log("Now Suite should be " + this.active_suite!.name);
+      this.update_active_case(this.active_suite!.ag_test_cases[num_cases - 1]);
     }
+    this.update_active_command(this.active_case!.ag_test_commands[command_index]);
   }
 
   get next_command_is_available() {
-    if (this.active_command !== null && this.active_case !== null) {
-      if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
+    if (this.active_case !== null && this.active_command !== null) {
+      let num_cases = this.active_suite!.ag_test_cases.length;
+
+      // if there is a command at the same index in the next case
+      if (num_cases - 1 > this.index_active_case) {
         let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
-                             .ag_test_commands.length - 1;
-        return num_commands >= this.index_active_command;
+          .ag_test_commands.length;
+        return num_commands > this.index_active_command;
       }
-      else {
-        if (this.index_active_suite <= this.test_suites.length - 1) {
-          if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
-            return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
-                     .ag_test_commands.length - 1 >= this.index_active_command;
-          }
+      // if you can go to the next suite
+      else if (this.index_active_suite < this.test_suites.length - 1) {
+        if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
+          return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
+                   .ag_test_commands.length > this.index_active_command;
         }
       }
     }
@@ -235,26 +237,15 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   }
 
   go_to_next_command() {
+    let command_index = this.index_active_command;
     if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
-      let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
-                           .ag_test_commands.length - 1;
-      if (num_commands >= this.index_active_command) {
-        this.index_active_case += 1;
-      }
+      this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case + 1]);
     }
     else {
-      if (this.index_active_suite <= this.test_suites.length - 1) {
-        if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
-          let num_commands =
-            this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
-              .ag_test_commands.length - 1;
-          if (num_commands >= this.index_active_command) {
-            this.index_active_suite += 1;
-            this.index_active_case = 0;
-          }
-        }
-      }
+      this.update_active_suite(this.test_suites[this.index_active_suite + 1]);
+      this.update_active_case(this.active_suite!.ag_test_cases[0]);
     }
+    this.update_active_command(this.active_case!.ag_test_commands[command_index]);
   }
 
   get active_level_is_suite() {
@@ -266,42 +257,65 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
   }
 
   update_active_suite(ag_suite: AGTestSuite) {
+    console.log("Updating active suite");
     if (this.active_suite !== null && this.active_suite.pk === ag_suite!.pk
         && this.index_active_case === -1 && this.index_active_command === -1) {
-      console.log(this.active_suite.name + " Was already clicked on");
+      this.active_suite = null;
       this.index_active_suite = -1;
     }
     else {
-      this.active_suite = deep_copy(ag_suite, AGTestSuite);
+      this.active_suite = ag_suite;
       this.index_active_suite = this.test_suites.findIndex(
         (test_suite: AGTestSuite) => ag_suite.pk === test_suite.pk
       );
+      this.active_case = null;
       this.index_active_case = -1;
+      this.active_command = null;
       this.index_active_command = -1;
     }
   }
 
   update_active_case(ag_case: AGTestCase) {
+    console.log("Updating active case");
     if (this.active_case !== null && this.active_case.pk === ag_case!.pk
         && this.active_command === null) {
+      this.active_case = null;
       this.index_active_case = -1;
     }
     else {
-      this.active_case = deep_copy(ag_case, AGTestCase);
+      this.active_case = ag_case;
       this.index_active_case = this.active_suite!.ag_test_cases.findIndex(
         (test_case: AGTestCase) => ag_case.pk === test_case.pk
       );
       this.index_active_command = this.active_case!.ag_test_commands.length === 0 ? -1 : 0;
+      if (this.index_active_command !== -1) {
+        this.update_active_command(this.active_case.ag_test_commands[0]);
+      }
     }
   }
 
   update_active_command(ag_command: AGTestCommand) {
-    this.index_active_command =  this.active_case!.ag_test_commands.findIndex(
+    console.log("Updating active command");
+    this.active_command = ag_command;
+    this.index_active_command = this.active_case!.ag_test_commands.findIndex(
         (test_command: AGTestCommand) => ag_command.pk === test_command.pk
     );
   }
 
-  // SuiteObserver --------------------------------------------------------------------------------
+  @handle_api_errors_async(handle_add_ag_suite_error)
+  async add_suite() {
+    try {
+      this.adding_suite = true;
+      await AGTestSuite.create(this.project.pk, { name: this.new_suite_name });
+      (<Modal> this.$refs.new_suite_modal).close();
+      this.new_suite_name = "";
+    }
+    finally {
+      this.adding_suite = false;
+    }
+  }
+
+  // SuiteObserver -------------------------------------------------------------------------------
   update_ag_test_suite_changed(ag_test_suite: AGTestSuite): void {
     let index = this.test_suites.findIndex((suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
     Vue.set(this.test_suites, index, deep_copy(ag_test_suite, AGTestSuite));
@@ -316,6 +330,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
     let index = this.test_suites.findIndex((suite: AGTestSuite) => ag_test_suite.pk === suite.pk);
     this.test_suites.splice(index, 1);
     if (this.test_suites.length === 0) {
+      this.active_suite = null;
       this.index_active_suite = -1;
     }
     else if (index === this.test_suites.length) {
@@ -329,18 +344,73 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver {
 
   update_ag_test_suites_order_changed(project_pk: number, ag_test_suite_order: ID[]): void {}
 
-  @handle_api_errors_async(handle_add_ag_suite_error)
-  async add_suite() {
-    try {
-      this.adding_suite = true;
-      await AGTestSuite.create(this.project.pk, { name: this.new_suite_name });
-      (<Modal> this.$refs.new_suite_modal).close();
-      this.new_suite_name = "";
+  // CaseObserver --------------------------------------------------------------------------------
+  update_ag_test_case_changed(ag_test_case: AGTestCase): void {
+    let index = this.active_suite!.ag_test_cases.findIndex(
+      (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
+    );
+    Vue.set(this.active_suite!.ag_test_cases, index, deep_copy(ag_test_case, AGTestCase));
+  }
+
+  update_ag_test_case_created(ag_test_case: AGTestCase): void {
+    console.log(ag_test_case.name);
+    let parent_suite_index = this.test_suites.findIndex(
+      (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
+    );
+    this.test_suites[parent_suite_index].ag_test_cases.push(ag_test_case);
+    this.update_active_case(ag_test_case);
+  }
+
+  update_ag_test_case_deleted(ag_test_case: AGTestCase): void {
+    let index = this.active_suite!.ag_test_cases.findIndex(
+      (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
+    );
+    this.active_suite!.ag_test_cases.splice(index, 1);
+
+    if (this.active_suite!.ag_test_cases.length === 0) {
+      console.log("All the cases are gone!");
+      this.update_active_suite(this.active_suite!);
     }
-    finally {
-      this.adding_suite = false;
+    else if (index === this.active_suite!.ag_test_cases.length) {
+      this.update_active_case(this.active_suite!.ag_test_cases[index - 1]);
+    }
+    else {
+      this.update_active_case(this.active_suite!.ag_test_cases[index]);
+    }
+
+  }
+
+  update_ag_test_cases_order_changed(ag_test_suite_pk: number, ag_test_case_order: number[]): void { }
+
+  // CommandObserver------------------------------------------------------------------------------
+  update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
+    let index = this.active_case!.ag_test_commands.findIndex(
+      (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
+    );
+    Vue.set(this.active_case!.ag_test_commands, index, deep_copy(ag_test_command, AGTestCommand));
+  }
+
+  update_ag_test_command_created(ag_test_command: AGTestCommand): void {
+    if (this.active_case!.pk === ag_test_command.ag_test_case) {
+      this.active_case!.ag_test_commands.push(ag_test_command);
+    }
+    this.update_active_command(ag_test_command);
+  }
+
+  update_ag_test_command_deleted(ag_test_command: AGTestCommand): void {
+    let index = this.active_case!.ag_test_commands.findIndex(
+      (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
+    );
+    this.active_case!.ag_test_commands.splice(index, 1);
+    if (index === this.active_case!.ag_test_commands.length) {
+      this.update_active_command(this.active_case!.ag_test_commands[index - 1]);
+    }
+    else {
+      this.update_active_command(this.active_case!.ag_test_commands[index]);
     }
   }
+
+  update_ag_test_commands_order_changed(ag_test_case_pk: number, ag_test_command_order: number[]): void { }
 }
 
 function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
