@@ -184,6 +184,9 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
       if (this.index_active_case !== 0) {
         let num_commands = this.active_suite!.ag_test_cases[
           this.index_active_case - 1].ag_test_commands.length;
+        if (num_commands > this.index_active_command) {
+          console.log("There are enough commands in the previous case");
+        }
         return num_commands > this.index_active_command;
       }
       // you can go to the previous suite
@@ -192,7 +195,10 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
         if (num_cases > 0) {
           let num_commands = this.test_suites[this.index_active_suite - 1].ag_test_cases[
             num_cases - 1].ag_test_commands.length;
-          return num_commands >= this.index_active_command;
+          if (num_commands > this.index_active_command) {
+            console.log("There are enough commands in the previous suite last case: " + num_commands);
+          }
+          return num_commands > this.index_active_command;
         }
       }
     }
@@ -209,7 +215,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
       let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
       console.log("Go to prev suite");
       this.update_active_suite(this.test_suites[this.index_active_suite - 1]);
-      console.log("Now Suite should be " + this.active_suite!.name);
       this.update_active_case(this.active_suite!.ag_test_cases[num_cases - 1]);
     }
     this.update_active_command(this.active_case!.ag_test_commands[command_index]);
@@ -218,16 +223,23 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   get next_command_is_available() {
     if (this.active_case !== null && this.active_command !== null) {
       let num_cases = this.active_suite!.ag_test_cases.length;
-
       // if there is a command at the same index in the next case
       if (num_cases - 1 > this.index_active_case) {
         let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
           .ag_test_commands.length;
+        if (num_commands > this.index_active_command) {
+          console.log("There are enough commands in the next case");
+        }
         return num_commands > this.index_active_command;
       }
       // if you can go to the next suite
       else if (this.index_active_suite < this.test_suites.length - 1) {
         if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
+
+          if (this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
+                .ag_test_commands.length > this.index_active_command) {
+            console.log("There are enough commands in the first case of the next suite");
+          }
           return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
                    .ag_test_commands.length > this.index_active_command;
         }
@@ -239,9 +251,11 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   go_to_next_command() {
     let command_index = this.index_active_command;
     if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
+      console.log("Go to next case");
       this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case + 1]);
     }
     else {
+      console.log("Go to next suite first case");
       this.update_active_suite(this.test_suites[this.index_active_suite + 1]);
       this.update_active_case(this.active_suite!.ag_test_cases[0]);
     }

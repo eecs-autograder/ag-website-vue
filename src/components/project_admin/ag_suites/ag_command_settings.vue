@@ -655,7 +655,6 @@ export default class AGCommandSettings extends Vue {
     }
   }
 
-
   stdin_source_labels = [
     {option: StdinSource.none, label: "No input"},
     {option: StdinSource.text, label: "Text"},
@@ -693,8 +692,8 @@ export default class AGCommandSettings extends Vue {
   readonly ExpectedReturnCode = ExpectedReturnCode;
 
   async created() {
-    this.d_test_command = this.test_command;
-    this.d_test_case = this.test_case;
+    this.d_test_command = deep_copy(this.test_command, AGTestCommand);
+    this.d_test_case = deep_copy(this.test_case, AGTestCase);
     this.sort_instructor_files();
   }
 
