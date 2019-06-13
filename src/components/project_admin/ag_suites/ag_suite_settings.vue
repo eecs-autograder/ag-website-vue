@@ -33,23 +33,18 @@
                     <legend> Grading Related </legend>
                     <div class="sandbox-container">
                       <label class="text-label"> Sandbox environment: </label>
+
                       <div class="dropdown">
-                        <dropdown ref="sandbox_environment_dropdown"
-                                  :items="docker_images"
-                                  @update_item_selected="test_suite.sandbox_docker_image = $event">
-                          <template slot="header">
-                            <div tabindex="1" class="dropdown-header-wrapper">
-                              <div class="dropdown-header large-dropdown">
-                                {{test_suite.sandbox_docker_image.display_name}}
-                                <i class="fas fa-caret-down dropdown-caret"></i>
-                              </div>
-                            </div>
-                          </template>
-                          <div slot-scope="{item}">
-                            <span class="dropdown-item">{{item.display_name}}</span>
-                          </div>
-                        </dropdown>
+                        <select id="sandbox_environment"
+                                v-model="d_test_suite.sandbox_docker_image"
+                                class="select">
+                          <option v-for="docker_image of docker_images"
+                                  :value="docker_image">
+                            {{docker_image.display_name}}
+                          </option>
+                        </select>
                       </div>
+
                     </div>
 
                     <div class="toggle-container">
@@ -269,7 +264,6 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -285,7 +279,6 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
-    Dropdown,
     DropdownTypeahead,
     Modal,
     Tab,
@@ -307,8 +300,6 @@ export default class AGSuiteSettings extends Vue {
 
   @Watch('test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
-    // console.log(old_test_suite);
-    // console.log(new_test_suite);
     this.d_test_suite = deep_copy(new_test_suite, AGTestSuite);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
@@ -426,6 +417,7 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/components/ag_tests.scss';
+@import '@/styles/forms.scss';
 $current-lang-choice: "Poppins";
 
 .tab-body {

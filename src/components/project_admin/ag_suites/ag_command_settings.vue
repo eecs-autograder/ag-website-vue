@@ -42,24 +42,35 @@
                   <legend> Stdin </legend>
                   <div class="command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Stdin source: </label>
+
                     <div class="dropdown">
-                      <dropdown ref="stdin_source_dropdown"
-                                :items="stdin_source_labels"
-                                @update_item_selected="d_test_command.stdin_source
-                                                       = $event.option">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header medium-dropdown">
-                              {{stdin_source}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.label}}</span>
-                        </div>
-                      </dropdown>
+                      <select id="stdin_source_dropdown"
+                              v-model="d_test_command.stdin_source"
+                              class="select">
+
+                        <option :value="StdinSource.none">
+                          No input
+                        </option>
+
+                        <option :value="StdinSource.text">
+                          Text
+                        </option>
+
+                        <option :value="StdinSource.instructor_file">
+                          Project file content
+                        </option>
+
+                        <option :value="StdinSource.setup_stdout">
+                          Stdout from setup
+                        </option>
+
+                        <option :value="StdinSource.setup_stderr">
+                          Stderr from setup
+                        </option>
+
+                      </select>
                     </div>
+
                   </div>
 
                   <div v-if="d_test_command.stdin_source === StdinSource.text"
@@ -76,26 +87,17 @@
                   <div v-if="d_test_command.stdin_source === StdinSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
-                    <div>
-                      <dropdown ref="file_stdin_source_dropdown"
-                                :items="project.instructor_files"
-                                :initial_highlighted_index="0"
-                                @update_item_selected="d_test_command.stdin_instructor_file
-                                                       = $event">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.stdin_instructor_file !== null ?
-                                d_test_command.stdin_instructor_file.name : ""}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.name}}</span>
-                        </div>
-                      </dropdown>
+
+                    <div class="dropdown">
+                      <select id="file_stdin_source_dropdown"
+                              v-model="d_test_command.stdin_instructor_file"
+                              class="select">
+                        <option v-for="file of project.instructor_files" :value="file">
+                          {{file.name}}
+                        </option>
+                      </select>
                     </div>
+
                   </div>
                 </fieldset>
               </div>
@@ -106,22 +108,19 @@
                   <div class="command-input-container">
                     <label class="text-label"> Expected Return Code: </label>
                     <div class="dropdown">
-                      <dropdown ref="expected_return_code_dropdown"
-                                :items="expected_return_code_labels"
-                                @update_item_selected="d_test_command.expected_return_code
-                                                       = $event.option;">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header medium-dropdown">
-                              {{expected_return_code}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.label}}</span>
-                        </div>
-                      </dropdown>
+                      <select id="expected_return_code_dropdown"
+                              v-model="d_test_command.expected_return_code"
+                              class="select">
+                        <option :value="ExpectedReturnCode.none">
+                          Don't Check
+                        </option>
+                        <option :value="ExpectedReturnCode.zero">
+                          Zero
+                        </option>
+                        <option :value="ExpectedReturnCode.nonzero">
+                          Nonzero
+                        </option>
+                      </select>
                     </div>
                   </div>
 
@@ -168,22 +167,19 @@
                   <div class="command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stdout against: </label>
                     <div class="dropdown">
-                      <dropdown ref="expected_stdout_source_dropdown"
-                                :items="expected_output_source_labels"
-                                @update_item_selected="d_test_command.expected_stdout_source
-                                                       = $event.option">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header medium-dropdown">
-                              {{expected_stdout_source}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.label}}</span>
-                        </div>
-                      </dropdown>
+                      <select id="expected_stdout_source_dropdown"
+                              v-model="d_test_command.expected_stdout_source"
+                              class="select">
+                        <option :value="ExpectedOutputSource.none">
+                          Don't Check
+                        </option>
+                        <option :value="ExpectedOutputSource.text">
+                          Text
+                        </option>
+                        <option :value="ExpectedOutputSource.instructor_file">
+                          Project file content
+                        </option>
+                      </select>
                     </div>
                   </div>
 
@@ -198,29 +194,17 @@
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source
-                             === ExpectedOutputSource.instructor_file"
+                  <div v-if="d_test_command.expected_stdout_source === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
-                    <div>
-                      <dropdown ref="file_stdout_dropdown"
-                                :items="project.instructor_files"
-                                :initial_highlighted_index="0"
-                                @update_item_selected="
-                                d_test_command.expected_stdout_instructor_file = $event">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_stdout_instructor_file !== null ?
-                                d_test_command.expected_stdout_instructor_file.name : ""}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.name}}</span>
-                        </div>
-                      </dropdown>
+                    <div class="dropdown">
+                      <select id="file_stdout_dropdown"
+                              v-model="d_test_command.expected_stdout_instructor_file"
+                              class="select">
+                        <option v-for="file of project.instructor_files" :value="file">
+                          {{file.name}}
+                        </option>
+                      </select>
                     </div>
                   </div>
 
@@ -268,23 +252,19 @@
                   <div class="command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stderr against: </label>
                     <div class="dropdown">
-                      <dropdown ref="expected_stderr_source_dropdown"
-                                :items="expected_output_source_labels"
-                                :initial_highlighted_index="0"
-                                @update_item_selected="
-                                d_test_command.expected_stderr_source = $event.option">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header medium-dropdown">
-                              {{expected_stderr_source}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.label}}</span>
-                        </div>
-                      </dropdown>
+                      <select id="expected_stderr_source_dropdown"
+                              v-model="d_test_command.expected_stderr_source"
+                              class="select">
+                        <option :value="ExpectedOutputSource.none">
+                          Don't Check
+                        </option>
+                        <option :value="ExpectedOutputSource.text">
+                          Text
+                        </option>
+                        <option :value="ExpectedOutputSource.instructor_file">
+                          Project file content
+                        </option>
+                      </select>
                     </div>
                   </div>
 
@@ -303,25 +283,14 @@
                              === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
-                    <div>
-                      <dropdown ref="file_stderr_dropdown"
-                                :items="project.instructor_files"
-                                :initial_highlighted_index="0"
-                                @update_item_selected="
-                                d_test_command.expected_stderr_instructor_file = $event">
-                        <template slot="header">
-                          <div tabindex="1" class="dropdown-header-wrapper">
-                            <div class="dropdown-header large-dropdown">
-                              {{d_test_command.expected_stderr_instructor_file !== null ?
-                                d_test_command.expected_stderr_instructor_file.name : ""}}
-                              <i class="fas fa-caret-down dropdown-caret"></i>
-                            </div>
-                          </div>
-                        </template>
-                        <div slot-scope="{item}">
-                          <span class="dropdown-item">{{item.name}}</span>
-                        </div>
-                      </dropdown>
+                    <div class="dropdown">
+                      <select id="file_stderr_dropdown"
+                              v-model="d_test_command.expected_stderr_instructor_file"
+                              class="select">
+                        <option v-for="file of project.instructor_files" :value="file">
+                          {{file.name}}
+                        </option>
+                      </select>
                     </div>
                   </div>
 
@@ -602,7 +571,6 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -619,7 +587,6 @@ import {
 @Component({
   components: {
     APIErrors,
-    Dropdown,
     Modal,
     Tab,
     TabHeader,
@@ -655,26 +622,6 @@ export default class AGCommandSettings extends Vue {
     }
   }
 
-  stdin_source_labels = [
-    {option: StdinSource.none, label: "No input"},
-    {option: StdinSource.text, label: "Text"},
-    {option: StdinSource.instructor_file, label: "Project file content"},
-    {option: StdinSource.setup_stdout, label: "Stdout from setup"},
-    {option: StdinSource.setup_stderr, label: "Stderr from setup"}
-  ];
-
-  expected_return_code_labels = [
-    {option: ExpectedReturnCode.none, label: "Don't check"},
-    {option: ExpectedReturnCode.zero, label: "Zero"},
-    {option: ExpectedReturnCode.nonzero, label: "Nonzero"}
-  ];
-
-  expected_output_source_labels = [
-    {option: ExpectedOutputSource.none, label: "Don't check"},
-    {option: ExpectedOutputSource.text, label: "Text"},
-    {option: ExpectedOutputSource.instructor_file, label: "Project file content"}
-  ];
-
   current_tab_index = 0;
   d_test_command: AGTestCommand | null = null;
   d_test_case: AGTestCase | null = null;
@@ -699,44 +646,6 @@ export default class AGCommandSettings extends Vue {
 
   get case_has_exactly_one_command() {
     return this.d_test_case!.ag_test_commands.length === 1;
-  }
-
-  get stdin_source() {
-    if (this.d_test_command!.stdin_source === StdinSource.none) {
-      return "No input";
-    }
-    else if (this.d_test_command!.stdin_source === StdinSource.text) {
-      return "Text";
-    }
-    else if (this.d_test_command!.stdin_source === StdinSource.instructor_file) {
-      return "Project file content";
-    }
-    return this.d_test_command!.stdin_source === StdinSource.setup_stdout
-      ? "Stdout from setup" : "Stderr from setup";
-  }
-
-  get expected_return_code() {
-    if (this.d_test_command!.expected_return_code === ExpectedReturnCode.none) {
-      return "Don't check";
-    }
-    return this.d_test_command!.expected_return_code === ExpectedReturnCode.zero
-      ? "Zero" : "Nonzero";
-  }
-
-  get expected_stdout_source() {
-    if (this.d_test_command!.expected_stdout_source === ExpectedOutputSource.none) {
-      return "Don't check";
-    }
-    return this.d_test_command!.expected_stdout_source === ExpectedOutputSource.text
-      ? "Text" : "Project file content";
-  }
-
-  get expected_stderr_source() {
-    if (this.d_test_command!.expected_stderr_source === ExpectedOutputSource.none) {
-      return "Don't check";
-    }
-    return this.d_test_command!.expected_stderr_source === ExpectedOutputSource.text
-      ? "Text" : "Project file content";
   }
 
   async delete_ag_test_command() {
@@ -786,6 +695,7 @@ function handle_save_ag_suite_settings_error(component: AGCommandSettings, error
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/components/ag_tests.scss';
+@import '@/styles/forms.scss';
 $current-lang-choice: "Poppins";
 
 #ag-test-command-settings-component {

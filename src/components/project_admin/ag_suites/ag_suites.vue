@@ -32,10 +32,6 @@
 
     <div id="viewing-window">
 
-      <div> {{active_suite !== null ? active_suite.name : "Null"}} </div>
-      <div> {{active_case !== null ? active_case.name : "Null"}} </div>
-      <div> {{active_command !== null ? active_command.name : "Null"}} </div>
-
       <div v-if="active_level_is_suite"
            class="settings-wrapper">
         <AGSuiteSettings :test_suite="active_suite"

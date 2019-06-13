@@ -105,7 +105,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   AGTestCase,
-  AGTestCaseObserver,
   AGTestCommand,
   AGTestSuite
 } from 'ag-client-typescript';

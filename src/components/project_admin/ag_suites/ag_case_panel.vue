@@ -147,14 +147,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import { AGTestCase, AGTestCommand, AGTestCommandObserver } from 'ag-client-typescript';
+import { AGTestCase, AGTestCommand } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
-import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -168,7 +167,6 @@ import { is_not_empty } from '@/validators';
     AGCaseSettings,
     ContextMenu,
     ContextMenuItem,
-    Dropdown,
     Modal,
     ValidatedForm,
     ValidatedInput
