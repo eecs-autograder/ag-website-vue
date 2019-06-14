@@ -180,7 +180,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Student files & Instructor files get sorted', async () => {
-        expect(component.d_test_suite.pk).toEqual(ag_suite.pk);
+        expect(component.d_test_suite!.pk).toEqual(ag_suite.pk);
         expect(component.project).toEqual(project);
 
         expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);

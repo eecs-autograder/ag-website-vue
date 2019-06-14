@@ -18,6 +18,8 @@
                             @submit.native.prevent="save_ag_test_command_settings"
                             @form_validity_changed="settings_form_is_valid = $event">
 
+              <div> Case has exactly one command: {{case_has_exactly_one_command}}</div>
+
               <div id="name-container">
                 <label class="text-label"> Command name </label>
                 <validated-input ref="command_name"
@@ -194,7 +196,8 @@
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source === ExpectedOutputSource.instructor_file"
+                  <div v-if="d_test_command.expected_stdout_source
+                             === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
                     <div class="dropdown">
@@ -332,12 +335,8 @@
                 </fieldset>
               </div>
 
-              <div v-if="d_test_command.expected_stdout_source === ExpectedOutputSource.text ||
-                         d_test_command.expected_stdout_source
-                         === ExpectedOutputSource.instructor_file  ||
-                         d_test_command.expected_stderr_source === ExpectedOutputSource.text  ||
-                         d_test_command.expected_stderr_source
-                         === ExpectedOutputSource.instructor_file"
+              <div v-if="d_test_command.expected_stdout_source !== ExpectedOutputSource.none ||
+                         d_test_command.expected_stderr_source !== ExpectedOutputSource.none"
                    class="section-container">
                 <fieldset>
                   <legend> Diff Options </legend>
@@ -616,6 +615,7 @@ export default class AGCommandSettings extends Vue {
 
   @Watch('test_case')
   on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
+    console.log("Case Changed");
     this.d_test_case = deep_copy(new_test_case, AGTestCase);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;

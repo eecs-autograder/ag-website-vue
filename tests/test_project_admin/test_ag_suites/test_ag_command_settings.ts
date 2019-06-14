@@ -859,7 +859,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Delete command', async () => {
-        wrapper.setProps({test_case: case_with_two_commands})
+        wrapper.setProps({test_case: case_with_two_commands});
 
         let delete_command_stub = sinon.stub(component.d_test_command!, 'delete');
 

@@ -1,5 +1,5 @@
 <template>
-  <div id="ag-test-suites-component">
+  <div id="ag-test-suites-component" v-if="!loading">
 
     <div id="suite-nav-bar">
 
@@ -102,11 +102,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
   AGTestCase,
+  AGTestCaseObserver,
   AGTestCommand,
+  AGTestCommandObserver,
   AGTestSuite,
   AGTestSuiteObserver,
-  Project,
-  AGTestCaseObserver, AGTestCommandObserver
+  Project
 } from 'ag-client-typescript';
 import { ID } from 'ag-client-typescript/dist/src/base';
 
@@ -134,16 +135,17 @@ import { is_not_empty } from '@/validators';
   }
 })
 
-export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTestCaseObserver, AGTestCommandObserver {
+export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTestCaseObserver,
+                                                     AGTestCommandObserver {
 
   @Prop({required: true, type: Project})
   project!: Project;
 
   readonly is_not_empty = is_not_empty;
 
-  active_suite: AGTestSuite | null = null;
-  active_case: AGTestCase | null = null;
-  active_command: AGTestCommand | null = null;
+  // active_suite: AGTestSuite | null = null;
+  // active_case: AGTestCase | null = null;
+  // active_command: AGTestCommand | null = null;
   add_suite_form_is_valid = false;
   adding_suite = false;
   index_active_suite = -1;
@@ -174,88 +176,111 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     });
   }
 
-  get prev_command_is_available() {
-    if (this.active_case !== null && this.active_command !== null) {
-      // if there is a command at the same index in the previous case
-      if (this.index_active_case !== 0) {
-        let num_commands = this.active_suite!.ag_test_cases[
-          this.index_active_case - 1].ag_test_commands.length;
-        if (num_commands > this.index_active_command) {
-          console.log("There are enough commands in the previous case");
-        }
-        return num_commands > this.index_active_command;
-      }
-      // you can go to the previous suite
-      else if (this.index_active_suite !== 0) {
-        let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
-        if (num_cases > 0) {
-          let num_commands = this.test_suites[this.index_active_suite - 1].ag_test_cases[
-            num_cases - 1].ag_test_commands.length;
-          if (num_commands > this.index_active_command) {
-            console.log("There are enough commands in the previous suite last case: " + num_commands);
-          }
-          return num_commands > this.index_active_command;
-        }
-      }
-    }
-    return false;
+  get active_suite() {
+    return this.index_active_suite === -1 ? null : this.test_suites[this.index_active_suite];
   }
 
+  get active_case() {
+    return this.index_active_case === -1 ? null : this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case];
+  }
+
+  get active_command() {
+    return this.index_active_command === -1 ? null : this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case].ag_test_commands[this.index_active_command];
+  }
+
+  get prev_command_is_available() {
+    // console.log("pcia - Index active suite: " + this.index_active_suite);
+    // console.log("pcia - Index active case: " + this.index_active_case);
+    // console.log("pcia - Index active command: " + this.index_active_command);
+    // if (this.index_active_case !== -1 && this.index_active_command !== -1
+    // && this.index_active_suite !== -1) {
+    //   // if there is a command at the same index in the previous case
+    //   if (this.index_active_case !== 0) {
+    //     let num_commands = this.active_suite!.ag_test_cases[
+    //       this.index_active_case - 1].ag_test_commands.length;
+    //     if (num_commands > this.index_active_command) {
+    //       console.log("There are enough commands in the previous case");
+    //     }
+    //     return num_commands > this.index_active_command;
+    //   }
+    //   // you can go to the previous suite
+    //   else if (this.index_active_suite !== 0) {
+    //     let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
+    //     if (num_cases > 0) {
+    //       let num_commands = this.test_suites[this.index_active_suite - 1].ag_test_cases[
+    //         num_cases - 1].ag_test_commands.length;
+    //       if (num_commands > this.index_active_command) {
+    //         console.log("There are enough commands in the previous suite last case: "
+    //                     + num_commands);
+    //       }
+    //       return num_commands > this.index_active_command;
+    //     }
+    //   }
+    // }
+    // return false;
+  }
+
+
+
   go_to_prev_command() {
-    let command_index = this.index_active_command;
-    if (this.index_active_case !== 0) {
-      console.log("Go to prev case");
-      this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case - 1]);
-    }
-    else {
-      let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
-      console.log("Go to prev suite");
-      this.update_active_suite(this.test_suites[this.index_active_suite - 1]);
-      this.update_active_case(this.active_suite!.ag_test_cases[num_cases - 1]);
-    }
-    this.update_active_command(this.active_case!.ag_test_commands[command_index]);
+    // let command_index = this.index_active_command;
+    // if (this.index_active_case !== 0) {
+    //   console.log("Go to prev case");
+    //   this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case - 1]);
+    // }
+    // else {
+    //   let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
+    //   console.log("Go to prev suite");
+    //   this.update_active_suite(this.test_suites[this.index_active_suite - 1]);
+    //   this.update_active_case(this.active_suite!.ag_test_cases[num_cases - 1]);
+    // }
+    // this.update_active_command(this.active_case!.ag_test_commands[command_index]);
   }
 
   get next_command_is_available() {
-    if (this.active_case !== null && this.active_command !== null) {
-      let num_cases = this.active_suite!.ag_test_cases.length;
-      // if there is a command at the same index in the next case
-      if (num_cases - 1 > this.index_active_case) {
-        let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
-          .ag_test_commands.length;
-        if (num_commands > this.index_active_command) {
-          console.log("There are enough commands in the next case");
-        }
-        return num_commands > this.index_active_command;
-      }
-      // if you can go to the next suite
-      else if (this.index_active_suite < this.test_suites.length - 1) {
-        if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
-
-          if (this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
-                .ag_test_commands.length > this.index_active_command) {
-            console.log("There are enough commands in the first case of the next suite");
-          }
-          return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
-                   .ag_test_commands.length > this.index_active_command;
-        }
-      }
-    }
-    return false;
+    // console.log("ncia - Index active suite: " + this.index_active_suite);
+    // console.log("ncia - Index active case: " + this.index_active_case);
+    // console.log("ncia - Index active command: " + this.index_active_command);
+    // if (this.index_active_case !== -1 && this.index_active_command !== -1
+    //     && this.index_active_suite !== -1) {
+    //   let num_cases = this.active_suite!.ag_test_cases.length;
+    //   // if there is a command at the same index in the next case
+    //   if (num_cases - 1 > this.index_active_case) {
+    //     let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
+    //       .ag_test_commands.length;
+    //     if (num_commands > this.index_active_command) {
+    //       console.log("There are enough commands in the next case");
+    //     }
+    //     return num_commands > this.index_active_command;
+    //   }
+    //   // if you can go to the next suite
+    //   else if (this.index_active_suite < this.test_suites.length - 1) {
+    //     if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
+    //
+    //       if (this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
+    //             .ag_test_commands.length > this.index_active_command) {
+    //         console.log("There are enough commands in the first case of the next suite");
+    //       }
+    //       return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
+    //                .ag_test_commands.length > this.index_active_command;
+    //     }
+    //   }
+    // }
+    // return false;
   }
 
   go_to_next_command() {
-    let command_index = this.index_active_command;
-    if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
-      console.log("Go to next case");
-      this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case + 1]);
-    }
-    else {
-      console.log("Go to next suite first case");
-      this.update_active_suite(this.test_suites[this.index_active_suite + 1]);
-      this.update_active_case(this.active_suite!.ag_test_cases[0]);
-    }
-    this.update_active_command(this.active_case!.ag_test_commands[command_index]);
+    // let command_index = this.index_active_command;
+    // if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
+    //   console.log("Go to next case");
+    //   this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case + 1]);
+    // }
+    // else {
+    //   console.log("Go to next suite first case");
+    //   this.update_active_suite(this.test_suites[this.index_active_suite + 1]);
+    //   this.update_active_case(this.active_suite!.ag_test_cases[0]);
+    // }
+    // this.update_active_command(this.active_case!.ag_test_commands[command_index]);
   }
 
   get active_level_is_suite() {
@@ -267,46 +292,31 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   }
 
   update_active_suite(ag_suite: AGTestSuite) {
-    console.log("Updating active suite");
+    // console.log("Updating active suite");
     if (this.active_suite !== null && this.active_suite.pk === ag_suite!.pk
-        && this.index_active_case === -1 && this.index_active_command === -1) {
-      this.active_suite = null;
-      this.index_active_suite = -1;
+        && this.active_case === null && this.active_command === null) {
     }
     else {
-      this.active_suite = ag_suite;
       this.index_active_suite = this.test_suites.findIndex(
         (test_suite: AGTestSuite) => ag_suite.pk === test_suite.pk
       );
-      this.active_case = null;
       this.index_active_case = -1;
-      this.active_command = null;
       this.index_active_command = -1;
     }
   }
 
   update_active_case(ag_case: AGTestCase) {
-    console.log("Updating active case");
-    if (this.active_case !== null && this.active_case.pk === ag_case!.pk
-        && this.active_command === null) {
-      this.active_case = null;
-      this.index_active_case = -1;
-    }
-    else {
-      this.active_case = ag_case;
-      this.index_active_case = this.active_suite!.ag_test_cases.findIndex(
-        (test_case: AGTestCase) => ag_case.pk === test_case.pk
-      );
-      this.index_active_command = this.active_case!.ag_test_commands.length === 0 ? -1 : 0;
-      if (this.index_active_command !== -1) {
-        this.update_active_command(this.active_case.ag_test_commands[0]);
-      }
+    // console.log("Updating active case");
+    this.index_active_case = this.active_suite!.ag_test_cases.findIndex(
+      (test_case: AGTestCase) => ag_case.pk === test_case.pk
+    );
+    this.index_active_command = -1;
+    if (ag_case.ag_test_commands.length > 0) {
+      this.update_active_command(this.active_case.ag_test_commands[0]);
     }
   }
 
   update_active_command(ag_command: AGTestCommand) {
-    console.log("Updating active command");
-    this.active_command = ag_command;
     this.index_active_command = this.active_case!.ag_test_commands.findIndex(
         (test_command: AGTestCommand) => ag_command.pk === test_command.pk
     );
@@ -328,7 +338,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   // SuiteObserver -------------------------------------------------------------------------------
   update_ag_test_suite_changed(ag_test_suite: AGTestSuite): void {
     let index = this.test_suites.findIndex((suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
-    Vue.set(this.test_suites, index, deep_copy(ag_test_suite, AGTestSuite));
+    Vue.set(this.test_suites, index, ag_test_suite);
   }
 
   update_ag_test_suite_created(ag_test_suite: AGTestSuite): void {
@@ -347,7 +357,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
       this.update_active_suite(this.test_suites[index - 1]);
     }
     else {
-      console.log("More than one test suite and not the first one");
+      // console.log("More than one test suite and not the first one");
       this.update_active_suite(this.test_suites[index]);
     }
   }
@@ -356,10 +366,14 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
 
   // CaseObserver --------------------------------------------------------------------------------
   update_ag_test_case_changed(ag_test_case: AGTestCase): void {
-    let index = this.active_suite!.ag_test_cases.findIndex(
+    let case_index = this.active_suite!.ag_test_cases.findIndex(
       (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
     );
-    Vue.set(this.active_suite!.ag_test_cases, index, deep_copy(ag_test_case, AGTestCase));
+    Vue.set(
+      this.test_suites[this.index_active_suite].ag_test_cases,
+      case_index,
+      ag_test_case
+    );
   }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
@@ -376,28 +390,38 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
       (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
     );
     this.active_suite!.ag_test_cases.splice(index, 1);
+    // console.log("Index: " + index);
 
     if (this.active_suite!.ag_test_cases.length === 0) {
-      console.log("All the cases are gone!");
+      // console.log("All the cases are gone!");
       this.update_active_suite(this.active_suite!);
     }
     else if (index === this.active_suite!.ag_test_cases.length) {
+      // console.log("Case deleted was the last case");
       this.update_active_case(this.active_suite!.ag_test_cases[index - 1]);
     }
     else {
+      // console.log("Case deleted was not the last case");
       this.update_active_case(this.active_suite!.ag_test_cases[index]);
     }
-
   }
 
-  update_ag_test_cases_order_changed(ag_test_suite_pk: number, ag_test_case_order: number[]): void { }
+  update_ag_test_cases_order_changed(ag_test_suite_pk: number, ag_test_case_order: number[]) { }
 
   // CommandObserver------------------------------------------------------------------------------
   update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
-    let index = this.active_case!.ag_test_commands.findIndex(
+    let command_index = this.active_case!.ag_test_commands.findIndex(
       (test_command: AGTestCommand) => test_command.pk === ag_test_command.pk
     );
-    Vue.set(this.active_case!.ag_test_commands, index, deep_copy(ag_test_command, AGTestCommand));
+
+    Vue.set(
+      this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case].ag_test_commands,
+      command_index,
+      ag_test_command
+    );
+
+    // console.log("Active Case.command[0] " + this.active_case!.ag_test_commands[0].name);
+    // console.log("Test suites command[0] " + this.test_suites[0].ag_test_cases[0].ag_test_commands[0].name);
   }
 
   update_ag_test_command_created(ag_test_command: AGTestCommand): void {
@@ -420,7 +444,8 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     }
   }
 
-  update_ag_test_commands_order_changed(ag_test_case_pk: number, ag_test_command_order: number[]): void { }
+  update_ag_test_commands_order_changed(ag_test_case_pk: number,
+                                        ag_test_command_order: number[]) { }
 }
 
 function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
