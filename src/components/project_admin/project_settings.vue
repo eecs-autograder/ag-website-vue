@@ -372,7 +372,6 @@ import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import TimePicker from "@/components/datetime/time_picker.vue";
-import Dropdown from '@/components/dropdown.vue';
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -396,7 +395,6 @@ interface UltimateSubmissionPolicyOption {
   components: {
     APIErrors,
     DatetimePicker,
-    Dropdown,
     TimePicker,
     Toggle,
     Tooltip,

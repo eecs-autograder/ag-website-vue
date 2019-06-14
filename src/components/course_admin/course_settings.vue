@@ -21,10 +21,7 @@
           <label class="text-label" for="semester"> Semester </label>
           <div>
             <select id="semester" v-model="d_course.semester" class="select">
-              <option :value="Semester.fall">{{Semester.fall}}</option>
-              <option :value="Semester.winter">{{Semester.winter}}</option>
-              <option :value="Semester.spring">{{Semester.spring}}</option>
-              <option :value="Semester.summer">{{Semester.summer}}</option>
+              <option v-for="semester of semesters" :value="semester">{{semester}}</option>
             </select>
           </div>
         </div>

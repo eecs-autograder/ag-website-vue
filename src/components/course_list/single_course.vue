@@ -60,21 +60,12 @@
 
             <div class="semester-container">
               <label class="text-label"> Semester: </label>
-              <div>
-                <dropdown ref="semester_dropdown"
-                          :items="semesters"
-                          @update_item_selected="new_course_semester = $event">
-                  <template slot="header">
-                    <div tabindex="1" class="dropdown-header-wrapper">
-                      <div class="dropdown-header semester-dropdown-header">{{new_course_semester}}
-                        <i class="fas fa-caret-down dropdown-caret"></i>
-                      </div>
-                    </div>
-                  </template>
-                  <div slot-scope="{item}">
-                    <span class="semester-item">{{item}}</span>
-                  </div>
-                </dropdown>
+              <div class="dropdown">
+                <select id="semester"
+                        v-model="new_course_semester"
+                        class="select">
+                  <option v-for="semester of semesters" :value="semester">{{semester}}</option>
+                </select>
               </div>
             </div>
 
@@ -109,7 +100,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Course, Semester } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -119,7 +109,6 @@ import { is_not_empty, is_number, make_min_value_validator } from '@/validators'
 @Component({
   components: {
     APIErrors,
-    Dropdown,
     Modal,
     ValidatedForm,
     ValidatedInput
@@ -179,6 +168,7 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/forms.scss';
 
 .toolbox {
   background-color: hsl(212, 60%, 94%);
