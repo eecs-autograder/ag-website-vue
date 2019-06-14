@@ -202,7 +202,7 @@
 
     show_countries_dropdown() {
       let countries_dropdown = <Dropdown> this.$refs.countries_dropdown;
-      countries_dropdown.show_the_dropdown_menu();
+      countries_dropdown.show();
     }
 
     log_event(e: Event) {

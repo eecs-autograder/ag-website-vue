@@ -151,7 +151,7 @@ export default class CourseAdmin extends Vue {
 
   show_roster_tab_dropdown_menu(event: Event) {
     let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
-    roster_dropdown.show_the_dropdown_menu();
+    roster_dropdown.show();
     event.stopPropagation();
   }
 
