@@ -61,7 +61,7 @@
 
 .checkbox + label::before {
     border-radius: 2px;
-    color: #ced4da;
+    color: lighten(black, 35);
     content: '\f0c8';
     display: inline-block;
     font-family: "Font Awesome 5 Free";
