@@ -195,6 +195,10 @@ export default class AGCasePanel extends Vue {
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   case_settings_form_is_valid = false;
 
+  created() {
+    console.log(this.test_case.ag_test_commands.length);
+  }
+
   get is_active_case() {
     return this.active_case !== null && this.active_case.pk === this.test_case!.pk;
   }

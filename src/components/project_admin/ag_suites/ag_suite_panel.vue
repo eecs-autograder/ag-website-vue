@@ -40,7 +40,7 @@
           <validated-form id="add-case-form"
                           autocomplete="off"
                           spellcheck="false"
-                          @submit.native.prevent="add_case"
+                          @submit.native.prevent="create_case"
                           @form_validity_changed="add_case_form_is_valid = $event">
 
             <div class="checkbox-container">
@@ -48,7 +48,7 @@
                      type="checkbox"
                      v-model="compound_case">
               <label class="checkbox-label"
-                     for="ignore-case"> Compound Case
+                     for="ignore-case"> Compound case
               </label>
               <i class="fas fa-question-circle input-tooltip">
                 <tooltip width="large" placement="right">
@@ -61,28 +61,47 @@
             </div>
 
             <div class="case-name-container">
-              <label class="text-label"> Case Name </label>
+              <label class="text-label"> Case name </label>
               <validated-input ref="new_case_name"
                                v-model="new_case_name"
                                :validators="[is_not_empty]">
               </validated-input>
             </div>
 
-            <div class="command-name-container" v-if="compound_case">
-              <label class="text-label"> Command Name </label>
-              <validated-input ref="new_command_name"
-                               v-model="new_command_name"
-                               :validators="[is_not_empty]">
-              </validated-input>
+            <div class="new-command-container">
+              <div class="command-name" v-if="compound_case">
+                <label class="text-label">{{compound_case ? "First command name" : "Command name"}}</label>
+                <validated-input ref="first_command_name"
+                                 v-model="first_command_name"
+                                 :validators="[is_not_empty]">
+                </validated-input>
+              </div>
+
+              <div class="command">
+                <label class="text-label">{{compound_case ? "First Command" : "Command"}}</label>
+                <validated-input ref="first_command"
+                                 v-model="first_command"
+                                 :validators="[is_not_empty]">
+                </validated-input>
+              </div>
             </div>
 
+            <div class="new-command-container" v-if="compound_case">
+              <div class="command-name">
+                <label class="text-label"> Second command name </label>
+                <validated-input ref="second_command_name"
+                                 v-model="second_command_name"
+                                 :validators="[is_not_empty]">
+                </validated-input>
+              </div>
 
-            <div class="command-container">
-              <label class="text-label"> Command </label>
-              <validated-input ref="new_command"
-                               v-model="new_command"
-                               :validators="[is_not_empty]">
-              </validated-input>
+              <div class="command">
+                <label class="text-label"> Second Command </label>
+                <validated-input ref="second_command"
+                                 v-model="second_command"
+                                 :validators="[is_not_empty]">
+                </validated-input>
+              </div>
             </div>
 
             <APIErrors ref="new_case_api_errors"></APIErrors>
@@ -101,7 +120,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
   AGTestCase,
@@ -115,7 +134,7 @@ import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue'
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -148,8 +167,10 @@ export default class AGSuitePanel extends Vue {
   adding_case = false;
   loading = true;
   new_case_name = "";
-  new_command_name = "";
-  new_command = "";
+  first_command_name = "";
+  first_command = "";
+  second_command_name = "";
+  second_command = "";
   compound_case = false;
 
   get is_active_suite() {
@@ -164,8 +185,10 @@ export default class AGSuitePanel extends Vue {
     if (this.active_suite === null || this.active_suite.pk !== this.test_suite!.pk) {
       this.$emit('update_active_suite', this.test_suite);
     }
-    this.new_command_name = "";
-    this.new_command = "";
+    this.first_command_name = "";
+    this.first_command = "";
+    this.second_command_name = "";
+    this.second_command = "";
     this.new_case_name = "";
     this.compound_case = false;
     (<Modal> this.$refs.new_case_modal).open();
@@ -174,18 +197,21 @@ export default class AGSuitePanel extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_add_ag_case_error)
-  async add_case() {
+  @handle_api_errors_async(handle_create_ag_case_error)
+  async create_case() {
     try {
       this.adding_case = true;
       (<APIErrors> this.$refs.new_case_api_errors).clear();
-      let created_case = await AGTestCase.create(
-        this.test_suite!.pk, { name: this.new_case_name }
-      );
-      this.new_command_name = this.compound_case ? this.new_command_name : this.new_case_name;
+      let created_case = await AGTestCase.create(this.test_suite!.pk, {name: this.new_case_name});
+      this.first_command_name = this.compound_case ? this.first_command_name : this.new_case_name;
       await AGTestCommand.create(
-        created_case.pk, { name: this.new_command_name, cmd: this.new_command }
+        created_case.pk, {name: this.first_command_name, cmd: this.first_command}
       );
+      if (this.compound_case) {
+        await AGTestCommand.create(
+          created_case.pk, {name: this.second_command_name, cmd: this.second_command}
+        );
+      }
       (<Modal> this.$refs.new_case_modal).close();
     }
     finally {
@@ -194,10 +220,9 @@ export default class AGSuitePanel extends Vue {
   }
 }
 
-function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
+function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
   (<APIErrors> component.$refs.new_case_api_errors).show_errors_from_response(error);
 }
-
 </script>
 
 <style scoped lang="scss">
@@ -279,19 +304,27 @@ function handle_add_ag_case_error(component: AGSuitePanel, error: unknown) {
 
 // Modal **************************************************************
 .case-name-container {
-  padding: 0 0 22px 0;
+  padding: 0 0 0 0;
 }
 
-.command-name-container {
-  padding: 0 0 22px 0;
+.command-name {
+  padding: 32px 0 0 0;
 }
 
-.command-container {
-  padding: 0 0 22px 0;
+.command {
+  padding: 12px 0;
+}
+
+.new-command-inputs {
+  width: 100%;
 }
 
 .checkbox-container {
   padding: 12px 0 12px 0;
+}
+
+.modal-create-button {
+  margin-top: 10px;
 }
 
 </style>

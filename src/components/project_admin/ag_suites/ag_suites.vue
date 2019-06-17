@@ -217,7 +217,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     //     }
     //   }
     // }
-    // return false;
+    return false;
   }
 
 
@@ -266,7 +266,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     //     }
     //   }
     // }
-    // return false;
+    return false;
   }
 
   go_to_next_command() {
@@ -350,7 +350,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     let index = this.test_suites.findIndex((suite: AGTestSuite) => ag_test_suite.pk === suite.pk);
     this.test_suites.splice(index, 1);
     if (this.test_suites.length === 0) {
-      this.active_suite = null;
+      // this.active_suite = null;
       this.index_active_suite = -1;
     }
     else if (index === this.test_suites.length) {

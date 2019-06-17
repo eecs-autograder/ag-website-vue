@@ -17,9 +17,7 @@
                             spellcheck="false"
                             @submit.native.prevent="save_ag_test_command_settings"
                             @form_validity_changed="settings_form_is_valid = $event">
-
-              <div> Case has exactly one command: {{case_has_exactly_one_command}}</div>
-
+              
               <div id="name-container">
                 <label class="text-label"> Command name </label>
                 <validated-input ref="command_name"
