@@ -1,8 +1,8 @@
 <template>
   <div id="datetime-picker-demo">
 
-    <fieldset>
-      <legend> DatePicker </legend>
+    <fieldset class="fieldset">
+      <legend class="legend"> DatePicker </legend>
       <div class="example">
         <div class="explanation"> Date string with bound input </div>
         <div class="modeling"
@@ -31,8 +31,8 @@
 
     </fieldset>
 
-    <fieldset>
-      <legend>TimePicker</legend>
+    <fieldset class="fieldset">
+      <legend class="legend">TimePicker</legend>
       <div class="example">
         <div class="explanation">TimePicker with no bound input</div>
         <time-picker></time-picker>

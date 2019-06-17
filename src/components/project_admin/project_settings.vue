@@ -16,8 +16,8 @@
       </div>
 
       <div>
-        <fieldset>
-          <legend> Project Deadline </legend>
+        <fieldset class="fieldset">
+          <legend class="legend"> Project Deadline </legend>
           <div class="project-input-container">
 
             <div class="clearable-datetime-picker soft-deadline">
@@ -75,12 +75,13 @@
       </div>
 
       <div class="section-container">
-        <fieldset>
-          <legend> Access </legend>
+        <fieldset class="fieldset">
+          <legend class="legend"> Access </legend>
 
           <div class="checkbox-input-container">
             <input id="visible-to-students"
                    type="checkbox"
+                   class="checkbox"
                    v-model="d_project.visible_to_students"/>
             <label class="checkbox-label"
                    for="visible-to-students">
@@ -91,6 +92,7 @@
           <div class="checkbox-input-container">
             <input id="guests-can-submit"
                    type="checkbox"
+                   class="checkbox"
                    v-model="d_project.guests_can_submit"/>
             <label class="checkbox-label"
                    for="guests-can-submit">
@@ -107,6 +109,7 @@
           <div class="checkbox-input-container">
             <input id="disallow-student-submissions"
                    type="checkbox"
+                   class="checkbox"
                    v-model="d_project.disallow_student_submissions"/>
             <label class="checkbox-label"
                    for="disallow-student-submissions">
@@ -123,6 +126,7 @@
           <div class="checkbox-input-container">
             <input id="publish-final-grades"
                    type="checkbox"
+                   class="checkbox"
                    :checked="!d_project.hide_ultimate_submission_fdbk"
                    @change="d_project.hide_ultimate_submission_fdbk = !$event.target.checked"/>
             <label class="checkbox-label"
@@ -140,8 +144,8 @@
       </div>
 
       <div class="section-container">
-        <fieldset>
-          <legend> Groups </legend>
+        <fieldset class="fieldset">
+          <legend class="legend"> Groups </legend>
 
           <div class="project-input-container">
             <div class="group-size-container">
@@ -176,6 +180,7 @@
           <div class="checkbox-input-container">
             <input id="disallow-group-registration"
                    type="checkbox"
+                   class="checkbox"
                    v-model="d_project.disallow_group_registration"/>
             <label class="checkbox-label"
                    for="disallow-group-registration">
@@ -194,8 +199,8 @@
       </div>
 
       <div class="section-container">
-        <fieldset>
-          <legend> Grading Policy </legend>
+        <fieldset class="fieldset">
+          <legend class="legend"> Grading Policy </legend>
           <div class="project-input-container">
             <label class="text-label"
                    for="ultimate-submission-policy"> Final graded submission policy </label>
@@ -227,8 +232,8 @@
       </div>
 
       <div class="section-container">
-        <fieldset>
-          <legend> Submission Limits </legend>
+        <fieldset class="fieldset">
+          <legend class="legend"> Submission Limits </legend>
           <div class="project-input-container">
               <label class="text-label"> Submissions per day </label>
               <validated-input id="submission-limit-per-day"
@@ -246,6 +251,7 @@
           <div class="checkbox-input-container">
             <input id="allow-submissions-past-limit"
                    type="checkbox"
+                   class="checkbox"
                    :disabled="d_project.submission_limit_per_day === null"
                    v-model="d_project.allow_submissions_past_limit"/>
             <label class="checkbox-label"
@@ -284,6 +290,7 @@
           <div class="checkbox-input-container">
             <input id="groups-combine-daily-submissions"
                    type="checkbox"
+                   class="checkbox"
                    v-model="d_project.groups_combine_daily_submissions"
                    :disabled="d_project.max_group_size === 1"/>
             <label class="checkbox-label"
@@ -313,6 +320,7 @@
           <div class="checkbox-input-container">
             <input id="allow-late-days"
                    type="checkbox"
+                   class="checkbox"
                    v-model="d_project.allow_late_days"/>
             <label class="checkbox-label"
                    for="allow-late-days">
