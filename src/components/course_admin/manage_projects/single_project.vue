@@ -59,18 +59,14 @@
                 <template slot="header">
                 <div tabindex="1" class="dropdown-header-wrapper">
                   <div id="input-course-to-copy-to" class="dropdown-header">
-                    {{course_to_clone_to.name ? course_to_clone_to.name : ""}} -
-                    {{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}
-                    {{course_to_clone_to.year ? course_to_clone_to.year : ""}}
+                    {{get_course_info(course_to_clone_to)}}
                     <i class="fas fa-caret-down dropdown-caret"></i>
                   </div>
                 </div>
                 </template>
                 <div slot-scope="{item}">
                   <span>
-                    {{item.name ? item.name : ""}} -
-                    {{item.semester ? item.semester : ""}}
-                    {{item.year ? item.year : ""}}
+                    {{get_course_info(item)}}
                   </span>
                 </div>
               </dropdown>
@@ -99,7 +95,7 @@ import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { get_course_info, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -124,6 +120,7 @@ export default class SingleProject extends Vue {
   project!: Project;
 
   readonly is_not_empty = is_not_empty;
+  readonly get_course_info = get_course_info;
 
   cloning_destinations: Course[] = [];
   api_errors: string[] = [];

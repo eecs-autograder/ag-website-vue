@@ -1,8 +1,10 @@
+import { Course, Semester } from 'ag-client-typescript';
+
 import {
     array_add_unique,
     array_get_unique,
     array_has_unique,
-    array_remove_unique, format_datetime, format_time,
+    array_remove_unique, format_datetime, format_time, get_course_info,
     safe_assign,
     UniqueArrayError,
     zip
@@ -82,6 +84,30 @@ describe('Datetime format tests', () => {
     test('format_time non-null', () => {
         expect(format_time('15:32')).toEqual('03:32 PM');
         expect(format_time('15:32:00')).toEqual('03:32 PM');
+    });
+});
+
+describe('get_course_info function tests', () => {
+    let course: Course;
+
+    beforeEach(() => {
+        course = new Course(
+            {pk: 11, name: "EECS 388", semester: Semester.fall, year: 2048, subtitle: '',
+             num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
+    });
+
+    test('Course has name, semester, and year', () => {
+       expect(get_course_info(course)).toEqual("EECS 388 Fall 2048");
+    });
+
+    test('Course semester is null', () => {
+        course.semester = null;
+        expect(get_course_info(course)).toEqual("EECS 388  2048");
+   });
+
+    test('Course year is null', () => {
+        course.year = null;
+        expect(get_course_info(course)).toEqual("EECS 388 Fall ");
     });
 });
 
