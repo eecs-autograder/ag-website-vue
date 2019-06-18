@@ -127,10 +127,9 @@ export function handle_api_errors_async(
 }
 
 export function get_course_info(course: Course) {
-    let course_name = course.name === null ? "" : course.name;
     let course_semester = course.semester === null ? "" : course.semester;
     let course_year = course.year === null ? "" : course.year;
-    return `${course_name} ${course_semester} ${course_year}`;
+    return `${course.name} ${course_semester} ${course_year}`;
 }
 
 export function get_axios_error_status(error: unknown): [AxiosResponse, number] {
