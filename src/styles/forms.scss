@@ -72,12 +72,12 @@ $check-mark-disabled: hsl(220, 12%, 20%);
     background-image: linear-gradient(lighten($checkbox-background-dark, 8),
                                       lighten($checkbox-background-dark, 3));
     border-color: hsl(220, 12%, 66%);
-    border-radius: 4px;
+    border-radius: 3px;
     border-style: solid;
     border-width: 1px;
     box-shadow: 0 0.5px 0.5px $pebble-dark;
     display: inline-block;
-    padding: 3px 3px 2.5px 3px;
+    padding: 2px 2px 2px 2px;
     margin-right: 10px;
     min-width: 10px;
     position: relative;
