@@ -280,11 +280,6 @@ export default class ValidatedInputDemo extends Vue {
 }
 
 .suffix-element {
-  display: inline-block;
-  vertical-align: top;
-  width: 300px;
-  background-color: pink;
-  padding-top: 10px;
   padding-left: 10px;
 }
 

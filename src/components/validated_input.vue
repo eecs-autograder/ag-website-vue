@@ -1,6 +1,6 @@
 <template>
   <div id="validated-input-component">
-    <div>
+    <div id="validated-input-wrapper">
       <input id="input"
              v-if="num_rows === 1"
              :style="input_style"
@@ -206,6 +206,13 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
+#validated-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
 
 .error-ul {
   list-style-type: none; /* Remove bullets */

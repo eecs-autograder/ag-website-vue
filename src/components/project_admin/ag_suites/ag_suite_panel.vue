@@ -43,24 +43,7 @@
                           @submit.native.prevent="create_case"
                           @form_validity_changed="add_case_form_is_valid = $event">
 
-            <div class="checkbox-container">
-              <input id="ignore-case"
-                     type="checkbox"
-                     v-model="compound_case">
-              <label class="checkbox-label"
-                     for="ignore-case"> Compound case
-              </label>
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  By default, the first command in a case shares the same name as the test case it
-                  is created in. If you intend to have more than one command in this case, checking
-                  this box will allow you to supply a different name than the test case name for
-                  the first command in the case.
-                </tooltip>
-              </i>
-            </div>
-
-            <div class="case-name-container">
+            <div id="case-name-container">
               <label class="text-label"> Case name </label>
               <validated-input ref="new_case_name"
                                v-model="new_case_name"
@@ -68,48 +51,59 @@
               </validated-input>
             </div>
 
-            <div class="new-command-container">
-              <div class="command-name" v-if="compound_case">
-                <label class="text-label">{{compound_case ? "First command name" : "Command name"}}</label>
-                <validated-input ref="first_command_name"
-                                 v-model="first_command_name"
-                                 :validators="[is_not_empty]">
-                </validated-input>
-              </div>
+            <div class="new-command-container" v-for="(new_command, index) of new_commands">
 
-              <div class="command">
-                <label class="text-label">{{compound_case ? "First Command" : "Command"}}</label>
-                <validated-input ref="first_command"
-                                 v-model="first_command"
-                                 :validators="[is_not_empty]">
-                </validated-input>
-              </div>
-            </div>
+              <div class="new-command-inputs">
+                <div class="command-name" v-if="new_commands.length > 1">
+                  <label class="text-label">{{get_ordinal_num(index)}} command name </label>
+                  <validated-input ref="command_name"
+                                   v-model="new_command.name"
+                                   :validators="[is_not_empty]"
+                                   input_style="width: 100%; min-width: 300px; max-width: 500px;">
+                    <div slot="suffix" class="remove-command-suffix"> Remove </div>
+                  </validated-input>
+                </div>
 
-            <div class="new-command-container" v-if="compound_case">
-              <div class="command-name">
-                <label class="text-label"> Second command name </label>
-                <validated-input ref="second_command_name"
-                                 v-model="second_command_name"
-                                 :validators="[is_not_empty]">
-                </validated-input>
-              </div>
+                <div class="command">
+                  <label class="text-label">{{get_ordinal_num(index)}} command </label>
+                  <validated-input ref="command"
+                                   v-model="new_command.cmd"
+                                   :validators="[is_not_empty]"
+                                   input_style="width: 100%; min-width: 300px; max-width: 500px;">
+                  </validated-input>
+                </div>
 
-              <div class="command">
-                <label class="text-label"> Second Command </label>
-                <validated-input ref="second_command"
-                                 v-model="second_command"
-                                 :validators="[is_not_empty]">
-                </validated-input>
+<!--                <div class="remove-command-button-container" v-if="new_commands.length > 1">-->
+<!--                  <button class="remove-command-button"-->
+<!--                          type="button"-->
+<!--                          @click="remove_command(index)">-->
+<!--                          Remove Command-->
+<!--                  </button>-->
+<!--                </div>-->
               </div>
             </div>
 
             <APIErrors ref="new_case_api_errors"></APIErrors>
 
-            <button class="modal-create-button"
-                    :disabled="!add_case_form_is_valid || adding_case">
-              Add Case
-            </button>
+            <div class="modal-button-footer">
+              <div id="add-command-button-container">
+                <button class="add-command-button"
+                        type="button"
+                        :disabled="new_commands.length === 3"
+                        @click="add_command">
+                  <i class="fas fa-plus"></i>
+                  <span> Add Another Command </span>
+                </button>
+              </div>
+
+              <div class="create-case-button">
+                <button class="modal-create-button"
+                        type="submit"
+                        :disabled="!add_case_form_is_valid || adding_case">
+                  Create Case
+                </button>
+              </div>
+            </div>
 
           </validated-form>
         </div>
@@ -127,6 +121,11 @@ import {
   AGTestCommand,
   AGTestSuite
 } from 'ag-client-typescript';
+
+interface CommandInCase {
+  name: string;
+  cmd: string;
+}
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
@@ -163,15 +162,33 @@ export default class AGSuitePanel extends Vue {
 
   readonly is_not_empty = is_not_empty;
 
+  get_ordinal_num(index: number) {
+    if (!index) {
+      return "First";
+    }
+    return index === 1 ? "Second" : "Third";
+  }
+
   add_case_form_is_valid = false;
   adding_case = false;
   loading = true;
   new_case_name = "";
-  first_command_name = "";
-  first_command = "";
-  second_command_name = "";
-  second_command = "";
+  new_commands: CommandInCase[] = [];
   compound_case = false;
+
+  add_command() {
+    if (this.new_commands.length === 1) {
+      this.new_commands[0].name = this.new_case_name;
+    }
+    this.new_commands.push({
+      name: "",
+      cmd: ""
+    });
+  }
+
+  remove_command(index: number) {
+    this.new_commands.splice(index, 1);
+  }
 
   get is_active_suite() {
     return this.active_suite !== null && this.active_suite.pk === this.test_suite!.pk;
@@ -185,12 +202,8 @@ export default class AGSuitePanel extends Vue {
     if (this.active_suite === null || this.active_suite.pk !== this.test_suite!.pk) {
       this.$emit('update_active_suite', this.test_suite);
     }
-    this.first_command_name = "";
-    this.first_command = "";
-    this.second_command_name = "";
-    this.second_command = "";
+    this.new_commands = [{name: "", cmd: ""}];
     this.new_case_name = "";
-    this.compound_case = false;
     (<Modal> this.$refs.new_case_modal).open();
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_case_name).invoke_focus();
@@ -203,13 +216,11 @@ export default class AGSuitePanel extends Vue {
       this.adding_case = true;
       (<APIErrors> this.$refs.new_case_api_errors).clear();
       let created_case = await AGTestCase.create(this.test_suite!.pk, {name: this.new_case_name});
-      this.first_command_name = this.compound_case ? this.first_command_name : this.new_case_name;
-      await AGTestCommand.create(
-        created_case.pk, {name: this.first_command_name, cmd: this.first_command}
-      );
-      if (this.compound_case) {
-        await AGTestCommand.create(
-          created_case.pk, {name: this.second_command_name, cmd: this.second_command}
+      if (this.new_commands.length === 1) {
+        this.new_commands[0].name = this.new_case_name;
+      }
+      for (let new_command of this.new_commands) {
+        await AGTestCommand.create(created_case.pk, { name: new_command.name, cmd: new_command.cmd }
         );
       }
       (<Modal> this.$refs.new_case_modal).close();
@@ -303,28 +314,59 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 }
 
 // Modal **************************************************************
-.case-name-container {
-  padding: 0 0 0 0;
-}
 
-.command-name {
-  padding: 32px 0 0 0;
-}
-
-.command {
-  padding: 12px 0;
+#case-name-container {
+  padding: 0 0 5px 0;
 }
 
 .new-command-inputs {
   width: 100%;
 }
 
-.checkbox-container {
-  padding: 12px 0 12px 0;
+.remove-command-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
-.modal-create-button {
+.remove-command-suffix {
+  display: inline-block;
+  padding-left: 10px;
+}
+
+.command-name {
+  padding: 15px 0 0 0;
+  width: 100%;
+  //border-top: 1px solid $white-gray;
+}
+
+.command {
+  padding: 5px 0 0 0;
+  width: 100%;
+}
+
+#add-command-button-container {
+}
+
+.add-command-button {
+  @extend .white-button;
+  margin-right: 20px;
+}
+
+.add-command-button span {
+  padding-left: 5px;
+}
+
+.remove-command-button {
+  @extend .light-gray-button;
   margin-top: 10px;
+}
+
+.modal-button-footer {
+  padding: 12px 0 5px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 </style>

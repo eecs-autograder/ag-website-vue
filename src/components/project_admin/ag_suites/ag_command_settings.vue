@@ -786,10 +786,7 @@ $current-lang-choice: "Poppins";
 }
 
 .unit-of-measurement {
-  display: inline-block;
-  vertical-align: top;
   padding-left: 10px;
-  padding-top: 6px;
 }
 
 #time-limit-container {
