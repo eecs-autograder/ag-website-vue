@@ -1,5 +1,6 @@
 import { Dictionary } from 'vue-router/types/router';
 
+import { Course } from 'ag-client-typescript';
 import { AxiosError, AxiosResponse } from 'axios';
 // @ts-ignore
 import moment from "moment";
@@ -10,11 +11,6 @@ import moment from "moment";
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
     Object.assign(to, from);
 }
-
-// export function deep_copy<T>(obj: T): T {
-//     let my_obj: T =  JSON.parse(JSON.stringify(obj));
-//     return my_obj;
-// }
 
 // Used to make a deep copy of an object whose constructor takes an object
 // of the same type as its only argument.
@@ -123,6 +119,17 @@ export function handle_api_errors_async(
         };
     }
     return decorator;
+}
+
+export function format_course_name(course: Course) {
+    let result = course.name;
+    if (course.semester !== null) {
+        result += ' ' + course.semester;
+    }
+    if (course.year !== null) {
+        result += ' ' + course.year.toString();
+    }
+    return result;
 }
 
 export function get_axios_error_status(error: unknown): [AxiosResponse, number] {

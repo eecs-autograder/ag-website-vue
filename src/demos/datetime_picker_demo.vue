@@ -1,8 +1,8 @@
 <template>
   <div id="datetime-picker-demo">
 
-    <fieldset>
-      <legend> DatePicker </legend>
+    <fieldset class="fieldset">
+      <legend class="legend"> DatePicker </legend>
       <div class="example">
         <div class="explanation"> Date string with bound input </div>
         <div class="modeling"
@@ -31,8 +31,8 @@
 
     </fieldset>
 
-    <fieldset>
-      <legend>TimePicker</legend>
+    <fieldset class="fieldset">
+      <legend class="legend">TimePicker</legend>
       <div class="example">
         <div class="explanation">TimePicker with no bound input</div>
         <time-picker></time-picker>
@@ -70,6 +70,7 @@ export default class DatetimePickerDemo extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 
 #datetime-picker-demo {
   display: inline-block;
@@ -90,19 +91,6 @@ export default class DatetimePickerDemo extends Vue {
   border-radius: 4px;
   padding: 10px;
   display: inline-block;
-}
-
-legend {
-  color: $ocean-blue;
-  font-size: 18px;
-}
-
-fieldset {
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  border-width: 2px;
 }
 
 .calender-icon {

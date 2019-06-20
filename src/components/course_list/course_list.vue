@@ -171,7 +171,6 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
 
 #course-list {
   margin-left: 5%;

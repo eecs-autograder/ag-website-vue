@@ -37,7 +37,7 @@
         <hr>
         <div>
           <div class="cloned-project-name">
-            <label class="input-label"> New project name </label>
+            <label class="text-label"> New project name </label>
             <validated-input ref="cloned_project_name"
                              v-model="cloned_project_name"
                              :validators="[is_not_empty]"
@@ -49,27 +49,24 @@
           </div>
 
           <div class="cloned-project-destination">
-            <label class="input-label"> Clone project to course: </label>
+            <label class="text-label"> Clone project to course: </label>
             <div>
-              <dropdown ref="copy_course_dropdown"
+              <dropdown ref="cloning_destinations_dropdown"
                         :items="cloning_destinations"
-                        @update_item_selected="course_to_clone_to = $event"
-                        :initial_highlighted_index="course_index">
+                        :initial_highlighted_index="course_index"
+                        dropdown_height="150px"
+                        @update_item_selected="course_to_clone_to = $event">
                 <template slot="header">
                 <div tabindex="1" class="dropdown-header-wrapper">
                   <div id="input-course-to-copy-to" class="dropdown-header">
-                    {{course_to_clone_to.name ? course_to_clone_to.name : ""}}
-                    {{course_to_clone_to.semester ? course_to_clone_to.semester : ""}}
-                    {{course_to_clone_to.year ? course_to_clone_to.year : ""}}
+                    {{format_course_name(course_to_clone_to)}}
                     <i class="fas fa-caret-down dropdown-caret"></i>
                   </div>
                 </div>
                 </template>
                 <div slot-scope="{item}">
                   <span>
-                    {{item.name ? item.name : ""}}
-                    {{item.semester ? item.semester : ""}}
-                    {{item.year ? item.year : ""}}
+                    {{format_course_name(item)}}
                   </span>
                 </div>
               </dropdown>
@@ -98,7 +95,7 @@ import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { format_course_name, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -123,6 +120,7 @@ export default class SingleProject extends Vue {
   project!: Project;
 
   readonly is_not_empty = is_not_empty;
+  readonly format_course_name = format_course_name;
 
   cloning_destinations: Course[] = [];
   api_errors: string[] = [];
@@ -134,7 +132,6 @@ export default class SingleProject extends Vue {
 
   async created() {
     this.course_to_clone_to = this.course;
-
     let user = await User.get_current();
     this.cloning_destinations = await user.courses_is_admin_for();
     this.course_index = this.cloning_destinations.findIndex(
@@ -155,8 +152,7 @@ export default class SingleProject extends Vue {
       this.course_to_clone_to!.pk, this.cloned_project_name
     );
     (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
-    let clone_project_modal = <Modal> this.$refs.clone_project_modal;
-    clone_project_modal.close();
+    (<Modal> this.$refs.clone_project_modal).close();
     if (this.course_to_clone_to!.pk === this.course.pk) {
       this.$emit('add_cloned_project', new_project);
     }
@@ -171,8 +167,8 @@ export function handle_add_cloned_project_error(component: SingleProject, error:
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
 
 .project-div {
   display: block;

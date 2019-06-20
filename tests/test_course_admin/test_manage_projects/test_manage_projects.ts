@@ -73,7 +73,9 @@ describe('ManageProjects.vue', () => {
             total_submission_limit: null,
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false
+            hide_ultimate_submission_fdbk: false,
+            instructor_files: [],
+            expected_student_files: []
         });
 
         project_2 = new Project({
@@ -98,7 +100,9 @@ describe('ManageProjects.vue', () => {
             total_submission_limit: null,
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false
+            hide_ultimate_submission_fdbk: false,
+            instructor_files: [],
+            expected_student_files: []
         });
 
         new_project = new Project ({
@@ -123,7 +127,9 @@ describe('ManageProjects.vue', () => {
             total_submission_limit: null,
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false
+            hide_ultimate_submission_fdbk: false,
+            instructor_files: [],
+            expected_student_files: []
         });
 
         projects = [project_1, project_2];
@@ -150,7 +156,9 @@ describe('ManageProjects.vue', () => {
             total_submission_limit: null,
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best_with_normal_fdbk,
-            hide_ultimate_submission_fdbk: false
+            hide_ultimate_submission_fdbk: false,
+            instructor_files: [],
+            expected_student_files: []
         });
 
         courses = [current_course, another_course];

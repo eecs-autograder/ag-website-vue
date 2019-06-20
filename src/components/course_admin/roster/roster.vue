@@ -6,7 +6,7 @@
                       @submit="add_users"
                       @form_validity_changed="add_users_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
-          <i class="fas fa-question-circle add-users-tooltip">
+          <i class="fas fa-question-circle input-tooltip">
             <tooltip width="large" placement="right">
               Enter a comma-separated list of email addresses.
             </tooltip>
@@ -154,8 +154,8 @@ export default class Roster extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
 
 .roster-container {
   margin: 0;
@@ -170,13 +170,6 @@ export default class Roster extends Vue {
   padding: 0 0 50px 0;
 }
 
-.add-users-tooltip {
-  color: mediumvioletred;
-  font-size: 18px;
-  margin-left: 3px;
-  top: 1px;
-}
-
 #add-users-button {
   @extend .green-button;
 }
@@ -188,7 +181,7 @@ export default class Roster extends Vue {
 .enrollment-add-label {
   color: black;
   display: block;
-  font-size: $title-size;
+  font-size: 20px;
   font-weight: 600;
   margin: 0;
   padding: 10px 0 8px 1px;

@@ -46,7 +46,9 @@ describe('ExpectedStudentFiles tests', () => {
             total_submission_limit: null,
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false
+            hide_ultimate_submission_fdbk: false,
+            instructor_files: [],
+            expected_student_files: []
         });
 
         file_1_has_wildcard = new ExpectedStudentFile({

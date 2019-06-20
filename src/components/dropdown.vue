@@ -49,7 +49,6 @@ export default class Dropdown extends Vue {
     if (this.$slots.header === undefined) {
       throw Error('Missing required slot: "header"');
     }
-
     let header_slot_content = this.$slots.header[0].elm!;
     header_slot_content.addEventListener("blur", () => {
       this.hide_the_dropdown_menu();

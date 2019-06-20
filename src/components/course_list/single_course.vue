@@ -38,7 +38,7 @@
            size="large">
       <span class="modal-container">
         <p class="modal-header"> Cloning course:
-          <span class="course-to-copy">{{course.name}} - {{course.semester}} {{course.year}}</span>
+          <span class="course-to-copy">{{format_course_name(course)}}</span>
         </p>
         <hr>
         <div id="clone-course-modal">
@@ -48,7 +48,7 @@
                          @submit="make_copy_of_course">
 
             <div class="name-container">
-              <label class="input-label"> Course name: </label>
+              <label class="text-label"> Course name: </label>
               <ValidatedInput ref="copy_of_course_name"
                               v-model="new_course_name"
                               input_style="width: 100%; max-width: 500px;"
@@ -59,27 +59,18 @@
             </div>
 
             <div class="semester-container">
-              <label class="input-label"> Semester: </label>
-              <div>
-                <dropdown ref="semester_dropdown"
-                          :items="semesters"
-                          @update_item_selected="new_course_semester = $event">
-                  <template slot="header">
-                    <div tabindex="1" class="dropdown-header-wrapper">
-                      <div class="dropdown-header semester-dropdown-header">{{new_course_semester}}
-                        <i class="fas fa-caret-down dropdown-caret"></i>
-                      </div>
-                    </div>
-                  </template>
-                  <div slot-scope="{item}">
-                    <span class="semester-item">{{item}}</span>
-                  </div>
-                </dropdown>
+              <label class="text-label"> Semester: </label>
+              <div class="dropdown">
+                <select id="semester"
+                        v-model="new_course_semester"
+                        class="select">
+                  <option v-for="semester of semesters" :value="semester">{{semester}}</option>
+                </select>
               </div>
             </div>
 
             <div class="year-container">
-              <label class="input-label"> Year: </label>
+              <label class="text-label"> Year: </label>
               <ValidatedInput ref="copy_of_course_year"
                               v-model="new_course_year"
                               :num_rows="1"
@@ -109,17 +100,15 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Course, Semester } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { format_course_name, handle_api_errors_async } from '@/utils';
 import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
 
 @Component({
   components: {
     APIErrors,
-    Dropdown,
     Modal,
     ValidatedForm,
     ValidatedInput
@@ -145,6 +134,7 @@ export default class SingleCourse extends Vue {
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
   readonly is_valid_course_year = make_min_value_validator(2000);
+  readonly format_course_name = format_course_name;
 
   created() {
     this.new_course_name = this.course.name;
@@ -179,7 +169,7 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/course_admin.scss';
+@import '@/styles/forms.scss';
 
 .toolbox {
   background-color: hsl(212, 60%, 94%);

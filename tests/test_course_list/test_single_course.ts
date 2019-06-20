@@ -9,6 +9,8 @@ import SingleCourse from '@/components/course_list/single_course.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { expect_html_element_has_value } from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -87,6 +89,34 @@ describe('SingleCourse.vue', () => {
         expect(component.is_admin).toBe(true);
         expect(wrapper.findAll('.clone-course').length).toEqual(1);
         expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
+    });
+
+    test('Semester binding - for clone of course', async () => {
+        wrapper = mount(SingleCourse, {
+            propsData: {
+                course: course_1,
+                is_admin: true
+            },
+            stubs: ['router-link', 'router-view']
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        wrapper.find('.clone-course').trigger('click');
+        await component.$nextTick();
+
+        let semester_select = wrapper.find('#semester');
+
+        expect(component.new_course_semester).toEqual(course_1.semester);
+
+        semester_select.setValue(Semester.summer);
+        expect(component.new_course_semester).toEqual(Semester.summer);
+
+        semester_select.setValue(Semester.winter);
+        expect(component.new_course_semester).toEqual(Semester.winter);
+
+        component.new_course_semester = Semester.spring;
+        expect_html_element_has_value(semester_select, Semester.spring);
     });
 
     test("If the user is not an admin, they don't have the option to clone or edit a course",
