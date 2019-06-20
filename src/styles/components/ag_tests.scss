@@ -6,7 +6,7 @@ $suite-in-active-container-color: white;
 
 legend {
     color: $ocean-blue;
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 
 fieldset {
@@ -20,7 +20,7 @@ fieldset {
 .text-label {
     color: lighten(black, 10);
     display: inline-block;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     margin: 0 0 2px 0;
     text-align: right;
@@ -125,10 +125,25 @@ input[type=checkbox] {
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    font-size: 14px;
     align-items: flex-start;
     justify-content: space-between;
     width: 100%;
+}
+
+.caret-right, .caret-down {
+    font-size: 15px;
+    color: black;
+    width: 16px;
+    box-sizing: border-box;
+}
+
+.level-name {
+    padding: 5px 5px 5px 15px;
+}
+
+.caret-right {
+    padding: 0 0 0 3px;
 }
 
 ::-webkit-scrollbar {
@@ -172,6 +187,7 @@ input[type=checkbox] {
 
 .delete-level-button {
     @extend .red-button;
+    font-size: 14px;
 }
 
 .delete-level-button span {
@@ -194,6 +210,10 @@ input[type=checkbox] {
     color: black;
 }
 
+.tab-heading {
+    font-size: 14px;
+}
+
 // Modal Related ***********************************************************
 
 .item-to-delete {
@@ -211,6 +231,13 @@ input[type=checkbox] {
 .modal-create-button {
     @extend .green-button;
     float: right;
+}
+
+.deletion-modal-button-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-top: 5px;
 }
 
 .modal-cancel-button {

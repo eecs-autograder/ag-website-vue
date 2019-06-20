@@ -37,7 +37,7 @@
       <hr>
       <div class="modal-body">
         <div class="name-container">
-          <validated-form id="add-case-form"
+          <validated-form ref="create_case_form"
                           autocomplete="off"
                           spellcheck="false"
                           @submit.native.prevent="create_case"
@@ -59,8 +59,14 @@
                   <validated-input ref="command_name"
                                    v-model="new_command.name"
                                    :validators="[is_not_empty]"
-                                   input_style="width: 100%; min-width: 300px; max-width: 500px;">
-                    <div slot="suffix" class="remove-command-suffix"> Remove </div>
+                                   input_style="width: 100%; min-width: 200px; max-width: 700px;">
+                    <div slot="suffix" class="remove-command-suffix">
+                      <button class="remove-command-button"
+                              type="button"
+                              @click="remove_command(index)">
+                        <i class="fas fa-times remove-command-icon"></i>
+                      </button>
+                    </div>
                   </validated-input>
                 </div>
 
@@ -69,17 +75,9 @@
                   <validated-input ref="command"
                                    v-model="new_command.cmd"
                                    :validators="[is_not_empty]"
-                                   input_style="width: 100%; min-width: 300px; max-width: 500px;">
+                                   input_style="width: 100%; min-width: 200px; max-width: 700px;">
                   </validated-input>
                 </div>
-
-<!--                <div class="remove-command-button-container" v-if="new_commands.length > 1">-->
-<!--                  <button class="remove-command-button"-->
-<!--                          type="button"-->
-<!--                          @click="remove_command(index)">-->
-<!--                          Remove Command-->
-<!--                  </button>-->
-<!--                </div>-->
               </div>
             </div>
 
@@ -99,7 +97,7 @@
               <div class="create-case-button">
                 <button class="modal-create-button"
                         type="submit"
-                        :disabled="!add_case_form_is_valid || adding_case">
+                        :disabled="!add_case_form_is_valid || creating_case">
                   Create Case
                 </button>
               </div>
@@ -114,7 +112,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   AGTestCase,
@@ -160,6 +158,11 @@ export default class AGSuitePanel extends Vue {
   @Prop({required: true, type: AGTestSuite})
   test_suite!: AGTestSuite;
 
+  @Watch('test_suite', {deep: true})
+  on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
+    this.test_suite = new_test_suite;
+  }
+
   readonly is_not_empty = is_not_empty;
 
   get_ordinal_num(index: number) {
@@ -170,7 +173,8 @@ export default class AGSuitePanel extends Vue {
   }
 
   add_case_form_is_valid = false;
-  adding_case = false;
+  incomplete_input_present = false;
+  creating_case = false;
   loading = true;
   new_case_name = "";
   new_commands: CommandInCase[] = [];
@@ -213,20 +217,23 @@ export default class AGSuitePanel extends Vue {
   @handle_api_errors_async(handle_create_ag_case_error)
   async create_case() {
     try {
-      this.adding_case = true;
+      this.creating_case = true;
+      this.incomplete_input_present = false;
       (<APIErrors> this.$refs.new_case_api_errors).clear();
       let created_case = await AGTestCase.create(this.test_suite!.pk, {name: this.new_case_name});
       if (this.new_commands.length === 1) {
         this.new_commands[0].name = this.new_case_name;
       }
-      for (let new_command of this.new_commands) {
-        await AGTestCommand.create(created_case.pk, { name: new_command.name, cmd: new_command.cmd }
+      for (let i = 0; i < this.new_commands.length; ++i) {
+        await AGTestCommand.create(
+          created_case.pk, { name: this.new_commands[i].name, cmd: this.new_commands[i].cmd }
         );
       }
+      (<ValidatedForm> this.$refs.create_case_form).reset_warning_state();
       (<Modal> this.$refs.new_case_modal).close();
     }
     finally {
-      this.adding_case = false;
+      this.creating_case = false;
     }
   }
 }
@@ -244,18 +251,14 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 
 .test-suite {
   @extend .panel;
-  padding: 0 5px 0 5px;
+  padding: 0 5px 0 0px;
 
   .suite-symbol-right {
-    padding: 0 10px 0 3px;
-    font-size: 18px;
-    color: darken($stormy-gray-dark, 10);
+    @extend .caret-right;
   }
 
   .suite-symbol-down {
-    padding: 0 8px 0 0;
-    font-size: 18px;
-    color: darken($stormy-gray-dark, 10);
+    @extend .caret-down;
   }
 
   #suite-menu {
@@ -272,7 +275,7 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 }
 
 .test-suite-name {
-  padding: 5px;
+  @extend .level-name;
 }
 
 .active-suite {
@@ -323,29 +326,30 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
   width: 100%;
 }
 
-.remove-command-button-container {
+.remove-command-suffix {
+  margin-left: 10px;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  align-self: stretch;
 }
 
-.remove-command-suffix {
-  display: inline-block;
-  padding-left: 10px;
+.remove-command-button {
+  @extend .light-gray-button;
+}
+
+.remove-command-icon {
+  display: flex;
+  align-self: center;
+  padding: 1px 4px 0 4px;
 }
 
 .command-name {
   padding: 15px 0 0 0;
   width: 100%;
-  //border-top: 1px solid $white-gray;
 }
 
 .command {
   padding: 5px 0 0 0;
   width: 100%;
-}
-
-#add-command-button-container {
 }
 
 .add-command-button {
@@ -357,13 +361,8 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
   padding-left: 5px;
 }
 
-.remove-command-button {
-  @extend .light-gray-button;
-  margin-top: 10px;
-}
-
 .modal-button-footer {
-  padding: 12px 0 5px 0;
+  padding: 25px 0 5px 0;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

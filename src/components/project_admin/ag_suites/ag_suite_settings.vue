@@ -224,15 +224,15 @@
                      :size="'large'"
                      :include_closing_x="false">
                 <div class="modal-header">
-                  Are you sure you want to delete the suite:
-                  <span class="suite-to-delete">{{d_test_suite.name}}</span>?
+                  Confirm Delete
                 </div>
                 <hr>
                 <div class="modal-body">
-                  <p> Are you sure you want to delete the suite Cheat Checking Database?
+                  <p> Are you sure you want to delete the suite
+                    <span class="item-to-delete">{{d_test_suite.name}}</span>?
                     This will delete all associated test cases and run results.
                     THIS ACTION CANNOT BE UNDONE. </p>
-                  <div id="modal-button-container">
+                  <div class="deletion-modal-button-footer">
                     <button class="modal-delete-button"
                             :disabled="saving"
                             @click="delete_ag_test_suite()"> Delete </button>
@@ -298,7 +298,7 @@ export default class AGSuiteSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  @Watch('test_suite')
+  @Watch('test_suite', {deep: true})
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
     this.d_test_suite = deep_copy(new_test_suite, AGTestSuite);
     if (this.current_tab_index === 2) {
@@ -399,9 +399,7 @@ export default class AGSuiteSettings extends Vue {
     try {
       this.saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
-      console.log("trying to save");
       await this.d_test_suite!.save();
-      console.log("Success");
     }
     finally {
       this.saving = false;
@@ -410,7 +408,6 @@ export default class AGSuiteSettings extends Vue {
 }
 
 function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: unknown) {
-  console.log("Something went wrong");
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
@@ -488,10 +485,6 @@ $current-lang-choice: "Poppins";
 
 .odd-index {
   background-color: hsl(210, 20%, 96%);
-}
-
-.suite-to-delete {
-  @extend .item-to-delete;
 }
 
 .delete-suite-button {

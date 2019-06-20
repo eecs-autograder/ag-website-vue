@@ -119,7 +119,7 @@ import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vu
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -143,9 +143,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
 
   readonly is_not_empty = is_not_empty;
 
-  // active_suite: AGTestSuite | null = null;
-  // active_case: AGTestCase | null = null;
-  // active_command: AGTestCommand | null = null;
   add_suite_form_is_valid = false;
   adding_suite = false;
   index_active_suite = -1;
@@ -171,8 +168,8 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
 
   open_new_suite_modal() {
     (<Modal> this.$refs.new_suite_modal).open();
-    Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_suite_name).invoke_focus();
+    Vue.nextTick(() => {(
+      <ValidatedInput> this.$refs.new_suite_name).invoke_focus();
     });
   }
 
@@ -181,106 +178,85 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   }
 
   get active_case() {
-    return this.index_active_case === -1 ? null : this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case];
+    return this.index_active_case === -1 ? null
+      : this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case];
   }
 
   get active_command() {
-    return this.index_active_command === -1 ? null : this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case].ag_test_commands[this.index_active_command];
+    return this.index_active_command === -1 ? null
+      : this.test_suites[this.index_active_suite].ag_test_cases[
+        this.index_active_case
+      ].ag_test_commands[this.index_active_command];
   }
 
   get prev_command_is_available() {
-    // console.log("pcia - Index active suite: " + this.index_active_suite);
-    // console.log("pcia - Index active case: " + this.index_active_case);
-    // console.log("pcia - Index active command: " + this.index_active_command);
-    // if (this.index_active_case !== -1 && this.index_active_command !== -1
-    // && this.index_active_suite !== -1) {
-    //   // if there is a command at the same index in the previous case
-    //   if (this.index_active_case !== 0) {
-    //     let num_commands = this.active_suite!.ag_test_cases[
-    //       this.index_active_case - 1].ag_test_commands.length;
-    //     if (num_commands > this.index_active_command) {
-    //       console.log("There are enough commands in the previous case");
-    //     }
-    //     return num_commands > this.index_active_command;
-    //   }
-    //   // you can go to the previous suite
-    //   else if (this.index_active_suite !== 0) {
-    //     let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
-    //     if (num_cases > 0) {
-    //       let num_commands = this.test_suites[this.index_active_suite - 1].ag_test_cases[
-    //         num_cases - 1].ag_test_commands.length;
-    //       if (num_commands > this.index_active_command) {
-    //         console.log("There are enough commands in the previous suite last case: "
-    //                     + num_commands);
-    //       }
-    //       return num_commands > this.index_active_command;
-    //     }
-    //   }
-    // }
+    if (this.index_active_case !== -1 && this.index_active_command !== -1
+    && this.index_active_suite !== -1) {
+      // if there is a command at the same index in the previous case
+      if (this.index_active_case !== 0) {
+        let num_commands = this.active_suite!.ag_test_cases[
+          this.index_active_case - 1].ag_test_commands.length;
+        return num_commands > this.index_active_command;
+      }
+      // you can go to the previous suite
+      else if (this.index_active_suite !== 0) {
+        let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
+        if (num_cases > 0) {
+          let num_commands = this.test_suites[this.index_active_suite - 1].ag_test_cases[
+            num_cases - 1].ag_test_commands.length;
+          return num_commands > this.index_active_command;
+        }
+      }
+    }
     return false;
   }
 
 
 
   go_to_prev_command() {
-    // let command_index = this.index_active_command;
-    // if (this.index_active_case !== 0) {
-    //   console.log("Go to prev case");
-    //   this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case - 1]);
-    // }
-    // else {
-    //   let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
-    //   console.log("Go to prev suite");
-    //   this.update_active_suite(this.test_suites[this.index_active_suite - 1]);
-    //   this.update_active_case(this.active_suite!.ag_test_cases[num_cases - 1]);
-    // }
-    // this.update_active_command(this.active_case!.ag_test_commands[command_index]);
+    let command_index = this.index_active_command;
+    if (this.index_active_case !== 0) {
+      this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case - 1]);
+    }
+    else {
+      let num_cases = this.test_suites[this.index_active_suite - 1].ag_test_cases.length;
+      this.update_active_suite(this.test_suites[this.index_active_suite - 1]);
+      this.update_active_case(this.active_suite!.ag_test_cases[num_cases - 1]);
+    }
+    this.update_active_command(this.active_case!.ag_test_commands[command_index]);
   }
 
   get next_command_is_available() {
-    // console.log("ncia - Index active suite: " + this.index_active_suite);
-    // console.log("ncia - Index active case: " + this.index_active_case);
-    // console.log("ncia - Index active command: " + this.index_active_command);
-    // if (this.index_active_case !== -1 && this.index_active_command !== -1
-    //     && this.index_active_suite !== -1) {
-    //   let num_cases = this.active_suite!.ag_test_cases.length;
-    //   // if there is a command at the same index in the next case
-    //   if (num_cases - 1 > this.index_active_case) {
-    //     let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
-    //       .ag_test_commands.length;
-    //     if (num_commands > this.index_active_command) {
-    //       console.log("There are enough commands in the next case");
-    //     }
-    //     return num_commands > this.index_active_command;
-    //   }
-    //   // if you can go to the next suite
-    //   else if (this.index_active_suite < this.test_suites.length - 1) {
-    //     if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
-    //
-    //       if (this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
-    //             .ag_test_commands.length > this.index_active_command) {
-    //         console.log("There are enough commands in the first case of the next suite");
-    //       }
-    //       return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
-    //                .ag_test_commands.length > this.index_active_command;
-    //     }
-    //   }
-    // }
+    if (this.index_active_case !== -1 && this.index_active_command !== -1
+        && this.index_active_suite !== -1) {
+      let num_cases = this.active_suite!.ag_test_cases.length;
+      // if there is a command at the same index in the next case
+      if (num_cases - 1 > this.index_active_case) {
+        let num_commands = this.active_suite!.ag_test_cases[this.index_active_case + 1]
+          .ag_test_commands.length;
+        return num_commands > this.index_active_command;
+      }
+      // if you can go to the next suite
+      else if (this.index_active_suite < this.test_suites.length - 1) {
+        if (this.test_suites[this.index_active_suite + 1].ag_test_cases.length > 0) {
+          return this.test_suites[this.index_active_suite + 1].ag_test_cases[0]
+                   .ag_test_commands.length > this.index_active_command;
+        }
+      }
+    }
     return false;
   }
 
   go_to_next_command() {
-    // let command_index = this.index_active_command;
-    // if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
-    //   console.log("Go to next case");
-    //   this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case + 1]);
-    // }
-    // else {
-    //   console.log("Go to next suite first case");
-    //   this.update_active_suite(this.test_suites[this.index_active_suite + 1]);
-    //   this.update_active_case(this.active_suite!.ag_test_cases[0]);
-    // }
-    // this.update_active_command(this.active_case!.ag_test_commands[command_index]);
+    let command_index = this.index_active_command;
+    if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
+      this.update_active_case(this.active_suite!.ag_test_cases[this.index_active_case + 1]);
+    }
+    else {
+      this.update_active_suite(this.test_suites[this.index_active_suite + 1]);
+      this.update_active_case(this.active_suite!.ag_test_cases[0]);
+    }
+    this.update_active_command(this.active_case!.ag_test_commands[command_index]);
   }
 
   get active_level_is_suite() {
@@ -292,7 +268,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   }
 
   update_active_suite(ag_suite: AGTestSuite) {
-    // console.log("Updating active suite");
     if (this.active_suite !== null && this.active_suite.pk === ag_suite!.pk
         && this.active_case === null && this.active_command === null) {
     }
@@ -306,7 +281,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   }
 
   update_active_case(ag_case: AGTestCase) {
-    // console.log("Updating active case");
     this.index_active_case = this.active_suite!.ag_test_cases.findIndex(
       (test_case: AGTestCase) => ag_case.pk === test_case.pk
     );
@@ -350,14 +324,12 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     let index = this.test_suites.findIndex((suite: AGTestSuite) => ag_test_suite.pk === suite.pk);
     this.test_suites.splice(index, 1);
     if (this.test_suites.length === 0) {
-      // this.active_suite = null;
       this.index_active_suite = -1;
     }
     else if (index === this.test_suites.length) {
       this.update_active_suite(this.test_suites[index - 1]);
     }
     else {
-      // console.log("More than one test suite and not the first one");
       this.update_active_suite(this.test_suites[index]);
     }
   }
@@ -377,7 +349,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
   }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    console.log(ag_test_case.name);
     let parent_suite_index = this.test_suites.findIndex(
       (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
     );
@@ -390,18 +361,14 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
       (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
     );
     this.active_suite!.ag_test_cases.splice(index, 1);
-    // console.log("Index: " + index);
 
     if (this.active_suite!.ag_test_cases.length === 0) {
-      // console.log("All the cases are gone!");
       this.update_active_suite(this.active_suite!);
     }
     else if (index === this.active_suite!.ag_test_cases.length) {
-      // console.log("Case deleted was the last case");
       this.update_active_case(this.active_suite!.ag_test_cases[index - 1]);
     }
     else {
-      // console.log("Case deleted was not the last case");
       this.update_active_case(this.active_suite!.ag_test_cases[index]);
     }
   }
@@ -419,9 +386,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
       command_index,
       ag_test_command
     );
-
-    // console.log("Active Case.command[0] " + this.active_case!.ag_test_commands[0].name);
-    // console.log("Test suites command[0] " + this.test_suites[0].ag_test_cases[0].ag_test_commands[0].name);
   }
 
   update_ag_test_command_created(ag_test_command: AGTestCommand): void {
@@ -498,7 +462,7 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 }
 
 #suites-title {
-  font-size: 25px;
+  font-size: 1.125rem;
   display: inline-block;
 }
 
@@ -528,13 +492,14 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
   left: 0;
   right: 0;
   min-height: 55px;
-  padding: 10px 10px 10px 10px;
+  padding: 10px;
   position: fixed;
 }
 
 #next-command-button, #prev-command-button {
   @extend .white-button;
   margin-left: 15px;
+  font-size: 14px;
 }
 
 #next {

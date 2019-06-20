@@ -24,7 +24,7 @@
           </button>
 
           <div v-if="!saving" class="last-saved-timestamp">
-          <span> Last Saved: </span>
+            <span> Last Saved: </span>
             {{(new Date(d_test_case.last_modified)).toLocaleString(
             'en-US', last_modified_format
             )}}
@@ -36,13 +36,6 @@
         </div>
       </validated-form>
     </div>
-
-    <hr>
-
-    <div id="feedback-container"> Feedback </div>
-
-
-        <!------------------------ Case Feedback Tab ------------------------------------->
   </div>
 </template>
 
@@ -77,15 +70,11 @@ export default class AGCaseSettings extends Vue {
   @Prop({required: true, type: AGTestCase})
   test_case!: AGTestCase;
 
-  @Watch('test_case')
+  @Watch('test_case', {deep: true})
   on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
     this.d_test_case = deep_copy(new_test_case, AGTestCase);
-    if (this.current_tab_index === 2) {
-      this.current_tab_index = 0;
-    }
   }
 
-  current_tab_index = 0;
   d_test_case: AGTestCase | null = null;
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};

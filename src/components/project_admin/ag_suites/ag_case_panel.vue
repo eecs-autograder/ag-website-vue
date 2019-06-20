@@ -16,8 +16,7 @@
            class="fas fa-caret-right case-symbol-right"></i>
         <i v-else-if="test_case.ag_test_commands.length > 1 && is_active_case"
            class="fas fa-caret-down case-symbol-down"></i>
-        <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">
-          {{test_case.name}}
+        <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">{{test_case.name}}
         </span>
       </div>
 
@@ -116,11 +115,11 @@
       <div class="modal-body">
         <p>
           Are you sure you want to delete the case:
-          <span class="case-to-delete">{{test_case.name}}</span>?
+          <span class="item-to-delete">{{test_case.name}}</span>?
           This will delete all associated test cases and run results.
           THIS ACTION CANNOT BE UNDONE.
         </p>
-        <div id="modal-button-container">
+        <div class="deletion-modal-button-footer">
           <button class="modal-delete-button"
                   @click="delete_ag_case()"> Delete </button>
 
@@ -147,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestCase, AGTestCommand } from 'ag-client-typescript';
 
@@ -195,8 +194,9 @@ export default class AGCasePanel extends Vue {
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   case_settings_form_is_valid = false;
 
-  created() {
-    console.log(this.test_case.ag_test_commands.length);
+  @Watch('test_suite', {deep: true})
+  on_test_suite_change(new_test_case: AGTestCase, old_test_suite: AGTestCase) {
+    this.test_case = new_test_case;
   }
 
   get is_active_case() {
@@ -255,18 +255,14 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 
 .test-case {
   @extend .panel;
-  padding: 0 5px 0 25px;
+  padding: 0 5px 0 26px;
 
   .case-symbol-right {
-    font-size: 18px;
-    padding: 0 10px 0 3px;
-    color: $stormy-gray-dark;
+    @extend .caret-right;
   }
 
   .case-symbol-down {
-    font-size: 18px;
-    padding: 0 8px 0 0;
-    color: $stormy-gray-dark;
+    @extend .caret-down;
   }
 
   #case-menu {
@@ -284,7 +280,7 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 }
 
 .test-case-name {
-  padding: 5px;
+  @extend .level-name;
 }
 
 .active-case {
@@ -308,11 +304,11 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 
 .test-command {
   @extend .panel;
-  padding: 0 5px 0 50px;
+  padding: 0 5px 0 54px;
 }
 
 .test-command-name {
-  padding: 5px 5px 5px 15px;
+  @extend .level-name;
 }
 
 .active-command, .active-single-command {
@@ -336,6 +332,10 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
   #case-menu {
     color: darken(teal, 10);
   }
+}
+
+.pad-left {
+  padding-left: 0px;
 }
 
 // Modal **************************************************************

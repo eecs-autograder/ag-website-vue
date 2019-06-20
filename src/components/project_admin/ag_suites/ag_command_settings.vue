@@ -338,7 +338,7 @@
                    class="section-container">
                 <fieldset>
                   <legend> Diff Options </legend>
-                  <div class="command-input-container">
+                  <div class="checkbox-input-container">
                     <input id="ignore-case"
                            type="checkbox"
                            v-model="d_test_command.ignore_case">
@@ -523,10 +523,9 @@
               <div class="modal-body">
                 <p>
                 Are you sure you want to delete the test {{case_has_exactly_one_command
-                                                           ? 'case' : 'command'}} :
-                <span class="command-to-delete">
-                  {{case_has_exactly_one_command ? d_test_case.name : d_test_command.name}}
-                </span>?
+                                                           ? 'case' : 'command'}}:
+                <span class="item-to-delete">{{case_has_exactly_one_command
+                  ? d_test_case.name : d_test_command.name}}</span>?
 
                 <span v-if="case_has_exactly_one_command"> This will delete all associated test
                   cases and run results. THIS ACTION CANNOT BE UNDONE.</span>
@@ -535,7 +534,7 @@
                   This will delete all associated commands and run results.
                   THIS ACTION CANNOT BE UNDONE. </span>
                 </p>
-                <div id="modal-button-container">
+                <div class="deletion-modal-button-footer">
                   <button class="modal-delete-button"
                           @click="delete_ag_test_command()"> Delete </button>
 
@@ -603,23 +602,6 @@ export default class AGCommandSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  @Watch('test_command')
-  on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
-    this.d_test_command = deep_copy(new_test_command, AGTestCommand);
-    if (this.current_tab_index === 2) {
-      this.current_tab_index = 0;
-    }
-  }
-
-  @Watch('test_case')
-  on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
-    console.log("Case Changed");
-    this.d_test_case = deep_copy(new_test_case, AGTestCase);
-    if (this.current_tab_index === 2) {
-      this.current_tab_index = 0;
-    }
-  }
-
   current_tab_index = 0;
   d_test_command: AGTestCommand | null = null;
   d_test_case: AGTestCase | null = null;
@@ -635,6 +617,22 @@ export default class AGCommandSettings extends Vue {
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
+
+  @Watch('test_command', {deep: true})
+  on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
+    this.d_test_command = deep_copy(new_test_command, AGTestCommand);
+    if (this.current_tab_index === 2) {
+      this.current_tab_index = 0;
+    }
+  }
+
+  @Watch('test_case', {deep: true})
+  on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
+    this.d_test_case = deep_copy(new_test_case, AGTestCase);
+    if (this.current_tab_index === 2) {
+      this.current_tab_index = 0;
+    }
+  }
 
   async created() {
     this.d_test_command = deep_copy(this.test_command, AGTestCommand);
@@ -734,7 +732,7 @@ $current-lang-choice: "Poppins";
 
 .file-dropdown-adjacent {
   display: inline-block;
-  margin-right: 50px;
+  width: 200px;
   vertical-align: top;
 }
 
@@ -764,8 +762,7 @@ $current-lang-choice: "Poppins";
 .add-points-container {
   display: block;
   box-sizing: border-box;
-  width: 300px;
-  margin-right: 50px;
+  width: 200px;
   vertical-align: top;
 }
 
@@ -787,6 +784,7 @@ $current-lang-choice: "Poppins";
 
 .unit-of-measurement {
   padding-left: 10px;
+  font-size: 14px;
 }
 
 #time-limit-container {
@@ -834,19 +832,19 @@ $current-lang-choice: "Poppins";
   }
 
   #time-limit-container {
-    width: 400px;
+    width: 300px;
   }
 
   #virtual-memory-container {
-    width: 400px;
+    width: 300px;
   }
 
   #stack-size-container {
-    width: 400px;
+    width: 300px;
   }
 
   #process-spawn-container {
-    width: 400px;
+    width: 300px;
   }
 }
 </style>

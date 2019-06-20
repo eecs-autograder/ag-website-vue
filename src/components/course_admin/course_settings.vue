@@ -221,10 +221,7 @@ function handle_save_course_settings_error(component: CourseSettings, error: unk
 }
 
 .suffix-element {
-  display: inline-block;
   padding-left: 10px;
-  padding-top: 8px;
-  vertical-align: top;
 }
 
 @media only screen and (min-width: 481px) {
