@@ -51,7 +51,7 @@ export default class Dropdown extends Vue {
     }
     let header_slot_content = this.$slots.header[0].elm!;
     header_slot_content.addEventListener("blur", () => {
-      this.hide_the_dropdown_menu();
+      this.hide();
     });
     header_slot_content.addEventListener("click", () => {
       this.d_is_open = !this.d_is_open;
@@ -74,18 +74,18 @@ export default class Dropdown extends Vue {
     return this.d_is_open;
   }
 
-  show_the_dropdown_menu() {
+  show() {
     this.d_is_open = true;
   }
 
-  hide_the_dropdown_menu() {
+  hide() {
     this.d_is_open = false;
   }
 
   choose_item_from_dropdown_menu(item_selected: object, index: number) {
     this.d_highlighted_index = index;
     this.$emit("update_item_selected", item_selected);
-    this.hide_the_dropdown_menu();
+    this.hide();
   }
 
   move_highlighted(event: KeyboardEvent) {
@@ -100,7 +100,7 @@ export default class Dropdown extends Vue {
       event.preventDefault();
       event.stopPropagation();
 
-      this.show_the_dropdown_menu();
+      this.show();
 
       if (this.d_highlighted_index < this.d_items.length - 1) {
         this.d_highlighted_index += 1;
@@ -110,14 +110,14 @@ export default class Dropdown extends Vue {
       event.preventDefault();
       event.stopPropagation();
 
-      this.show_the_dropdown_menu();
+      this.show();
 
       if (this.d_highlighted_index > 0) {
         this.d_highlighted_index -= 1;
       }
     }
     else if (event.code === 'Escape') {
-      this.hide_the_dropdown_menu();
+      this.hide();
     }
   }
 }

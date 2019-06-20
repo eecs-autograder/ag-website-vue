@@ -103,11 +103,11 @@ describe('Dropdown tests', () => {
         expect(dropdown.is_open).toBe(false);
         expect(menu_wrapper.element.style.display).toEqual('none');
 
-        dropdown.show_the_dropdown_menu();
+        dropdown.show();
         expect(dropdown.is_open).toBe(true);
         expect(menu_wrapper.element.style.display).toEqual('block');
 
-        dropdown.hide_the_dropdown_menu();
+        dropdown.hide();
         expect(dropdown.is_open).toBe(false);
         expect(menu_wrapper.element.style.display).toEqual('none');
     });
@@ -116,13 +116,13 @@ describe('Dropdown tests', () => {
         header_wrapper.trigger('click');
         expect(dropdown.is_open).toBe(true);
 
-        dropdown.hide_the_dropdown_menu();
+        dropdown.hide();
         expect(dropdown.is_open).toBe(false);
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
         expect(dropdown.is_open).toBe(true);
 
-        dropdown.hide_the_dropdown_menu();
+        dropdown.hide();
         expect(dropdown.is_open).toBe(false);
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
@@ -133,7 +133,7 @@ describe('Dropdown tests', () => {
         header_wrapper.trigger('click');
         expect(dropdown.is_open).toBe(true);
 
-        dropdown.hide_the_dropdown_menu();
+        dropdown.hide();
 
         dropdown_container_wrapper.trigger('keydown', {code: 'A'});
         expect(dropdown.is_open).toBe(false);

@@ -65,7 +65,7 @@ export default class DropdownTypeahead extends Vue {
     if (!dropdown.is_open) {
       // don't want to automatically select what was previously selected
       if (key.code !== "Enter") {
-        dropdown.show_the_dropdown_menu();
+        dropdown.show();
       }
     }
   }
