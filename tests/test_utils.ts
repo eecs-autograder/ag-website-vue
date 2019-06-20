@@ -4,7 +4,7 @@ import {
     array_add_unique,
     array_get_unique,
     array_has_unique,
-    array_remove_unique, format_datetime, format_time, get_course_info,
+    array_remove_unique, format_course_name, format_datetime, format_time,
     safe_assign,
     UniqueArrayError,
     zip
@@ -87,7 +87,7 @@ describe('Datetime format tests', () => {
     });
 });
 
-describe('get_course_info function tests', () => {
+describe('format_course_name tests', () => {
     let course: Course;
 
     beforeEach(() => {
@@ -96,18 +96,18 @@ describe('get_course_info function tests', () => {
              num_late_days: 0, allowed_guest_domain: '', last_modified: ''});
     });
 
-    test('Course has name, semester, and year', () => {
-       expect(get_course_info(course)).toEqual("EECS 388 Fall 2048");
+    test('Name, semester, and year non-null', () => {
+       expect(format_course_name(course)).toEqual("EECS 388 Fall 2048");
     });
 
-    test('Course semester is null', () => {
+    test('Semester is null', () => {
         course.semester = null;
-        expect(get_course_info(course)).toEqual("EECS 388  2048");
+        expect(format_course_name(course)).toEqual("EECS 388 2048");
    });
 
-    test('Course year is null', () => {
+    test('Year is null', () => {
         course.year = null;
-        expect(get_course_info(course)).toEqual("EECS 388 Fall ");
+        expect(format_course_name(course)).toEqual("EECS 388 Fall");
     });
 });
 

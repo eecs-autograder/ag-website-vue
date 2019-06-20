@@ -38,7 +38,7 @@
            size="large">
       <span class="modal-container">
         <p class="modal-header"> Cloning course:
-          <span class="course-to-copy">{{get_course_info(course)}}</span>
+          <span class="course-to-copy">{{format_course_name(course)}}</span>
         </p>
         <hr>
         <div id="clone-course-modal">
@@ -103,7 +103,7 @@ import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { get_course_info, handle_api_errors_async } from '@/utils';
+import { format_course_name, handle_api_errors_async } from '@/utils';
 import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
 
 @Component({
@@ -134,7 +134,7 @@ export default class SingleCourse extends Vue {
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
   readonly is_valid_course_year = make_min_value_validator(2000);
-  readonly get_course_info = get_course_info;
+  readonly format_course_name = format_course_name;
 
   created() {
     this.new_course_name = this.course.name;

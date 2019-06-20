@@ -59,14 +59,14 @@
                 <template slot="header">
                 <div tabindex="1" class="dropdown-header-wrapper">
                   <div id="input-course-to-copy-to" class="dropdown-header">
-                    {{get_course_info(course_to_clone_to)}}
+                    {{format_course_name(course_to_clone_to)}}
                     <i class="fas fa-caret-down dropdown-caret"></i>
                   </div>
                 </div>
                 </template>
                 <div slot-scope="{item}">
                   <span>
-                    {{get_course_info(item)}}
+                    {{format_course_name(item)}}
                   </span>
                 </div>
               </dropdown>
@@ -95,7 +95,7 @@ import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { get_course_info, handle_api_errors_async } from '@/utils';
+import { format_course_name, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -120,7 +120,7 @@ export default class SingleProject extends Vue {
   project!: Project;
 
   readonly is_not_empty = is_not_empty;
-  readonly get_course_info = get_course_info;
+  readonly format_course_name = format_course_name;
 
   cloning_destinations: Course[] = [];
   api_errors: string[] = [];

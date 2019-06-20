@@ -12,11 +12,6 @@ export function safe_assign<ToType extends FromType, FromType>(to: ToType, from:
     Object.assign(to, from);
 }
 
-// export function deep_copy<T>(obj: T): T {
-//     let my_obj: T =  JSON.parse(JSON.stringify(obj));
-//     return my_obj;
-// }
-
 // Used to make a deep copy of an object whose constructor takes an object
 // of the same type as its only argument.
 // This is needed to get around the fact that the "JSON.parse(JSON.stringify(...))"
@@ -126,10 +121,15 @@ export function handle_api_errors_async(
     return decorator;
 }
 
-export function get_course_info(course: Course) {
-    let course_semester = course.semester === null ? "" : course.semester;
-    let course_year = course.year === null ? "" : course.year;
-    return `${course.name} ${course_semester} ${course_year}`;
+export function format_course_name(course: Course) {
+    let result = course.name;
+    if (course.semester !== null) {
+        result += ' ' + course.semester;
+    }
+    if (course.year !== null) {
+        result += ' ' + course.year.toString();
+    }
+    return result;
 }
 
 export function get_axios_error_status(error: unknown): [AxiosResponse, number] {
