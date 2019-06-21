@@ -29,8 +29,8 @@
                 </div>
 
                 <div class="section-container">
-                  <fieldset>
-                    <legend> Grading Related </legend>
+                  <fieldset class="fieldset">
+                    <legend class="legend"> Grading Related </legend>
                     <div class="sandbox-container">
                       <label class="text-label"> Sandbox environment: </label>
 
@@ -80,8 +80,8 @@
                 </div>
 
                 <div class="section-container">
-                  <fieldset>
-                    <legend> Project Files </legend>
+                  <fieldset class="fieldset">
+                    <legend class="legend"> Project Files </legend>
                     <div class="typeahead-search-bar">
                       <dropdown-typeahead ref="project_files_typeahead"
                                           placeholder_text="Enter a filename"
@@ -111,8 +111,8 @@
                 </div>
 
                 <div class="section-container">
-                  <fieldset>
-                    <legend> Student Files </legend>
+                  <fieldset class="fieldset">
+                    <legend class="legend"> Student Files </legend>
                     <div class="typeahead-search-bar">
                       <dropdown-typeahead ref="student_files_typeahead"
                                           placeholder_text="Enter a filename"
@@ -142,8 +142,8 @@
                 </div>
 
                 <div class="section-container">
-                  <fieldset>
-                    <legend> Setup </legend>
+                  <fieldset class="fieldset">
+                    <legend class="legend"> Setup </legend>
 
                     <div id="setup-command-label-container">
                       <label class="text-label"> Setup command label </label>

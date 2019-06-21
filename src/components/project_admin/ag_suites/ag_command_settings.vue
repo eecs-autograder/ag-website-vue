@@ -38,8 +38,8 @@
               </div>
 
               <div class="section-container">
-                <fieldset>
-                  <legend> Stdin </legend>
+                <fieldset class="fieldset">
+                  <legend class="legend"> Stdin </legend>
                   <div class="command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Stdin source: </label>
 
@@ -103,8 +103,8 @@
               </div>
 
               <div class="section-container">
-                <fieldset>
-                  <legend> Return Code </legend>
+                <fieldset class="fieldset">
+                  <legend class="legend"> Return Code </legend>
                   <div class="command-input-container">
                     <label class="text-label"> Expected Return Code: </label>
                     <div class="dropdown">
@@ -162,8 +162,8 @@
               </div>
 
               <div class="section-container">
-                <fieldset>
-                  <legend> Stdout </legend>
+                <fieldset class="fieldset">
+                  <legend class="legend"> Stdout </legend>
                   <div class="command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stdout against: </label>
                     <div class="dropdown">
@@ -248,8 +248,8 @@
               </div>
 
               <div class="section-container">
-                <fieldset>
-                  <legend> Stderr </legend>
+                <fieldset class="fieldset">
+                  <legend class="legend"> Stderr </legend>
                   <div class="command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stderr against: </label>
                     <div class="dropdown">
@@ -336,11 +336,12 @@
               <div v-if="d_test_command.expected_stdout_source !== ExpectedOutputSource.none ||
                          d_test_command.expected_stderr_source !== ExpectedOutputSource.none"
                    class="section-container">
-                <fieldset>
-                  <legend> Diff Options </legend>
+                <fieldset class="fieldset">
+                  <legend class="legend"> Diff Options </legend>
                   <div class="checkbox-input-container">
                     <input id="ignore-case"
                            type="checkbox"
+                           class="checkbox"
                            v-model="d_test_command.ignore_case">
                     <label class="checkbox-label"
                            for="ignore-case"> Ignore case sensitivity
@@ -350,6 +351,7 @@
                   <div class="checkbox-input-container">
                     <input id="ignore-whitespace"
                            type="checkbox"
+                           class="checkbox"
                            v-model="d_test_command.ignore_whitespace">
                     <label class="checkbox-label"
                            for="ignore-whitespace"> Ignore whitespace
@@ -359,6 +361,7 @@
                   <div class="checkbox-input-container">
                     <input id="ignore-whitespace-changes"
                            type="checkbox"
+                           class="checkbox"
                            v-model="d_test_command.ignore_whitespace_changes">
                     <label class="checkbox-label"
                            for="ignore-whitespace-changes"> Ignore whitespace changes
@@ -368,6 +371,7 @@
                   <div class="checkbox-input-container">
                     <input id="ignore-blank-lines"
                            type="checkbox"
+                           class="checkbox"
                            v-model="d_test_command.ignore_blank_lines">
                     <label class="checkbox-label"
                            for="ignore-blank-lines"> Ignore blank lines
@@ -377,8 +381,8 @@
               </div>
 
               <div class="section-container">
-                <fieldset>
-                  <legend> Resource Settings </legend>
+                <fieldset class="fieldset">
+                  <legend class="legend"> Resource Settings </legend>
                   <div id="time-and-virtual">
                     <div id="time-limit-container">
                       <label class="text-label"> Time limit </label>

@@ -861,7 +861,7 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
         await component.$nextTick();
 
-        expect(component.active_case.ag_test_commands.length).toEqual(2);
+        expect(component.active_case!.ag_test_commands.length).toEqual(2);
         expect(component.active_command).toEqual(ag_command_blue_2);
     });
 
@@ -914,16 +914,20 @@ describe('AGSuites tests', () => {
         expect(component.active_command).toEqual(ag_command_purple_1);
 
         expect(component.test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(ag_command_purple_1);
+        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            ag_command_purple_1
+        );
 
         AGTestCommand.notify_ag_test_command_changed(updated_ag_command_purple_1);
         await component.$nextTick();
 
         expect(ag_command_purple_1.name).not.toEqual(updated_ag_command_purple_1.name);
         expect(component.test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(updated_ag_command_purple_1);
+        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            updated_ag_command_purple_1
+        );
 
-        // expect(component.active_command).toEqual(updated_ag_command_purple_1);
+        expect(component.active_command).toEqual(updated_ag_command_purple_1);
     });
 
     test.skip('Command changed - parent case has exactly one command', async () => {
@@ -936,7 +940,7 @@ describe('AGSuites tests', () => {
 
     test.skip('Command that is not the first command is deleted in suite with more than ' +
          'one case',
-         async () => {
+              async () => {
 
     });
 
@@ -950,57 +954,56 @@ describe('AGSuites tests', () => {
         // should return false
     });
 
-    test.skip('prev_command_is_available (false) - Active case index is 0 and active suite index is zero',
-         async () => {
+    test.skip('prev_command_is_available (false) - Active case index is 0 and active suite' +
+              ' index is zero',
+              async () => {
              // should return false
     });
 
-    test.skip('prev_command_is_available (false) - Active case index is 0, active suite index is not zero' +
-         ', and the previous suite doesnt have any test cases',
-         async () => {
+    test.skip('prev_command_is_available (false) - Active case index is 0, active suite ' +
+              'index is not zero, and the previous suite doesnt have any test cases',
+              async () => {
         // returns false
     });
 
-    test.skip("prev_command_is_available (false) - Active case index is 0, active suite index is not zero" +
-         ", the previous suite's last case doesnt have at least index_active_command commands" +
-         "commands",
-         async () => {
+    test.skip("prev_command_is_available (false) - Active case index is 0, active suite " +
+              "index is not zero, the previous suite's last case doesnt have at least " +
+              "index_active_command commands",
+              async () => {
          // returns false
     });
 
-    test.skip("prev_command_is_available (true) - Active case index is 0, active suite index is not zero" +
-         ", the previous suite's last case has at least index_active_command commands" +
-         "commands",
-         async () => {
+    test.skip("prev_command_is_available (true) - Active case index is 0, active suite " +
+              "index is not zero, the previous suite's last case has at least " +
+              "index_active_command commands commands",
+              async () => {
          // returns false
     });
 
-    test.skip("prev_command_is_available (true) - Active case index is 0, active suite index is not zero" +
-         ", the previous suite's last case has at least index_active_command commands" +
-         "commands",
-         async () => {
+    test.skip("prev_command_is_available (true) - Active case index is 0, active suite " +
+              "index is not zero, the previous suite's last case has at least " +
+              "index_active_command commands commands",
+              async () => {
          // returns false
     });
 
-    test.skip('prev_command_is_available (false) - Active case index is not zero, previous case' +
-         'does not have at least index_active_command commands',
-         async () => {
+    test.skip('prev_command_is_available (false) - Active case index is not zero, ' +
+              'previous case does not have at least index_active_command commands',
+              async () => {
 
     });
 
-    test.skip('prev_command_is_available (true) - Active case index is not zero, previous case' +
-         ' has at least index_active_command commands',
-         async () => {
+    test.skip('prev_command_is_available (true) - Active case index is not zero, ' +
+              'previous case has at least index_active_command commands',
+              async () => {
 
     });
 
-    test.skip('go_to_prev_command - prev case in same suite',
-         async () => {
+    test.skip('go_to_prev_command - prev case in same suite', async () => {
 
     });
 
-    test.skip('go_to_prev_command - last case in previous suite',
-         async () => {
+    test.skip('go_to_prev_command - last case in previous suite', async () => {
 
     });
 
@@ -1014,28 +1017,29 @@ describe('AGSuites tests', () => {
         // should return false
     });
 
-    test.skip('next_command_is_available (false) - More than index_active_case cases in current ' +
-         'suite but there are not at least index_active_command commands in the next suite',
-         async () => {
+    test.skip('next_command_is_available (false) - More than index_active_case cases ' +
+              'in current suite but there are not at least index_active_command commands in the ' +
+              'next suite',
+              async () => {
              // should return false
     });
 
-    test.skip('next_command_is_available (true) - More than index_active_case cases in current ' +
-         'suite and next suite has at least index_active_command commands',
-         async () => {
+    test.skip('next_command_is_available (true) - More than index_active_case cases in ' +
+              'current suite and next suite has at least index_active_command commands',
+              async () => {
              // returns false
     });
 
     test.skip('next_command_is_available (false) - There are not more than index_active_case ' +
          'cases in the current suite, and current suite is the last suite',
-         async () => {
+              async () => {
 
     });
 
     test.skip('next_command_is_available (false) - There are not more than index_active_case ' +
          'cases in the current suite, current suite is not the last suite but the next suite' +
          'doesnt have any cases',
-         async () => {
+              async () => {
 
     });
 
@@ -1043,7 +1047,7 @@ describe('AGSuites tests', () => {
          'cases in the current suite, current suite is not the last suite, the next suite' +
          'has at least one case, but the first case doesnt have at least index_active_command ' +
          'commands.',
-         async () => {
+              async () => {
 
     });
 
@@ -1051,53 +1055,46 @@ describe('AGSuites tests', () => {
          'cases in the current suite, current suite is not the last suite, the next suite' +
          'has at least one case, and the first case has at least index_active_command ' +
          'commands.',
-         async () => {
+              async () => {
 
     });
 
-    test.skip('go_to_next_command - next case in same suite',
-         async () => {
+    test.skip('go_to_next_command - next case in same suite', async () => {
 
     });
 
-    test.skip('go_to_next_command - first case in next suite',
-         async () => {
+    test.skip('go_to_next_command - first case in next suite', async () => {
 
     });
 
 
-    test.skip('active_level_is_suite',
-         async () => {
+    test.skip('active_level_is_suite', async () => {
 
     });
 
-    test.skip('active_level_is_command',
-         async () => {
+    test.skip('active_level_is_command', async () => {
 
     });
 
     // -------------------------------------------------------------------------------------------
 
     // updating active suite
-    test.skip('updating active suite - suite was already the active suite',
-         async () => {
+    test.skip('updating active suite - suite was already the active suite', async () => {
 
     });
 
     test.skip('updating active suite - suite passed in is not already the active suite',
-         async () => {
+              async () => {
 
     });
 
     // updating active case
-    test.skip('updating active case',
-         async () => {
+    test.skip('updating active case', async () => {
 
     });
 
     // updating active command
-    test.skip('updating active command',
-         async () => {
+    test.skip('updating active command', async () => {
 
     });
 

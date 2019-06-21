@@ -4,7 +4,7 @@ import {
     AGTestCase,
     AGTestCaseFeedbackConfig,
     AGTestCommand,
-    AGTestCommandFeedbackConfig,
+    AGTestCommandFeedbackConfig, AGTestSuite,
     ExpectedOutputSource,
     ExpectedReturnCode,
     get_sandbox_docker_images,
@@ -535,5 +535,14 @@ describe('AGCasePanel tests', () => {
         await component.$nextTick();
 
         expect(new_command_validator.is_valid).toBe(false);
+    });
+
+    test('Watcher for test_case', async () => {
+        expect(component.test_case).toEqual(ag_case_green);
+
+        wrapper.setProps({test_case: ag_case_yellow});
+        await component.$nextTick();
+
+        expect(component.test_case).toEqual(ag_case_yellow);
     });
 });

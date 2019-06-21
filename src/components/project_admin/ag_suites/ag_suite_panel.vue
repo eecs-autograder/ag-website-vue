@@ -54,30 +54,47 @@
             <div class="new-command-container" v-for="(new_command, index) of new_commands">
 
               <div class="new-command-inputs">
-                <div class="command-name" v-if="new_commands.length > 1">
-                  <label class="text-label">{{get_ordinal_num(index)}} command name </label>
-                  <validated-input ref="command_name"
-                                   v-model="new_command.name"
-                                   :validators="[is_not_empty]"
-                                   input_style="width: 100%; min-width: 200px; max-width: 700px;">
-                    <div slot="suffix" class="remove-command-suffix">
-                      <button class="remove-command-button"
-                              type="button"
-                              @click="remove_command(index)">
-                        <i class="fas fa-times remove-command-icon"></i>
-                      </button>
-                    </div>
-                  </validated-input>
-                </div>
+                <fieldset class="case-modal-fieldset">
+                  <legend class="legend"> {{get_ordinal_num(index)}} </legend>
 
-                <div class="command">
-                  <label class="text-label">{{get_ordinal_num(index)}} command </label>
-                  <validated-input ref="command"
-                                   v-model="new_command.cmd"
-                                   :validators="[is_not_empty]"
-                                   input_style="width: 100%; min-width: 200px; max-width: 700px;">
-                  </validated-input>
-                </div>
+                  <div class="command-name" v-if="new_commands.length > 1">
+                    <label class="text-label"> Command name </label>
+                    <validated-input ref="command_name"
+                                     v-model="new_command.name"
+                                     :validators="[is_not_empty]"
+                                     input_style="width: 100%;
+                                                  min-width: 200px;
+                                                  max-width: 700px;">
+                      <div slot="suffix" class="remove-command-suffix">
+                        <button class="remove-command-button"
+                                type="button"
+                                @click="remove_command(index)">
+                          <i class="fas fa-times remove-command-icon"></i>
+                        </button>
+                      </div>
+                    </validated-input>
+                  </div>
+
+                  <div class="command">
+                    <label class="text-label"> Command </label>
+                    <validated-input ref="command"
+                                     v-model="new_command.cmd"
+                                     :validators="[is_not_empty]"
+                                     input_style="width: 100%;
+                                                  min-width: 200px;
+                                                  max-width: 700px;">
+                    </validated-input>
+
+                    <div>
+                      <div v-if="duplicate_command_name_in_case
+                                 && new_command.name === duplicate_command_name"
+                           class="duplicate-command-msg">
+                        Duplicate command name
+                      </div>
+                    </div>
+
+                  </div>
+                </fieldset>
               </div>
             </div>
 
@@ -166,7 +183,7 @@ export default class AGSuitePanel extends Vue {
   readonly is_not_empty = is_not_empty;
 
   get_ordinal_num(index: number) {
-    if (!index) {
+    if (index === 0) {
       return "First";
     }
     return index === 1 ? "Second" : "Third";
@@ -174,11 +191,11 @@ export default class AGSuitePanel extends Vue {
 
   add_case_form_is_valid = false;
   incomplete_input_present = false;
+  duplicate_command_name_in_case = false;
   creating_case = false;
   loading = true;
   new_case_name = "";
   new_commands: CommandInCase[] = [];
-  compound_case = false;
 
   add_command() {
     if (this.new_commands.length === 1) {
@@ -192,6 +209,9 @@ export default class AGSuitePanel extends Vue {
 
   remove_command(index: number) {
     this.new_commands.splice(index, 1);
+    if (this.new_commands.length === 1) {
+      this.duplicate_command_name_in_case = false;
+    }
   }
 
   get is_active_suite() {
@@ -206,6 +226,7 @@ export default class AGSuitePanel extends Vue {
     if (this.active_suite === null || this.active_suite.pk !== this.test_suite!.pk) {
       this.$emit('update_active_suite', this.test_suite);
     }
+    this.duplicate_command_name_in_case = false;
     this.new_commands = [{name: "", cmd: ""}];
     this.new_case_name = "";
     (<Modal> this.$refs.new_case_modal).open();
@@ -214,16 +235,40 @@ export default class AGSuitePanel extends Vue {
     });
   }
 
+  get duplicate_command_name() {
+    if (this.new_commands.length > 1) {
+      if (this.new_commands[0].name === this.new_commands[1].name) {
+        return this.new_commands[0].name;
+      }
+      if (this.new_commands.length === 3) {
+        if (this.new_commands[0].name === this.new_commands[2].name
+            || this.new_commands[1].name === this.new_commands[2].name) {
+          return this.new_commands[2].name;
+        }
+      }
+    }
+    return "";
+  }
+
   @handle_api_errors_async(handle_create_ag_case_error)
   async create_case() {
     try {
       this.creating_case = true;
-      this.incomplete_input_present = false;
-      (<APIErrors> this.$refs.new_case_api_errors).clear();
-      let created_case = await AGTestCase.create(this.test_suite!.pk, {name: this.new_case_name});
+      this.duplicate_command_name_in_case = false;
+
       if (this.new_commands.length === 1) {
         this.new_commands[0].name = this.new_case_name;
       }
+      else {
+        if (this.duplicate_command_name !== "") {
+          this.duplicate_command_name_in_case = true;
+          return;
+        }
+      }
+
+      (<APIErrors> this.$refs.new_case_api_errors).clear();
+      let created_case = await AGTestCase.create(this.test_suite!.pk, {name: this.new_case_name});
+
       for (let i = 0; i < this.new_commands.length; ++i) {
         await AGTestCommand.create(
           created_case.pk, { name: this.new_commands[i].name, cmd: this.new_commands[i].cmd }
@@ -248,10 +293,11 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
+@import '@/styles/forms.scss';
 
 .test-suite {
   @extend .panel;
-  padding: 0 5px 0 0px;
+  padding: 0 5px 0 0;
 
   .suite-symbol-right {
     @extend .caret-right;
@@ -319,11 +365,12 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 // Modal **************************************************************
 
 #case-name-container {
-  padding: 0 0 5px 0;
+  padding: 0;
 }
 
 .new-command-inputs {
   width: 100%;
+  padding-top: 14px;
 }
 
 .remove-command-suffix {
@@ -343,12 +390,12 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 }
 
 .command-name {
-  padding: 15px 0 0 0;
+  padding: 0 0 3px 0;
   width: 100%;
 }
 
 .command {
-  padding: 5px 0 0 0;
+  padding: 0;
   width: 100%;
 }
 
@@ -366,6 +413,26 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.duplicate-command-msg {
+  box-sizing: border-box;
+  color: #721c24;
+  display: inline-block;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 2px 10px;
+  border-radius: .25rem;
+  margin-top: 11px;
+}
+
+.case-modal-fieldset {
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  border-width: 2px;
+  padding: 0;
 }
 
 </style>

@@ -138,7 +138,7 @@
       </div>
       <hr>
       <div class="modal-body">
-        <AGCaseSettings :test_case="test_case"></AGCaseSettings>
+        <AGCaseSettings :ag_case="test_case"></AGCaseSettings>
       </div>
     </modal>
 
@@ -194,8 +194,8 @@ export default class AGCasePanel extends Vue {
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   case_settings_form_is_valid = false;
 
-  @Watch('test_suite', {deep: true})
-  on_test_suite_change(new_test_case: AGTestCase, old_test_suite: AGTestCase) {
+  @Watch('test_case', {deep: true})
+  on_test_suite_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
     this.test_case = new_test_case;
   }
 

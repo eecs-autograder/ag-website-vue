@@ -168,8 +168,8 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
 
   open_new_suite_modal() {
     (<Modal> this.$refs.new_suite_modal).open();
-    Vue.nextTick(() => {(
-      <ValidatedInput> this.$refs.new_suite_name).invoke_focus();
+    Vue.nextTick(() => {
+      (<ValidatedInput> this.$refs.new_suite_name).invoke_focus();
     });
   }
 
@@ -286,7 +286,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     );
     this.index_active_command = -1;
     if (ag_case.ag_test_commands.length > 0) {
-      this.update_active_command(this.active_case.ag_test_commands[0]);
+      this.update_active_command(this.active_case!.ag_test_commands[0]);
     }
   }
 
@@ -382,7 +382,9 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver, AGTest
     );
 
     Vue.set(
-      this.test_suites[this.index_active_suite].ag_test_cases[this.index_active_case].ag_test_commands,
+      this.test_suites[
+        this.index_active_suite
+      ].ag_test_cases[this.index_active_case].ag_test_commands,
       command_index,
       ag_test_command
     );
