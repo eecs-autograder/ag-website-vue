@@ -699,18 +699,6 @@ $current-lang-choice: "Poppins";
   font-family: $current-lang-choice;
 }
 
-.tab-body {
-  box-sizing: border-box;
-  padding: 15px;
-  height: 700px;
-  overflow-y: scroll;
-  border-left: 2px solid darken($pebble-light, 1);
-}
-
-.command-to-delete {
-  @extend .item-to-delete;
-}
-
 .delete-command-button {
   @extend .delete-level-button;
 }
@@ -743,21 +731,6 @@ $current-lang-choice: "Poppins";
   margin-top: 10px;
 }
 
-.command-settings-input {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-  display: inline-block;
-  font-size: 1rem;
-  line-height: 1.5;
-  position: relative;
-  padding: .375rem .75rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  width: 80px;
-}
-
 .point-assignment-container {
   padding: 10px 0 0 0;
 }
@@ -771,18 +744,6 @@ $current-lang-choice: "Poppins";
 
 .subtract-points-container {
   display: block;
-}
-
-.minus-sign {
-  color: darkorange;
-}
-
-.plus-sign {
-  color: $ocean-blue;
-}
-
-.minus-sign, .plus-sign {
-  margin-right: 10px;
 }
 
 .unit-of-measurement {

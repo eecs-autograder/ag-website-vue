@@ -513,15 +513,15 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
 
-.settings-wrapper {
-  height: 100%;
-}
-
 #ag-test-suites-component {
   font-family: "Poppins";
   width: 100%;
   box-sizing: border-box;
   display: flex;
+}
+
+.settings-wrapper {
+  height: 100%;
 }
 
 #suite-nav-bar {
@@ -601,11 +601,7 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 }
 
 // Modal **************************************************************
-#name-and-command {
-  padding: 10px 0 20px 0;
-}
-
-.name-container, .command-container {
+.name-container {
   padding: 0 0 22px 0;
 }
 

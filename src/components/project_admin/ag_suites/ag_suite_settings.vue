@@ -419,18 +419,6 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/forms.scss';
 $current-lang-choice: "Poppins";
 
-.tab-body {
-  box-sizing: border-box;
-  padding: 15px;
-  height: 700px;
-  overflow-y: scroll;
-  border-left: 2px solid darken($pebble-light, 1);
-}
-
-.network-label {
-  padding-right: 15px;
-}
-
 #ag-test-suite-settings-component {
   font-family: $current-lang-choice;
   height: 100%;

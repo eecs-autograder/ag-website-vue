@@ -1178,6 +1178,7 @@ describe('AGSuites tests', () => {
 
     test('prev_command_is_available (false) - index_active_suite is -1', async () => {
         expect(component.prev_command_is_available).toBe(false);
+        expect(wrapper.findAll('#prev-command-button').length).toEqual(0);
     });
 
     test('prev_command_is_available (false) - index_active_case is -1', async () => {
@@ -1185,6 +1186,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(false);
+        expect(wrapper.findAll('#prev-command-button').length).toEqual(0);
     });
 
     test('prev_command_is_available (false) - index_active_case is 0 and active suite' +
@@ -1194,6 +1196,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(false);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(true);
     });
 
     test('prev_command_is_available (false) - index_active_case is 0, index_active_suite ' +
@@ -1209,6 +1212,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(false);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(true);
     });
 
     test("prev_command_is_available (false) - index_active_case is 0, index_active_suite" +
@@ -1234,6 +1238,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(false);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(true);
     });
 
     test("prev_command_is_available (true) - index_active_case is 0, index_active_suite " +
@@ -1243,6 +1248,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(true);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(false);
     });
 
     test('prev_command_is_available (false) - index_active_case is not zero, previous ' +
@@ -1252,6 +1258,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(false);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(true);
     });
 
     test('prev_command_is_available (true) - index_active_case is not zero, ' +
@@ -1342,13 +1349,16 @@ describe('AGSuites tests', () => {
 
     test('next_command_is_available (false) - Active suite is null', async () => {
         expect(component.next_command_is_available).toBe(false);
+        expect(wrapper.findAll('#next-command-button').length).toEqual(0);
     });
 
     test('next_command_is_available (false) - Active case is null', async () => {
         component.update_active_suite(ag_suite_colors);
         await component.$nextTick();
 
+
         expect(component.next_command_is_available).toBe(false);
+        expect(wrapper.findAll('#next-command-button').length).toEqual(0);
     });
 
     test('next_command_is_available (false) - More than index_active_case cases ' +
@@ -1359,6 +1369,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.next_command_is_available).toBe(false);
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(true);
     });
 
     test('next_command_is_available (true) - More than index_active_case cases in ' +
@@ -1368,6 +1379,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.next_command_is_available).toBe(true);
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(false);
     });
 
     test('next_command_is_available (false) - There are not more than index_active_case ' +
@@ -1377,6 +1389,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.next_command_is_available).toBe(false);
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(true);
     });
 
     test('next_command_is_available (false) - There are not more than index_active_case ' +
@@ -1414,6 +1427,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.next_command_is_available).toBe(false);
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(true);
     });
 
     test('next_command_is_available (false) - There are not more than index_active_case ' +
@@ -1425,6 +1439,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.next_command_is_available).toBe(false);
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(true);
     });
 
     test('next_command_is_available (true) - There are not more than index_active_case ' +
@@ -1436,6 +1451,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.next_command_is_available).toBe(true);
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(false);
     });
 
     test('go_to_next_command - next case in same suite', async () => {

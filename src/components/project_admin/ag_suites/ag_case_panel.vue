@@ -15,14 +15,12 @@
            class="fas fa-caret-right case-symbol-right"></i>
         <i v-else-if="test_case.ag_test_commands.length > 1 && is_open"
            class="fas fa-caret-down case-symbol-down"></i>
-        <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">{{test_case.name}}
-        </span>
+        <span>{{test_case.name}}</span>
       </div>
 
       <div id="case-menu"
            @click.stop="$refs.case_context_menu.show_context_menu($event.pageX, $event.pageY);
-                        $emit('update_active_case', {ag_suite: test_suite,
-                                                     ag_case: test_case})">
+                        $emit('update_active_case', {ag_suite: test_suite, ag_case: test_case})">
         <i class="fas fa-ellipsis-v"></i>
       </div>
       <context-menu ref="case_context_menu">
@@ -161,12 +159,6 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
-
-interface AGLevel {
-  ag_suite: string;
-  ag_case: string;
-  ag_command: string;
-}
 
 @Component({
   components: {
@@ -375,22 +367,7 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
   }
 }
 
-.pad-left {
-  padding-left: 0;
-}
-
 // Modal **************************************************************
-#case-name-container {
-  padding: 10px 13px 22px 13px;
-}
-
-.case-feedback-title {
-  padding: 10px 13px 10px 13px;
-}
-
-.case-settings-divider {
-  margin: 2px 13px 13px 13px;
-}
 
 #name-container, #command-container {
   padding: 0 0 22px 0;
