@@ -699,6 +699,10 @@ $current-lang-choice: "Poppins";
   font-family: $current-lang-choice;
 }
 
+.tab-body {
+  padding: 15px;
+}
+
 .delete-command-button {
   @extend .delete-level-button;
 }

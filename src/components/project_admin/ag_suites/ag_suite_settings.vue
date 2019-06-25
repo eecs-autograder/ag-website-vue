@@ -424,6 +424,10 @@ $current-lang-choice: "Poppins";
   height: 100%;
 }
 
+.tab-body {
+  padding: 15px;
+}
+
 #setup-command-container {
   margin: 15px 0 10px 0;
 }

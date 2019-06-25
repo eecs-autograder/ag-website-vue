@@ -218,7 +218,7 @@ export default class AGSuitePanel extends Vue {
   }
 
   toggle_is_open() {
-    if (this.is_open && this.active_suite === this.test_suite) {
+    if (this.is_open && this.is_active_suite && this.active_case === null) {
       this.close();
     }
     else {
