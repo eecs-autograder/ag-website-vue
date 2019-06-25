@@ -4,7 +4,7 @@ import {
     AGTestCase,
     AGTestCaseFeedbackConfig,
     AGTestCommand,
-    AGTestCommandFeedbackConfig, AGTestSuite,
+    AGTestCommandFeedbackConfig, AGTestSuite, AGTestSuiteFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
     get_sandbox_docker_images,
@@ -25,6 +25,7 @@ beforeAll(() => {
 describe('AGCasePanel tests', () => {
     let wrapper: Wrapper<AGCasePanel>;
     let component: AGCasePanel;
+    let ag_suite_colors: AGTestSuite;
     let ag_case_green: AGTestCase;
     let ag_case_yellow: AGTestCase;
     let ag_command_green_1: AGTestCommand;
@@ -32,6 +33,7 @@ describe('AGCasePanel tests', () => {
     let ag_command_green_3: AGTestCommand;
     let ag_command_yellow_1: AGTestCommand;
     let command_in_different_case: AGTestCommand;
+    let default_suite_feedback_config: AGTestSuiteFeedbackConfig;
     let default_case_feedback_config: AGTestCaseFeedbackConfig;
     let default_command_feedback_config: AGTestCommandFeedbackConfig;
     let original_match_media: (query: string) => MediaQueryList;
@@ -43,6 +45,15 @@ describe('AGCasePanel tests', () => {
                 return {matches: true};
             })
         });
+
+        default_suite_feedback_config = {
+            show_individual_tests: false,
+            show_setup_return_code: false,
+            show_setup_stderr: false,
+            show_setup_stdout: false,
+            show_setup_timed_out: false,
+            visible: false
+        };
 
         default_case_feedback_config = {
             visible: false,
@@ -270,9 +281,35 @@ describe('AGCasePanel tests', () => {
             ag_test_commands: [ag_command_yellow_1]
         });
 
+        ag_suite_colors = new AGTestSuite({
+            pk: 1,
+            name: "Suite 1",
+            project: 10,
+            last_modified: "",
+            read_only_instructor_files: true,
+            setup_suite_cmd: "",
+            setup_suite_cmd_name: "",
+            sandbox_docker_image: {
+            pk: 1,
+            name: "Sandy",
+            tag: "",
+            display_name: "Hi everyone"
+            },
+            allow_network_access: false,
+            deferred: true,
+            normal_fdbk_config: default_suite_feedback_config,
+            past_limit_submission_fdbk_config: default_suite_feedback_config,
+            staff_viewer_fdbk_config: default_suite_feedback_config,
+            ultimate_submission_fdbk_config: default_suite_feedback_config,
+            ag_test_cases: [ag_case_green, ag_case_yellow],
+            instructor_files_needed: [],
+            student_files_needed: []
+        });
+
         wrapper = mount(AGCasePanel, {
             propsData: {
                 test_case: ag_case_green,
+                test_suite: ag_suite_colors,
                 active_case: null,
                 active_command: null
             }
@@ -297,17 +334,38 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(ag_case_green);
+        expect(wrapper.emitted().update_active_case[0][0]).toEqual(
+            { ag_suite: ag_suite_colors, ag_case: ag_case_green}
+        );
     });
 
-    test('When a case with exactly one command is clicked on, the case',
+    test('When a case with exactly one command is clicked on, the case is emitted',
          async () => {
         wrapper.setProps({test_case: ag_case_yellow});
 
         wrapper.findAll('.test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(ag_case_yellow);
+        expect(wrapper.emitted().update_active_case[0][0]).toEqual(
+            { ag_suite: ag_suite_colors, ag_case: ag_case_yellow }
+        );
+    });
+
+    test('When a case that is active is clicked on again, it closes', async () => {
+        expect(component.is_open).toBe(false);
+
+        wrapper.setProps({active_case: ag_case_green});
+        await component.$nextTick();
+
+        expect(component.is_open).toBe(true);
+
+        wrapper.findAll('.test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.emitted('update_active_suite').length).toEqual(1);
+
+        // will be closed once active case is updated in the parent - but will return true now
+        // expect(component.is_open).toBe(false);
     });
 
     test('When a command is clicked on, an event is emitted', async () => {
@@ -317,7 +375,11 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.test-command').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_command[0][0]).toEqual(ag_command_green_1);
+        expect(wrapper.emitted().update_active_command[0][0]).toEqual({
+            ag_suite: ag_suite_colors,
+            ag_case: ag_case_green,
+            ag_command: ag_command_green_1
+        });
     });
 
     test('Add command - successful', async () => {
@@ -544,5 +606,38 @@ describe('AGCasePanel tests', () => {
         await component.$nextTick();
 
         expect(component.test_case).toEqual(ag_case_yellow);
+    });
+
+    test('Watcher for test_suite', async () => {
+        let another_suite = new AGTestSuite({
+            pk: 2,
+            name: "Another Suite",
+            project: 10,
+            last_modified: "",
+            read_only_instructor_files: true,
+            setup_suite_cmd: "",
+            setup_suite_cmd_name: "",
+            sandbox_docker_image: {
+                pk: 1,
+                name: "Sandy",
+                tag: "",
+                display_name: "Hi everyone"
+            },
+            allow_network_access: false,
+            deferred: true,
+            normal_fdbk_config: default_suite_feedback_config,
+            past_limit_submission_fdbk_config: default_suite_feedback_config,
+            staff_viewer_fdbk_config: default_suite_feedback_config,
+            ultimate_submission_fdbk_config: default_suite_feedback_config,
+            ag_test_cases: [],
+            instructor_files_needed: [],
+            student_files_needed: []
+        });
+        expect(component.test_suite).toEqual(ag_suite_colors);
+
+        wrapper.setProps({test_suite: another_suite});
+        await component.$nextTick();
+
+        expect(component.test_suite).toEqual(another_suite);
     });
 });

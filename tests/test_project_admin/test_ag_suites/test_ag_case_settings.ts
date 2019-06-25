@@ -37,7 +37,7 @@ describe('', () => {
 
         wrapper = mount(AGCaseSettings, {
             propsData: {
-                ag_case: ag_case
+                test_case: ag_case
             }
         });
         component = wrapper.vm;
@@ -66,9 +66,9 @@ describe('', () => {
         expect(wrapper.find('#save-button').is('[disabled]')).toBe(true);
     });
 
-    test('ag_case Watcher', async () => {
+    test('test_case Watcher', async () => {
         await component.$nextTick();
-        expect(component.d_ag_case!.name).toEqual(ag_case.name);
+        expect(component.d_test_case!.name).toEqual(ag_case.name);
 
         let another_case = new AGTestCase({
             pk: 3,
@@ -81,16 +81,16 @@ describe('', () => {
             last_modified: '',
             ag_test_commands: []
         });
-        expect(component.d_ag_case).toEqual(ag_case);
+        expect(component.d_test_case).toEqual(ag_case);
 
-        wrapper.setProps({ag_case: another_case});
+        wrapper.setProps({test_case: another_case});
         await component.$nextTick();
 
-        expect(component.d_ag_case).toEqual(another_case);
+        expect(component.d_test_case).toEqual(another_case);
     });
 
     test('save d_ag_case - successful', async () => {
-        let save_case_stub = sinon.stub(component.d_ag_case!, 'save');
+        let save_case_stub = sinon.stub(component.d_test_case!, 'save');
 
         wrapper.find({ref: 'ag_case_settings_form'}).trigger('submit');
         await component.$nextTick();
@@ -114,7 +114,7 @@ describe('', () => {
             },
             config: {},
         };
-        let save_case_stub = sinon.stub(component.d_ag_case!, 'save').returns(
+        let save_case_stub = sinon.stub(component.d_test_case!, 'save').returns(
             Promise.reject(axios_response_instance)
         );
 

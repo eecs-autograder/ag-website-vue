@@ -212,6 +212,19 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.emitted('update_active_suite').length).toEqual(1);
     });
 
+    test('When a suite is clicked on and is already the active suite, it closes',
+         async () => {
+        wrapper.setProps({active_suite: ag_suite});
+        await component.$nextTick();
+
+        expect(component.is_open).toBe(true);
+
+        wrapper.findAll('.test-suite').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.emitted('update_active_suite').length).toEqual(1);
+    });
+
     test('Clicking on the suite-menu when the suite is not active prompts an event ' +
          'to be emitted',
          async () => {

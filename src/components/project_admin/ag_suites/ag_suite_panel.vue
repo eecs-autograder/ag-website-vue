@@ -3,10 +3,10 @@
       <div :class="['test-suite',
                    {'active-suite': is_active_suite},
                    {'suite-in-active-container': case_or_command_is_active_level}]"
-         @click="$emit('update_active_suite', test_suite)">
+           @click="toggle_is_open">
 
         <div class="test-suite-name">
-          <i v-if="is_active_suite" class="fas fa-caret-down suite-symbol-down"></i>
+          <i v-if="is_open" class="fas fa-caret-down suite-symbol-down"></i>
           <i v-else class="fas fa-caret-right suite-symbol-right"></i>
           <span>{{test_suite.name}}</span>
         </div>
@@ -18,12 +18,14 @@
         </div>
       </div>
 
-      <div class="cases-container" v-if="is_active_suite">
+      <div class="cases-container" v-if="is_open">
         <div v-for="(test_case, index) of test_suite.ag_test_cases"
              :key="test_case.pk">
           <AGCasePanel :test_case="test_case"
+                       :test_suite="test_suite"
                        :active_case="active_case"
                        :active_command="active_command"
+                       @update_active_suite="$emit('update_active_suite', $event)"
                        @update_active_case="$emit('update_active_case', $event)"
                        @update_active_command="$emit('update_active_command', $event)">
           </AGCasePanel>
@@ -137,11 +139,6 @@ import {
   AGTestSuite
 } from 'ag-client-typescript';
 
-interface CommandInCase {
-  name: string;
-  cmd: string;
-}
-
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
@@ -150,6 +147,11 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
+
+interface CommandInCase {
+  name: string;
+  cmd: string;
+}
 
 @Component({
   components: {
@@ -194,6 +196,7 @@ export default class AGSuitePanel extends Vue {
   duplicate_command_name_in_case = false;
   creating_case = false;
   loading = true;
+  is_open = false;
   new_case_name = "";
   new_commands: CommandInCase[] = [];
 
@@ -214,8 +217,33 @@ export default class AGSuitePanel extends Vue {
     }
   }
 
+  toggle_is_open() {
+    if (this.is_open && this.active_suite === this.test_suite) {
+      this.close();
+    }
+    else {
+      this.open();
+    }
+  }
+
+  open() {
+    this.is_open = true;
+    this.$emit('update_active_suite', this.test_suite);
+  }
+
+  close() {
+    this.$emit('update_active_suite', null);
+    this.is_open = false;
+  }
+
   get is_active_suite() {
-    return this.active_suite !== null && this.active_suite.pk === this.test_suite!.pk;
+    if (this.active_suite !== null && this.active_suite.pk === this.test_suite.pk) {
+      if (!this.is_open) {
+        this.is_open = true;
+      }
+      return true;
+    }
+    return false;
   }
 
   get case_or_command_is_active_level() {

@@ -39,6 +39,11 @@ describe('AGSuites tests', () => {
     let ag_case_blue: AGTestCase;
     let ag_command_blue_1: AGTestCommand;
 
+    let ag_case_green: AGTestCase;
+    let ag_command_green_1: AGTestCommand;
+    let ag_command_green_2: AGTestCommand;
+    let ag_command_green_3: AGTestCommand;
+
     let ag_suite_pets: AGTestSuite;
 
     let ag_case_dog: AGTestCase;
@@ -205,8 +210,119 @@ describe('AGSuites tests', () => {
             process_spawn_limit: 1
         });
 
-        ag_command_dog_1 = new AGTestCommand({
+        ag_command_green_1 = new AGTestCommand({
             pk: 4,
+            name: "Green Command 1",
+            ag_test_case: 3,
+            last_modified: "",
+            cmd: "Say please and thank you",
+            stdin_source: StdinSource.none,
+            stdin_text: "",
+            stdin_instructor_file: null,
+            expected_return_code: ExpectedReturnCode.none,
+            expected_stdout_source: ExpectedOutputSource.none,
+            expected_stdout_text: "",
+            expected_stdout_instructor_file: null,
+            expected_stderr_source: ExpectedOutputSource.none,
+            expected_stderr_text: "",
+            expected_stderr_instructor_file: null,
+            ignore_case: false,
+            ignore_whitespace: false,
+            ignore_whitespace_changes: false,
+            ignore_blank_lines: false,
+            points_for_correct_return_code: 1,
+            points_for_correct_stdout: 1,
+            points_for_correct_stderr: 1,
+            deduction_for_wrong_return_code: 1,
+            deduction_for_wrong_stdout: 1,
+            deduction_for_wrong_stderr: 1,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
+            time_limit: 1,
+            stack_size_limit: 1,
+            virtual_memory_limit: 1,
+            process_spawn_limit: 1
+        });
+
+        ag_command_green_2 = new AGTestCommand({
+            pk: 5,
+            name: "Green Command 2",
+            ag_test_case: 3,
+            last_modified: "",
+            cmd: "Say please and thank you",
+            stdin_source: StdinSource.none,
+            stdin_text: "",
+            stdin_instructor_file: null,
+            expected_return_code: ExpectedReturnCode.none,
+            expected_stdout_source: ExpectedOutputSource.none,
+            expected_stdout_text: "",
+            expected_stdout_instructor_file: null,
+            expected_stderr_source: ExpectedOutputSource.none,
+            expected_stderr_text: "",
+            expected_stderr_instructor_file: null,
+            ignore_case: false,
+            ignore_whitespace: false,
+            ignore_whitespace_changes: false,
+            ignore_blank_lines: false,
+            points_for_correct_return_code: 1,
+            points_for_correct_stdout: 1,
+            points_for_correct_stderr: 1,
+            deduction_for_wrong_return_code: 1,
+            deduction_for_wrong_stdout: 1,
+            deduction_for_wrong_stderr: 1,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
+            time_limit: 1,
+            stack_size_limit: 1,
+            virtual_memory_limit: 1,
+            process_spawn_limit: 1
+        });
+
+        ag_command_green_3 = new AGTestCommand({
+            pk: 6,
+            name: "Green Command 3",
+            ag_test_case: 3,
+            last_modified: "",
+            cmd: "Say please and thank you",
+            stdin_source: StdinSource.none,
+            stdin_text: "",
+            stdin_instructor_file: null,
+            expected_return_code: ExpectedReturnCode.none,
+            expected_stdout_source: ExpectedOutputSource.none,
+            expected_stdout_text: "",
+            expected_stdout_instructor_file: null,
+            expected_stderr_source: ExpectedOutputSource.none,
+            expected_stderr_text: "",
+            expected_stderr_instructor_file: null,
+            ignore_case: false,
+            ignore_whitespace: false,
+            ignore_whitespace_changes: false,
+            ignore_blank_lines: false,
+            points_for_correct_return_code: 1,
+            points_for_correct_stdout: 1,
+            points_for_correct_stderr: 1,
+            deduction_for_wrong_return_code: 1,
+            deduction_for_wrong_stdout: 1,
+            deduction_for_wrong_stderr: 1,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
+            time_limit: 1,
+            stack_size_limit: 1,
+            virtual_memory_limit: 1,
+            process_spawn_limit: 1
+        });
+
+        ag_command_dog_1 = new AGTestCommand({
+            pk: 7,
             name: "Dog Command 1",
             ag_test_case: 3,
             last_modified: "",
@@ -243,7 +359,7 @@ describe('AGSuites tests', () => {
         });
 
         ag_command_bird_1 = new AGTestCommand({
-            pk: 5,
+            pk: 8,
             name: "Bird Command 1",
             ag_test_case: 4,
             last_modified: "",
@@ -280,7 +396,7 @@ describe('AGSuites tests', () => {
         });
 
         ag_command_sprite_1 = new AGTestCommand({
-            pk: 5,
+            pk: 9,
             name: "Sprite Command 1",
             ag_test_case: 4,
             last_modified: "",
@@ -340,8 +456,20 @@ describe('AGSuites tests', () => {
             ag_test_commands: [ag_command_blue_1]
         });
 
-        ag_case_dog = new AGTestCase({
+        ag_case_green = new AGTestCase({
             pk: 3,
+            name: "Green Case",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: [ag_command_green_1, ag_command_green_2, ag_command_green_3]
+        });
+
+        ag_case_dog = new AGTestCase({
+            pk: 4,
             name: "Dog Case",
             ag_test_suite: 2,
             normal_fdbk_config: default_case_feedback_config,
@@ -353,7 +481,7 @@ describe('AGSuites tests', () => {
         });
 
         ag_case_bird = new AGTestCase({
-            pk: 4,
+            pk: 5,
             name: "Bird Case",
             ag_test_suite: 2,
             normal_fdbk_config: default_case_feedback_config,
@@ -365,7 +493,7 @@ describe('AGSuites tests', () => {
         });
 
         ag_case_sprite = new AGTestCase({
-            pk: 5,
+            pk: 6,
             name: "Sprite Case",
             ag_test_suite: 3,
             normal_fdbk_config: default_case_feedback_config,
@@ -420,7 +548,7 @@ describe('AGSuites tests', () => {
             past_limit_submission_fdbk_config: default_suite_feedback_config,
             staff_viewer_fdbk_config: default_suite_feedback_config,
             ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [ag_case_purple, ag_case_blue],
+            ag_test_cases: [ag_case_purple, ag_case_blue, ag_case_green],
             instructor_files_needed: [],
             student_files_needed: []
         });
@@ -611,10 +739,76 @@ describe('AGSuites tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
+    test('Delete first suite in suites', async () => {
+        expect(component.test_suites.length).toEqual(3);
+
+        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.test_suites.length).toEqual(2);
+    });
+
+    test('Delete active first suite in suites', async () => {
+        expect(component.test_suites.length).toEqual(3);
+
+        component.update_active_suite(ag_suite_colors);
+        await component.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.test_suites.length).toEqual(2);
+        expect(component.active_suite!.pk).toEqual(ag_suite_pets.pk);
+    });
+
+    test('Delete last suite in suites', async () => {
+        expect(component.test_suites.length).toEqual(3);
+
+        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
+        await component.$nextTick();
+
+        expect(component.test_suites.length).toEqual(2);
+    });
+
+    test('Delete active last suite in suites', async () => {
+        expect(component.test_suites.length).toEqual(3);
+
+        component.update_active_suite(ag_suite_beverages);
+        await component.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
+        await component.$nextTick();
+
+        expect(component.test_suites.length).toEqual(2);
+        expect(component.active_suite.pk).toEqual(ag_suite_pets.pk);
+    });
+
+    test('Delete middle suite in suites', async () => {
+        expect(component.test_suites.length).toEqual(3);
+
+        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
+        await component.$nextTick();
+
+        expect(component.test_suites.length).toEqual(2);
+    });
+
+    test('Delete active middle suite in suites', async () => {
+        expect(component.test_suites.length).toEqual(3);
+
+        component.update_active_suite(ag_suite_pets);
+        await component.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
+        await component.$nextTick();
+
+        expect(component.test_suites.length).toEqual(2);
+        expect(component.active_suite.pk).toEqual(ag_suite_beverages.pk);
+    });
+
     test('Delete all suites - active_suite gets set to null', async () => {
         expect(component.test_suites.length).toEqual(3);
 
-        wrapper.setData({active_suite: ag_suite_colors});
+        component.update_active_suite(ag_suite_colors);
         await component.$nextTick();
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
@@ -632,45 +826,6 @@ describe('AGSuites tests', () => {
 
         expect(component.test_suites.length).toEqual(0);
         expect(component.active_suite).toBe(null);
-    });
-
-    test('Delete first suite in suites', async () => {
-        expect(component.test_suites.length).toEqual(3);
-
-        wrapper.setData({active_suite: ag_suite_colors});
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
-        await component.$nextTick();
-
-        expect(component.test_suites.length).toEqual(2);
-        expect(component.active_suite).toEqual(ag_suite_pets);
-    });
-
-    test('Delete last suite in suites', async () => {
-        expect(component.test_suites.length).toEqual(3);
-
-        wrapper.setData({active_suite: ag_suite_beverages});
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
-        await component.$nextTick();
-
-        expect(component.test_suites.length).toEqual(2);
-        expect(component.active_suite).toEqual(ag_suite_pets);
-    });
-
-    test('Delete middle suite in suites', async () => {
-        expect(component.test_suites.length).toEqual(3);
-
-        wrapper.setData({active_suite: ag_suite_pets});
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
-        await component.$nextTick();
-
-        expect(component.test_suites.length).toEqual(2);
-        expect(component.active_suite).toEqual(ag_suite_beverages);
     });
 
     test('Suite changed', async () => {
@@ -698,7 +853,8 @@ describe('AGSuites tests', () => {
             instructor_files_needed: [],
             student_files_needed: []
         });
-        expect(component.test_suites[1].name).toEqual(ag_suite_pets.name);
+        expect(component.test_suites[1]).toEqual(ag_suite_pets);
+        expect(ag_suite_pets).not.toEqual(updated_ag_suite_pets);
 
         AGTestSuite.notify_ag_test_suite_changed(updated_ag_suite_pets);
         await component.$nextTick();
@@ -709,9 +865,7 @@ describe('AGSuites tests', () => {
     // Case Related ------------------------------------------------------------------------------
 
     test('Case created', async () => {
-        component.update_active_suite(ag_suite_pets);
-        await component.$nextTick();
-
+        expect(component.test_suites[1]).toEqual(ag_suite_pets);
         expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
 
         let cat_case = new AGTestCase({
@@ -735,7 +889,7 @@ describe('AGSuites tests', () => {
 
     test('Case changed', async () => {
         let updated_ag_case_bird = new AGTestCase({
-            pk: 4,
+            pk: ag_case_bird.pk,
             name: "Updated Bird Case",
             ag_test_suite: 2,
             normal_fdbk_config: default_case_feedback_config,
@@ -746,43 +900,96 @@ describe('AGSuites tests', () => {
             ag_test_commands: [ag_command_bird_1]
         });
 
-        component.update_active_suite(ag_suite_pets);
-        await component.$nextTick();
-
+        expect(component.test_suites[1]).toEqual(ag_suite_pets);
         expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.test_suites[1].ag_test_cases[1].name).toEqual(ag_case_bird.name);
+        expect(component.test_suites[1].ag_test_cases[1]).toEqual(ag_case_bird);
+        expect(component.test_suites[1].ag_test_cases[1]).not.toEqual(updated_ag_case_bird);
 
         AGTestCase.notify_ag_test_case_changed(updated_ag_case_bird);
         await component.$nextTick();
 
         expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(ag_case_bird.name).not.toEqual(updated_ag_case_bird.name);
-        expect(component.test_suites[1].ag_test_cases[1].name).toEqual(updated_ag_case_bird.name);
+        expect(component.test_suites[1].ag_test_cases[1]).toEqual(updated_ag_case_bird);
     });
 
-    test('Case deleted in suite with only one case - suite becomes active level', async () => {
-        component.update_active_suite(ag_suite_beverages);
+    test('First case deleted', async () => {
+        expect(component.test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_purple);
         await component.$nextTick();
 
-        component.update_active_case(ag_case_sprite);
-        await component.$nextTick();
-
-        expect(component.test_suites[2].ag_test_cases.length).toEqual(1);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_sprite);
-        await component.$nextTick();
-
-        expect(component.test_suites[2].ag_test_cases.length).toEqual(0);
-        expect(component.active_level_is_suite).toBe(true);
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(2);
     });
 
-    test('first case deleted in suite with more than one case', async () => {
-        component.update_active_suite(ag_suite_pets);
+    test('active first case deleted', async () => {
+        component.update_active_case(ag_case_purple, ag_suite_colors);
         await component.$nextTick();
 
-        component.update_active_case(ag_case_dog);
+        expect(component.active_suite).toEqual(ag_suite_colors);
+        expect(component.active_case).toEqual(ag_case_purple);
+        expect(component.active_command).toEqual(ag_command_purple_1);
+        expect(component.test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_purple);
         await component.$nextTick();
 
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(component.active_case).toEqual(ag_case_blue);
+    });
+
+    test('Middle case deleted', async () => {
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_blue);
+        await component.$nextTick();
+
+        expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
+    });
+
+    test('Active middle case deleted', async () => {
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(3);
+
+        component.update_active_case(ag_case_blue, ag_suite_colors);
+        await component.$nextTick();
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_blue);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(component.active_case).toEqual(ag_case_green);
+    });
+
+    test('last case deleted', async () => {
+        expect(component.test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_green);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(2);
+    });
+
+    test('active last case deleted', async () => {
+        component.update_active_case(ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_green);
+        await component.$nextTick();
+
+        expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.active_case).toEqual(ag_case_blue);
+    });
+
+    test('Delete all cases in suite - suite becomes active', async () => {
+        component.update_active_case(ag_case_dog, ag_suite_pets);
+        await component.$nextTick();
+
+        expect(component.test_suites[1]).toEqual(ag_suite_pets);
         expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_dog);
@@ -790,39 +997,269 @@ describe('AGSuites tests', () => {
 
         expect(component.test_suites[1].ag_test_cases.length).toEqual(1);
         expect(component.active_case).toEqual(ag_case_bird);
-        expect(component.active_level_is_suite).toBe(false);
-    });
-
-    test('Case that is not the first case is deleted in suite with more than one ' +
-         'case',
-         async () => {
-        component.update_active_suite(ag_suite_pets);
-        await component.$nextTick();
-
-        component.update_active_case(ag_case_bird);
-        await component.$nextTick();
-
-        expect(component.test_suites[1].ag_test_cases.length).toEqual(2);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_bird);
         await component.$nextTick();
 
-        expect(component.test_suites[1].ag_test_cases.length).toEqual(1);
-        expect(component.active_case).toEqual(ag_case_dog);
-        expect(component.active_level_is_suite).toBe(false);
+        expect(component.test_suites[1].ag_test_cases.length).toEqual(0);
+        expect(component.active_suite).toEqual(ag_suite_pets);
     });
 
     // Command Related ---------------------------------------------------------------------------
 
     test('Command created', async () => {
+        let ag_command_blue_2 = new AGTestCommand({
+            pk: 50,
+            name: "Blue Command 2",
+            ag_test_case: 2,
+            last_modified: "",
+            cmd: "Say please and thank you",
+            stdin_source: StdinSource.none,
+            stdin_text: "",
+            stdin_instructor_file: null,
+            expected_return_code: ExpectedReturnCode.none,
+            expected_stdout_source: ExpectedOutputSource.none,
+            expected_stdout_text: "",
+            expected_stdout_instructor_file: null,
+            expected_stderr_source: ExpectedOutputSource.none,
+            expected_stderr_text: "",
+            expected_stderr_instructor_file: null,
+            ignore_case: false,
+            ignore_whitespace: false,
+            ignore_whitespace_changes: false,
+            ignore_blank_lines: false,
+            points_for_correct_return_code: 1,
+            points_for_correct_stdout: 1,
+            points_for_correct_stderr: 1,
+            deduction_for_wrong_return_code: 1,
+            deduction_for_wrong_stdout: 1,
+            deduction_for_wrong_stderr: 1,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
+            time_limit: 1,
+            stack_size_limit: 1,
+            virtual_memory_limit: 1,
+            process_spawn_limit: 1
+        });
+
+        expect(component.test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(1);
+
+        AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(2);
+        expect(component.active_command).toEqual(ag_command_blue_2);
+    });
+
+    test('Command changed', async () => {
+        let updated_ag_command_purple_2 = new AGTestCommand({
+            pk: ag_command_purple_2.pk,
+            name: "Updated Purple Command 2",
+            ag_test_case: 1,
+            last_modified: "",
+            cmd: "The Music Man",
+            stdin_source: StdinSource.none,
+            stdin_text: "",
+            stdin_instructor_file: null,
+            expected_return_code: ExpectedReturnCode.none,
+            expected_stdout_source: ExpectedOutputSource.none,
+            expected_stdout_text: "",
+            expected_stdout_instructor_file: null,
+            expected_stderr_source: ExpectedOutputSource.none,
+            expected_stderr_text: "",
+            expected_stderr_instructor_file: null,
+            ignore_case: false,
+            ignore_whitespace: false,
+            ignore_whitespace_changes: false,
+            ignore_blank_lines: false,
+            points_for_correct_return_code: 1,
+            points_for_correct_stdout: 1,
+            points_for_correct_stderr: 1,
+            deduction_for_wrong_return_code: 1,
+            deduction_for_wrong_stdout: 1,
+            deduction_for_wrong_stderr: 1,
+            normal_fdbk_config: default_command_feedback_config,
+            first_failed_test_normal_fdbk_config: default_command_feedback_config,
+            ultimate_submission_fdbk_config: default_command_feedback_config,
+            past_limit_submission_fdbk_config: default_command_feedback_config,
+            staff_viewer_fdbk_config: default_command_feedback_config,
+            time_limit: 1,
+            stack_size_limit: 1,
+            virtual_memory_limit: 1,
+            process_spawn_limit: 1
+        });
+
+        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            ag_command_purple_1
+        );
+        expect(ag_command_purple_2).not.toEqual(updated_ag_command_purple_2);
+
+        AGTestCommand.notify_ag_test_command_changed(updated_ag_command_purple_2);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            updated_ag_command_purple_2
+        );
+    });
+
+    test('First command deleted in case', async () => {
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+
+        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+    });
+
+    test('active First command deleted in case', async () => {
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+
+        component.update_active_command(ag_command_green_1, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+
+        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.active_command).toEqual(ag_command_green_2);
+    });
+
+    test('Middle command deleted in case',
+         async () => {
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+
+        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+    });
+
+    test('Active middle command deleted in case', async () => {
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+
+        component.update_active_command(ag_command_green_2, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+
+        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.active_command).toEqual(ag_command_green_3);
+    });
+
+    test('Last command deleted in case', async () => {
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+
+        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+    });
+
+    test('Active last command deleted in case', async () => {
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+
+        component.update_active_command(ag_command_green_3, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+
+        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
+        await component.$nextTick();
+
+        expect(component.test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.active_command).toEqual(ag_command_green_2);
+    });
+
+    // Visiting Previous Command -----------------------------------------------------------------
+
+    test('prev_command_is_available (false) - index_active_suite is -1', async () => {
+        expect(component.prev_command_is_available).toBe(false);
+    });
+
+    test('prev_command_is_available (false) - index_active_case is -1', async () => {
         component.update_active_suite(ag_suite_colors);
         await component.$nextTick();
 
-        component.update_active_case(ag_case_blue);
+        expect(component.prev_command_is_available).toBe(false);
+    });
+
+    test('prev_command_is_available (false) - index_active_case is 0 and active suite' +
+              ' index is zero',
+              async () => {
+        component.update_active_case(ag_case_purple, ag_suite_colors);
         await component.$nextTick();
 
+        expect(component.prev_command_is_available).toBe(false);
+    });
+
+    test('prev_command_is_available (false) - index_active_case is 0, index_active_suite ' +
+         'is not zero, and the previous suite doesnt have any test cases',
+         async () => {
+        AGTestCase.notify_ag_test_case_deleted(ag_case_dog);
+        await component.$nextTick();
+
+        AGTestCase.notify_ag_test_case_deleted(ag_case_bird);
+        await component.$nextTick();
+
+        component.update_active_command(ag_command_sprite_1, ag_case_sprite, ag_suite_beverages);
+        await component.$nextTick();
+
+        expect(component.prev_command_is_available).toBe(false);
+    });
+
+    test("prev_command_is_available (false) - index_active_case is 0, index_active_suite" +
+         " is not zero, the previous suite's last case doesnt have at least " +
+         "index_active_command commands",
+              async () => {
+        let ag_case_cat = new AGTestCase({
+            pk: 6,
+            name: "Cat Case",
+            ag_test_suite: ag_suite_pets.pk,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: []
+        });
+
+        AGTestCase.notify_ag_test_case_created(ag_case_cat);
+        await component.$nextTick();
+
+        component.update_active_case(ag_case_sprite, ag_suite_beverages);
+        await component.$nextTick();
+
+        expect(component.prev_command_is_available).toBe(false);
+    });
+
+    test("prev_command_is_available (true) - index_active_case is 0, index_active_suite " +
+              "is not zero, the previous suite's last case has at least " +
+              "index_active_command commands",
+              async () => {
+        component.update_active_command(ag_command_sprite_1, ag_case_sprite, ag_suite_beverages);
+        await component.$nextTick();
+
+        expect(component.prev_command_is_available).toBe(true);
+    });
+
+    test('prev_command_is_available (false) - index_active_case is not zero, ' +
+              'previous case does not have at least index_active_command commands',
+              async () => {
+        component.update_active_command(ag_command_green_3, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.prev_command_is_available).toBe(false);
+    });
+
+    test('prev_command_is_available (true) - index_active_case is not zero, ' +
+         'previous case has at least index_active_command commands',
+         async () => {
         let ag_command_blue_2 = new AGTestCommand({
-            pk: 7,
+            pk: 50,
             name: "Blue Command 2",
             ag_test_case: 2,
             last_modified: "",
@@ -861,212 +1298,180 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
         await component.$nextTick();
 
-        expect(component.active_case!.ag_test_commands.length).toEqual(2);
-        expect(component.active_command).toEqual(ag_command_blue_2);
+        component.update_active_command(ag_command_green_2, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.prev_command_is_available).toBe(true);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(false);
     });
 
-    test.only('Command changed - parent case has more than one command', async () => {
-        let updated_ag_command_purple_1 = new AGTestCommand({
-            pk: 1,
-            name: "Updated Purple Command 1",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "The Music Man",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
-
-        component.update_active_suite(ag_suite_colors);
+    test('go_to_prev_command - prev case in same suite', async () => {
+        component.update_active_command(ag_command_blue_1, ag_case_blue, ag_suite_colors);
         await component.$nextTick();
 
-        component.update_active_case(ag_case_purple);
-        await component.$nextTick();
-        //
+        expect(component.active_command).toEqual(ag_command_blue_1);
+        expect(component.active_case).toEqual(ag_case_blue);
         expect(component.active_suite).toEqual(ag_suite_colors);
-        expect(component.active_case).toEqual(ag_case_purple);
-        expect(component.active_command).toEqual(ag_command_purple_1);
 
-        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
-            ag_command_purple_1
-        );
-
-        AGTestCommand.notify_ag_test_command_changed(updated_ag_command_purple_1);
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(false);
+        wrapper.find('#prev-command-button').trigger('click');
         await component.$nextTick();
 
-        expect(ag_command_purple_1.name).not.toEqual(updated_ag_command_purple_1.name);
-        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
-            updated_ag_command_purple_1
-        );
-
-        expect(component.active_command).toEqual(updated_ag_command_purple_1);
+        expect(component.active_command).toEqual(ag_command_purple_1);
+        expect(component.active_case).toEqual(ag_case_purple);
+        expect(component.active_suite).toEqual(ag_suite_colors);
     });
 
-    test.skip('Command changed - parent case has exactly one command', async () => {
+    test('go_to_prev_command - last case in previous suite', async () => {
+        component.update_active_command(ag_command_dog_1, ag_case_dog, ag_suite_pets);
+        await component.$nextTick();
 
-    });
+        expect(component.active_command).toEqual(ag_command_dog_1);
+        expect(component.active_case).toEqual(ag_case_dog);
+        expect(component.active_suite).toEqual(ag_suite_pets);
 
-    test.skip('First command deleted in case with more than one case', async () => {
+        expect(wrapper.find('#prev-command-button').is('[disabled]')).toBe(false);
+        wrapper.find('#prev-command-button').trigger('click');
+        await component.$nextTick();
 
-    });
-
-    test.skip('Command that is not the first command is deleted in suite with more than ' +
-         'one case',
-              async () => {
-
-    });
-
-    // Visiting Previous Command -----------------------------------------------------------------
-
-    test.skip('prev_command_is_available (false) - Active case is null', async () => {
-        // should return false
-    });
-
-    test.skip('prev_command_is_available (false) - Active command is null', async () => {
-        // should return false
-    });
-
-    test.skip('prev_command_is_available (false) - Active case index is 0 and active suite' +
-              ' index is zero',
-              async () => {
-             // should return false
-    });
-
-    test.skip('prev_command_is_available (false) - Active case index is 0, active suite ' +
-              'index is not zero, and the previous suite doesnt have any test cases',
-              async () => {
-        // returns false
-    });
-
-    test.skip("prev_command_is_available (false) - Active case index is 0, active suite " +
-              "index is not zero, the previous suite's last case doesnt have at least " +
-              "index_active_command commands",
-              async () => {
-         // returns false
-    });
-
-    test.skip("prev_command_is_available (true) - Active case index is 0, active suite " +
-              "index is not zero, the previous suite's last case has at least " +
-              "index_active_command commands commands",
-              async () => {
-         // returns false
-    });
-
-    test.skip("prev_command_is_available (true) - Active case index is 0, active suite " +
-              "index is not zero, the previous suite's last case has at least " +
-              "index_active_command commands commands",
-              async () => {
-         // returns false
-    });
-
-    test.skip('prev_command_is_available (false) - Active case index is not zero, ' +
-              'previous case does not have at least index_active_command commands',
-              async () => {
-
-    });
-
-    test.skip('prev_command_is_available (true) - Active case index is not zero, ' +
-              'previous case has at least index_active_command commands',
-              async () => {
-
-    });
-
-    test.skip('go_to_prev_command - prev case in same suite', async () => {
-
-    });
-
-    test.skip('go_to_prev_command - last case in previous suite', async () => {
-
+        expect(component.active_command).toEqual(ag_command_green_1);
+        expect(component.active_case).toEqual(ag_case_green);
+        expect(component.active_suite).toEqual(ag_suite_colors);
     });
 
     // Visiting Next Command ---------------------------------------------------------------------
 
-    test.skip('next_command_is_available (false) - Active case is null', async () => {
-        // should return false
+    test('next_command_is_available (false) - Active suite is null', async () => {
+        expect(component.next_command_is_available).toBe(false);
     });
 
-    test.skip('next_command_is_available (false) - Active command is null', async () => {
-        // should return false
+    test('next_command_is_available (false) - Active case is null', async () => {
+        component.update_active_suite(ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.next_command_is_available).toBe(false);
     });
 
-    test.skip('next_command_is_available (false) - More than index_active_case cases ' +
-              'in current suite but there are not at least index_active_command commands in the ' +
-              'next suite',
-              async () => {
-             // should return false
+    test('next_command_is_available (false) - More than index_active_case cases ' +
+         'in current suite but there are not at least index_active_command commands in the ' +
+         'next suite',
+         async () => {
+        component.update_active_command(ag_command_purple_2, ag_case_purple, ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.next_command_is_available).toBe(false);
     });
 
-    test.skip('next_command_is_available (true) - More than index_active_case cases in ' +
-              'current suite and next suite has at least index_active_command commands',
-              async () => {
-             // returns false
+    test('next_command_is_available (true) - More than index_active_case cases in ' +
+         'current suite and next suite has at least index_active_command commands',
+         async () => {
+        component.update_active_command(ag_command_purple_1, ag_case_purple, ag_suite_colors);
+        await component.$nextTick();
+
+        expect(component.next_command_is_available).toBe(true);
     });
 
-    test.skip('next_command_is_available (false) - There are not more than index_active_case ' +
+    test('next_command_is_available (false) - There are not more than index_active_case ' +
          'cases in the current suite, and current suite is the last suite',
-              async () => {
+         async () => {
+        component.update_active_command(ag_command_sprite_1, ag_case_sprite, ag_suite_beverages);
+        await component.$nextTick();
 
+        expect(component.next_command_is_available).toBe(false);
     });
 
-    test.skip('next_command_is_available (false) - There are not more than index_active_case ' +
+    test('next_command_is_available (false) - There are not more than index_active_case ' +
          'cases in the current suite, current suite is not the last suite but the next suite' +
          'doesnt have any cases',
-              async () => {
+         async () => {
+        let new_suite = new AGTestSuite({
+            pk: 4,
+            name: "New Suite",
+            project: 10,
+            last_modified: "",
+            read_only_instructor_files: true,
+            setup_suite_cmd: "",
+            setup_suite_cmd_name: "",
+            sandbox_docker_image: {
+            pk: 1,
+            name: "Sandy",
+            tag: "",
+            display_name: "Hi everyone"
+            },
+            allow_network_access: false,
+            deferred: true,
+            normal_fdbk_config: default_suite_feedback_config,
+            past_limit_submission_fdbk_config: default_suite_feedback_config,
+            staff_viewer_fdbk_config: default_suite_feedback_config,
+            ultimate_submission_fdbk_config: default_suite_feedback_config,
+            ag_test_cases: [],
+            instructor_files_needed: [],
+            student_files_needed: []
+        });
+        AGTestSuite.notify_ag_test_suite_created(new_suite);
+        await component.$nextTick();
 
+        component.update_active_command(ag_command_sprite_1, ag_case_sprite, ag_suite_beverages);
+        await component.$nextTick();
+
+        expect(component.next_command_is_available).toBe(false);
     });
 
-    test.skip('next_command_is_available (false) - There are not more than index_active_case ' +
+    test('next_command_is_available (false) - There are not more than index_active_case ' +
          'cases in the current suite, current suite is not the last suite, the next suite' +
          'has at least one case, but the first case doesnt have at least index_active_command ' +
          'commands.',
-              async () => {
+         async () => {
+        component.update_active_command(ag_command_green_2, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
 
+        expect(component.next_command_is_available).toBe(false);
     });
 
-    test.skip('next_command_is_available (true) - There are not more than index_active_case ' +
+    test('next_command_is_available (true) - There are not more than index_active_case ' +
          'cases in the current suite, current suite is not the last suite, the next suite' +
          'has at least one case, and the first case has at least index_active_command ' +
          'commands.',
-              async () => {
+         async () => {
+        component.update_active_command(ag_command_green_1, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
 
+        expect(component.next_command_is_available).toBe(true);
     });
 
-    test.skip('go_to_next_command - next case in same suite', async () => {
+    test('go_to_next_command - next case in same suite', async () => {
+        component.update_active_command(ag_command_dog_1, ag_case_dog, ag_suite_pets);
+        await component.$nextTick();
 
+        expect(component.active_command).toEqual(ag_command_dog_1);
+        expect(component.active_case).toEqual(ag_case_dog);
+        expect(component.active_suite).toEqual(ag_suite_pets);
+
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(false);
+        wrapper.find('#next-command-button').trigger('click');
+        await component.$nextTick();
+
+        expect(component.active_command).toEqual(ag_command_bird_1);
+        expect(component.active_case).toEqual(ag_case_bird);
+        expect(component.active_suite).toEqual(ag_suite_pets);
     });
 
-    test.skip('go_to_next_command - first case in next suite', async () => {
+    test('go_to_next_command - first case in next suite', async () => {
+        component.update_active_command(ag_command_green_1, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
 
+        expect(component.active_command).toEqual(ag_command_green_1);
+        expect(component.active_case).toEqual(ag_case_green);
+        expect(component.active_suite).toEqual(ag_suite_colors);
+
+        expect(wrapper.find('#next-command-button').is('[disabled]')).toBe(false);
+        wrapper.find('#next-command-button').trigger('click');
+        await component.$nextTick();
+
+        expect(component.active_command).toEqual(ag_command_dog_1);
+        expect(component.active_case).toEqual(ag_case_dog);
+        expect(component.active_suite).toEqual(ag_suite_pets);
     });
-
 
     test.skip('active_level_is_suite', async () => {
 
@@ -1075,27 +1480,4 @@ describe('AGSuites tests', () => {
     test.skip('active_level_is_command', async () => {
 
     });
-
-    // -------------------------------------------------------------------------------------------
-
-    // updating active suite
-    test.skip('updating active suite - suite was already the active suite', async () => {
-
-    });
-
-    test.skip('updating active suite - suite passed in is not already the active suite',
-              async () => {
-
-    });
-
-    // updating active case
-    test.skip('updating active case', async () => {
-
-    });
-
-    // updating active command
-    test.skip('updating active command', async () => {
-
-    });
-
 });

@@ -1,6 +1,8 @@
 <template>
   <div v-if="test_case !== null">
 
+    Is open: {{is_open}}
+
     <div :class="['test-case',
                  {'active-case' : is_active_case},
                  {'active-single-command': test_case.ag_test_commands.length === 1
@@ -9,7 +11,7 @@
                                               === active_command.pk},
                  {'parent-of-active-command': command_is_active_level
                                               && test_case.ag_test_commands.length > 1}]"
-                 @click="$emit('update_active_case', test_case)">
+                 @click="toggle_is_open()">
 
       <div class="test-case-name">
         <i v-if="test_case.ag_test_commands.length > 1 && !is_active_case"
@@ -22,7 +24,8 @@
 
       <div id="case-menu"
            @click.stop="$refs.case_context_menu.show_context_menu($event.pageX, $event.pageY);
-                        $emit('update_active_case', test_case)">
+                        $emit('update_active_case', {ag_suite: test_suite,
+                                                     ag_case: test_case})">
         <i class="fas fa-ellipsis-v"></i>
       </div>
       <context-menu ref="case_context_menu">
@@ -52,13 +55,15 @@
 
     </div>
 
-    <div class="commands-container" v-if="is_active_case && test_case.ag_test_commands.length > 1">
+    <div class="commands-container" v-if="is_open && test_case.ag_test_commands.length > 1">
       <div v-for="test_command of test_case.ag_test_commands"
            :class="['test-command',
                    {'active-command': active_command !== null
                                       && active_command.pk === test_command.pk}
            ]"
-           @click="$emit('update_active_command', test_command)">
+           @click="$emit('update_active_command', {ag_suite: test_suite,
+                                                   ag_case: test_case,
+                                                   ag_command: test_command})">
 
         <div class="test-command-name">
           <span>{{test_command.name}}</span>
@@ -138,7 +143,7 @@
       </div>
       <hr>
       <div class="modal-body">
-        <AGCaseSettings :ag_case="test_case"></AGCaseSettings>
+        <AGCaseSettings :test_case="test_case"></AGCaseSettings>
       </div>
     </modal>
 
@@ -148,7 +153,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { AGTestCase, AGTestCommand } from 'ag-client-typescript';
+import { AGTestCase, AGTestCommand, AGTestSuite } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
@@ -159,6 +164,12 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
+
+interface AGLevel {
+  ag_suite: string;
+  ag_case: string;
+  ag_command: string;
+}
 
 @Component({
   components: {
@@ -177,6 +188,9 @@ export default class AGCasePanel extends Vue {
   @Prop({required: true, type: AGTestCase})
   test_case!: AGTestCase;
 
+  @Prop({required: true, type: AGTestSuite})
+  test_suite!: AGTestSuite;
+
   @Prop({required: true})
   active_case!: AGTestCase | null;
 
@@ -185,6 +199,7 @@ export default class AGCasePanel extends Vue {
 
   readonly is_not_empty = is_not_empty;
 
+  is_open = false;
   add_command_form_is_valid = false;
   adding_command = false;
   new_command_name = "";
@@ -195,12 +210,45 @@ export default class AGCasePanel extends Vue {
   case_settings_form_is_valid = false;
 
   @Watch('test_case', {deep: true})
-  on_test_suite_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
+  on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
     this.test_case = new_test_case;
   }
 
+  @Watch('test_suite', {deep: true})
+  on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
+    this.test_suite = new_test_suite;
+  }
+
+  toggle_is_open() {
+    // console.log("Clicked on Case");
+    if (this.is_open && this.test_case === this.active_case) {
+      // console.log("Closing case");
+      this.close();
+    }
+    else {
+      this.open();
+    }
+  }
+
+  open() {
+    this.is_open = true;
+    this.$emit('update_active_case', {ag_suite: this.test_suite, ag_case: this.test_case});
+  }
+
+  close() {
+    // console.log("close got called");
+    this.$emit('update_active_suite', this.test_suite);
+    this.is_open = false;
+  }
+
   get is_active_case() {
-    return this.active_case !== null && this.active_case.pk === this.test_case!.pk;
+    if (this.active_case !== null && this.active_case.pk === this.test_case.pk) {
+      if (!this.is_open) {
+        this.is_open = true;
+      }
+      return true;
+    }
+    return false;
   }
 
   get command_is_active_level() {
@@ -335,7 +383,7 @@ function handle_add_ag_command_error(component: AGCasePanel, error: unknown) {
 }
 
 .pad-left {
-  padding-left: 0px;
+  padding-left: 0;
 }
 
 // Modal **************************************************************
