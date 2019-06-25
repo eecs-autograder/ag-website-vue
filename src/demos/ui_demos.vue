@@ -79,6 +79,84 @@
         </template>
       </tab>
       <tab>
+        <tab-header>Tabs (Body Scroll)</tab-header>
+        <template slot="body">
+          <tabs :scroll_body="true"
+                tab_active_class="gray-white-theme-active"
+                tab_inactive_class="gray-white-theme-inactive">
+            <tab>
+              <tab-header>Tab with scroll</tab-header>
+              <template slot="body">
+                Start<br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                <br>scroll<br><br><br><br><br><br><br><br><br>
+                End
+              </template>
+            </tab>
+          </tabs>
+        </template>
+      </tab>
+      <tab>
+        <tab-header>Tabs (Column Scroll)</tab-header>
+        <template slot="body">
+          <tabs :scroll_body="true"
+                tab_active_class="gray-white-theme-active"
+                tab_inactive_class="gray-white-theme-inactive">
+            <tab>
+              <tab-header>Tab with scroll</tab-header>
+              <template slot="body">
+                <div class="scroll-container">
+                  <h2>Fixed Top</h2>
+                  <div class="scroll-column-container">
+                    <div class="scroll-column">
+                      <div class="scroll-container">
+                        <h3>Column 1 (Only as wide as content)</h3>
+                        <div class="scroll-column">
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          End
+                        </div>
+                      </div>
+                    </div>
+                    <div class="scroll-column-grow">
+                      <div class="scroll-container">
+                        <h3>Column 2 (Fill space)</h3>
+                        <div class="scroll-column">
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          <br>scroll<br><br><br><br><br><br><br><br><br>
+                          End
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </tab>
+          </tabs>
+        </template>
+      </tab>
+      <tab>
         <tab-header>Tooltip</tab-header>
         <template slot="body">
           <TooltipDemo></TooltipDemo>
@@ -177,11 +255,20 @@ export default class UIDemos extends Vue {
 
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
+  @import '@/styles/independent_scrolling.scss';
+
+  * {
+    box-sizing: border-box;
+  }
 
   #demos-container {
     height: 100%;
     display: flex;
     flex-direction: column;
+  }
+
+  .scroll-column {
+    padding-right: 15px;
   }
 </style>
 

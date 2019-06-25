@@ -31,6 +31,9 @@ export default class Tabs extends Vue {
   @Prop({default: '', type: String})
   tab_body_container_class!: string;
 
+  @Prop({default: false})
+  scroll_body!: boolean;
+
   @Watch('value')
   on_value_changed(new_value: number, old_value: number) {
     this.d_active_tab_index = new_value;
@@ -88,7 +91,9 @@ export default class Tabs extends Vue {
 
     return create_element(
       'div',
-      {class: ['tabs-container', this.tab_position === 'side' ? 'container-sidebar' : '']},
+      {class: ['tabs-container',
+               this.tab_position === 'side' ? 'container-sidebar' : '',
+               this.scroll_body ? 'scroll-tabs-container' : '']},
       [this._render_tab_headers(create_element, tab_data),
        this._render_tab_body(create_element, tab_data)]
     );
@@ -206,7 +211,9 @@ export default class Tabs extends Vue {
       'div',
       {
         ref: 'active-tab-body',
-        class: [body_class, this.tab_body_container_class]
+        class: [body_class,
+                this.scroll_body ? 'scroll-tab-body-container' : '',
+                this.tab_body_container_class]
       },
       tab_data[this.d_active_tab_index].body.children
     );
@@ -229,6 +236,19 @@ interface ExtractedTabData {
   // Always added to the outermost element.
   .tabs-container {
     height: 100%;
+  }
+
+  // Added to outermost element when scroll_body is true
+  .scroll-tabs-container {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scroll-tab-body-container {
+    height: 100%;
+    overflow: auto;
+    flex-grow: 1;
   }
 
   // Added to the outermost element when displaying tabs as sidebar.

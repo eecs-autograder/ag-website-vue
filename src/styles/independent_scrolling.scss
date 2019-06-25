@@ -1,0 +1,25 @@
+// NOTE: In order for this to work, all parent elements must have height: 100%.
+// NOTE: If you're using this inside of <tabs>, you must set :scroll_body="true" on those tabs.
+
+// See ui_demos.vue for usage examples.
+
+.scroll-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    // Use this class for a multi-column setup. For a single column, you can
+    // leave this out.
+    .scroll-column-container {
+        display: flex;
+    }
+
+    .scroll-column, .scroll-column-grow {
+        overflow: auto;
+    }
+
+    .scroll-column-grow {
+        flex-grow: 1;
+    }
+}
