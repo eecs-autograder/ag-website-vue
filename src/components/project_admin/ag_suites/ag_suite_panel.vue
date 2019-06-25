@@ -19,7 +19,7 @@
       </div>
 
       <div class="cases-container" v-if="is_open">
-        <div v-for="(test_case, index) of test_suite.ag_test_cases"
+        <div v-for="test_case of test_suite.ag_test_cases"
              :key="test_case.pk">
           <AGCasePanel :test_case="test_case"
                        :test_suite="test_suite"

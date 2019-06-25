@@ -1,8 +1,5 @@
 <template>
   <div v-if="test_case !== null">
-
-    Is open: {{is_open}}
-
     <div :class="['test-case',
                  {'active-case' : is_active_case},
                  {'active-single-command': test_case.ag_test_commands.length === 1
@@ -14,9 +11,9 @@
                  @click="toggle_is_open()">
 
       <div class="test-case-name">
-        <i v-if="test_case.ag_test_commands.length > 1 && !is_active_case"
+        <i v-if="test_case.ag_test_commands.length > 1 && !is_open"
            class="fas fa-caret-right case-symbol-right"></i>
-        <i v-else-if="test_case.ag_test_commands.length > 1 && is_active_case"
+        <i v-else-if="test_case.ag_test_commands.length > 1 && is_open"
            class="fas fa-caret-down case-symbol-down"></i>
         <span :class="{'pad-left': test_case.ag_test_commands.length === 1}">{{test_case.name}}
         </span>
@@ -220,9 +217,7 @@ export default class AGCasePanel extends Vue {
   }
 
   toggle_is_open() {
-    // console.log("Clicked on Case");
     if (this.is_open && this.test_case === this.active_case) {
-      // console.log("Closing case");
       this.close();
     }
     else {
@@ -236,7 +231,6 @@ export default class AGCasePanel extends Vue {
   }
 
   close() {
-    // console.log("close got called");
     this.$emit('update_active_suite', this.test_suite);
     this.is_open = false;
   }
@@ -266,7 +260,6 @@ export default class AGCasePanel extends Vue {
 
   async delete_ag_case() {
     await this.test_case!.delete();
-    // don't close modal here
   }
 
   @handle_api_errors_async(handle_add_ag_command_error)

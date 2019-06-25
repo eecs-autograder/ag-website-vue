@@ -383,7 +383,6 @@ export default class AGSuiteSettings extends Vue {
 
   async delete_ag_test_suite() {
     await this.d_test_suite!.delete();
-    // (<Modal> this.$refs.delete_suite_modal).close();
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {

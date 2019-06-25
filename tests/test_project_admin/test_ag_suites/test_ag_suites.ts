@@ -780,7 +780,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.test_suites.length).toEqual(2);
-        expect(component.active_suite.pk).toEqual(ag_suite_pets.pk);
+        expect(component.active_suite!.pk).toEqual(ag_suite_pets.pk);
     });
 
     test('Delete middle suite in suites', async () => {
@@ -802,7 +802,7 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(component.test_suites.length).toEqual(2);
-        expect(component.active_suite.pk).toEqual(ag_suite_beverages.pk);
+        expect(component.active_suite!.pk).toEqual(ag_suite_beverages.pk);
     });
 
     test('Delete all suites - active_suite gets set to null', async () => {
@@ -1188,8 +1188,8 @@ describe('AGSuites tests', () => {
     });
 
     test('prev_command_is_available (false) - index_active_case is 0 and active suite' +
-              ' index is zero',
-              async () => {
+         ' index is zero',
+         async () => {
         component.update_active_case(ag_case_purple, ag_suite_colors);
         await component.$nextTick();
 
@@ -1214,7 +1214,7 @@ describe('AGSuites tests', () => {
     test("prev_command_is_available (false) - index_active_case is 0, index_active_suite" +
          " is not zero, the previous suite's last case doesnt have at least " +
          "index_active_command commands",
-              async () => {
+         async () => {
         let ag_case_cat = new AGTestCase({
             pk: 6,
             name: "Cat Case",
@@ -1237,18 +1237,17 @@ describe('AGSuites tests', () => {
     });
 
     test("prev_command_is_available (true) - index_active_case is 0, index_active_suite " +
-              "is not zero, the previous suite's last case has at least " +
-              "index_active_command commands",
-              async () => {
+         "is not zero, the previous suite's last case has at least index_active_command commands",
+         async () => {
         component.update_active_command(ag_command_sprite_1, ag_case_sprite, ag_suite_beverages);
         await component.$nextTick();
 
         expect(component.prev_command_is_available).toBe(true);
     });
 
-    test('prev_command_is_available (false) - index_active_case is not zero, ' +
-              'previous case does not have at least index_active_command commands',
-              async () => {
+    test('prev_command_is_available (false) - index_active_case is not zero, previous ' +
+        'case does not have at least index_active_command commands',
+         async () => {
         component.update_active_command(ag_command_green_3, ag_case_green, ag_suite_colors);
         await component.$nextTick();
 
@@ -1473,11 +1472,35 @@ describe('AGSuites tests', () => {
         expect(component.active_suite).toEqual(ag_suite_pets);
     });
 
-    test.skip('active_level_is_suite', async () => {
+    test('active_level_is_suite', async () => {
+        expect(component.active_level_is_suite).toBe(false);
 
+        component.update_active_suite(ag_suite_colors);
+        await component.$nextTick();
+        expect(component.active_level_is_suite).toBe(true);
+
+        component.update_active_case(ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+        expect(component.active_level_is_suite).toBe(false);
+
+        component.update_active_command(ag_command_green_1, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+        expect(component.active_level_is_suite).toBe(false);
     });
 
-    test.skip('active_level_is_command', async () => {
+    test('active_level_is_command', async () => {
+        expect(component.active_level_is_command).toBe(false);
 
+        component.update_active_suite(ag_suite_colors);
+        await component.$nextTick();
+        expect(component.active_level_is_command).toBe(false);
+
+        component.update_active_case(ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+        expect(component.active_level_is_command).toBe(true);
+
+        component.update_active_command(ag_command_green_1, ag_case_green, ag_suite_colors);
+        await component.$nextTick();
+        expect(component.active_level_is_command).toBe(true);
     });
 });

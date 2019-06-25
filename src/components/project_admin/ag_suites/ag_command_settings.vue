@@ -655,7 +655,6 @@ export default class AGCommandSettings extends Vue {
     else {
       await this.d_test_command!.delete();
     }
-    // dont delete the modal here
   }
 
   sort_instructor_files() {
