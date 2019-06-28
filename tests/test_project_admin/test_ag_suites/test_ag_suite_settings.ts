@@ -18,6 +18,8 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 
+import { checkbox_is_checked } from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -186,6 +188,28 @@ describe('AGSuiteSettings tests', () => {
         await component.$nextTick();
 
         expect(component.settings_form_is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+    });
+
+    test('Publish final grades binding', () => {
+        let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
+
+        synchronous_checkbox.setChecked(true);
+        expect(component.d_ag_test_suite!.deferred).toEqual(false);
+
+        synchronous_checkbox.setChecked(false);
+        expect(component.d_ag_test_suite!.deferred).toEqual(true);
+
+        synchronous_checkbox.setChecked(true);
+        expect(component.d_ag_test_suite!.deferred).toEqual(false);
+
+        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
+
+        component.d_ag_test_suite!.deferred = true;
+        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
+
+        component.d_ag_test_suite!.deferred = false;
+        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
     });
 
     test('Adding a student file', async () => {

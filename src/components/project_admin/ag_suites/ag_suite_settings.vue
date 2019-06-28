@@ -29,6 +29,18 @@
                   </validated-input>
                 </div>
 
+                <div class="checkbox-container">
+                  <input id="synchronous-or-deferred"
+                         type="checkbox"
+                         class="checkbox"
+                         :checked="!d_ag_test_suite.deferred"
+                         @change="d_ag_test_suite.deferred = !$event.target.checked"/>
+                  <label class="checkbox-label"
+                         for="synchronous-or-deferred">
+                    Suite must finish before students can submit again
+                  </label>
+                </div>
+
                 <div class="section-container">
                   <fieldset class="fieldset">
                     <legend class="legend"> Grading Environment </legend>
@@ -45,26 +57,6 @@
                           </option>
                         </select>
                       </div>
-
-                    </div>
-
-<!--                    // suite must finish before students can submit again (put with name)-->
-                    <div class="toggle-container">
-                      <toggle v-model="d_ag_test_suite.deferred">
-                        <div slot="on">
-                          Deferred
-                        </div>
-                        <div slot="off">
-                          Synchronous
-                        </div>
-                      </toggle>
-<!--                      <i class="fas fa-question-circle input-tooltip">-->
-<!--                        <tooltip width="medium" placement="right">-->
-<!--                          Students can re-submit once all synchronous test suites are finished.-->
-<!--                          Deferred test suites are graded whenever resources are available,-->
-<!--                          but they do not block students from re-submitting.-->
-<!--                        </tooltip>-->
-<!--                      </i>-->
                     </div>
 
                     <div class="toggle-container">
@@ -422,6 +414,10 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 
 #setup-command-container {
   margin: 15px 0 10px 0;
+}
+
+.checkbox-container {
+  padding: 0 12px 22px 12px;
 }
 
 .toggle-container {

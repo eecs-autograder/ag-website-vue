@@ -1,6 +1,7 @@
 <template>
   <div id="validated-input-component">
     <div id="validated-input-wrapper">
+      <slot name="prefix"> </slot>
       <input id="input"
              v-if="num_rows === 1"
              :style="input_style"

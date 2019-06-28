@@ -202,6 +202,7 @@ export default class AGCasePanel extends Vue {
 
   add_command_form_is_valid = false;
   adding_command = false;
+  commands_are_visible = false;
   new_command_name = "";
   new_command = "";
   saving = false;
@@ -212,8 +213,14 @@ export default class AGCasePanel extends Vue {
   @Watch('active_ag_test_command')
   on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
                                     old_active_ag_test_command: AGTestCommand) {
-    if (new_active_ag_test_command !== null
+    if (this.active_ag_test_command !== null
         && new_active_ag_test_command.ag_test_case === this.ag_test_case.pk) {
+      this.commands_are_visible = true;
+    }
+  }
+
+  created() {
+    if (this.command_in_case_is_active) {
       this.commands_are_visible = true;
     }
   }
@@ -231,8 +238,6 @@ export default class AGCasePanel extends Vue {
       (<ValidatedInput> this.$refs.new_ag_test_command_name).focus();
     });
   }
-
-  commands_are_visible = false;
 
   get is_open() {
     return this.commands_are_visible;

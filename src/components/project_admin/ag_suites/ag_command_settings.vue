@@ -129,6 +129,9 @@
                                            is_greater_than_or_equal_to_one
                                          ]"
                                          input_style="width: 80px;">
+                          <div slot="prefix" class="plus-sign">
+                            <i class="fas fa-plus"></i>
+                          </div>
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
                       </div>
@@ -146,6 +149,9 @@
                                            is_greater_than_or_equal_to_one
                                          ]"
                                          input_style="width: 80px;">
+                          <div slot="prefix" class="minus-sign">
+                            <i class="fas fa-minus"></i>
+                          </div>
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
                       </div>
@@ -217,6 +223,9 @@
                                            is_greater_than_or_equal_to_one
                                          ]"
                                          input_style="width: 80px;">
+                          <div slot="prefix" class="plus-sign">
+                            <i class="fas fa-plus"></i>
+                          </div>
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
                       </div>
@@ -224,6 +233,7 @@
 
                     <div class="subtract-points-container">
                       <label class="text-label"> Wrong stdout</label>
+
                       <div>
                         <validated-input ref="deduction_for_wrong_stdout"
                                          v-model="d_ag_test_command.deduction_for_wrong_stdout"
@@ -233,10 +243,14 @@
                                            is_greater_than_or_equal_to_one
                                          ]"
                                          input_style="width: 80px;">
+                          <div slot="prefix" class="minus-sign">
+                            <i class="fas fa-minus"></i>
+                          </div>
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
                       </div>
                     </div>
+
                   </div>
 
                 </fieldset>
@@ -305,6 +319,9 @@
                                            is_greater_than_or_equal_to_one
                                          ]"
                                          input_style="width: 80px;">
+                          <div slot="prefix" class="plus-sign">
+                            <i class="fas fa-plus"></i>
+                          </div>
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
                       </div>
@@ -321,10 +338,14 @@
                                            is_greater_than_or_equal_to_one
                                          ]"
                                          input_style="width: 80px;">
+                          <div slot="prefix" class="minus-sign">
+                            <i class="fas fa-minus"></i>
+                          </div>
                           <div slot="suffix" class="unit-of-measurement"> points </div>
                         </validated-input>
                       </div>
                     </div>
+
                   </div>
 
                 </fieldset>
@@ -626,9 +647,8 @@ export default class AGCommandSettings extends Vue {
     }
   }
 
-  // implement command observer
   // deep needs to be here to pick up on the deletion of commands from the ag_suites component
-  @Watch('ag_test_case')
+  @Watch('ag_test_case', {deep: true})
   on_test_case_change(new_ag_test_case: AGTestCase, old_ag_test_case: AGTestCase) {
     this.d_ag_test_case = deep_copy(new_ag_test_case, AGTestCase);
     if (this.current_tab_index === 2) {
@@ -707,7 +727,29 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
 .file-dropdown-adjacent {
   display: inline-block;
   width: 200px;
+  margin-right: 5px;
   vertical-align: top;
+}
+
+.add-points-container div, .subtract-points-container div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.plus-sign, .minus-sign {
+  display: flex;
+  padding-right: 10px;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.plus-sign {
+  color: $ocean-blue;
+}
+
+.minus-sign {
+  color: $orange;
 }
 
 .text-container {
@@ -722,6 +764,7 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
   display: block;
   box-sizing: border-box;
   width: 200px;
+  margin-right: 5px;
   vertical-align: top;
 }
 
@@ -770,11 +813,7 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
     min-width: 500px;
   }
 
-  .add-points-container {
-    display: inline-block;
-  }
-
-  .subtract-points-container {
+  .add-points-container, .subtract-points-container {
     display: inline-block;
   }
 
