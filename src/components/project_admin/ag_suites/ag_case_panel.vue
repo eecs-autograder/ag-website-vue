@@ -17,7 +17,7 @@
       </div>
 
       <div id="ag-test-case-menu"
-           @click.stop="$emit('update_active_thing', ag_test_case);
+           @click.stop="$emit('update_active_item', ag_test_case);
                         $refs.ag_test_case_context_menu.show_context_menu($event.pageX,
                                                                           $event.pageY)">
         <i class="fas fa-ellipsis-v"></i>
@@ -63,7 +63,7 @@
                    {'active-ag-test-command': active_ag_test_command !== null
                                               && active_ag_test_command.pk === ag_test_command.pk}
            ]"
-           @click="$emit('update_active_thing', ag_test_command)"
+           @click="$emit('update_active_item', ag_test_command)"
            :key="ag_test_command.pk">
 
         <div class="ag-test-command-name">
@@ -250,12 +250,12 @@ export default class AGCasePanel extends Vue {
       }
       else {
         this.commands_are_visible = true;
-        this.$emit('update_active_thing', this.ag_test_case);
+        this.$emit('update_active_item', this.ag_test_case);
       }
     }
     else {
       if (!this.command_in_case_is_active) {
-        this.$emit('update_active_thing', this.ag_test_case);
+        this.$emit('update_active_item', this.ag_test_case);
       }
       else {
         this.commands_are_visible = false;

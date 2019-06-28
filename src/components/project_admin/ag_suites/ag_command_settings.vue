@@ -126,9 +126,11 @@
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
-                                           is_greater_than_or_equal_to_one
+
+                                           is_greater_than_or_equal_to_zero
                                          ]"
-                                         input_style="width: 80px;">
+                                         input_style="width: 80px;"
+                                         :from_string_fn="string_to_num">
                           <div slot="prefix" class="plus-sign">
                             <i class="fas fa-plus"></i>
                           </div>
@@ -146,9 +148,10 @@
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
-                                           is_greater_than_or_equal_to_one
+                                           is_greater_than_or_equal_to_zero
                                          ]"
-                                         input_style="width: 80px;">
+                                         input_style="width: 80px;"
+                                         :from_string_fn="string_to_num">
                           <div slot="prefix" class="minus-sign">
                             <i class="fas fa-minus"></i>
                           </div>
@@ -220,9 +223,10 @@
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
-                                           is_greater_than_or_equal_to_one
+                                           is_greater_than_or_equal_to_zero
                                          ]"
-                                         input_style="width: 80px;">
+                                         input_style="width: 80px;"
+                                         :from_string_fn="string_to_num">
                           <div slot="prefix" class="plus-sign">
                             <i class="fas fa-plus"></i>
                           </div>
@@ -240,9 +244,10 @@
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
-                                           is_greater_than_or_equal_to_one
+                                           is_greater_than_or_equal_to_zero
                                          ]"
-                                         input_style="width: 80px;">
+                                         input_style="width: 80px;"
+                                         :from_string_fn="string_to_num">
                           <div slot="prefix" class="minus-sign">
                             <i class="fas fa-minus"></i>
                           </div>
@@ -316,9 +321,10 @@
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
-                                           is_greater_than_or_equal_to_one
+                                           is_greater_than_or_equal_to_zero
                                          ]"
-                                         input_style="width: 80px;">
+                                         input_style="width: 80px;"
+                                         :from_string_fn="string_to_num">
                           <div slot="prefix" class="plus-sign">
                             <i class="fas fa-plus"></i>
                           </div>
@@ -335,9 +341,10 @@
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
-                                           is_greater_than_or_equal_to_one
+                                           is_greater_than_or_equal_to_zero
                                          ]"
-                                         input_style="width: 80px;">
+                                         input_style="width: 80px;"
+                                         :from_string_fn="string_to_num">
                           <div slot="prefix" class="minus-sign">
                             <i class="fas fa-minus"></i>
                           </div>
@@ -353,7 +360,7 @@
 
               <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none
                          || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
-                   class="section-container">
+                   class="section-container diff-options">
                 <fieldset class="fieldset">
                   <legend class="legend"> Diff Options </legend>
                   <div class="checkbox-input-container">
@@ -413,7 +420,8 @@
                                            is_not_empty,
                                            is_integer,
                                            is_greater_than_or_equal_to_one
-                                         ]">
+                                         ]"
+                                         :from_string_fn="string_to_num">
                           <div slot="suffix" class="unit-of-measurement"> seconds </div>
                         </validated-input>
                       </div>
@@ -430,7 +438,8 @@
                                            is_not_empty,
                                            is_integer,
                                            is_greater_than_or_equal_to_one
-                                         ]">
+                                         ]"
+                                         :from_string_fn="string_to_num">
                           <div slot="suffix" class="unit-of-measurement"> bytes </div>
                         </validated-input>
                       </div>
@@ -450,7 +459,8 @@
                                            is_not_empty,
                                            is_integer,
                                            is_greater_than_or_equal_to_one
-                                         ]">
+                                         ]"
+                                         :from_string_fn="string_to_num">
                           <div slot="suffix" class="unit-of-measurement"> bytes </div>
                         </validated-input>
                       </div>
@@ -467,7 +477,8 @@
                                            is_not_empty,
                                            is_integer,
                                            is_greater_than_or_equal_to_zero
-                                         ]">
+                                         ]"
+                                         :from_string_fn="string_to_num">
                           <div slot="suffix" class="unit-of-measurement"> child processes </div>
                         </validated-input>
                       </div>
@@ -598,7 +609,8 @@ import { deep_copy, handle_api_errors_async } from '@/utils';
 import {
   is_integer,
   is_not_empty,
-  make_min_value_validator
+  make_min_value_validator,
+  string_to_num
 } from '@/validators';
 
 @Component({
@@ -635,6 +647,7 @@ export default class AGCommandSettings extends Vue {
   readonly is_integer = is_integer;
   readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
   readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
+  readonly string_to_num = string_to_num;
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;

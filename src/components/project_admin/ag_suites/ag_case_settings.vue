@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="d_ag_test_case !== null">
     <div id="ag-test-case-settings-component">
       <validated-form ref="ag_test_case_settings_form"
                       autocomplete="off"
@@ -53,22 +53,7 @@ export default class AGCaseSettings extends Vue {
 
   readonly is_not_empty = is_not_empty;
 
-  default_case_feedback_config = {
-    visible: false,
-    show_individual_commands: false
-  };
-
-  d_ag_test_case: AGTestCase = new AGTestCase({
-    pk: 1,
-    name: "",
-    ag_test_suite: 1,
-    normal_fdbk_config: this.default_case_feedback_config,
-    ultimate_submission_fdbk_config: this.default_case_feedback_config,
-    past_limit_submission_fdbk_config: this.default_case_feedback_config,
-    staff_viewer_fdbk_config: this.default_case_feedback_config,
-    last_modified: '',
-    ag_test_commands: []
-  });
+  d_ag_test_case: AGTestCase | null = null;
 
   saving = false;
   settings_form_is_valid = true;

@@ -21,7 +21,7 @@
           <AGCasePanel :ag_test_case="test_case"
                        :ag_test_suite="ag_test_suite"
                        :active_ag_test_command="active_ag_test_command"
-                       @update_active_thing="$emit('update_active_thing', $event)">
+                       @update_active_item="$emit('update_active_item', $event)">
           </AGCasePanel>
         </div>
       </div>
@@ -213,17 +213,17 @@ export default class AGSuitePanel extends Vue {
   update_ag_test_suite_panel_when_clicked() {
     if (!this.cases_are_visible) {
       this.cases_are_visible = true;
-      this.$emit('update_active_thing', this.ag_test_suite);
+      this.$emit('update_active_item', this.ag_test_suite);
     }
     else {
       if (this.suite_is_active) {
         this.cases_are_visible = false;
       }
       else if (this.command_in_suite_is_active) {
-        this.$emit('update_active_thing', this.ag_test_suite);
+        this.$emit('update_active_item', this.ag_test_suite);
       }
       else {
-        this.$emit('update_active_thing', this.ag_test_suite);
+        this.$emit('update_active_item', this.ag_test_suite);
       }
     }
   }
@@ -248,7 +248,7 @@ export default class AGSuitePanel extends Vue {
   }
 
   open_new_ag_test_case_modal() {
-    this.$emit('update_active_thing', this.ag_test_suite);
+    this.$emit('update_active_item', this.ag_test_suite);
     this.duplicate_command_name_in_case = false;
     this.add_command();
     this.new_case_name = "";

@@ -191,7 +191,7 @@ describe('AGSuiteSettings tests', () => {
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
-    test('Publish final grades binding', () => {
+    test('deferred binding', () => {
         let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
 
         synchronous_checkbox.setChecked(true);

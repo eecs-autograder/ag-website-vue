@@ -19,6 +19,8 @@ import APIErrors from '@/components/api_errors.vue';
 import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { checkbox_is_checked } from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -254,6 +256,7 @@ describe('AGCommandSettings tests', () => {
         let name_validator = <ValidatedInput> wrapper.find({ref: "command_name"}).vm;
 
         expect(name_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> name_input.element).value = " ";
         name_input.trigger('input');
@@ -268,6 +271,8 @@ describe('AGCommandSettings tests', () => {
         let cmd_validator = <ValidatedInput> wrapper.find({ref: "cmd"}).vm;
 
         expect(cmd_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+
 
         (<HTMLInputElement> cmd_input.element).value = " ";
         cmd_input.trigger('input');
@@ -281,12 +286,15 @@ describe('AGCommandSettings tests', () => {
         let stdin_text_input = wrapper.find({ref: "cmd"}).find('#textarea');
         let stdin_text_validator = <ValidatedInput> wrapper.find({ref: "cmd"}).vm;
 
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+
         component.d_ag_test_command!.stdin_source = StdinSource.text;
         (<HTMLInputElement> stdin_text_input.element).value = "Lamp";
         stdin_text_input.trigger('input');
         await component.$nextTick();
 
         expect(stdin_text_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> stdin_text_input.element).value = " ";
         stdin_text_input.trigger('input');
@@ -308,12 +316,14 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(correct_return_code_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> correct_return_code_points_input.element).value = " ";
         correct_return_code_points_input.trigger('input');
         await component.$nextTick();
 
         expect(correct_return_code_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> correct_return_code_points_input.element).value = "Glasses";
         correct_return_code_points_input.trigger('input');
@@ -335,6 +345,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(correct_return_code_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> correct_return_code_points_input.element).value = "-2";
         correct_return_code_points_input.trigger('input');
@@ -356,12 +367,14 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(wrong_return_code_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> wrong_return_code_points_input.element).value = " ";
         wrong_return_code_points_input.trigger('input');
         await component.$nextTick();
 
         expect(wrong_return_code_points_validator.is_valid).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         (<HTMLInputElement> wrong_return_code_points_input.element).value = "Glasses";
         wrong_return_code_points_input.trigger('input');
@@ -383,6 +396,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(wrong_return_code_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> wrong_return_code_points_input.element).value = "-1";
         wrong_return_code_points_input.trigger('input');
@@ -393,7 +407,10 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - expected_stdout_text is blank', async () => {
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+
         component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         let expected_stdout_text_input = wrapper.find(
             {ref: "expected_stdout_text"}
@@ -407,6 +424,8 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(expected_stdout_text_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+
 
         (<HTMLInputElement> expected_stdout_text_input.element).value = " ";
         expected_stdout_text_input.trigger('input');
@@ -428,6 +447,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(correct_stdout_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> correct_stdout_points_input.element).value = " ";
         correct_stdout_points_input.trigger('input');
@@ -456,6 +476,8 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(correct_stdout_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+
 
         (<HTMLInputElement> correct_stdout_points_input.element).value = "-1";
         correct_stdout_points_input.trigger('input');
@@ -477,6 +499,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(wrong_stdout_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> wrong_stdout_points_input.element).value = " ";
         wrong_stdout_points_input.trigger('input');
@@ -505,6 +528,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(wrong_stdout_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> wrong_stdout_points_input.element).value = "-1";
         wrong_stdout_points_input.trigger('input');
@@ -516,6 +540,8 @@ describe('AGCommandSettings tests', () => {
 
     test('error - expected_stderr_text is blank', async () => {
         component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         let expected_stderr_text_input = wrapper.find(
             {ref: "expected_stderr_text"}
@@ -529,6 +555,7 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(expected_stderr_text_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> expected_stderr_text_input.element).value = " ";
         expected_stderr_text_input.trigger('input');
@@ -551,6 +578,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(correct_stderr_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> correct_stderr_points_input.element).value = " ";
         correct_stderr_points_input.trigger('input');
@@ -580,6 +608,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(correct_stderr_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> correct_stderr_points_input.element).value = "-1";
         correct_stderr_points_input.trigger('input');
@@ -602,6 +631,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(wrong_stderr_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> wrong_stderr_points_input.element).value = " ";
         wrong_stderr_points_input.trigger('input');
@@ -631,6 +661,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(wrong_stderr_points_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> wrong_stderr_points_input.element).value = "-1";
         wrong_stderr_points_input.trigger('input');
@@ -640,11 +671,151 @@ describe('AGCommandSettings tests', () => {
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
+    test('Diff options appear when expected_stdout_source !== none ' +
+         'OR expected_stderr_source !== none',
+         async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+
+        expect(wrapper.findAll('.diff-options').length).toEqual(0);
+    });
+
+    test('ignore_case binding', async () => {
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+
+        let ignore_case = wrapper.find('#ignore-case');
+
+        ignore_case.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_case).toBe(true);
+        expect(checkbox_is_checked(ignore_case)).toEqual(true);
+
+        ignore_case.setChecked(false);
+        expect(component.d_ag_test_command!.ignore_case).toBe(false);
+        expect(checkbox_is_checked(ignore_case)).toEqual(false);
+
+        ignore_case.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_case).toBe(true);
+        expect(checkbox_is_checked(ignore_case)).toEqual(true);
+
+        component.d_ag_test_command!.ignore_case = false;
+        expect(checkbox_is_checked(ignore_case)).toBe(false);
+
+        component.d_ag_test_command!.ignore_case = true;
+        expect(checkbox_is_checked(ignore_case)).toBe(true);
+    });
+
+    test('ignore_whitespace binding', async () => {
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        let ignore_whitespace = wrapper.find('#ignore-whitespace');
+
+        ignore_whitespace.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_whitespace).toBe(true);
+        expect(checkbox_is_checked(ignore_whitespace)).toEqual(true);
+
+        ignore_whitespace.setChecked(false);
+        expect(component.d_ag_test_command!.ignore_whitespace).toBe(false);
+        expect(checkbox_is_checked(ignore_whitespace)).toEqual(false);
+
+        ignore_whitespace.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_whitespace).toBe(true);
+        expect(checkbox_is_checked(ignore_whitespace)).toEqual(true);
+
+        component.d_ag_test_command!.ignore_whitespace = false;
+        expect(checkbox_is_checked(ignore_whitespace)).toBe(false);
+
+        component.d_ag_test_command!.ignore_whitespace = true;
+        expect(checkbox_is_checked(ignore_whitespace)).toBe(true);
+    });
+
+    test('ignore_whitespace_changes binding', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+
+        let ignore_whitespace_changes = wrapper.find('#ignore-whitespace-changes');
+
+        ignore_whitespace_changes.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_whitespace_changes).toBe(true);
+        expect(checkbox_is_checked(ignore_whitespace_changes)).toEqual(true);
+
+        ignore_whitespace_changes.setChecked(false);
+        expect(component.d_ag_test_command!.ignore_whitespace_changes).toBe(false);
+        expect(checkbox_is_checked(ignore_whitespace_changes)).toEqual(false);
+
+        ignore_whitespace_changes.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_whitespace_changes).toBe(true);
+        expect(checkbox_is_checked(ignore_whitespace_changes)).toEqual(true);
+
+        component.d_ag_test_command!.ignore_whitespace_changes = false;
+        expect(checkbox_is_checked(ignore_whitespace_changes)).toBe(false);
+
+        component.d_ag_test_command!.ignore_whitespace_changes = true;
+        expect(checkbox_is_checked(ignore_whitespace_changes)).toBe(true);
+    });
+
+    test('ignore_blank_lines binding', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        let ignore_blank_lines = wrapper.find('#ignore-blank-lines');
+
+        ignore_blank_lines.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_blank_lines).toBe(true);
+        expect(checkbox_is_checked(ignore_blank_lines)).toEqual(true);
+
+        ignore_blank_lines.setChecked(false);
+        expect(component.d_ag_test_command!.ignore_blank_lines).toBe(false);
+        expect(checkbox_is_checked(ignore_blank_lines)).toEqual(false);
+
+        ignore_blank_lines.setChecked(true);
+        expect(component.d_ag_test_command!.ignore_blank_lines).toBe(true);
+        expect(checkbox_is_checked(ignore_blank_lines)).toEqual(true);
+
+        component.d_ag_test_command!.ignore_blank_lines = false;
+        expect(checkbox_is_checked(ignore_blank_lines)).toBe(false);
+
+        component.d_ag_test_command!.ignore_blank_lines = true;
+        expect(checkbox_is_checked(ignore_blank_lines)).toBe(true);
+    });
+
     test('error - time_limit is blank or not an integer', async () => {
         let time_limit_input = wrapper.find({ref: 'time_limit'}).find('#input');
         let time_limit_validator = <ValidatedInput> wrapper.find({ref: 'time_limit'}).vm;
 
         expect(time_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> time_limit_input.element).value = " ";
         time_limit_input.trigger('input');
@@ -666,6 +837,7 @@ describe('AGCommandSettings tests', () => {
         let time_limit_validator = <ValidatedInput> wrapper.find({ref: 'time_limit'}).vm;
 
         expect(time_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> time_limit_input.element).value = "0";
         time_limit_input.trigger('input');
@@ -690,6 +862,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(virtual_memory_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> virtual_memory_limit_input.element).value = " ";
         virtual_memory_limit_input.trigger('input');
@@ -715,6 +888,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(virtual_memory_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> virtual_memory_limit_input.element).value = "0";
         virtual_memory_limit_input.trigger('input');
@@ -739,6 +913,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(stack_size_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> stack_size_limit_input.element).value = " ";
         stack_size_limit_input.trigger('input');
@@ -764,6 +939,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(stack_size_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> stack_size_limit_input.element).value = "0";
         stack_size_limit_input.trigger('input');
@@ -788,6 +964,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(process_spawn_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> process_spawn_limit_input.element).value = " ";
         process_spawn_limit_input.trigger('input');
@@ -813,6 +990,7 @@ describe('AGCommandSettings tests', () => {
         ).vm;
 
         expect(process_spawn_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         (<HTMLInputElement> process_spawn_limit_input.element).value = "-1";
         process_spawn_limit_input.trigger('input');
@@ -826,10 +1004,12 @@ describe('AGCommandSettings tests', () => {
         await component.$nextTick();
 
         expect(process_spawn_limit_validator.is_valid).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('Save command settings - successful', async () => {
         let save_stub = sinon.stub(component.d_ag_test_command!, 'save');
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#ag-test-command-settings-form').trigger('submit');
         await component.$nextTick();

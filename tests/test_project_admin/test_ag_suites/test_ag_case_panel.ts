@@ -334,7 +334,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(
             ag_case_green
         );
         expect(component.commands_are_visible).toBe(true);
@@ -369,7 +369,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_case_green);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
 
         expect(component.commands_are_visible).toBe(true);
 
@@ -387,7 +387,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[1][0]).toEqual(ag_case_green);
+        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_case_green);
 
         expect(component.commands_are_visible).toBe(true);
     });
@@ -397,7 +397,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(
             ag_case_green
         );
 
@@ -431,7 +431,7 @@ describe('AGCasePanel tests', () => {
 
         expect(component.is_open).toBe(true);
         expect(component.commands_are_visible).toBe(true);
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_case_green);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
         await component.$nextTick();
@@ -451,13 +451,13 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_case_green);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
         expect(component.commands_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-command').at(1).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[1][0]).toEqual(ag_command_green_2);
+        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_command_green_2);
     });
 
     test('Add command - successful', async () => {

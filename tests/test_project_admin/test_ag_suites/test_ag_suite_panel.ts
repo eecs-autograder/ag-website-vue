@@ -210,7 +210,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_suite);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
         expect(component.cases_are_visible).toBe(true);
     });
 
@@ -244,7 +244,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_suite);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
@@ -255,7 +255,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[1][0]).toEqual(ag_suite);
+        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_suite);
         expect(component.cases_are_visible).toBe(true);
     });
 
@@ -264,7 +264,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted('update_active_thing').length).toEqual(1);
+        expect(wrapper.emitted('update_active_item').length).toEqual(1);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
@@ -287,7 +287,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_suite);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
     });
 
     test('Command in suite becomes active', async () => {
@@ -306,7 +306,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted('update_active_thing').length).toEqual(1);
+        expect(wrapper.emitted('update_active_item').length).toEqual(1);
     });
 
     test('Add case (and first command of the same name) - successful', async () => {

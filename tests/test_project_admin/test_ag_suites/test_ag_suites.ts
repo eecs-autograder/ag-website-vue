@@ -17,7 +17,6 @@ import {
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
-import { NewAGTestCommandData } from 'ag-client-typescript/dist/src/ag_test_command';
 import { AxiosError } from 'axios';
 import { create } from 'domain';
 import * as sinon from "sinon";
@@ -374,7 +373,7 @@ describe('AGSuites tests', () => {
     test('Delete active first suite in suites', async () => {
         expect(component.ag_test_suites.length).toEqual(3);
 
-        component.update_active_thing(ag_suite_colors);
+        component.update_active_item(ag_suite_colors);
         await component.$nextTick();
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
@@ -396,7 +395,7 @@ describe('AGSuites tests', () => {
     test('Delete active last suite in suites', async () => {
         expect(component.ag_test_suites.length).toEqual(3);
 
-        component.update_active_thing(ag_suite_beverages);
+        component.update_active_item(ag_suite_beverages);
         await component.$nextTick();
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
@@ -418,7 +417,7 @@ describe('AGSuites tests', () => {
     test('Delete active middle suite in suites', async () => {
         expect(component.ag_test_suites.length).toEqual(3);
 
-        component.update_active_thing(ag_suite_pets);
+        component.update_active_item(ag_suite_pets);
         await component.$nextTick();
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
@@ -431,7 +430,7 @@ describe('AGSuites tests', () => {
     test('Delete all suites - active_suite gets set to null', async () => {
         expect(component.ag_test_suites.length).toEqual(3);
 
-        component.update_active_thing(ag_suite_colors);
+        component.update_active_item(ag_suite_colors);
         await component.$nextTick();
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
@@ -503,7 +502,7 @@ describe('AGSuites tests', () => {
     });
 
     test('active first case deleted', async () => {
-        component.update_active_thing(ag_case_purple);
+        component.update_active_item(ag_case_purple);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_purple_1);
@@ -529,7 +528,7 @@ describe('AGSuites tests', () => {
     test('Active middle case deleted', async () => {
         expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
-        component.update_active_thing(ag_case_blue);
+        component.update_active_item(ag_case_blue);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_blue_1);
@@ -552,7 +551,7 @@ describe('AGSuites tests', () => {
     });
 
     test('active last case deleted', async () => {
-        component.update_active_thing(ag_case_green);
+        component.update_active_item(ag_case_green);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_green_1);
@@ -567,7 +566,7 @@ describe('AGSuites tests', () => {
     });
 
     test('Delete all cases in suite - suite becomes active', async () => {
-        component.update_active_thing(ag_case_dog);
+        component.update_active_item(ag_case_dog);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
@@ -637,7 +636,7 @@ describe('AGSuites tests', () => {
     test('active First command deleted in case', async () => {
         expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
-        component.update_active_thing(ag_command_green_1);
+        component.update_active_item(ag_command_green_1);
         await component.$nextTick();
 
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
@@ -660,7 +659,7 @@ describe('AGSuites tests', () => {
     test('Active middle command deleted in case', async () => {
         expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
-        component.update_active_thing(ag_command_green_2);
+        component.update_active_item(ag_command_green_2);
         await component.$nextTick();
 
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
@@ -682,7 +681,7 @@ describe('AGSuites tests', () => {
     test('Active last command deleted in case', async () => {
         expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
-        component.update_active_thing(ag_command_green_3);
+        component.update_active_item(ag_command_green_3);
         await component.$nextTick();
 
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
@@ -700,7 +699,7 @@ describe('AGSuites tests', () => {
     });
 
     test('prev_ag_test_case_is_available (false) - active_ag_test_command is null', async () => {
-        component.update_active_thing(ag_suite_colors);
+        component.update_active_item(ag_suite_colors);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(false);
@@ -709,7 +708,7 @@ describe('AGSuites tests', () => {
 
     test('prev_ag_test_case_is_available (false) - suite index is 0, case index is 0',
          async () => {
-        component.update_active_thing(ag_case_purple);
+        component.update_active_item(ag_case_purple);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(false);
@@ -725,7 +724,7 @@ describe('AGSuites tests', () => {
         AGTestCase.notify_ag_test_case_deleted(ag_case_bird);
         await component.$nextTick();
 
-        component.update_active_thing(ag_command_sprite_1);
+        component.update_active_item(ag_command_sprite_1);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(false);
@@ -740,7 +739,7 @@ describe('AGSuites tests', () => {
         AGTestCase.notify_ag_test_case_created(ag_case_cat);
         await component.$nextTick();
 
-        component.update_active_thing(ag_case_sprite);
+        component.update_active_item(ag_case_sprite);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(false);
@@ -750,7 +749,7 @@ describe('AGSuites tests', () => {
     test("prev_ag_test_case_is_available (true) - suite index != 0, case index is 0, " +
          "prev suite's last case has enough commands",
          async () => {
-        component.update_active_thing(ag_command_sprite_1);
+        component.update_active_item(ag_command_sprite_1);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(true);
@@ -760,7 +759,7 @@ describe('AGSuites tests', () => {
     test('prev_ag_test_case_is_available (false) - suite index is 0, case index != 0, ' +
          'prev case does not have enough commands',
          async () => {
-        component.update_active_thing(ag_command_green_3);
+        component.update_active_item(ag_command_green_3);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(false);
@@ -779,7 +778,7 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
         await component.$nextTick();
 
-        component.update_active_thing(ag_command_green_2);
+        component.update_active_item(ag_command_green_2);
         await component.$nextTick();
 
         expect(component.prev_ag_test_case_is_available).toBe(true);
@@ -787,7 +786,7 @@ describe('AGSuites tests', () => {
     });
 
     test('go_to_prev_command - prev case in same suite', async () => {
-        component.update_active_thing(ag_command_blue_1);
+        component.update_active_item(ag_command_blue_1);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_blue_1);
@@ -800,7 +799,7 @@ describe('AGSuites tests', () => {
     });
 
     test('go_to_prev_command - last case in previous suite', async () => {
-        component.update_active_thing(ag_command_dog_1);
+        component.update_active_item(ag_command_dog_1);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
@@ -820,7 +819,7 @@ describe('AGSuites tests', () => {
     });
 
     test('next_ag_test_case_is_available (false) - active_ag_test_command is null', async () => {
-        component.update_active_thing(ag_suite_colors);
+        component.update_active_item(ag_suite_colors);
         await component.$nextTick();
 
 
@@ -831,7 +830,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (false) - suite index is 0, case index is 0, ' +
          'next case doesnt have enough commands',
          async () => {
-        component.update_active_thing(ag_command_purple_2);
+        component.update_active_item(ag_command_purple_2);
         await component.$nextTick();
 
         expect(component.next_ag_test_case_is_available).toBe(false);
@@ -841,7 +840,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (true) - suite index is 0, case index is 0, next ' +
          'case has enough commands',
          async () => {
-        component.update_active_thing(ag_command_purple_1);
+        component.update_active_item(ag_command_purple_1);
         await component.$nextTick();
 
         expect(component.next_ag_test_case_is_available).toBe(true);
@@ -851,7 +850,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (false) - suite is the last suite, case is the ' +
          'last case in the suite',
          async () => {
-        component.update_active_thing(ag_command_sprite_1);
+        component.update_active_item(ag_command_sprite_1);
         await component.$nextTick();
 
         expect(component.next_ag_test_case_is_available).toBe(false);
@@ -866,7 +865,7 @@ describe('AGSuites tests', () => {
         AGTestSuite.notify_ag_test_suite_created(new_suite);
         await component.$nextTick();
 
-        component.update_active_thing(ag_command_sprite_1);
+        component.update_active_item(ag_command_sprite_1);
         await component.$nextTick();
 
         expect(component.next_ag_test_case_is_available).toBe(false);
@@ -876,7 +875,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (false) - suite is not the last suite, case is ' +
          'the last case in the suite, first case in next suite doesnt have enough commands',
          async () => {
-        component.update_active_thing(ag_command_green_2);
+        component.update_active_item(ag_command_green_2);
         await component.$nextTick();
 
         expect(component.next_ag_test_case_is_available).toBe(false);
@@ -886,7 +885,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (true) - suite is not the last suite, case is' +
          'the last case in the suite, first case in the next suite has enough commands',
          async () => {
-        component.update_active_thing(ag_command_green_1);
+        component.update_active_item(ag_command_green_1);
         await component.$nextTick();
 
         expect(component.next_ag_test_case_is_available).toBe(true);
@@ -894,7 +893,7 @@ describe('AGSuites tests', () => {
     });
 
     test('go_to_next_command - next case in same suite', async () => {
-        component.update_active_thing(ag_command_dog_1);
+        component.update_active_item(ag_command_dog_1);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
@@ -907,7 +906,7 @@ describe('AGSuites tests', () => {
     });
 
     test('go_to_next_command - first case in next suite', async () => {
-        component.update_active_thing(ag_command_green_1);
+        component.update_active_item(ag_command_green_1);
         await component.$nextTick();
 
         expect(component.active_ag_test_command).toEqual(ag_command_green_1);
@@ -922,15 +921,15 @@ describe('AGSuites tests', () => {
     test('active_level_is_suite', async () => {
         expect(component.active_level_is_suite).toBe(false);
 
-        component.update_active_thing(ag_suite_colors);
+        component.update_active_item(ag_suite_colors);
         await component.$nextTick();
         expect(component.active_level_is_suite).toBe(true);
 
-        component.update_active_thing(ag_case_green);
+        component.update_active_item(ag_case_green);
         await component.$nextTick();
         expect(component.active_level_is_suite).toBe(false);
 
-        component.update_active_thing(ag_command_green_1);
+        component.update_active_item(ag_command_green_1);
         await component.$nextTick();
         expect(component.active_level_is_suite).toBe(false);
     });
@@ -938,15 +937,15 @@ describe('AGSuites tests', () => {
     test('active_level_is_command', async () => {
         expect(component.active_level_is_command).toBe(false);
 
-        component.update_active_thing(ag_suite_colors);
+        component.update_active_item(ag_suite_colors);
         await component.$nextTick();
         expect(component.active_level_is_command).toBe(false);
 
-        component.update_active_thing(ag_case_green);
+        component.update_active_item(ag_case_green);
         await component.$nextTick();
         expect(component.active_level_is_command).toBe(true);
 
-        component.update_active_thing(ag_command_green_1);
+        component.update_active_item(ag_command_green_1);
         await component.$nextTick();
         expect(component.active_level_is_command).toBe(true);
     });
@@ -954,12 +953,12 @@ describe('AGSuites tests', () => {
     test('parent_ag_test_case getter', async () => {
         expect(component.parent_ag_test_case).toBeNull();
 
-        component.update_active_thing(ag_case_green);
+        component.update_active_item(ag_case_green);
         await component.$nextTick();
 
         expect(component.parent_ag_test_case).toEqual(ag_case_green);
 
-        component.update_active_thing(ag_command_bird_1);
+        component.update_active_item(ag_command_bird_1);
         await component.$nextTick();
 
         expect(component.parent_ag_test_case).toEqual(ag_case_bird);
@@ -968,17 +967,17 @@ describe('AGSuites tests', () => {
     test('parent_ag_test_suite getter', async () => {
         expect(component.parent_ag_test_suite).toBeNull();
 
-        component.update_active_thing(ag_suite_pets);
+        component.update_active_item(ag_suite_pets);
         await component.$nextTick();
 
         expect(component.parent_ag_test_suite).toBeNull();
 
-        component.update_active_thing(ag_case_blue);
+        component.update_active_item(ag_case_blue);
         await component.$nextTick();
 
         expect(component.parent_ag_test_suite).toEqual(ag_suite_colors);
 
-        component.update_active_thing(ag_command_bird_1);
+        component.update_active_item(ag_command_bird_1);
         await component.$nextTick();
 
         expect(component.parent_ag_test_suite).toEqual(ag_suite_pets);
