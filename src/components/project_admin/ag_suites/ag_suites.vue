@@ -462,7 +462,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
     let command_was_active = this.active_ag_test_command !== null
                              && ag_test_command.pk === this.active_ag_test_command!.pk;
-    this.update_active_thing(null);
     parent_ag_test_case!.ag_test_commands.splice(command_index, 1);
     if (command_was_active) {
       if (command_index === parent_ag_test_case!.ag_test_commands.length) {
@@ -471,7 +470,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
       else {
         this.update_active_thing(parent_ag_test_case!.ag_test_commands[command_index]);
       }
-
     }
   }
 

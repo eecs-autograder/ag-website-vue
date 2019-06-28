@@ -626,8 +626,9 @@ export default class AGCommandSettings extends Vue {
     }
   }
 
+  // implement command observer
   // deep needs to be here to pick up on the deletion of commands from the ag_suites component
-  @Watch('ag_test_case', {deep: true})
+  @Watch('ag_test_case')
   on_test_case_change(new_ag_test_case: AGTestCase, old_ag_test_case: AGTestCase) {
     this.d_ag_test_case = deep_copy(new_ag_test_case, AGTestCase);
     if (this.current_tab_index === 2) {

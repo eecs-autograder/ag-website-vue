@@ -63,7 +63,8 @@
                    {'active-ag-test-command': active_ag_test_command !== null
                                               && active_ag_test_command.pk === ag_test_command.pk}
            ]"
-           @click="$emit('update_active_thing', ag_test_command)">
+           @click="$emit('update_active_thing', ag_test_command)"
+           :key="ag_test_command.pk">
 
         <div class="ag-test-command-name">
           <span>{{ag_test_command.name}}</span>

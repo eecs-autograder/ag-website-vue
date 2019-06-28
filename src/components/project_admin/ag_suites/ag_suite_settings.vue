@@ -33,7 +33,7 @@
                   <fieldset class="fieldset">
                     <legend class="legend"> Grading Environment </legend>
                     <div class="sandbox-container">
-                      <label class="text-label"> Sandbox environment: </label>
+                      <label class="text-label"> Sandbox environment </label>
 
                       <div class="dropdown">
                         <select id="sandbox_environment"
@@ -48,6 +48,7 @@
 
                     </div>
 
+<!--                    // suite must finish before students can submit again (put with name)-->
                     <div class="toggle-container">
                       <toggle v-model="d_ag_test_suite.deferred">
                         <div slot="on">
@@ -57,13 +58,13 @@
                           Synchronous
                         </div>
                       </toggle>
-                      <i class="fas fa-question-circle input-tooltip">
-                        <tooltip width="medium" placement="right">
-                          Students can re-submit once all synchronous test suites are finished.
-                          Deferred test suites are graded whenever resources are available,
-                          but they do not block students from re-submitting.
-                        </tooltip>
-                      </i>
+<!--                      <i class="fas fa-question-circle input-tooltip">-->
+<!--                        <tooltip width="medium" placement="right">-->
+<!--                          Students can re-submit once all synchronous test suites are finished.-->
+<!--                          Deferred test suites are graded whenever resources are available,-->
+<!--                          but they do not block students from re-submitting.-->
+<!--                        </tooltip>-->
+<!--                      </i>-->
                     </div>
 
                     <div class="toggle-container">
