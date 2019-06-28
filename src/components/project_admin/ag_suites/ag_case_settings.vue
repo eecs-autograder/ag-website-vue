@@ -73,7 +73,7 @@ export default class AGCaseSettings extends Vue {
   saving = false;
   settings_form_is_valid = true;
 
-  @Watch('ag_test_case', {deep: true})
+  @Watch('ag_test_case')
   on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
     this.d_ag_test_case = deep_copy(new_test_case, AGTestCase);
   }

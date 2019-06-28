@@ -31,7 +31,7 @@
 
                 <div class="section-container">
                   <fieldset class="fieldset">
-                    <legend class="legend"> RENAME ME </legend>
+                    <legend class="legend"> Grading Environment </legend>
                     <div class="sandbox-container">
                       <label class="text-label"> Sandbox environment: </label>
 

@@ -170,7 +170,7 @@
                           Text
                         </option>
                         <option :value="ExpectedOutputSource.instructor_file">
-                          Project file content
+                          Instructor file content
                         </option>
                       </select>
                     </div>
@@ -258,7 +258,7 @@
                           Text
                         </option>
                         <option :value="ExpectedOutputSource.instructor_file">
-                          Project file content
+                          Instructor file content
                         </option>
                       </select>
                     </div>

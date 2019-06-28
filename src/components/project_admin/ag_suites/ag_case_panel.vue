@@ -1,10 +1,10 @@
 <template>
   <div v-if="ag_test_case !== null">
     <div :class="['ag-test-case',
-                 {'closed-but-active': !is_open && command_in_case_is_active},
-                 {'active-ag-test-case-multiple-commands': ag_test_case.ag_test_commands.length > 1
-                                                   && command_in_case_is_active},
-                 {'active-ag-test-case-one-command': ag_test_case.ag_test_commands.length === 1
+                 {'closed-but-active': !is_open && command_in_case_is_active,
+                 'active-ag-test-case-multiple-commands': ag_test_case.ag_test_commands.length > 1
+                                                   && command_in_case_is_active,
+                 'active-ag-test-case-one-command': ag_test_case.ag_test_commands.length === 1
                                              && command_in_case_is_active}]"
          @click="update_ag_test_case_panel_when_clicked">
 
