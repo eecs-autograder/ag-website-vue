@@ -2,9 +2,9 @@
   <div v-if="ag_test_case !== null">
     <div :class="['ag-test-case',
                  {'closed-but-active': !is_open && command_in_case_is_active},
-                 {'active-case-multiple-commands': ag_test_case.ag_test_commands.length > 1
+                 {'active-ag-test-case-multiple-commands': ag_test_case.ag_test_commands.length > 1
                                                    && command_in_case_is_active},
-                 {'active-case-one-command': ag_test_case.ag_test_commands.length === 1
+                 {'active-ag-test-case-one-command': ag_test_case.ag_test_commands.length === 1
                                              && command_in_case_is_active}]"
          @click="update_ag_test_case_panel_when_clicked">
 
@@ -13,7 +13,7 @@
            class="fas fa-caret-right ag-test-case-symbol-right"></i>
         <i v-else-if="ag_test_case.ag_test_commands.length > 1 && is_open"
            class="fas fa-caret-down ag-test-case-symbol-down"></i>
-        <span>{{ag_test_case.name}} {{ag_test_case.ag_test_commands.length}}</span>
+        <span>{{ag_test_case.name}}</span>
       </div>
 
       <div id="ag-test-case-menu"
@@ -175,13 +175,6 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
-export enum CasePanelState {
-  open_and_child_command_active,
-  open_and_child_command_not_active,
-  closed_and_child_command_active,
-  closed_and_child_command_not_active
-}
-
 @Component({
   components: {
     APIErrors,
@@ -211,7 +204,6 @@ export default class AGCasePanel extends Vue {
   new_command_name = "";
   new_command = "";
   saving = false;
-  case_panel_state: CasePanelState = CasePanelState.closed_and_child_command_not_active;
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   ag_test_case_settings_form_is_valid = false;
@@ -333,13 +325,13 @@ function handle_add_ag_test_command_error(component: AGCasePanel, error: unknown
   @extend .active-level;
 }
 
-.active-case-multiple-commands {
+.active-ag-test-case-multiple-commands {
   #ag-test-case-menu, #ag-test-case-menu:hover {
     visibility: visible;
   }
 }
 
-.active-case-one-command {
+.active-ag-test-case-one-command {
   @extend .active-level;
   #ag-test-case-menu, #ag-test-case-menu:hover {
     visibility: visible;

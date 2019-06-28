@@ -143,7 +143,6 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
-// make this a class that's default constructable
 export class NewCommandFields {
   name: string;
   cmd: string;
@@ -213,21 +212,17 @@ export default class AGSuitePanel extends Vue {
 
   update_ag_test_suite_panel_when_clicked() {
     if (!this.cases_are_visible) {
-      console.log("Was closed and nothing was active");
       this.cases_are_visible = true;
       this.$emit('update_active_thing', this.ag_test_suite);
     }
     else {
       if (this.suite_is_active) {
-        console.log("Was open and suite was active");
         this.cases_are_visible = false;
       }
       else if (this.command_in_suite_is_active) {
-        console.log("Was open and command was active");
         this.$emit('update_active_thing', this.ag_test_suite);
       }
       else {
-        console.log("Was open and nothing was active");
         this.$emit('update_active_thing', this.ag_test_suite);
       }
     }

@@ -14,7 +14,7 @@
 
       <div id="nav-bar-body" @wheel.stop>
         <div id="all-ag-test-suites">
-          <div v-for="(ag_test_suite, index) of ag_test_suites"
+          <div v-for="ag_test_suite of ag_test_suites"
                class="ag-test-suite-container"
                :key="ag_test_suite.pk">
             <AGSuitePanel :ag_test_suite="ag_test_suite"
@@ -28,12 +28,6 @@
     </div>
 
     <div id="viewing-window">
-<!--      <div>Active Suite:-->
-<!--        {{active_ag_test_suite === null ? "NULL" : active_ag_test_suite.name}}</div>-->
-<!--      <div>Active Command:-->
-<!--        {{active_ag_test_command === null ? "NULL" : active_ag_test_command.name}}</div>-->
-
-
       <div v-if="active_ag_test_suite !== null"
            class="settings-wrapper">
         <AGSuiteSettings :ag_test_suite="active_ag_test_suite"

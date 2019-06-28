@@ -14,8 +14,6 @@
           <template slot="body">
             <div class="tab-body">
 
-              <div> Num cases: {{d_ag_test_suite.ag_test_cases.length}}</div>
-
               <validated-form id="ag-test-suite-settings-form"
                               autocomplete="off"
                               spellcheck="false"
@@ -220,7 +218,7 @@
               <button class="delete-ag-test-suite-button"
                       type="button"
                       @click="$refs.delete_ag_test_suite_modal.open()">
-                Delete Suite: <span>{{d_ag_test_suite.name}}</span>
+                Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
               </button>
 
               <modal ref="delete_ag_test_suite_modal"
@@ -258,7 +256,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
-  AGTestSuite, AGTestSuiteObserver,
+  AGTestSuite,
   ExpectedStudentFile,
   get_sandbox_docker_images,
   InstructorFile,
@@ -383,7 +381,6 @@ export default class AGSuiteSettings extends Vue {
 
   async delete_ag_test_suite() {
     await this.d_ag_test_suite!.delete();
-    // (<Modal> this.$refs.delete_ag_test_suite_modal).close();
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {

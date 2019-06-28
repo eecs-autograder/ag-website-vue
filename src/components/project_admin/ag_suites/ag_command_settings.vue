@@ -58,17 +58,8 @@
                         </option>
 
                         <option :value="StdinSource.instructor_file">
-                          Project file content
+                          Instructor file content
                         </option>
-
-                        <option :value="StdinSource.setup_stdout">
-                          Stdout from setup
-                        </option>
-
-                        <option :value="StdinSource.setup_stderr">
-                          Stderr from setup
-                        </option>
-
                       </select>
                     </div>
 
@@ -339,8 +330,8 @@
                 </fieldset>
               </div>
 
-              <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none ||
-                         d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+              <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none
+                         || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
                    class="section-container">
                 <fieldset class="fieldset">
                   <legend class="legend"> Diff Options </legend>
@@ -514,11 +505,10 @@
         <template slot="body">
           <div class="tab-body">
 
-            <span> Number of commands in case: {{d_ag_test_case.ag_test_commands.length}} </span>
             <button class="delete-ag-test-command-button"
                     type="button"
                     @click="$refs.delete_ag_test_command_modal.open()">
-              {{case_has_exactly_one_command ? 'Delete Case' : 'Delete Command'}}:
+              {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Test Command'}}:
               <span>
                 {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
               </span>
@@ -636,7 +626,7 @@ export default class AGCommandSettings extends Vue {
     }
   }
 
-  // deep needs to be here to pick up on deletion of commands from parent (ag_suites)
+  // deep needs to be here to pick up on the deletion of commands from the ag_suites component
   @Watch('ag_test_case', {deep: true})
   on_test_case_change(new_ag_test_case: AGTestCase, old_ag_test_case: AGTestCase) {
     this.d_ag_test_case = deep_copy(new_ag_test_case, AGTestCase);
@@ -661,7 +651,6 @@ export default class AGCommandSettings extends Vue {
     else {
       await this.d_ag_test_command!.delete();
     }
-    // (<Modal> this.$refs.delete_ag_test_command_modal).close();
   }
 
   @handle_api_errors_async(handle_save_ag_command_settings_error)
