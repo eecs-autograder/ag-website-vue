@@ -174,7 +174,13 @@ export default class AGSuitePanel extends Vue {
   @Prop({required: true, type: AGTestSuite})
   ag_test_suite!: AGTestSuite;
 
+  add_case_form_is_valid = false;
   cases_are_visible = false;
+  creating_case = false;
+  duplicate_command_name_in_case = false;
+  loading = true;
+  new_case_name = "";
+  new_commands: NewCommandFields[] = [];
 
   readonly is_not_empty = is_not_empty;
 
@@ -192,23 +198,16 @@ export default class AGSuitePanel extends Vue {
     ) !== -1;
   }
 
+  get is_open() {
+    return this.cases_are_visible;
+  }
+
   format_ordinal_num(index: number) {
     if (index === 0) {
       return "First";
     }
     return index === 1 ? "Second" : "Third";
   }
-
-  get is_open() {
-    return this.cases_are_visible;
-  }
-
-  add_case_form_is_valid = false;
-  duplicate_command_name_in_case = false;
-  creating_case = false;
-  loading = true;
-  new_case_name = "";
-  new_commands: NewCommandFields[] = [];
 
   update_ag_test_suite_panel_when_clicked() {
     if (!this.cases_are_visible) {

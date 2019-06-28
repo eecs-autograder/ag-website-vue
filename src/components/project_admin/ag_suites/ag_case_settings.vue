@@ -54,7 +54,6 @@ export default class AGCaseSettings extends Vue {
   readonly is_not_empty = is_not_empty;
 
   d_ag_test_case: AGTestCase | null = null;
-
   saving = false;
   settings_form_is_valid = true;
 
