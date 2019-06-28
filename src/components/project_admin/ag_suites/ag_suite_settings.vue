@@ -1,5 +1,5 @@
 <template>
-  <div id="ag-test-suite-settings-component" v-if="d_test_suite !== null">
+  <div id="ag-test-suite-settings-component" v-if="d_ag_test_suite !== null">
     <div v-if="!loading">
       <tabs ref="tabs-gray"
             v-model="current_tab_index"
@@ -13,30 +13,33 @@
           </tab-header>
           <template slot="body">
             <div class="tab-body">
-              <validated-form id="suite-settings-form"
+
+              <div> Num cases: {{d_ag_test_suite.ag_test_cases.length}}</div>
+
+              <validated-form id="ag-test-suite-settings-form"
                               autocomplete="off"
                               spellcheck="false"
                               @submit.native.prevent="save_ag_test_suite_settings"
                               @form_validity_changed="settings_form_is_valid = $event">
 
-                <div id="name-container">
+                <div id="ag-test-suite-name-container">
                   <label class="text-label"> Suite name </label>
                   <validated-input ref="suite_name"
                                    id="input-name"
-                                   v-model="d_test_suite.name"
+                                   v-model="d_ag_test_suite.name"
                                    :validators="[is_not_empty]">
                   </validated-input>
                 </div>
 
                 <div class="section-container">
                   <fieldset class="fieldset">
-                    <legend class="legend"> Grading Related </legend>
+                    <legend class="legend"> RENAME ME </legend>
                     <div class="sandbox-container">
                       <label class="text-label"> Sandbox environment: </label>
 
                       <div class="dropdown">
                         <select id="sandbox_environment"
-                                v-model="d_test_suite.sandbox_docker_image"
+                                v-model="d_ag_test_suite.sandbox_docker_image"
                                 class="select">
                           <option v-for="docker_image of docker_images"
                                   :value="docker_image">
@@ -48,7 +51,7 @@
                     </div>
 
                     <div class="toggle-container">
-                      <toggle v-model="d_test_suite.deferred">
+                      <toggle v-model="d_ag_test_suite.deferred">
                         <div slot="on">
                           Deferred
                         </div>
@@ -66,7 +69,7 @@
                     </div>
 
                     <div class="toggle-container">
-                      <toggle v-model="d_test_suite.allow_network_access">
+                      <toggle v-model="d_ag_test_suite.allow_network_access">
                         <div slot="on">
                           Allow network access
                         </div>
@@ -81,9 +84,9 @@
 
                 <div class="section-container">
                   <fieldset class="fieldset">
-                    <legend class="legend"> Project Files </legend>
+                    <legend class="legend"> Instructor Files </legend>
                     <div class="typeahead-search-bar">
-                      <dropdown-typeahead ref="project_files_typeahead"
+                      <dropdown-typeahead ref="instructor_files_typeahead"
                                           placeholder_text="Enter a filename"
                                           :choices="instructor_files_available"
                                           :filter_fn="instructor_file_filter_fn"
@@ -97,7 +100,7 @@
                     </div>
 
                     <div class="instructor-files">
-                      <div v-for="(file, index) of d_test_suite.instructor_files_needed"
+                      <div v-for="(file, index) of instructor_files_needed"
                            :class="['file', {'odd-index': index % 2 !== 0}]">
                         <span class="file-name"> {{file.name}} </span>
                         <div class="delete-file-icon-container"
@@ -128,7 +131,7 @@
                     </div>
 
                     <div class="student-files">
-                      <div v-for="(file, index) of d_test_suite.student_files_needed"
+                      <div v-for="(file, index) of student_files_needed"
                            :class="['file', {'odd-index': index % 2 !== 0}]">
                         <span class="file-name"> {{file.pattern}} </span>
                         <div class="delete-file-icon-container"
@@ -149,7 +152,7 @@
                       <label class="text-label"> Setup command label </label>
                       <validated-input ref="suite_name"
                                        id="setup-command-label"
-                                       v-model="d_test_suite.setup_suite_cmd_name"
+                                       v-model="d_ag_test_suite.setup_suite_cmd_name"
                                        :validators="[]">
                       </validated-input>
                     </div>
@@ -158,7 +161,7 @@
                       <label class="text-label"> Setup command </label>
                       <validated-input ref="suite_name"
                                        id="setup-command"
-                                       v-model="d_test_suite.setup_suite_cmd"
+                                       v-model="d_ag_test_suite.setup_suite_cmd"
                                        :validators="[]">
                       </validated-input>
                     </div>
@@ -176,7 +179,7 @@
 
                   <div v-show="!saving" class="last-saved-timestamp">
                     <span> Last Saved: </span>
-                    {{(new Date(d_test_suite.last_modified)).toLocaleString(
+                    {{(new Date(d_ag_test_suite.last_modified)).toLocaleString(
                     'en-US', last_modified_format
                     )}}
                   </div>
@@ -214,13 +217,13 @@
           <template slot="body">
             <div class="tab-body">
 
-              <button class="delete-suite-button"
+              <button class="delete-ag-test-suite-button"
                       type="button"
-                      @click="$refs.delete_suite_modal.open()">
-                Delete Suite: <span>{{d_test_suite.name}}</span>
+                      @click="$refs.delete_ag_test_suite_modal.open()">
+                Delete Suite: <span>{{d_ag_test_suite.name}}</span>
               </button>
 
-              <modal ref="delete_suite_modal"
+              <modal ref="delete_ag_test_suite_modal"
                      :size="'large'"
                      :include_closing_x="false">
                 <div class="modal-header">
@@ -229,7 +232,7 @@
                 <hr>
                 <div class="modal-body">
                   <p> Are you sure you want to delete the suite
-                    <span class="item-to-delete">{{d_test_suite.name}}</span>?
+                    <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
                     This will delete all associated test cases and run results.
                     THIS ACTION CANNOT BE UNDONE. </p>
                   <div class="deletion-modal-button-footer">
@@ -238,7 +241,7 @@
                             @click="delete_ag_test_suite()"> Delete </button>
 
                     <button class="modal-cancel-button"
-                            @click="$refs.delete_suite_modal.close()"> Cancel </button>
+                            @click="$refs.delete_ag_test_suite_modal.close()"> Cancel </button>
                   </div>
                 </div>
               </modal>
@@ -255,7 +258,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
-  AGTestSuite,
+  AGTestSuite, AGTestSuiteObserver,
   ExpectedStudentFile,
   get_sandbox_docker_images,
   InstructorFile,
@@ -293,21 +296,21 @@ import { is_not_empty } from '@/validators';
 export default class AGSuiteSettings extends Vue {
 
   @Prop({required: true, type: AGTestSuite})
-  test_suite!: AGTestSuite;
+  ag_test_suite!: AGTestSuite;
 
   @Prop({required: true, type: Project})
   project!: Project;
 
-  @Watch('test_suite', {deep: true})
+  @Watch('ag_test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
-    this.d_test_suite = deep_copy(new_test_suite, AGTestSuite);
+    this.d_ag_test_suite = deep_copy(new_test_suite, AGTestSuite);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
     }
   }
 
   current_tab_index = 0;
-  d_test_suite: AGTestSuite | null = null;
+  d_ag_test_suite: AGTestSuite | null = null;
   docker_images: SandboxDockerImageData[] = [];
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
@@ -318,71 +321,69 @@ export default class AGSuiteSettings extends Vue {
   readonly is_not_empty = is_not_empty;
 
   async created() {
-    this.d_test_suite = deep_copy(this.test_suite, AGTestSuite);
+    this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
     this.docker_images = await get_sandbox_docker_images();
-    this.sort_instructor_files();
-    this.sort_student_files();
     this.loading = false;
   }
 
   get instructor_files_available() {
     return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
-      return this.d_test_suite!.instructor_files_needed.findIndex(
+      return this.d_ag_test_suite!.instructor_files_needed.findIndex(
         (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
     });
   }
 
-  get expected_student_files_available() {
-    return this.project.expected_student_files.filter(
-      (expected_student_file: ExpectedStudentFile) => {
-        return this.d_test_suite!.student_files_needed.findIndex(
-          (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
-      }
-    );
-  }
-
-  sort_instructor_files() {
-    this.d_test_suite!.instructor_files_needed.sort(
+  get instructor_files_needed() {
+    return this.d_ag_test_suite!.instructor_files_needed.sort(
       (file_a: InstructorFile, file_b: InstructorFile) => {
         return file_a.name.localeCompare(file_b.name, undefined, {numeric: true});
       }
     );
   }
 
-  sort_student_files() {
-    this.d_test_suite!.student_files_needed.sort(
+  get student_files_needed() {
+    return this.d_ag_test_suite!.student_files_needed.sort(
       (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
         return file_a.pattern.localeCompare(file_b.pattern, undefined, {numeric: true});
       }
     );
   }
 
+
+  get expected_student_files_available() {
+    return this.project.expected_student_files.filter(
+      (expected_student_file: ExpectedStudentFile) => {
+        return this.d_ag_test_suite!.student_files_needed.findIndex(
+          (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
+      }
+    );
+  }
+
   add_instructor_file(instructor_file: InstructorFile) {
-    this.d_test_suite!.instructor_files_needed.push(instructor_file);
-    this.sort_instructor_files();
+    this.d_ag_test_suite!.instructor_files_needed.push(instructor_file);
   }
 
   add_student_file(student_file: ExpectedStudentFile) {
-    this.d_test_suite!.student_files_needed.push(student_file);
-    this.sort_student_files();
+    this.d_ag_test_suite!.student_files_needed.push(student_file);
   }
 
   delete_instructor_file(instructor_file: InstructorFile) {
-    let index = this.d_test_suite!.instructor_files_needed.findIndex(
+    let index = this.d_ag_test_suite!.instructor_files_needed.findIndex(
       (file: InstructorFile) => file.pk === instructor_file.pk
     );
-    this.d_test_suite!.instructor_files_needed.splice(index, 1);
+    this.d_ag_test_suite!.instructor_files_needed.splice(index, 1);
   }
 
   delete_student_file(student_file: ExpectedStudentFile) {
-    let index = this.d_test_suite!.student_files_needed.findIndex(
+    let index = this.d_ag_test_suite!.student_files_needed.findIndex(
       (file: ExpectedStudentFile) => file.pk === student_file.pk
     );
-    this.d_test_suite!.student_files_needed.splice(index, 1);
+    this.d_ag_test_suite!.student_files_needed.splice(index, 1);
   }
 
   async delete_ag_test_suite() {
-    await this.d_test_suite!.delete();
+    await this.d_ag_test_suite!.delete();
+    // (<Modal> this.$refs.delete_ag_test_suite_modal).close();
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
@@ -398,7 +399,7 @@ export default class AGSuiteSettings extends Vue {
     try {
       this.saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_test_suite!.save();
+      await this.d_ag_test_suite!.save();
     }
     finally {
       this.saving = false;
@@ -412,17 +413,10 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
-$current-lang-choice: "Poppins";
-
-#ag-test-suite-settings-component {
-  font-family: $current-lang-choice;
-  height: 100%;
-}
 
 .tab-body {
   padding: 15px;
@@ -478,11 +472,11 @@ $current-lang-choice: "Poppins";
   background-color: hsl(210, 20%, 96%);
 }
 
-.delete-suite-button {
+.delete-ag-test-suite-button {
   @extend .delete-level-button;
 }
 
-.delete-suite-button span {
+.delete-ag-test-suite-button span {
   margin-left: 5px;
 }
 
@@ -490,7 +484,7 @@ $current-lang-choice: "Poppins";
   padding: 10px 0 10px 3px;
 }
 
-#name-container {
+#ag-test-suite-name-container {
   padding: 0 12px 22px 12px;
 }
 

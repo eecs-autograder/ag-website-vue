@@ -1,31 +1,26 @@
 <template>
   <div id="ag-test-suites-component" v-if="!loading">
 
-    <div id="suite-nav-bar">
+    <div id="ag-test-suite-nav-bar">
 
       <div id="nav-bar-header">
-        <div id="suites-title"> Suites </div>
+        <div id="ag-test-suites-title"> Suites </div>
         <button type="button"
-                id="add-suite-button"
-                @click="open_new_suite_modal()">
-          <i class="fas fa-plus plus"></i> Add Suite
+                id="add-ag-test-suite-button"
+                @click="open_new_ag_test_suite_modal()">
+          <i class="fas fa-plus plus"></i> Add Test Suite
         </button>
       </div>
 
       <div id="nav-bar-body" @wheel.stop>
-        <div id="all-suites">
-          <div v-for="test_suite of test_suites"
-               class="suite-container"
-               :key="test_suite.pk">
-            <AGSuitePanel :test_suite="test_suite"
-                          :active_suite="active_suite"
-                          :active_case="active_case"
-                          :active_command="active_command"
-                          @update_active_suite="update_active_suite($event)"
-                          @update_active_case="update_active_case($event.ag_case, $event.ag_suite)"
-                          @update_active_command="update_active_command($event.ag_command,
-                                                                        $event.ag_case,
-                                                                        $event.ag_suite)">
+        <div id="all-ag-test-suites">
+          <div v-for="(ag_test_suite, index) of ag_test_suites"
+               class="ag-test-suite-container"
+               :key="ag_test_suite.pk">
+            <AGSuitePanel :ag_test_suite="ag_test_suite"
+                          :active_ag_test_suite="active_ag_test_suite"
+                          :active_ag_test_command="active_ag_test_command"
+                          @update_active_thing="update_active_thing($event)">
             </AGSuitePanel>
           </div>
         </div>
@@ -33,55 +28,61 @@
     </div>
 
     <div id="viewing-window">
-      <div v-if="active_level_is_suite"
+<!--      <div>Active Suite:-->
+<!--        {{active_ag_test_suite === null ? "NULL" : active_ag_test_suite.name}}</div>-->
+<!--      <div>Active Command:-->
+<!--        {{active_ag_test_command === null ? "NULL" : active_ag_test_command.name}}</div>-->
+
+
+      <div v-if="active_ag_test_suite !== null"
            class="settings-wrapper">
-        <AGSuiteSettings :test_suite="active_suite"
+        <AGSuiteSettings :ag_test_suite="active_ag_test_suite"
                          :project="project">
         </AGSuiteSettings>
       </div>
 
       <div v-else-if="active_level_is_command"
            class="settings-wrapper">
-        <AGCommandSettings :test_command="active_command"
-                           :test_case="active_case"
+        <AGCommandSettings :ag_test_command="active_ag_test_command"
+                           :ag_test_case="parent_ag_test_case"
                            :project="project">
         </AGCommandSettings>
       </div>
-    </div> <!--viewing-window-->
+    </div>
 
     <div id="button-footer">
       <span v-if="active_level_is_command">
         <button type="button"
-                @click="go_to_prev_command"
-                id="prev-command-button"
-                :disabled="!prev_command_is_available">
-          <i class="fas fa-angle-double-left" id="prev"> </i> Previous Command
+                @click="go_to_prev_ag_test_case"
+                id="prev-ag-test-case-button"
+                :disabled="!prev_ag_test_case_is_available">
+          <i class="fas fa-angle-double-left" id="prev"> </i> Previous Case
         </button>
 
         <button type="button"
-                @click="go_to_next_command"
-                id="next-command-button"
-                :disabled="!next_command_is_available">
-          Next Command <i class="fas fa-angle-double-right" id="next"></i>
+                @click="go_to_next_ag_test_case"
+                id="next-ag-test-case-button"
+                :disabled="!next_ag_test_case_is_available">
+          Next Case <i class="fas fa-angle-double-right" id="next"></i>
         </button>
       </span>
     </div>
 
-    <modal ref="new_suite_modal"
+    <modal ref="new_ag_test_suite_modal"
            click_outside_to_close
            size="medium">
       <div class="modal-header"> New Suite </div>
       <hr>
       <div class="modal-body">
-        <validated-form id="add-suite-form"
+        <validated-form id="add-ag-test-suite-form"
                         autocomplete="off"
                         spellcheck="false"
-                        @submit.native.prevent="add_suite"
-                        @form_validity_changed="add_suite_form_is_valid = $event">
-          <div class="name-container">
+                        @submit="add_ag_test_suite"
+                        @form_validity_changed="add_ag_test_suite_form_is_valid = $event">
+          <div class="ag-test-suite-name-container">
             <label class="text-label"> Suite Name </label>
-            <validated-input ref="new_suite_name"
-                             v-model="new_suite_name"
+            <validated-input ref="new_ag_test_suite_name"
+                             v-model="new_ag_test_suite_name"
                              :validators="[is_not_empty]">
             </validated-input>
           </div>
@@ -89,7 +90,7 @@
           <APIErrors ref="api_errors"></APIErrors>
 
           <button class="modal-create-button"
-                  :disabled="!add_suite_form_is_valid || adding_suite"> Add Suite
+                  :disabled="!add_ag_test_suite_form_is_valid || adding_suite"> Add Suite
           </button>
         </validated-form>
       </div>
@@ -120,7 +121,7 @@ import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vu
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { deep_copy, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -135,32 +136,42 @@ import { is_not_empty } from '@/validators';
     ValidatedInput
   }
 })
-
 export default class AGSuites extends Vue implements AGTestSuiteObserver,
                                                      AGTestCaseObserver,
                                                      AGTestCommandObserver {
-
   @Prop({required: true, type: Project})
   project!: Project;
 
   readonly is_not_empty = is_not_empty;
 
-  add_suite_form_is_valid = false;
-  new_suite_name = "";
+  add_ag_test_suite_form_is_valid = false;
+  new_ag_test_suite_name = "";
   adding_suite = false;
 
-  index_active_suite = -1;
-  index_active_case = -1;
-  index_active_command = -1;
-
+  active_ag_test_suite: AGTestSuite | null = null;
+  active_ag_test_command: AGTestCommand | null = null;
   loading = true;
-  test_suites: AGTestSuite[] = [];
+  ag_test_suites: AGTestSuite[] = [];
+
+  get parent_ag_test_case() {
+    if (this.active_ag_test_command !== null) {
+      return this.find_parent_suite_and_case(this.active_ag_test_command)[1];
+    }
+    return null;
+  }
+
+  get parent_ag_test_suite() {
+    if (this.active_ag_test_command !== null) {
+      return this.find_parent_suite_and_case(this.active_ag_test_command)[0];
+    }
+    return null;
+  }
 
   async created() {
     AGTestSuite.subscribe(this);
     AGTestCase.subscribe(this);
     AGTestCommand.subscribe(this);
-    this.test_suites = await AGTestSuite.get_all_from_project(this.project.pk);
+    this.ag_test_suites = await AGTestSuite.get_all_from_project(this.project.pk);
     this.loading = false;
   }
 
@@ -170,200 +181,204 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     AGTestCommand.unsubscribe(this);
   }
 
-  open_new_suite_modal() {
-    (<Modal> this.$refs.new_suite_modal).open();
+  update_active_thing(thing: AGTestSuite | AGTestCase | AGTestCommand | null) {
+    if (thing instanceof AGTestSuite) {
+      this.active_ag_test_suite = thing;
+      this.active_ag_test_command = null;
+    }
+    else if (thing instanceof AGTestCase) {
+      this.active_ag_test_suite = null;
+      this.active_ag_test_command = thing.ag_test_commands[0];
+    }
+    else if (thing instanceof AGTestCommand) {
+      this.active_ag_test_suite = null;
+      this.active_ag_test_command = thing;
+    }
+    else {
+      this.active_ag_test_suite = null;
+      this.active_ag_test_command = null;
+    }
+  }
+
+  open_new_ag_test_suite_modal() {
+    (<Modal> this.$refs.new_ag_test_suite_modal).open();
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_suite_name).invoke_focus();
+      (<ValidatedInput> this.$refs.new_ag_test_suite_name).focus();
     });
   }
 
-  get active_suite() {
-    return this.index_active_suite === -1 ? null
-      : this.test_suites[this.index_active_suite];
-  }
+  get prev_ag_test_case_is_available() {
+    if (this.active_ag_test_command !== null) {
+      let prev_suite: AGTestSuite;
+      let prev_case: AGTestCase;
 
-  get active_case() {
-    return this.index_active_case === -1 ? null
-      : this.active_suite!.ag_test_cases[this.index_active_case];
-  }
-
-  get active_command() {
-    return this.index_active_command === -1 ? null
-      : this.active_case!.ag_test_commands[this.index_active_command];
-  }
-
-  get prev_command_is_available() {
-    let prev_suite: AGTestSuite;
-    let prev_case: AGTestCase;
-
-    if (this.index_active_command !== -1
-        && this.index_active_case !== -1
-        && this.index_active_suite !== -1) {
+      let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+        this.active_ag_test_command!
+      );
+      let suite_index = this.ag_test_suites.findIndex(
+        (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
+      );
+      let case_index = parent_ag_test_suite.ag_test_cases.findIndex(
+        (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case.pk
+      );
+      let command_index = parent_ag_test_case.ag_test_commands.findIndex(
+        (ag_command: AGTestCommand) => ag_command.pk === this.active_ag_test_command!.pk
+      );
 
       // if there is a command at the same index in the previous case
-      if (this.index_active_case !== 0) {
-        //
-        prev_case = this.active_suite!.ag_test_cases[this.index_active_case - 1];
-        return prev_case.ag_test_commands.length > this.index_active_command;
+      if (case_index !== 0) {
+        prev_case = parent_ag_test_suite.ag_test_cases[case_index - 1];
+        return prev_case.ag_test_commands.length > command_index;
       }
       // you can go to the previous suite
-      else if (this.index_active_suite !== 0) {
-        prev_suite = this.test_suites[this.index_active_suite - 1];
+      else if (suite_index !== 0) {
+        prev_suite = this.ag_test_suites[suite_index - 1];
         let num_cases = prev_suite.ag_test_cases.length;
         if (num_cases > 0) {
           prev_case = prev_suite.ag_test_cases[num_cases - 1];
-          return prev_case.ag_test_commands.length > this.index_active_command;
+          return prev_case.ag_test_commands.length > command_index;
         }
       }
     }
     return false;
   }
 
-  get next_command_is_available() {
-    let next_suite: AGTestSuite;
-    let next_case: AGTestCase;
+  get next_ag_test_case_is_available() {
+    if (this.active_ag_test_command !== null) {
+      let next_suite: AGTestSuite;
+      let next_case: AGTestCase;
+      let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+        this.active_ag_test_command!
+      );
+      let suite_index = this.ag_test_suites.findIndex(
+        (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
+      );
+      let case_index = parent_ag_test_suite.ag_test_cases.findIndex(
+        (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case.pk
+      );
+      let command_index = parent_ag_test_case.ag_test_commands.findIndex(
+        (ag_command: AGTestCommand) => ag_command.pk === this.active_ag_test_command!.pk
+      );
 
-    if (this.index_active_command !== -1
-        && this.index_active_case !== -1
-        && this.index_active_suite !== -1) {
-
-      let num_cases = this.active_suite!.ag_test_cases.length;
-
+      let num_cases = parent_ag_test_suite.ag_test_cases.length;
       // if there is a command at the same index in the next case
-      if (num_cases - 1 > this.index_active_case) {
-        next_case = this.active_suite!.ag_test_cases[this.index_active_case + 1];
-        return next_case.ag_test_commands.length > this.index_active_command;
+      if (num_cases - 1 > case_index) {
+        next_case = parent_ag_test_suite.ag_test_cases[case_index + 1];
+        return next_case.ag_test_commands.length > command_index;
       }
       // if you can go to the next suite
-      else if (this.index_active_suite < this.test_suites.length - 1) {
-        next_suite = this.test_suites[this.index_active_suite + 1];
+      else if (suite_index < this.ag_test_suites.length - 1) {
+        next_suite = this.ag_test_suites[suite_index + 1];
         if (next_suite.ag_test_cases.length > 0) {
           next_case = next_suite.ag_test_cases[0];
-          return next_case.ag_test_commands.length > this.index_active_command;
+          return next_case.ag_test_commands.length > command_index;
         }
       }
     }
     return false;
   }
 
-  go_to_next_command() {
-    let parent_suite: AGTestSuite = this.active_suite!;
-    let parent_case: AGTestCase;
+  go_to_next_ag_test_case() {
+    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+      this.active_ag_test_command!
+    );
 
-    let command_index = this.index_active_command;
-    if (this.active_suite!.ag_test_cases.length - 1 > this.index_active_case) {
-      parent_case = parent_suite!.ag_test_cases[this.index_active_case + 1];
+    let suite_index = this.ag_test_suites.findIndex(
+      (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
+    );
+    let case_index = parent_ag_test_suite.ag_test_cases.findIndex(
+      (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case.pk
+    );
+    let command_index = parent_ag_test_case.ag_test_commands.findIndex(
+      (ag_command: AGTestCommand) => ag_command.pk === this.active_ag_test_command!.pk
+    );
+
+    if (parent_ag_test_suite.ag_test_cases.length - 1 > case_index) {
+      parent_ag_test_case = parent_ag_test_suite!.ag_test_cases[case_index + 1];
     }
     else {
-      parent_suite = this.test_suites[this.index_active_suite + 1];
-      parent_case = parent_suite!.ag_test_cases[0];
+      parent_ag_test_suite = this.ag_test_suites[suite_index + 1];
+      parent_ag_test_case = parent_ag_test_suite!.ag_test_cases[0];
     }
-    this.update_active_command(parent_case!.ag_test_commands[command_index],
-                               parent_case,
-                               parent_suite);
+    this.update_active_thing(parent_ag_test_case!.ag_test_commands[command_index]);
   }
 
-  go_to_prev_command() {
-    let parent_suite: AGTestSuite = this.active_suite!;
-    let parent_case: AGTestCase;
+  go_to_prev_ag_test_case() {
+    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+      this.active_ag_test_command!
+    );
 
-    let command_index = this.index_active_command;
-    if (this.index_active_case !== 0) {
-      parent_case = parent_suite.ag_test_cases[this.index_active_case - 1];
+    let suite_index = this.ag_test_suites.findIndex(
+      (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
+    );
+    let case_index = parent_ag_test_suite.ag_test_cases.findIndex(
+      (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case.pk
+    );
+    let command_index = parent_ag_test_case.ag_test_commands.findIndex(
+      (ag_command: AGTestCommand) => ag_command.pk === this.active_ag_test_command!.pk
+    );
+
+    if (case_index !== 0) {
+      parent_ag_test_case = parent_ag_test_suite.ag_test_cases[case_index - 1];
     }
     else {
-      parent_suite =  this.test_suites[this.index_active_suite - 1];
-      let num_cases = parent_suite.ag_test_cases.length;
-      parent_case = parent_suite.ag_test_cases[num_cases - 1];
+      parent_ag_test_suite =  this.ag_test_suites[suite_index - 1];
+      let num_cases = parent_ag_test_suite.ag_test_cases.length;
+      parent_ag_test_case = parent_ag_test_suite.ag_test_cases[num_cases - 1];
     }
-    this.update_active_command(parent_case.ag_test_commands[command_index],
-                               parent_case,
-                               parent_suite);
+    this.update_active_thing(parent_ag_test_case!.ag_test_commands[command_index]);
   }
 
   get active_level_is_suite() {
-    return this.active_suite !== null && this.active_case === null;
+    return this.active_ag_test_suite !== null;
   }
 
   get active_level_is_command() {
-    return this.active_command !== null;
+    return this.active_ag_test_command !== null;
   }
 
-  update_active_suite(ag_suite: AGTestSuite | null) {
-    this.reset_active_indices();
-    if (ag_suite !== null) {
-      this.index_active_suite = this.test_suites.findIndex(
-        (test_suite: AGTestSuite) => test_suite.pk === ag_suite.pk);
-    }
-  }
-
-  update_active_case(ag_case: AGTestCase, parent_suite: AGTestSuite) {
-    this.reset_active_indices();
-    this.index_active_suite = this.test_suites.findIndex(
-      (test_suite: AGTestSuite) => test_suite.pk === parent_suite.pk);
-    this.index_active_case = this.active_suite!.ag_test_cases.findIndex(
-      (test_case: AGTestCase) => test_case.pk === ag_case.pk);
-    this.index_active_command = this.active_case!.ag_test_commands.length > 0 ? 0 : -1;
-  }
-
-  update_active_command(ag_command: AGTestCommand, parent_case: AGTestCase,
-                        parent_suite: AGTestSuite) {
-    this.index_active_command = -1;
-    this.index_active_case = -1;
-    this.index_active_suite = -1;
-    this.index_active_suite = this.test_suites.findIndex(
-      (test_suite: AGTestSuite) => test_suite.pk === parent_suite.pk);
-    this.index_active_case = this.active_suite!.ag_test_cases.findIndex(
-      (test_case: AGTestCase) => test_case.pk === parent_case.pk);
-    this.index_active_command =  this.active_case!.ag_test_commands.findIndex(
-      (test_command: AGTestCommand) => test_command.pk === ag_command.pk);
-  }
-
-  @handle_api_errors_async(handle_add_ag_suite_error)
-  async add_suite() {
+  @handle_api_errors_async(handle_add_ag_test_suite_error)
+  async add_ag_test_suite() {
     try {
       this.adding_suite = true;
-      await AGTestSuite.create(this.project.pk, { name: this.new_suite_name });
-      (<Modal> this.$refs.new_suite_modal).close();
-      this.new_suite_name = "";
+      let new_suite = await AGTestSuite.create(
+        this.project.pk, {name: this.new_ag_test_suite_name}
+      );
+      (<Modal> this.$refs.new_ag_test_suite_modal).close();
+      this.new_ag_test_suite_name = "";
     }
     finally {
       this.adding_suite = false;
     }
   }
 
-  reset_active_indices() {
-    this.index_active_command = -1;
-    this.index_active_case = -1;
-    this.index_active_suite = -1;
-  }
-
   // SuiteObserver -------------------------------------------------------------------------------
   update_ag_test_suite_changed(ag_test_suite: AGTestSuite): void {
-    let index = this.test_suites.findIndex((suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
-    Vue.set(this.test_suites, index, ag_test_suite);
+    let index = this.ag_test_suites.findIndex(
+      (suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
+    Vue.set(this.ag_test_suites, index, deep_copy(ag_test_suite, AGTestSuite));
   }
 
   update_ag_test_suite_created(ag_test_suite: AGTestSuite): void {
-    this.test_suites.push(ag_test_suite);
-    this.update_active_suite(ag_test_suite);
+    this.ag_test_suites.push(ag_test_suite);
+    this.update_active_thing(ag_test_suite);
   }
 
   update_ag_test_suite_deleted(ag_test_suite: AGTestSuite): void {
-    let index = this.test_suites.findIndex((suite: AGTestSuite) => ag_test_suite.pk === suite.pk);
-    let suite_was_active: boolean = (this.active_suite !== null
-                                     && ag_test_suite.pk === this.active_suite.pk);
-    this.reset_active_indices();
-    this.test_suites.splice(index, 1);
+    let index = this.ag_test_suites.findIndex(
+      (suite: AGTestSuite) => ag_test_suite.pk === suite.pk);
+    let suite_was_active: boolean = (this.active_ag_test_suite !== null
+                                     && ag_test_suite.pk === this.active_ag_test_suite.pk);
+    this.ag_test_suites.splice(index, 1);
     if (suite_was_active) {
-      if (this.test_suites.length === 0) {
-        this.update_active_suite(null);
+      if (this.ag_test_suites.length === 0) {
+        this.update_active_thing(null);
       }
-      else if (index === this.test_suites.length) {
-        this.update_active_suite(this.test_suites[index - 1]);
+      else if (index === this.ag_test_suites.length) {
+        this.update_active_thing(this.ag_test_suites[index - 1]);
       }
       else {
-        this.update_active_suite(this.test_suites[index]);
+        this.update_active_thing(this.ag_test_suites[index]);
       }
     }
   }
@@ -372,7 +387,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
   // CaseObserver --------------------------------------------------------------------------------
   update_ag_test_case_changed(ag_test_case: AGTestCase): void {
-    let parent_suite = this.test_suites[this.test_suites.findIndex(
+    let parent_suite = this.ag_test_suites[this.ag_test_suites.findIndex(
       (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
     )];
     let case_index = parent_suite!.ag_test_cases.findIndex(
@@ -381,40 +396,38 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     Vue.set(
       parent_suite.ag_test_cases,
       case_index,
-      ag_test_case
+      deep_copy(ag_test_case, AGTestCase)
     );
   }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    let parent_suite = this.test_suites[this.test_suites.findIndex(
+    let parent_suite = this.ag_test_suites[this.ag_test_suites.findIndex(
       (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
     )];
     parent_suite.ag_test_cases.push(ag_test_case);
-    this.update_active_case(ag_test_case, parent_suite);
   }
 
   update_ag_test_case_deleted(ag_test_case: AGTestCase): void {
-    let parent_suite = this.test_suites[this.test_suites.findIndex(
+    let parent_suite = this.ag_test_suites[this.ag_test_suites.findIndex(
       (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
     )];
     let case_index = parent_suite!.ag_test_cases.findIndex(
       (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
     );
-    let case_was_active: boolean = this.active_case !== null
-                                   && ag_test_case.pk === this.active_case.pk;
-    this.reset_active_indices();
+    let case_was_active: boolean = (this.active_ag_test_command !== null
+                                    && this.active_ag_test_command.ag_test_case
+                                    === ag_test_case.pk);
+    this.update_active_thing(null);
     parent_suite!.ag_test_cases.splice(case_index, 1);
     if (case_was_active) {
       if (parent_suite.ag_test_cases.length === 0) {
-        this.update_active_suite(parent_suite!);
+        this.update_active_thing(parent_suite!);
       }
       else if (case_index === parent_suite!.ag_test_cases.length) {
-       this.update_active_case(parent_suite!.ag_test_cases[case_index - 1],
-                               parent_suite!);
+        this.update_active_thing(parent_suite!.ag_test_cases[case_index - 1]);
       }
       else {
-        this.update_active_case(parent_suite!.ag_test_cases[case_index],
-                                parent_suite!);
+        this.update_active_thing(parent_suite!.ag_test_cases[case_index]);
       }
     }
   }
@@ -423,98 +436,82 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
   // CommandObserver------------------------------------------------------------------------------
   update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
-    let parent_suite: AGTestSuite = this.active_suite!;
-    let parent_case: AGTestCase = this.active_case!;
+    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+      ag_test_command
+    );
 
-    for (let suite_index = 0; suite_index < this.test_suites.length; ++suite_index) {
-      let case_index = this.test_suites[suite_index].ag_test_cases.findIndex(
-        (ag_case: AGTestCase) => ag_case.pk === ag_test_command.ag_test_case);
-      if (case_index !== -1) {
-        parent_suite = this.test_suites[suite_index];
-        parent_case = parent_suite.ag_test_cases[case_index];
-      }
-    }
-
-    let command_index = parent_case.ag_test_commands.findIndex(
-      (ag_command) => ag_command.pk === ag_test_command.pk);
+    let command_index = parent_ag_test_case.ag_test_commands.findIndex(
+      (ag_command: AGTestCommand) => ag_command.pk === ag_test_command.pk);
 
     Vue.set(
-      parent_case.ag_test_commands,
+      parent_ag_test_case.ag_test_commands,
       command_index,
-      ag_test_command
+      deep_copy(ag_test_command, AGTestCommand)
     );
   }
 
   update_ag_test_command_created(ag_test_command: AGTestCommand): void {
-    let parent_suite: AGTestSuite = this.active_suite!;
-    let parent_case: AGTestCase = this.active_case!;
-
-    for (let suite_index = 0; suite_index < this.test_suites.length; ++suite_index) {
-      let case_index = this.test_suites[suite_index].ag_test_cases.findIndex(
-        (ag_case: AGTestCase) => ag_case.pk === ag_test_command.ag_test_case);
-      if (case_index !== -1) {
-        parent_suite = this.test_suites[suite_index];
-        parent_case = parent_suite.ag_test_cases[case_index];
-      }
-    }
-
-    parent_case!.ag_test_commands.push(ag_test_command);
-    this.update_active_command(ag_test_command,
-                               parent_case,
-                               parent_suite);
+    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+      ag_test_command
+    );
+    parent_ag_test_case!.ag_test_commands.push(ag_test_command);
+    this.update_active_thing(ag_test_command);
   }
 
   update_ag_test_command_deleted(ag_test_command: AGTestCommand): void {
-    let parent_suite: AGTestSuite = this.active_suite!;
-    let parent_case: AGTestCase = this.active_case!;
+    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
+      ag_test_command
+    );
 
-    for (let suite_index = 0; suite_index < this.test_suites.length; ++suite_index) {
-      let case_index = this.test_suites[suite_index].ag_test_cases.findIndex(
-        (ag_case: AGTestCase) => ag_case.pk === ag_test_command.ag_test_case);
-      if (case_index !== -1) {
-        parent_suite = this.test_suites[suite_index];
-        parent_case = parent_suite.ag_test_cases[case_index];
-      }
-    }
+    let command_index = parent_ag_test_case.ag_test_commands.findIndex(
+      (ag_command: AGTestCommand) => ag_command.pk === ag_test_command.pk);
 
-    let command_index = parent_case.ag_test_commands.findIndex(
-      (ag_command) => ag_command.pk === ag_test_command.pk);
-
-    let command_was_active = this.active_command !== null
-                             && ag_test_command.pk === this.active_command!.pk;
-    this.reset_active_indices();
-    parent_case!.ag_test_commands.splice(command_index, 1);
+    let command_was_active = this.active_ag_test_command !== null
+                             && ag_test_command.pk === this.active_ag_test_command!.pk;
+    this.update_active_thing(null);
+    parent_ag_test_case!.ag_test_commands.splice(command_index, 1);
     if (command_was_active) {
-      if (command_index === parent_case!.ag_test_commands.length) {
-        this.update_active_command(parent_case!.ag_test_commands[command_index - 1],
-                                   parent_case,
-                                   parent_suite);
+      if (command_index === parent_ag_test_case!.ag_test_commands.length) {
+        this.update_active_thing(parent_ag_test_case!.ag_test_commands[command_index - 1]);
       }
       else {
-        this.update_active_command(parent_case!.ag_test_commands[command_index],
-                                   parent_case!,
-                                   parent_suite!);
+        this.update_active_thing(parent_ag_test_case!.ag_test_commands[command_index]);
+      }
+
+    }
+  }
+
+  find_parent_suite_and_case(ag_test_command: AGTestCommand): [AGTestSuite, AGTestCase] {
+    let parent_ag_test_suite!: AGTestSuite;
+    let parent_ag_test_case!: AGTestCase;
+
+    for (let suite_index = 0; suite_index < this.ag_test_suites.length; ++suite_index) {
+      let case_index = this.ag_test_suites[suite_index].ag_test_cases.findIndex(
+        (ag_case: AGTestCase) => ag_case.pk === ag_test_command.ag_test_case);
+      if (case_index !== -1) {
+        parent_ag_test_suite = this.ag_test_suites[suite_index];
+        parent_ag_test_case = parent_ag_test_suite.ag_test_cases[case_index];
       }
     }
+    return [parent_ag_test_suite, parent_ag_test_case];
   }
 
   update_ag_test_commands_order_changed(ag_test_case_pk: number,
                                         ag_test_command_order: number[]) { }
 }
 
-function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
+function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
+@import '@/styles/forms.scss';
 
 #ag-test-suites-component {
-  font-family: "Poppins";
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -524,7 +521,7 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
   height: 100%;
 }
 
-#suite-nav-bar {
+#ag-test-suite-nav-bar {
   box-sizing: border-box;
   flex-direction: column;
   align-items: stretch;
@@ -551,12 +548,12 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
   height: 700px;
 }
 
-#suites-title {
+#ag-test-suites-title {
   font-size: 1.125rem;
   display: inline-block;
 }
 
-#add-suite-button {
+#add-ag-test-suite-button {
   @extend .white-button;
   box-shadow: none;
 }
@@ -586,7 +583,7 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
   position: fixed;
 }
 
-#next-command-button, #prev-command-button {
+#next-ag-test-case-button, #prev-ag-test-case-button {
   @extend .white-button;
   margin-left: 15px;
   font-size: 14px;
@@ -601,7 +598,7 @@ function handle_add_ag_suite_error(component: AGSuites, error: unknown) {
 }
 
 // Modal **************************************************************
-.name-container {
+.ag-test-suite-name-container {
   padding: 0 0 22px 0;
 }
 

@@ -160,7 +160,7 @@ describe('AGSuiteSettings tests', () => {
 
         wrapper = mount(AGSuiteSettings, {
             propsData: {
-                test_suite: ag_suite,
+                ag_test_suite: ag_suite,
                 project: project
             }
         });
@@ -179,21 +179,10 @@ describe('AGSuiteSettings tests', () => {
         }
     });
 
-    test('Student files & Instructor files get sorted', async () => {
-        expect(component.d_test_suite!.pk).toEqual(ag_suite.pk);
-        expect(component.project).toEqual(project);
-
-        expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-
-        expect(component.d_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_test_suite!.student_files_needed[1]).toEqual(student_file_2);
-    });
-
     test('Suite name cannot be empty - violates condition', async () => {
         expect(component.settings_form_is_valid).toBe(true);
 
-        component.d_test_suite!.name = " ";
+        component.d_ag_test_suite!.name = " ";
         await component.$nextTick();
 
         expect(component.settings_form_is_valid).toBe(false);
@@ -219,16 +208,16 @@ describe('AGSuiteSettings tests', () => {
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(component.d_test_suite!.student_files_needed.length).toEqual(3);
-        expect(component.d_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_test_suite!.student_files_needed[1]).toEqual(student_file_2);
-        expect(component.d_test_suite!.student_files_needed[2]).toEqual(student_file_3);
+        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(3);
+        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+        expect(component.d_ag_test_suite!.student_files_needed[2]).toEqual(student_file_3);
     });
 
     test('Deleting a student file', async () => {
-        expect(component.d_test_suite!.student_files_needed.length).toEqual(2);
-        expect(component.d_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
+        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
 
         let student_files_section = wrapper.find('.student-files');
         student_files_section.findAll('.file').at(1).find(
@@ -236,18 +225,18 @@ describe('AGSuiteSettings tests', () => {
         ).trigger('click');
         await component.$nextTick();
 
-        expect(component.d_test_suite!.student_files_needed.length).toEqual(1);
-        expect(component.d_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(1);
+        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
     });
 
     test('Adding an instructor file', async () => {
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'project_files_typeahead'}
+            {ref: 'instructor_files_typeahead'}
         ).vm;
         expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
 
         let search_bar = wrapper.find(
-            {ref: 'project_files_typeahead'}
+            {ref: 'instructor_files_typeahead'}
         ).find('input');
         search_bar.trigger("click");
 
@@ -260,16 +249,16 @@ describe('AGSuiteSettings tests', () => {
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(component.d_test_suite!.instructor_files_needed.length).toEqual(3);
-        expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-        expect(component.d_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
+        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(3);
+        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+        expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+        expect(component.d_ag_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
     });
 
     test('Deleting an instructor file', async () => {
-        expect(component.d_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
+        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+        expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
 
         let instructor_files_section = wrapper.find('.instructor-files');
         instructor_files_section.findAll('.file').at(1).find(
@@ -277,8 +266,8 @@ describe('AGSuiteSettings tests', () => {
         ).trigger('click');
         await component.$nextTick();
 
-        expect(component.d_test_suite!.instructor_files_needed.length).toEqual(1);
-        expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(1);
+        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
     });
 
     test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
@@ -311,9 +300,9 @@ describe('AGSuiteSettings tests', () => {
     test('expected_student_files_available', async () => {
         expect(component.expected_student_files_available).toEqual([student_file_3]);
 
-        expect(component.d_test_suite!.student_files_needed.length).toEqual(2);
-        expect(component.d_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
+        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
 
         let student_files_section = wrapper.find('.student-files');
         student_files_section.findAll('.file').at(1).find(
@@ -321,7 +310,7 @@ describe('AGSuiteSettings tests', () => {
         ).trigger('click');
         await component.$nextTick();
 
-        expect(component.d_test_suite!.student_files_needed.length).toEqual(1);
+        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(1);
         expect(component.expected_student_files_available).toEqual(
             [student_file_2, student_file_3]
         );
@@ -329,7 +318,7 @@ describe('AGSuiteSettings tests', () => {
 
     test('InstructorFile filter function on dropdown typeahead', async () => {
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'project_files_typeahead'}
+            {ref: 'instructor_files_typeahead'}
         ).vm;
         expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
 
@@ -357,9 +346,9 @@ describe('AGSuiteSettings tests', () => {
     test('instructor_files_available', async () => {
         expect(component.instructor_files_available).toEqual([instructor_file_3]);
 
-        expect(component.d_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
+        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+        expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
 
         let instructor_file_section = wrapper.find('.instructor-files');
         instructor_file_section.findAll('.file').at(1).find(
@@ -367,23 +356,23 @@ describe('AGSuiteSettings tests', () => {
         ).trigger('click');
         await component.$nextTick();
 
-        expect(component.d_test_suite!.instructor_files_needed.length).toEqual(1);
+        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(1);
         expect(component.instructor_files_available).toEqual(
             [instructor_file_2, instructor_file_3]
         );
     });
 
     test('Save suite settings - successful', async () => {
-        let save_stub = sinon.stub(component.d_test_suite!, 'save');
+        let save_stub = sinon.stub(component.d_ag_test_suite!, 'save');
 
-        wrapper.find('#suite-settings-form').trigger('submit.native');
+        wrapper.find('#ag-test-suite-settings-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
     });
 
     test('Save suite settings - unsuccessful', async () => {
-        let save_stub = sinon.stub(component.d_test_suite!, 'save');
+        let save_stub = sinon.stub(component.d_ag_test_suite!, 'save');
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -401,7 +390,7 @@ describe('AGSuiteSettings tests', () => {
         };
         save_stub.returns(Promise.reject(axios_response_instance));
 
-        wrapper.find('#suite-settings-form').trigger('submit');
+        wrapper.find('#ag-test-suite-settings-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
@@ -411,12 +400,12 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Delete a Suite', async () => {
-        let delete_stub = sinon.stub(component.d_test_suite!, 'delete');
+        let delete_stub = sinon.stub(component.d_ag_test_suite!, 'delete');
 
         wrapper.setData({current_tab_index: 2});
         await component.$nextTick();
 
-        wrapper.find('.delete-suite-button').trigger('click');
+        wrapper.find('.delete-ag-test-suite-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
@@ -451,13 +440,13 @@ describe('AGSuiteSettings tests', () => {
             student_files_needed: [student_file_2, student_file_1]
         });
 
-        expect(component.d_test_suite!.pk).toEqual(ag_suite.pk);
+        expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
         expect(component.current_tab_index).toEqual(0);
 
-        wrapper.setProps({'test_suite': another_ag_suite});
+        wrapper.setProps({'ag_test_suite': another_ag_suite});
         await component.$nextTick();
 
-        expect(component.d_test_suite!.pk).toEqual(another_ag_suite.pk);
+        expect(component.d_ag_test_suite!.pk).toEqual(another_ag_suite.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setData({current_tab_index: 2});
@@ -465,10 +454,10 @@ describe('AGSuiteSettings tests', () => {
 
         expect(component.current_tab_index).toEqual(2);
 
-        wrapper.setProps({'test_suite': ag_suite});
+        wrapper.setProps({'ag_test_suite': ag_suite});
         await component.$nextTick();
 
-        expect(component.d_test_suite!.pk).toEqual(ag_suite.pk);
+        expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
         expect(component.current_tab_index).toEqual(0);
     });
 });

@@ -37,7 +37,7 @@ describe('', () => {
 
         wrapper = mount(AGCaseSettings, {
             propsData: {
-                test_case: ag_case
+                ag_test_case: ag_case
             }
         });
         component = wrapper.vm;
@@ -66,33 +66,10 @@ describe('', () => {
         expect(wrapper.find('#save-button').is('[disabled]')).toBe(true);
     });
 
-    test('test_case Watcher', async () => {
-        await component.$nextTick();
-        expect(component.d_test_case!.name).toEqual(ag_case.name);
-
-        let another_case = new AGTestCase({
-            pk: 3,
-            name: "Best Case Scenario",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-        expect(component.d_test_case).toEqual(ag_case);
-
-        wrapper.setProps({test_case: another_case});
-        await component.$nextTick();
-
-        expect(component.d_test_case).toEqual(another_case);
-    });
-
     test('save d_ag_case - successful', async () => {
-        let save_case_stub = sinon.stub(component.d_test_case!, 'save');
+        let save_case_stub = sinon.stub(component.d_ag_test_case!, 'save');
 
-        wrapper.find({ref: 'ag_case_settings_form'}).trigger('submit');
+        wrapper.find({ref: 'ag_test_case_settings_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_case_stub.calledOnce).toBe(true);
@@ -114,16 +91,39 @@ describe('', () => {
             },
             config: {},
         };
-        let save_case_stub = sinon.stub(component.d_test_case!, 'save').returns(
+        let save_case_stub = sinon.stub(component.d_ag_test_case!, 'save').returns(
             Promise.reject(axios_response_instance)
         );
 
-        wrapper.find({ref: 'ag_case_settings_form'}).trigger('submit.native');
+        wrapper.find({ref: 'ag_test_case_settings_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_case_stub.calledOnce).toBe(true);
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+    });
+
+    test('ag_test_case Watcher', async () => {
+        await component.$nextTick();
+        expect(component.d_ag_test_case!.name).toEqual(ag_case.name);
+
+        let another_case = new AGTestCase({
+            pk: 3,
+            name: "Best Case Scenario",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: []
+        });
+        expect(component.d_ag_test_case).toEqual(ag_case);
+
+        wrapper.setProps({ag_test_case: another_case});
+        await component.$nextTick();
+
+        expect(component.d_ag_test_case).toEqual(another_case);
     });
 });
 

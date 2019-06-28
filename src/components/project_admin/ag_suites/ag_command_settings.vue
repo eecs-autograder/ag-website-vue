@@ -1,5 +1,5 @@
 <template>
-  <div id="ag-test-command-settings-component" v-if="d_test_command !== null">
+  <div id="ag-test-command-settings-component" v-if="d_ag_test_command !== null">
     <tabs ref="tabs-gray"
           v-model="current_tab_index"
           tab_active_class="white-theme-active"
@@ -12,26 +12,27 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            <validated-form id="command-settings-form"
+            <validated-form id="ag-test-command-settings-form"
                             autocomplete="off"
                             spellcheck="false"
-                            @submit.native.prevent="save_ag_test_command_settings"
+                            @submit="save_ag_test_command_settings"
                             @form_validity_changed="settings_form_is_valid = $event">
-              
-              <div id="name-container">
-                <label class="text-label"> Command name </label>
+
+              <div id="ag-test-command-name-container" v-if="!case_has_exactly_one_command">
+                <label class="text-label"> Name </label>
                 <validated-input ref="command_name"
                                  id="input-name"
-                                 v-model="d_test_command.name"
+                                 v-model="d_ag_test_command.name"
                                  :validators="[is_not_empty]">
                 </validated-input>
               </div>
 
-              <div id="command-container">
+
+              <div id="ag-test-command-container">
                 <label class="text-label"> Command </label>
                 <validated-input ref="cmd"
                                  id="input-cmd"
-                                 v-model="d_test_command.cmd"
+                                 v-model="d_ag_test_command.cmd"
                                  :num_rows="2"
                                  :validators="[is_not_empty]">
                 </validated-input>
@@ -40,12 +41,12 @@
               <div class="section-container">
                 <fieldset class="fieldset">
                   <legend class="legend"> Stdin </legend>
-                  <div class="command-input-container file-dropdown-adjacent">
+                  <div class="ag-test-command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Stdin source: </label>
 
                     <div class="dropdown">
                       <select id="stdin_source_dropdown"
-                              v-model="d_test_command.stdin_source"
+                              v-model="d_ag_test_command.stdin_source"
                               class="select">
 
                         <option :value="StdinSource.none">
@@ -73,24 +74,24 @@
 
                   </div>
 
-                  <div v-if="d_test_command.stdin_source === StdinSource.text"
+                  <div v-if="d_ag_test_command.stdin_source === StdinSource.text"
                        class="text-container">
                     <label class="text-label"> Stdin source text: </label>
                     <validated-input ref="stdin_text"
                                      placeholder="Enter the stdin input here."
                                      :num_rows="5"
-                                     v-model="d_test_command.stdin_text"
+                                     v-model="d_ag_test_command.stdin_text"
                                      :validators="[is_not_empty]">
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.stdin_source === StdinSource.instructor_file"
+                  <div v-if="d_ag_test_command.stdin_source === StdinSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
 
                     <div class="dropdown">
                       <select id="file_stdin_source_dropdown"
-                              v-model="d_test_command.stdin_instructor_file"
+                              v-model="d_ag_test_command.stdin_instructor_file"
                               class="select">
                         <option v-for="file of project.instructor_files" :value="file">
                           {{file.name}}
@@ -105,11 +106,11 @@
               <div class="section-container">
                 <fieldset class="fieldset">
                   <legend class="legend"> Return Code </legend>
-                  <div class="command-input-container">
+                  <div class="ag-test-command-input-container">
                     <label class="text-label"> Expected Return Code: </label>
                     <div class="dropdown">
                       <select id="expected_return_code_dropdown"
-                              v-model="d_test_command.expected_return_code"
+                              v-model="d_ag_test_command.expected_return_code"
                               class="select">
                         <option :value="ExpectedReturnCode.none">
                           Don't Check
@@ -124,13 +125,13 @@
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_return_code !== ExpectedReturnCode.none"
+                  <div v-if="d_ag_test_command.expected_return_code !== ExpectedReturnCode.none"
                        class="point-assignment-container">
                     <div class="add-points-container">
                       <label class="text-label"> Correct return code </label>
                       <div>
                         <validated-input ref="points_for_correct_return_code"
-                                         v-model="d_test_command.points_for_correct_return_code"
+                                         v-model="d_ag_test_command.points_for_correct_return_code"
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
@@ -146,7 +147,8 @@
                       <label class="text-label"> Wrong return code </label>
                       <div>
                         <validated-input ref="deduction_for_wrong_return_code"
-                                         v-model="d_test_command.deduction_for_wrong_return_code"
+                                         v-model="
+                                         d_ag_test_command.deduction_for_wrong_return_code"
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
@@ -164,11 +166,11 @@
               <div class="section-container">
                 <fieldset class="fieldset">
                   <legend class="legend"> Stdout </legend>
-                  <div class="command-input-container file-dropdown-adjacent">
+                  <div class="ag-test-command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stdout against: </label>
                     <div class="dropdown">
                       <select id="expected_stdout_source_dropdown"
-                              v-model="d_test_command.expected_stdout_source"
+                              v-model="d_ag_test_command.expected_stdout_source"
                               class="select">
                         <option :value="ExpectedOutputSource.none">
                           Don't Check
@@ -183,24 +185,25 @@
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source === ExpectedOutputSource.text"
+                  <div v-if="d_ag_test_command.expected_stdout_source
+                             === ExpectedOutputSource.text"
                        class="text-container">
                     <label class="text-label"> Expected stdout text: </label>
                     <validated-input ref="expected_stdout_text"
                                      placeholder="Enter the expected stdout output here."
-                                     v-model="d_test_command.expected_stdout_text"
+                                     v-model="d_ag_test_command.expected_stdout_text"
                                      :num_rows="5"
                                      :validators="[is_not_empty]">
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source
+                  <div v-if="d_ag_test_command.expected_stdout_source
                              === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
                     <div class="dropdown">
                       <select id="file_stdout_dropdown"
-                              v-model="d_test_command.expected_stdout_instructor_file"
+                              v-model="d_ag_test_command.expected_stdout_instructor_file"
                               class="select">
                         <option v-for="file of project.instructor_files" :value="file">
                           {{file.name}}
@@ -209,13 +212,14 @@
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stdout_source !== ExpectedOutputSource.none"
+                  <div v-if="d_ag_test_command.expected_stdout_source
+                             !== ExpectedOutputSource.none"
                        class="point-assignment-container">
                     <div class="add-points-container">
                       <label class="text-label"> Correct stdout </label>
                       <div>
                         <validated-input ref="points_for_correct_stdout"
-                                         v-model="d_test_command.points_for_correct_stdout"
+                                         v-model="d_ag_test_command.points_for_correct_stdout"
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
@@ -231,7 +235,7 @@
                       <label class="text-label"> Wrong stdout</label>
                       <div>
                         <validated-input ref="deduction_for_wrong_stdout"
-                                         v-model="d_test_command.deduction_for_wrong_stdout"
+                                         v-model="d_ag_test_command.deduction_for_wrong_stdout"
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
@@ -250,11 +254,11 @@
               <div class="section-container">
                 <fieldset class="fieldset">
                   <legend class="legend"> Stderr </legend>
-                  <div class="command-input-container file-dropdown-adjacent">
+                  <div class="ag-test-command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stderr against: </label>
                     <div class="dropdown">
                       <select id="expected_stderr_source_dropdown"
-                              v-model="d_test_command.expected_stderr_source"
+                              v-model="d_ag_test_command.expected_stderr_source"
                               class="select">
                         <option :value="ExpectedOutputSource.none">
                           Don't Check
@@ -269,24 +273,25 @@
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stderr_source === ExpectedOutputSource.text"
+                  <div v-if="d_ag_test_command.expected_stderr_source
+                             === ExpectedOutputSource.text"
                        class="text-container">
                     <label class="text-label"> Expected stderr text: </label>
                     <validated-input ref="expected_stderr_text"
                                      placeholder="Enter the expected stderr output here."
-                                     v-model="d_test_command.expected_stderr_text"
+                                     v-model="d_ag_test_command.expected_stderr_text"
                                      :num_rows="5"
                                      :validators="[is_not_empty]">
                     </validated-input>
                   </div>
 
-                  <div v-if="d_test_command.expected_stderr_source
+                  <div v-if="d_ag_test_command.expected_stderr_source
                              === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
                     <div class="dropdown">
                       <select id="file_stderr_dropdown"
-                              v-model="d_test_command.expected_stderr_instructor_file"
+                              v-model="d_ag_test_command.expected_stderr_instructor_file"
                               class="select">
                         <option v-for="file of project.instructor_files" :value="file">
                           {{file.name}}
@@ -295,13 +300,14 @@
                     </div>
                   </div>
 
-                  <div v-if="d_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+                  <div v-if="d_ag_test_command.expected_stderr_source
+                             !== ExpectedOutputSource.none"
                        class="point-assignment-container">
                     <div class="add-points-container">
                       <label class="text-label"> Correct stderr </label>
                       <div>
                         <validated-input ref="points_for_correct_stderr"
-                                         v-model="d_test_command.points_for_correct_stderr"
+                                         v-model="d_ag_test_command.points_for_correct_stderr"
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
@@ -317,7 +323,7 @@
                       <label class="text-label">  Wrong stderr </label>
                       <div>
                         <validated-input ref="deduction_for_wrong_stderr"
-                                         v-model="d_test_command.deduction_for_wrong_stderr"
+                                         v-model="d_ag_test_command.deduction_for_wrong_stderr"
                                          :validators="[
                                            is_not_empty,
                                            is_integer,
@@ -333,8 +339,8 @@
                 </fieldset>
               </div>
 
-              <div v-if="d_test_command.expected_stdout_source !== ExpectedOutputSource.none ||
-                         d_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+              <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none ||
+                         d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
                    class="section-container">
                 <fieldset class="fieldset">
                   <legend class="legend"> Diff Options </legend>
@@ -342,7 +348,7 @@
                     <input id="ignore-case"
                            type="checkbox"
                            class="checkbox"
-                           v-model="d_test_command.ignore_case">
+                           v-model="d_ag_test_command.ignore_case">
                     <label class="checkbox-label"
                            for="ignore-case"> Ignore case sensitivity
                     </label>
@@ -352,7 +358,7 @@
                     <input id="ignore-whitespace"
                            type="checkbox"
                            class="checkbox"
-                           v-model="d_test_command.ignore_whitespace">
+                           v-model="d_ag_test_command.ignore_whitespace">
                     <label class="checkbox-label"
                            for="ignore-whitespace"> Ignore whitespace
                     </label>
@@ -362,7 +368,7 @@
                     <input id="ignore-whitespace-changes"
                            type="checkbox"
                            class="checkbox"
-                           v-model="d_test_command.ignore_whitespace_changes">
+                           v-model="d_ag_test_command.ignore_whitespace_changes">
                     <label class="checkbox-label"
                            for="ignore-whitespace-changes"> Ignore whitespace changes
                     </label>
@@ -372,7 +378,7 @@
                     <input id="ignore-blank-lines"
                            type="checkbox"
                            class="checkbox"
-                           v-model="d_test_command.ignore_blank_lines">
+                           v-model="d_ag_test_command.ignore_blank_lines">
                     <label class="checkbox-label"
                            for="ignore-blank-lines"> Ignore blank lines
                     </label>
@@ -389,7 +395,7 @@
                       <div class="resource-input">
                         <validated-input ref="time_limit"
                                          id="input-time-limit"
-                                         v-model="d_test_command.time_limit"
+                                         v-model="d_ag_test_command.time_limit"
                                          input_style="width: 150px;"
                                          :validators="[
                                            is_not_empty,
@@ -406,7 +412,7 @@
                       <div class="resource-input">
                         <validated-input ref="virtual_memory_limit"
                                          id="input-virtual-memory-limit"
-                                         v-model="d_test_command.virtual_memory_limit"
+                                         v-model="d_ag_test_command.virtual_memory_limit"
                                          input_style="width: 150px;"
                                          :validators="[
                                            is_not_empty,
@@ -426,7 +432,7 @@
                       <div class="resource-input">
                         <validated-input ref="stack_size_limit"
                                          id="input-stack-size-limit"
-                                         v-model="d_test_command.stack_size_limit"
+                                         v-model="d_ag_test_command.stack_size_limit"
                                          input_style="width: 150px;"
                                          :validators="[
                                            is_not_empty,
@@ -443,7 +449,7 @@
                       <div class="resource-input">
                         <validated-input ref="process_spawn_limit"
                                          id="input-process-spawn-limit"
-                                         v-model="d_test_command.process_spawn_limit"
+                                         v-model="d_ag_test_command.process_spawn_limit"
                                          input_style="width: 150px;"
                                          :validators="[
                                            is_not_empty,
@@ -469,7 +475,7 @@
 
                 <div v-if="!saving" class="last-saved-timestamp">
                   <span> Last Saved: </span>
-                  {{(new Date(d_test_command.last_modified)).toLocaleString(
+                  {{(new Date(d_ag_test_command.last_modified)).toLocaleString(
                   'en-US', last_modified_format
                   )}}
                 </div>
@@ -508,16 +514,17 @@
         <template slot="body">
           <div class="tab-body">
 
-            <button class="delete-command-button"
+            <span> Number of commands in case: {{d_ag_test_case.ag_test_commands.length}} </span>
+            <button class="delete-ag-test-command-button"
                     type="button"
-                    @click="$refs.delete_command_modal.open()">
+                    @click="$refs.delete_ag_test_command_modal.open()">
               {{case_has_exactly_one_command ? 'Delete Case' : 'Delete Command'}}:
               <span>
-                {{case_has_exactly_one_command ? d_test_case.name : d_test_command.name}}
+                {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
               </span>
             </button>
 
-            <modal ref="delete_command_modal"
+            <modal ref="delete_ag_test_command_modal"
                    :size="'large'"
                    :include_closing_x="false">
               <div class="modal-header">
@@ -529,7 +536,7 @@
                 Are you sure you want to delete the test {{case_has_exactly_one_command
                                                            ? 'case' : 'command'}}:
                 <span class="item-to-delete">{{case_has_exactly_one_command
-                  ? d_test_case.name : d_test_command.name}}</span>?
+                  ? d_ag_test_case.name : d_ag_test_command.name}}</span>?
 
                 <span v-if="case_has_exactly_one_command"> This will delete all associated test
                   cases and run results. THIS ACTION CANNOT BE UNDONE.</span>
@@ -543,7 +550,7 @@
                           @click="delete_ag_test_command()"> Delete </button>
 
                   <button class="modal-cancel-button"
-                          @click="$refs.delete_command_modal.close()"> Cancel </button>
+                          @click="$refs.delete_ag_test_command_modal.close()"> Cancel </button>
                 </div>
               </div>
             </modal>
@@ -565,7 +572,6 @@ import {
   AGTestCommand,
   ExpectedOutputSource,
   ExpectedReturnCode,
-  InstructorFile,
   Project,
   StdinSource
 } from 'ag-client-typescript';
@@ -598,17 +604,17 @@ import {
 export default class AGCommandSettings extends Vue {
 
   @Prop({required: true, type: AGTestCommand})
-  test_command!: AGTestCommand;
+  ag_test_command!: AGTestCommand;
 
   @Prop({required: true, type: AGTestCase})
-  test_case!: AGTestCase;
+  ag_test_case!: AGTestCase;
 
   @Prop({required: true, type: Project})
   project!: Project;
 
   current_tab_index = 0;
-  d_test_command: AGTestCommand | null = null;
-  d_test_case: AGTestCase | null = null;
+  d_ag_test_command: AGTestCommand | null = null;
+  d_ag_test_case: AGTestCase | null = null;
   last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
                           hour: 'numeric', minute: 'numeric', second: 'numeric'};
   saving = false;
@@ -622,59 +628,48 @@ export default class AGCommandSettings extends Vue {
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
 
-  @Watch('test_command', {deep: true})
+  @Watch('ag_test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
-    this.d_test_command = deep_copy(new_test_command, AGTestCommand);
+    this.d_ag_test_command = deep_copy(new_test_command, AGTestCommand);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
     }
   }
 
-  @Watch('test_case', {deep: true})
-  on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
-    this.d_test_case = deep_copy(new_test_case, AGTestCase);
+  // deep needs to be here to pick up on deletion of commands from parent (ag_suites)
+  @Watch('ag_test_case', {deep: true})
+  on_test_case_change(new_ag_test_case: AGTestCase, old_ag_test_case: AGTestCase) {
+    this.d_ag_test_case = deep_copy(new_ag_test_case, AGTestCase);
     if (this.current_tab_index === 2) {
       this.current_tab_index = 0;
     }
   }
 
   async created() {
-    this.d_test_command = deep_copy(this.test_command, AGTestCommand);
-    this.d_test_case = deep_copy(this.test_case, AGTestCase);
-    this.sort_instructor_files();
+    this.d_ag_test_command = deep_copy(this.ag_test_command, AGTestCommand);
+    this.d_ag_test_case = deep_copy(this.ag_test_case, AGTestCase);
   }
 
   get case_has_exactly_one_command() {
-    return this.d_test_case!.ag_test_commands.length === 1;
+    return this.d_ag_test_case!.ag_test_commands.length === 1;
   }
 
   async delete_ag_test_command() {
     if (this.case_has_exactly_one_command) {
-      await this.d_test_case!.delete();
+      await this.d_ag_test_case!.delete();
     }
     else {
-      await this.d_test_command!.delete();
+      await this.d_ag_test_command!.delete();
     }
+    // (<Modal> this.$refs.delete_ag_test_command_modal).close();
   }
 
-  sort_instructor_files() {
-    this.project.instructor_files!.sort(
-      (file_a: InstructorFile, file_b: InstructorFile) => {
-        return file_a.name.localeCompare(file_b.name, undefined, {numeric: true});
-      }
-    );
-  }
-
-  @handle_api_errors_async(handle_save_ag_suite_settings_error)
+  @handle_api_errors_async(handle_save_ag_command_settings_error)
   async save_ag_test_command_settings() {
     try {
       this.saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_test_command!.save();
-      if (this.d_test_case!.ag_test_commands.length === 1) {
-        this.d_test_case!.name = this.d_test_command!.name;
-        await this.d_test_case!.save();
-      }
+      await this.d_ag_test_command!.save();
     }
     finally {
       this.saving = false;
@@ -682,40 +677,34 @@ export default class AGCommandSettings extends Vue {
   }
 }
 
-function handle_save_ag_suite_settings_error(component: AGCommandSettings, error: unknown) {
+function handle_save_ag_command_settings_error(component: AGCommandSettings, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
-$current-lang-choice: "Poppins";
-
-#ag-test-command-settings-component {
-  font-family: $current-lang-choice;
-}
 
 .tab-body {
   padding: 15px;
 }
 
-.delete-command-button {
+.delete-ag-test-command-button {
   @extend .delete-level-button;
 }
 
-.command-input-container {
+.ag-test-command-input-container {
   padding: 10px 0 10px 3px;
 }
 
-#name-container {
+#ag-test-command-name-container {
   padding: 0 12px 12px 12px;
 }
 
-#command-container {
+#ag-test-command-container {
   padding: 10px 12px 22px 12px;
 }
 

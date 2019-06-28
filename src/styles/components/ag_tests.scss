@@ -2,56 +2,6 @@ $active-color: teal;
 $parent-of-active-color: white;
 $suite-in-active-container-color: white;
 
-// Dropdown related ************************************************************
-
-.small-dropdown {
-    width: 100px;
-}
-
-.medium-dropdown {
-    width: 300px;
-}
-
-.large-dropdown {
-    width: 400px;
-}
-
-.dropdown-header-wrapper {
-    display: inline-block;
-    margin: 0;
-    position: relative;
-}
-
-.dropdown-header {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    box-sizing: border-box;
-    color: #495057;
-    cursor: default;
-    display: block;
-    font-size: 1rem;
-    line-height: 1.5;
-    min-height: 38px;
-    padding: .375rem .75rem;
-    position: relative;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.dropdown-header:focus {
-    border-color: $ocean-blue;
-}
-
-.dropdown-caret {
-    cursor: pointer;
-    font-size: 30px;
-    position: absolute;
-    right: 18px;
-    top: 3px;
-}
-
-// Other *******************************************************************
-
 .panel {
     cursor: pointer;
     box-sizing: border-box;
@@ -81,12 +31,6 @@ $suite-in-active-container-color: white;
 ::-webkit-scrollbar {
     background: transparent;
     width: 0;
-}
-
-.input-tooltip {
-    color: mediumvioletred;
-    font-size: 15px;
-    margin-left: 8px;
 }
 
 .loading-spinner {

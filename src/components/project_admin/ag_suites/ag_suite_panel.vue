@@ -1,48 +1,42 @@
 <template>
-  <div id="ag-suite-panel" v-if="test_suite !== null">
-      <div :class="['test-suite',
-                   {'active-suite': is_active_suite},
-                   {'suite-in-active-container': case_or_command_is_active_level}]"
-           @click="toggle_is_open">
-
-        <div class="test-suite-name">
-          <i v-if="is_open" class="fas fa-caret-down suite-symbol-down"></i>
-          <i v-else class="fas fa-caret-right suite-symbol-right"></i>
-          <span>{{test_suite.name}}</span>
+  <div id="ag-test-suite-panel" v-if="ag_test_suite !== null">
+      <div :class="['ag-test-suite', {'active-ag-test-suite': suite_is_active}]"
+           @click="update_ag_test_suite_panel_when_clicked()">
+        <div class="ag-test-suite-name">
+          <i v-if="is_open" class="fas fa-caret-down ag-test-suite-symbol-down"></i>
+          <i v-else class="fas fa-caret-right ag-test-suite-symbol-right"></i>
+          <span>{{ag_test_suite.name}}</span>
         </div>
 
-        <div id="suite-menu"
-             title="Add Case"
-             @click.stop="open_new_case_modal">
+        <div id="ag-test-suite-menu"
+             title="Add Test Case"
+             @click.stop="open_new_ag_test_case_modal">
           <i class="fas fa-plus"></i>
         </div>
       </div>
 
-      <div class="cases-container" v-if="is_open">
-        <div v-for="test_case of test_suite.ag_test_cases"
+      <div class="ag-test-cases-container" v-if="is_open">
+        <div v-for="test_case of ag_test_suite.ag_test_cases"
              :key="test_case.pk">
-          <AGCasePanel :test_case="test_case"
-                       :test_suite="test_suite"
-                       :active_case="active_case"
-                       :active_command="active_command"
-                       @update_active_suite="$emit('update_active_suite', $event)"
-                       @update_active_case="$emit('update_active_case', $event)"
-                       @update_active_command="$emit('update_active_command', $event)">
+          <AGCasePanel :ag_test_case="test_case"
+                       :ag_test_suite="ag_test_suite"
+                       :active_ag_test_command="active_ag_test_command"
+                       @update_active_thing="$emit('update_active_thing', $event)">
           </AGCasePanel>
         </div>
       </div>
 
-    <modal ref="new_case_modal"
+    <modal ref="new_ag_test_case_modal"
            click_outside_to_close
            size="large">
-      <div class="modal-header"> New Case </div>
+      <div class="modal-header"> New Test Case </div>
       <hr>
       <div class="modal-body">
         <div class="name-container">
-          <validated-form ref="create_case_form"
+          <validated-form ref="create_ag_test_case_form"
                           autocomplete="off"
                           spellcheck="false"
-                          @submit.native.prevent="create_case"
+                          @submit="create_ag_test_case"
                           @form_validity_changed="add_case_form_is_valid = $event">
 
             <div id="case-name-container">
@@ -53,13 +47,14 @@
               </validated-input>
             </div>
 
-            <div class="new-command-container" v-for="(new_command, index) of new_commands">
+            <div class="new-ag-test-command-container"
+                 v-for="(new_command, index) of new_commands">
 
-              <div class="new-command-inputs">
-                <fieldset class="case-modal-fieldset">
-                  <legend class="legend"> {{get_ordinal_num(index)}} </legend>
+              <div class="new-ag-test-command-inputs">
+                <fieldset class="ag-test-case-modal-fieldset">
+                  <legend class="legend">{{format_ordinal_num(index)}}</legend>
 
-                  <div class="command-name" v-if="new_commands.length > 1">
+                  <div class="ag-test-command-name" v-if="new_commands.length > 1">
                     <label class="text-label"> Command name </label>
                     <validated-input ref="command_name"
                                      v-model="new_command.name"
@@ -67,17 +62,17 @@
                                      input_style="width: 100%;
                                                   min-width: 200px;
                                                   max-width: 700px;">
-                      <div slot="suffix" class="remove-command-suffix">
-                        <button class="remove-command-button"
+                      <div slot="suffix" class="remove-ag-test-command-suffix">
+                        <button class="remove-ag-test-command-button"
                                 type="button"
                                 @click="remove_command(index)">
-                          <i class="fas fa-times remove-command-icon"></i>
+                          <i class="fas fa-times remove-ag-test-command-icon"></i>
                         </button>
                       </div>
                     </validated-input>
                   </div>
 
-                  <div class="command">
+                  <div class="ag-test-command">
                     <label class="text-label"> Command </label>
                     <validated-input ref="command"
                                      v-model="new_command.cmd"
@@ -90,7 +85,7 @@
                     <div>
                       <div v-if="duplicate_command_name_in_case
                                  && new_command.name === duplicate_command_name"
-                           class="duplicate-command-msg">
+                           class="duplicate-ag-test-command-msg">
                         Duplicate command name
                       </div>
                     </div>
@@ -100,11 +95,11 @@
               </div>
             </div>
 
-            <APIErrors ref="new_case_api_errors"></APIErrors>
+            <APIErrors ref="new_ag_test_case_api_errors"></APIErrors>
 
             <div class="modal-button-footer">
-              <div id="add-command-button-container">
-                <button class="add-command-button"
+              <div id="add-ag-test-command-button-container">
+                <button class="add-ag-test-command-button"
                         type="button"
                         :disabled="new_commands.length === 3"
                         @click="add_command">
@@ -113,7 +108,7 @@
                 </button>
               </div>
 
-              <div class="create-case-button">
+              <div class="create-ag-test-case-button">
                 <button class="modal-create-button"
                         type="submit"
                         :disabled="!add_case_form_is_valid || creating_case">
@@ -148,9 +143,15 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
-interface CommandInCase {
+// make this a class that's default constructable
+export class NewCommandFields {
   name: string;
   cmd: string;
+
+  constructor({name = "", cmd = ""}: {name?: string, cmd?: string}) {
+    this.name = name;
+    this.cmd = cmd;
+  }
 }
 
 @Component({
@@ -166,48 +167,77 @@ interface CommandInCase {
 export default class AGSuitePanel extends Vue {
 
   @Prop({default: null, type: AGTestSuite})
-  active_suite!: AGTestSuite | null;
+  active_ag_test_suite!: AGTestSuite | null;
 
   @Prop({required: true})
-  active_case!: AGTestCase | null;
-
-  @Prop({required: true})
-  active_command!: AGTestCommand | null;
+  active_ag_test_command!: AGTestCommand | null;
 
   @Prop({required: true, type: AGTestSuite})
-  test_suite!: AGTestSuite;
+  ag_test_suite!: AGTestSuite;
 
-  @Watch('test_suite', {deep: true})
-  on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
-    this.test_suite = new_test_suite;
-  }
+  cases_are_visible = false;
 
   readonly is_not_empty = is_not_empty;
 
-  get_ordinal_num(index: number) {
+  @Watch('active_ag_test_command')
+  on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
+                                    old_active_ag_test_command: AGTestCommand) {
+    if (this.command_in_suite_is_active) {
+      this.cases_are_visible = true;
+    }
+  }
+
+  get command_in_suite_is_active() {
+    return this.active_ag_test_command !== null && this.ag_test_suite.ag_test_cases.findIndex(
+      (test_case: AGTestCase) => test_case.pk === this.active_ag_test_command!.ag_test_case
+    ) !== -1;
+  }
+
+  format_ordinal_num(index: number) {
     if (index === 0) {
       return "First";
     }
     return index === 1 ? "Second" : "Third";
   }
 
+  get is_open() {
+    return this.cases_are_visible;
+  }
+
   add_case_form_is_valid = false;
-  incomplete_input_present = false;
   duplicate_command_name_in_case = false;
   creating_case = false;
   loading = true;
-  is_open = false;
   new_case_name = "";
-  new_commands: CommandInCase[] = [];
+  new_commands: NewCommandFields[] = [];
+
+  update_ag_test_suite_panel_when_clicked() {
+    if (!this.cases_are_visible) {
+      console.log("Was closed and nothing was active");
+      this.cases_are_visible = true;
+      this.$emit('update_active_thing', this.ag_test_suite);
+    }
+    else {
+      if (this.suite_is_active) {
+        console.log("Was open and suite was active");
+        this.cases_are_visible = false;
+      }
+      else if (this.command_in_suite_is_active) {
+        console.log("Was open and command was active");
+        this.$emit('update_active_thing', this.ag_test_suite);
+      }
+      else {
+        console.log("Was open and nothing was active");
+        this.$emit('update_active_thing', this.ag_test_suite);
+      }
+    }
+  }
 
   add_command() {
     if (this.new_commands.length === 1) {
       this.new_commands[0].name = this.new_case_name;
     }
-    this.new_commands.push({
-      name: "",
-      cmd: ""
-    });
+    this.new_commands.push(new NewCommandFields({}));
   }
 
   remove_command(index: number) {
@@ -217,49 +247,19 @@ export default class AGSuitePanel extends Vue {
     }
   }
 
-  toggle_is_open() {
-    if (this.is_open && this.is_active_suite && this.active_case === null) {
-      this.close();
-    }
-    else {
-      this.open();
-    }
+  get suite_is_active() {
+    return this.active_ag_test_suite !== null
+           && this.active_ag_test_suite.pk === this.ag_test_suite.pk;
   }
 
-  open() {
-    this.is_open = true;
-    this.$emit('update_active_suite', this.test_suite);
-  }
-
-  close() {
-    this.$emit('update_active_suite', null);
-    this.is_open = false;
-  }
-
-  get is_active_suite() {
-    if (this.active_suite !== null && this.active_suite.pk === this.test_suite.pk) {
-      if (!this.is_open) {
-        this.is_open = true;
-      }
-      return true;
-    }
-    return false;
-  }
-
-  get case_or_command_is_active_level() {
-    return this.is_active_suite && this.active_case !== null;
-  }
-
-  open_new_case_modal() {
-    if (this.active_suite === null || this.active_suite.pk !== this.test_suite!.pk) {
-      this.$emit('update_active_suite', this.test_suite);
-    }
+  open_new_ag_test_case_modal() {
+    this.$emit('update_active_thing', this.ag_test_suite);
     this.duplicate_command_name_in_case = false;
-    this.new_commands = [{name: "", cmd: ""}];
+    this.add_command();
     this.new_case_name = "";
-    (<Modal> this.$refs.new_case_modal).open();
+    (<Modal> this.$refs.new_ag_test_case_modal).open();
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_case_name).invoke_focus();
+      (<ValidatedInput> this.$refs.new_case_name).focus();
     });
   }
 
@@ -278,8 +278,8 @@ export default class AGSuitePanel extends Vue {
     return "";
   }
 
-  @handle_api_errors_async(handle_create_ag_case_error)
-  async create_case() {
+  @handle_api_errors_async(handle_create_ag_test_case_error)
+  async create_ag_test_case() {
     try {
       this.creating_case = true;
       this.duplicate_command_name_in_case = false;
@@ -294,16 +294,18 @@ export default class AGSuitePanel extends Vue {
         }
       }
 
-      (<APIErrors> this.$refs.new_case_api_errors).clear();
-      let created_case = await AGTestCase.create(this.test_suite!.pk, {name: this.new_case_name});
+      (<APIErrors> this.$refs.new_ag_test_case_api_errors).clear();
+      let created_case = await AGTestCase.create(
+        this.ag_test_suite!.pk, {name: this.new_case_name}
+      );
 
       for (let i = 0; i < this.new_commands.length; ++i) {
         await AGTestCommand.create(
           created_case.pk, { name: this.new_commands[i].name, cmd: this.new_commands[i].cmd }
         );
       }
-      (<ValidatedForm> this.$refs.create_case_form).reset_warning_state();
-      (<Modal> this.$refs.new_case_modal).close();
+      (<ValidatedForm> this.$refs.create_ag_test_case_form).reset_warning_state();
+      (<Modal> this.$refs.new_ag_test_case_modal).close();
     }
     finally {
       this.creating_case = false;
@@ -311,80 +313,79 @@ export default class AGSuitePanel extends Vue {
   }
 }
 
-function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
-  (<APIErrors> component.$refs.new_case_api_errors).show_errors_from_response(error);
+function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknown) {
+  (<APIErrors> component.$refs.new_ag_test_case_api_errors).show_errors_from_response(error);
 }
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
 
-.test-suite {
+.ag-test-suite {
   @extend .panel;
   padding: 0 5px 0 0;
 
-  .suite-symbol-right {
+  .ag-test-suite-symbol-right {
     @extend .caret-right;
   }
 
-  .suite-symbol-down {
+  .ag-test-suite-symbol-down {
     @extend .caret-down;
   }
 
-  #suite-menu {
+  #ag-test-suite-menu {
     padding: 5px;
     visibility: hidden;
   }
 }
 
-.test-suite:hover {
-  #suite-menu {
+.ag-test-suite:hover {
+  #ag-test-suite-menu {
     visibility: visible;
     color: darken($stormy-gray-dark, 10);
   }
 }
 
-.test-suite-name {
+.ag-test-suite-name {
   @extend .level-name;
 }
 
-.active-suite {
+.active-ag-test-suite {
   @extend .active-level;
 
-  #suite-menu, #suite-menu:hover {
+  #ag-test-suite-menu, #ag-test-suite-menu:hover {
     visibility: visible;
     color: white;
   }
 
-  .suite-symbol-right, .suite-symbol-down {
+  .ag-test-suite-symbol-right, .ag-test-suite-symbol-down {
     color: white;
   }
 }
 
-.active-suite:hover {
-  #suite-menu {
+.active-ag-test-suite:hover {
+  #ag-test-suite-menu {
     color: white;
   }
 }
 
-.suite-in-active-container {
+.ag-test-suite-in-active-container {
   @extend .parent-of-active-level;
   background-color: white;
 
-  #suite-menu, .suite-symbol-right, .suite-symbol-down {
+  #ag-test-suite-menu, .ag-test-suite-symbol-right, .ag-test-suite-symbol-down {
     color: darken(teal, 10);
   }
 
-  #suite-menu {
+  #ag-test-suite-menu {
     visibility: visible;
   }
 }
 
-.suite-in-active-container:hover {
+.ag-test-suite-in-active-container:hover {
   #suite-menu {
     color: darken(teal, 10);
   }
@@ -392,47 +393,47 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
 
 // Modal **************************************************************
 
-#case-name-container {
+#ag-test-case-name-container {
   padding: 0;
 }
 
-.new-command-inputs {
+.new-ag-test-command-inputs {
   width: 100%;
   padding-top: 14px;
 }
 
-.remove-command-suffix {
+.remove-ag-test-command-suffix {
   margin-left: 10px;
   display: flex;
   align-self: stretch;
 }
 
-.remove-command-button {
+.remove-ag-test-command-button {
   @extend .light-gray-button;
 }
 
-.remove-command-icon {
+.remove-ag-test-command-icon {
   display: flex;
   align-self: center;
   padding: 1px 4px 0 4px;
 }
 
-.command-name {
+.ag-test-command-name {
   padding: 0 0 3px 0;
   width: 100%;
 }
 
-.command {
+.ag-test-command {
   padding: 0;
   width: 100%;
 }
 
-.add-command-button {
+.add-ag-test-command-button {
   @extend .white-button;
   margin-right: 20px;
 }
 
-.add-command-button span {
+.add-ag-test-command-button span {
   padding-left: 5px;
 }
 
@@ -443,7 +444,7 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
   justify-content: space-between;
 }
 
-.duplicate-command-msg {
+.duplicate-ag-test-command-msg {
   box-sizing: border-box;
   color: #721c24;
   display: inline-block;
@@ -454,7 +455,7 @@ function handle_create_ag_case_error(component: AGSuitePanel, error: unknown) {
   margin-top: 11px;
 }
 
-.case-modal-fieldset {
+.ag-test-case-modal-fieldset {
   border-bottom: none;
   border-left: none;
   border-right: none;

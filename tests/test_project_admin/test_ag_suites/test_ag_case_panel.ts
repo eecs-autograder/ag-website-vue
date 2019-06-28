@@ -308,10 +308,10 @@ describe('AGCasePanel tests', () => {
 
         wrapper = mount(AGCasePanel, {
             propsData: {
-                test_case: ag_case_green,
-                test_suite: ag_suite_colors,
-                active_case: null,
-                active_command: null
+                ag_test_case: ag_case_green,
+                ag_test_suite: ag_suite_colors,
+                active_ag_test_case: null,
+                active_ag_test_command: null
             }
         });
         component = wrapper.vm;
@@ -329,71 +329,147 @@ describe('AGCasePanel tests', () => {
         }
     });
 
-    test('When a case with more than one command is clicked on, the case is emitted',
+    test('Case (closed and child command not active) is clicked on',
          async () => {
-        wrapper.findAll('.test-case').at(0).trigger('click');
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(
-            { ag_suite: ag_suite_colors, ag_case: ag_case_green}
+        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(
+            ag_case_green
         );
+        expect(component.commands_are_visible).toBe(true);
     });
 
-    test('When a case with exactly one command is clicked on, the case is emitted',
+    test('Case (closed and child command is active) is clicked on',
          async () => {
-        wrapper.setProps({test_case: ag_case_yellow});
-
-        wrapper.findAll('.test-case').at(0).trigger('click');
+        wrapper.setProps({active_ag_test_command: ag_command_green_2});
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_case[0][0]).toEqual(
-            { ag_suite: ag_suite_colors, ag_case: ag_case_yellow }
+        expect(component.command_in_case_is_active).toBe(true);
+        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+        expect(component.commands_are_visible).toBe(true);
+
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(component.command_in_case_is_active).toBe(true);
+        expect(component.commands_are_visible).toBe(false);
+        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(component.command_in_case_is_active).toBe(true);
+        expect(component.commands_are_visible).toBe(true);
+        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+    });
+
+    test('Case (open and child command not active) is clicked on',
+         async () => {
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_case_green);
+
+        expect(component.commands_are_visible).toBe(true);
+
+        wrapper.setProps({active_ag_test_command: ag_command_green_1});
+        await component.$nextTick();
+
+        expect(component.command_in_case_is_active).toBe(true);
+
+        wrapper.setProps({active_ag_test_command: ag_command_yellow_1});
+        await component.$nextTick();
+
+        expect(component.commands_are_visible).toBe(true);
+        expect(component.command_in_case_is_active).toBe(false);
+
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.emitted().update_active_thing[1][0]).toEqual(ag_case_green);
+
+        expect(component.commands_are_visible).toBe(true);
+    });
+
+    test('Case (open and child command is active) is clicked on',
+         async () => {
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(
+            ag_case_green
         );
+
+        wrapper.setProps({active_ag_test_command: ag_command_green_1});
+        await component.$nextTick();
+
+        expect(component.commands_are_visible).toBe(true);
+        expect(component.command_in_case_is_active).toBe(true);
+
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(component.commands_are_visible).toBe(false);
+        expect(component.command_in_case_is_active).toBe(true);
+    });
+
+    test('Command in case becomes active',
+         async () => {
+        wrapper.setProps({active_ag_test_command: ag_command_green_2});
+        await component.$nextTick();
+
+        expect(component.commands_are_visible).toBe(true);
+        expect(component.command_in_case_is_active).toBe(true);
     });
 
     test('When a case that is active is clicked on again, it closes', async () => {
         expect(component.is_open).toBe(false);
 
-        wrapper.setProps({active_case: ag_case_green});
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
         expect(component.is_open).toBe(true);
+        expect(component.commands_are_visible).toBe(true);
+        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_case_green);
 
-        wrapper.findAll('.test-case').at(0).trigger('click');
+        wrapper.setProps({active_ag_test_command: ag_command_green_1});
         await component.$nextTick();
 
-        expect(wrapper.emitted('update_active_suite').length).toEqual(1);
+        expect(component.command_in_case_is_active).toBe(true);
 
-        // will be closed once active case is updated in the parent - but will return true now
-        // expect(component.is_open).toBe(false);
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(component.command_in_case_is_active).toBe(true);
+        expect(component.commands_are_visible).toBe(false);
+        expect(component.is_open).toBe(false);
     });
 
-    test('When a command is clicked on, an event is emitted', async () => {
-        wrapper.setProps({active_case: ag_case_green});
+    test('When a command is clicked on, an event is emitted',
+         async () => {
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await component.$nextTick();
 
-        wrapper.findAll('.test-command').at(0).trigger('click');
+        expect(wrapper.emitted().update_active_thing[0][0]).toEqual(ag_case_green);
+        expect(component.commands_are_visible).toBe(true);
+
+        wrapper.findAll('.ag-test-command').at(1).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_command[0][0]).toEqual({
-            ag_suite: ag_suite_colors,
-            ag_case: ag_case_green,
-            ag_command: ag_command_green_1
-        });
+        expect(wrapper.emitted().update_active_thing[1][0]).toEqual(ag_command_green_2);
     });
 
     test('Add command - successful', async () => {
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
-        wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
 
-        wrapper.find({ref: 'add_command_menu_item'}).trigger('click');
+        wrapper.findAll({ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
         await component.$nextTick();
 
         component.new_command_name = "New command name";
         component.new_command = "New command";
 
-        wrapper.find('#add-command-form').trigger('submit.native');
+        wrapper.find('#add-ag-test-command-form').trigger('submit');
         await component.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -421,13 +497,13 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_case: ag_case_green});
         await component.$nextTick();
 
-        wrapper.find({ref: 'add_command_menu_item'}).trigger('click');
+        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await component.$nextTick();
 
         component.new_command_name = "New command name";
         component.new_command = "New command";
 
-        wrapper.find('#add-command-form').trigger('submit.native');
+        wrapper.find('#add-ag-test-command-form').trigger('submit');
         await component.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -437,62 +513,17 @@ describe('AGCasePanel tests', () => {
     });
 
     test('Delete case - successful', async () => {
-        let delete_case_stub = sinon.stub(component.test_case, 'delete');
+        let delete_case_stub = sinon.stub(component.ag_test_case, 'delete');
         wrapper.setProps({active_case: ag_case_green});
         await component.$nextTick();
 
-        wrapper.find({ref: 'delete_case_menu_item'}).trigger('click');
+        wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
         await component.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
-    });
-
-    test('is_active_case getter', async () => {
-        let case_in_different_suite = new AGTestCase({
-            pk: 4,
-            name: "Casey's Corner: Changed",
-            ag_test_suite: 2,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
-        expect(component.is_active_case).toBe(false);
-
-        wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
-
-        expect(component.is_active_case).toBe(true);
-
-        wrapper.setProps({active_command: ag_command_green_2});
-        await component.$nextTick();
-
-        expect(component.is_active_case).toBe(true);
-
-        wrapper.setProps({active_case: case_in_different_suite});
-        await component.$nextTick();
-
-        expect(component.is_active_case).toBe(false);
-    });
-
-    test('command_is_active_level', async () => {
-        expect(component.command_is_active_level).toBe(false);
-
-        wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
-
-        expect(component.command_is_active_level).toBe(false);
-
-        wrapper.setProps({active_command: ag_command_green_2});
-        await component.$nextTick();
-
-        expect(component.command_is_active_level).toBe(true);
     });
 
     test('command in a different case changed', async () => {
@@ -532,31 +563,31 @@ describe('AGCasePanel tests', () => {
             virtual_memory_limit: 1,
             process_spawn_limit: 1
         });
-        expect(component.test_case.ag_test_commands!.length).toEqual(3);
-        expect(component.test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
-        expect(component.test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
-        expect(component.test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
+        expect(component.ag_test_case.ag_test_commands!.length).toEqual(3);
+        expect(component.ag_test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
+        expect(component.ag_test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
+        expect(component.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
 
         AGTestCommand.notify_ag_test_command_changed(updated_command_in_different_case);
         await component.$nextTick();
 
-        expect(component.test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
-        expect(component.test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
-        expect(component.test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
+        expect(component.ag_test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
+        expect(component.ag_test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
+        expect(component.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
     });
 
     test('error - new command name is blank', async () => {
-        wrapper.setProps({active_case: ag_case_green});
+        wrapper.setProps({active_ag_test_case: ag_case_green});
         await component.$nextTick();
 
-        wrapper.find({ref: 'add_command_menu_item'}).trigger('click');
+        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await component.$nextTick();
 
         let new_command_name_input = wrapper.find(
-            {ref: 'new_command_name'}
+            {ref: 'new_ag_test_command_name'}
         ).find('#input');
         let new_command_name_validator = <ValidatedInput> wrapper.find(
-            {ref: 'new_command_name'}
+            {ref: 'new_ag_test_command_name'}
         ).vm;
 
         expect(new_command_name_validator.is_valid).toBe(false);
@@ -575,14 +606,14 @@ describe('AGCasePanel tests', () => {
     });
 
     test('error - new command is blank', async () => {
-        wrapper.setProps({active_case: ag_case_green});
+        wrapper.setProps({active_ag_test_case: ag_case_green});
         await component.$nextTick();
 
-        wrapper.find({ref: 'add_command_menu_item'}).trigger('click');
+        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await component.$nextTick();
 
-        let new_command_input = wrapper.find({ref: 'new_command'}).find('#input');
-        let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_command'}).vm;
+        let new_command_input = wrapper.find({ref: 'new_ag_test_command'}).find('#input');
+        let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_ag_test_command'}).vm;
 
         expect(new_command_validator.is_valid).toBe(false);
 
@@ -600,12 +631,12 @@ describe('AGCasePanel tests', () => {
     });
 
     test('Watcher for test_case', async () => {
-        expect(component.test_case).toEqual(ag_case_green);
+        expect(component.ag_test_case).toEqual(ag_case_green);
 
-        wrapper.setProps({test_case: ag_case_yellow});
+        wrapper.setProps({ag_test_case: ag_case_yellow});
         await component.$nextTick();
 
-        expect(component.test_case).toEqual(ag_case_yellow);
+        expect(component.ag_test_case).toEqual(ag_case_yellow);
     });
 
     test('Watcher for test_suite', async () => {
@@ -633,11 +664,11 @@ describe('AGCasePanel tests', () => {
             instructor_files_needed: [],
             student_files_needed: []
         });
-        expect(component.test_suite).toEqual(ag_suite_colors);
+        expect(component.ag_test_suite).toEqual(ag_suite_colors);
 
-        wrapper.setProps({test_suite: another_suite});
+        wrapper.setProps({ag_test_suite: another_suite});
         await component.$nextTick();
 
-        expect(component.test_suite).toEqual(another_suite);
+        expect(component.ag_test_suite).toEqual(another_suite);
     });
 });

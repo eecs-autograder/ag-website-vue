@@ -26,8 +26,8 @@ beforeAll(() => {
 describe('AGCommandSettings tests', () => {
     let wrapper: Wrapper<AGCommandSettings>;
     let component: AGCommandSettings;
-    let ag_case: AGTestCase;
-    let ag_command: AGTestCommand;
+    let ag_test_case: AGTestCase;
+    let ag_test_command: AGTestCommand;
     let another_command: AGTestCommand;
     let case_with_two_commands: AGTestCase;
     let instructor_file_1: InstructorFile;
@@ -63,7 +63,7 @@ describe('AGCommandSettings tests', () => {
             show_individual_commands: false
         };
 
-        ag_command = new AGTestCommand({
+        ag_test_command = new AGTestCommand({
             pk: 1,
             name: "Command 1",
             ag_test_case: 1,
@@ -137,7 +137,7 @@ describe('AGCommandSettings tests', () => {
             process_spawn_limit: 1
         });
 
-        ag_case = new AGTestCase({
+        ag_test_case = new AGTestCase({
             pk: 1,
             name: "Case A",
             ag_test_suite: 1,
@@ -146,7 +146,7 @@ describe('AGCommandSettings tests', () => {
             past_limit_submission_fdbk_config: default_case_feedback_config,
             staff_viewer_fdbk_config: default_case_feedback_config,
             last_modified: '',
-            ag_test_commands: [ag_command]
+            ag_test_commands: [ag_test_command]
         });
 
         case_with_two_commands = new AGTestCase({
@@ -158,7 +158,7 @@ describe('AGCommandSettings tests', () => {
             past_limit_submission_fdbk_config: default_case_feedback_config,
             staff_viewer_fdbk_config: default_case_feedback_config,
             last_modified: '',
-            ag_test_commands: [ag_command, another_command]
+            ag_test_commands: [ag_test_command, another_command]
         });
 
         instructor_file_1 = new InstructorFile({
@@ -214,8 +214,8 @@ describe('AGCommandSettings tests', () => {
 
         wrapper = mount(AGCommandSettings, {
             propsData: {
-                test_case: ag_case,
-                test_command: ag_command,
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
                 project: project
             }
         });
@@ -234,14 +234,22 @@ describe('AGCommandSettings tests', () => {
         }
     });
 
-    test('Instructor files from the project get sorted', async () => {
-        expect(component.project.instructor_files!.length).toEqual(3);
-        expect(component.project.instructor_files![0]).toEqual(instructor_file_2);
-        expect(component.project.instructor_files![1]).toEqual(instructor_file_1);
-        expect(component.project.instructor_files![2]).toEqual(instructor_file_3);
-    });
+    test('error - command name is blank (case has more than one command)', async () => {
+        let another_case = new AGTestCase({
+            pk: 1,
+            name: "Another Case",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: [ag_test_command, another_command]
+        });
 
-    test('error - command name is blank', async () => {
+        wrapper.setProps({ag_test_case: another_case});
+        await component.$nextTick();
+
         let name_input = wrapper.find({ref: "command_name"}).find('#input');
         let name_validator = <ValidatedInput> wrapper.find({ref: "command_name"}).vm;
 
@@ -273,7 +281,7 @@ describe('AGCommandSettings tests', () => {
         let stdin_text_input = wrapper.find({ref: "cmd"}).find('#textarea');
         let stdin_text_validator = <ValidatedInput> wrapper.find({ref: "cmd"}).vm;
 
-        component.d_test_command!.stdin_source = StdinSource.text;
+        component.d_ag_test_command!.stdin_source = StdinSource.text;
         (<HTMLInputElement> stdin_text_input.element).value = "Lamp";
         stdin_text_input.trigger('input');
         await component.$nextTick();
@@ -289,7 +297,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - points_for_correct_return_code is blank or not an integer', async () => {
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
         let correct_return_code_points_input = wrapper.find(
@@ -316,7 +324,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - points_for_correct_return_code must be >= 0', async () => {
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
         let correct_return_code_points_input = wrapper.find(
@@ -337,7 +345,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
         let wrong_return_code_points_input = wrapper.find(
@@ -364,7 +372,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - deduction_for_wrong_return_code must be >= 0', async () => {
-        component.d_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
         let wrong_return_code_points_input = wrapper.find(
@@ -385,7 +393,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - expected_stdout_text is blank', async () => {
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
 
         let expected_stdout_text_input = wrapper.find(
             {ref: "expected_stdout_text"}
@@ -409,8 +417,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - points_for_correct_stdout is blank or not an integer', async () => {
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stdout_text = "Hi there";
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         let correct_stdout_points_input = wrapper.find(
             {ref: "points_for_correct_stdout"}
@@ -437,8 +445,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - points_for_correct_stdout must be >= 0', async () => {
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stdout_text = "Hi there";
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         let correct_stdout_points_input = wrapper.find(
             {ref: "points_for_correct_stdout"}
@@ -458,8 +466,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stdout_text = "Hi there";
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         let wrong_stdout_points_input = wrapper.find(
             {ref: "deduction_for_wrong_stdout"}
@@ -486,8 +494,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - deduction_for_wrong_stdout must be >= 0', async () => {
-        component.d_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stdout_text = "Hi there";
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         let wrong_stdout_points_input = wrapper.find(
             {ref: "deduction_for_wrong_stdout"}
@@ -507,7 +515,7 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - expected_stderr_text is blank', async () => {
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         let expected_stderr_text_input = wrapper.find(
             {ref: "expected_stderr_text"}
@@ -531,8 +539,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - points_for_correct_stderr is blank or not an integer', async () => {
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stderr_text = "Hi there";
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
         let correct_stderr_points_input = wrapper.find(
@@ -560,8 +568,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - points_for_correct_stderr must be >= 0', async () => {
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stderr_text = "Hi there";
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
         let correct_stderr_points_input = wrapper.find(
@@ -582,8 +590,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stderr_text = "Hi there";
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
         let wrong_stderr_points_input = wrapper.find(
@@ -611,8 +619,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - deduction_for_wrong_stderr must be >= 0', async () => {
-        component.d_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_test_command!.expected_stderr_text = "Hi there";
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
         let wrong_stderr_points_input = wrapper.find(
@@ -821,16 +829,16 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Save command settings - successful', async () => {
-        let save_stub = sinon.stub(component.d_test_command!, 'save');
+        let save_stub = sinon.stub(component.d_ag_test_command!, 'save');
 
-        wrapper.find('#command-settings-form').trigger('submit.native');
+        wrapper.find('#ag-test-command-settings-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
     });
 
     test('Save command settings - unsuccessful', async () => {
-        let save_stub = sinon.stub(component.d_test_command!, 'save');
+        let save_stub = sinon.stub(component.d_ag_test_command!, 'save');
         let axios_response_instance: AxiosError = {
             name: 'AxiosError',
             message: 'u heked up',
@@ -849,7 +857,7 @@ describe('AGCommandSettings tests', () => {
         save_stub.returns(Promise.reject(axios_response_instance));
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
-        wrapper.find('#command-settings-form').trigger('submit.native');
+        wrapper.find('#ag-test-command-settings-form').trigger('submit');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
@@ -859,14 +867,14 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Delete command', async () => {
-        wrapper.setProps({test_case: case_with_two_commands});
+        wrapper.setProps({ag_test_case: case_with_two_commands});
 
-        let delete_command_stub = sinon.stub(component.d_test_command!, 'delete');
+        let delete_command_stub = sinon.stub(component.d_ag_test_command!, 'delete');
 
         wrapper.setData({current_tab_index: 2});
         await component.$nextTick();
 
-        wrapper.find('.delete-command-button').trigger('click');
+        wrapper.find('.delete-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
@@ -876,12 +884,12 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Delete case with exactly one command', async () => {
-        let delete_case_stub = sinon.stub(component.d_test_case!, 'delete');
+        let delete_case_stub = sinon.stub(component.d_ag_test_case!, 'delete');
 
         wrapper.setData({current_tab_index: 2});
         await component.$nextTick();
 
-        wrapper.find('.delete-command-button').trigger('click');
+        wrapper.find('.delete-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
@@ -891,13 +899,13 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {
-        expect(component.d_test_command!.pk).toEqual(ag_command.pk);
+        expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
         expect(component.current_tab_index).toEqual(0);
 
-        wrapper.setProps({'test_command': another_command});
+        wrapper.setProps({'ag_test_command': another_command});
         await component.$nextTick();
 
-        expect(component.d_test_command!.pk).toEqual(another_command.pk);
+        expect(component.d_ag_test_command!.pk).toEqual(another_command.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setData({current_tab_index: 2});
@@ -905,21 +913,21 @@ describe('AGCommandSettings tests', () => {
 
         expect(component.current_tab_index).toEqual(2);
 
-        wrapper.setProps({'test_command': ag_command});
+        wrapper.setProps({'ag_test_command': ag_test_command});
         await component.$nextTick();
 
-        expect(component.d_test_command!.pk).toEqual(ag_command.pk);
+        expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
         expect(component.current_tab_index).toEqual(0);
     });
 
     test('Parent component changes the value supplied to the test_case prop', async () => {
-        expect(component.d_test_case!.pk).toEqual(ag_case.pk);
+        expect(component.d_ag_test_case!.pk).toEqual(ag_test_case.pk);
         expect(component.current_tab_index).toEqual(0);
 
-        wrapper.setProps({'test_case': case_with_two_commands});
+        wrapper.setProps({'ag_test_case': case_with_two_commands});
         await component.$nextTick();
 
-        expect(component.d_test_case!.pk).toEqual(case_with_two_commands.pk);
+        expect(component.d_ag_test_case!.pk).toEqual(case_with_two_commands.pk);
         expect(component.current_tab_index).toEqual(0);
 
         wrapper.setData({current_tab_index: 2});
@@ -927,10 +935,10 @@ describe('AGCommandSettings tests', () => {
 
         expect(component.current_tab_index).toEqual(2);
 
-        wrapper.setProps({'test_case': ag_case});
+        wrapper.setProps({'ag_test_case': ag_test_case});
         await component.$nextTick();
 
-        expect(component.d_test_command!.pk).toEqual(ag_command.pk);
+        expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
         expect(component.current_tab_index).toEqual(0);
     });
 });
