@@ -175,18 +175,18 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     AGTestCommand.unsubscribe(this);
   }
 
-  update_active_item(thing: AGTestSuite | AGTestCase | AGTestCommand | null) {
-    if (thing instanceof AGTestSuite) {
-      this.active_ag_test_suite = thing;
+  update_active_item(item: AGTestSuite | AGTestCase | AGTestCommand | null) {
+    if (item instanceof AGTestSuite) {
+      this.active_ag_test_suite = item;
       this.active_ag_test_command = null;
     }
-    else if (thing instanceof AGTestCase) {
+    else if (item instanceof AGTestCase) {
       this.active_ag_test_suite = null;
-      this.active_ag_test_command = thing.ag_test_commands[0];
+      this.active_ag_test_command = item.ag_test_commands[0];
     }
-    else if (thing instanceof AGTestCommand) {
+    else if (item instanceof AGTestCommand) {
       this.active_ag_test_suite = null;
-      this.active_ag_test_command = thing;
+      this.active_ag_test_command = item;
     }
     else {
       this.active_ag_test_suite = null;
