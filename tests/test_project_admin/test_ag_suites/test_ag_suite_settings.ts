@@ -4,7 +4,6 @@ import {
     AGTestSuite,
     AGTestSuiteFeedbackConfig,
     ExpectedStudentFile,
-    get_sandbox_docker_images,
     InstructorFile,
     Project,
     UltimateSubmissionPolicy
@@ -127,8 +126,8 @@ describe('AGSuiteSettings tests', () => {
             staff_viewer_fdbk_config: default_feedback_config,
             ultimate_submission_fdbk_config: default_feedback_config,
             ag_test_cases: [],
-            instructor_files_needed: [instructor_file_2, instructor_file_1],
-            student_files_needed: [student_file_2, student_file_1]
+            instructor_files_needed: [instructor_file_1, instructor_file_2],
+            student_files_needed: [student_file_1, student_file_2]
         });
 
         project = new Project({
@@ -154,8 +153,8 @@ describe('AGSuiteSettings tests', () => {
             allow_late_days: true,
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
-            expected_student_files: [student_file_2, student_file_1, student_file_3],
-            instructor_files: [instructor_file_2, instructor_file_1, instructor_file_3]
+            expected_student_files: [student_file_1, student_file_2, student_file_3],
+            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3]
         });
 
         sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
@@ -229,7 +228,7 @@ describe('AGSuiteSettings tests', () => {
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
 
-        search_bar.trigger('keydown', { code: 'Enter' });
+        search_bar.trigger('keydown', {code: 'Enter'});
         await dropdown_typeahead.$nextTick();
 
         expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(3);

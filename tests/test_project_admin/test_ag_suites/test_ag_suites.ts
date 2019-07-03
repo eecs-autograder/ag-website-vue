@@ -589,7 +589,6 @@ describe('AGSuites tests', () => {
 
     // Command Related ---------------------------------------------------------------------------
 
-    // should created commands become active commands?
     test('Command created', async () => {
         let ag_command_blue_2 = create_command(50, "Blue Command 2", ag_case_blue.pk);
 
@@ -691,7 +690,7 @@ describe('AGSuites tests', () => {
         expect(component.active_ag_test_command).toEqual(ag_command_green_2);
     });
 
-    // Visiting Previous Command -----------------------------------------------------------------
+    // Visiting Previous Test Case ---------------------------------------------------------------
 
     test('prev_ag_test_case_is_available (false) - active_ag_test_suite is null', async () => {
         expect(component.prev_ag_test_case_is_available).toBe(false);
@@ -811,7 +810,7 @@ describe('AGSuites tests', () => {
         expect(component.active_ag_test_command).toEqual(ag_command_green_1);
     });
 
-    // Visiting Next Command ---------------------------------------------------------------------
+    // Visiting Next Test Case -------------------------------------------------------------------
 
     test('next_ag_test_case_is_available (false) - active_ag_test_suite is null', async () => {
         expect(component.next_ag_test_case_is_available).toBe(false);

@@ -257,18 +257,15 @@ export default class AGSuitePanel extends Vue {
     });
   }
 
-  get duplicate_command_name() {
-    if (this.new_commands.length > 1) {
-      if (this.new_commands[0].name === this.new_commands[1].name) {
-        return this.new_commands[0].name;
+  get duplicate_command_name(): string {
+    let names = new Set();
+    for (let new_command of this.new_commands) {
+      if (names.has(new_command.name)) {
+        return new_command.name;
       }
-      if (this.new_commands.length === 3) {
-        if (this.new_commands[0].name === this.new_commands[2].name
-            || this.new_commands[1].name === this.new_commands[2].name) {
-          return this.new_commands[2].name;
-        }
-      }
+      names.add(new_command.name);
     }
+
     return "";
   }
 
@@ -295,7 +292,7 @@ export default class AGSuitePanel extends Vue {
 
       for (let i = 0; i < this.new_commands.length; ++i) {
         await AGTestCommand.create(
-          created_case.pk, { name: this.new_commands[i].name, cmd: this.new_commands[i].cmd }
+          created_case.pk, {name: this.new_commands[i].name, cmd: this.new_commands[i].cmd}
         );
       }
       (<ValidatedForm> this.$refs.create_ag_test_case_form).reset_warning_state();

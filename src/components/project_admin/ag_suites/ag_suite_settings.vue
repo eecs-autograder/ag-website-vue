@@ -17,7 +17,7 @@
               <validated-form id="ag-test-suite-settings-form"
                               autocomplete="off"
                               spellcheck="false"
-                              @submit.native.prevent="save_ag_test_suite_settings"
+                              @submit="save_ag_test_suite_settings"
                               @form_validity_changed="settings_form_is_valid = $event">
 
                 <div id="ag-test-suite-name-container">
@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="instructor-files">
-                      <div v-for="(file, index) of instructor_files_needed"
+                      <div v-for="(file, index) of d_ag_test_suite.instructor_files_needed"
                            :class="['file', {'odd-index': index % 2 !== 0}]">
                         <span class="file-name"> {{file.name}} </span>
                         <div class="delete-file-icon-container"
@@ -122,7 +122,7 @@
                     </div>
 
                     <div class="student-files">
-                      <div v-for="(file, index) of student_files_needed"
+                      <div v-for="(file, index) of d_ag_test_suite.student_files_needed"
                            :class="['file', {'odd-index': index % 2 !== 0}]">
                         <span class="file-name"> {{file.pattern}} </span>
                         <div class="delete-file-icon-container"
@@ -323,23 +323,6 @@ export default class AGSuiteSettings extends Vue {
         (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
     });
   }
-
-  get instructor_files_needed() {
-    return this.d_ag_test_suite!.instructor_files_needed.sort(
-      (file_a: InstructorFile, file_b: InstructorFile) => {
-        return file_a.name.localeCompare(file_b.name, undefined, {numeric: true});
-      }
-    );
-  }
-
-  get student_files_needed() {
-    return this.d_ag_test_suite!.student_files_needed.sort(
-      (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
-        return file_a.pattern.localeCompare(file_b.pattern, undefined, {numeric: true});
-      }
-    );
-  }
-
 
   get expected_student_files_available() {
     return this.project.expected_student_files.filter(

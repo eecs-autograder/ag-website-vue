@@ -379,7 +379,7 @@ describe('AGSuitePanel tests', () => {
         component.new_commands[1].name = "BANANAS";
         component.new_commands[1].cmd = "bananas";
 
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_case_stub.calledOnce).toBe(true);
@@ -478,6 +478,8 @@ describe('AGSuitePanel tests', () => {
 
         expect(create_case_stub.callCount).toEqual(0);
         expect(create_command_stub.callCount).toEqual(0);
+
+        expect(wrapper.findAll('.duplicate-ag-test-command-msg').length).toEqual(2);
     });
 
     test('Attempt to add case with duplicate command name present (1st and 3rd', async () => {
@@ -519,11 +521,13 @@ describe('AGSuitePanel tests', () => {
         component.new_commands[2].name = "APPLES";
         component.new_commands[2].cmd = "cherries";
 
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit.native');
+        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_case_stub.callCount).toEqual(0);
         expect(create_command_stub.callCount).toEqual(0);
+
+        expect(wrapper.findAll('.duplicate-ag-test-command-msg').length).toEqual(2);
     });
 
     test('Attempt to add case with duplicate command name present (2nd and 3rd', async () => {
@@ -570,6 +574,8 @@ describe('AGSuitePanel tests', () => {
 
         expect(create_case_stub.callCount).toEqual(0);
         expect(create_command_stub.callCount).toEqual(0);
+
+        expect(wrapper.findAll('.duplicate-ag-test-command-msg').length).toEqual(2);
     });
 
     test('Add case (and first command) - unsuccessful', async () => {
