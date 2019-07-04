@@ -1,4 +1,6 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { Vue } from 'vue-property-decorator';
+
+import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase, AGTestCaseFeedbackConfig,
@@ -17,9 +19,8 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
-import { checkbox_is_checked } from '@/tests/utils';
+import { checkbox_is_checked, set_validated_input_text, get_validated_input_text } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -252,317 +253,67 @@ describe('AGCommandSettings tests', () => {
         wrapper.setProps({ag_test_case: another_case});
         await component.$nextTick();
 
-        let name_input = wrapper.find({ref: "command_name"}).find('#input');
-        let name_validator = <ValidatedInput> wrapper.find({ref: "command_name"}).vm;
-
-        expect(name_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> name_input.element).value = " ";
-        name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(name_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(wrapper, {ref: "command_name"}, ' ', '.save-button');
     });
 
     test('error - cmd is blank', async () => {
-        let cmd_input = wrapper.find({ref: "cmd"}).find('#textarea');
-        let cmd_validator = <ValidatedInput> wrapper.find({ref: "cmd"}).vm;
-
-        expect(cmd_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-
-        (<HTMLInputElement> cmd_input.element).value = " ";
-        cmd_input.trigger('input');
-        await component.$nextTick();
-
-        expect(cmd_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-    });
-
-    test('error - stdin_text is blank', async () => {
-        let stdin_text_input = wrapper.find({ref: "cmd"}).find('#textarea');
-        let stdin_text_validator = <ValidatedInput> wrapper.find({ref: "cmd"}).vm;
-
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        component.d_ag_test_command!.stdin_source = StdinSource.text;
-        (<HTMLInputElement> stdin_text_input.element).value = "Lamp";
-        stdin_text_input.trigger('input');
-        await component.$nextTick();
-
-        expect(stdin_text_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> stdin_text_input.element).value = " ";
-        stdin_text_input.trigger('input');
-        await component.$nextTick();
-
-        expect(stdin_text_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(wrapper, {ref: "cmd"}, ' ', '.save-button');
     });
 
     test('error - points_for_correct_return_code is blank or not an integer', async () => {
         component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
-        let correct_return_code_points_input = wrapper.find(
-            {ref: "points_for_correct_return_code"}
-        ).find('#input');
-        let correct_return_code_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "points_for_correct_return_code"}
-        ).vm;
-
-        expect(correct_return_code_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> correct_return_code_points_input.element).value = " ";
-        correct_return_code_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_return_code_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> correct_return_code_points_input.element).value = "Glasses";
-        correct_return_code_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_return_code_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: "points_for_correct_return_code"}, '.save-button');
     });
 
     test('error - points_for_correct_return_code must be >= 0', async () => {
         component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
-        let correct_return_code_points_input = wrapper.find(
-            {ref: "points_for_correct_return_code"}
-        ).find('#input');
-        let correct_return_code_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "points_for_correct_return_code"}
-        ).vm;
-
-        expect(correct_return_code_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> correct_return_code_points_input.element).value = "-2";
-        correct_return_code_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_return_code_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_for_correct_return_code'}, '-2', '.save-button');
     });
 
     test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
         component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
-        let wrong_return_code_points_input = wrapper.find(
-            {ref: "deduction_for_wrong_return_code"}
-        ).find('#input');
-        let wrong_return_code_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "deduction_for_wrong_return_code"}
-        ).vm;
-
-        expect(wrong_return_code_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> wrong_return_code_points_input.element).value = " ";
-        wrong_return_code_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_return_code_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> wrong_return_code_points_input.element).value = "Glasses";
-        wrong_return_code_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_return_code_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'deduction_for_wrong_return_code'}, '.save-button');
     });
 
     test('error - deduction_for_wrong_return_code must be >= 0', async () => {
         component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await component.$nextTick();
 
-        let wrong_return_code_points_input = wrapper.find(
-            {ref: "deduction_for_wrong_return_code"}
-        ).find('#input');
-        let wrong_return_code_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "deduction_for_wrong_return_code"}
-        ).vm;
-
-        expect(wrong_return_code_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> wrong_return_code_points_input.element).value = "-1";
-        wrong_return_code_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_return_code_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-    });
-
-    test('error - expected_stdout_text is blank', async () => {
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        let expected_stdout_text_input = wrapper.find(
-            {ref: "expected_stdout_text"}
-        ).find('#textarea');
-        let expected_stdout_text_validator = <ValidatedInput> wrapper.find(
-            {ref: "expected_stdout_text"}
-        ).vm;
-
-        (<HTMLInputElement> expected_stdout_text_input.element).value = "Rain";
-        expected_stdout_text_input.trigger('input');
-        await component.$nextTick();
-
-        expect(expected_stdout_text_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-
-        (<HTMLInputElement> expected_stdout_text_input.element).value = " ";
-        expected_stdout_text_input.trigger('input');
-        await component.$nextTick();
-
-        expect(expected_stdout_text_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-    });
-
-    test('error - points_for_correct_stdout is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
-
-        let correct_stdout_points_input = wrapper.find(
-            {ref: "points_for_correct_stdout"}
-        ).find('#input');
-        let correct_stdout_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "points_for_correct_stdout"}
-        ).vm;
-
-        expect(correct_stdout_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> correct_stdout_points_input.element).value = " ";
-        correct_stdout_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_stdout_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> correct_stdout_points_input.element).value = "Scooby Doo";
-        correct_stdout_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_stdout_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'deduction_for_wrong_return_code'}, '-1', '.save-button');
     });
 
     test('error - points_for_correct_stdout must be >= 0', async () => {
         component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
-        let correct_stdout_points_input = wrapper.find(
-            {ref: "points_for_correct_stdout"}
-        ).find('#input');
-        let correct_stdout_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "points_for_correct_stdout"}
-        ).vm;
-
-        expect(correct_stdout_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-
-        (<HTMLInputElement> correct_stdout_points_input.element).value = "-1";
-        correct_stdout_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_stdout_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_for_correct_stdout'}, '-1', '.save-button');
     });
 
     test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
         component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
-        let wrong_stdout_points_input = wrapper.find(
-            {ref: "deduction_for_wrong_stdout"}
-        ).find('#input');
-        let wrong_stdout_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "deduction_for_wrong_stdout"}
-        ).vm;
-
-        expect(wrong_stdout_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> wrong_stdout_points_input.element).value = " ";
-        wrong_stdout_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_stdout_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> wrong_stdout_points_input.element).value = "Mystery Machine";
-        wrong_stdout_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_stdout_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'deduction_for_wrong_stdout'}, '.save-button');
     });
 
     test('error - deduction_for_wrong_stdout must be >= 0', async () => {
         component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         component.d_ag_test_command!.expected_stdout_text = "Hi there";
 
-        let wrong_stdout_points_input = wrapper.find(
-            {ref: "deduction_for_wrong_stdout"}
-        ).find('#input');
-        let wrong_stdout_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "deduction_for_wrong_stdout"}
-        ).vm;
-
-        expect(wrong_stdout_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> wrong_stdout_points_input.element).value = "-1";
-        wrong_stdout_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_stdout_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-    });
-
-    test('error - expected_stderr_text is blank', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        let expected_stderr_text_input = wrapper.find(
-            {ref: "expected_stderr_text"}
-        ).find('#textarea');
-        let expected_stderr_text_validator = <ValidatedInput> wrapper.find(
-            {ref: "expected_stderr_text"}
-        ).vm;
-
-        (<HTMLInputElement> expected_stderr_text_input.element).value = "Snow";
-        expected_stderr_text_input.trigger('input');
-        await component.$nextTick();
-
-        expect(expected_stderr_text_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> expected_stderr_text_input.element).value = " ";
-        expected_stderr_text_input.trigger('input');
-        await component.$nextTick();
-
-        expect(expected_stderr_text_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'deduction_for_wrong_stdout'}, '-1', '.save-button');
     });
 
     test('error - points_for_correct_stderr is blank or not an integer', async () => {
@@ -570,29 +321,8 @@ describe('AGCommandSettings tests', () => {
         component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
-        let correct_stderr_points_input = wrapper.find(
-            {ref: "points_for_correct_stderr"}
-        ).find('#input');
-        let correct_stderr_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "points_for_correct_stderr"}
-        ).vm;
-
-        expect(correct_stderr_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> correct_stderr_points_input.element).value = " ";
-        correct_stderr_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_stderr_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> correct_stderr_points_input.element).value = "Scooby Doo";
-        correct_stderr_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_stderr_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'points_for_correct_stderr'}, '.save-button');
     });
 
     test('error - points_for_correct_stderr must be >= 0', async () => {
@@ -600,22 +330,8 @@ describe('AGCommandSettings tests', () => {
         component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
-        let correct_stderr_points_input = wrapper.find(
-            {ref: "points_for_correct_stderr"}
-        ).find('#input');
-        let correct_stderr_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "points_for_correct_stderr"}
-        ).vm;
-
-        expect(correct_stderr_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> correct_stderr_points_input.element).value = "-1";
-        correct_stderr_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(correct_stderr_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_for_correct_stderr'}, '-1', '.save-button');
     });
 
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
@@ -623,29 +339,8 @@ describe('AGCommandSettings tests', () => {
         component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
-        let wrong_stderr_points_input = wrapper.find(
-            {ref: "deduction_for_wrong_stderr"}
-        ).find('#input');
-        let wrong_stderr_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "deduction_for_wrong_stderr"}
-        ).vm;
-
-        expect(wrong_stderr_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> wrong_stderr_points_input.element).value = " ";
-        wrong_stderr_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_stderr_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> wrong_stderr_points_input.element).value = "Scooby Doo";
-        wrong_stderr_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_stderr_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'deduction_for_wrong_stderr'}, '.save-button');
     });
 
     test('error - deduction_for_wrong_stderr must be >= 0', async () => {
@@ -653,22 +348,8 @@ describe('AGCommandSettings tests', () => {
         component.d_ag_test_command!.expected_stderr_text = "Hi there";
         await component.$nextTick();
 
-        let wrong_stderr_points_input = wrapper.find(
-            {ref: "deduction_for_wrong_stderr"}
-        ).find('#input');
-        let wrong_stderr_points_validator = <ValidatedInput> wrapper.find(
-            {ref: "deduction_for_wrong_stderr"}
-        ).vm;
-
-        expect(wrong_stderr_points_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> wrong_stderr_points_input.element).value = "-1";
-        wrong_stderr_points_input.trigger('input');
-        await component.$nextTick();
-
-        expect(wrong_stderr_points_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'deduction_for_wrong_stderr'}, '-1', '.save-button');
     });
 
     test('Diff options appear when expected_stdout_source !== none ' +
@@ -811,200 +492,40 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('error - time_limit is blank or not an integer', async () => {
-        let time_limit_input = wrapper.find({ref: 'time_limit'}).find('#input');
-        let time_limit_validator = <ValidatedInput> wrapper.find({ref: 'time_limit'}).vm;
-
-        expect(time_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> time_limit_input.element).value = " ";
-        time_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(time_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> time_limit_input.element).value = "cupcake";
-        time_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(time_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(wrapper, {ref: 'time_limit'}, '.save-button');
     });
 
     test('error - time_limit must be >= 1', async () => {
-        let time_limit_input = wrapper.find({ref: 'time_limit'}).find('#input');
-        let time_limit_validator = <ValidatedInput> wrapper.find({ref: 'time_limit'}).vm;
-
-        expect(time_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> time_limit_input.element).value = "0";
-        time_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(time_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> time_limit_input.element).value = "1";
-        time_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(time_limit_validator.is_valid).toBe(true);
+        return do_invalid_text_input_test(wrapper, {ref: 'time_limit'}, '0', '.save-button');
     });
 
     test('error - virtual_memory_limit is blank or not an integer', async () => {
-        let virtual_memory_limit_input = wrapper.find(
-            {ref: 'virtual_memory_limit'}
-        ).find('#input');
-        let virtual_memory_limit_validator = <ValidatedInput> wrapper.find(
-            {ref: 'virtual_memory_limit'}
-        ).vm;
-
-        expect(virtual_memory_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> virtual_memory_limit_input.element).value = " ";
-        virtual_memory_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(virtual_memory_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> virtual_memory_limit_input.element).value = "cheesecake";
-        virtual_memory_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(virtual_memory_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'virtual_memory_limit'}, '.save-button');
     });
 
     test('error - virtual_memory_limit must be >= 1', async () => {
-        let virtual_memory_limit_input = wrapper.find(
-            {ref: 'virtual_memory_limit'}
-        ).find('#input');
-        let virtual_memory_limit_validator = <ValidatedInput> wrapper.find(
-            {ref: 'virtual_memory_limit'}
-        ).vm;
-
-        expect(virtual_memory_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> virtual_memory_limit_input.element).value = "0";
-        virtual_memory_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(virtual_memory_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> virtual_memory_limit_input.element).value = "1";
-        virtual_memory_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(virtual_memory_limit_validator.is_valid).toBe(true);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'virtual_memory_limit'}, '0', '.save-button');
     });
 
     test('error - stack_size_limit is blank or not an integer', async () => {
-        let stack_size_limit_input = wrapper.find(
-            {ref: 'stack_size_limit'}
-        ).find('#input');
-        let stack_size_limit_validator = <ValidatedInput> wrapper.find(
-            {ref: 'stack_size_limit'}
-        ).vm;
-
-        expect(stack_size_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> stack_size_limit_input.element).value = " ";
-        stack_size_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(stack_size_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> stack_size_limit_input.element).value = "pudding";
-        stack_size_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(stack_size_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'stack_size_limit'}, '.save-button');
     });
 
     test('error - stack_size_limit must be >= 1', async () => {
-        let stack_size_limit_input = wrapper.find(
-            {ref: 'stack_size_limit'}
-        ).find('#input');
-        let stack_size_limit_validator = <ValidatedInput> wrapper.find(
-            {ref: 'stack_size_limit'}
-        ).vm;
-
-        expect(stack_size_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> stack_size_limit_input.element).value = "0";
-        stack_size_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(stack_size_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> stack_size_limit_input.element).value = "1";
-        stack_size_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(stack_size_limit_validator.is_valid).toBe(true);
+        return do_invalid_text_input_test(wrapper, {ref: 'stack_size_limit'}, '0', '.save-button');
     });
 
     test('error - process_spawn_limit is blank or not an integer', async () => {
-        let process_spawn_limit_input = wrapper.find(
-            {ref: 'process_spawn_limit'}
-        ).find('#input');
-        let process_spawn_limit_validator = <ValidatedInput> wrapper.find(
-            {ref: 'process_spawn_limit'}
-        ).vm;
-
-        expect(process_spawn_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> process_spawn_limit_input.element).value = " ";
-        process_spawn_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(process_spawn_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> process_spawn_limit_input.element).value = "jello";
-        process_spawn_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(process_spawn_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'process_spawn_limit'}, '.save-button');
     });
 
     test('error - process_spawn_limit must be >= 0', async () => {
-        let process_spawn_limit_input = wrapper.find(
-            {ref: 'process_spawn_limit'}
-        ).find('#input');
-        let process_spawn_limit_validator = <ValidatedInput> wrapper.find(
-            {ref: 'process_spawn_limit'}
-        ).vm;
-
-        expect(process_spawn_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-        (<HTMLInputElement> process_spawn_limit_input.element).value = "-1";
-        process_spawn_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(process_spawn_limit_validator.is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-
-        (<HTMLInputElement> process_spawn_limit_input.element).value = "0";
-        process_spawn_limit_input.trigger('input');
-        await component.$nextTick();
-
-        expect(process_spawn_limit_validator.is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'process_spawn_limit'}, '-1', '.save-button');
     });
 
     test('Save command settings - successful', async () => {
@@ -1122,3 +643,30 @@ describe('AGCommandSettings tests', () => {
         expect(component.current_tab_index).toEqual(0);
     });
 });
+
+async function do_invalid_text_input_test(component_wrapper: Wrapper<Vue>,
+                                          input_selector: string | RefSelector,
+                                          invalid_text: string,
+                                          save_button_selector: string | RefSelector) {
+    let input_wrapper = component_wrapper.find(input_selector);
+    expect(input_wrapper.vm.is_valid).toBe(true);
+    expect(component_wrapper.find(save_button_selector).is('[disabled]')).toBe(false);
+
+    set_validated_input_text(input_wrapper, invalid_text);
+    await component_wrapper.vm.$nextTick();
+
+    expect(input_wrapper.vm.is_valid).toBe(false);
+    expect(component_wrapper.find(save_button_selector).is('[disabled]')).toBe(true);
+}
+
+async function do_input_blank_or_not_integer_test(component_wrapper: Wrapper<Vue>,
+                                                  input_selector: string | RefSelector,
+                                                  save_button_selector: string | RefSelector) {
+    let input_wrapper = component_wrapper.find(input_selector);
+    let original_text = get_validated_input_text(input_wrapper);
+
+    await do_invalid_text_input_test(component_wrapper, input_selector, ' ', save_button_selector);
+    set_validated_input_text(input_wrapper, original_text);
+    return do_invalid_text_input_test(
+        component_wrapper, input_selector, 'not num', save_button_selector);
+}
