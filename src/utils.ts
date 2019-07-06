@@ -1,7 +1,6 @@
 import { Dictionary } from 'vue-router/types/router';
 
-import { Course } from 'ag-client-typescript';
-import { AxiosError, AxiosResponse } from 'axios';
+import { Course, HttpError } from 'ag-client-typescript';
 // @ts-ignore
 import moment from "moment";
 
@@ -130,14 +129,6 @@ export function format_course_name(course: Course) {
         result += ' ' + course.year.toString();
     }
     return result;
-}
-
-export function get_axios_error_status(error: unknown): [AxiosResponse, number] {
-    let response = (error as AxiosError).response;
-    if (response === undefined) {
-        throw error;
-    }
-    return [response, response.status];
 }
 
 // Returns the value associated with key in query params. If more than one value is associated with

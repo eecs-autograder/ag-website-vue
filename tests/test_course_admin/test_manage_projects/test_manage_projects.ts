@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { Course, HttpError, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/componenets/api_errors.vue';
@@ -241,22 +240,6 @@ describe('ManageProjects.vue', () => {
     test('New project name must be unique among projects in the same course - violates ' +
          'condition',
          async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Project with this Name and Course already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         expect(component.projects.length).toEqual(2);
 
         let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
@@ -270,7 +253,11 @@ describe('ManageProjects.vue', () => {
         expect(validated_input.is_valid).toBe(true);
 
         let create_project_stub = sinon.stub(Project, 'create').returns(
-            Promise.reject(axios_response_instance)
+            Promise.reject(
+                new HttpError(400, {
+                    __all__: "Project with this Name and Course already exists."
+                })
+            )
         );
 
         wrapper.find({ref: 'new_project_form'}).trigger('submit');

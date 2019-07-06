@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { HttpError, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -465,24 +464,10 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Unsuccessful attempt to save project settings', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Project with this name already exists in course?"
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         let save_settings_stub = sinon.stub(component.d_project, 'save');
-        save_settings_stub.returns(Promise.reject(axios_response_instance));
+        save_settings_stub.returns(Promise.reject(
+            new HttpError(400, {__all__: "Project with this name already exists in course"})
+        ));
 
         expect(component.settings_form_is_valid).toBe(true);
 

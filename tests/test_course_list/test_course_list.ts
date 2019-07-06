@@ -2,9 +2,7 @@ import Vue from 'vue';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Semester, User } from 'ag-client-typescript';
-import { AllCourses } from 'ag-client-typescript/src/course';
-import { AxiosError } from 'axios';
+import { AllCourses, Course, HttpError, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import CourseList from '@/components/course_list/course_list.vue';
@@ -191,22 +189,6 @@ describe('Course_List.vue', () => {
     });
 
     test('If attempt to clone a course is unsuccessful, a course is not added', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "A course with this name, semester, and year already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         all_courses = {
             courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
             courses_is_staff_for: [],
@@ -215,7 +197,14 @@ describe('Course_List.vue', () => {
         };
 
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
-        sinon.stub(fall18_eecs280, 'copy').returns(Promise.reject(axios_response_instance));
+        sinon.stub(fall18_eecs280, 'copy').returns(
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "A course with this name, semester, and year already exists."}
+                )
+            )
+        );
 
         wrapper = mount(CourseList, {
             stubs: ['router-link', 'router-view']

@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { ExpectedStudentFile, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { ExpectedStudentFile, HttpError, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -85,28 +84,14 @@ describe('CreateExpectedStudentFile tests', () => {
     });
 
     test('Unsuccessful creation of a file - name is not unique', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "File with this name already exists in project"
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         let form_wrapper = wrapper.find({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
         await component.$nextTick();
 
-        sinon.stub(ExpectedStudentFile, 'create').rejects(axios_response_instance);
+        sinon.stub(ExpectedStudentFile, 'create').rejects(
+            new HttpError(400, {__all__: "File with this name already exists in project"})
+        );
         wrapper.find('#expected-student-file-form').trigger('submit');
         await component.$nextTick();
 

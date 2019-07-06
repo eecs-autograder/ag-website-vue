@@ -1,29 +1,14 @@
 import { mount, Wrapper } from "@vue/test-utils";
 
-import { AxiosError } from 'axios';
+import { HttpError } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
-
 
 describe('APIErrors component tests', () => {
     let wrapper: Wrapper<APIErrors>;
     let component: APIErrors;
-    let base_axios_error: AxiosError;
 
     beforeEach(() => {
-        base_axios_error = {
-            name: '',
-            message: '',
-            config: {},
-            response: {
-                data: {},
-                status: 0,
-                statusText: '',
-                headers: {},
-                config: {}
-            }
-        };
-
         wrapper = mount(APIErrors);
         component = wrapper.vm;
     });
@@ -35,8 +20,7 @@ describe('APIErrors component tests', () => {
     });
 
     test('504 error',  () => {
-        base_axios_error.response!.status = 504;
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(new HttpError(504, 'gateway timeout'));
 
         let messages = wrapper.findAll('.error-msg');
 
@@ -46,8 +30,7 @@ describe('APIErrors component tests', () => {
     });
 
     test('413 error', () => {
-        base_axios_error.response!.status = 413;
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(new HttpError(413, 'too big'));
 
         let messages = wrapper.findAll('.error-msg');
 
@@ -57,11 +40,7 @@ describe('APIErrors component tests', () => {
     });
 
     test('400 error with __all__ string', () => {
-        base_axios_error.response!.status = 400;
-        base_axios_error.response!.data = {
-            '__all__': 'Duplicate course'
-        };
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(new HttpError(400, {'__all__': 'Duplicate course'}));
 
         let messages = wrapper.findAll('.error-msg');
 
@@ -70,11 +49,8 @@ describe('APIErrors component tests', () => {
     });
 
     test('400 error with __all__ array', () => {
-        base_axios_error.response!.status = 400;
-        base_axios_error.response!.data = {
-            '__all__': ['Duplicate course', 'Very duplicate']
-        };
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(
+            new HttpError(400, {'__all__': ['Duplicate course', 'Very duplicate']}));
 
         let messages = wrapper.findAll('.error-msg');
 
@@ -83,12 +59,12 @@ describe('APIErrors component tests', () => {
     });
 
     test('400 error with specific field validation errors', () => {
-        base_axios_error.response!.status = 400;
-        base_axios_error.response!.data = {
-            'name': 'Name cannot be blank',
-            'size': 'Size must be < 42'
-        };
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(
+            new HttpError(400,  {
+                'name': 'Name cannot be blank',
+                'size': 'Size must be < 42'
+            })
+        );
 
         let messages = wrapper.findAll('.error-msg');
 
@@ -101,21 +77,25 @@ describe('APIErrors component tests', () => {
         expect(actual_messages[1]).toEqual('Error in "size": Size must be < 42');
     });
 
+    test('400 error with string data', () => {
+        component.show_errors_from_response(new HttpError(400,  'I am error'));
+        let messages = wrapper.findAll('.error-msg');
+        expect(messages.length).toEqual(1);
+        expect(messages.at(0).text()).toEqual('I am error');
+    });
+
     test('General case API error', () => {
-        base_axios_error.response!.status = 403;
-        base_axios_error.response!.statusText = 'Forbidden';
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(new HttpError(403, 'forbidden'));
 
         let messages = wrapper.findAll('.error-msg');
 
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual(
-            'An unexpected error occurred: 403 Forbidden.');
+            'An unexpected error occurred: 403 "forbidden"');
     });
 
     test('Clear errors', () => {
-        base_axios_error.response!.status = 504;
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(new HttpError(504, 'timeout'));
 
         let messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(1);
@@ -127,12 +107,12 @@ describe('APIErrors component tests', () => {
     });
 
     test('Dismiss single error', () => {
-        base_axios_error.response!.status = 400;
-        base_axios_error.response!.data = {
-            'name': 'Name cannot be blank',
-            'size': 'Size must be < 42'
-        };
-        component.show_errors_from_response(base_axios_error);
+        component.show_errors_from_response(
+            new HttpError(400, {
+                'name': 'Name cannot be blank',
+                'size': 'Size must be < 42'
+            })
+        );
 
         let messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(2);

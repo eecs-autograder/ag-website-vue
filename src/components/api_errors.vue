@@ -15,24 +15,40 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import { get_axios_error_status } from '@/utils';
+import { HttpError } from 'ag-client-typescript';
 
 @Component
 export default class APIErrors extends Vue {
   d_api_errors: string[] = [];
 
   show_errors_from_response(error_response: unknown) {
-    let [response, status] = get_axios_error_status(error_response);
+    if (!(error_response instanceof HttpError)) {
+      throw error_response;
+    }
     this.d_api_errors = [];
-    if (status === 504) {
+    if (error_response.status === 504) {
       this.d_api_errors.push('Error: The request timed out. Please try again later.');
     }
-    else if (status === 413) {
+    else if (error_response.status === 413) {
       this.d_api_errors.push(
         'Error: Request too large. If you are uploading files, please reduce their size.');
     }
-    else if (status === 400) {
-      for (let [field_name, message] of Object.entries(response.data)) {
+    else if (error_response.status === 400) {
+      this.show_400_error_data(error_response);
+    }
+    else {
+      this.d_api_errors.push(
+        'An unexpected error occurred: '
+        + `${error_response.status} ${JSON.stringify(error_response.data)}`);
+    }
+  }
+
+  private show_400_error_data(error: HttpError) {
+    if (typeof error.data === 'string') {
+      this.d_api_errors.push(error.data);
+    }
+    else {
+      for (let [field_name, message] of Object.entries(error.data)) {
         if (field_name ===  '__all__') {
           if (Array.isArray(message)) {
             this.d_api_errors.push(message[0]);
@@ -45,10 +61,6 @@ export default class APIErrors extends Vue {
           this.d_api_errors.push(`Error in "${field_name}": ${message}`);
         }
       }
-    }
-    else {
-      this.d_api_errors.push(
-        `An unexpected error occurred: ${status} ${response.statusText}.`);
     }
   }
 
