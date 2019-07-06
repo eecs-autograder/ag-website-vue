@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { InstructorFile } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { HttpError, InstructorFile } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 import * as sinon from "sinon";
 
@@ -171,22 +170,6 @@ describe('SingleInstructorFile tests', () => {
     });
 
     test('File names must be unique - violates condition', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "File with this name already exists in project"
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         wrapper.find('.edit-file-name').trigger('click');
         await component.$nextTick();
 
@@ -197,7 +180,9 @@ describe('SingleInstructorFile tests', () => {
 
         expect(component.new_file_name).toEqual("AlreadyExists.cpp");
 
-        sinon.stub(file_1, 'rename').returns(Promise.reject(axios_response_instance));
+        sinon.stub(file_1, 'rename').returns(Promise.reject(
+            new HttpError(400, {__all__: "File with this name already exists in project"})
+        ));
         wrapper.find('.update-file-name-button').trigger('click');
         await component.$nextTick();
 

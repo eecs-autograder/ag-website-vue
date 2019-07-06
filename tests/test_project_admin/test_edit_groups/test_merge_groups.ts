@@ -2,10 +2,10 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
     Group,
+    HttpError,
     Project,
-    UltimateSubmissionPolicy
+    UltimateSubmissionPolicy,
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -214,29 +214,18 @@ describe('MergeGroups tests', () => {
     });
 
     test('merge_groups - unsuccessful', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Error in \"members\": Groups with any staff users must consist " +
-                             "of only staff users."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         component.group_1 = group_2;
         component.group_2 = group_4;
         await component.$nextTick();
 
         let merge_groups_stub = sinon.stub(component.group_1, 'merge_groups');
-        merge_groups_stub.returns(Promise.reject(axios_response_instance));
+        merge_groups_stub.returns(Promise.reject(
+            new HttpError(
+                400,
+                {__all__: "Error in \"members\": Groups with any staff users must consist "
+                          + "of only staff users."}
+            )
+        ));
 
         wrapper.find('#merge-groups-button').trigger('click');
         await component.$nextTick();

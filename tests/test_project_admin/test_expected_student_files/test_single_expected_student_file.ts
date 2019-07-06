@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { ExpectedStudentFile } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { ExpectedStudentFile, HttpError } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -84,22 +83,9 @@ describe('ExpectedStudentFiles tests', () => {
     });
 
     test('error - edited filename not unique to project', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "File with this name already exists in project"
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-        sinon.stub(component.d_expected_student_file, 'save').rejects(axios_response_instance);
+        sinon.stub(component.d_expected_student_file, 'save').rejects(
+            new HttpError(400, {__all__: "File with this name already exists in project"})
+        );
 
         expect(component.expected_student_file.pattern).toEqual("filename*.cpp");
         expect(component.expected_student_file.min_num_matches).toEqual(2);

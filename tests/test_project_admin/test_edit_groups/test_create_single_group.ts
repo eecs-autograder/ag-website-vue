@@ -3,12 +3,12 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 import {
     Course,
     Group,
+    HttpError,
     NewGroupData,
     Project,
     Semester,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -307,23 +307,13 @@ describe('CreateSingleGroup tests', () => {
 
     test('Group member must be enrolled in course - violates condition', async () => {
         let create_group_stub = sinon.stub(Group, 'create');
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Error in \"members\": This project only accepts submissions " +
-                             "from enrolled students."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-        create_group_stub.returns(Promise.reject(axios_response_instance));
+        create_group_stub.returns(Promise.reject(
+            new HttpError(
+                400,
+                {__all__: "Error in \"members\": This project only accepts submissions "
+                          + "from enrolled students."}
+            )
+        ));
 
         let member_name_inputs = wrapper.findAll('.member-name-input');
 

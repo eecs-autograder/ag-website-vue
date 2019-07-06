@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Semester } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { Course, HttpError, Semester } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -244,23 +243,14 @@ describe('CourseSettings.vue', () => {
     });
 
     test('Course must be unique among courses - violates condition', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "A course with this name, semester, and year " +
-                             "already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-        sinon.stub(component.d_course, 'save').returns(Promise.reject(axios_response_instance));
+        sinon.stub(component.d_course, 'save').returns(
+            Promise.reject(
+                new HttpError(400, {
+                    'name': 'Name cannot be blank',
+                    'size': 'Size must be < 42'
+                })
+            )
+        );
 
         let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
 
@@ -271,6 +261,6 @@ describe('CourseSettings.vue', () => {
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.d_api_errors.length).toBe(2);
     });
 });

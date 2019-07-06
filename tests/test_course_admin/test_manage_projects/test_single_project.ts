@@ -1,7 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
+import { Course, HttpError, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -305,65 +304,51 @@ describe('SingleProject.vue', () => {
         expect(wrapper.emitted().add_cloned_project).toBeFalsy();
     });
 
-    test('Cloned project name must be unique among projects in the same course - violates ' +
-         'condition',
-         async () => {
-         let axios_response_instance: AxiosError = {
-             name: 'AxiosError',
-             message: 'u heked up',
-             response: {
-                 data: {
-                     __all__: "Project with this Name and Course already exists."
-                 },
-                 status: 400,
-                 statusText: 'OK',
-                 headers: {},
-                 request: {},
-                 config: {}
-             },
-             config: {},
-         };
+    test('Error cloned project name must be unique within course', async () => {
+        wrapper = mount(SingleProject, {
+            propsData: {
+                course: course_1,
+                project: project_1,
+                existing_projects: projects
+            },
+            stubs: ['router-link']
+        });
 
-         wrapper = mount(SingleProject, {
-             propsData: {
-                 course: course_1,
-                 project: project_1,
-                 existing_projects: projects
-             },
-             stubs: ['router-link']
-         });
+        single_project = wrapper.vm;
+        await single_project.$nextTick();
 
-         single_project = wrapper.vm;
-         await single_project.$nextTick();
+        courses = [course_1, course_2];
 
-         courses = [course_1, course_2];
+        wrapper.find('.copier').trigger('click');
+        await single_project.$nextTick();
 
-         wrapper.find('.copier').trigger('click');
-         await single_project.$nextTick();
+        let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
+        let validated_input = <ValidatedInput> wrapper.find(
+            {ref: "cloned_project_name"}
+        ).vm;
 
-         let modal = <Modal> wrapper.find({ ref: 'clone_project_modal'}).vm;
-         let validated_input = <ValidatedInput> wrapper.find(
-             {ref: "cloned_project_name"}
-         ).vm;
+        expect(modal.is_open).toBe(true);
+        expect(validated_input.is_valid).toBe(false);
 
-         expect(modal.is_open).toBe(true);
-         expect(validated_input.is_valid).toBe(false);
+        let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
+        (<HTMLInputElement> clone_name.element).value = project_1.name;
+        clone_name.trigger('input');
+        await single_project.$nextTick();
 
-         let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
-         (<HTMLInputElement> clone_name.element).value = project_1.name;
-         clone_name.trigger('input');
-         await single_project.$nextTick();
+        expect(single_project.course_to_clone_to).toBe(course_1);
+        expect(validated_input.is_valid).toBe(true);
+        expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
 
-         expect(single_project.course_to_clone_to).toBe(course_1);
-         expect(validated_input.is_valid).toBe(true);
-         expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
+        sinon.stub(project_1, 'copy_to_course').returns(
+            Promise.reject(
+                new HttpError(400, {__all__: "Project with this Name and Course already exists."}
+            )
+        ));
+        wrapper.find('.clone-project-button').trigger('click');
+        await single_project.$nextTick();
 
-         sinon.stub(project_1, 'copy_to_course').returns(Promise.reject(axios_response_instance));
-         wrapper.find('.clone-project-button').trigger('click');
-         await single_project.$nextTick();
-
-         expect(modal.is_open).toBe(true);
-         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
-         expect(api_errors.d_api_errors.length).toBe(1);
+        expect(modal.is_open).toBe(true);
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
     });
 });
