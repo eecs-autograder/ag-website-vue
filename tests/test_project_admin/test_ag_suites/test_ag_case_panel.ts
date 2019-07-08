@@ -7,9 +7,9 @@ import {
     AGTestCommandFeedbackConfig, AGTestSuite, AGTestSuiteFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
-    get_sandbox_docker_images,
     StdinSource,
-    ValueFeedbackLevel
+    ValueFeedbackLevel,
+    HttpError
 } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 import * as sinon from "sinon";
@@ -476,23 +476,13 @@ describe('AGCasePanel tests', () => {
     });
 
     test('Add command - unsuccessful', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Ag test command with this Name and AG test case already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
         let create_command_stub = sinon.stub(AGTestCommand, 'create').returns(
-            Promise.reject(axios_response_instance)
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "Ag test command with this Name and AG test case already exists."}
+                )
+            )
         );
         wrapper.setProps({active_case: ag_case_green});
         await component.$nextTick();

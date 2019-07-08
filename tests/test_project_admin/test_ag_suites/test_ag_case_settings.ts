@@ -11,7 +11,7 @@ import APIErrors from '@/components/api_errors.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-describe('', () => {
+describe('AG test case settings form tests', () => {
     let wrapper: Wrapper<AGCaseSettings>;
     let component: AGCaseSettings;
     let ag_case: AGTestCase;

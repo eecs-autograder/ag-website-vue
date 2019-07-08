@@ -8,7 +8,8 @@
           tab_active_class="gray-white-theme-active"
           tab_inactive_class="gray-white-theme-inactive"
           v-model="current_tab_index"
-          @input="on_tab_changed">
+          @input="on_tab_changed"
+          :scroll_body="true">
       <tab>
         <tab-header ref="project_settings_tab">
           <div class="tab-label">
@@ -264,6 +265,7 @@ export default class ProjectAdmin extends Vue {
 .tab-body {
   text-align: left;
   width: 100%;
+  height: 100%;
   padding-top: 0;
 }
 
