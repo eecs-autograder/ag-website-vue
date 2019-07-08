@@ -74,7 +74,7 @@
 
         <button id="save-button"
                 type="submit"
-                :disabled="!settings_form_is_valid || saving"> Save Updates </button>
+                :disabled="!settings_form_is_valid || saving">Save</button>
 
         <div v-if="!saving"
              class="last-saved-timestamp">

@@ -228,7 +228,7 @@ describe('CourseSettings.vue', () => {
         expect(validated_input_is_valid(allowed_guest_domain_input)).toEqual(true);
     });
 
-    test('Clicking on the save updates button calls course.save', async () => {
+    test('Clicking on the save button calls course.save', async () => {
         let save_settings_stub = sinon.stub(component.d_course, 'save');
 
         let settings_form = <ValidatedForm> wrapper.find('#course-settings-form').vm;
