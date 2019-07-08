@@ -4,13 +4,13 @@ import {
     AGTestSuite,
     AGTestSuiteFeedbackConfig,
     ExpectedStudentFile,
+    HttpError,
     InstructorFile,
     Project,
     UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -396,22 +396,14 @@ describe('AGSuiteSettings tests', () => {
 
     test('Save suite settings - unsuccessful', async () => {
         let save_stub = sinon.stub(component.d_ag_test_suite!, 'save');
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Ag test suite with this Name and Project already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-        save_stub.returns(Promise.reject(axios_response_instance));
+        save_stub.returns(
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "Ag test suite with this Name and Project already exists."}
+                )
+            )
+        );
 
         wrapper.find('#ag-test-suite-settings-form').trigger('submit');
         await component.$nextTick();

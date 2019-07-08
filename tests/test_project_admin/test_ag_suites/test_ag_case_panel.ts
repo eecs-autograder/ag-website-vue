@@ -7,9 +7,9 @@ import {
     AGTestCommandFeedbackConfig, AGTestSuite, AGTestSuiteFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
+    HttpError,
     StdinSource,
     ValueFeedbackLevel,
-    HttpError
 } from 'ag-client-typescript';
 import { AxiosError } from 'axios';
 import * as sinon from "sinon";

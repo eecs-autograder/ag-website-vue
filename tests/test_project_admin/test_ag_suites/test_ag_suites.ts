@@ -9,7 +9,7 @@ import {
     AGTestSuiteFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
-    get_sandbox_docker_images,
+    HttpError,
     InstructorFile,
     Project,
     StdinSource, UltimateSubmissionPolicy,
@@ -327,24 +327,13 @@ describe('AGSuites tests', () => {
     });
 
     test('Creating a suite - unsuccessfully', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Ag test suite with this Name and Project already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         let create_suite_stub = sinon.stub(AGTestSuite, 'create').returns(
-            Promise.reject(axios_response_instance)
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "Ag test suite with this Name and Project already exists."}
+                )
+            )
         );
 
         wrapper.find('#add-ag-test-suite-button').trigger('click');

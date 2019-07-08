@@ -3,24 +3,26 @@ import { Vue } from 'vue-property-decorator';
 import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
 
 import {
-    AGTestCase, AGTestCaseFeedbackConfig,
+    AGTestCase,
+    AGTestCaseFeedbackConfig,
     AGTestCommand,
     AGTestCommandFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
+    HttpError,
     InstructorFile,
     Project,
     StdinSource,
     UltimateSubmissionPolicy,
-    ValueFeedbackLevel
+    ValueFeedbackLevel,
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 
-import { checkbox_is_checked, set_validated_input_text, get_validated_input_text } from '@/tests/utils';
+import { checkbox_is_checked, get_validated_input_text, set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -540,22 +542,14 @@ describe('AGCommandSettings tests', () => {
 
     test('Save command settings - unsuccessful', async () => {
         let save_stub = sinon.stub(component.d_ag_test_command!, 'save');
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Ag test command with this Name and AG test case already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-        save_stub.returns(Promise.reject(axios_response_instance));
+        save_stub.returns(
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "Ag test command with this Name and AG test case already exists."}
+                )
+            )
+        );
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#ag-test-command-settings-form').trigger('submit');
@@ -648,21 +642,26 @@ async function do_invalid_text_input_test(component_wrapper: Wrapper<Vue>,
                                           input_selector: string | RefSelector,
                                           invalid_text: string,
                                           save_button_selector: string | RefSelector) {
-    let input_wrapper = component_wrapper.find(input_selector);
-    expect(input_wrapper.vm.is_valid).toBe(true);
-    expect(component_wrapper.find(save_button_selector).is('[disabled]')).toBe(false);
+    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
+    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
+    expect(validated_input_is_valid(input_wrapper)).toEqual(true);
+    // tslint:disable-next-line
+    expect(component_wrapper.find(<any> save_button_selector).is('[disabled]')).toBe(false);
 
     set_validated_input_text(input_wrapper, invalid_text);
     await component_wrapper.vm.$nextTick();
 
-    expect(input_wrapper.vm.is_valid).toBe(false);
-    expect(component_wrapper.find(save_button_selector).is('[disabled]')).toBe(true);
+    expect(validated_input_is_valid(input_wrapper)).toEqual(false);
+    // tslint:disable-next-line
+    let save_button_wrapper = component_wrapper.find(<any> save_button_selector);
+    expect(save_button_wrapper.is('[disabled]')).toBe(true);
 }
 
 async function do_input_blank_or_not_integer_test(component_wrapper: Wrapper<Vue>,
                                                   input_selector: string | RefSelector,
                                                   save_button_selector: string | RefSelector) {
-    let input_wrapper = component_wrapper.find(input_selector);
+    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
+    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
     let original_text = get_validated_input_text(input_wrapper);
 
     await do_invalid_text_input_test(component_wrapper, input_selector, ' ', save_button_selector);

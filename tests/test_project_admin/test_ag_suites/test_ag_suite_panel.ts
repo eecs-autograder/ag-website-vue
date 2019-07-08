@@ -9,11 +9,10 @@ import {
     AGTestSuiteFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
-    get_sandbox_docker_images,
+    HttpError,
     StdinSource,
-    ValueFeedbackLevel
+    ValueFeedbackLevel,
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -579,24 +578,12 @@ describe('AGSuitePanel tests', () => {
     });
 
     test('Add case (and first command) - unsuccessful', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "Ag test case with this Name and AG test suite already exists."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
-
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(
-            Promise.reject(axios_response_instance)
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "Ag test case with this Name and AG test suite already exists."})
+            )
         );
         sinon.stub(AGTestCommand, 'create');
 

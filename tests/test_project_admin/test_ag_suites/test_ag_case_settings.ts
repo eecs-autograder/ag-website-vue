@@ -2,9 +2,9 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
-    AGTestCaseFeedbackConfig
+    AGTestCaseFeedbackConfig,
+    HttpError
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -76,23 +76,13 @@ describe('AG test case settings form tests', () => {
     });
 
     test('save d_ag_case - unsuccessful', async () => {
-        let axios_response_instance: AxiosError = {
-            name: 'AxiosError',
-            message: 'u heked up',
-            response: {
-                data: {
-                    __all__: "An AG Test Case with this name already exists in the suite."
-                },
-                status: 400,
-                statusText: 'OK',
-                headers: {},
-                request: {},
-                config: {}
-            },
-            config: {},
-        };
         let save_case_stub = sinon.stub(component.d_ag_test_case!, 'save').returns(
-            Promise.reject(axios_response_instance)
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__: "An AG Test Case with this name already exists in the suite."}
+                )
+            )
         );
 
         wrapper.find({ref: 'ag_test_case_settings_form'}).trigger('submit');
