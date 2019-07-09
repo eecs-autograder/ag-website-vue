@@ -12,7 +12,8 @@ import {
     HttpError,
     InstructorFile,
     Project,
-    StdinSource, UltimateSubmissionPolicy,
+    StdinSource,
+    UltimateSubmissionPolicy,
     ValueFeedbackLevel
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports

@@ -241,6 +241,12 @@ export default class ProjectAdmin extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 #project-admin {
   height: 100vh;
   width: 100vw;

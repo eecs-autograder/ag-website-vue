@@ -1,46 +1,48 @@
 <template>
-  <div id="ag-test-suites-component">
+  <div id="ag-test-suites-component" class="scroll-container">
     <template v-if="!loading">
-      <div id="ag-test-suite-nav-bar">
+      <div id="columns-container" class="scroll-column-container">
+        <div id="ag-test-suite-sidebar" class="scroll-column">
+          <div class="scroll-container">
+            <div id="sidebar-header">
+              <div id="ag-test-suites-title"> Suites </div>
+              <button type="button"
+                      id="add-ag-test-suite-button"
+                      @click="open_new_ag_test_suite_modal()">
+                <i class="fas fa-plus plus"></i> Add Suite
+              </button>
+            </div>
 
-        <div id="nav-bar-header">
-          <div id="ag-test-suites-title"> Suites </div>
-          <button type="button"
-                  id="add-ag-test-suite-button"
-                  @click="open_new_ag_test_suite_modal()">
-            <i class="fas fa-plus plus"></i> Add Test Suite
-          </button>
-        </div>
-
-        <div id="nav-bar-body" @wheel.stop>
-          <div id="all-ag-test-suites">
-            <div v-for="ag_test_suite of ag_test_suites"
-                class="ag-test-suite-container"
-                :key="ag_test_suite.pk">
-              <AGSuitePanel :ag_test_suite="ag_test_suite"
-                            :active_ag_test_suite="active_ag_test_suite"
-                            :active_ag_test_command="active_ag_test_command"
-                            @update_active_item="update_active_item($event)">
-              </AGSuitePanel>
+            <div id="sidebar-body" class="scroll-column">
+              <div id="all-ag-test-suites">
+                <div v-for="ag_test_suite of ag_test_suites"
+                    class="ag-test-suite-container"
+                    :key="ag_test_suite.pk">
+                  <AGSuitePanel :ag_test_suite="ag_test_suite"
+                                :active_ag_test_suite="active_ag_test_suite"
+                                :active_ag_test_command="active_ag_test_command"
+                                @update_active_item="update_active_item($event)">
+                  </AGSuitePanel>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="viewing-window">
-        <div v-if="active_ag_test_suite !== null"
-            class="settings-wrapper">
-          <AGSuiteSettings :ag_test_suite="active_ag_test_suite"
-                          :project="project">
-          </AGSuiteSettings>
-        </div>
+        <div class="vertical-divider"></div>
 
-        <div v-else-if="active_level_is_command"
-            class="settings-wrapper">
-          <AGCommandSettings :ag_test_command="active_ag_test_command"
-                            :ag_test_case="parent_ag_test_case"
+        <div id="viewing-window" class="scroll-column-grow">
+          <template v-if="active_ag_test_suite !== null">
+            <AGSuiteSettings :ag_test_suite="active_ag_test_suite"
                             :project="project">
-          </AGCommandSettings>
+            </AGSuiteSettings>
+          </template>
+          <template v-else-if="active_level_is_command">
+            <AGCommandSettings :ag_test_command="active_ag_test_command"
+                              :ag_test_case="parent_ag_test_case"
+                              :project="project">
+            </AGCommandSettings>
+          </template>
         </div>
       </div>
 
@@ -89,7 +91,6 @@
           </validated-form>
         </div>
       </modal>
-
     </template>
     <template v-else>
       <div class="loading-large"><i class="fa fa-spinner fa-pulse"></i></div>
@@ -504,6 +505,7 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/independent_scrolling.scss';;
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/global.scss';
@@ -514,25 +516,15 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
   box-sizing: border-box;
 }
 
-#ag-test-suites-component {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  display: flex;
+#columns-container {
+  height: calc(100% - 55px);
 }
 
-.settings-wrapper {
-  height: 100%;
+#ag-test-suite-sidebar {
+  min-width: 300px;
 }
 
-#ag-test-suite-nav-bar {
-  box-sizing: border-box;
-  flex-direction: column;
-  align-items: stretch;
-  min-width: 400px;
-}
-
-#nav-bar-header {
+#sidebar-header {
   padding: 15px;
   display: flex;
   flex-direction: row;
@@ -541,15 +533,10 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
   border-left: none;
   border-bottom: none;
   margin-top: 10px;
-  box-sizing: border-box;
 }
 
-#nav-bar-body {
-  box-sizing: border-box;
-  flex: 2;
-  overflow-y: scroll;
+#sidebar-body {
   padding-bottom: 10px;
-  height: 700px;
 }
 
 #ag-test-suites-title {
@@ -566,25 +553,23 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
   padding-right: 5px;
 }
 
+.vertical-divider {
+  border: 1px solid $pebble-medium;
+  margin: 10px 8px;
+}
+
 #viewing-window {
-  box-sizing: border-box;
-  flex: 1;
   padding-top: 20px;
 }
 
 #button-footer {
   background-color: $white-gray;
   border-top: 1px solid hsl(210, 20%, 94%);
-  bottom: 0;
-  box-sizing: border-box;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  left: 0;
-  right: 0;
   min-height: 55px;
   padding: 10px;
-  position: fixed;
 }
 
 #next-ag-test-case-button, #prev-ag-test-case-button {
