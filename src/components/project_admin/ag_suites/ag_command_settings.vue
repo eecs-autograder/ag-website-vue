@@ -504,10 +504,7 @@
                         :disabled="!settings_form_is_valid || saving">Save</button>
 
                 <div v-if="!saving" class="last-saved-timestamp">
-                  <span> Last Saved: </span>
-                  {{(new Date(d_ag_test_command.last_modified)).toLocaleString(
-                  'en-US', last_modified_format
-                  )}}
+                  <span> Last Saved: </span> {{format_datetime(d_ag_test_command.last_modified)}}
                 </div>
 
                 <div v-else class="last-saved-spinner">
@@ -547,7 +544,7 @@
             <button class="delete-ag-test-command-button"
                     type="button"
                     @click="$refs.delete_ag_test_command_modal.open()">
-              {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Test Command'}}:
+              {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
               <span>
                 {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
               </span>
@@ -555,23 +552,27 @@
 
             <modal ref="delete_ag_test_command_modal"
                    :size="'large'"
-                   :include_closing_x="false">
+                   :include_closing_x="true"
+                   click_outside_to_close>
               <div class="modal-header">
                 Confirm Delete
               </div>
               <hr>
               <div class="modal-body">
                 <p>
-                Are you sure you want to delete the test {{case_has_exactly_one_command
-                                                           ? 'case' : 'command'}}:
-                <span class="item-to-delete">{{case_has_exactly_one_command
-                  ? d_ag_test_case.name : d_ag_test_command.name}}</span>?
+                Are you sure you want to delete the
+                {{case_has_exactly_one_command ? 'test case' : 'command'}}:
+                <span class="item-to-delete">
+                  "{{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}"
+                </span>? <br>
 
-                <span v-if="case_has_exactly_one_command"> This will delete all associated test
-                  cases and run results. THIS ACTION CANNOT BE UNDONE.</span>
+                <span v-if="case_has_exactly_one_command">
+                  This will delete all associated run results. <br>
+                  THIS ACTION CANNOT BE UNDONE.
+                </span>
 
                 <span v-if="!case_has_exactly_one_command">
-                  This will delete all associated commands and run results.
+                  This will delete all associated run results. <br>
                   THIS ACTION CANNOT BE UNDONE. </span>
                 </p>
                 <div class="deletion-modal-button-footer">
@@ -613,7 +614,7 @@ import Tabs from '@/components/tabs/tabs.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -647,8 +648,7 @@ export default class AGCommandSettings extends Vue {
   current_tab_index = 0;
   d_ag_test_command: AGTestCommand | null = null;
   d_ag_test_case: AGTestCase | null = null;
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+
   saving = false;
   settings_form_is_valid = true;
 
@@ -660,6 +660,8 @@ export default class AGCommandSettings extends Vue {
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
+
+  readonly format_datetime = format_datetime;
 
   @Watch('ag_test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {

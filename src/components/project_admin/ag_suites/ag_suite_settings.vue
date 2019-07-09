@@ -168,10 +168,7 @@
                           :disabled="!settings_form_is_valid || saving">Save</button>
 
                   <div v-show="!saving" class="last-saved-timestamp">
-                    <span> Last Saved: </span>
-                    {{(new Date(d_ag_test_suite.last_modified)).toLocaleString(
-                    'en-US', last_modified_format
-                    )}}
+                    <span> Last Saved: </span> {{format_datetime(d_ag_test_suite.last_modified)}}
                   </div>
 
                   <div v-show="saving" class="last-saved-spinner">
@@ -266,7 +263,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -302,13 +299,12 @@ export default class AGSuiteSettings extends Vue {
   current_tab_index = 0;
   d_ag_test_suite: AGTestSuite | null = null;
   docker_images: SandboxDockerImageData[] = [];
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
   loading = true;
   saving = false;
   settings_form_is_valid = true;
 
   readonly is_not_empty = is_not_empty;
+  readonly format_datetime = format_datetime;
 
   async created() {
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);

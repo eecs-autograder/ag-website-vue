@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="display-timestamp">
-        {{(new Date(file.last_modified)).toLocaleString('en-US', last_modified_format)}}
+        {{format_datetime(file.last_modified)}}
       </div>
     </div>
 
@@ -82,7 +82,7 @@ import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { format_datetime, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -99,11 +99,10 @@ export default class SingleInstructorFile extends Vue {
   file!: InstructorFile;
 
   readonly is_not_empty = is_not_empty;
+  readonly format_datetime = format_datetime;
 
   d_delete_pending = false;
   editing = false;
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
   new_file_name: string = "";
   new_name_is_valid = true;
 

@@ -127,16 +127,17 @@
 
     <modal ref="delete_ag_test_case_modal"
            size="large"
-           :include_closing_x="false">
+           :include_closing_x="true"
+           click_outside_to_close>
       <div class="modal-header">
-        Confirm Delete
+        Delete "{{ag_test_case.name}}"
       </div>
       <hr>
       <div class="modal-body">
         <p>
-          Are you sure you want to delete the case:
-          <span class="item-to-delete">{{ag_test_case.name}}</span>?
-          This will delete all associated test cases and run results.
+          Are you sure you want to delete the test case:
+          <span class="item-to-delete">{{ag_test_case.name}}</span>? <br>
+          This will delete all associated run results. <br>
           THIS ACTION CANNOT BE UNDONE.
         </p>
         <div class="deletion-modal-button-footer">
@@ -210,8 +211,7 @@ export default class AGCasePanel extends Vue {
   new_command_name = "";
   new_command = "";
   saving = false;
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
+
   ag_test_case_settings_form_is_valid = false;
 
   @Watch('active_ag_test_command')

@@ -62,8 +62,6 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
 
   d_collapsed = false;
   instructor_files: InstructorFile[] = [];
-  last_modified_format = {year: 'numeric', month: 'long', day: 'numeric',
-                          hour: 'numeric', minute: 'numeric', second: 'numeric'};
   num_files_currently_viewing = 0;
 
   @Prop({required: true, type: Project})
