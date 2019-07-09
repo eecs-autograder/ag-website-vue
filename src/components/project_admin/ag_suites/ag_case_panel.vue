@@ -27,28 +27,32 @@
           <context-menu-item ref="add_ag_test_command_menu_item"
                              @context_menu_item_clicked="open_new_ag_test_command_modal">
             <template slot="label">
-              Add command
+              <i class="fas fa-plus"></i>
+              <span class="context-menu-item-text">Add command</span>
             </template>
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="edit_ag_test_case_menu_item"
                              @context_menu_item_clicked="$refs.ag_test_case_settings_modal.open()">
             <template slot="label">
-              Edit test case settings
+              <i class="fas fa-pencil-alt"></i>
+              <span class="context-menu-item-text">Edit test case settings</span>
             </template>
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="clone_ag_test_case_menu_item"
                              @context_menu_item_clicked="$refs.clone_ag_test_case_modal.open()">
             <template slot="label">
-              <span id="clone-case-label"> Clone test case </span>
+              <i class="far fa-copy"></i>
+              <span class="context-menu-item-text"> Clone test case </span>
             </template>
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="delete_ag_test_case_menu_item"
                              @context_menu_item_clicked="$refs.delete_ag_test_case_modal.open()">
             <template slot="label">
-              <span id="delete-case-label"> Delete test case </span>
+              <i class="fas fa-trash-alt"></i>
+              <span id="delete-case-label" class="context-menu-item-text"> Delete test case </span>
             </template>
           </context-menu-item>
         </template>
@@ -356,6 +360,14 @@ function handle_add_ag_test_command_error(component: AGCasePanel, error: unknown
 
 .active-ag-test-command, .active-single-ag-test-command {
   @extend .active-level;
+}
+
+.context-menu-item-text {
+  margin-left: 10px;
+}
+
+#delete-case-label {
+  color: $warning-red;
 }
 
 // Modal **************************************************************
