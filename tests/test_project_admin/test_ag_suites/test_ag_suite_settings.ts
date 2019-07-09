@@ -181,12 +181,12 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Suite name cannot be empty - violates condition', async () => {
-        expect(component.settings_form_is_valid).toBe(true);
+        expect(component.d_settings_form_is_valid).toBe(true);
 
         component.d_ag_test_suite!.name = " ";
         await component.$nextTick();
 
-        expect(component.settings_form_is_valid).toBe(false);
+        expect(component.d_settings_form_is_valid).toBe(false);
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
@@ -417,7 +417,7 @@ describe('AGSuiteSettings tests', () => {
     test('Delete a Suite', async () => {
         let delete_stub = sinon.stub(component.d_ag_test_suite!, 'delete');
 
-        wrapper.setData({current_tab_index: 2});
+        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
         wrapper.find('.delete-ag-test-suite-button').trigger('click');
@@ -456,23 +456,23 @@ describe('AGSuiteSettings tests', () => {
         });
 
         expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
 
         wrapper.setProps({'ag_test_suite': another_ag_suite});
         await component.$nextTick();
 
         expect(component.d_ag_test_suite!.pk).toEqual(another_ag_suite.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
 
-        wrapper.setData({current_tab_index: 2});
+        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
+        expect(component.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_suite': ag_suite});
         await component.$nextTick();
 
         expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
     });
 });

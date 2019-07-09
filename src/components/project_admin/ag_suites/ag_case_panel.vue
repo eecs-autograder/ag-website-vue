@@ -87,12 +87,12 @@
                         autocomplete="off"
                         spellcheck="false"
                         @submit="add_ag_test_command"
-                        @form_validity_changed="add_command_form_is_valid = $event">
+                        @form_validity_changed="d_add_command_form_is_valid = $event">
           <div id="ag-test-name-and-command">
             <div id="ag-test-command-name-container">
               <label class="text-label"> Command name </label>
               <validated-input ref="new_ag_test_command_name"
-                               v-model="new_command_name"
+                               v-model="d_new_command_name"
                                :show_warnings_on_blur="true"
                                :validators="[is_not_empty]">
               </validated-input>
@@ -100,7 +100,7 @@
             <div id="ag-test-command-container">
               <label class="text-label">Command</label>
               <validated-input ref="new_ag_test_command"
-                               v-model="new_command"
+                               v-model="d_new_command"
                                :show_warnings_on_blur="true"
                                :validators="[is_not_empty]">
               </validated-input>
@@ -110,7 +110,7 @@
           <APIErrors ref="new_command_api_errors"></APIErrors>
 
           <button class="modal-create-button"
-                  :disabled="!add_command_form_is_valid || adding_command">
+                  :disabled="!d_add_command_form_is_valid || d_adding_command">
             Add Command
           </button>
         </validated-form>
@@ -205,27 +205,29 @@ export default class AGCasePanel extends Vue {
 
   readonly is_not_empty = is_not_empty;
 
-  add_command_form_is_valid = false;
-  adding_command = false;
-  commands_are_visible = false;
-  new_command_name = "";
-  new_command = "";
-  saving = false;
+  d_add_command_form_is_valid = false;
+  d_adding_command = false;
 
-  ag_test_case_settings_form_is_valid = false;
+  get commands_are_visible() {
+    return this.d_commands_are_visible;
+  }
+  private d_commands_are_visible = false;
+
+  d_new_command_name = "";
+  d_new_command = "";
 
   @Watch('active_ag_test_command')
   on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
                                     old_active_ag_test_command: AGTestCommand) {
     if (this.active_ag_test_command !== null
         && new_active_ag_test_command.ag_test_case === this.ag_test_case.pk) {
-      this.commands_are_visible = true;
+      this.d_commands_are_visible = true;
     }
   }
 
   created() {
     if (this.command_in_case_is_active) {
-      this.commands_are_visible = true;
+      this.d_commands_are_visible = true;
     }
   }
 
@@ -235,8 +237,8 @@ export default class AGCasePanel extends Vue {
   }
 
   open_new_ag_test_command_modal() {
-    this.new_command = "";
-    this.new_command_name = "";
+    this.d_new_command = "";
+    this.d_new_command_name = "";
     (<Modal> this.$refs.new_ag_test_command_modal).open();
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_ag_test_command_name).focus();
@@ -244,16 +246,16 @@ export default class AGCasePanel extends Vue {
   }
 
   get is_open() {
-    return this.commands_are_visible;
+    return this.d_commands_are_visible;
   }
 
   update_ag_test_case_panel_when_clicked() {
-    if (!this.commands_are_visible) {
+    if (!this.d_commands_are_visible) {
       if (this.command_in_case_is_active) {
-        this.commands_are_visible = true;
+        this.d_commands_are_visible = true;
       }
       else {
-        this.commands_are_visible = true;
+        this.d_commands_are_visible = true;
         this.$emit('update_active_item', this.ag_test_case);
       }
     }
@@ -262,7 +264,7 @@ export default class AGCasePanel extends Vue {
         this.$emit('update_active_item', this.ag_test_case);
       }
       else {
-        this.commands_are_visible = false;
+        this.d_commands_are_visible = false;
       }
     }
   }
@@ -274,14 +276,14 @@ export default class AGCasePanel extends Vue {
   @handle_api_errors_async(handle_add_ag_test_command_error)
   async add_ag_test_command() {
     try {
-      this.adding_command = true;
+      this.d_adding_command = true;
       await AGTestCommand.create(
-        this.ag_test_case!.pk, {name: this.new_command_name, cmd: this.new_command}
+        this.ag_test_case!.pk, {name: this.d_new_command_name, cmd: this.d_new_command}
       );
       (<Modal> this.$refs.new_ag_test_command_modal).close();
     }
     finally {
-      this.adding_command = false;
+      this.d_adding_command = false;
     }
   }
 }

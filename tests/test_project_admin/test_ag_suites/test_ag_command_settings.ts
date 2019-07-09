@@ -566,7 +566,7 @@ describe('AGCommandSettings tests', () => {
 
         let delete_command_stub = sinon.stub(component.d_ag_test_command!, 'delete');
 
-        wrapper.setData({current_tab_index: 2});
+        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
         wrapper.find('.delete-ag-test-command-button').trigger('click');
@@ -581,7 +581,7 @@ describe('AGCommandSettings tests', () => {
     test('Delete case with exactly one command', async () => {
         let delete_case_stub = sinon.stub(component.d_ag_test_case!, 'delete');
 
-        wrapper.setData({current_tab_index: 2});
+        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
         wrapper.find('.delete-ag-test-command-button').trigger('click');
@@ -595,46 +595,46 @@ describe('AGCommandSettings tests', () => {
 
     test('Parent component changes the value supplied to the test_command prop', async () => {
         expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
 
         wrapper.setProps({'ag_test_command': another_command});
         await component.$nextTick();
 
         expect(component.d_ag_test_command!.pk).toEqual(another_command.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
 
-        wrapper.setData({current_tab_index: 2});
+        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
+        expect(component.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_command': ag_test_command});
         await component.$nextTick();
 
         expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
     });
 
     test('Parent component changes the value supplied to the test_case prop', async () => {
         expect(component.d_ag_test_case!.pk).toEqual(ag_test_case.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
 
         wrapper.setProps({'ag_test_case': case_with_two_commands});
         await component.$nextTick();
 
         expect(component.d_ag_test_case!.pk).toEqual(case_with_two_commands.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
 
-        wrapper.setData({current_tab_index: 2});
+        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
+        expect(component.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_case': ag_test_case});
         await component.$nextTick();
 
         expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_current_tab_index).toEqual(0);
     });
 });
 

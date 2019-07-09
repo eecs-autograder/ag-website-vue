@@ -465,8 +465,8 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll({ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
         await component.$nextTick();
 
-        component.new_command_name = "New command name";
-        component.new_command = "New command";
+        component.d_new_command_name = "New command name";
+        component.d_new_command = "New command";
 
         wrapper.find('#add-ag-test-command-form').trigger('submit');
         await component.$nextTick();
@@ -489,8 +489,8 @@ describe('AGCasePanel tests', () => {
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await component.$nextTick();
 
-        component.new_command_name = "New command name";
-        component.new_command = "New command";
+        component.d_new_command_name = "New command name";
+        component.d_new_command = "New command";
 
         wrapper.find('#add-ag-test-command-form').trigger('submit');
         await component.$nextTick();

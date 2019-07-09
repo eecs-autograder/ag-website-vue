@@ -37,26 +37,26 @@
                           autocomplete="off"
                           spellcheck="false"
                           @submit="create_ag_test_case"
-                          @form_validity_changed="add_case_form_is_valid = $event">
+                          @form_validity_changed="d_add_case_form_is_valid = $event">
 
             <div id="case-name-container">
               <label class="text-label"> Test name </label>
               <validated-input ref="new_case_name"
-                               v-model="new_case_name"
+                               v-model="d_new_case_name"
                                :validators="[is_not_empty]"
                                :show_warnings_on_blur="true">
               </validated-input>
             </div>
 
             <div class="new-ag-test-command-container"
-                 v-for="(new_command, index) of new_commands">
+                 v-for="(new_command, index) of d_new_commands">
 
               <div class="new-ag-test-command-inputs">
                 <fieldset class="ag-test-case-modal-fieldset">
-                  <legend v-if="new_commands.length > 1"
+                  <legend v-if="d_new_commands.length > 1"
                           class="legend">{{format_ordinal_num(index)}}</legend>
 
-                  <div class="ag-test-command-name" v-if="new_commands.length > 1">
+                  <div class="ag-test-command-name" v-if="d_new_commands.length > 1">
                     <label class="text-label"> Command name </label>
                     <validated-input ref="command_name"
                                      v-model="new_command.name"
@@ -96,7 +96,7 @@
                     </validated-input>
 
                     <div>
-                      <div v-if="duplicate_command_name_in_case
+                      <div v-if="d_duplicate_command_name_in_case
                                  && new_command.name === duplicate_command_name"
                            class="duplicate-ag-test-command-msg">
                         Duplicate command name
@@ -114,7 +114,7 @@
               <div id="add-ag-test-command-button-container">
                 <button class="add-ag-test-command-button"
                         type="button"
-                        :disabled="new_commands.length === 3"
+                        :disabled="d_new_commands.length === 3"
                         @click="add_command">
                   <i class="fas fa-plus"></i>
                   <span> Add Another Command </span>
@@ -124,7 +124,7 @@
               <div class="create-ag-test-case-button">
                 <button class="modal-create-button"
                         type="submit"
-                        :disabled="!add_case_form_is_valid || creating_case">
+                        :disabled="!d_add_case_form_is_valid || d_creating_case">
                   Create Case
                 </button>
               </div>
@@ -187,13 +187,12 @@ export default class AGSuitePanel extends Vue {
   @Prop({required: true, type: AGTestSuite})
   ag_test_suite!: AGTestSuite;
 
-  add_case_form_is_valid = false;
-  cases_are_visible = false;
-  creating_case = false;
-  duplicate_command_name_in_case = false;
-  loading = true;
-  new_case_name = "";
-  new_commands: NewCommandFields[] = [new NewCommandFields({})];
+  d_add_case_form_is_valid = false;
+  d_cases_are_visible = false;
+  d_creating_case = false;
+  d_duplicate_command_name_in_case = false;
+  d_new_case_name = "";
+  d_new_commands: NewCommandFields[] = [new NewCommandFields({})];
 
   readonly is_not_empty = is_not_empty;
 
@@ -201,7 +200,7 @@ export default class AGSuitePanel extends Vue {
   on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
                                     old_active_ag_test_command: AGTestCommand) {
     if (this.command_in_suite_is_active) {
-      this.cases_are_visible = true;
+      this.d_cases_are_visible = true;
     }
   }
 
@@ -212,7 +211,7 @@ export default class AGSuitePanel extends Vue {
   }
 
   get is_open() {
-    return this.cases_are_visible;
+    return this.d_cases_are_visible;
   }
 
   format_ordinal_num(index: number) {
@@ -223,13 +222,13 @@ export default class AGSuitePanel extends Vue {
   }
 
   update_ag_test_suite_panel_when_clicked() {
-    if (!this.cases_are_visible) {
-      this.cases_are_visible = true;
+    if (!this.d_cases_are_visible) {
+      this.d_cases_are_visible = true;
       this.$emit('update_active_item', this.ag_test_suite);
     }
     else {
       if (this.suite_is_active) {
-        this.cases_are_visible = false;
+        this.d_cases_are_visible = false;
       }
       else if (this.command_in_suite_is_active) {
         this.$emit('update_active_item', this.ag_test_suite);
@@ -241,16 +240,16 @@ export default class AGSuitePanel extends Vue {
   }
 
   add_command() {
-    if (this.new_commands.length === 1) {
-      this.new_commands[0].name = this.new_case_name;
+    if (this.d_new_commands.length === 1) {
+      this.d_new_commands[0].name = this.d_new_case_name;
     }
-    this.new_commands.push(new NewCommandFields({}));
+    this.d_new_commands.push(new NewCommandFields({}));
   }
 
   remove_command(index: number) {
-    this.new_commands.splice(index, 1);
-    if (this.new_commands.length === 1) {
-      this.duplicate_command_name_in_case = false;
+    this.d_new_commands.splice(index, 1);
+    if (this.d_new_commands.length === 1) {
+      this.d_duplicate_command_name_in_case = false;
     }
   }
 
@@ -261,17 +260,17 @@ export default class AGSuitePanel extends Vue {
 
   open_new_ag_test_case_modal() {
     this.$emit('update_active_item', this.ag_test_suite);
-    this.duplicate_command_name_in_case = false;
-    this.new_case_name = "";
+    this.d_duplicate_command_name_in_case = false;
+    this.d_new_case_name = "";
     (<Modal> this.$refs.new_ag_test_case_modal).open();
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_case_name).focus();
+      (<ValidatedInput> this.$refs.d_new_case_name).focus();
     });
   }
 
   get duplicate_command_name(): string {
     let names = new Set();
-    for (let new_command of this.new_commands) {
+    for (let new_command of this.d_new_commands) {
       if (names.has(new_command.name)) {
         return new_command.name;
       }
@@ -284,34 +283,34 @@ export default class AGSuitePanel extends Vue {
   @handle_api_errors_async(handle_create_ag_test_case_error)
   async create_ag_test_case() {
     try {
-      this.creating_case = true;
-      this.duplicate_command_name_in_case = false;
+      this.d_creating_case = true;
+      this.d_duplicate_command_name_in_case = false;
 
-      if (this.new_commands.length === 1) {
-        this.new_commands[0].name = this.new_case_name;
+      if (this.d_new_commands.length === 1) {
+        this.d_new_commands[0].name = this.d_new_case_name;
       }
       else {
         if (this.duplicate_command_name !== "") {
-          this.duplicate_command_name_in_case = true;
+          this.d_duplicate_command_name_in_case = true;
           return;
         }
       }
 
       (<APIErrors> this.$refs.new_ag_test_case_api_errors).clear();
       let created_case = await AGTestCase.create(
-        this.ag_test_suite!.pk, {name: this.new_case_name}
+        this.ag_test_suite!.pk, {name: this.d_new_case_name}
       );
 
-      for (let i = 0; i < this.new_commands.length; ++i) {
+      for (let i = 0; i < this.d_new_commands.length; ++i) {
         await AGTestCommand.create(
-          created_case.pk, {name: this.new_commands[i].name, cmd: this.new_commands[i].cmd}
+          created_case.pk, {name: this.d_new_commands[i].name, cmd: this.d_new_commands[i].cmd}
         );
       }
       (<ValidatedForm> this.$refs.create_ag_test_case_form).reset_warning_state();
       (<Modal> this.$refs.new_ag_test_case_modal).close();
     }
     finally {
-      this.creating_case = false;
+      this.d_creating_case = false;
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <div id="ag-test-suite-settings-component" v-if="d_ag_test_suite !== null">
-    <div v-if="!loading">
+    <div v-if="!d_loading">
       <tabs ref="tabs-gray"
-            v-model="current_tab_index"
+            v-model="d_current_tab_index"
             tab_active_class="white-theme-active"
             tab_inactive_class="white-theme-inactive">
 
@@ -18,7 +18,7 @@
                               autocomplete="off"
                               spellcheck="false"
                               @submit="save_ag_test_suite_settings"
-                              @form_validity_changed="settings_form_is_valid = $event">
+                              @form_validity_changed="d_settings_form_is_valid = $event">
 
                 <div id="ag-test-suite-name-container">
                   <label class="text-label"> Suite name </label>
@@ -51,7 +51,7 @@
                         <select id="sandbox_environment"
                                 v-model="d_ag_test_suite.sandbox_docker_image"
                                 class="select">
-                          <option v-for="docker_image of docker_images"
+                          <option v-for="docker_image of d_docker_images"
                                   :value="docker_image">
                             {{docker_image.display_name}}
                           </option>
@@ -165,13 +165,13 @@
 
                   <button type="submit"
                           class="save-button"
-                          :disabled="!settings_form_is_valid || saving">Save</button>
+                          :disabled="!d_settings_form_is_valid || d_saving">Save</button>
 
-                  <div v-show="!saving" class="last-saved-timestamp">
+                  <div v-show="!d_saving" class="last-saved-timestamp">
                     <span> Last Saved: </span> {{format_datetime(d_ag_test_suite.last_modified)}}
                   </div>
 
-                  <div v-show="saving" class="last-saved-spinner">
+                  <div v-show="d_saving" class="last-saved-spinner">
                     <i class="fa fa-spinner fa-pulse"></i>
                   </div>
                 </div>
@@ -224,7 +224,7 @@
                     THIS ACTION CANNOT BE UNDONE. </p>
                   <div class="deletion-modal-button-footer">
                     <button class="modal-delete-button"
-                            :disabled="saving"
+                            :disabled="d_saving"
                             @click="delete_ag_test_suite()"> Delete </button>
 
                     <button class="modal-cancel-button"
@@ -291,25 +291,25 @@ export default class AGSuiteSettings extends Vue {
   @Watch('ag_test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
     this.d_ag_test_suite = deep_copy(new_test_suite, AGTestSuite);
-    if (this.current_tab_index === 2) {
-      this.current_tab_index = 0;
+    if (this.d_current_tab_index === 2) {
+      this.d_current_tab_index = 0;
     }
   }
 
-  current_tab_index = 0;
+  d_current_tab_index = 0;
   d_ag_test_suite: AGTestSuite | null = null;
-  docker_images: SandboxDockerImageData[] = [];
-  loading = true;
-  saving = false;
-  settings_form_is_valid = true;
+  d_docker_images: SandboxDockerImageData[] = [];
+  d_loading = true;
+  d_saving = false;
+  d_settings_form_is_valid = true;
 
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
   async created() {
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
-    this.docker_images = await get_sandbox_docker_images();
-    this.loading = false;
+    this.d_docker_images = await get_sandbox_docker_images();
+    this.d_loading = false;
   }
 
   get instructor_files_available() {
@@ -365,12 +365,12 @@ export default class AGSuiteSettings extends Vue {
   @handle_api_errors_async(handle_save_ag_suite_settings_error)
   async save_ag_test_suite_settings() {
     try {
-      this.saving = true;
+      this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
       await this.d_ag_test_suite!.save();
     }
     finally {
-      this.saving = false;
+      this.d_saving = false;
     }
   }
 }

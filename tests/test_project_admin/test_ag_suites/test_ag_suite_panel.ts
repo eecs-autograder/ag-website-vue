@@ -210,7 +210,7 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
-        expect(component.cases_are_visible).toBe(true);
+        expect(component.d_cases_are_visible).toBe(true);
     });
 
     test('Suite (open, suite is not active, child command is not active) is clicked on',
@@ -255,7 +255,7 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_suite);
-        expect(component.cases_are_visible).toBe(true);
+        expect(component.d_cases_are_visible).toBe(true);
     });
 
     test('Suite (open, suite is active, child command is not active) is clicked on',
@@ -268,12 +268,12 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        expect(component.cases_are_visible).toBe(true);
+        expect(component.d_cases_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(component.cases_are_visible).toBe(false);
+        expect(component.d_cases_are_visible).toBe(false);
     });
 
     test('Suite (open, suite is not active, child command is active) is clicked on',
@@ -281,7 +281,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_command: ag_command});
         await component.$nextTick();
 
-        expect(component.cases_are_visible).toBe(true);
+        expect(component.d_cases_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-suite').at(0).trigger('click');
         await component.$nextTick();
@@ -293,7 +293,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_command: ag_command});
         await component.$nextTick();
 
-        expect(component.cases_are_visible).toBe(true);
+        expect(component.d_cases_are_visible).toBe(true);
         expect(component.is_open).toBe(true);
     });
 
@@ -329,11 +329,11 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Case 2";
-        component.new_commands[0].cmd = "Sit down";
+        component.d_new_case_name = "Case 2";
+        component.d_new_commands[0].cmd = "Sit down";
 
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
@@ -366,17 +366,17 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Casey";
+        component.d_new_case_name = "Casey";
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        component.new_commands[0].cmd = "apples";
-        component.new_commands[1].name = "BANANAS";
-        component.new_commands[1].cmd = "bananas";
+        component.d_new_commands[0].cmd = "apples";
+        component.d_new_commands[1].name = "BANANAS";
+        component.d_new_commands[1].cmd = "bananas";
 
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
@@ -413,18 +413,18 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Casey";
+        component.d_new_case_name = "Casey";
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        component.new_commands[0].name = "APPLES";
-        component.new_commands[0].cmd = "apples";
-        component.new_commands[1].name = "BANANAS";
-        component.new_commands[1].cmd = "bananas";
+        component.d_new_commands[0].name = "APPLES";
+        component.d_new_commands[0].cmd = "apples";
+        component.d_new_commands[1].name = "BANANAS";
+        component.d_new_commands[1].cmd = "bananas";
 
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
@@ -460,18 +460,18 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Casey";
+        component.d_new_case_name = "Casey";
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        component.new_commands[0].name = "APPLES";
-        component.new_commands[0].cmd = "apples";
-        component.new_commands[1].name = "APPLES";
-        component.new_commands[1].cmd = "bananas";
+        component.d_new_commands[0].name = "APPLES";
+        component.d_new_commands[0].cmd = "apples";
+        component.d_new_commands[1].name = "APPLES";
+        component.d_new_commands[1].cmd = "bananas";
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
 
@@ -503,22 +503,22 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Casey";
+        component.d_new_case_name = "Casey";
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        component.new_commands[0].name = "APPLES";
-        component.new_commands[0].cmd = "apples";
-        component.new_commands[1].name = "BANANAS";
-        component.new_commands[1].cmd = "bananas";
-        component.new_commands[2].name = "APPLES";
-        component.new_commands[2].cmd = "cherries";
+        component.d_new_commands[0].name = "APPLES";
+        component.d_new_commands[0].cmd = "apples";
+        component.d_new_commands[1].name = "BANANAS";
+        component.d_new_commands[1].cmd = "bananas";
+        component.d_new_commands[2].name = "APPLES";
+        component.d_new_commands[2].cmd = "cherries";
 
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
@@ -553,20 +553,20 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Casey";
+        component.d_new_case_name = "Casey";
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        component.new_commands[0].name = "APPLES";
-        component.new_commands[0].cmd = "apples";
-        component.new_commands[1].name = "BANANAS";
-        component.new_commands[1].cmd = "bananas";
-        component.new_commands[2].name = "BANANAS";
-        component.new_commands[2].cmd = "cherries";
+        component.d_new_commands[0].name = "APPLES";
+        component.d_new_commands[0].cmd = "apples";
+        component.d_new_commands[1].name = "BANANAS";
+        component.d_new_commands[1].cmd = "bananas";
+        component.d_new_commands[2].name = "BANANAS";
+        component.d_new_commands[2].cmd = "cherries";
 
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
@@ -593,8 +593,8 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        component.new_case_name = "Case A";
-        component.new_commands[0].cmd = "stand up";
+        component.d_new_case_name = "Case A";
+        component.d_new_commands[0].cmd = "stand up";
 
         wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
         await component.$nextTick();
@@ -612,10 +612,10 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(component.new_case_name).toEqual("");
-        expect(component.new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(component.d_new_case_name).toEqual("");
+        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.new_case_name = "Casey";
+        component.d_new_case_name = "Casey";
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(0);
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
@@ -801,45 +801,45 @@ describe('AGSuitePanel tests', () => {
     });
 
     test('duplicate_command_name getter', async () => {
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Anna", cmd: "Kendrick"}
         ];
         expect(component.duplicate_command_name).toEqual("");
 
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Anna", cmd: "Kendrick"},
             {name: "Rebel", cmd: "Wilson"}
         ]; // different names
         expect(component.duplicate_command_name).toEqual("");
 
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Anna", cmd: "Kendrick"},
             {name: "Anna", cmd: "Camp"}
         ]; // same name
         expect(component.duplicate_command_name).toEqual("Anna");
 
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Adam", cmd: "DeVine"},
             {name: "Adam", cmd: "Levine"},
             {name: "Brittany", cmd: "Snow"}
         ];  // 1 and 2 same name
         expect(component.duplicate_command_name).toEqual("Adam");
 
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Ester", cmd: "Dean"},
             {name: "Anna", cmd: "Camp"},
             {name: "Anna", cmd: "Kendrick"}
         ];  // 2 and 3 same name
         expect(component.duplicate_command_name).toEqual("Anna");
 
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Adam", cmd: "DeVine"},
             {name: "Brittany", cmd: "Snow"},
             {name: "Adam", cmd: "Levine"}
         ];  // 1 and 3 same name
         expect(component.duplicate_command_name).toEqual("Adam");
 
-        component.new_commands = [
+        component.d_new_commands = [
             {name: "Ester", cmd: "Dean"},
             {name: "Anna", cmd: "Camp"},
             {name: "Rebel", cmd: "Wilson"}

@@ -1,7 +1,7 @@
 <template>
   <div id="ag-test-command-settings-component" v-if="d_ag_test_command !== null">
     <tabs ref="tabs-gray"
-          v-model="current_tab_index"
+          v-model="d_current_tab_index"
           tab_active_class="white-theme-active"
           tab_inactive_class="white-theme-inactive">
 
@@ -16,7 +16,7 @@
                             autocomplete="off"
                             spellcheck="false"
                             @submit="save_ag_test_command_settings"
-                            @form_validity_changed="settings_form_is_valid = $event">
+                            @form_validity_changed="d_settings_form_is_valid = $event">
 
               <div id="ag-test-command-name-container" v-if="!case_has_exactly_one_command">
                 <label class="text-label"> Name </label>
@@ -501,9 +501,9 @@
 
                 <button type="submit"
                         class="save-button"
-                        :disabled="!settings_form_is_valid || saving">Save</button>
+                        :disabled="!d_settings_form_is_valid || d_saving">Save</button>
 
-                <div v-if="!saving" class="last-saved-timestamp">
+                <div v-if="!d_saving" class="last-saved-timestamp">
                   <span> Last Saved: </span> {{format_datetime(d_ag_test_command.last_modified)}}
                 </div>
 
@@ -644,12 +644,12 @@ export default class AGCommandSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  current_tab_index = 0;
+  d_current_tab_index = 0;
   d_ag_test_command: AGTestCommand | null = null;
   d_ag_test_case: AGTestCase | null = null;
 
-  saving = false;
-  settings_form_is_valid = true;
+  d_saving = false;
+  d_settings_form_is_valid = true;
 
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
@@ -665,8 +665,8 @@ export default class AGCommandSettings extends Vue {
   @Watch('ag_test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
     this.d_ag_test_command = deep_copy(new_test_command, AGTestCommand);
-    if (this.current_tab_index === 2) {
-      this.current_tab_index = 0;
+    if (this.d_current_tab_index === 2) {
+      this.d_current_tab_index = 0;
     }
   }
 
@@ -674,8 +674,8 @@ export default class AGCommandSettings extends Vue {
   @Watch('ag_test_case', {deep: true})
   on_test_case_change(new_ag_test_case: AGTestCase, old_ag_test_case: AGTestCase) {
     this.d_ag_test_case = deep_copy(new_ag_test_case, AGTestCase);
-    if (this.current_tab_index === 2) {
-      this.current_tab_index = 0;
+    if (this.d_current_tab_index === 2) {
+      this.d_current_tab_index = 0;
     }
   }
 
@@ -700,12 +700,12 @@ export default class AGCommandSettings extends Vue {
   @handle_api_errors_async(handle_save_ag_command_settings_error)
   async save_ag_test_command_settings() {
     try {
-      this.saving = true;
+      this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
       await this.d_ag_test_command!.save();
     }
     finally {
-      this.saving = false;
+      this.d_saving = false;
     }
   }
 }

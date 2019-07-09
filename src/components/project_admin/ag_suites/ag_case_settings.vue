@@ -5,7 +5,7 @@
                       autocomplete="off"
                       spellcheck="false"
                       @submit="save_ag_test_case_settings"
-                      @form_validity_changed="settings_form_is_valid = $event">
+                      @form_validity_changed="d_settings_form_is_valid = $event">
 
           <div id="name-container">
             <label class="text-label"> Test name </label>
@@ -19,7 +19,7 @@
 
             <button id="save-button"
                     type="submit"
-                    :disabled="!settings_form_is_valid || saving">Save</button>
+                    :disabled="!d_settings_form_is_valid || d_saving">Save</button>
           </div>
       </validated-form>
     </div>
@@ -53,8 +53,8 @@ export default class AGCaseSettings extends Vue {
   readonly is_not_empty = is_not_empty;
 
   d_ag_test_case: AGTestCase | null = null;
-  saving = false;
-  settings_form_is_valid = true;
+  d_saving = false;
+  d_settings_form_is_valid = true;
 
   @Watch('ag_test_case')
   on_test_case_change(new_test_case: AGTestCase, old_test_case: AGTestCase) {
@@ -68,12 +68,12 @@ export default class AGCaseSettings extends Vue {
   @handle_api_errors_async(handle_save_ag_test_case_settings_error)
   async save_ag_test_case_settings() {
     try {
-      this.saving = true;
+      this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
       await this.d_ag_test_case!.save();
     }
     finally {
-      this.saving = false;
+      this.d_saving = false;
     }
   }
 }

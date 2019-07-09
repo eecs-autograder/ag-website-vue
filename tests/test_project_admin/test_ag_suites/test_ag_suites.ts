@@ -310,9 +310,9 @@ describe('AGSuites tests', () => {
         wrapper.find('#add-ag-test-suite-button').trigger('click');
         await component.$nextTick();
 
-        component.new_ag_test_suite_name = "Sweet";
+        component.d_new_ag_test_suite_name = "Sweet";
 
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         let create_suite_stub = sinon.stub(AGTestSuite, 'create').callsFake(() =>
             AGTestSuite.notify_ag_test_suite_created(new_suite)
@@ -322,9 +322,9 @@ describe('AGSuites tests', () => {
         await component.$nextTick();
 
         expect(create_suite_stub.calledOnce).toBe(true);
-        expect(component.new_ag_test_suite_name).toBe("");
-        expect(component.ag_test_suites.length).toEqual(4);
-        expect(component.active_ag_test_suite).toEqual(new_suite);
+        expect(component.d_new_ag_test_suite_name).toBe("");
+        expect(component.d_ag_test_suites.length).toEqual(4);
+        expect(component.d_active_ag_test_suite).toEqual(new_suite);
     });
 
     test('Creating a suite - unsuccessfully', async () => {
@@ -340,7 +340,7 @@ describe('AGSuites tests', () => {
         wrapper.find('#add-ag-test-suite-button').trigger('click');
         await component.$nextTick();
 
-        component.new_ag_test_suite_name = "Sweet";
+        component.d_new_ag_test_suite_name = "Sweet";
 
         wrapper.find('#add-ag-test-suite-form').trigger('submit');
         await component.$nextTick();
@@ -352,16 +352,16 @@ describe('AGSuites tests', () => {
     });
 
     test('Delete first suite in suites', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
+        expect(component.d_ag_test_suites.length).toEqual(2);
     });
 
     test('Delete active first suite in suites', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         component.update_active_item(ag_suite_colors);
         await component.$nextTick();
@@ -369,21 +369,21 @@ describe('AGSuites tests', () => {
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
-        expect(component.active_ag_test_suite!.pk).toEqual(ag_suite_pets.pk);
+        expect(component.d_ag_test_suites.length).toEqual(2);
+        expect(component.d_active_ag_test_suite!.pk).toEqual(ag_suite_pets.pk);
     });
 
     test('Delete last suite in suites', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
+        expect(component.d_ag_test_suites.length).toEqual(2);
     });
 
     test('Delete active last suite in suites', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         component.update_active_item(ag_suite_beverages);
         await component.$nextTick();
@@ -391,21 +391,21 @@ describe('AGSuites tests', () => {
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
-        expect(component.active_ag_test_suite!.pk).toEqual(ag_suite_pets.pk);
+        expect(component.d_ag_test_suites.length).toEqual(2);
+        expect(component.d_active_ag_test_suite!.pk).toEqual(ag_suite_pets.pk);
     });
 
     test('Delete middle suite in suites', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
+        expect(component.d_ag_test_suites.length).toEqual(2);
     });
 
     test('Delete active middle suite in suites', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         component.update_active_item(ag_suite_pets);
         await component.$nextTick();
@@ -413,12 +413,12 @@ describe('AGSuites tests', () => {
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
-        expect(component.active_ag_test_suite!.pk).toEqual(ag_suite_beverages.pk);
+        expect(component.d_ag_test_suites.length).toEqual(2);
+        expect(component.d_active_ag_test_suite!.pk).toEqual(ag_suite_beverages.pk);
     });
 
     test('Delete all suites - active_suite gets set to null', async () => {
-        expect(component.ag_test_suites.length).toEqual(3);
+        expect(component.d_ag_test_suites.length).toEqual(3);
 
         component.update_active_item(ag_suite_colors);
         await component.$nextTick();
@@ -426,155 +426,155 @@ describe('AGSuites tests', () => {
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(2);
+        expect(component.d_ag_test_suites.length).toEqual(2);
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(1);
+        expect(component.d_ag_test_suites.length).toEqual(1);
 
         AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
         await component.$nextTick();
 
-        expect(component.ag_test_suites.length).toEqual(0);
-        expect(component.active_ag_test_suite).toBe(null);
+        expect(component.d_ag_test_suites.length).toEqual(0);
+        expect(component.d_active_ag_test_suite).toBe(null);
     });
 
     test('Suite changed', async () => {
         let updated_ag_suite_pets = create_suite(ag_suite_pets.pk, "Pets 2 Suite");
 
-        expect(component.ag_test_suites[1]).toEqual(ag_suite_pets);
+        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
         expect(ag_suite_pets).not.toEqual(updated_ag_suite_pets);
 
         AGTestSuite.notify_ag_test_suite_changed(updated_ag_suite_pets);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].name).toEqual(updated_ag_suite_pets.name);
+        expect(component.d_ag_test_suites[1].name).toEqual(updated_ag_suite_pets.name);
     });
 
     // Case Related ------------------------------------------------------------------------------
 
     test('Case created', async () => {
-        expect(component.ag_test_suites[1]).toEqual(ag_suite_pets);
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
 
         let ag_case_cat = create_case(6, "Cat Case", ag_suite_pets.pk);
 
         AGTestCase.notify_ag_test_case_created(ag_case_cat);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(3);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(3);
     });
 
     test('Case changed', async () => {
         let updated_ag_case_bird = create_case(ag_case_bird.pk, "Updated Bird Case", 2);
 
-        expect(component.ag_test_suites[1]).toEqual(ag_suite_pets);
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.ag_test_suites[1].ag_test_cases[1]).toEqual(ag_case_bird);
-        expect(component.ag_test_suites[1].ag_test_cases[1]).not.toEqual(updated_ag_case_bird);
+        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.d_ag_test_suites[1].ag_test_cases[1]).toEqual(ag_case_bird);
+        expect(component.d_ag_test_suites[1].ag_test_cases[1]).not.toEqual(updated_ag_case_bird);
 
         AGTestCase.notify_ag_test_case_changed(updated_ag_case_bird);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.ag_test_suites[1].ag_test_cases[1]).toEqual(updated_ag_case_bird);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.d_ag_test_suites[1].ag_test_cases[1]).toEqual(updated_ag_case_bird);
     });
 
     test('First case deleted', async () => {
-        expect(component.ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
+        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_purple);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
     });
 
     test('active first case deleted', async () => {
         component.update_active_item(ag_case_purple);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_purple_1);
-        expect(component.ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_purple_1);
+        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_purple);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_blue_1);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
     });
 
     test('Middle case deleted', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_blue);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
     });
 
     test('Active middle case deleted', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
         component.update_active_item(ag_case_blue);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_blue_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_blue);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_1);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
     });
 
     test('last case deleted', async () => {
-        expect(component.ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
+        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_green);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
     });
 
     test('active last case deleted', async () => {
         component.update_active_item(ag_case_green);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_green_1);
-        expect(component.ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.ag_test_suites[0].ag_test_cases.length).toEqual(3);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
+        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
+        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_green);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_blue_1);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
     });
 
     test('Delete all cases in suite - suite becomes active', async () => {
         component.update_active_item(ag_case_dog);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
-        expect(component.ag_test_suites[1]).toEqual(ag_suite_pets);
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
+        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_dog);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(1);
-        expect(component.active_ag_test_suite).toBeNull();
-        expect(component.active_ag_test_command).toEqual(ag_command_bird_1);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(1);
+        expect(component.d_active_ag_test_suite).toBeNull();
+        expect(component.d_active_ag_test_command).toEqual(ag_command_bird_1);
 
         AGTestCase.notify_ag_test_case_deleted(ag_case_bird);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[1].ag_test_cases.length).toEqual(0);
-        expect(component.active_ag_test_suite).toEqual(ag_suite_pets);
+        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(0);
+        expect(component.d_active_ag_test_suite).toEqual(ag_suite_pets);
     });
 
     // Command Related ---------------------------------------------------------------------------
@@ -582,13 +582,13 @@ describe('AGSuites tests', () => {
     test('Command created', async () => {
         let ag_command_blue_2 = create_command(50, "Blue Command 2", ag_case_blue.pk);
 
-        expect(component.ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(1);
+        expect(component.d_ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(1);
 
         AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_blue_2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_2);
     });
 
     test('Command changed', async () => {
@@ -598,8 +598,8 @@ describe('AGSuites tests', () => {
             ag_command_purple_2.ag_test_case
         );
 
-        expect(component.ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
             ag_command_purple_1
         );
         expect(ag_command_purple_2).not.toEqual(updated_ag_command_purple_2);
@@ -607,23 +607,23 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_changed(updated_ag_command_purple_2);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
             updated_ag_command_purple_2
         );
     });
 
     test('First command deleted in case', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
     });
 
     test('active First command deleted in case', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
         component.update_active_item(ag_command_green_1);
         await component.$nextTick();
@@ -631,22 +631,22 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_2);
     });
 
     test('Middle command deleted in case',
          async () => {
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
     });
 
     test('Active middle command deleted in case', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
         component.update_active_item(ag_command_green_2);
         await component.$nextTick();
@@ -654,21 +654,21 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_3);
     });
 
     test('Last command deleted in case', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
     });
 
     test('Active last command deleted in case', async () => {
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
 
         component.update_active_item(ag_command_green_3);
         await component.$nextTick();
@@ -676,18 +676,18 @@ describe('AGSuites tests', () => {
         AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
         await component.$nextTick();
 
-        expect(component.ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_2);
     });
 
     // Visiting Previous Test Case ---------------------------------------------------------------
 
-    test('prev_ag_test_case_is_available (false) - active_ag_test_suite is null', async () => {
+    test('prev_ag_test_case_is_available (false) - d_active_ag_test_suite is null', async () => {
         expect(component.prev_ag_test_case_is_available).toBe(false);
         expect(wrapper.findAll('#prev-ag-test-case-button').length).toEqual(0);
     });
 
-    test('prev_ag_test_case_is_available (false) - active_ag_test_command is null', async () => {
+    test('prev_ag_test_case_is_available (false) - d_active_ag_test_command is null', async () => {
         component.update_active_item(ag_suite_colors);
         await component.$nextTick();
 
@@ -778,36 +778,36 @@ describe('AGSuites tests', () => {
         component.update_active_item(ag_command_blue_1);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_blue_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
 
         expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
         wrapper.find('#prev-ag-test-case-button').trigger('click');
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_purple_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_purple_1);
     });
 
     test('go_to_prev_command - last case in previous suite', async () => {
         component.update_active_item(ag_command_dog_1);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
 
         expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
         wrapper.find('#prev-ag-test-case-button').trigger('click');
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_green_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
     });
 
     // Visiting Next Test Case -------------------------------------------------------------------
 
-    test('next_ag_test_case_is_available (false) - active_ag_test_suite is null', async () => {
+    test('next_ag_test_case_is_available (false) - d_active_ag_test_suite is null', async () => {
         expect(component.next_ag_test_case_is_available).toBe(false);
         expect(wrapper.findAll('#next-ag-test-case-button').length).toEqual(0);
     });
 
-    test('next_ag_test_case_is_available (false) - active_ag_test_command is null', async () => {
+    test('next_ag_test_case_is_available (false) - d_active_ag_test_command is null', async () => {
         component.update_active_item(ag_suite_colors);
         await component.$nextTick();
 
@@ -885,26 +885,26 @@ describe('AGSuites tests', () => {
         component.update_active_item(ag_command_dog_1);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
 
         expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
         wrapper.find('#next-ag-test-case-button').trigger('click');
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_bird_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_bird_1);
     });
 
     test('go_to_next_command - first case in next suite', async () => {
         component.update_active_item(ag_command_green_1);
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_green_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
 
         expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
         wrapper.find('#next-ag-test-case-button').trigger('click');
         await component.$nextTick();
 
-        expect(component.active_ag_test_command).toEqual(ag_command_dog_1);
+        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
     });
 
     test('active_level_is_suite', async () => {
