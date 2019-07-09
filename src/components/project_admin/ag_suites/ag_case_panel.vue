@@ -27,7 +27,7 @@
           <context-menu-item ref="add_ag_test_command_menu_item"
                              @context_menu_item_clicked="open_new_ag_test_command_modal">
             <template slot="label">
-              Add test command
+              Add command
             </template>
           </context-menu-item>
           <div class="context-menu-divider"> </div>
@@ -84,7 +84,7 @@
                         spellcheck="false"
                         @submit="add_ag_test_command"
                         @form_validity_changed="add_command_form_is_valid = $event">
-        <div id="ag-test-name-and-command">
+          <div id="ag-test-name-and-command">
             <div id="ag-test-command-name-container">
               <label class="text-label"> Command Name </label>
               <validated-input ref="new_ag_test_command_name"
@@ -93,7 +93,7 @@
               </validated-input>
             </div>
             <div id="ag-test-command-container">
-              <label class="text-label"> Command </label>
+              <label class="text-label">Command</label>
               <validated-input ref="new_ag_test_command"
                                v-model="new_command"
                                :validators="[is_not_empty]">
@@ -105,7 +105,7 @@
 
           <button class="modal-create-button"
                   :disabled="!add_command_form_is_valid || adding_command">
-            Add Test Command
+            Add Command
           </button>
         </validated-form>
       </div>

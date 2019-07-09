@@ -52,7 +52,8 @@
 
               <div class="new-ag-test-command-inputs">
                 <fieldset class="ag-test-case-modal-fieldset">
-                  <legend class="legend">{{format_ordinal_num(index)}}</legend>
+                  <legend v-if="new_commands.length > 1"
+                          class="legend">{{format_ordinal_num(index)}}</legend>
 
                   <div class="ag-test-command-name" v-if="new_commands.length > 1">
                     <label class="text-label"> Command name </label>
@@ -73,7 +74,16 @@
                   </div>
 
                   <div class="ag-test-command">
-                    <label class="text-label"> Command </label>
+                    <label class="text-label">
+                      Command
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          Can be any valid bash command. <br>
+                          Note that if it includes sequencing or piping,
+                          you will have to increase the process limit.
+                        </tooltip>
+                      </i>
+                    </label>
                     <validated-input ref="command"
                                      v-model="new_command.cmd"
                                      :validators="[is_not_empty]"
@@ -180,7 +190,7 @@ export default class AGSuitePanel extends Vue {
   duplicate_command_name_in_case = false;
   loading = true;
   new_case_name = "";
-  new_commands: NewCommandFields[] = [];
+  new_commands: NewCommandFields[] = [new NewCommandFields({})];
 
   readonly is_not_empty = is_not_empty;
 
@@ -249,7 +259,6 @@ export default class AGSuitePanel extends Vue {
   open_new_ag_test_case_modal() {
     this.$emit('update_active_item', this.ag_test_suite);
     this.duplicate_command_name_in_case = false;
-    this.add_command();
     this.new_case_name = "";
     (<Modal> this.$refs.new_ag_test_case_modal).open();
     Vue.nextTick(() => {

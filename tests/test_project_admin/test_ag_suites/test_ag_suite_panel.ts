@@ -634,6 +634,10 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(0);
     });
 
+    test('Opening and closing new test case modal preserves number of commands', async () => {
+        fail();
+    });
+
     test('is_active_suite getter', async () => {
         let another_suite = new AGTestSuite({
             pk: 2,

@@ -11,7 +11,6 @@ import {
     StdinSource,
     ValueFeedbackLevel,
 } from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';

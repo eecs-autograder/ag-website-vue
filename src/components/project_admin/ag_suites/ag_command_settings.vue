@@ -27,9 +27,17 @@
                 </validated-input>
               </div>
 
-
               <div id="ag-test-command-container">
-                <label class="text-label"> Command </label>
+                <label class="text-label">
+                  Command
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      Can be any valid bash command. <br>
+                      Note that if it includes sequencing or piping,
+                      you will have to increase the process limit.
+                    </tooltip>
+                  </i>
+                </label>
                 <validated-input ref="cmd"
                                  id="input-cmd"
                                  v-model="d_ag_test_command.cmd"
@@ -602,6 +610,7 @@ import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
+import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -619,6 +628,7 @@ import {
     Tab,
     TabHeader,
     Tabs,
+    Tooltip,
     ValidatedForm,
     ValidatedInput
   }
