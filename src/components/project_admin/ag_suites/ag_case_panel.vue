@@ -90,9 +90,10 @@
                         @form_validity_changed="add_command_form_is_valid = $event">
           <div id="ag-test-name-and-command">
             <div id="ag-test-command-name-container">
-              <label class="text-label"> Command Name </label>
+              <label class="text-label"> Command name </label>
               <validated-input ref="new_ag_test_command_name"
                                v-model="new_command_name"
+                               :show_warnings_on_blur="true"
                                :validators="[is_not_empty]">
               </validated-input>
             </div>
@@ -100,6 +101,7 @@
               <label class="text-label">Command</label>
               <validated-input ref="new_ag_test_command"
                                v-model="new_command"
+                               :show_warnings_on_blur="true"
                                :validators="[is_not_empty]">
               </validated-input>
             </div>
@@ -127,7 +129,6 @@
 
     <modal ref="delete_ag_test_case_modal"
            size="large"
-           :include_closing_x="true"
            click_outside_to_close>
       <div class="modal-header">
         Delete "{{ag_test_case.name}}"
@@ -152,10 +153,9 @@
 
     <modal ref="ag_test_case_settings_modal"
            size="large"
-           click_outside_to_close
-           :include_closing_x="true">
+           click_outside_to_close>
       <div class="modal-header">
-        Case Settings & Feedback
+        Test Case Settings
       </div>
       <hr>
       <div class="modal-body">

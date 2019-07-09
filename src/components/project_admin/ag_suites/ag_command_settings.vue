@@ -552,7 +552,6 @@
 
             <modal ref="delete_ag_test_command_modal"
                    :size="'large'"
-                   :include_closing_x="true"
                    click_outside_to_close>
               <div class="modal-header">
                 Confirm Delete

@@ -8,7 +8,7 @@
                       @form_validity_changed="settings_form_is_valid = $event">
 
           <div id="name-container">
-            <label class="text-label"> Case name </label>
+            <label class="text-label"> Test name </label>
             <validated-input ref="name"
                              v-model="d_ag_test_case.name"
                              :validators="[is_not_empty]">
