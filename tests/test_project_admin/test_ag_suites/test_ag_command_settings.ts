@@ -244,6 +244,55 @@ describe('AGCommandSettings tests', () => {
         }
     });
 
+    test('command name binding', async () => {
+        wrapper.setProps({ag_test_case: case_with_two_commands});
+        await component.$nextTick();
+
+        let command_name_input = wrapper.find({ref: 'command_name'});
+        set_validated_input_text(command_name_input, 'Name');
+
+        expect(component.d_ag_test_command!.name).toEqual('Name');
+        expect(validated_input_is_valid(command_name_input)).toEqual(true);
+
+        component.d_ag_test_command!.name = 'Fame';
+        expect(get_validated_input_text(command_name_input)).toEqual('Fame');
+    });
+
+    test('error - command name is blank (case has more than one command)', async () => {
+        let another_case = new AGTestCase({
+            pk: 1,
+            name: "Another Case",
+            ag_test_suite: 1,
+            normal_fdbk_config: default_case_feedback_config,
+            ultimate_submission_fdbk_config: default_case_feedback_config,
+            past_limit_submission_fdbk_config: default_case_feedback_config,
+            staff_viewer_fdbk_config: default_case_feedback_config,
+            last_modified: '',
+            ag_test_commands: [ag_test_command, another_command]
+        });
+
+        wrapper.setProps({ag_test_case: another_case});
+        await component.$nextTick();
+
+        return do_invalid_text_input_test(wrapper, {ref: "command_name"}, ' ', '.save-button');
+    });
+
+    test('cmd binding', async () => {
+        let command_name_input = wrapper.find({ref: 'cmd'});
+
+        set_validated_input_text(command_name_input, 'Tim Hortons');
+
+        expect(component.d_ag_test_command!.cmd).toEqual('Tim Hortons');
+        expect(validated_input_is_valid(command_name_input)).toEqual(true);
+
+        component.d_ag_test_command!.cmd = 'Starbucks';
+        expect(get_validated_input_text(command_name_input)).toEqual('Starbucks');
+    });
+
+    test('error - cmd is blank', async () => {
+        return do_invalid_text_input_test(wrapper, {ref: "cmd"}, ' ', '.save-button');
+    });
+
     test('stdin_source binding', async () => {
         let stdin_source_input = wrapper.find('#stdin-source');
 
@@ -273,6 +322,24 @@ describe('AGCommandSettings tests', () => {
         component.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
         expect_html_element_has_value(stdin_source_input,
                                       StdinSource.instructor_file);
+    });
+
+    test('stdin_text binding', async () => {
+        component.d_ag_test_command!.stdin_source = StdinSource.text;
+
+        let stdin_text_input = wrapper.find({ref: 'stdin_text'});
+        set_validated_input_text(stdin_text_input, 'Hot');
+
+        expect(component.d_ag_test_command!.stdin_text).toEqual('Hot');
+        expect(validated_input_is_valid(stdin_text_input)).toEqual(true);
+
+        set_validated_input_text(stdin_text_input, '');
+
+        expect(component.d_ag_test_command!.stdin_text).toEqual('');
+        expect(validated_input_is_valid(stdin_text_input)).toEqual(true);
+
+        component.d_ag_test_command!.stdin_text = 'Cold';
+        expect(get_validated_input_text(stdin_text_input)).toEqual('Cold');
     });
 
     test('stdin_instructor_file binding', async () => {
@@ -328,6 +395,150 @@ describe('AGCommandSettings tests', () => {
         expect(stdin_instructor_file_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(instructor_file_1.name);
+    });
+
+    test('expected_return_code binding', async () => {
+        let expected_return_code_input = wrapper.find('#expected-return-code');
+
+        expected_return_code_input.setValue(ExpectedReturnCode.none);
+        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+            ExpectedReturnCode.none
+        );
+
+        expected_return_code_input.setValue(ExpectedReturnCode.zero);
+        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+            ExpectedReturnCode.zero
+        );
+
+        expected_return_code_input.setValue(ExpectedReturnCode.nonzero);
+        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+            ExpectedReturnCode.nonzero
+        );
+
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.none;
+        expect_html_element_has_value(expected_return_code_input,
+                                      ExpectedReturnCode.none);
+
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        expect_html_element_has_value(expected_return_code_input,
+                                      ExpectedReturnCode.zero);
+
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.nonzero;
+        expect_html_element_has_value(expected_return_code_input,
+                                      ExpectedReturnCode.nonzero);
+    });
+
+    test('points_for_correct_return_code binding', async () => {
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+
+        let points_for_correct_return_code_input = wrapper.find(
+            {ref: 'points_for_correct_return_code'}
+        );
+
+        set_validated_input_text(points_for_correct_return_code_input, '2');
+
+        expect(component.d_ag_test_command!.points_for_correct_return_code).toEqual(2);
+        expect(validated_input_is_valid(points_for_correct_return_code_input)).toEqual(true);
+
+        component.d_ag_test_command!.points_for_correct_return_code = 3;
+        expect(get_validated_input_text(points_for_correct_return_code_input)).toEqual('3');
+    });
+
+    test('error - points_for_correct_return_code is blank or not an integer', async () => {
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await component.$nextTick();
+
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: "points_for_correct_return_code"}, '.save-button');
+    });
+
+    test('error - points_for_correct_return_code must be >= 0', async () => {
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await component.$nextTick();
+
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_for_correct_return_code'}, '-2', '.save-button');
+    });
+
+    test('deduction_for_wrong_return_code binding', async () => {
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+
+        let deduction_for_wrong_return_code_input = wrapper.find(
+            {ref: 'deduction_for_wrong_return_code'}
+        );
+
+        set_validated_input_text(deduction_for_wrong_return_code_input, '2');
+
+        expect(component.d_ag_test_command!.deduction_for_wrong_return_code).toEqual(2);
+        expect(validated_input_is_valid(deduction_for_wrong_return_code_input)).toEqual(true);
+
+        component.d_ag_test_command!.deduction_for_wrong_return_code = 3;
+        expect(get_validated_input_text(deduction_for_wrong_return_code_input)).toEqual('3');
+    });
+
+    test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await component.$nextTick();
+
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'deduction_for_wrong_return_code'}, '.save-button');
+    });
+
+    test('error - deduction_for_wrong_return_code must be >= 0', async () => {
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await component.$nextTick();
+
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'deduction_for_wrong_return_code'}, '-1', '.save-button');
+    });
+
+    test('expected_stdout_source binding', async () => {
+        let expected_stdout_source_input = wrapper.find('#expected-stdout-source');
+
+        expected_stdout_source_input.setValue(ExpectedOutputSource.none);
+        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+            ExpectedOutputSource.none
+        );
+
+        expected_stdout_source_input.setValue(ExpectedOutputSource.text);
+        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+            ExpectedOutputSource.text
+        );
+
+        expected_stdout_source_input.setValue(ExpectedOutputSource.instructor_file);
+        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+            ExpectedOutputSource.instructor_file
+        );
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        expect_html_element_has_value(expected_stdout_source_input,
+                                      ExpectedOutputSource.none);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        expect_html_element_has_value(expected_stdout_source_input,
+                                      ExpectedOutputSource.text);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        expect_html_element_has_value(expected_stdout_source_input,
+                                      ExpectedOutputSource.instructor_file);
+    });
+
+    test('expected_stdout_text binding', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+
+        let expected_stdout_text = wrapper.find({ref: 'expected_stdout_text'});
+        set_validated_input_text(expected_stdout_text, 'Not');
+
+        expect(component.d_ag_test_command!.expected_stdout_text).toEqual('Not');
+        expect(validated_input_is_valid(expected_stdout_text)).toEqual(true);
+
+        set_validated_input_text(expected_stdout_text, '');
+
+        expect(component.d_ag_test_command!.expected_stdout_text).toEqual('');
+        expect(validated_input_is_valid(expected_stdout_text)).toEqual(true);
+
+        component.d_ag_test_command!.expected_stdout_text = 'Cot';
+        expect(get_validated_input_text(expected_stdout_text)).toEqual('Cot');
     });
 
     test('expected_stdout_instructor_file binding', async () => {
@@ -393,6 +604,116 @@ describe('AGCommandSettings tests', () => {
         ).text()).toEqual(instructor_file_1.name);
     });
 
+    test('points_for_correct_stdout binding', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+
+        let points_for_correct_stdout_input = wrapper.find({ref: 'points_for_correct_stdout'});
+
+        set_validated_input_text(points_for_correct_stdout_input, '21');
+
+        expect(component.d_ag_test_command!.points_for_correct_stdout).toEqual(21);
+        expect(validated_input_is_valid(points_for_correct_stdout_input)).toEqual(true);
+
+        component.d_ag_test_command!.points_for_correct_stdout = 5;
+        expect(get_validated_input_text(points_for_correct_stdout_input)).toEqual('5');
+    });
+
+
+    test('error - points_for_correct_stdout is blank or not an integer', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'points_for_correct_stdout'}, '.save-button');
+    });
+
+    test('error - points_for_correct_stdout must be >= 0', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_for_correct_stdout'}, '-1', '.save-button');
+    });
+
+    test('deduction_for_wrong_stdout binding', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+
+        let deduction_for_wrong_stdout_input = wrapper.find({ref: 'deduction_for_wrong_stdout'});
+
+        set_validated_input_text(deduction_for_wrong_stdout_input, '9');
+
+        expect(component.d_ag_test_command!.deduction_for_wrong_stdout).toEqual(9);
+        expect(validated_input_is_valid(deduction_for_wrong_stdout_input)).toEqual(true);
+
+        component.d_ag_test_command!.deduction_for_wrong_stdout = 4;
+        expect(get_validated_input_text(deduction_for_wrong_stdout_input)).toEqual('4');
+    });
+
+    test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'deduction_for_wrong_stdout'}, '.save-button');
+    });
+
+    test('error - deduction_for_wrong_stdout must be >= 0', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'deduction_for_wrong_stdout'}, '-1', '.save-button');
+    });
+
+    test('expected_stderr_source binding', async () => {
+        let expected_stderr_source_input = wrapper.find('#expected-stderr-source');
+
+        expected_stderr_source_input.setValue(ExpectedOutputSource.none);
+        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+            ExpectedOutputSource.none
+        );
+
+        expected_stderr_source_input.setValue(ExpectedOutputSource.text);
+        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+            ExpectedOutputSource.text
+        );
+
+        expected_stderr_source_input.setValue(ExpectedOutputSource.instructor_file);
+        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+            ExpectedOutputSource.instructor_file
+        );
+
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+        expect_html_element_has_value(expected_stderr_source_input,
+                                      ExpectedOutputSource.none);
+
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        expect_html_element_has_value(expected_stderr_source_input,
+                                      ExpectedOutputSource.text);
+
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        expect_html_element_has_value(expected_stderr_source_input,
+                                      ExpectedOutputSource.instructor_file);
+    });
+
+    test('expected_stderr_text binding', async () => {
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        let expected_stderr_text = wrapper.find({ref: 'expected_stderr_text'});
+        set_validated_input_text(expected_stderr_text, 'Rot');
+
+        expect(component.d_ag_test_command!.expected_stderr_text).toEqual('Rot');
+        expect(validated_input_is_valid(expected_stderr_text)).toEqual(true);
+
+        set_validated_input_text(expected_stderr_text, '');
+
+        expect(component.d_ag_test_command!.expected_stderr_text).toEqual('');
+        expect(validated_input_is_valid(expected_stderr_text)).toEqual(true);
+
+        component.d_ag_test_command!.expected_stderr_text = 'Jot';
+        expect(get_validated_input_text(expected_stderr_text)).toEqual('Jot');
+    });
+
     test('expected_stderr_instructor_file binding', async () => {
         component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
         await component.$nextTick();
@@ -456,176 +777,18 @@ describe('AGCommandSettings tests', () => {
         ).text()).toEqual(instructor_file_1.name);
     });
 
-    test('expected_return_code binding', async () => {
-        let expected_return_code_input = wrapper.find('#expected-return-code');
-
-        expected_return_code_input.setValue(ExpectedReturnCode.none);
-        expect(component.d_ag_test_command!.expected_return_code).toEqual(
-            ExpectedReturnCode.none
-        );
-
-        expected_return_code_input.setValue(ExpectedReturnCode.zero);
-        expect(component.d_ag_test_command!.expected_return_code).toEqual(
-            ExpectedReturnCode.zero
-        );
-
-        expected_return_code_input.setValue(ExpectedReturnCode.nonzero);
-        expect(component.d_ag_test_command!.expected_return_code).toEqual(
-            ExpectedReturnCode.nonzero
-        );
-
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.none;
-        expect_html_element_has_value(expected_return_code_input,
-                                      ExpectedReturnCode.none);
-
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        expect_html_element_has_value(expected_return_code_input,
-                                      ExpectedReturnCode.zero);
-
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.nonzero;
-        expect_html_element_has_value(expected_return_code_input,
-                                      ExpectedReturnCode.nonzero);
-    });
-
-    test('expected_stdout_source binding', async () => {
-        let expected_stdout_source_input = wrapper.find('#expected-stdout-source');
-
-        expected_stdout_source_input.setValue(ExpectedOutputSource.none);
-        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
-            ExpectedOutputSource.none
-        );
-
-        expected_stdout_source_input.setValue(ExpectedOutputSource.text);
-        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
-            ExpectedOutputSource.text
-        );
-
-        expected_stdout_source_input.setValue(ExpectedOutputSource.instructor_file);
-        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
-            ExpectedOutputSource.instructor_file
-        );
-
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
-        expect_html_element_has_value(expected_stdout_source_input,
-                                      ExpectedOutputSource.none);
-
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        expect_html_element_has_value(expected_stdout_source_input,
-                                      ExpectedOutputSource.text);
-
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        expect_html_element_has_value(expected_stdout_source_input,
-                                      ExpectedOutputSource.instructor_file);
-    });
-
-    test('expected_stderr_source binding', async () => {
-        let expected_stderr_source_input = wrapper.find('#expected-stderr-source');
-
-        expected_stderr_source_input.setValue(ExpectedOutputSource.none);
-        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
-            ExpectedOutputSource.none
-        );
-
-        expected_stderr_source_input.setValue(ExpectedOutputSource.text);
-        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
-            ExpectedOutputSource.text
-        );
-
-        expected_stderr_source_input.setValue(ExpectedOutputSource.instructor_file);
-        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
-            ExpectedOutputSource.instructor_file
-        );
-
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-        expect_html_element_has_value(expected_stderr_source_input,
-                                      ExpectedOutputSource.none);
-
+    test('points_for_correct_stderr binding', async () => {
         component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        expect_html_element_has_value(expected_stderr_source_input,
-                                      ExpectedOutputSource.text);
 
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
-        expect_html_element_has_value(expected_stderr_source_input,
-                                      ExpectedOutputSource.instructor_file);
-    });
+        let points_for_correct_stderr_input = wrapper.find({ref: 'points_for_correct_stderr'});
 
-    test('error - command name is blank (case has more than one command)', async () => {
-        let another_case = new AGTestCase({
-            pk: 1,
-            name: "Another Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_test_command, another_command]
-        });
+        set_validated_input_text(points_for_correct_stderr_input, '9');
 
-        wrapper.setProps({ag_test_case: another_case});
-        await component.$nextTick();
+        expect(component.d_ag_test_command!.points_for_correct_stderr).toEqual(9);
+        expect(validated_input_is_valid(points_for_correct_stderr_input)).toEqual(true);
 
-        return do_invalid_text_input_test(wrapper, {ref: "command_name"}, ' ', '.save-button');
-    });
-
-    test('error - cmd is blank', async () => {
-        return do_invalid_text_input_test(wrapper, {ref: "cmd"}, ' ', '.save-button');
-    });
-
-    test('error - points_for_correct_return_code is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
-
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: "points_for_correct_return_code"}, '.save-button');
-    });
-
-    test('error - points_for_correct_return_code must be >= 0', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
-
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'points_for_correct_return_code'}, '-2', '.save-button');
-    });
-
-    test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
-
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'deduction_for_wrong_return_code'}, '.save-button');
-    });
-
-    test('error - deduction_for_wrong_return_code must be >= 0', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
-
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'deduction_for_wrong_return_code'}, '-1', '.save-button');
-    });
-
-    test('error - points_for_correct_stdout must be >= 0', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
-
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'points_for_correct_stdout'}, '-1', '.save-button');
-    });
-
-    test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
-
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'deduction_for_wrong_stdout'}, '.save-button');
-    });
-
-    test('error - deduction_for_wrong_stdout must be >= 0', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
-
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'deduction_for_wrong_stdout'}, '-1', '.save-button');
+        component.d_ag_test_command!.points_for_correct_stderr = 4;
+        expect(get_validated_input_text(points_for_correct_stderr_input)).toEqual('4');
     });
 
     test('error - points_for_correct_stderr is blank or not an integer', async () => {
@@ -644,6 +807,20 @@ describe('AGCommandSettings tests', () => {
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'points_for_correct_stderr'}, '-1', '.save-button');
+    });
+
+    test('deduction_for_wrong_stderr binding', async () => {
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+
+        let deduction_for_wrong_stderr_input = wrapper.find({ref: 'deduction_for_wrong_stderr'});
+
+        set_validated_input_text(deduction_for_wrong_stderr_input, '9');
+
+        expect(component.d_ag_test_command!.deduction_for_wrong_stderr).toEqual(9);
+        expect(validated_input_is_valid(deduction_for_wrong_stderr_input)).toEqual(true);
+
+        component.d_ag_test_command!.deduction_for_wrong_stderr = 4;
+        expect(get_validated_input_text(deduction_for_wrong_stderr_input)).toEqual('4');
     });
 
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
@@ -803,12 +980,36 @@ describe('AGCommandSettings tests', () => {
         expect(checkbox_is_checked(ignore_blank_lines)).toBe(true);
     });
 
+    test('time_limit binding', async () => {
+        let time_limit_input = wrapper.find({ref: 'time_limit'});
+
+        set_validated_input_text(time_limit_input, '9');
+
+        expect(component.d_ag_test_command!.time_limit).toEqual(9);
+        expect(validated_input_is_valid(time_limit_input)).toEqual(true);
+
+        component.d_ag_test_command!.time_limit = 4;
+        expect(get_validated_input_text(time_limit_input)).toEqual('4');
+    });
+
     test('error - time_limit is blank or not an integer', async () => {
         return do_input_blank_or_not_integer_test(wrapper, {ref: 'time_limit'}, '.save-button');
     });
 
     test('error - time_limit must be >= 1', async () => {
         return do_invalid_text_input_test(wrapper, {ref: 'time_limit'}, '0', '.save-button');
+    });
+
+    test('virtual_memory_limit binding', async () => {
+        let virtual_memory_limit_input = wrapper.find({ref: 'virtual_memory_limit'});
+
+        set_validated_input_text(virtual_memory_limit_input, '9');
+
+        expect(component.d_ag_test_command!.virtual_memory_limit).toEqual(9);
+        expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
+
+        component.d_ag_test_command!.virtual_memory_limit = 4;
+        expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
     });
 
     test('error - virtual_memory_limit is blank or not an integer', async () => {
@@ -821,6 +1022,18 @@ describe('AGCommandSettings tests', () => {
             wrapper, {ref: 'virtual_memory_limit'}, '0', '.save-button');
     });
 
+    test('stack_size_limit binding', async () => {
+        let stack_size_limit_input = wrapper.find({ref: 'stack_size_limit'});
+
+        set_validated_input_text(stack_size_limit_input, '9');
+
+        expect(component.d_ag_test_command!.stack_size_limit).toEqual(9);
+        expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
+
+        component.d_ag_test_command!.stack_size_limit = 4;
+        expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
+    });
+
     test('error - stack_size_limit is blank or not an integer', async () => {
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: 'stack_size_limit'}, '.save-button');
@@ -828,6 +1041,19 @@ describe('AGCommandSettings tests', () => {
 
     test('error - stack_size_limit must be >= 1', async () => {
         return do_invalid_text_input_test(wrapper, {ref: 'stack_size_limit'}, '0', '.save-button');
+    });
+
+
+    test('process_spawn_limit binding', async () => {
+        let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
+
+        set_validated_input_text(process_spawn_limit_input, '9');
+
+        expect(component.d_ag_test_command!.process_spawn_limit).toEqual(9);
+        expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
+
+        component.d_ag_test_command!.process_spawn_limit = 4;
+        expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
     });
 
     test('error - process_spawn_limit is blank or not an integer', async () => {

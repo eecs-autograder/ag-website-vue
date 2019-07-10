@@ -78,9 +78,9 @@
             <div class="ag-test-suite-name-container">
               <label class="text-label"> Suite name </label>
               <validated-input ref="new_ag_test_suite_name"
-                              v-model="d_new_ag_test_suite_name"
-                              :show_warnings_on_blur="true"
-                              :validators="[is_not_empty]">
+                               v-model="d_new_ag_test_suite_name"
+                               :show_warnings_on_blur="true"
+                               :validators="[is_not_empty]">
               </validated-input>
             </div>
 

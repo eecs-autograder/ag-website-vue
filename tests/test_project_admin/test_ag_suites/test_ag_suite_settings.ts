@@ -17,7 +17,11 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 
-import { checkbox_is_checked } from '@/tests/utils';
+import {
+    checkbox_is_checked,
+    get_validated_input_text,
+    set_validated_input_text, validated_input_is_valid
+} from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -208,12 +212,24 @@ describe('AGSuiteSettings tests', () => {
         }
     });
 
+    test('suite name binding', async () => {
+        let suite_name_input = wrapper.find({ref: 'suite_name'});
+        set_validated_input_text(suite_name_input, 'Sweet Name');
+
+        expect(component.d_ag_test_suite!.name).toEqual("Sweet Name");
+        expect(validated_input_is_valid(suite_name_input)).toEqual(true);
+
+        component.d_ag_test_suite!.name = "Thanks";
+        expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
+    });
+
     test('Suite name cannot be empty - violates condition', async () => {
         expect(component.d_settings_form_is_valid).toBe(true);
 
-        component.d_ag_test_suite!.name = " ";
-        await component.$nextTick();
+        let suite_name_input = wrapper.find({ref: 'suite_name'});
+        set_validated_input_text(suite_name_input, '');
 
+        expect(validated_input_is_valid(suite_name_input)).toBe(false);
         expect(component.d_settings_form_is_valid).toBe(false);
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
@@ -493,23 +509,38 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('setup_suite_cmd_name binding', async () => {
-        expect(component.d_settings_form_is_valid).toBe(true);
+        let setup_suite_cmd_name_input = wrapper.find({ref: 'setup_suite_cmd_name'});
+        set_validated_input_text(setup_suite_cmd_name_input, 'sunflower');
 
-        component.d_ag_test_suite!.setup_suite_cmd_name = "purple";
-        await component.$nextTick();
+        expect(component.d_ag_test_suite!.setup_suite_cmd_name).toEqual("sunflower");
+        expect(validated_input_is_valid(setup_suite_cmd_name_input)).toEqual(true);
 
-        expect(component.d_settings_form_is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+        set_validated_input_text(setup_suite_cmd_name_input, '');
+        expect(component.d_ag_test_suite!.setup_suite_cmd_name).toEqual("");
+        expect(validated_input_is_valid(setup_suite_cmd_name_input)).toEqual(true);
+
+        component.d_ag_test_suite!.setup_suite_cmd_name = "Rainbow";
+        expect(get_validated_input_text(setup_suite_cmd_name_input)).toEqual("Rainbow");
     });
 
     test('setup_suite_cmd binding', async () => {
-        expect(component.d_settings_form_is_valid).toBe(true);
+        let setup_suite_cmd_input = wrapper.find({ref: 'setup_suite_cmd'});
 
-        component.d_ag_test_suite!.setup_suite_cmd = "blue";
-        await component.$nextTick();
+        set_validated_input_text(setup_suite_cmd_input, 'three to the right');
 
-        expect(component.d_settings_form_is_valid).toBe(true);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+        expect(component.d_ag_test_suite!.setup_suite_cmd).toEqual(
+            "three to the right"
+        );
+        expect(validated_input_is_valid(setup_suite_cmd_input)).toEqual(true);
+
+        set_validated_input_text(setup_suite_cmd_input, '');
+        expect(component.d_ag_test_suite!.setup_suite_cmd).toEqual("");
+        expect(validated_input_is_valid(setup_suite_cmd_input)).toEqual(true);
+
+        component.d_ag_test_suite!.setup_suite_cmd = "four to the left";
+        expect(get_validated_input_text(setup_suite_cmd_input)).toEqual(
+            "four to the left"
+        );
     });
 
     test('Save suite settings - successful', async () => {

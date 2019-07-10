@@ -18,12 +18,17 @@ import {
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
-import { AxiosError } from 'axios';
 import { create } from 'domain';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+
+import {
+    get_validated_input_text,
+    set_validated_input_text,
+    validated_input_is_valid
+} from '@/tests/utils';
 
 let default_suite_feedback_config: AGTestSuiteFeedbackConfig = {
     show_individual_tests: false,
@@ -303,6 +308,20 @@ describe('AGSuites tests', () => {
     });
 
     // Suite Related -----------------------------------------------------------------------------
+
+    test('d_new_ag_test_suite_name binding', async () => {
+        wrapper.find('#add-ag-test-suite-button').trigger('click');
+        await component.$nextTick();
+
+        let d_new_ag_test_suite_name_input = wrapper.find({ref: 'new_ag_test_suite_name'});
+
+        set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
+        expect(validated_input_is_valid(d_new_ag_test_suite_name_input)).toBe(true);
+        expect(component.d_new_ag_test_suite_name).toEqual("Suite I");
+
+        component.d_new_ag_test_suite_name = "Suite II";
+        expect(get_validated_input_text(d_new_ag_test_suite_name_input)).toEqual("Suite II");
+    });
 
     test('Creating a suite - successfully', async () => {
         let new_suite = create_suite(4, "New Suite");

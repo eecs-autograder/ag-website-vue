@@ -20,6 +20,12 @@ import Modal from '@/components/modal.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import {
+    get_validated_input_text,
+    set_validated_input_text,
+    validated_input_is_valid
+} from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -307,6 +313,23 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(wrapper.emitted('update_active_item').length).toEqual(1);
+    });
+
+    test('d_new_case_name binding', async () => {
+        wrapper.setProps({active_ag_test_suite: ag_suite});
+        await component.$nextTick();
+
+        wrapper.find('#ag-test-suite-menu').trigger('click');
+        await component.$nextTick();
+
+        let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
+
+        set_validated_input_text(d_new_case_name_input, "Case 1");
+        expect(validated_input_is_valid(d_new_case_name_input)).toBe(true);
+        expect(component.d_new_case_name).toEqual("Case 1");
+
+        component.d_new_case_name = "Case 2";
+        expect(get_validated_input_text(d_new_case_name_input)).toEqual("Case 2");
     });
 
     test('Add case (and first command of the same name) - successful', async () => {
@@ -705,6 +728,23 @@ describe('AGSuitePanel tests', () => {
         expect(component.suite_is_active).toBe(false);
     });
 
+    test('d_new_case_name binding', async () => {
+        wrapper.setProps({active_ag_test_suite: ag_suite});
+        await component.$nextTick();
+
+        wrapper.find('#ag-test-suite-menu').trigger('click');
+        await component.$nextTick();
+
+        let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
+
+        set_validated_input_text(d_new_case_name_input, "Case 1");
+        expect(validated_input_is_valid(d_new_case_name_input)).toBe(true);
+        expect(component.d_new_case_name).toEqual("Case 1");
+
+        component.d_new_case_name = "Case 2";
+        expect(get_validated_input_text(d_new_case_name_input)).toEqual("Case 2");
+    });
+
     test('error - new case name is blank', async () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
@@ -730,6 +770,26 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.find('.modal-create-button').is(
             '[disabled]'
         )).toBe(true);
+    });
+
+    test('new_command.name binding', async () => {
+        wrapper.setProps({active_ag_test_suite: ag_suite});
+        await component.$nextTick();
+
+        wrapper.find('#ag-test-suite-menu').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-ag-test-command-button').trigger('click');
+        await component.$nextTick();
+
+        let first_new_command_name_input = wrapper.findAll({ref: 'command_name'}).at(0);
+
+        set_validated_input_text(first_new_command_name_input, "Pasta");
+        expect(validated_input_is_valid(first_new_command_name_input)).toBe(true);
+        expect(component.d_new_commands[0].name).toEqual("Pasta");
+
+        component.d_new_commands[0].name = "Pizza";
+        expect(get_validated_input_text(first_new_command_name_input)).toEqual("Pizza");
     });
 
     test('error - new command name is blank', async () => {
@@ -766,6 +826,23 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.find('.modal-create-button').is(
             '[disabled]'
         )).toBe(true);
+    });
+
+    test('new_command.cmd binding', async () => {
+        wrapper.setProps({active_ag_test_suite: ag_suite});
+        await component.$nextTick();
+
+        wrapper.find('#ag-test-suite-menu').trigger('click');
+        await component.$nextTick();
+
+        let first_new_command_input = wrapper.find({ref: 'command'});
+
+        set_validated_input_text(first_new_command_input, "Lasagna");
+        expect(validated_input_is_valid(first_new_command_input)).toBe(true);
+        expect(component.d_new_commands[0].cmd).toEqual("Lasagna");
+
+        component.d_new_commands[0].cmd = "Spaghetti";
+        expect(get_validated_input_text(first_new_command_input)).toEqual("Spaghetti");
     });
 
     test('error - new command is blank', async () => {

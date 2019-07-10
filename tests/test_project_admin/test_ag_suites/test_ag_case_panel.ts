@@ -17,6 +17,12 @@ import APIErrors from '@/components/api_errors.vue';
 import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import {
+    get_validated_input_text,
+    set_validated_input_text,
+    validated_input_is_valid
+} from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -565,6 +571,23 @@ describe('AGCasePanel tests', () => {
         expect(component.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
     });
 
+    test('d_new_command_name binding', async () => {
+        wrapper.setProps({active_ag_test_case: ag_case_green});
+        await component.$nextTick();
+
+        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
+        await component.$nextTick();
+
+        let new_ag_test_command_name_input = wrapper.find({ref: 'new_ag_test_command_name'});
+        set_validated_input_text(new_ag_test_command_name_input, 'Sunny');
+
+        expect(component.d_new_command_name).toEqual("Sunny");
+        expect(validated_input_is_valid(new_ag_test_command_name_input)).toEqual(true);
+
+        component.d_new_command_name = "Cloudy";
+        expect(get_validated_input_text(new_ag_test_command_name_input)).toEqual("Cloudy");
+    });
+
     test('error - new command name is blank', async () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
         await component.$nextTick();
@@ -592,6 +615,23 @@ describe('AGCasePanel tests', () => {
         await component.$nextTick();
 
         expect(new_command_name_validator.is_valid).toBe(false);
+    });
+
+    test('d_new_command binding', async () => {
+        wrapper.setProps({active_ag_test_case: ag_case_green});
+        await component.$nextTick();
+
+        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
+        await component.$nextTick();
+
+        let new_ag_test_command_input = wrapper.find({ref: 'new_ag_test_command'});
+        set_validated_input_text(new_ag_test_command_input, 'Moo');
+
+        expect(component.d_new_command).toEqual("Moo");
+        expect(validated_input_is_valid(new_ag_test_command_input)).toEqual(true);
+
+        component.d_new_command = "Baa";
+        expect(get_validated_input_text(new_ag_test_command_input)).toEqual("Baa");
     });
 
     test('error - new command is blank', async () => {

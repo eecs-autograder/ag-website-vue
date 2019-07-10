@@ -153,8 +153,7 @@
 
                     <div id="setup-command-label-container">
                       <label class="text-label"> Setup command label </label>
-                      <validated-input ref="suite_name"
-                                       id="setup-command-label"
+                      <validated-input ref="setup_suite_cmd_name"
                                        v-model="d_ag_test_suite.setup_suite_cmd_name"
                                        :validators="[]">
                       </validated-input>
@@ -162,8 +161,7 @@
 
                     <div id="setup-command-container">
                       <label class="text-label"> Setup command </label>
-                      <validated-input ref="suite_name"
-                                       id="setup-command"
+                      <validated-input ref="setup_suite_cmd"
                                        v-model="d_ag_test_suite.setup_suite_cmd"
                                        :validators="[]">
                       </validated-input>
@@ -404,11 +402,6 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
   padding: 15px;
 }
 
-.sandbox-docker-image-dropdown {
-  min-width: 400px;
-  width: 100%;
-}
-
 #setup-command-container {
   margin: 15px 0 10px 0;
 }
@@ -473,6 +466,11 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 
 .sandbox-container {
   padding: 10px 0 10px 3px;
+}
+
+.sandbox-docker-image-dropdown {
+  min-width: 400px;
+  width: 100%;
 }
 
 #ag-test-suite-name-container {

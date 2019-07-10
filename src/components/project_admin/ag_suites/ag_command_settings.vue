@@ -767,11 +767,6 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
   padding: 15px;
 }
 
-.instructor-file-dropdown {
-  min-width: 400px;
-  width: 100%;
-}
-
 .delete-ag-test-command-button {
   @extend .delete-level-button;
 }
@@ -799,6 +794,11 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
   width: 200px;
   margin-right: 5px;
   vertical-align: top;
+}
+
+.instructor-file-dropdown {
+  min-width: 400px;
+  width: 100%;
 }
 
 .add-points-container div, .subtract-points-container div {
