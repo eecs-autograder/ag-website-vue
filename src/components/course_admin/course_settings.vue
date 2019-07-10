@@ -74,7 +74,7 @@
 
         <button id="save-button"
                 type="submit"
-                :disabled="!settings_form_is_valid || saving"> Save Updates </button>
+                :disabled="!settings_form_is_valid || saving">Save</button>
 
         <div v-if="!saving"
              class="last-saved-timestamp">
@@ -221,10 +221,7 @@ function handle_save_course_settings_error(component: CourseSettings, error: unk
 }
 
 .suffix-element {
-  display: inline-block;
   padding-left: 10px;
-  padding-top: 8px;
-  vertical-align: top;
 }
 
 @media only screen and (min-width: 481px) {

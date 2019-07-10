@@ -8,7 +8,8 @@
           tab_active_class="gray-white-theme-active"
           tab_inactive_class="gray-white-theme-inactive"
           v-model="current_tab_index"
-          @input="on_tab_changed">
+          @input="on_tab_changed"
+          :scroll_body="true">
       <tab>
         <tab-header ref="project_settings_tab">
           <div class="tab-label">
@@ -56,7 +57,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            AG TEST CASES - TODO (branch exists)
+            <AGTestSuites :project="project"></AGTestSuites>
           </div>
         </template>
       </tab>
@@ -135,6 +136,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { Project } from 'ag-client-typescript';
 
+import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
@@ -146,6 +148,7 @@ import { get_query_param } from "@/utils";
 
 @Component({
   components: {
+    AGTestSuites,
     EditGroups,
     ExpectedStudentFiles,
     InstructorFiles,
@@ -238,6 +241,18 @@ export default class ProjectAdmin extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#project-admin {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
 .loading-spinner {
   color: $ocean-blue;
   font-size: 55px;
@@ -255,7 +270,8 @@ export default class ProjectAdmin extends Vue {
 
 .tab-body {
   text-align: left;
-  /*position: relative;*/
+  width: 100%;
+  height: 100%;
   padding-top: 0;
 }
 

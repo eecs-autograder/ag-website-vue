@@ -147,6 +147,7 @@ export default class Tooltip extends Vue {
     transition: opacity 0.3s;
     word-wrap: break-word;
     z-index: 1;
+    line-height: 1.4;
   }
 
   .placement-left {

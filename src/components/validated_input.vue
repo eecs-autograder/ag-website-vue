@@ -1,6 +1,7 @@
 <template>
   <div id="validated-input-component">
-    <div>
+    <div id="validated-input-wrapper">
+      <slot name="prefix"> </slot>
       <input id="input"
              v-if="num_rows === 1"
              :style="input_style"
@@ -124,6 +125,11 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
     this.debounced_enable_warnings = debounce(() => this.d_show_warnings = true, 500);
   }
 
+  focus() {
+    let class_name = this.num_rows === 1 ? 'input' : 'textarea';
+    (<HTMLInputElement> this.$el.getElementsByClassName(class_name)[0]).focus();
+  }
+
   destroyed() {
     this.unregister(this);
   }
@@ -201,6 +207,13 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
+#validated-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
 
 .error-ul {
   list-style-type: none; /* Remove bullets */

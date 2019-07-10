@@ -14,7 +14,7 @@
 
 .legend {
     color: $ocean-blue;
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 
 .fieldset {
@@ -34,9 +34,9 @@
 .text-label {
     color: lighten(black, 10);
     display: inline-block;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    margin: 0 0 7px 0;
+    margin: 0 0 4px 0;
     text-align: right;
 }
 
@@ -55,6 +55,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
     padding: 10px 0 10px 5px;
+    position: relative;
 }
 
 .checkbox  {

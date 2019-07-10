@@ -1,0 +1,126 @@
+$active-color: teal;
+$parent-of-active-color: white;
+$suite-in-active-container-color: white;
+
+.panel {
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.caret-right, .caret-down {
+    font-size: 15px;
+    color: black;
+    width: 16px;
+    box-sizing: border-box;
+}
+
+.level-name {
+    padding: 5px 5px 5px 15px;
+}
+
+.caret-right {
+    padding: 0 0 0 3px;
+}
+
+::-webkit-scrollbar {
+    background: transparent;
+    width: 0;
+}
+
+.loading-spinner {
+    color: $ocean-blue;
+    display: inline-block;
+    padding-left: 10px;
+    font-size: 18px;
+}
+
+.bottom-of-form {
+    padding: 0 10px 10px 13px;
+}
+
+.save-button {
+    @extend .green-button;
+    display: block;
+    margin: 0 10px 10px 0;
+}
+
+.last-saved-timestamp {
+    color: lighten(#495057, 40);
+    font-size: 15px;
+}
+
+.last-saved-spinner {
+    color: $ocean-blue;
+    display: inline-block;
+    font-size: 18px;
+}
+
+.delete-level-button {
+    @extend .red-button;
+    font-size: 14px;
+}
+
+.delete-level-button span {
+    margin-left: 5px;
+}
+
+.add-level-button {
+    color: lighten(black, 25);
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.active-level {
+    background-color: $active-color;
+    color: white;
+}
+
+.parent-of-active-level {
+    background-color: inherit;
+    color: black;
+}
+
+.tab-heading {
+    font-size: 14px;
+}
+
+// Modal Related ***********************************************************
+
+.item-to-delete {
+    color: $ocean-blue;
+    margin-left: 3px;
+}
+
+.modal-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.modal-create-button {
+    @extend .green-button;
+    float: right;
+}
+
+.deletion-modal-button-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-top: 5px;
+}
+
+.modal-cancel-button {
+    @extend .white-button;
+}
+
+.modal-delete-button {
+    @extend .red-button;
+    margin-right: 15px;
+}

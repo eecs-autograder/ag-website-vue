@@ -15,7 +15,7 @@ export function set_validated_input_text(wrapper: Wrapper<Vue>, value: string) {
     if (!is_validated_input(wrapper)) {
         throw new TypeError(`Expected ValidatedInput, but got "${wrapper.name()}"`);
     }
-    wrapper.find('#input').setValue(value);
+    wrapper.find('.input').setValue(value);
 }
 
 // Gets the text that is currently entered in the validated input.
@@ -25,7 +25,7 @@ export function get_validated_input_text(wrapper: Wrapper<Vue>): string {
     if (!is_validated_input(wrapper)) {
         throw new TypeError(`Expected ValidatedInput, but got "${wrapper.name()}"`);
     }
-    return (<HTMLInputElement> wrapper.find('#input').element).value;
+    return (<HTMLInputElement> wrapper.find('.input').element).value;
 }
 
 // Verifies that the given wrapper holds a ValidatedInput and returns whether it is valid.

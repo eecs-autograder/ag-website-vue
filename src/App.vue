@@ -18,6 +18,11 @@ export default class App extends Vue {}
     margin: 0;
     padding: 0;
     height: 100%;
+    width: 100%;
+  }
+
+  html {
+    height: 100%;
   }
 
   body, input {

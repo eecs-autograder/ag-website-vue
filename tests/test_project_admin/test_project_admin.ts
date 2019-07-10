@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 
 import {
+    AGTestSuite,
     Course,
     ExpectedStudentFile,
     Group,
@@ -173,6 +174,9 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Test Cases tab', async () => {
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -381,6 +385,9 @@ describe('select_tab function called with different values associated with "curr
 
 
     test('current tab parameter value = test_cases', async () => {
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
         $route.query = { current_tab: 'test_cases' };
         wrapper = mount(ProjectAdmin, {
             mocks: {

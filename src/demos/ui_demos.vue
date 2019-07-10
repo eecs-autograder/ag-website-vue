@@ -259,6 +259,8 @@ export default class UIDemos extends Vue {
 
   * {
     box-sizing: border-box;
+    padding: 0;
+    margin: 0;
   }
 
   #demos-container {

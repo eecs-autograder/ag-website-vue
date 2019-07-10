@@ -361,9 +361,7 @@
 
         <button id="save-button"
                 type="submit"
-                :disabled="!settings_form_is_valid || d_saving">
-          Save Updates
-        </button>
+                :disabled="!settings_form_is_valid || d_saving">Save</button>
         <span v-show="d_saving" class="saving-spinner">
           <i class="fa fa-spinner fa-pulse"></i>
         </span>
