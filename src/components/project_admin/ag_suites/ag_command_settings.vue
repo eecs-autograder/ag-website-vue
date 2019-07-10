@@ -53,7 +53,7 @@
                     <label class="text-label"> Stdin source: </label>
 
                     <div class="dropdown">
-                      <select id="stdin_source_dropdown"
+                      <select id="stdin-source"
                               v-model="d_ag_test_command.stdin_source"
                               class="select">
 
@@ -80,7 +80,7 @@
                                      placeholder="Enter the stdin input here."
                                      :num_rows="5"
                                      v-model="d_ag_test_command.stdin_text"
-                                     :validators="[is_not_empty]">
+                                     :validators="[]">
                     </validated-input>
                   </div>
 
@@ -88,16 +88,28 @@
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
 
-                    <div class="dropdown">
-                      <select id="file_stdin_source_dropdown"
-                              v-model="d_ag_test_command.stdin_instructor_file"
-                              class="select">
-                        <option v-for="file of project.instructor_files" :value="file">
-                          {{file.name}}
-                        </option>
-                      </select>
+                    <div>
+                      <dropdown id="stdin-instructor-file"
+                                :items="project.instructor_files"
+                                dropdown_height="250px"
+                                @update_item_selected="d_ag_test_command.stdin_instructor_file
+                                                       = $event">
+                        <template slot="header">
+                          <div tabindex="1" class="dropdown-header-wrapper">
+                            <div class="dropdown-header instructor-file-dropdown">
+                              {{d_ag_test_command.stdin_instructor_file === null ? ' '
+                                : d_ag_test_command.stdin_instructor_file.name}}
+                              <i class="fas fa-caret-down dropdown-caret"></i>
+                            </div>
+                          </div>
+                        </template>
+                        <div slot-scope="{item}">
+                          <span>
+                            {{item.name}}
+                          </span>
+                        </div>
+                      </dropdown>
                     </div>
-
                   </div>
                 </fieldset>
               </div>
@@ -108,7 +120,7 @@
                   <div class="ag-test-command-input-container">
                     <label class="text-label"> Expected Return Code: </label>
                     <div class="dropdown">
-                      <select id="expected_return_code_dropdown"
+                      <select id="expected-return-code"
                               v-model="d_ag_test_command.expected_return_code"
                               class="select">
                         <option :value="ExpectedReturnCode.none">
@@ -177,7 +189,7 @@
                   <div class="ag-test-command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stdout against: </label>
                     <div class="dropdown">
-                      <select id="expected_stdout_source_dropdown"
+                      <select id="expected-stdout-source"
                               v-model="d_ag_test_command.expected_stdout_source"
                               class="select">
                         <option :value="ExpectedOutputSource.none">
@@ -201,7 +213,7 @@
                                      placeholder="Enter the expected stdout output here."
                                      v-model="d_ag_test_command.expected_stdout_text"
                                      :num_rows="5"
-                                     :validators="[is_not_empty]">
+                                     :validators="[]">
                     </validated-input>
                   </div>
 
@@ -209,14 +221,28 @@
                              === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
-                    <div class="dropdown">
-                      <select id="file_stdout_dropdown"
-                              v-model="d_ag_test_command.expected_stdout_instructor_file"
-                              class="select">
-                        <option v-for="file of project.instructor_files" :value="file">
-                          {{file.name}}
-                        </option>
-                      </select>
+
+                    <div>
+                      <dropdown id="expected-stdout-instructor-file"
+                                :items="project.instructor_files"
+                                dropdown_height="250px"
+                                @update_item_selected="
+                                    d_ag_test_command.expected_stdout_instructor_file = $event">
+                        <template slot="header">
+                          <div tabindex="1" class="dropdown-header-wrapper">
+                            <div class="dropdown-header instructor-file-dropdown">
+                              {{d_ag_test_command.expected_stdout_instructor_file === null ? ' '
+                              : d_ag_test_command.expected_stdout_instructor_file.name}}
+                              <i class="fas fa-caret-down dropdown-caret"></i>
+                            </div>
+                          </div>
+                        </template>
+                        <div slot-scope="{item}">
+                          <span>
+                            {{item.name}}
+                          </span>
+                        </div>
+                      </dropdown>
                     </div>
                   </div>
 
@@ -275,7 +301,7 @@
                   <div class="ag-test-command-input-container file-dropdown-adjacent">
                     <label class="text-label"> Check stderr against: </label>
                     <div class="dropdown">
-                      <select id="expected_stderr_source_dropdown"
+                      <select id="expected-stderr-source"
                               v-model="d_ag_test_command.expected_stderr_source"
                               class="select">
                         <option :value="ExpectedOutputSource.none">
@@ -299,7 +325,7 @@
                                      placeholder="Enter the expected stderr output here."
                                      v-model="d_ag_test_command.expected_stderr_text"
                                      :num_rows="5"
-                                     :validators="[is_not_empty]">
+                                     :validators="[]">
                     </validated-input>
                   </div>
 
@@ -307,14 +333,28 @@
                              === ExpectedOutputSource.instructor_file"
                        class="file-dropdown-container">
                     <label class="text-label"> File name: </label>
-                    <div class="dropdown">
-                      <select id="file_stderr_dropdown"
-                              v-model="d_ag_test_command.expected_stderr_instructor_file"
-                              class="select">
-                        <option v-for="file of project.instructor_files" :value="file">
-                          {{file.name}}
-                        </option>
-                      </select>
+
+                    <div>
+                      <dropdown id="expected-stderr-instructor-file"
+                                :items="project.instructor_files"
+                                dropdown_height="250px"
+                                @update_item_selected="
+                                    d_ag_test_command.expected_stderr_instructor_file = $event">
+                        <template slot="header">
+                          <div tabindex="1" class="dropdown-header-wrapper">
+                            <div class="dropdown-header instructor-file-dropdown">
+                              {{d_ag_test_command.expected_stderr_instructor_file === null ? ' '
+                              : d_ag_test_command.expected_stderr_instructor_file.name}}
+                              <i class="fas fa-caret-down dropdown-caret"></i>
+                            </div>
+                          </div>
+                        </template>
+                        <div slot-scope="{item}">
+                          <span>
+                            {{item.name}}
+                          </span>
+                        </div>
+                      </dropdown>
                     </div>
                   </div>
 
@@ -606,6 +646,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -624,6 +665,7 @@ import {
 @Component({
   components: {
     APIErrors,
+    Dropdown,
     Modal,
     Tab,
     TabHeader,
@@ -723,6 +765,11 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
 
 .tab-body {
   padding: 15px;
+}
+
+.instructor-file-dropdown {
+  min-width: 400px;
+  width: 100%;
 }
 
 .delete-ag-test-command-button {

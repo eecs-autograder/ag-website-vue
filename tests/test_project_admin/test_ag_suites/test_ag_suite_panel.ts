@@ -16,6 +16,7 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
@@ -635,7 +636,34 @@ describe('AGSuitePanel tests', () => {
     });
 
     test('Opening and closing new test case modal preserves number of commands', async () => {
-        fail();
+        wrapper.setProps({active_suite: ag_suite});
+        await component.$nextTick();
+
+        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
+
+        let new_ag_test_case_modal = <Modal> wrapper.find(
+            {ref: 'new_ag_test_case_modal'}
+        ).vm;
+
+        wrapper.find('#ag-test-suite-menu').trigger('click');
+        await component.$nextTick();
+
+        // clicking closing_x to close the modal
+        wrapper.find('#close-button').trigger('click');
+        await component.$nextTick();
+
+        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
+        expect(new_ag_test_case_modal.is_open).toBe(false);
+
+        wrapper.find('#ag-test-suite-menu').trigger('click');
+        await component.$nextTick();
+
+        // clicking outside the modal to close the modal
+        wrapper.find('#modal-mask').trigger('click');
+        await component.$nextTick();
+
+        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
+        expect(new_ag_test_case_modal.is_open).toBe(false);
     });
 
     test('is_active_suite getter', async () => {

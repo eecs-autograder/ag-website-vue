@@ -20,9 +20,14 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
-import { checkbox_is_checked, get_validated_input_text, set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
+import {
+    checkbox_is_checked,
+    expect_html_element_has_value,
+    get_validated_input_text,
+    set_validated_input_text,
+    validated_input_is_valid
+} from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -237,6 +242,311 @@ describe('AGCommandSettings tests', () => {
         if (wrapper.exists()) {
             wrapper.destroy();
         }
+    });
+
+    test('stdin_source binding', async () => {
+        let stdin_source_input = wrapper.find('#stdin-source');
+
+        stdin_source_input.setValue(StdinSource.none);
+        expect(component.d_ag_test_command!.stdin_source).toEqual(
+            StdinSource.none
+        );
+
+        stdin_source_input.setValue(StdinSource.text);
+        expect(component.d_ag_test_command!.stdin_source).toEqual(
+            StdinSource.text
+        );
+
+        stdin_source_input.setValue(StdinSource.instructor_file);
+        expect(component.d_ag_test_command!.stdin_source).toEqual(
+            StdinSource.instructor_file
+        );
+
+        component.d_ag_test_command!.stdin_source = StdinSource.none;
+        expect_html_element_has_value(stdin_source_input,
+                                      StdinSource.none);
+
+        component.d_ag_test_command!.stdin_source = StdinSource.text;
+        expect_html_element_has_value(stdin_source_input,
+                                      StdinSource.text);
+
+        component.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
+        expect_html_element_has_value(stdin_source_input,
+                                      StdinSource.instructor_file);
+    });
+
+    test('stdin_instructor_file binding', async () => {
+        component.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
+        await component.$nextTick();
+
+        let stdin_instructor_file_input = wrapper.find('#stdin-instructor-file');
+        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        await component.$nextTick();
+
+        let highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_2.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_2);
+        expect(stdin_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_2.name);
+
+        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        await component.$nextTick();
+
+        highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_3.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_3);
+        expect(stdin_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_3.name);
+
+        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
+
+        highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_1.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_1);
+        expect(stdin_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_1.name);
+    });
+
+    test('expected_stdout_instructor_file binding', async () => {
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        await component.$nextTick();
+
+        let expected_stdout_instructor_file_input = wrapper.find(
+            '#expected-stdout-instructor-file'
+        );
+        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        await component.$nextTick();
+
+        let highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_2.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
+            instructor_file_2
+        );
+        expect(expected_stdout_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_2.name);
+
+        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        await component.$nextTick();
+
+        highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_3.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
+            instructor_file_3
+        );
+        expect(expected_stdout_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_3.name);
+
+        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
+
+        highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_1.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
+            instructor_file_1
+        );
+        expect(expected_stdout_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_1.name);
+    });
+
+    test('expected_stderr_instructor_file binding', async () => {
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        await component.$nextTick();
+
+        let expected_stderr_instructor_file_input = wrapper.find(
+            '#expected-stderr-instructor-file'
+        );
+        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        await component.$nextTick();
+
+        let highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_2.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
+            instructor_file_2
+        );
+        expect(expected_stderr_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_2.name);
+
+        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        await component.$nextTick();
+
+        highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_3.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
+            instructor_file_3
+        );
+        expect(expected_stderr_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_3.name);
+
+        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        await component.$nextTick();
+
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
+        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
+
+        highlighted_item = wrapper.find(".highlight");
+        expect(highlighted_item.text()).toContain(instructor_file_1.name);
+        highlighted_item.trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
+            instructor_file_1
+        );
+        expect(expected_stderr_instructor_file_input.find(
+            '.dropdown-header-wrapper'
+        ).text()).toEqual(instructor_file_1.name);
+    });
+
+    test('expected_return_code binding', async () => {
+        let expected_return_code_input = wrapper.find('#expected-return-code');
+
+        expected_return_code_input.setValue(ExpectedReturnCode.none);
+        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+            ExpectedReturnCode.none
+        );
+
+        expected_return_code_input.setValue(ExpectedReturnCode.zero);
+        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+            ExpectedReturnCode.zero
+        );
+
+        expected_return_code_input.setValue(ExpectedReturnCode.nonzero);
+        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+            ExpectedReturnCode.nonzero
+        );
+
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.none;
+        expect_html_element_has_value(expected_return_code_input,
+                                      ExpectedReturnCode.none);
+
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        expect_html_element_has_value(expected_return_code_input,
+                                      ExpectedReturnCode.zero);
+
+        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.nonzero;
+        expect_html_element_has_value(expected_return_code_input,
+                                      ExpectedReturnCode.nonzero);
+    });
+
+    test('expected_stdout_source binding', async () => {
+        let expected_stdout_source_input = wrapper.find('#expected-stdout-source');
+
+        expected_stdout_source_input.setValue(ExpectedOutputSource.none);
+        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+            ExpectedOutputSource.none
+        );
+
+        expected_stdout_source_input.setValue(ExpectedOutputSource.text);
+        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+            ExpectedOutputSource.text
+        );
+
+        expected_stdout_source_input.setValue(ExpectedOutputSource.instructor_file);
+        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+            ExpectedOutputSource.instructor_file
+        );
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        expect_html_element_has_value(expected_stdout_source_input,
+                                      ExpectedOutputSource.none);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        expect_html_element_has_value(expected_stdout_source_input,
+                                      ExpectedOutputSource.text);
+
+        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        expect_html_element_has_value(expected_stdout_source_input,
+                                      ExpectedOutputSource.instructor_file);
+    });
+
+    test('expected_stderr_source binding', async () => {
+        let expected_stderr_source_input = wrapper.find('#expected-stderr-source');
+
+        expected_stderr_source_input.setValue(ExpectedOutputSource.none);
+        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+            ExpectedOutputSource.none
+        );
+
+        expected_stderr_source_input.setValue(ExpectedOutputSource.text);
+        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+            ExpectedOutputSource.text
+        );
+
+        expected_stderr_source_input.setValue(ExpectedOutputSource.instructor_file);
+        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+            ExpectedOutputSource.instructor_file
+        );
+
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+        expect_html_element_has_value(expected_stderr_source_input,
+                                      ExpectedOutputSource.none);
+
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        expect_html_element_has_value(expected_stderr_source_input,
+                                      ExpectedOutputSource.text);
+
+        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        expect_html_element_has_value(expected_stderr_source_input,
+                                      ExpectedOutputSource.instructor_file);
     });
 
     test('error - command name is blank (case has more than one command)', async () => {

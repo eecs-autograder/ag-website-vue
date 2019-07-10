@@ -46,21 +46,33 @@
                     <legend class="legend"> Grading Environment </legend>
                     <div class="sandbox-container">
                       <label class="text-label"> Sandbox environment </label>
-
                       <div class="dropdown">
-                        <select id="sandbox_environment"
-                                v-model="d_ag_test_suite.sandbox_docker_image"
-                                class="select">
-                          <option v-for="docker_image of d_docker_images"
-                                  :value="docker_image">
-                            {{docker_image.display_name}}
-                          </option>
-                        </select>
+                        <dropdown id="sandbox-docker-image"
+                                  :items="d_docker_images"
+                                  dropdown_height="250px"
+                                  @update_item_selected="
+                                    d_ag_test_suite.sandbox_docker_image = $event">
+                          <template slot="header">
+                            <div tabindex="1" class="dropdown-header-wrapper">
+                              <div class="dropdown-header sandbox-docker-image-dropdown">
+                                {{d_ag_test_suite.sandbox_docker_image === null ? ' '
+                                : d_ag_test_suite.sandbox_docker_image.display_name}}
+                                <i class="fas fa-caret-down dropdown-caret"></i>
+                              </div>
+                            </div>
+                          </template>
+                          <div slot-scope="{item}">
+                          <span>
+                            {{item.display_name}}
+                          </span>
+                          </div>
+                        </dropdown>
                       </div>
                     </div>
 
                     <div class="toggle-container">
-                      <toggle v-model="d_ag_test_suite.allow_network_access">
+                      <toggle v-model="d_ag_test_suite.allow_network_access"
+                              ref="allow_network_access">
                         <div slot="on">
                           Allow network access
                         </div>
@@ -254,6 +266,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -269,6 +282,7 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
+    Dropdown,
     DropdownTypeahead,
     Modal,
     Tab,
@@ -388,6 +402,11 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 
 .tab-body {
   padding: 15px;
+}
+
+.sandbox-docker-image-dropdown {
+  min-width: 400px;
+  width: 100%;
 }
 
 #setup-command-container {
