@@ -7,7 +7,7 @@ import {
     Course,
     ExpectedStudentFile,
     Group,
-    InstructorFile,
+    InstructorFile, MutationTestSuite,
     Project,
     Semester,
     UltimateSubmissionPolicy
@@ -192,6 +192,9 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Mutation Testing tab', async () => {
+        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -404,6 +407,10 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current tab parameter value = mutation_testing', async () => {
+        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(
+            Promise.resolve([])
+        );
+
         $route.query = { current_tab: 'mutation_testing' };
         wrapper = mount(ProjectAdmin, {
             mocks: {

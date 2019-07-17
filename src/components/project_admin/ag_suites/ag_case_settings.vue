@@ -23,6 +23,12 @@
           </div>
       </validated-form>
     </div>
+
+    <div v-if="d_ag_test_case.ag_test_commands.length > 1"
+         class="ag-case-feedback-panels">
+      <FeedbackConfigAGCase :ag_test_case="d_ag_test_case"></FeedbackConfigAGCase>
+    </div>
+
   </div>
 </template>
 
@@ -33,6 +39,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import FeedbackConfigAGCase from '@/components/feedback_config/feedback_config/feedback_config_ag_case.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -41,6 +48,7 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
+    FeedbackConfigAGCase,
     ValidatedForm,
     ValidatedInput
   }
@@ -98,6 +106,10 @@ $current-lang-choice: "Poppins";
 
 #save-button {
   @extend .green-button;
+}
+
+.ag-case-feedback-panels {
+  padding-top: 10px;
 }
 
 </style>

@@ -17,6 +17,7 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 
+import { create_ag_suite } from '@/tests/data_utils';
 import {
     checkbox_is_checked,
     get_validated_input_text,
@@ -112,30 +113,9 @@ describe('AGSuiteSettings tests', () => {
             last_modified: "now"
         });
 
-        ag_suite = new AGTestSuite({
-            pk: 1,
-            name: "Suite 1",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-                pk: 1,
-                name: "Sandy",
-                tag: "",
-                display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_feedback_config,
-            past_limit_submission_fdbk_config: default_feedback_config,
-            staff_viewer_fdbk_config: default_feedback_config,
-            ultimate_submission_fdbk_config: default_feedback_config,
-            ag_test_cases: [],
-            instructor_files_needed: [instructor_file_1, instructor_file_2],
-            student_files_needed: [student_file_1, student_file_2]
-        });
+        ag_suite = create_ag_suite(1, "Suite 1", 10);
+        ag_suite.instructor_files_needed = [instructor_file_1, instructor_file_2];
+        ag_suite.student_files_needed = [student_file_1, student_file_2];
 
         project = new Project({
             pk: 10,
@@ -589,30 +569,9 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Parent component changes the value of the test_suite prop', async () => {
-        let another_ag_suite = new AGTestSuite({
-            pk: 2,
-            name: "Suite 2",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-                pk: 1,
-                name: "Patrick",
-                tag: "",
-                display_name: "Star"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_feedback_config,
-            past_limit_submission_fdbk_config: default_feedback_config,
-            staff_viewer_fdbk_config: default_feedback_config,
-            ultimate_submission_fdbk_config: default_feedback_config,
-            ag_test_cases: [],
-            instructor_files_needed: [instructor_file_2, instructor_file_1],
-            student_files_needed: [student_file_2, student_file_1]
-        });
+        let another_ag_suite = create_ag_suite(2, "Suite 2", 1);
+        another_ag_suite.instructor_files_needed = [instructor_file_2, instructor_file_1];
+        another_ag_suite.student_files_needed = [student_file_2, student_file_1];
 
         expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
         expect(component.d_current_tab_index).toEqual(0);

@@ -200,7 +200,8 @@
           </tab-header>
           <template slot="body">
             <div class="tab-body">
-
+              <FeedbackConfigAGSuite :ag_test_suite="d_ag_test_suite">
+              </FeedbackConfigAGSuite>
             </div>
           </template>
         </tab>
@@ -266,6 +267,7 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import FeedbackConfigAGSuite from '@/components/feedback_config/feedback_config/feedback_config_ag_suite.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -282,6 +284,7 @@ import { is_not_empty } from '@/validators';
     APIErrors,
     Dropdown,
     DropdownTypeahead,
+    FeedbackConfigAGSuite,
     Modal,
     Tab,
     TabHeader,

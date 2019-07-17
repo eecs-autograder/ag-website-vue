@@ -1,0 +1,133 @@
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
+
+// Config Panel ------------------------------------------------------------
+
+#config-panel {
+    margin-bottom: 10px;
+    box-shadow: 0 1px 1px $white-gray;
+    border-radius: 3px;
+    min-width: 600px;
+}
+
+#ag-case-config-panel {
+    @extend #config-panel;
+    width: 100%;
+}
+
+#header {
+    background-color: hsl(220, 30%, 94%);
+    border: 2px solid hsl(220, 30%, 92%);
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 33px;
+    padding: 4px 4px 5px 10px;
+}
+
+#config-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#preset-label {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+#footer {
+    border: 2px solid hsl(210, 20%, 92%);
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background-color: white;
+    padding: 5px;
+}
+
+// Feedback Config ---------------------------------------------------------
+
+.config-panels-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.save-feedback-config-settings {
+    @extend .green-button;
+    margin: 0 0 20px 0;
+}
+
+// Edit Settings ------------------------------------------------------------
+
+.edit-feedback {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.feedback-checkbox-input-container {
+    padding: 5px 0;
+}
+
+#edit-feedback-toggle-zone {
+    background-color: white;
+}
+
+.select-row {
+    padding: 5px 5px 8px 5px;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.setting-title {
+    padding-right: 10px;
+    font-size: 14px;
+}
+
+.advanced-settings-label {
+    font-size: 16px;
+    color: $navy-blue;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: center;
+    padding: 10px 10px 10px 8px;
+}
+
+.advanced-settings-label span {
+    padding-right: 20px;
+    font-weight: bold;
+}
+
+.caret-right, .caret-down {
+    font-size: 15px;
+    width: 22px;
+    color: $navy-blue;
+}
+
+.advanced-settings-divider {
+    border-top: 1px solid $pebble-dark;
+    flex: 1;
+}
+
+.select-row div {
+    padding-top: 3px;
+}
+
+.select-row label {
+    font-weight: normal;
+    font-size: 16px;
+}

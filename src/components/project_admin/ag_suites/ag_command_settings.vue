@@ -566,7 +566,9 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-
+            <FeedbackConfigAGCommand :ag_test_command="d_ag_test_command"
+                                     :ag_test_case="d_ag_test_case">
+            </FeedbackConfigAGCommand>
           </div>
         </template>
       </tab>
@@ -647,6 +649,7 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
+import FeedbackConfigAGCommand from '@/components/feedback_config/feedback_config/feedback_config_ag_command.vue';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -666,6 +669,7 @@ import {
   components: {
     APIErrors,
     Dropdown,
+    FeedbackConfigAGCommand,
     Modal,
     Tab,
     TabHeader,
