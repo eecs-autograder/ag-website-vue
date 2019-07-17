@@ -2,7 +2,7 @@
   <div class="feedback-config-container">
     <div class="inner">
       <div class="config-panels-container">
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.normal)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.normal)"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_ag_test_suite.normal_fdbk_config"
                       @apply_preset="apply_preset(
@@ -23,7 +23,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.ultimate_submission)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.ultimate_submission)"
                       :config_name="FeedbackConfigLabel.ultimate_submission"
                       v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
                       @apply_preset="apply_preset(
@@ -44,7 +44,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.past_limit)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.past_limit)"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
                       @apply_preset="apply_preset(
@@ -66,7 +66,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.staff_viewer)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.staff_viewer)"
                       :config_name="FeedbackConfigLabel.staff_viewer"
                       v-model="d_ag_test_suite.staff_viewer_fdbk_config"
                       @apply_preset="apply_preset(
@@ -109,17 +109,14 @@ import { AGTestSuite, AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
-import { FeedbackConfigLabel, hyphenated_config_name } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
+import {
+  AGTestSuiteFeedbackPreset,
+  FeedbackConfigLabel,
+  transform_to_snake_case
+} from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import { SafeMap } from "@/safe_map";
 import { handle_api_errors_async, safe_assign } from '@/utils';
 
-interface AGTestSuiteFeedbackPreset {
-  show_individual_tests: boolean;
-  show_setup_return_code: boolean;
-  show_setup_timed_out: boolean;
-  show_setup_stdout: boolean;
-  show_setup_stderr: boolean;
-}
 @Component({
   components: {
     APIErrors,
@@ -132,10 +129,11 @@ export default class FeedbackConfigAGSuite extends Vue {
   ag_test_suite!: AGTestSuite;
 
   FeedbackConfigLabel = FeedbackConfigLabel;
-  hyphenated_config_name = hyphenated_config_name;
+  transform_to_snake_case = transform_to_snake_case;
 
   d_ag_test_suite: AGTestSuite | null = null;
   d_saving = false;
+
   default_config: AGTestSuiteFeedbackConfig = {
     visible: false,
     show_individual_tests: true,
@@ -144,6 +142,7 @@ export default class FeedbackConfigAGSuite extends Vue {
     show_setup_stdout: true,
     show_setup_stderr: true
   };
+
   fdbk_presets = new SafeMap<string, AGTestSuiteFeedbackPreset>([
     [
       'Public Setup',

@@ -2,24 +2,40 @@
   <div class="feedback-config-container">
     <div class="config-panels-container">
 
-      <AGCaseConfigPanel :ref="hyphenated_config_name(FeedbackConfigLabel.normal)"
+      <AGCaseConfigPanel :ref="transform_to_snake_case(FeedbackConfigLabel.normal)"
                          :config_name="FeedbackConfigLabel.normal"
+                         @input="update_config_settings(
+                           $event,
+                           d_ag_test_case.normal_fdbk_config
+                         )"
                          v-model="d_ag_test_case.normal_fdbk_config">
       </AGCaseConfigPanel>
 
-      <AGCaseConfigPanel :ref="hyphenated_config_name(FeedbackConfigLabel.ultimate_submission)"
+      <AGCaseConfigPanel :ref="transform_to_snake_case(FeedbackConfigLabel.ultimate_submission)"
                          :config_name="FeedbackConfigLabel.ultimate_submission"
+                         @input="update_config_settings(
+                           $event,
+                           d_ag_test_case.ultimate_submission_fdbk_config
+                         )"
                          v-model="d_ag_test_case.ultimate_submission_fdbk_config">
       </AGCaseConfigPanel>
 
 
-      <AGCaseConfigPanel :ref="hyphenated_config_name(FeedbackConfigLabel.past_limit)"
+      <AGCaseConfigPanel :ref="transform_to_snake_case(FeedbackConfigLabel.past_limit)"
                          :config_name="FeedbackConfigLabel.past_limit"
+                         @input="update_config_settings(
+                           $event,
+                           d_ag_test_case.past_limit_submission_fdbk_config
+                         )"
                          v-model="d_ag_test_case.past_limit_submission_fdbk_config">
       </AGCaseConfigPanel>
 
-      <AGCaseConfigPanel :ref="hyphenated_config_name(FeedbackConfigLabel.staff_viewer)"
+      <AGCaseConfigPanel :ref="transform_to_snake_case(FeedbackConfigLabel.staff_viewer)"
                          :config_name="FeedbackConfigLabel.staff_viewer"
+                         @input="update_config_settings(
+                           $event,
+                           d_ag_test_case.staff_viewer_fdbk_config
+                         )"
                          v-model="d_ag_test_case.staff_viewer_fdbk_config">
       </AGCaseConfigPanel>
 
@@ -45,7 +61,7 @@ import { AGTestCase, AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case_config_panel.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
-import { FeedbackConfigLabel, hyphenated_config_name } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
+import { FeedbackConfigLabel, transform_to_snake_case } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import { handle_api_errors_async, safe_assign } from "@/utils";
 
 @Component({
@@ -62,14 +78,14 @@ export default class FeedbackConfigAGCase extends Vue {
   d_ag_test_case: AGTestCase | null = null;
   d_saving = false;
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
-  hyphenated_config_name = hyphenated_config_name;
+  transform_to_snake_case = transform_to_snake_case;
 
   created() {
     this.d_ag_test_case = this.ag_test_case;
   }
 
-  update_config(config: AGTestCaseFeedbackConfig,
-                config_to_apply_changes_to: AGTestCaseFeedbackConfig) {
+  update_config_settings(config: AGTestCaseFeedbackConfig,
+                         config_to_apply_changes_to: AGTestCaseFeedbackConfig) {
     safe_assign(config_to_apply_changes_to, config);
   }
 

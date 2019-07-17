@@ -10,7 +10,7 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import FeedbackConfigMutationSuite from '@/components/feedback_config/feedback_config/feedback_config_mutation_suite.vue';
-import { FeedbackConfigLabel, hyphenated_config_name } from '@/components/feedback_config/feedback_config/feedback_config_utils';
+import { FeedbackConfigLabel, transform_to_snake_case } from '@/components/feedback_config/feedback_config/feedback_config_utils';
 
 import { create_mutation_suite, create_mutation_suite_feedback_config } from '@/tests/data_utils';
 
@@ -228,12 +228,12 @@ describe('FeedbackConfigMutationSuite tests', () => {
 
     test("apply_preset called from config_panel", async () => {
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.staff_viewer_fdbk_config,
+            component.d_mutation_test_suite!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Custom");
 
         let past_limit_config_panel = wrapper.find(
-            {ref: hyphenated_config_name(FeedbackConfigLabel.past_limit)}
+            {ref: transform_to_snake_case(FeedbackConfigLabel.past_limit)}
         );
 
         past_limit_config_panel.find('#config-preset-select').setValue(
@@ -242,31 +242,31 @@ describe('FeedbackConfigMutationSuite tests', () => {
         await component.$nextTick();
 
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.past_limit_submission_fdbk_config,
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
             component.fdbk_presets
         )).toEqual("False Positives");
     });
 
-    test.only("update_config_settings", async () => {
+    test("update_config_settings", async () => {
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.normal_fdbk_config,
+            component.d_mutation_test_suite!.normal_fdbk_config,
             component.fdbk_presets
         )).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.ultimate_submission_fdbk_config,
+            component.d_mutation_test_suite!.ultimate_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.past_limit_submission_fdbk_config,
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.staff_viewer_fdbk_config,
+            component.d_mutation_test_suite!.staff_viewer_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
 
         let ultimate_submission_config_panel = wrapper.find(
-            {ref: hyphenated_config_name(FeedbackConfigLabel.ultimate_submission)}
+            {ref: transform_to_snake_case(FeedbackConfigLabel.ultimate_submission)}
         );
 
         ultimate_submission_config_panel.find('.advanced-settings-label').trigger(
@@ -279,19 +279,19 @@ describe('FeedbackConfigMutationSuite tests', () => {
         );
 
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.normal_fdbk_config,
+            component.d_mutation_test_suite!.normal_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.ultimate_submission_fdbk_config,
+            component.d_mutation_test_suite!.ultimate_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Private");
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.past_limit_submission_fdbk_config,
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_mutation_test_suite.staff_viewer_fdbk_config,
+            component.d_mutation_test_suite!.staff_viewer_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
     });
@@ -299,10 +299,14 @@ describe('FeedbackConfigMutationSuite tests', () => {
     test("update_config_settings - checkboxes in config panels do not react to changes in " +
          "other panels",
          async () => {
-        expect(component.d_mutation_test_suite.normal_fdbk_config.show_validity_check_stderr).toBe(false);
-        expect(component.d_mutation_test_suite.past_limit_submission_fdbk_config.show_validity_check_stderr).toBe(false);
-        expect(component.d_mutation_test_suite.ultimate_submission_fdbk_config.show_validity_check_stderr).toBe(false);
-        expect(component.d_mutation_test_suite.staff_viewer_fdbk_config.show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.normal_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.past_limit_submission_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.ultimate_submission_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.staff_viewer_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
 
         wrapper.findAll('.advanced-settings-label').at(0).trigger('click');
         await component.$nextTick();
@@ -318,10 +322,14 @@ describe('FeedbackConfigMutationSuite tests', () => {
 
         wrapper.find('#student-lookup-show-validity-check-stderr').setChecked(true);
 
-        expect(component.d_mutation_test_suite.normal_fdbk_config.show_validity_check_stderr).toBe(false);
-        expect(component.d_mutation_test_suite.past_limit_submission_fdbk_config.show_validity_check_stderr).toBe(false);
-        expect(component.d_mutation_test_suite.ultimate_submission_fdbk_config.show_validity_check_stderr).toBe(false);
-        expect(component.d_mutation_test_suite.staff_viewer_fdbk_config.show_validity_check_stderr).toBe(true);
+        expect(component.d_mutation_test_suite!.normal_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.past_limit_submission_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.ultimate_submission_fdbk_config
+                   .show_validity_check_stderr).toBe(false);
+        expect(component.d_mutation_test_suite!.staff_viewer_fdbk_config
+                   .show_validity_check_stderr).toBe(true);
     });
 
     test("save d_mutation_test_suite settings - successful", async () => {

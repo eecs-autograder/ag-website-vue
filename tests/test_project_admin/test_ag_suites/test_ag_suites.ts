@@ -754,7 +754,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
          'case is the last case in the suite, next suite doesnt have any cases',
          async () => {
-        let new_suite = create_ag_suite(4, "New Suite");
+        let new_suite = create_ag_suite(4, "New Suite", 10);
 
         AGTestSuite.notify_ag_test_suite_created(new_suite);
         await component.$nextTick();

@@ -11,13 +11,6 @@ import FeedbackConfigAGCase from '@/components/feedback_config/feedback_config/f
 
 import { create_ag_case } from '@/tests/data_utils';
 
-export enum FeedbackConfigLabel {
-    normal = "Normal",
-    ultimate_submission = "Ultimate Submission",
-    past_limit = "Past Limit",
-    staff_viewer = "Student Lookup"
-}
-
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -45,7 +38,39 @@ describe('FeedbackConfigAGCase tests', () => {
         }
     });
 
+    test('update_config_settings - checkbox ids are unique to a config panel', async () => {
+        expect(component.d_ag_test_case!.normal_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.ultimate_submission_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config.visible).toBe(false);
 
+        wrapper.find('#normal-visible').setChecked(true);
+
+        expect(component.d_ag_test_case!.normal_fdbk_config.visible).toBe(true);
+        expect(component.d_ag_test_case!.ultimate_submission_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config.visible).toBe(false);
+
+        expect(component.d_ag_test_case!.normal_fdbk_config
+                   .show_individual_commands).toBe(false);
+        expect(component.d_ag_test_case!.ultimate_submission_fdbk_config
+                   .show_individual_commands).toBe(false);
+        expect(component.d_ag_test_case!.past_limit_submission_fdbk_config
+                   .show_individual_commands).toBe(false);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config
+                   .show_individual_commands).toBe(false);
+
+        wrapper.find('#normal-show-individual-commands').setChecked(true);
+
+        expect(component.d_ag_test_case!.normal_fdbk_config
+                   .show_individual_commands).toBe(true);
+        expect(component.d_ag_test_case!.ultimate_submission_fdbk_config
+                   .show_individual_commands).toBe(false);
+        expect(component.d_ag_test_case!.past_limit_submission_fdbk_config
+                   .show_individual_commands).toBe(false);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config
+                   .show_individual_commands).toBe(false);
+    });
 
     test("save d_ag_test_case settings - successful", async () => {
         let save_stub = sinon.stub(component.d_ag_test_case!, 'save');

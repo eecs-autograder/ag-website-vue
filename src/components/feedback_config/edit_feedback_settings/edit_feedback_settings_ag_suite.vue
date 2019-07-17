@@ -4,12 +4,12 @@
 
       <div class="non-advanced">
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-visible`"
+          <input :id="`${hyphenate(config_name)}-visible`"
                  type="checkbox"
                  @change="$emit('input', d_ag_test_suite_settings)"
                  class="checkbox"
                  v-model="d_ag_test_suite_settings.visible">
-          <label :for="`${hyphenated_config_name(config_name)}-visible`"> Suite is Visible </label>
+          <label :for="`${hyphenate(config_name)}-visible`"> Suite is Visible </label>
         </div>
       </div>
 
@@ -23,52 +23,52 @@
       <div v-if="is_open"
            class="advanced-settings">
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-individual-tests`"
+          <input :id="`${hyphenate(config_name)}-show-individual-tests`"
                  type="checkbox"
                  @change="$emit('input', d_ag_test_suite_settings)"
                  class="checkbox"
                  v-model="d_ag_test_suite_settings.show_individual_tests">
-          <label :for="`${hyphenated_config_name(config_name)}-show-individual-tests`"> Show Individual Tests
+          <label :for="`${hyphenate(config_name)}-show-individual-tests`"> Show Individual Tests
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-return-code`"
+          <input :id="`${hyphenate(config_name)}-show-setup-return-code`"
                  type="checkbox"
                  @change="$emit('input', d_ag_test_suite_settings)"
                  class="checkbox"
                  v-model="d_ag_test_suite_settings.show_setup_return_code">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-return-code`"> Show Setup Return Code
+          <label :for="`${hyphenate(config_name)}-show-setup-return-code`"> Show Setup Return Code
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-timed-out`"
+          <input :id="`${hyphenate(config_name)}-show-setup-timed-out`"
                  type="checkbox"
                  @change="$emit('input', d_ag_test_suite_settings)"
                  class="checkbox"
                  v-model="d_ag_test_suite_settings.show_setup_timed_out">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-timed-out`"> Show Setup Timed Out
+          <label :for="`${hyphenate(config_name)}-show-setup-timed-out`"> Show Setup Timed Out
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-stdout`"
+          <input :id="`${hyphenate(config_name)}-show-setup-stdout`"
                  type="checkbox"
                  @change="$emit('input', d_ag_test_suite_settings)"
                  class="checkbox"
                  v-model="d_ag_test_suite_settings.show_setup_stdout">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-stdout`"> Show Setup Stdout
+          <label :for="`${hyphenate(config_name)}-show-setup-stdout`"> Show Setup Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-stderr`"
+          <input :id="`${hyphenate(config_name)}-show-setup-stderr`"
                  type="checkbox"
                  @change="$emit('input', d_ag_test_suite_settings)"
                  class="checkbox"
                  v-model="d_ag_test_suite_settings.show_setup_stderr">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-stderr`"> Show Setup Stderr
+          <label :for="`${hyphenate(config_name)}-show-setup-stderr`"> Show Setup Stderr
           </label>
         </div>
       </div>
@@ -81,7 +81,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript/dist/src/ag_test_suite';
 
-import { hyphenated_config_name } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
+import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
 import Toggle from '@/components/toggle.vue';
 
 @Component({
@@ -96,7 +96,7 @@ export default class EditFeedbackSettingsAGSuite extends Vue {
   @Prop({required: true, type: Object})
   value!: AGTestSuiteFeedbackConfig | null;
 
-  hyphenated_config_name = hyphenated_config_name;
+  hyphenate = hyphenate;
 
   d_ag_test_suite_settings: AGTestSuiteFeedbackConfig | null = null;
 

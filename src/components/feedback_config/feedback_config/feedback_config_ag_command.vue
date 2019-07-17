@@ -3,7 +3,7 @@
     <div class="inner">
       <div class="config-panels-container">
 
-        <config-panel :ref="FeedbackConfigLabel.normal"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.normal)"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_ag_test_command.normal_fdbk_config"
                       @apply_preset="apply_preset($event,
@@ -23,7 +23,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="FeedbackConfigLabel.first_failure"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.first_failure)"
                       :config_name="FeedbackConfigLabel.first_failure"
                       v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
                       @apply_preset="apply_preset(
@@ -35,13 +35,15 @@
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <div class="checkbox-input-container">
-              <input id="first-failed-config-enabled"
+              <input :id="`${hyphenate(FeedbackConfigLabel.first_failure)}-config-enabled`"
                      type="checkbox"
                      @change="d_ag_test_command.first_failed_test_normal_fdbk_config
                               = first_failed_config_is_enabled ? default_config : null"
                      class="checkbox"
                      v-model="first_failed_config_is_enabled">
-              <label for="first-failed-config-enabled"> Enabled </label>
+              <label :for="`${hyphenate(FeedbackConfigLabel.first_failure)}-config-enabled`">
+                Enabled
+              </label>
             </div>
             <EditFeedbackSettingsAGCommand v-model="
                                            d_ag_test_command.first_failed_test_normal_fdbk_config"
@@ -54,7 +56,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="FeedbackConfigLabel.ultimate_submission"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.ultimate_submission)"
                       :config_name="FeedbackConfigLabel.ultimate_submission"
                       v-model="d_ag_test_command.ultimate_submission_fdbk_config"
                       @apply_preset="apply_preset(
@@ -77,7 +79,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="FeedbackConfigLabel.past_limit"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.past_limit)"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_ag_test_command.past_limit_submission_fdbk_config"
                       @apply_preset="apply_preset(
@@ -100,7 +102,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="FeedbackConfigLabel.staff_viewer"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.staff_viewer)"
                       :config_name="FeedbackConfigLabel.staff_viewer"
                       v-model="d_ag_test_command.staff_viewer_fdbk_config"
                       @apply_preset="apply_preset($event,
@@ -136,7 +138,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   AGTestCase, AGTestCaseFeedbackConfig,
@@ -148,20 +150,15 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
-import { FeedbackConfigLabel, hyphenated_config_name } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
+import {
+  AGTestCommandFeedbackPreset,
+  FeedbackConfigLabel,
+  hyphenate,
+  transform_to_snake_case
+} from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import { SafeMap } from '@/safe_map';
-import { handle_api_errors_async, safe_assign } from '@/utils';
+import { deep_copy, handle_api_errors_async, safe_assign } from '@/utils';
 
-interface AGTestCommandFeedbackPreset {
-  return_code_fdbk_level: ValueFeedbackLevel;
-  stdout_fdbk_level: ValueFeedbackLevel;
-  stderr_fdbk_level: ValueFeedbackLevel;
-  show_points: boolean;
-  show_actual_return_code: boolean;
-  show_actual_stdout: boolean;
-  show_actual_stderr: boolean;
-  show_whether_timed_out: boolean;
-}
 @Component({
   components: {
     APIErrors,
@@ -178,11 +175,12 @@ export default class FeedbackConfigAGCommand extends Vue {
 
   safe_assign = safe_assign;
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
-  hyphenated_config_name = hyphenated_config_name;
-
+  hyphenate = hyphenate;
+  transform_to_snake_case = transform_to_snake_case;
 
   d_ag_test_case: AGTestCase | null = null;
   d_ag_test_command: AGTestCommand | null = null;
+  d_saving = false;
   default_config: AGTestCommandFeedbackConfig = {
     visible: true,
     return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
@@ -194,7 +192,6 @@ export default class FeedbackConfigAGCommand extends Vue {
     show_actual_stderr: true,
     show_whether_timed_out: true
   };
-  d_saving = false;
   fdbk_presets = new SafeMap<string, AGTestCommandFeedbackPreset>([
     [
       'Public',
@@ -277,32 +274,32 @@ export default class FeedbackConfigAGCommand extends Vue {
   ]);
   first_failed_config_is_enabled = false;
 
+  @Watch('ag_test_case', {deep: true})
+  on_ag_test_case_change(new_value: AGTestCase, old_value: AGTestCase) {
+    this.d_ag_test_case = deep_copy(new_value, AGTestCase);
+  }
+
+  @Watch('ag_test_command')
+  on_ag_test_command_change(new_value: AGTestCommand, old_value: AGTestCommand) {
+    this.d_ag_test_command = deep_copy(new_value, AGTestCommand);
+  }
+
+  created() {
+    this.d_ag_test_case = deep_copy(this.ag_test_case, AGTestCase);
+    this.d_ag_test_command = deep_copy(this.ag_test_command, AGTestCommand);
+    this.first_failed_config_is_enabled =
+      this.d_ag_test_command!.first_failed_test_normal_fdbk_config !== null;
+  }
+
   update_config_settings(command_config_to_apply_changes_to: AGTestCommandFeedbackConfig,
                          case_config_to_apply_changes_to: AGTestCaseFeedbackConfig | null,
                          config: AGTestCommandFeedbackConfig) {
     safe_assign(command_config_to_apply_changes_to, config);
     if (this.d_ag_test_case!.ag_test_commands.length === 1
         && case_config_to_apply_changes_to !== null) {
+      // console.log("Case only has one command");
       case_config_to_apply_changes_to.show_individual_commands =
         command_config_to_apply_changes_to.visible;
-    }
-  }
-
-  created() {
-    this.d_ag_test_case = this.ag_test_case;
-    this.d_ag_test_command = this.ag_test_command;
-    this.first_failed_config_is_enabled =
-      this.d_ag_test_command!.first_failed_test_normal_fdbk_config !== null;
-  }
-
-  @handle_api_errors_async(handle_save_ag_command_feedback_config_settings)
-  async save_feedback_config_settings() {
-    try {
-      this.d_saving = true;
-      await this.d_ag_test_command!.save();
-    }
-    finally {
-      this.d_saving = false;
     }
   }
 
@@ -340,6 +337,17 @@ export default class FeedbackConfigAGCommand extends Vue {
       }
     }
     return "Custom";
+  }
+
+  @handle_api_errors_async(handle_save_ag_command_feedback_config_settings)
+  async save_feedback_config_settings() {
+    try {
+      this.d_saving = true;
+      await this.d_ag_test_command!.save();
+    }
+    finally {
+      this.d_saving = false;
+    }
   }
 }
 

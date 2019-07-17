@@ -3,7 +3,7 @@
     <div class="inner">
       <div class="config-panels-container">
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.normal)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.normal)"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_mutation_test_suite.normal_fdbk_config"
                       @apply_preset="apply_preset($event,
@@ -21,7 +21,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.ultimate_submission)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.ultimate_submission)"
                       :config_name="FeedbackConfigLabel.ultimate_submission"
                       v-model="d_mutation_test_suite.ultimate_submission_fdbk_config"
                       @apply_preset="apply_preset(
@@ -45,7 +45,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.past_limit)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.past_limit)"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_mutation_test_suite.past_limit_submission_fdbk_config"
                       @apply_preset="apply_preset(
@@ -68,7 +68,7 @@
           </template>
         </config-panel>
 
-        <config-panel :ref="hyphenated_config_name(FeedbackConfigLabel.staff_viewer)"
+        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.staff_viewer)"
                       :config_name="FeedbackConfigLabel.staff_viewer"
                       v-model="d_mutation_test_suite.staff_viewer_fdbk_config"
                       @apply_preset="apply_preset($event,
@@ -112,25 +112,13 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import EditFeedbackSettingsMutationSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_mutation_suite.vue';
-import { FeedbackConfigLabel, hyphenated_config_name } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
+import {
+  FeedbackConfigLabel,
+  MutationTestSuiteFeedbackPreset,
+  transform_to_snake_case
+} from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import { SafeMap } from '@/safe_map';
 import { handle_api_errors_async, safe_assign } from '@/utils';
-
-export interface MutationTestSuiteFeedbackPreset {
-  show_setup_return_code: boolean;
-  show_setup_stdout: boolean;
-  show_setup_stderr: boolean;
-  show_invalid_test_names: boolean;
-  show_points: boolean;
-  bugs_exposed_fdbk_level: BugsExposedFeedbackLevel;
-  show_get_test_names_return_code: boolean;
-  show_get_test_names_stdout: boolean;
-  show_get_test_names_stderr: boolean;
-  show_validity_check_stdout: boolean;
-  show_validity_check_stderr: boolean;
-  show_grade_buggy_impls_stdout: boolean;
-  show_grade_buggy_impls_stderr: boolean;
-}
 
 @Component({
   components: {
@@ -144,8 +132,7 @@ export default class FeedbackConfigMutationSuite extends Vue {
   mutation_test_suite!: MutationTestSuite;
 
   FeedbackConfigLabel = FeedbackConfigLabel;
-
-  hyphenated_config_name = hyphenated_config_name;
+  transform_to_snake_case = transform_to_snake_case;
 
   d_mutation_test_suite: MutationTestSuite | null = null;
   d_saving = false;

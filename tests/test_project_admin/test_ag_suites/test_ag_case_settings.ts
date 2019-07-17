@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -11,6 +11,7 @@ import APIErrors from '@/components/api_errors.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { create_ag_case, create_ag_command } from '@/tests/data_utils';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -108,6 +109,31 @@ describe('AG test case settings form tests', () => {
         expect(save_case_stub.calledOnce).toBe(true);
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+    });
+
+    test('FeedbackCongfigAGCase component only available when ag_test_case has more than ' +
+         'one command',
+         async () => {
+        let case_2 = create_ag_case(2, "Case 2", 1);
+        case_2.ag_test_commands = [
+            create_ag_command(40, "Command 40", 2),
+            create_ag_command(50, "Command 50", 2)
+        ];
+
+        wrapper.setProps({ag_test_case: case_2});
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.ag-case-feedback-panels').length).toEqual(1);
+
+        let case_3 = create_ag_case(2, "Case 3", 1);
+        case_3.ag_test_commands = [
+            create_ag_command(60, "Command 60", 3),
+        ];
+
+        wrapper.setProps({ag_test_case: case_3});
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.ag-case-feedback-panels').length).toEqual(0);
     });
 
     test('ag_test_case Watcher', async () => {

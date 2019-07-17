@@ -4,12 +4,12 @@
          v-if="d_mutation_test_suite_settings !== null">
 
       <div class="checkbox-input-container">
-        <input :id="`${hyphenated_config_name(config_name)}-visible`"
+        <input :id="`${hyphenate(config_name)}-visible`"
                type="checkbox"
                class="checkbox"
                @change="$emit('input', d_mutation_test_suite_settings)"
                v-model="d_mutation_test_suite_settings.visible">
-        <label :for="`${hyphenated_config_name(config_name)}-visible`"> Suite is Visible </label>
+        <label :for="`${hyphenate(config_name)}-visible`"> Suite is Visible </label>
       </div>
 
       <div class="advanced-settings-label" @click="toggle_is_open">
@@ -24,7 +24,7 @@
         <div class="select-row">
           <label class="setting-title"> Return Code Correctness </label>
           <div>
-            <select :id="`${hyphenated_config_name(config_name)}-bugs-exposed-fdbk-level`"
+            <select :id="`${hyphenate(config_name)}-bugs-exposed-fdbk-level`"
                     @change="$emit('input', d_mutation_test_suite_settings)"
                     v-model="d_mutation_test_suite_settings.bugs_exposed_fdbk_level"
                     class="select">
@@ -42,128 +42,128 @@
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-invalid-test-names`"
+          <input :id="`${hyphenate(config_name)}-show-invalid-test-names`"
                  type="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  class="checkbox"
                  v-model="d_mutation_test_suite_settings.show_invalid_test_names">
-          <label :for="`${hyphenated_config_name(config_name)}-show-invalid-test-names`">
+          <label :for="`${hyphenate(config_name)}-show-invalid-test-names`">
             Show Individual Student Test Names
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-points`"
+          <input :id="`${hyphenate(config_name)}-show-points`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_points">
-          <label :for="`${hyphenated_config_name(config_name)}-show-points`"> Show Points </label>
+          <label :for="`${hyphenate(config_name)}-show-points`"> Show Points </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-return-code`"
+          <input :id="`${hyphenate(config_name)}-show-setup-return-code`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_setup_return_code">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-return-code`">
+          <label :for="`${hyphenate(config_name)}-show-setup-return-code`">
             Show Setup Return Code
           </label>
         </div>
 
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-stdout`"
+          <input :id="`${hyphenate(config_name)}-show-setup-stdout`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_setup_stdout">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-stdout`"> Show Setup Stdout </label>
+          <label :for="`${hyphenate(config_name)}-show-setup-stdout`"> Show Setup Stdout </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-setup-stderr`"
+          <input :id="`${hyphenate(config_name)}-show-setup-stderr`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_setup_stderr">
-          <label :for="`${hyphenated_config_name(config_name)}-show-setup-stderr`"> Show Setup Stderr </label>
+          <label :for="`${hyphenate(config_name)}-show-setup-stderr`"> Show Setup Stderr </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-get-test-names-return-code`"
+          <input :id="`${hyphenate(config_name)}-show-get-test-names-return-code`"
                  type="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  class="checkbox"
                  v-model="d_mutation_test_suite_settings.show_get_test_names_return_code">
-          <label :for="`${hyphenated_config_name(config_name)}-show-get-test-names-return-code`">
+          <label :for="`${hyphenate(config_name)}-show-get-test-names-return-code`">
             Show Get Test Names Return Code
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-get-test-names-stdout`"
+          <input :id="`${hyphenate(config_name)}-show-get-test-names-stdout`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_get_test_names_stdout">
-          <label :for="`${hyphenated_config_name(config_name)}-show-get-test-names-stdout`">
+          <label :for="`${hyphenate(config_name)}-show-get-test-names-stdout`">
             Show Get Test Names Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-get-test-names-stderr`"
+          <input :id="`${hyphenate(config_name)}-show-get-test-names-stderr`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_get_test_names_stderr">
-          <label :for="`${hyphenated_config_name(config_name)}-show-get-test-names-stderr`">
+          <label :for="`${hyphenate(config_name)}-show-get-test-names-stderr`">
             Show Get Test Names Stderr
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-validity-check-stdout`"
+          <input :id="`${hyphenate(config_name)}-show-validity-check-stdout`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_validity_check_stdout">
-          <label :for="`${hyphenated_config_name(config_name)}-show-validity-check-stdout`">
+          <label :for="`${hyphenate(config_name)}-show-validity-check-stdout`">
             Show Validity Check Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-validity-check-stderr`"
+          <input :id="`${hyphenate(config_name)}-show-validity-check-stderr`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_validity_check_stderr">
-          <label :for="`${hyphenated_config_name(config_name)}-show-validity-check-stderr`">
+          <label :for="`${hyphenate(config_name)}-show-validity-check-stderr`">
             Show Validity Check Stderr
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-grade-buggy-impls-stdout`"
+          <input :id="`${hyphenate(config_name)}-show-grade-buggy-impls-stdout`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_grade_buggy_impls_stdout">
-          <label :for="`${hyphenated_config_name(config_name)}-show-grade-buggy-impls-stdout`">
+          <label :for="`${hyphenate(config_name)}-show-grade-buggy-impls-stdout`">
             Show Buggy Impls Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenated_config_name(config_name)}-show-grade-buggy-impls-stderr`"
+          <input :id="`${hyphenate(config_name)}-show-grade-buggy-impls-stderr`"
                  type="checkbox"
                  class="checkbox"
                  @change="$emit('input', d_mutation_test_suite_settings)"
                  v-model="d_mutation_test_suite_settings.show_grade_buggy_impls_stderr">
-          <label :for="`${hyphenated_config_name(config_name)}-show-grade-buggy-impls-stderr`">
+          <label :for="`${hyphenate(config_name)}-show-grade-buggy-impls-stderr`">
             Show Buggy Impls Stderr
           </label>
         </div>
@@ -177,7 +177,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { BugsExposedFeedbackLevel, MutationTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
-import { hyphenated_config_name } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
+import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
 import Toggle from '@/components/toggle.vue';
 
 @Component({
@@ -192,7 +192,7 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
   @Prop({required: false, type: Object})
   value!: MutationTestSuiteFeedbackConfig | null;
 
-  hyphenated_config_name = hyphenated_config_name;
+  hyphenate = hyphenate;
   BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
   d_mutation_test_suite_settings: MutationTestSuiteFeedbackConfig | null = null;
   is_open = false;

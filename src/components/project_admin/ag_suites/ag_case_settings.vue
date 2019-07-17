@@ -26,7 +26,8 @@
 
     <div v-if="d_ag_test_case.ag_test_commands.length > 1"
          class="ag-case-feedback-panels">
-      <FeedbackConfigAGCase :ag_test_case="d_ag_test_case"></FeedbackConfigAGCase>
+      <FeedbackConfigAGCase ref="feedback_config_ag_case"
+                            :ag_test_case="d_ag_test_case"></FeedbackConfigAGCase>
     </div>
 
   </div>

@@ -31,35 +31,16 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   AGTestCommandFeedbackConfig,
-  AGTestSuiteFeedbackConfig, ValueFeedbackLevel
+  AGTestSuiteFeedbackConfig
 } from 'ag-client-typescript';
 
+import {
+  AGTestCommandFeedbackPreset,
+  AGTestSuiteFeedbackPreset,
+  MutationTestSuiteFeedbackPreset
+} from '@/components/feedback_config/feedback_config/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
 
-interface MutationTestSuiteFeedbackPreset {
-  show_individual_tests: boolean;
-  show_setup_return_code: boolean;
-  show_setup_timed_out: boolean;
-  show_setup_stdout: boolean;
-  show_setup_stderr: boolean;
-}
-interface AGTestSuiteFeedbackPreset {
-  show_individual_tests: boolean;
-  show_setup_return_code: boolean;
-  show_setup_timed_out: boolean;
-  show_setup_stdout: boolean;
-  show_setup_stderr: boolean;
-}
-interface AGTestCommandFeedbackPreset {
-  return_code_fdbk_level: ValueFeedbackLevel;
-  stdout_fdbk_level: ValueFeedbackLevel;
-  stderr_fdbk_level: ValueFeedbackLevel;
-  show_points: boolean;
-  show_actual_return_code: boolean;
-  show_actual_stdout: boolean;
-  show_actual_stderr: boolean;
-  show_whether_timed_out: boolean;
-}
 export type FeedbackPresetType = MutationTestSuiteFeedbackPreset
                                  | AGTestCommandFeedbackPreset
                                  | AGTestSuiteFeedbackPreset;
@@ -70,9 +51,6 @@ export type FeedbackConfigType = AGTestCommandFeedbackConfig
                                  | null;
 @Component
 export default class ConfigPanel extends Vue {
-  @Prop({required: false, type: Object})
-  value!: FeedbackConfigType | null;
-
   @Prop({required: true, type: String})
   config_name!: string;
 
@@ -83,12 +61,14 @@ export default class ConfigPanel extends Vue {
   @Prop({required: true, type: SafeMap})
   preset_options!: SafeMap<string, FeedbackPresetType>;
 
-  d_configuration: FeedbackConfigType | null = null;
+  @Prop({required: false, type: Object})
+  value!: FeedbackConfigType | null;
 
+  d_configuration: FeedbackConfigType | null = null;
   preset_names: string[] = [];
   preset_selected: string = "Custom";
 
-  @Watch('value', {deep: true})
+  @Watch('value')
   on_value_changed(new_value: FeedbackConfigType, old_value: FeedbackConfigType) {
     this.d_configuration = new_value === null ? null : JSON.parse(JSON.stringify(new_value));
     if (this.d_configuration !== null) {

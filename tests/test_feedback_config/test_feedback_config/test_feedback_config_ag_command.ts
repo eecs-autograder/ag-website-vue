@@ -11,16 +11,12 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import FeedbackConfigAGCommand from '@/components/feedback_config/feedback_config/feedback_config_ag_command.vue';
+import {
+    FeedbackConfigLabel,
+    transform_to_snake_case
+} from '@/components/feedback_config/feedback_config/feedback_config_utils';
 
 import { create_ag_case, create_ag_command } from '@/tests/data_utils';
-
-export enum FeedbackConfigLabel {
-    normal = "Normal",
-    first_failure = "First Failure",
-    ultimate_submission = "Ultimate Submission",
-    past_limit = "Past Limit",
-    staff_viewer = "Student Lookup"
-}
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -56,7 +52,40 @@ describe('FeedbackConfigAGCommand tests', () => {
 
     test('toggle whether first_failed_test_normal_fdbk_config config is enabled',
          async () => {
-        fail();
+        let first_failure_config = wrapper.find(
+            {ref: transform_to_snake_case(FeedbackConfigLabel.first_failure)}
+        );
+
+        component.apply_preset("Pass/Fail + Exit Status",
+                               component.d_ag_test_command!.first_failed_test_normal_fdbk_config!,
+                               component.fdbk_presets
+        );
+        expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config).not.toBeNull();
+        expect(component.get_current_preset_fn(
+            component.d_ag_test_command!.first_failed_test_normal_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Pass/Fail + Exit Status");
+        expect(first_failure_config.findAll('.setting-selection-container').length).toEqual(1);
+        expect(first_failure_config.findAll('.advanced-settings-label').length).toEqual(1);
+
+        let first_failure_config_is_enabled_input = wrapper.find('#first-failure-config-enabled');
+        first_failure_config_is_enabled_input.setChecked(false);
+
+        expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config).toBeNull();
+        expect(first_failure_config.findAll('setting-selection-container').length).toEqual(0);
+        expect(first_failure_config.findAll('.advanced-settings-label').length).toEqual(0);
+
+        first_failure_config_is_enabled_input.setChecked(true);
+
+        expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config).toEqual(
+            component.default_config
+        );
+        expect(component.get_current_preset_fn(
+            component.d_ag_test_command!.first_failed_test_normal_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Public");
+        expect(first_failure_config.findAll('.setting-selection-container').length).toEqual(1);
+        expect(first_failure_config.findAll('.advanced-settings-label').length).toEqual(1);
     });
 
     test("get_current_preset_fn", async () => {
@@ -235,12 +264,12 @@ describe('FeedbackConfigAGCommand tests', () => {
 
     test("apply_preset called from config_panel", async () => {
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.staff_viewer_fdbk_config,
+            component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Custom");
 
         let staff_viewer_config_panel = wrapper.find(
-            {ref: FeedbackConfigLabel.staff_viewer}
+            {ref: transform_to_snake_case(FeedbackConfigLabel.staff_viewer)}
         );
 
         staff_viewer_config_panel.find('#config-preset-select').setValue(
@@ -249,38 +278,36 @@ describe('FeedbackConfigAGCommand tests', () => {
         await component.$nextTick();
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.staff_viewer_fdbk_config,
+            component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Diff");
     });
 
     test("update_config_settings", async () => {
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config, component.fdbk_presets)
-        ).toEqual("Custom");
-
-        expect(component.get_current_preset_fn(component.d_ag_test_command.normal_fdbk_config,
-                                               component.fdbk_presets)).toEqual("Custom");
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_command.first_failed_test_normal_fdbk_config,
+            component.d_ag_test_command!.normal_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.ultimate_submission_fdbk_config,
+            component.d_ag_test_command!.first_failed_test_normal_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config,
+            component.d_ag_test_command!.ultimate_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.staff_viewer_fdbk_config,
+            component.d_ag_test_command!.past_limit_submission_fdbk_config,
+            component.fdbk_presets)
+        ).toEqual("Custom");
+        expect(component.get_current_preset_fn(
+            component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
 
-        let past_limit_config_panel = wrapper.findAll(
-            {ref: FeedbackConfigLabel.past_limit}
-        ).at(0);
+        let past_limit_config_panel = wrapper.find(
+            {ref: transform_to_snake_case(FeedbackConfigLabel.past_limit)}
+        );
 
         past_limit_config_panel.find('.advanced-settings-label').trigger(
             'click'
@@ -290,7 +317,7 @@ describe('FeedbackConfigAGCommand tests', () => {
         wrapper.find('#past-limit-show-points').setChecked(true);
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config, component.fdbk_presets)
+            component.d_ag_test_command!.past_limit_submission_fdbk_config, component.fdbk_presets)
         ).toEqual("Pass/Fail");
 
         wrapper.find('#past-limit-return-code-fdbk-level').setValue(
@@ -298,41 +325,41 @@ describe('FeedbackConfigAGCommand tests', () => {
         );
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config, component.fdbk_presets)
+            component.d_ag_test_command!.past_limit_submission_fdbk_config, component.fdbk_presets)
         ).toEqual("Custom");
 
         wrapper.find('#past-limit-stdout-fdbk-level').setValue(ValueFeedbackLevel.no_feedback);
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config, component.fdbk_presets)
+            component.d_ag_test_command!.past_limit_submission_fdbk_config, component.fdbk_presets)
         ).toEqual("Custom");
 
         wrapper.find('#past-limit-stderr-fdbk-level').setValue(ValueFeedbackLevel.no_feedback);
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config, component.fdbk_presets)
+            component.d_ag_test_command!.past_limit_submission_fdbk_config, component.fdbk_presets)
         ).toEqual("Custom");
 
         wrapper.find('#past-limit-show-points').setChecked(false);
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.normal_fdbk_config,
+            component.d_ag_test_command!.normal_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.first_failed_test_normal_fdbk_config,
+            component.d_ag_test_command!.first_failed_test_normal_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.ultimate_submission_fdbk_config,
+            component.d_ag_test_command!.ultimate_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.past_limit_submission_fdbk_config,
+            component.d_ag_test_command!.past_limit_submission_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Private");
         expect(component.get_current_preset_fn(
-            component.d_ag_test_command.staff_viewer_fdbk_config,
+            component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets)
         ).toEqual("Custom");
     });
@@ -352,37 +379,37 @@ describe('FeedbackConfigAGCommand tests', () => {
 
         wrapper.find('#first-failure-show-actual-stdout').setChecked(true);
 
-        expect(component.d_ag_test_command.normal_fdbk_config.show_actual_stdout).toBe(false);
-        expect(component.d_ag_test_command.first_failed_test_normal_fdbk_config
+        expect(component.d_ag_test_command!.normal_fdbk_config.show_actual_stdout).toBe(false);
+        expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config!
                    .show_actual_stdout
         ).toBe(true);
-        expect(component.d_ag_test_command.ultimate_submission_fdbk_config
+        expect(component.d_ag_test_command!.ultimate_submission_fdbk_config
                    .show_actual_stdout
         ).toBe(false);
     });
 
     test("update_config_settings - command visibility changed & case only has one command",
          async () => {
-        let staff_viewer_fdbk_config_panel = wrapper.findAll(
-            {ref: FeedbackConfigLabel.staff_viewer}
-        ).at(0);
+        let staff_viewer_fdbk_config_panel = wrapper.find(
+            {ref: transform_to_snake_case(FeedbackConfigLabel.staff_viewer)}
+        );
 
         staff_viewer_fdbk_config_panel.find('.advanced-settings-label').trigger('click');
         await component.$nextTick();
 
-        component.d_ag_test_command.staff_viewer_fdbk_config.visible = true;
-        component.d_ag_test_case.staff_viewer_fdbk_config.show_individual_commands = true;
+        component.d_ag_test_command!.staff_viewer_fdbk_config.visible = true;
+        component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands = true;
 
-        expect(component.d_ag_test_command.staff_viewer_fdbk_config.visible).toBe(true);
-        expect(component.d_ag_test_case.staff_viewer_fdbk_config.show_individual_commands).toBe(
+        expect(component.d_ag_test_command!.staff_viewer_fdbk_config.visible).toBe(true);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands).toBe(
             true
         );
 
         staff_viewer_fdbk_config_panel.find("#student-lookup-visible").trigger('click');
         await component.$nextTick();
 
-        expect(component.d_ag_test_command.staff_viewer_fdbk_config.visible).toBe(false);
-        expect(component.d_ag_test_case.staff_viewer_fdbk_config.show_individual_commands).toBe(
+        expect(component.d_ag_test_command!.staff_viewer_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands).toBe(
             false
         );
     });
@@ -390,31 +417,35 @@ describe('FeedbackConfigAGCommand tests', () => {
     test("update_config_settings - command visibility changed & case has more than one " +
          "command",
          async () => {
-        let another_command = create_ag_command(2, "Another Command", 1);
+        let another_case = create_ag_case(2, "Case 2", 2);
+        another_case.ag_test_commands = [
+            create_ag_command(2, "Command 2", 1),
+            create_ag_command(3, "Command 3", 1)
+        ];
 
-        component.ag_test_case.ag_test_commands = [ag_test_command, another_command];
+        wrapper.setProps({ag_test_case: another_case});
         await component.$nextTick();
 
-        let staff_viewer_fdbk_config_panel = wrapper.findAll(
-            {ref: FeedbackConfigLabel.staff_viewer}
-        ).at(0);
+        let staff_viewer_fdbk_config_panel = wrapper.find(
+            {ref: transform_to_snake_case(FeedbackConfigLabel.staff_viewer)}
+        );
 
         staff_viewer_fdbk_config_panel.find('.advanced-settings-label').trigger('click');
         await component.$nextTick();
 
-        component.d_ag_test_command.staff_viewer_fdbk_config.visible = true;
-        component.d_ag_test_case.staff_viewer_fdbk_config.show_individual_commands = true;
+        component.d_ag_test_command!.staff_viewer_fdbk_config.visible = true;
+        component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands = true;
 
-        expect(component.d_ag_test_command.staff_viewer_fdbk_config.visible).toBe(true);
-        expect(component.d_ag_test_case.staff_viewer_fdbk_config.show_individual_commands).toBe(
+        expect(component.d_ag_test_command!.staff_viewer_fdbk_config.visible).toBe(true);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands).toBe(
             true
         );
 
         staff_viewer_fdbk_config_panel.find("#student-lookup-visible").trigger('click');
         await component.$nextTick();
 
-        expect(component.d_ag_test_command.staff_viewer_fdbk_config.visible).toBe(false);
-        expect(component.d_ag_test_case.staff_viewer_fdbk_config.show_individual_commands).toBe(
+        expect(component.d_ag_test_command!.staff_viewer_fdbk_config.visible).toBe(false);
+        expect(component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands).toBe(
             true
         );
     });
@@ -445,5 +476,33 @@ describe('FeedbackConfigAGCommand tests', () => {
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+    });
+
+    test('ag_test_case Watcher', async () => {
+        expect(component.d_ag_test_case).toEqual(ag_test_case);
+        expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(1);
+
+        let another_case = create_ag_case(2, "Case 2", 2);
+        another_case.ag_test_commands = [
+            create_ag_command(2, "Command 2", 1),
+            create_ag_command(3, "Command 3", 1)
+        ];
+
+        wrapper.setProps({ag_test_case: another_case});
+        await component.$nextTick();
+
+        expect(component.d_ag_test_case).toEqual(another_case);
+        expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(2);
+    });
+
+    test('ag_test_command Watcher', async () => {
+        expect(component.d_ag_test_command).toEqual(ag_test_command);
+
+        let another_command = create_ag_command(2, "Command 2", 1);
+
+        wrapper.setProps({ag_test_command: another_command});
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command).toEqual(another_command);
     });
 });
