@@ -264,7 +264,7 @@ export default class AGSuitePanel extends Vue {
     this.d_new_case_name = "";
     (<Modal> this.$refs.new_ag_test_case_modal).open();
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.d_new_case_name).focus();
+      (<ValidatedInput> this.$refs.new_case_name).focus();
     });
   }
 

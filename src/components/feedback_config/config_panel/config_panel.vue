@@ -68,7 +68,7 @@ export default class ConfigPanel extends Vue {
   preset_names: string[] = [];
   preset_selected: string = "Custom";
 
-  @Watch('value')
+  @Watch('value', {deep: true})
   on_value_changed(new_value: FeedbackConfigType, old_value: FeedbackConfigType) {
     this.d_configuration = new_value === null ? null : JSON.parse(JSON.stringify(new_value));
     if (this.d_configuration !== null) {

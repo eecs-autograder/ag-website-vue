@@ -96,23 +96,21 @@ export default class EditFeedbackSettingsAGSuite extends Vue {
   @Prop({required: true, type: Object})
   value!: AGTestSuiteFeedbackConfig | null;
 
-  hyphenate = hyphenate;
-
   d_ag_test_suite_settings: AGTestSuiteFeedbackConfig | null = null;
+  hyphenate = hyphenate;
+  is_open = false;
 
   @Watch('value')
   on_value_changed(new_value: AGTestSuiteFeedbackConfig, old_value: AGTestSuiteFeedbackConfig) {
-    this.d_ag_test_suite_settings = new_value;
+    this.d_ag_test_suite_settings = JSON.parse(JSON.stringify(new_value));
   }
-
-  is_open = false;
 
   toggle_is_open() {
     this.is_open = !this.is_open;
   }
 
   created() {
-    this.d_ag_test_suite_settings = this.value;
+    this.d_ag_test_suite_settings = JSON.parse(JSON.stringify(this.value));
   }
 }
 </script>

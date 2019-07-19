@@ -3,85 +3,66 @@
     <div class="inner">
       <div class="config-panels-container">
 
-        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.normal)"
+        <config-panel ref="normal"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_mutation_test_suite.normal_fdbk_config"
                       @apply_preset="apply_preset($event,
-                                                  d_mutation_test_suite.normal_fdbk_config,
-                                                  fdbk_presets)"
+                                                  d_mutation_test_suite.normal_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsMutationSuite :config_name="FeedbackConfigLabel.normal"
-                                               v-model="d_mutation_test_suite.normal_fdbk_config"
-                                               @input="update_config_settings(
-                                                 $event,
-                                                 d_mutation_test_suite.normal_fdbk_config)">
+            <EditFeedbackSettingsMutationSuite
+              :config_name="FeedbackConfigLabel.normal"
+              v-model="d_mutation_test_suite.normal_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
           </template>
         </config-panel>
 
-        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.ultimate_submission)"
+        <config-panel ref="final_graded"
                       :config_name="FeedbackConfigLabel.ultimate_submission"
                       v-model="d_mutation_test_suite.ultimate_submission_fdbk_config"
                       @apply_preset="apply_preset(
                         $event,
-                        d_mutation_test_suite.ultimate_submission_fdbk_config,
-                        fdbk_presets
+                        d_mutation_test_suite.ultimate_submission_fdbk_config
                       )"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsMutationSuite :config_name="FeedbackConfigLabel
-                                                 .ultimate_submission"
-                                               v-model="d_mutation_test_suite
-                                                 .ultimate_submission_fdbk_config"
-                                               @input="update_config_settings(
-                                                 $event,
-                                                 d_mutation_test_suite
-                                                   .ultimate_submission_fdbk_config
-                                               )">
+            <EditFeedbackSettingsMutationSuite
+              :config_name="FeedbackConfigLabel.ultimate_submission"
+              v-model="d_mutation_test_suite.ultimate_submission_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
           </template>
         </config-panel>
 
-        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.past_limit)"
+        <config-panel ref="past_limit"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_mutation_test_suite.past_limit_submission_fdbk_config"
                       @apply_preset="apply_preset(
                         $event,
-                        d_mutation_test_suite.past_limit_submission_fdbk_config,
-                        fdbk_presets
+                        d_mutation_test_suite.past_limit_submission_fdbk_config
                       )"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsMutationSuite :config_name="FeedbackConfigLabel.past_limit"
-                                               v-model="d_mutation_test_suite
-                                                 .past_limit_submission_fdbk_config"
-                                               @input="update_config_settings(
-                                                 $event,
-                                                 d_mutation_test_suite
-                                                   .past_limit_submission_fdbk_config
-                                               )">
+            <EditFeedbackSettingsMutationSuite
+              :config_name="FeedbackConfigLabel.past_limit"
+              v-model="d_mutation_test_suite.past_limit_submission_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
           </template>
         </config-panel>
 
-        <config-panel :ref="transform_to_snake_case(FeedbackConfigLabel.staff_viewer)"
+        <config-panel ref="student_lookup"
                       :config_name="FeedbackConfigLabel.staff_viewer"
                       v-model="d_mutation_test_suite.staff_viewer_fdbk_config"
                       @apply_preset="apply_preset($event,
-                                                  d_mutation_test_suite.staff_viewer_fdbk_config,
-                                                  fdbk_presets)"
+                                                  d_mutation_test_suite.staff_viewer_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsMutationSuite :config_name="FeedbackConfigLabel.staff_viewer"
-                                               v-model="d_mutation_test_suite
-                                                 .staff_viewer_fdbk_config"
-                                               @input="update_config_settings($event,
-                                                 d_mutation_test_suite.staff_viewer_fdbk_config)">
+            <EditFeedbackSettingsMutationSuite
+              :config_name="FeedbackConfigLabel.staff_viewer"
+              v-model="d_mutation_test_suite.staff_viewer_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
           </template>
         </config-panel>
@@ -115,7 +96,6 @@ import EditFeedbackSettingsMutationSuite from '@/components/feedback_config/edit
 import {
   FeedbackConfigLabel,
   MutationTestSuiteFeedbackPreset,
-  transform_to_snake_case
 } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import { SafeMap } from '@/safe_map';
 import { handle_api_errors_async, safe_assign } from '@/utils';
@@ -132,26 +112,9 @@ export default class FeedbackConfigMutationSuite extends Vue {
   mutation_test_suite!: MutationTestSuite;
 
   FeedbackConfigLabel = FeedbackConfigLabel;
-  transform_to_snake_case = transform_to_snake_case;
 
   d_mutation_test_suite: MutationTestSuite | null = null;
   d_saving = false;
-  default_config: MutationTestSuiteFeedbackConfig = {
-    visible: true,
-    show_setup_return_code: true,
-    show_setup_stdout: true,
-    show_setup_stderr: true,
-    show_invalid_test_names: true,
-    show_points: true,
-    bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.exposed_bug_names,
-    show_get_test_names_return_code: true,
-    show_get_test_names_stdout: true,
-    show_get_test_names_stderr: true,
-    show_validity_check_stdout: true,
-    show_validity_check_stderr: true,
-    show_grade_buggy_impls_stdout: true,
-    show_grade_buggy_impls_stderr: true
-  };
   fdbk_presets = new SafeMap<string, MutationTestSuiteFeedbackPreset>([
     [
       'Public',
@@ -249,11 +212,6 @@ export default class FeedbackConfigMutationSuite extends Vue {
     this.d_mutation_test_suite = this.mutation_test_suite;
   }
 
-  update_config_settings(config: MutationTestSuiteFeedbackConfig,
-                         config_to_apply_changes_to: MutationTestSuiteFeedbackConfig) {
-    safe_assign(config_to_apply_changes_to, config);
-  }
-
   @handle_api_errors_async(handle_save_mutation_suite_feedback_config_settings)
   async save_feedback_config_settings() {
     try {
@@ -302,10 +260,9 @@ export default class FeedbackConfigMutationSuite extends Vue {
     return "Custom";
   }
   apply_preset(preset_selected: string,
-               config_being_viewed: MutationTestSuiteFeedbackConfig,
-               fdbk_presets: SafeMap<string, MutationTestSuiteFeedbackPreset>) {
+               config_being_viewed: MutationTestSuiteFeedbackConfig) {
     if (preset_selected !== 'Custom') {
-      let preset = fdbk_presets.get(preset_selected);
+      let preset = this.fdbk_presets.get(preset_selected);
       safe_assign(config_being_viewed, preset);
     }
   }

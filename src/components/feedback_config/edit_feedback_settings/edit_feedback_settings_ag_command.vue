@@ -2,7 +2,8 @@
   <div class="edit-feedback">
 
     <div id="edit-feedback-toggle-zone" v-if="d_ag_test_command_settings !== null">
-      <div class="checkbox-input-container">
+      <div class="checkbox-input-container" v-if="ag_test_case.ag_test_commands.length > 1
+                                                  || d_ag_test_command_settings.visible === false">
         <input :id="`${hyphenate(config_name)}-visible`"
                type="checkbox"
                @change="$emit('input', d_ag_test_command_settings)"
@@ -142,7 +143,10 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { AGTestCommandFeedbackConfig, ValueFeedbackLevel } from 'ag-client-typescript';
+import { AGTestCase,
+         AGTestCommandFeedbackConfig,
+         ValueFeedbackLevel
+} from 'ag-client-typescript';
 
 import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
 import Toggle from '@/components/toggle.vue';
@@ -159,24 +163,26 @@ export default class EditFeedbackSettingsAGCommand extends Vue {
   @Prop({required: false, type: Object})
   value!: AGTestCommandFeedbackConfig | null;
 
-  hyphenate = hyphenate;
+  @Prop({required: true, type: AGTestCase})
+  ag_test_case!: AGTestCase;
+
   d_ag_test_command_settings: AGTestCommandFeedbackConfig | null = null;
+  hyphenate = hyphenate;
+  is_open = false;
   ValueFeedbackLevel = ValueFeedbackLevel;
 
   @Watch('value')
   on_value_changed(new_value: AGTestCommandFeedbackConfig,
                    old_value: AGTestCommandFeedbackConfig) {
-    this.d_ag_test_command_settings = new_value;
+    this.d_ag_test_command_settings = JSON.parse(JSON.stringify(new_value));
   }
-
-  is_open = false;
 
   toggle_is_open() {
     this.is_open = !this.is_open;
   }
 
   created() {
-    this.d_ag_test_command_settings = this.value;
+    this.d_ag_test_command_settings = JSON.parse(JSON.stringify(this.value));
   }
 }
 </script>

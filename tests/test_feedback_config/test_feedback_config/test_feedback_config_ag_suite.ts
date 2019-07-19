@@ -8,13 +8,11 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
+import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import FeedbackConfigAGSuite from '@/components/feedback_config/feedback_config/feedback_config_ag_suite.vue';
-import {
-    FeedbackConfigLabel,
-    transform_to_snake_case
-} from '@/components/feedback_config/feedback_config/feedback_config_utils';
+import { safe_assign } from '@/utils';
 
-import { create_ag_suite } from '@/tests/data_utils';
+import { create_ag_suite, create_ag_suite_feedback_config } from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -48,100 +46,56 @@ describe('FeedbackConfigAGSuite tests', () => {
         let pass_fail_setup_preset = component.fdbk_presets.get('Pass/Fail Setup');
         let private_setup_preset = component.fdbk_presets.get('Private Setup');
 
-        let ag_test_suite_config: AGTestSuiteFeedbackConfig | null = {
-            visible: true,
-            show_individual_tests: public_setup_preset.show_individual_tests,
-            show_setup_return_code: public_setup_preset.show_setup_return_code,
-            show_setup_timed_out: public_setup_preset.show_setup_timed_out,
-            show_setup_stdout: public_setup_preset.show_setup_stdout,
-            show_setup_stderr: public_setup_preset.show_setup_stderr
-        };
-
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Public Setup");
-
-        ag_test_suite_config = {
-            visible: true,
-            show_individual_tests: pass_fail_setup_preset.show_individual_tests,
-            show_setup_return_code: pass_fail_setup_preset.show_setup_return_code,
-            show_setup_timed_out: pass_fail_setup_preset.show_setup_timed_out,
-            show_setup_stdout: pass_fail_setup_preset.show_setup_stdout,
-            show_setup_stderr: pass_fail_setup_preset.show_setup_stderr
-        };
-
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Pass/Fail Setup");
-
-        ag_test_suite_config = {
-            visible: true,
-            show_individual_tests: private_setup_preset.show_individual_tests,
-            show_setup_return_code: private_setup_preset.show_setup_return_code,
-            show_setup_timed_out: private_setup_preset.show_setup_timed_out,
-            show_setup_stdout: private_setup_preset.show_setup_stdout,
-            show_setup_stderr: private_setup_preset.show_setup_stderr
-        };
-
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Private Setup");
-
-        ag_test_suite_config = {
-            visible: false,
-            show_individual_tests: false,
-            show_setup_return_code: false,
-            show_setup_timed_out: false,
-            show_setup_stdout: false,
-            show_setup_stderr: false
-        };
-
+        let ag_test_suite_config: AGTestSuiteFeedbackConfig | null
+            = create_ag_suite_feedback_config();
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Custom");
 
-        ag_test_suite_config = null;
+        safe_assign(ag_test_suite_config!, public_setup_preset);
+        expect(component.get_current_preset_fn(
+            ag_test_suite_config, component.fdbk_presets
+        )).toEqual("Public Setup");
 
+        safe_assign(ag_test_suite_config!, pass_fail_setup_preset);
+        expect(component.get_current_preset_fn(
+            ag_test_suite_config, component.fdbk_presets
+        )).toEqual("Pass/Fail Setup");
+
+        safe_assign(ag_test_suite_config!, private_setup_preset);
+        expect(component.get_current_preset_fn(
+            ag_test_suite_config, component.fdbk_presets
+        )).toEqual("Private Setup");
+
+        ag_test_suite_config = null;
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Custom");
     });
 
     test("apply_preset", async () => {
-        let ag_test_suite_config: AGTestSuiteFeedbackConfig = {
-            visible: false,
-            show_individual_tests: false,
-            show_setup_return_code: false,
-            show_setup_timed_out: false,
-            show_setup_stdout: false,
-            show_setup_stderr: false
-        };
+        let ag_test_suite_config: AGTestSuiteFeedbackConfig = create_ag_suite_feedback_config();
 
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Custom");
 
-        component.apply_preset("Public Setup", ag_test_suite_config, component.fdbk_presets);
-
+        component.apply_preset("Public Setup", ag_test_suite_config);
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Public Setup");
 
-        component.apply_preset("Pass/Fail Setup", ag_test_suite_config, component.fdbk_presets);
-
+        component.apply_preset("Pass/Fail Setup", ag_test_suite_config);
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Pass/Fail Setup");
 
-        component.apply_preset("Private Setup", ag_test_suite_config, component.fdbk_presets);
-
+        component.apply_preset("Private Setup", ag_test_suite_config);
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Private Setup");
 
-        // Nothing should happen - but this feels like a weird test
-        component.apply_preset(
-            "Custom", ag_test_suite_config, component.fdbk_presets);
+        component.apply_preset("Custom", ag_test_suite_config);
         expect(component.get_current_preset_fn(
             ag_test_suite_config, component.fdbk_presets
         )).toEqual("Private Setup");
@@ -149,13 +103,10 @@ describe('FeedbackConfigAGSuite tests', () => {
 
     test("apply_preset called from config_panel", async () => {
         expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.staff_viewer_fdbk_config,
-            component.fdbk_presets
+            component.d_ag_test_suite!.staff_viewer_fdbk_config, component.fdbk_presets
         )).toEqual("Custom");
 
-        let staff_viewer_config_panel = wrapper.find(
-            {ref: transform_to_snake_case(FeedbackConfigLabel.staff_viewer)}
-        );
+        let staff_viewer_config_panel = wrapper.find({ref: 'student_lookup'});
 
         staff_viewer_config_panel.find('#config-preset-select').setValue("Pass/Fail Setup");
         await component.$nextTick();
@@ -166,55 +117,42 @@ describe('FeedbackConfigAGSuite tests', () => {
         )).toEqual("Pass/Fail Setup");
     });
 
-    test("update_config_settings", async () => {
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.past_limit_submission_fdbk_config, component.fdbk_presets
-        )).toEqual("Custom");
+    test("update_config_settings in edit_feedback_settings_ag_suite - changes reflected in " +
+         "preset_selected in config_panel",
+         async () => {
+        let normal_config_panel = wrapper.find({ref: 'normal'});
+        let normal_config_panel_component = <ConfigPanel> normal_config_panel.vm;
 
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.normal_fdbk_config, component.fdbk_presets
-        )).toEqual("Custom");
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.ultimate_submission_fdbk_config,
-            component.fdbk_presets)
-        ).toEqual("Custom");
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.past_limit_submission_fdbk_config,
-            component.fdbk_presets
-        )).toEqual("Custom");
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.staff_viewer_fdbk_config,
-            component.fdbk_presets
-        )).toEqual("Custom");
+        expect(normal_config_panel_component.preset_selected).toEqual("Custom");
 
-        let normal_config_panel = wrapper.findAll(
-            {ref: transform_to_snake_case(FeedbackConfigLabel.normal)}
-        ).at(0);
-
-        normal_config_panel.find('.advanced-settings-label').trigger(
-            'click'
-        );
+        normal_config_panel.find('.advanced-settings-label').trigger('click');
         await component.$nextTick();
 
         wrapper.find('#normal-show-individual-tests').setChecked(true);
+        expect(normal_config_panel_component.preset_selected).toEqual("Private Setup");
 
-        expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.normal_fdbk_config,
-            component.fdbk_presets
-        )).toEqual("Private Setup");
+        wrapper.find('#normal-show-setup-return-code').setChecked(true);
+        expect(normal_config_panel_component.preset_selected).toEqual("Custom");
+
+        wrapper.find('#normal-show-setup-timed-out').setChecked(true);
+        expect(normal_config_panel_component.preset_selected).toEqual("Pass/Fail Setup");
     });
 
-    test("update_config_settings - checkboxes in config panels do not react to changes in " +
+    test("checkboxes in config panels do not react to changes in " +
          "other panels",
          async () => {
-        expect(component.d_ag_test_suite!.normal_fdbk_config
-                   .show_setup_timed_out).toBe(false);
-        expect(component.d_ag_test_suite!.ultimate_submission_fdbk_config
-                   .show_setup_timed_out).toBe(false);
-        expect(component.d_ag_test_suite!.past_limit_submission_fdbk_config
-                   .show_setup_timed_out).toBe(false);
-        expect(component.d_ag_test_suite!.staff_viewer_fdbk_config
-                   .show_setup_timed_out).toBe(false);
+        expect(
+            component.d_ag_test_suite!.normal_fdbk_config.show_setup_timed_out
+        ).toBe(false);
+        expect(
+            component.d_ag_test_suite!.ultimate_submission_fdbk_config.show_setup_timed_out
+        ).toBe(false);
+        expect(
+            component.d_ag_test_suite!.past_limit_submission_fdbk_config.show_setup_timed_out
+        ).toBe(false);
+        expect(
+            component.d_ag_test_suite!.staff_viewer_fdbk_config.show_setup_timed_out
+        ).toBe(false);
 
         wrapper.findAll('.advanced-settings-label').at(0).trigger('click');
         await component.$nextTick();
@@ -229,15 +167,18 @@ describe('FeedbackConfigAGSuite tests', () => {
         await component.$nextTick();
 
         wrapper.find('#final-graded-show-setup-timed-out').setChecked(true);
-
-        expect(component.d_ag_test_suite!.normal_fdbk_config
-                   .show_setup_timed_out).toBe(false);
-        expect(component.d_ag_test_suite!.ultimate_submission_fdbk_config
-                   .show_setup_timed_out).toBe(true);
-        expect(component.d_ag_test_suite!.past_limit_submission_fdbk_config
-            .show_setup_timed_out).toBe(false);
-        expect(component.d_ag_test_suite!.staff_viewer_fdbk_config
-                   .show_setup_timed_out).toBe(false);
+        expect(
+            component.d_ag_test_suite!.normal_fdbk_config.show_setup_timed_out
+        ).toBe(false);
+        expect(
+            component.d_ag_test_suite!.ultimate_submission_fdbk_config.show_setup_timed_out
+        ).toBe(true);
+        expect(
+            component.d_ag_test_suite!.past_limit_submission_fdbk_config.show_setup_timed_out
+        ).toBe(false);
+        expect(
+            component.d_ag_test_suite!.staff_viewer_fdbk_config.show_setup_timed_out
+        ).toBe(false);
     });
 
     test("save d_ag_test_suite settings - successful", async () => {

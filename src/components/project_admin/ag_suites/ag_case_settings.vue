@@ -14,20 +14,45 @@
                              :validators="[is_not_empty]">
             </validated-input>
           </div>
-          <div id="button-footer">
-            <APIErrors ref="api_errors"></APIErrors>
 
-            <button id="save-button"
-                    type="submit"
-                    :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+          <div v-if="d_ag_test_case.ag_test_commands.length > 1"
+               class="ag-case-feedback-panels">
+            <AGCaseConfigPanel
+              ref="normal"
+              v-model="d_ag_test_case.normal_fdbk_config"
+              :config_name="FeedbackConfigLabel.normal">
+            </AGCaseConfigPanel>
+
+            <AGCaseConfigPanel
+              ref="final_graded"
+              v-model="d_ag_test_case.ultimate_submission_fdbk_config"
+              :config_name="FeedbackConfigLabel.ultimate_submission">
+            </AGCaseConfigPanel>
+
+
+            <AGCaseConfigPanel
+              ref="past_limit"
+              v-model="d_ag_test_case.past_limit_submission_fdbk_config"
+              :config_name="FeedbackConfigLabel.past_limit">
+            </AGCaseConfigPanel>
+
+            <AGCaseConfigPanel
+              ref="student_lookup"
+              v-model="d_ag_test_case.staff_viewer_fdbk_config"
+              :config_name="FeedbackConfigLabel.staff_viewer">
+            </AGCaseConfigPanel>
           </div>
-      </validated-form>
-    </div>
 
-    <div v-if="d_ag_test_case.ag_test_commands.length > 1"
-         class="ag-case-feedback-panels">
-      <FeedbackConfigAGCase ref="feedback_config_ag_case"
-                            :ag_test_case="d_ag_test_case"></FeedbackConfigAGCase>
+        <div id="button-footer">
+          <APIErrors ref="api_errors"></APIErrors>
+
+          <button id="save-button"
+                  type="submit"
+                  :disabled="!d_settings_form_is_valid || d_saving">
+            Save
+          </button>
+        </div>
+      </validated-form>
     </div>
 
   </div>
@@ -40,7 +65,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import FeedbackConfigAGCase from '@/components/feedback_config/feedback_config/feedback_config_ag_case.vue';
+import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case_config_panel.vue';
+import { FeedbackConfigLabel } from "@/components/feedback_config/feedback_config/feedback_config_utils";
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -49,7 +75,7 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
-    FeedbackConfigAGCase,
+    AGCaseConfigPanel,
     ValidatedForm,
     ValidatedInput
   }
@@ -60,6 +86,7 @@ export default class AGCaseSettings extends Vue {
   ag_test_case!: AGTestCase;
 
   readonly is_not_empty = is_not_empty;
+  FeedbackConfigLabel = FeedbackConfigLabel;
 
   d_ag_test_case: AGTestCase | null = null;
   d_saving = false;
@@ -93,16 +120,14 @@ function handle_save_ag_test_case_settings_error(component: AGCaseSettings, erro
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css?family=Hind|Poppins');
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
-$current-lang-choice: "Poppins";
 
 #button-footer {
   margin: 12px 0 0 0;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 #save-button {
@@ -110,7 +135,7 @@ $current-lang-choice: "Poppins";
 }
 
 .ag-case-feedback-panels {
-  padding-top: 10px;
+  padding-top: 15px;
 }
 
 </style>

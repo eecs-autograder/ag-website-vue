@@ -1,10 +1,14 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { AGTestCommandFeedbackConfig, ValueFeedbackLevel } from 'ag-client-typescript';
+import { AGTestCase, AGTestCommandFeedbackConfig, ValueFeedbackLevel } from 'ag-client-typescript';
 
 import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
 
-import { create_ag_command_feedback_config } from '@/tests/data_utils';
+import {
+    create_ag_case,
+    create_ag_command,
+    create_ag_command_feedback_config
+} from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
 
 beforeAll(() => {
@@ -14,16 +18,22 @@ beforeAll(() => {
 describe('EditFeedbackSettingsAGCommand tests', () => {
     let wrapper: Wrapper<EditFeedbackSettingsAGCommand>;
     let component: EditFeedbackSettingsAGCommand;
+    let ag_test_case: AGTestCase;
     let ag_test_command_normal_feedback_config: AGTestCommandFeedbackConfig;
     let ag_test_command_first_failure_feedback_config: AGTestCommandFeedbackConfig;
 
     beforeEach(() => {
         ag_test_command_normal_feedback_config = create_ag_command_feedback_config();
         ag_test_command_first_failure_feedback_config = create_ag_command_feedback_config();
+        ag_test_case = create_ag_case(1, "Case 1", 1);
+        ag_test_case.ag_test_commands = [
+            create_ag_command(1, "Command 1", 1)
+        ];
 
         wrapper = mount(EditFeedbackSettingsAGCommand, {
             propsData: {
                 config_name: "normal",
+                ag_test_case: ag_test_case,
                 value: ag_test_command_normal_feedback_config
             }
         });
@@ -36,17 +46,37 @@ describe('EditFeedbackSettingsAGCommand tests', () => {
         }
     });
 
-    test('visible binding', async () => {
+    test('visible binding - case has only one command', async () => {
         let visible_input = wrapper.find('#normal-visible');
 
-        visible_input.setChecked(true);
-        expect(component.d_ag_test_command_settings!.visible).toEqual(true);
-
-        visible_input.setChecked(false);
+        expect(component.ag_test_case.ag_test_commands.length).toEqual(1);
         expect(component.d_ag_test_command_settings!.visible).toEqual(false);
+        expect(wrapper.findAll('#normal-visible').length).toEqual(1);
 
         visible_input.setChecked(true);
+
         expect(component.d_ag_test_command_settings!.visible).toEqual(true);
+        expect(wrapper.findAll('#normal-visible').length).toEqual(0);
+    });
+
+    test('visible binding - case has more than one command', async () => {
+        let case_with_more_than_one_command = create_ag_case(2, "Case 2", 1);
+        case_with_more_than_one_command.ag_test_commands = [
+            create_ag_command(3, "Command 3", 2),
+            create_ag_command(4, "Command 4", 2)
+        ];
+        wrapper.setProps({ag_test_case: case_with_more_than_one_command});
+        await component.$nextTick();
+
+        let visible_input = wrapper.find('#normal-visible');
+
+        expect(component.d_ag_test_command_settings!.visible).toEqual(false);
+        expect(wrapper.findAll('#normal-visible').length).toEqual(1);
+
+        visible_input.setChecked(true);
+
+        expect(component.d_ag_test_command_settings!.visible).toEqual(true);
+        expect(wrapper.findAll('#normal-visible').length).toEqual(1);
 
         expect(checkbox_is_checked(visible_input)).toEqual(true);
 
@@ -55,6 +85,12 @@ describe('EditFeedbackSettingsAGCommand tests', () => {
 
         component.d_ag_test_command_settings!.visible = true;
         expect(checkbox_is_checked(visible_input)).toEqual(true);
+
+        wrapper.setProps({ag_test_case: ag_test_case});
+        await component.$nextTick();
+
+        expect(component.d_ag_test_command_settings!.visible).toEqual(true);
+        expect(wrapper.findAll('#normal-visible').length).toEqual(0);
     });
 
     test('return_code_fdbk_level binding', async () => {

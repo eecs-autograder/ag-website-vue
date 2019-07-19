@@ -192,15 +192,15 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
   @Prop({required: false, type: Object})
   value!: MutationTestSuiteFeedbackConfig | null;
 
-  hyphenate = hyphenate;
   BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
   d_mutation_test_suite_settings: MutationTestSuiteFeedbackConfig | null = null;
+  hyphenate = hyphenate;
   is_open = false;
 
   @Watch('value')
   on_value_changed(new_value: MutationTestSuiteFeedbackConfig,
                    old_value: MutationTestSuiteFeedbackConfig) {
-    this.d_mutation_test_suite_settings = new_value;
+    this.d_mutation_test_suite_settings = JSON.parse(JSON.stringify(new_value));
   }
 
   toggle_is_open() {
@@ -208,7 +208,7 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
   }
 
   created() {
-    this.d_mutation_test_suite_settings = this.value;
+    this.d_mutation_test_suite_settings = JSON.parse(JSON.stringify(this.value));
   }
 }
 </script>

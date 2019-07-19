@@ -47,8 +47,3 @@ export function hyphenate(str: string) {
     let hyphenated_str = str.toLowerCase().replace(' ', '-');
     return hyphenated_str;
 }
-
-export function transform_to_snake_case(config_name: string) {
-    let snake_case_config_name = config_name.toLowerCase().replace(' ', '_');
-    return snake_case_config_name;
-}

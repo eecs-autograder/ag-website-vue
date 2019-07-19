@@ -1,13 +1,8 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import {
-    AGTestSuiteFeedbackConfig
-} from 'ag-client-typescript';
+import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
-import ConfigPanel, {
-    FeedbackConfigType,
-    FeedbackPresetType
-} from '@/components/feedback_config/config_panel/config_panel.vue';
+import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import {
     AGTestSuiteFeedbackPreset,
     FeedbackConfigLabel
@@ -31,7 +26,6 @@ describe('ConfigPanel tests', () => {
          preset_options: SafeMap<string, AGTestSuiteFeedbackPreset>) => string;
 
     beforeEach(() => {
-
         ag_test_suite_normal_feedback_config = create_ag_suite_feedback_config();
         ag_test_suite_default_config = create_ag_suite_feedback_config();
         ag_test_suite_fdbk_presets = new SafeMap<string, AGTestSuiteFeedbackPreset>([

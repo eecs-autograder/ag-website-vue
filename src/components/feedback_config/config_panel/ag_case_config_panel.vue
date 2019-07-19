@@ -12,7 +12,7 @@
                @change="$emit('input', d_ag_test_case_settings)"
                class="checkbox"
                v-model="d_ag_test_case_settings.visible">
-        <label :for="`${hyphenate(config_name)}-visible`"> Suite is Visible </label>
+        <label :for="`${hyphenate(config_name)}-visible`"> Case is Visible </label>
       </div>
 
       <div class="checkbox-input-container">

@@ -10,47 +10,6 @@ import {
     ValueFeedbackLevel
 } from 'ag-client-typescript';
 
-let default_suite_feedback_config: AGTestSuiteFeedbackConfig = {
-    show_individual_tests: false,
-    show_setup_return_code: false,
-    show_setup_stderr: false,
-    show_setup_stdout: false,
-    show_setup_timed_out: false,
-    visible: false
-};
-
-export function create_ag_suite_feedback_config() {
-    return JSON.parse(JSON.stringify(default_suite_feedback_config));
-}
-
-export function create_ag_suite(pk: number, suite_name: string, project: number): AGTestSuite {
-    let new_suite = new AGTestSuite({
-        pk: pk,
-        name: suite_name,
-        project: project,
-        last_modified: "",
-        read_only_instructor_files: true,
-        setup_suite_cmd: "",
-        setup_suite_cmd_name: "",
-        sandbox_docker_image: {
-            pk: 1,
-            name: "Sandy",
-            tag: "",
-            display_name: "Hi everyone"
-        },
-        allow_network_access: false,
-        deferred: true,
-        normal_fdbk_config: create_ag_suite_feedback_config(),
-        past_limit_submission_fdbk_config: create_ag_suite_feedback_config(),
-        staff_viewer_fdbk_config: create_ag_suite_feedback_config(),
-        ultimate_submission_fdbk_config: create_ag_suite_feedback_config(),
-        ag_test_cases: [],
-        instructor_files_needed: [],
-        student_files_needed: []
-    });
-    return new_suite;
-}
-
 let default_mutation_suite_feedback_config: MutationTestSuiteFeedbackConfig = {
     visible: false,
     show_setup_return_code: false,
@@ -107,6 +66,46 @@ export function create_mutation_suite(pk: number, suite_name: string,
     return new_suite;
 }
 
+let default_suite_feedback_config: AGTestSuiteFeedbackConfig = {
+    show_individual_tests: false,
+    show_setup_return_code: false,
+    show_setup_stderr: false,
+    show_setup_stdout: false,
+    show_setup_timed_out: false,
+    visible: false
+};
+
+export function create_ag_suite_feedback_config() {
+    return JSON.parse(JSON.stringify(default_suite_feedback_config));
+}
+
+export function create_ag_suite(pk: number, suite_name: string, project: number): AGTestSuite {
+    let new_suite = new AGTestSuite({
+        pk: pk,
+        name: suite_name,
+        project: project,
+        last_modified: "",
+        read_only_instructor_files: true,
+        setup_suite_cmd: "",
+        setup_suite_cmd_name: "",
+        sandbox_docker_image: {
+            pk: 1,
+            name: "Sandy",
+            tag: "",
+            display_name: "Hi everyone"
+        },
+        allow_network_access: false,
+        deferred: true,
+        normal_fdbk_config: create_ag_suite_feedback_config(),
+        past_limit_submission_fdbk_config: create_ag_suite_feedback_config(),
+        staff_viewer_fdbk_config: create_ag_suite_feedback_config(),
+        ultimate_submission_fdbk_config: create_ag_suite_feedback_config(),
+        ag_test_cases: [],
+        instructor_files_needed: [],
+        student_files_needed: []
+    });
+    return new_suite;
+}
 
 let default_ag_case_feedback_config: AGTestCaseFeedbackConfig = {
     visible: false,
