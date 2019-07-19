@@ -2,13 +2,23 @@ import {
     AGTestCase,
     AGTestCaseFeedbackConfig,
     AGTestCommand,
-    AGTestCommandFeedbackConfig, AGTestSuite,
-    AGTestSuiteFeedbackConfig, BugsExposedFeedbackLevel,
+    AGTestCommandFeedbackConfig,
+    AGTestSuite,
+    AGTestSuiteFeedbackConfig,
+    BugsExposedFeedbackLevel,
+    Course,
     ExpectedOutputSource,
-    ExpectedReturnCode, MutationTestSuite, MutationTestSuiteFeedbackConfig,
+    ExpectedReturnCode,
+    MutationTestSuite,
+    MutationTestSuiteFeedbackConfig,
+    Project,
+    Semester,
     StdinSource,
+    UltimateSubmissionPolicy,
     ValueFeedbackLevel
 } from 'ag-client-typescript';
+
+import { safe_assign } from "@/utils";
 
 let default_mutation_suite_feedback_config: MutationTestSuiteFeedbackConfig = {
     visible: false,
@@ -186,4 +196,81 @@ export function create_ag_command(pk: number, command_name: string,
         process_spawn_limit: 1
     });
     return new_command;
+}
+
+function* counter() {
+    let count = 1;
+    while (true) {
+        yield count;
+        count += 1;
+    }
+}
+
+const COURSE_PKS = counter();
+
+export function make_course(args: Partial<Course> = {}): Course {
+    let defaults = {
+        pk: COURSE_PKS.next().value,
+        name: `Course ${random_id()}`,
+        semester: Semester.winter,
+        year: 2019,
+        subtitle: '',
+        num_late_days: 0,
+        allowed_guest_domain: '',
+        last_modified: now_str()
+    };
+    safe_assign(defaults, args);
+    return new Course(defaults);
+}
+
+const PROJECT_PKS = counter();
+
+export function make_project(course_pk: number, args: Partial<Project> = {}): Project {
+    let defaults = {
+        pk: PROJECT_PKS.next().value,
+        name: `Project ${random_id()}`,
+        course: course_pk,
+        last_modified: now_str(),
+        visible_to_students: true,
+        closing_time: null,
+        soft_closing_time: null,
+        disallow_student_submissions: true,
+        disallow_group_registration: true,
+        guests_can_submit: true,
+        min_group_size: 1,
+        max_group_size: 1,
+        submission_limit_per_day: null,
+        allow_submissions_past_limit: true,
+        groups_combine_daily_submissions: false,
+        submission_limit_reset_time: "",
+        submission_limit_reset_timezone: "",
+        num_bonus_submissions: 1,
+        total_submission_limit: null,
+        allow_late_days: true,
+        ultimate_submission_policy: UltimateSubmissionPolicy.best,
+        hide_ultimate_submission_fdbk: false,
+        instructor_files: [],
+        expected_student_files: [],
+        has_handgrading_rubric: false,
+    };
+    safe_assign(defaults, args);
+    defaults.course = course_pk;
+    return new Project(defaults);
+}
+
+function random_id() {
+    let result = '';
+    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 20; ++i) {
+        result += chars.charAt(rand_int(chars.length - 1));
+    }
+    return result;
+}
+
+function rand_int(max: number) {
+    return Math.floor(Math.random() * max);
+}
+
+function now_str() {
+    return (new Date()).toISOString();
 }

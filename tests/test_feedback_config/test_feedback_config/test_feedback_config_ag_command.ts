@@ -270,6 +270,20 @@ describe('FeedbackConfigAGCommand tests', () => {
     });
 
     test("checkboxes in config panels do not react to changes in other panels", async () => {
+        expect(component.d_ag_test_command!.normal_fdbk_config.show_actual_stdout).toBe(false);
+        expect(
+            component.d_ag_test_command!.first_failed_test_normal_fdbk_config!.show_actual_stdout
+        ).toBe(false);
+        expect(
+            component.d_ag_test_command!.ultimate_submission_fdbk_config.show_actual_stdout
+        ).toBe(false);
+        expect(
+            component.d_ag_test_command!.past_limit_submission_fdbk_config.show_actual_stdout
+        ).toBe(false);
+        expect(
+            component.d_ag_test_command!.staff_viewer_fdbk_config.show_actual_stdout
+        ).toBe(false);
+
         wrapper.findAll('.advanced-settings-label').at(0).trigger('click');
         await component.$nextTick();
 
@@ -279,13 +293,26 @@ describe('FeedbackConfigAGCommand tests', () => {
         wrapper.findAll('.advanced-settings-label').at(2).trigger('click');
         await component.$nextTick();
 
+        wrapper.findAll('.advanced-settings-label').at(3).trigger('click');
+        await component.$nextTick();
+
+        wrapper.findAll('.advanced-settings-label').at(4).trigger('click');
+        await component.$nextTick();
+
         wrapper.find('#first-failure-show-actual-stdout').setChecked(true);
+
         expect(component.d_ag_test_command!.normal_fdbk_config.show_actual_stdout).toBe(false);
         expect(
             component.d_ag_test_command!.first_failed_test_normal_fdbk_config!.show_actual_stdout
         ).toBe(true);
         expect(
             component.d_ag_test_command!.ultimate_submission_fdbk_config.show_actual_stdout
+        ).toBe(false);
+        expect(
+            component.d_ag_test_command!.past_limit_submission_fdbk_config.show_actual_stdout
+        ).toBe(false);
+        expect(
+            component.d_ag_test_command!.staff_viewer_fdbk_config.show_actual_stdout
         ).toBe(false);
     });
 
