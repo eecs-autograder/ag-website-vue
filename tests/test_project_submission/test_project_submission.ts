@@ -2,7 +2,7 @@ import VueRouter from 'vue-router';
 
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 
-import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { Course, Project, Semester, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import ProjectSubmission from '@/components/project_submission/project_submission.vue';
@@ -15,6 +15,7 @@ describe('Changing Tabs', ()  => {
     let wrapper: Wrapper<ProjectSubmission>;
     let component: ProjectSubmission;
     let project: Project;
+    let course: Course;
     let original_match_media: (query: string) => MediaQueryList;
     // tslint:disable-next-line naming-convention
     const localVue = createLocalVue();
@@ -63,7 +64,13 @@ describe('Changing Tabs', ()  => {
             has_handgrading_rubric: false,
         });
 
+        course = new Course({
+            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
+            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
+        });
+
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
+        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
 
         config.logModifiedComponents = false;
         original_match_media = window.matchMedia;
@@ -143,6 +150,7 @@ describe('select_tab function called with different values associated with "curr
     let wrapper: Wrapper<ProjectSubmission>;
     let component: ProjectSubmission;
     let project: Project;
+    let course: Course;
     let original_match_media: (query: string) => MediaQueryList;
 
     const $route = {
@@ -183,7 +191,13 @@ describe('select_tab function called with different values associated with "curr
             has_handgrading_rubric: false,
         });
 
+        course = new Course({
+            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
+            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
+        });
+
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
+        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
 
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {

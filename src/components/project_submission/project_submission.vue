@@ -18,7 +18,10 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Submit - TODO
+            <group-registration :project="project"
+                                :course="course">
+            </group-registration>
+            <!--TODO Submit component-->
           </div>
         </template>
       </tab>
@@ -31,7 +34,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Submissions - TODO
+            <!--TODO Submissions-->
           </div>
         </template>
       </tab>
@@ -44,7 +47,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            Student Lookup - TODO (branch Exists)
+            <!--TODO Student Lookup-->
           </div>
         </template>
       </tab>
@@ -56,8 +59,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import { Project } from 'ag-client-typescript';
+import { Course, Project } from 'ag-client-typescript';
 
+import GroupRegistration from '@/components/project_submission/group_registration/group_registration.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -65,6 +69,7 @@ import { get_query_param } from '@/utils';
 
 @Component({
   components: {
+    GroupRegistration,
     Tab,
     TabHeader,
     Tabs
@@ -74,9 +79,11 @@ export default class ProjectSubmission extends Vue {
   current_tab_index = 0;
   d_loading = true;
   project: Project | null = null;
+  course: Course | null = null;
 
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
+    this.course = await Course.get_by_pk(this.project.course);
     this.d_loading = false;
   }
 
@@ -134,7 +141,7 @@ export default class ProjectSubmission extends Vue {
 .tab-body {
   text-align: left;
   position: relative;
-  padding-top: 10px;
+  padding: 10px;
 }
 
 .tab-label {
