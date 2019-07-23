@@ -53,7 +53,7 @@ describe('InstructorFiles.vue', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         file_same_name_as_1 = new File(

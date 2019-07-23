@@ -64,7 +64,7 @@ describe('CourseView tests', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         sinon.stub(User, 'get_current').returns(Promise.resolve(user));

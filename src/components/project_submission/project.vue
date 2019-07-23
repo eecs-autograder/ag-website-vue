@@ -18,10 +18,30 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            <group-registration :project="project"
-                                :course="course">
-            </group-registration>
+            <div v-if="group === null">
+              <group-registration :project="project"
+                                  :course="course">
+              </group-registration>
+            </div>
+
+            <div v-if="group !== null">
+<!--              <div v-if="group.extended_due_date !== null">-->
+<!--                <h4 id="extension">-->
+<!--                  Extension: {{format_datetime(group.extended_due_date)}}-->
+<!--                </h4>-->
+<!--              </div>-->
+
+              <div id="group-members-container">
+                <div id="group-members-title"><b> Group members: </b></div>
+                <div v-for="(member, index) of group.member_names">
+                  <div :class="['group-member', {'odd-row': index % 2 !== 0}]">{{member}}</div>
+                </div>
+              </div>
+
+            </div>
+
             <!--TODO Submit component-->
+
           </div>
         </template>
       </tab>
@@ -59,7 +79,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import { Course, Project } from 'ag-client-typescript';
+import { Course, Group, GroupObserver, Project, User } from 'ag-client-typescript';
 
 import GroupRegistration from '@/components/project_submission/group_registration/group_registration.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -75,16 +95,31 @@ import { get_query_param } from '@/utils';
     Tabs
   }
 })
-export default class ProjectSubmission extends Vue {
+export default class ProjectSubmission extends Vue implements GroupObserver {
   current_tab_index = 0;
   d_loading = true;
+  user: User | null = null;
   project: Project | null = null;
   course: Course | null = null;
+  group: Group | null = null;
 
   async created() {
+    Group.subscribe(this);
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
     this.course = await Course.get_by_pk(this.project.course);
+    this.user = await User.get_current();
+    let groups_is_member_of = await this.user.groups_is_member_of();
+    if (groups_is_member_of.length > 0) {
+      let result = groups_is_member_of.find(group => group.project === this.project!.pk);
+      if (result !== undefined) {
+        this.group = result;
+      }
+    }
     this.d_loading = false;
+  }
+
+  beforeDestroy() {
+    Group.unsubscribe(this);
   }
 
   mounted() {
@@ -117,6 +152,14 @@ export default class ProjectSubmission extends Vue {
         this.current_tab_index = 0;
     }
   }
+
+  update_group_changed(group: Group): void {}
+
+  update_group_created(group: Group): void {
+    this.group = group;
+  }
+
+  update_group_merged(new_group: Group, group1_pk: number, group2_pk: number): void {}
 }
 </script>
 
@@ -147,6 +190,29 @@ export default class ProjectSubmission extends Vue {
 .tab-label {
   outline: none;
   cursor: pointer;
+}
+
+#group-members-container {
+  min-width: 25%;
+  border-collapse: collapse;
+  border: 2px solid $gray-blue-1;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+#group-members-title {
+  padding: 10px 15px 10px 15px;
+  background-color: $gray-blue-1;
+}
+
+.group-member {
+  font-size: 16px;
+  padding: 10px 15px 10px 15px;
+  border-radius: 0 0 2px 2px;
+}
+
+#group-members-container .odd-row {
+  background-color: $white-gray;
 }
 
 @media only screen and (min-width: 481px) {
