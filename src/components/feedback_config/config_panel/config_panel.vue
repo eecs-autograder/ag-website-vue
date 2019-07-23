@@ -9,7 +9,7 @@
         <span id="preset-label">Preset:</span>
         <select id="config-preset-select"
                 v-model="preset_selected"
-                @change="$emit('apply_preset', preset_selected)"
+                @change="update_config"
                 class="select">
           <option hidden>Custom</option>
           <option v-for="preset_name of preset_names"
@@ -40,6 +40,7 @@ import {
   MutationTestSuiteFeedbackPreset
 } from '@/components/feedback_config/feedback_config/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
+import { safe_assign } from "@/utils";
 
 export type FeedbackPresetType = MutationTestSuiteFeedbackPreset
                                  | AGTestCommandFeedbackPreset
@@ -74,6 +75,12 @@ export default class ConfigPanel extends Vue {
     if (this.d_configuration !== null) {
       this.preset_selected = this.get_preset_fn(this.d_configuration, this.preset_options);
     }
+  }
+
+  update_config() {
+    safe_assign(this.d_configuration!, this.preset_options.get(this.preset_selected));
+    let copy_of_config = JSON.parse(JSON.stringify(this.d_configuration));
+    this.$emit('input', copy_of_config);
   }
 
   created() {

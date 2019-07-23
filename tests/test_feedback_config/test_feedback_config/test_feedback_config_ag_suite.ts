@@ -9,6 +9,7 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
 import FeedbackConfigAGSuite from '@/components/feedback_config/feedback_config/feedback_config_ag_suite.vue';
 import { safe_assign } from '@/utils';
 
@@ -73,48 +74,58 @@ describe('FeedbackConfigAGSuite tests', () => {
         )).toEqual("Custom");
     });
 
-    test("apply_preset", async () => {
-        let ag_test_suite_config: AGTestSuiteFeedbackConfig = create_ag_suite_feedback_config();
-
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Custom");
-
-        component.apply_preset("Public Setup", ag_test_suite_config);
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Public Setup");
-
-        component.apply_preset("Pass/Fail Setup", ag_test_suite_config);
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Pass/Fail Setup");
-
-        component.apply_preset("Private Setup", ag_test_suite_config);
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Private Setup");
-
-        component.apply_preset("Custom", ag_test_suite_config);
-        expect(component.get_current_preset_fn(
-            ag_test_suite_config, component.fdbk_presets
-        )).toEqual("Private Setup");
-    });
-
-    test("apply_preset called from config_panel", async () => {
+    test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
         expect(component.get_current_preset_fn(
             component.d_ag_test_suite!.staff_viewer_fdbk_config, component.fdbk_presets
         )).toEqual("Custom");
 
-        let staff_viewer_config_panel = wrapper.find({ref: 'student_lookup'});
+        let ultimate_submission_config_panel = wrapper.find({ref: 'final_graded'});
+        let ultimate_submission_edit_settings = <EditFeedbackSettingsAGSuite> wrapper.find({
+            ref: 'final_graded_edit_feedback_settings'
+        }).vm;
 
-        staff_viewer_config_panel.find('#config-preset-select').setValue("Pass/Fail Setup");
+        ultimate_submission_config_panel.find('#config-preset-select').setValue(
+            "Pass/Fail Setup"
+        );
         await component.$nextTick();
 
         expect(component.get_current_preset_fn(
-            component.d_ag_test_suite!.staff_viewer_fdbk_config,
+            component.d_ag_test_suite!.ultimate_submission_fdbk_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail Setup");
+        expect(component.get_current_preset_fn(
+            ultimate_submission_edit_settings.d_ag_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Pass/Fail Setup");
+
+        ultimate_submission_config_panel.find('#config-preset-select').setValue(
+            "Public Setup"
+        );
+        await component.$nextTick();
+
+        expect(component.get_current_preset_fn(
+            component.d_ag_test_suite!.ultimate_submission_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Public Setup");
+        expect(component.get_current_preset_fn(
+            ultimate_submission_edit_settings.d_ag_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Public Setup");
+
+        ultimate_submission_config_panel.find('#config-preset-select').setValue(
+            "Private Setup"
+        );
+        await component.$nextTick();
+
+        expect(component.get_current_preset_fn(
+            component.d_ag_test_suite!.ultimate_submission_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Private Setup");
+        expect(component.get_current_preset_fn(
+            ultimate_submission_edit_settings.d_ag_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Private Setup");
+
     });
 
     test("update_config_settings in edit_feedback_settings_ag_suite - changes reflected in " +

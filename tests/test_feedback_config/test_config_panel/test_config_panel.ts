@@ -1,6 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
+import { AGTestCommandFeedbackConfig, AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import {
@@ -9,7 +9,10 @@ import {
 } from '@/components/feedback_config/feedback_config/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
 
-import { create_ag_suite_feedback_config } from '@/tests/data_utils';
+import {
+    create_ag_command_feedback_config,
+    create_ag_suite_feedback_config
+} from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -61,7 +64,7 @@ describe('ConfigPanel tests', () => {
             ]
         ]);
 
-        get_current_preset_fn = function get_current_preset_fn(
+        get_current_preset_fn = function(
             current_config: AGTestSuiteFeedbackConfig,
             preset_options: SafeMap<string, AGTestSuiteFeedbackPreset>) {
             for (let [preset_label, potential_match] of preset_options) {
@@ -125,20 +128,53 @@ describe('ConfigPanel tests', () => {
         config_preset_select_input.setValue(component.preset_names[0]);
         await component.$nextTick();
 
-        expect(wrapper.emitted().apply_preset.length).toEqual(1);
         expect(component.preset_selected).toEqual(component.preset_names[0]);
 
         config_preset_select_input.setValue(component.preset_names[1]);
         await component.$nextTick();
 
-        expect(wrapper.emitted().apply_preset.length).toEqual(2);
         expect(component.preset_selected).toEqual(component.preset_names[1]);
 
         config_preset_select_input.setValue(component.preset_names[2]);
         await component.$nextTick();
 
-        expect(wrapper.emitted().apply_preset.length).toEqual(3);
         expect(component.preset_selected).toEqual(component.preset_names[2]);
+    });
+
+    test.only("apply_preset", async () => {
+        wrapper = mount(ConfigPanel, {
+            propsData: {
+                config_name: FeedbackConfigLabel.normal,
+                get_preset_fn: get_current_preset_fn,
+                preset_options: ag_test_suite_fdbk_presets,
+                value: ag_test_suite_normal_feedback_config
+            }
+        });
+        component = wrapper.vm;
+
+        expect(component.preset_names.length).toEqual(3);
+        expect(component.preset_names).toEqual([
+            'Public Setup',
+            'Pass/Fail Setup',
+            'Private Setup'
+        ]);
+
+        let config_preset_select_input = wrapper.find('#config-preset-select');
+
+        config_preset_select_input.setValue(component.preset_names[2]);
+        expect(component.get_preset_fn(
+            component.d_configuration, component.preset_options
+        )).toEqual("Private Setup");
+
+        config_preset_select_input.setValue(component.preset_names[1]);
+        expect(component.get_preset_fn(
+            component.d_configuration, component.preset_options
+        )).toEqual("Pass/Fail Setup");
+
+        config_preset_select_input.setValue(component.preset_names[0]);
+        expect(component.get_preset_fn(
+            component.d_configuration, component.preset_options
+        )).toEqual("Public Setup");
     });
 
     test('Value prop changed to a configuration that is not null', async () => {

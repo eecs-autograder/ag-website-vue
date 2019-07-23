@@ -10,6 +10,7 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsMutationSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_mutation_suite.vue';
 import FeedbackConfigMutationSuite from '@/components/feedback_config/feedback_config/feedback_config_mutation_suite.vue';
 import { safe_assign } from '@/utils';
 
@@ -87,50 +88,40 @@ describe('FeedbackConfigMutationSuite tests', () => {
         )).toEqual("Custom");
     });
 
-    test("apply_preset", async () => {
-        let mutation_test_suite_config = create_mutation_suite_feedback_config();
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("Custom");
-
-        component.apply_preset("Public", mutation_test_suite_config);
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("Public");
-
-        component.apply_preset("Num Bugs + Prep Output", mutation_test_suite_config);
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("Num Bugs + Prep Output");
-
-        component.apply_preset("Num Bugs Exposed", mutation_test_suite_config);
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("Num Bugs Exposed");
-
-        component.apply_preset("False Positives", mutation_test_suite_config);
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("False Positives");
-
-        component.apply_preset("Private", mutation_test_suite_config);
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("Private");
-
-        component.apply_preset("Custom", mutation_test_suite_config);
-        expect(component.get_current_preset_fn(
-            mutation_test_suite_config, component.fdbk_presets
-        )).toEqual("Private");
-    });
-
-    test("apply_preset called from config_panel", async () => {
+    test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
         expect(component.get_current_preset_fn(
             component.d_mutation_test_suite!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Custom");
 
         let past_limit_config_panel = wrapper.find({ref: 'past_limit'});
+        let past_limit_edit_settings = <EditFeedbackSettingsMutationSuite> wrapper.find({
+            ref: 'past_limit_edit_feedback_settings'
+        }).vm;
+
+        past_limit_config_panel.find('#config-preset-select').setValue("Num Bugs + Prep Output");
+        await component.$nextTick();
+
+        expect(component.get_current_preset_fn(
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Num Bugs + Prep Output");
+        expect(component.get_current_preset_fn(
+            past_limit_edit_settings.d_mutation_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Num Bugs + Prep Output");
+
+        past_limit_config_panel.find('#config-preset-select').setValue("Num Bugs Exposed");
+        await component.$nextTick();
+
+        expect(component.get_current_preset_fn(
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Num Bugs Exposed");
+        expect(component.get_current_preset_fn(
+            past_limit_edit_settings.d_mutation_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Num Bugs Exposed");
 
         past_limit_config_panel.find('#config-preset-select').setValue("False Positives");
         await component.$nextTick();
@@ -139,6 +130,34 @@ describe('FeedbackConfigMutationSuite tests', () => {
             component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
             component.fdbk_presets
         )).toEqual("False Positives");
+        expect(component.get_current_preset_fn(
+            past_limit_edit_settings.d_mutation_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("False Positives");
+
+        past_limit_config_panel.find('#config-preset-select').setValue("Private");
+        await component.$nextTick();
+
+        expect(component.get_current_preset_fn(
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Private");
+        expect(component.get_current_preset_fn(
+            past_limit_edit_settings.d_mutation_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Private");
+
+        past_limit_config_panel.find('#config-preset-select').setValue("Public");
+        await component.$nextTick();
+
+        expect(component.get_current_preset_fn(
+            component.d_mutation_test_suite!.past_limit_submission_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Public");
+        expect(component.get_current_preset_fn(
+            past_limit_edit_settings.d_mutation_test_suite_settings,
+            component.fdbk_presets
+        )).toEqual("Public");
     });
 
     test("update config settings in edit_feedback_settings_mutation_suite - changes " +

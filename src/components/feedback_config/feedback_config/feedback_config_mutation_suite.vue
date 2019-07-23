@@ -6,12 +6,11 @@
         <config-panel ref="normal"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_mutation_test_suite.normal_fdbk_config"
-                      @apply_preset="apply_preset($event,
-                                                  d_mutation_test_suite.normal_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsMutationSuite
+              ref="normal_edit_feedback_settings"
               :config_name="FeedbackConfigLabel.normal"
               v-model="d_mutation_test_suite.normal_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
@@ -21,14 +20,11 @@
         <config-panel ref="final_graded"
                       :config_name="FeedbackConfigLabel.ultimate_submission"
                       v-model="d_mutation_test_suite.ultimate_submission_fdbk_config"
-                      @apply_preset="apply_preset(
-                        $event,
-                        d_mutation_test_suite.ultimate_submission_fdbk_config
-                      )"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsMutationSuite
+              ref="final_graded_edit_feedback_settings"
               :config_name="FeedbackConfigLabel.ultimate_submission"
               v-model="d_mutation_test_suite.ultimate_submission_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
@@ -38,14 +34,11 @@
         <config-panel ref="past_limit"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_mutation_test_suite.past_limit_submission_fdbk_config"
-                      @apply_preset="apply_preset(
-                        $event,
-                        d_mutation_test_suite.past_limit_submission_fdbk_config
-                      )"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsMutationSuite
+              ref="past_limit_edit_feedback_settings"
               :config_name="FeedbackConfigLabel.past_limit"
               v-model="d_mutation_test_suite.past_limit_submission_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
@@ -55,12 +48,11 @@
         <config-panel ref="student_lookup"
                       :config_name="FeedbackConfigLabel.staff_viewer"
                       v-model="d_mutation_test_suite.staff_viewer_fdbk_config"
-                      @apply_preset="apply_preset($event,
-                                                  d_mutation_test_suite.staff_viewer_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsMutationSuite
+              ref="student_lookup_edit_feedback_settings"
               :config_name="FeedbackConfigLabel.staff_viewer"
               v-model="d_mutation_test_suite.staff_viewer_fdbk_config">
             </EditFeedbackSettingsMutationSuite>
@@ -258,13 +250,6 @@ export default class FeedbackConfigMutationSuite extends Vue {
       }
     }
     return "Custom";
-  }
-  apply_preset(preset_selected: string,
-               config_being_viewed: MutationTestSuiteFeedbackConfig) {
-    if (preset_selected !== 'Custom') {
-      let preset = this.fdbk_presets.get(preset_selected);
-      safe_assign(config_being_viewed, preset);
-    }
   }
 }
 

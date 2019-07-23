@@ -5,12 +5,11 @@
         <config-panel ref="normal"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_ag_test_suite.normal_fdbk_config"
-                      @apply_preset="apply_preset($event,
-                                                  d_ag_test_suite.normal_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsAGSuite v-model="d_ag_test_suite.normal_fdbk_config"
+            <EditFeedbackSettingsAGSuite ref="normal_edit_feedback_settings"
+                                         v-model="d_ag_test_suite.normal_fdbk_config"
                                          :config_name="FeedbackConfigLabel.normal">
             </EditFeedbackSettingsAGSuite>
           </template>
@@ -19,12 +18,11 @@
         <config-panel ref="final_graded"
                       :config_name="FeedbackConfigLabel.ultimate_submission"
                       v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
-                      @apply_preset="apply_preset($event,
-                                                  d_ag_test_suite.ultimate_submission_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsAGSuite v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
+            <EditFeedbackSettingsAGSuite ref="final_graded_edit_feedback_settings"
+                                         v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
                                          :config_name="FeedbackConfigLabel.ultimate_submission">
             </EditFeedbackSettingsAGSuite>
           </template>
@@ -34,12 +32,11 @@
           ref="past_limit"
           :config_name="FeedbackConfigLabel.past_limit"
           v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
-          @apply_preset="apply_preset($event,
-                                      d_ag_test_suite.past_limit_submission_fdbk_config)"
           :get_preset_fn="get_current_preset_fn"
           :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGSuite
+              ref="past_limit_feedback_settings"
               v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
               :config_name="FeedbackConfigLabel.past_limit">
             </EditFeedbackSettingsAGSuite>
@@ -49,12 +46,11 @@
         <config-panel ref="student_lookup"
                       :config_name="FeedbackConfigLabel.staff_viewer"
                       v-model="d_ag_test_suite.staff_viewer_fdbk_config"
-                      @apply_preset="apply_preset($event,
-                                                  d_ag_test_suite.staff_viewer_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsAGSuite v-model="d_ag_test_suite.staff_viewer_fdbk_config"
+            <EditFeedbackSettingsAGSuite ref="student_lookup_edit_feedback_settings"
+                                         v-model="d_ag_test_suite.staff_viewer_fdbk_config"
                                          :config_name="FeedbackConfigLabel.staff_viewer">
             </EditFeedbackSettingsAGSuite>
           </template>
@@ -170,14 +166,6 @@ export default class FeedbackConfigAGSuite extends Vue {
       }
     }
     return "Custom";
-  }
-
-  apply_preset(preset_selected: string,
-               config_to_apply_changes_to: AGTestSuiteFeedbackConfig) {
-    if (preset_selected !== 'Custom') {
-      let preset = this.fdbk_presets.get(preset_selected);
-      safe_assign(config_to_apply_changes_to, preset);
-    }
   }
 }
 

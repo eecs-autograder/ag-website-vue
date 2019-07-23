@@ -11,6 +11,7 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
 import FeedbackConfigAGCommand from '@/components/feedback_config/feedback_config/feedback_config_ag_command.vue';
 import { safe_assign } from '@/utils';
 
@@ -57,8 +58,10 @@ describe('FeedbackConfigAGCommand tests', () => {
         let first_failure_config = wrapper.find({ref: 'first_failure'});
         let first_failure_config_component = <ConfigPanel> first_failure_config.vm;
 
-        component.apply_preset("Pass/Fail + Exit Status",
-                               component.d_ag_test_command!.first_failed_test_normal_fdbk_config!);
+        safe_assign(
+            component.d_ag_test_command!.first_failed_test_normal_fdbk_config!,
+            component.fdbk_presets.get("Pass/Fail + Exit Status")
+        );
         await component.$nextTick();
 
         expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config).not.toBeNull();
@@ -136,63 +139,28 @@ describe('FeedbackConfigAGCommand tests', () => {
         )).toEqual("Custom");
     });
 
-    test("apply_preset", async () => {
-        let ag_test_command_config: AGTestCommandFeedbackConfig
-            = create_ag_command_feedback_config();
-
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Custom");
-
-        component.apply_preset("Public", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Public");
-
-        component.apply_preset("Pass/Fail + Output", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail + Output");
-
-        component.apply_preset("Pass/Fail + Diff", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail + Diff");
-
-        component.apply_preset("Pass/Fail + Exit Status", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail + Exit Status");
-
-        component.apply_preset("Pass/Fail", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail");
-
-        component.apply_preset("Private", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Private");
-
-        component.apply_preset("Custom", ag_test_command_config);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Private");
-    });
-
-    test("apply_preset called from config_panel", async () => {
+    test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
         expect(component.get_current_preset_fn(
             component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Custom");
 
         let staff_viewer_config_panel = wrapper.find({ref: 'student_lookup'});
+        staff_viewer_config_panel.find('.advanced-settings-label').trigger('click');
+
+        let staff_viewer_edit_settings = <EditFeedbackSettingsAGCommand> wrapper.find({ref:
+            'student_lookup_edit_feedback_settings'
+        }).vm;
 
         staff_viewer_config_panel.find('#config-preset-select').setValue("Public");
         await component.$nextTick();
 
         expect(component.get_current_preset_fn(
             component.d_ag_test_command!.staff_viewer_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Public");
+        expect(component.get_current_preset_fn(
+            staff_viewer_edit_settings.d_ag_test_command_settings,
             component.fdbk_presets
         )).toEqual("Public");
 
@@ -203,12 +171,20 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Output");
+        expect(component.get_current_preset_fn(
+            staff_viewer_edit_settings.d_ag_test_command_settings,
+            component.fdbk_presets
+        )).toEqual("Pass/Fail + Output");
 
         staff_viewer_config_panel.find('#config-preset-select').setValue("Pass/Fail + Diff");
         await component.$nextTick();
 
         expect(component.get_current_preset_fn(
             component.d_ag_test_command!.staff_viewer_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Pass/Fail + Diff");
+        expect(component.get_current_preset_fn(
+            staff_viewer_edit_settings.d_ag_test_command_settings,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Diff");
 
@@ -221,6 +197,10 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Exit Status");
+        expect(component.get_current_preset_fn(
+            staff_viewer_edit_settings.d_ag_test_command_settings,
+            component.fdbk_presets
+        )).toEqual("Pass/Fail + Exit Status");
 
         staff_viewer_config_panel.find('#config-preset-select').setValue("Pass/Fail");
         await component.$nextTick();
@@ -229,12 +209,20 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail");
+        expect(component.get_current_preset_fn(
+            staff_viewer_edit_settings.d_ag_test_command_settings,
+            component.fdbk_presets
+        )).toEqual("Pass/Fail");
 
         staff_viewer_config_panel.find('#config-preset-select').setValue("Private");
         await component.$nextTick();
 
         expect(component.get_current_preset_fn(
             component.d_ag_test_command!.staff_viewer_fdbk_config,
+            component.fdbk_presets
+        )).toEqual("Private");
+        expect(component.get_current_preset_fn(
+            staff_viewer_edit_settings.d_ag_test_command_settings,
             component.fdbk_presets
         )).toEqual("Private");
     });

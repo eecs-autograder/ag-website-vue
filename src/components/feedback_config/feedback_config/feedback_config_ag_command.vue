@@ -6,30 +6,20 @@
         <config-panel ref="normal"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_ag_test_command.normal_fdbk_config"
-                      @apply_preset="apply_preset($event,
-                                                  d_ag_test_command.normal_fdbk_config)"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsAGCommand v-model="d_ag_test_command.normal_fdbk_config"
+            <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
+                                           v-model="d_ag_test_command.normal_fdbk_config"
                                            :ag_test_case="ag_test_case"
                                            :config_name="FeedbackConfigLabel.normal">
             </EditFeedbackSettingsAGCommand>
           </template>
         </config-panel>
 
-        <button @click="apply_preset('Pass/Fail + Exit Status',
-           d_ag_test_command.first_failed_test_normal_fdbk_config)">
-          Press me
-        </button>
-
         <config-panel ref="first_failure"
                       :config_name="FeedbackConfigLabel.first_failure"
                       v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                      @apply_preset="apply_preset(
-                        $event,
-                        d_ag_test_command.first_failed_test_normal_fdbk_config
-                      )"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
@@ -45,6 +35,7 @@
               </label>
             </div>
             <EditFeedbackSettingsAGCommand
+              ref="first_failure_edit_feedback_settings"
               v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
               :ag_test_case="ag_test_case"
               :config_name="FeedbackConfigLabel.first_failure">
@@ -56,12 +47,11 @@
           ref="final_graded"
           :config_name="FeedbackConfigLabel.ultimate_submission"
           v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-          @apply_preset="apply_preset($event,
-                                      d_ag_test_command.ultimate_submission_fdbk_config)"
           :get_preset_fn="get_current_preset_fn"
           :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGCommand
+              ref="final_graded_edit_feedback_settings"
               v-model="d_ag_test_command.ultimate_submission_fdbk_config"
               :ag_test_case="ag_test_case"
               :config_name="FeedbackConfigLabel.ultimate_submission">
@@ -72,14 +62,11 @@
         <config-panel ref="past_limit"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                      @apply_preset="apply_preset(
-                        $event,
-                        d_ag_test_command.past_limit_submission_fdbk_config
-                      )"
                       :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGCommand
+              ref="past_limit_edit_feedback_settings"
               v-model="d_ag_test_command.past_limit_submission_fdbk_config"
               :ag_test_case="ag_test_case"
               :config_name="FeedbackConfigLabel.past_limit">
@@ -91,12 +78,11 @@
           ref="student_lookup"
           :config_name="FeedbackConfigLabel.staff_viewer"
           v-model="d_ag_test_command.staff_viewer_fdbk_config"
-          @apply_preset="apply_preset($event,
-                                      d_ag_test_command.staff_viewer_fdbk_config)"
           :get_preset_fn="get_current_preset_fn"
           :preset_options="fdbk_presets">
           <template slot="settings">
-            <EditFeedbackSettingsAGCommand v-model="d_ag_test_command.staff_viewer_fdbk_config"
+            <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
+                                           v-model="d_ag_test_command.staff_viewer_fdbk_config"
                                            :ag_test_case="ag_test_case"
                                            :config_name="FeedbackConfigLabel.staff_viewer">
             </EditFeedbackSettingsAGCommand>
@@ -250,14 +236,6 @@ export default class FeedbackConfigAGCommand extends Vue {
     this.d_ag_test_command = deep_copy(this.ag_test_command, AGTestCommand);
     this.first_failed_config_is_enabled =
       this.d_ag_test_command!.first_failed_test_normal_fdbk_config !== null;
-  }
-
-  apply_preset(preset_selected: string,
-               config_to_apply_changes_to: AGTestCommandFeedbackConfig) {
-    if (preset_selected !== "Custom") {
-      let preset = this.fdbk_presets.get(preset_selected);
-      safe_assign(config_to_apply_changes_to, preset);
-    }
   }
 
   get_current_preset_fn(current_config: AGTestCommandFeedbackConfig | null,
