@@ -696,7 +696,9 @@ describe.only('GroupRegistration tests', () => {
         expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
     });
 
-    test('send invitation - fields reset every time modal is opened', async () => {
+    test('group member inputs are reset whenever the send_group_invitation_modal is opened' +
+         '- after successful submission',
+         async () => {
         let group_invitation_created =  new GroupInvitation({
             pk: 2,
             invitation_creator: user.username,
@@ -769,5 +771,285 @@ describe.only('GroupRegistration tests', () => {
         expect(wrapper.findAll('.member-name-input').length).toEqual(2);
         expect(wrapper.findAll('.member-name-input').at(0).text()).toEqual("");
         expect(wrapper.findAll('.member-name-input').at(1).text()).toEqual("");
+    });
+
+    test('group member inputs are reset whenever the send_group_invitation_modal is opened' +
+         '- after canceling during the process of creating the invitation',
+         async () => {
+        let send_invitation_stub = sinon.stub(GroupInvitation, 'send_invitation');
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.invitation_sent).toEqual(null);
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+
+        let member_1_name_input = wrapper.findAll('.member-name-input').at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = "milo";
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_2_name_input = wrapper.findAll('.member-name-input').at(1);
+        (<HTMLInputElement> member_2_name_input.element).value = "keiko";
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        wrapper.find('.cancel-send-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        expect(send_invitation_stub.callCount).toEqual(0);
+        expect(component.invitation_sent).toEqual(null);
+        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').at(0).text()).toEqual("");
+        expect(wrapper.findAll('.member-name-input').at(1).text()).toEqual("");
+    });
+
+    test('group member inputs are reset whenever the send_group_invitation_modal is opened' +
+         '- after clicking outside of the modal when creating the invitation',
+         async () => {
+        let send_invitation_stub = sinon.stub(GroupInvitation, 'send_invitation');
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.invitation_sent).toEqual(null);
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+
+        let member_1_name_input = wrapper.findAll('.member-name-input').at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = "milo";
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        wrapper.find('#modal-mask').trigger('click');
+        await component.$nextTick();
+
+        expect(send_invitation_stub.callCount).toEqual(0);
+        expect(component.invitation_sent).toEqual(null);
+        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').at(0).text()).toEqual("");
+        expect(wrapper.findAll('.member-name-input').at(1).text()).toEqual("");
+    });
+
+    test('group member inputs are reset whenever the send_group_invitation_modal is opened' +
+         '- after an unsuccessful submit',
+         async () => {
+        let send_invitation_stub = sinon.stub(GroupInvitation, 'send_invitation').returns(
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {__all__:
+                            "Error in 'invited_users': Groups with any staff users must consist " +
+                            "of only staff users" }
+                )
+        ));
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.invitation_sent).toEqual(null);
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+
+        let member_1_name_input = wrapper.findAll('.member-name-input').at(0);
+        (<HTMLInputElement> member_1_name_input.element).value = "milo";
+        member_1_name_input.trigger('input');
+        await component.$nextTick();
+
+        let member_2_name_input = wrapper.findAll('.member-name-input').at(1);
+        (<HTMLInputElement> member_2_name_input.element).value = "michael";
+        member_2_name_input.trigger('input');
+        await component.$nextTick();
+
+        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        expect(send_invitation_stub.calledOnce).toBe(true);
+        expect(component.invitation_sent).toEqual(null);
+        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+
+        wrapper.find('#modal-mask').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').at(0).text()).toEqual("");
+        expect(wrapper.findAll('.member-name-input').at(1).text()).toEqual("");
+    });
+
+    test('If the Project.max_group_size === Project.min_group_size, ' +
+         'Project.min_group_size - 1 group member inputs are displayed when the ' +
+         'send_group_invitation_modal is opened',
+         async () => {
+         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+         project.min_group_size = 5;
+         project.max_group_size = 5;
+
+         wrapper = mount(GroupRegistration, {
+             propsData: {
+                 project: project,
+                 course: course
+             }
+         });
+         component = wrapper.vm;
+         await component.$nextTick();
+
+         wrapper.find('.send-group-invitation-button').trigger('click');
+         await component.$nextTick();
+
+         expect(wrapper.findAll('.member-name-input').length).toEqual(4);
+    });
+
+    test('If the Project.max_group_size !== Project.min_group_size, ' +
+         'Project.min_group_size - 1 group member inputs are displayed when the ' +
+         'send_group_invitation_modal is opened',
+         async () => {
+         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+         project.min_group_size = 3;
+         project.max_group_size = 5;
+
+         wrapper = mount(GroupRegistration, {
+             propsData: {
+                 project: project,
+                 course: course
+             }
+         });
+         component = wrapper.vm;
+         await component.$nextTick();
+
+         wrapper.find('.send-group-invitation-button').trigger('click');
+         await component.$nextTick();
+
+         expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+    });
+
+    test('If the Project.max_group_size !== Project.min_group_size, & ' +
+         'Project.min_group_size === 1, 1 group member input is displayed when the ' +
+         'send_group_invitation_modal is opened',
+         async () => {
+         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+         project.min_group_size = 1;
+         project.max_group_size = 5;
+
+         wrapper = mount(GroupRegistration, {
+             propsData: {
+                 project: project,
+                 course: course
+             }
+         });
+         component = wrapper.vm;
+         await component.$nextTick();
+
+         wrapper.find('.send-group-invitation-button').trigger('click');
+         await component.$nextTick();
+
+         expect(wrapper.findAll('.member-name-input').length).toEqual(1);
+    });
+
+    test('The number of group member inputs cannot exceed Project.max_group_size - 1 (to' +
+         'account for the creator of the group)',
+         async () => {
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+        project.min_group_size = 3;
+        project.max_group_size = 5;
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        expect(component.project.max_group_size).toEqual(5);
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+        expect(component.users_to_invite.length).toEqual(2);
+        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(false);
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
+        expect(component.users_to_invite.length).toEqual(3);
+        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(false);
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(4);
+        expect(component.users_to_invite.length).toEqual(4);
+        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(true);
     });
 });

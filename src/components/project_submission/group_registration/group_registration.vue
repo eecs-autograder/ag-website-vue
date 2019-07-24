@@ -266,7 +266,10 @@ export default class GroupRegistration extends Vue {
     this.users_to_invite = [];
 
     let min_num_inputs = this.project.min_group_size === this.project.max_group_size
-      ? this.project.min_group_size - 1 :  this.project.min_group_size;
+      ? this.project.min_group_size - 1 :  this.project.min_group_size - 1;
+    if (min_num_inputs === 0) {
+        min_num_inputs = 1;
+    }
     for (let i = 0; i < min_num_inputs; ++i) {
       this.users_to_invite.push(
         {
@@ -303,8 +306,6 @@ export default class GroupRegistration extends Vue {
       if (this.users_to_invite.length === 0) {
         this.add_group_member();
       }
-
-
 
       for (let i = 0; i < this.users_to_invite.length; ++i) {
         if (this.users_to_invite[i].username.trim() === this.course.allowed_guest_domain) {

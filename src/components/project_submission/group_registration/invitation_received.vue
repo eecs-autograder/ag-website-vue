@@ -96,7 +96,6 @@ export default class InvitationReceived extends Vue {
 
   @Watch('value')
   on_value_changed(new_value: GroupInvitation, old_value: GroupInvitation) {
-      console.log("Value changed");
       this.d_invitation = deep_copy(new_value, GroupInvitation);
   }
 
@@ -128,7 +127,6 @@ export default class InvitationReceived extends Vue {
       let copy_of_invitation = deep_copy(this.d_invitation!, GroupInvitation);
       this.$emit('input', copy_of_invitation);
       if (result !== null) {
-        console.log("Response status should have been 201");
         Group.notify_group_created(result);
       }
       (<Modal> this.$refs.confirm_accept_modal).close();
