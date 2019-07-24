@@ -1,27 +1,29 @@
 <template>
-  <div>
+  <div v-if="!d_loading">
     <div id="group-registration-title"> Group Registration </div>
 
     <div v-if="project.disallow_group_registration"
-         class="registration-closed">
+         id="registration-closed">
       Group registration has been closed for this project.
-      Please email the course staff to resolve this?
+      Please email the course staff to resolve this
     </div>
-    <div v-else>
+    <div v-else id="registration-open">
       <div id="button-decision-container"
            v-if="invitation_sent === null
                  && invitations_received.length === 0">
         <button class="blue-button work-alone-button"
                 @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
-        <button class="green-button"
+        <button class="green-button send-group-invitation-button"
                 @click="open_send_group_invitation_modal()"> Create new invitation </button>
       </div>
 
       <div v-if="invitations_received.length > 0">
         <div id="invitations-received-title"> Invitations received </div>
-        <div v-for="invitation of invitations_received">
-          <invitation-received :invitation="invitation"
-                               :project="project">
+        <div v-for="(invitation, index) of invitations_received"
+             :key="invitation.pk">
+          <invitation-received v-model="invitations_received[index]"
+                               :project="project"
+                               @invitation_rejected="invitations_received.splice(index, 1)">
           </invitation-received>
         </div>
       </div>
@@ -49,7 +51,7 @@
             </ul>
           </div>
 
-          <button class="red-button"
+          <button class="red-button cancel-sent-invitation-button"
                   @click="$refs.cancel_group_invitation_modal.open()">
             Cancel Invitation
           </button>
@@ -75,9 +77,9 @@
         <div class="modal-button-container">
           <APIErrors ref="work_alone_api_errors"> </APIErrors>
 
-          <button class="light-gray-button cancel-button"
+          <button class="light-gray-button cancel-confirm-working-alone-button"
                   @click="$refs.confirm_working_alone_modal.close()"> Cancel </button>
-          <button class="blue-button"
+          <button class="blue-button confirm-working-alone-button"
                   @click="work_alone"
                   :disabled="d_awaiting_action"> Work Alone </button>
         </div>
@@ -136,12 +138,12 @@
             <APIErrors ref="api_errors"> </APIErrors>
 
             <div class="modal-button-container">
-              <button class="light-gray-button cancel-button"
+              <button class="light-gray-button cancel-send-invitation-button"
                       type="button"
                       @click="$refs.send_group_invitation_modal.close()">
                 Cancel
               </button>
-              <button class="blue-button"
+              <button class="blue-button confirm-send-invitation-button"
                       type="submit"
                       @click="send_invitation"
                       :disabled="d_sending_invitation">
@@ -168,10 +170,10 @@
           </ul>
         </div>
         <div class="modal-button-container">
-          <button class="red-button cancel-button"
+          <button class="red-button confirm-cancel-sent-invitation-button"
                   @click="cancel_invitation"
-                  :distabled="d_cancelling_invitation"> Cancel Invitation </button>
-          <button class="blue-button"
+                  :disabled="d_cancelling_invitation"> Cancel Invitation </button>
+          <button class="blue-button confirm-keep-sent-invitation-button"
                   @click="$refs.cancel_group_invitation_modal.close()"> Keep Invitation </button>
         </div>
       </div>
@@ -247,7 +249,7 @@ export default class GroupRegistration extends Vue {
     }
 
     if (this.project.max_group_size === 1) {
-      this.work_alone();
+      await this.work_alone();
     }
 
     this.invitations_received = await this.user.group_invitations_received();
@@ -275,6 +277,7 @@ export default class GroupRegistration extends Vue {
     }
   }
 
+  @handle_api_errors_async(handle_work_alone_error)
   async work_alone() {
     try {
       this.d_awaiting_action = true;
@@ -300,6 +303,8 @@ export default class GroupRegistration extends Vue {
       if (this.users_to_invite.length === 0) {
         this.add_group_member();
       }
+
+
 
       for (let i = 0; i < this.users_to_invite.length; ++i) {
         if (this.users_to_invite[i].username.trim() === this.course.allowed_guest_domain) {
@@ -339,7 +344,6 @@ export default class GroupRegistration extends Vue {
 
 function handle_work_alone_error(component: GroupRegistration, error: unknown) {
   (<APIErrors> component.$refs.work_alone_api_errors).show_errors_from_response(error);
-
 }
 
 function handle_cancel_invitation_error(component: GroupRegistration, error: unknown) {
@@ -378,16 +382,8 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   padding: 10px 0;
 }
 
-.work-alone-button {
-  margin-right: 10px;
-}
-
 .modal-message {
   padding: 10px 0;
-}
-
-.cancel-button {
-  margin-right: 10px;
 }
 
 .modal-header {
@@ -412,6 +408,13 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 
 #invitations-received-title {
   padding: 5px 0;
+}
+
+.confirm-cancel-sent-invitation-button,
+.cancel-send-invitation-button,
+.cancel-confirm-working-alone-button,
+.work-alone-button {
+  margin-right: 10px;
 }
 
 .invited_member {

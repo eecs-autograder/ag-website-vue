@@ -1,5 +1,3 @@
-import APIErrors from '@/components/api_errors.vue';
-import Modal from '@/components/modal.vue';
 import { mount, Wrapper } from '@vue/test-utils';
 
 import {
@@ -12,6 +10,8 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
+import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
 import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
 
 describe('InvitationReceived tests', () => {
@@ -72,7 +72,7 @@ describe('InvitationReceived tests', () => {
 
         wrapper = mount(InvitationReceived, {
             propsData: {
-                invitation: invitation,
+                value: invitation,
                 project: project
             }
         });
@@ -84,13 +84,13 @@ describe('InvitationReceived tests', () => {
     });
 
     test('reject an invitation - cancel action in modal', async () => {
-        expect(component.invitation).toEqual(invitation);
+        expect(component.d_invitation!).toEqual(invitation);
         expect(component.user).toEqual(user);
         expect(component.d_loading).toBe(false);
         let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
         expect(confirm_reject_modal.is_open).toBe(false);
 
-        wrapper.find('.reject-invite-button').trigger('click');
+        wrapper.find('.reject-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_reject_modal.is_open).toBe(true);
@@ -102,11 +102,11 @@ describe('InvitationReceived tests', () => {
     });
 
     test('reject an invitation - confirm action in modal', async () => {
-        let reject_invitation_stub = sinon.stub(component.d_invitation, 'reject');
+        let reject_invitation_stub = sinon.stub(component.d_invitation!, 'reject');
         let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
         expect(confirm_reject_modal.is_open).toBe(false);
 
-        wrapper.find('.reject-invite-button').trigger('click');
+        wrapper.find('.reject-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_reject_modal.is_open).toBe(true);
@@ -118,30 +118,31 @@ describe('InvitationReceived tests', () => {
     });
 
     test('already_accepted', async () => {
-        expect(component.invitation.invitees_who_accepted).not.toContain(user.username);
-        expect(component.already_accepted).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(false);
-
-        wrapper.setProps({invitation: new GroupInvitation({
-                pk: 1,
-                invitation_creator: "sean@umich.edu",
-                project: 15,
-                invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-                invitees_who_accepted: ["milo@umich.edu", "alexis@umich.edu"]
-            })
+        let updated_invitation = new GroupInvitation({
+            pk: 1,
+            invitation_creator: "sean@umich.edu",
+            project: 15,
+            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            invitees_who_accepted: ["milo@umich.edu", "alexis@umich.edu"]
         });
+        expect(component.d_invitation!.invitees_who_accepted).not.toContain(user.username);
+        expect(component.already_accepted).toBe(false);
+        expect(wrapper.find('.accept-invitation-button').is('[disabled]')).toBe(false);
 
-        expect(component.invitation.invitees_who_accepted).toContain(user.username);
+        wrapper.setProps({value: updated_invitation});
+        await component.$nextTick();
+
+        expect(component.d_invitation!.invitees_who_accepted).toContain(user.username);
         expect(component.already_accepted).toBe(true);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.accept-invitation-button').is('[disabled]')).toBe(true);
     });
 
     test('accept an invitation - cancel action in modal', async () => {
         let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
         expect(confirm_accept_modal.is_open).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.accept-invitation-button').is('[disabled]')).toBe(false);
 
-        wrapper.find('.accept-invite-button').trigger('click');
+        wrapper.find('.accept-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_accept_modal.is_open).toBe(true);
@@ -150,37 +151,52 @@ describe('InvitationReceived tests', () => {
         await component.$nextTick();
 
         expect(confirm_accept_modal.is_open).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(false);
     });
 
-    test.skip('accept an invitation - confirm action in modal - successful - & not the last person ' +
-         'in the group to accept the invite',
+    test('accept an invitation - confirm action in modal - successful ' +
+         '- & not the last person in the group to accept the invite',
          async () => {
-        let accept_invitation_stub = sinon.stub(component.d_invitation, 'accept');
-        let create_group_stub = sinon.stub(Group, 'create');
+        let accept_invitation_stub = sinon.stub(component.d_invitation!, 'accept').returns(
+            Promise.resolve(null)
+        );
         let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
         expect(confirm_accept_modal.is_open).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.accept-invitation-button').is('[disabled]')).toBe(false);
 
-        wrapper.find('.accept-invite-button').trigger('click');
+        wrapper.find('.accept-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_accept_modal.is_open).toBe(true);
 
         wrapper.find('.confirm-accept-button').trigger('click');
         await component.$nextTick();
+        await component.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
-        expect(create_group_stub.callCount).toEqual(0);
         expect(confirm_accept_modal.is_open).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(true);
-
-        fail();
     });
 
-    test.only('accept an invitation - confirm action in modal - successful ' +
+    test('accept an invitation - confirm action in modal - successful ' +
          '& last person in group to accept invitation',
          async () => {
+        let group_created = new Group({
+            pk: 1,
+            project: 15,
+            extended_due_date: "2019-04-18T15:26:06.965696Z",
+            member_names: [
+                user.username,
+                "keiko@umich.edu",
+                "milo@umich.edu",
+                "sean@umich.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
         wrapper.setProps({invitation: new GroupInvitation({
                 pk: 1,
                 invitation_creator: "sean@umich.edu",
@@ -190,13 +206,14 @@ describe('InvitationReceived tests', () => {
             })
         });
 
-        let accept_invitation_stub = sinon.stub(component.d_invitation, 'accept');
-        let create_group_stub = sinon.stub(Group, 'create');
+        let accept_invitation_stub = sinon.stub(component.d_invitation!, 'accept').returns(
+            Promise.resolve(group_created)
+        );
         let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
         expect(confirm_accept_modal.is_open).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.accept-invitation-button').is('[disabled]')).toBe(false);
 
-        wrapper.find('.accept-invite-button').trigger('click');
+        wrapper.find('.accept-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_accept_modal.is_open).toBe(true);
@@ -205,11 +222,11 @@ describe('InvitationReceived tests', () => {
         await component.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
-        expect(create_group_stub.callCount).toEqual(1);
+        expect(confirm_accept_modal.is_open).toBe(false);
     });
 
     test('accept an invitation - confirm action in modal - unsuccessful', async () => {
-        let accept_invitation_stub = sinon.stub(component.d_invitation, 'accept').returns(
+        let accept_invitation_stub = sinon.stub(component.d_invitation!, 'accept').returns(
             Promise.reject(
                 new HttpError(400, {
                     __all__: "Already accepted invitation."
@@ -219,9 +236,9 @@ describe('InvitationReceived tests', () => {
 
         let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
         expect(confirm_accept_modal.is_open).toBe(false);
-        expect(wrapper.find('.accept-invite-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.accept-invitation-button').is('[disabled]')).toBe(false);
 
-        wrapper.find('.accept-invite-button').trigger('click');
+        wrapper.find('.accept-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_accept_modal.is_open).toBe(true);
@@ -236,17 +253,44 @@ describe('InvitationReceived tests', () => {
     });
 
     test('prospective_group_members', async () => {
-        fail();
-
+        expect(component.d_invitation!.invited_usernames).toEqual([
+            "alexis@umich.edu",
+            "milo@umich.edu",
+            "keiko@umich.edu"
+        ]);
+        expect(component.user!.username).toEqual("alexis@umich.edu");
+        expect(component.d_invitation!.invitation_creator).toEqual("sean@umich.edu");
+        expect(component.other_group_members).toEqual([
+            invitation.invitation_creator,
+            "milo@umich.edu",
+            "keiko@umich.edu"
+        ]);
     });
 
     test('Members who have already accepted', async () => {
-        fail();
+        expect(component.d_invitation!.invitees_who_accepted.length).toEqual(1);
+        expect(component.d_invitation!.invitees_who_accepted).toContain("milo@umich.edu");
 
+        let members_who_have_accepted = wrapper.findAll('.member-who-has-accepted');
+        expect(members_who_have_accepted.length).toEqual(1);
+        expect(members_who_have_accepted.at(0).text()).toEqual("milo@umich.edu");
     });
 
-    test('invitation Watcher', async () => {
-        fail();
+    test('value Watcher', async () => {
+        let updated_invitation = new GroupInvitation({
+            pk: 1,
+            invitation_creator: "sean@umich.edu",
+            project: 15,
+            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
+        });
+
+        expect(component.d_invitation).toEqual(invitation);
+
+        wrapper.setProps({value: updated_invitation});
+        await component.$nextTick();
+
+        expect(component.d_invitation).toEqual(updated_invitation);
     });
 
 });

@@ -1,10 +1,5 @@
 <template>
   <div v-if="!d_loading">
-    <div> Invited Users:</div>
-    <ul>
-      <li v-for="username of invitation.invited_usernames">{{username}}</li>
-    </ul>
-
     <div id="invitation-received">
       <div>
         You've been invited to be in a group with:
@@ -14,18 +9,19 @@
         <li v-for="username of other_group_members">{{username}}</li>
       </ul>
 
-      <div v-if="invitation.invitees_who_accepted.length > 0">
+      <div v-if="d_invitation.invitees_who_accepted.length > 0">
         Members who have already accepted this invitation are:
         <ul>
-          <li v-for="username of invitation.invitees_who_accepted">{{username}}</li>
+          <li v-for="username of d_invitation.invitees_who_accepted"
+              class="member-who-has-accepted">{{username}}</li>
         </ul>
       </div>
 
       <div>
-        <button class="red-button reject-invite-button"
+        <button class="red-button reject-invitation-button"
                 @click="$refs.confirm_reject_modal.open()"> Reject </button>
-        <button class="green-button accept-invite-button"
-                :disabled="already_accepted"
+        <button class="green-button accept-invitation-button"
+                :disabled="already_accepted || d_accepting"
                 @click="$refs.confirm_accept_modal.open()"> Accept </button>
       </div>
     </div>
@@ -46,6 +42,7 @@
           <button class="light-gray-button cancel-accept-button"
                   @click="$refs.confirm_accept_modal.close()"> Cancel </button>
           <button class="blue-button confirm-accept-button"
+                  :disabled="d_accepting"
                   @click="accept_invitation"> Accept </button>
         </div>
       </div>
@@ -65,6 +62,7 @@
           <button class="light-gray-button cancel-reject-button"
                   @click="$refs.confirm_reject_modal.close()"> Cancel </button>
           <button class="red-button confirm-reject-button"
+                  :disabled="d_rejecting"
                   @click="reject_invitation"> Reject </button>
         </div>
       </div>
@@ -81,7 +79,7 @@ import { Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import { handle_api_errors_async } from '@/utils';
+import { deep_copy, handle_api_errors_async } from '@/utils';
 
 @Component({
   components: {
@@ -91,61 +89,61 @@ import { handle_api_errors_async } from '@/utils';
 })
 export default class InvitationReceived extends Vue {
   @Prop({required: true, type: GroupInvitation})
-  invitation!: GroupInvitation;
+  value!: GroupInvitation;
 
   @Prop({required: true, type: Project})
   project!: Project;
 
+  @Watch('value')
+  on_value_changed(new_value: GroupInvitation, old_value: GroupInvitation) {
+      console.log("Value changed");
+      this.d_invitation = deep_copy(new_value, GroupInvitation);
+  }
+
   user: User | null = null;
   d_loading = true;
   d_invitation: GroupInvitation | null = null;
-
-  @Watch('invitation')
-  on_invitation_changed(new_value: GroupInvitation, old_value: GroupInvitation) {
-    this.d_invitation = new_value;
-    console.log("invitation changed");
-  }
+  d_accepting = false;
+  d_rejecting = false;
 
   async created() {
     this.user = await User.get_current();
-    this.d_invitation = this.invitation;
+    this.d_invitation = deep_copy(this.value, GroupInvitation);
     this.d_loading = false;
   }
 
   async reject_invitation() {
-    await this.invitation.reject();
+    this.d_rejecting = true;
+    await this.d_invitation!.reject();
     (<Modal> this.$refs.confirm_reject_modal).close();
+    this.$emit('invitation_rejected');
+    this.d_rejecting = false;
   }
 
   @handle_api_errors_async(handle_accept_invitation_error)
   async accept_invitation() {
     try {
-      await this.invitation.accept();
-      console.log("Invitees who accepted length: " + this.invitation.invitees_who_accepted.length);
-      console.log("Invited usernames length: " + this.invitation.invited_usernames.length);
-      if (this.invitation.invitees_who_accepted.length
-          === this.invitation.invited_usernames.length) {
-        console.log("Enough people accepted");
-        let member_names = [this.invitation.invitation_creator];
-        for (let member of this.invitation.invited_usernames) {
-          console.log(member);
-          member_names.push(member);
-        }
-        await Group.create(this.project.pk, {member_names: member_names});
+      this.d_accepting = true;
+      let result = await this.d_invitation!.accept();
+      let copy_of_invitation = deep_copy(this.d_invitation!, GroupInvitation);
+      this.$emit('input', copy_of_invitation);
+      if (result !== null) {
+        console.log("Response status should have been 201");
+        Group.notify_group_created(result);
       }
-      else {
-        (<Modal> this.$refs.confirm_accept_modal).close();
-      }
+      (<Modal> this.$refs.confirm_accept_modal).close();
     }
-    finally {}
+    finally {
+      this.d_accepting = false;
+    }
   }
 
   get other_group_members() {
     if (this.user === null) {
       return [];
     }
-    let other_invitees = [this.invitation.invitation_creator];
-    this.invitation.invited_usernames.forEach((invitee: string) => {
+    let other_invitees = [this.d_invitation!.invitation_creator];
+    this.d_invitation!.invited_usernames.forEach((invitee: string) => {
       if (invitee !== this.user!.username) {
         other_invitees.push(invitee);
       }
@@ -154,7 +152,7 @@ export default class InvitationReceived extends Vue {
   }
 
   get already_accepted() {
-    let index = this.invitation.invitees_who_accepted.findIndex(
+    let index = this.d_invitation!.invitees_who_accepted.findIndex(
       (invitee: string) => invitee === this.user!.username);
     return index !== -1;
   }
@@ -174,6 +172,12 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
   font-weight: bold;
 }
 
+.modal-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 #invitation-received {
   padding: 10px 20px 10px 10px;
   border: 1px solid $pebble-medium;
@@ -181,11 +185,8 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
   display: inline-block;
 }
 
-.reject-invite-button {
+.reject-invitation-button, .cancel-accept-button, .cancel-reject-button {
   margin-right: 10px;
 }
 
-.cancel-button {
-  margin-right: 10px;
-}
 </style>
