@@ -19,17 +19,18 @@
         <template slot="body">
           <div class="tab-body">
             <div v-if="group === null">
-              <group-registration :project="project"
+              <group-registration ref="group_registration"
+                                  :project="project"
                                   :course="course">
               </group-registration>
             </div>
 
             <div v-if="group !== null">
-<!--              <div v-if="group.extended_due_date !== null">-->
-<!--                <h4 id="extension">-->
-<!--                  Extension: {{format_datetime(group.extended_due_date)}}-->
-<!--                </h4>-->
-<!--              </div>-->
+              <div v-if="group.extended_due_date !== null">
+                <h4 id="extension">
+                  Extension: {{format_datetime(group.extended_due_date)}}
+                </h4>
+              </div>
 
               <div id="group-members-container">
                 <div id="group-members-title"><b> Group members: </b></div>
@@ -85,7 +86,7 @@ import GroupRegistration from '@/components/project_submission/group_registratio
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
-import { get_query_param } from '@/utils';
+import { format_datetime, get_query_param } from '@/utils';
 
 @Component({
   components: {
@@ -102,6 +103,7 @@ export default class ProjectSubmission extends Vue implements GroupObserver {
   project: Project | null = null;
   course: Course | null = null;
   group: Group | null = null;
+  readonly format_datetime = format_datetime;
 
   async created() {
     Group.subscribe(this);

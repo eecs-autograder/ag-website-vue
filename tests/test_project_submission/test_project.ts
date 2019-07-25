@@ -4,7 +4,7 @@ import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 
 import {
     Course,
-    Group,
+    Group, GroupInvitation,
     Project,
     Semester,
     UltimateSubmissionPolicy,
@@ -12,6 +12,7 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
+import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
 import ProjectSubmission from '@/components/project_submission/project.vue';
 
 beforeAll(() => {
@@ -512,7 +513,7 @@ describe('GroupObserver tests for the Project Component', () => {
             closing_time: null,
             soft_closing_time: null,
             disallow_student_submissions: true,
-            disallow_group_registration: true,
+            disallow_group_registration: false,
             guests_can_submit: true,
             min_group_size: 1,
             max_group_size: 1,
@@ -538,23 +539,14 @@ describe('GroupObserver tests for the Project Component', () => {
 
         user = new User({
             pk: 3,
-            username: "worldsbestboss@umich.edu",
-            first_name: "Steve",
-            last_name: "Carell",
-            email: "worldsbestbo$$@umich.edu",
+            username: "alexis@umich.edu",
+            first_name: "Alexis",
+            last_name: "Bledel",
+            email: "alexis@umich.edu",
             is_superuser: true
         });
 
-        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
-        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
-
-        wrapper = mount(ProjectSubmission, {
-            localVue,
-            router
-        });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -569,11 +561,156 @@ describe('GroupObserver tests for the Project Component', () => {
         }
     });
 
-    test('solo group created', async () => {
-        fail();
+    test('solo group created in created() in the GroupRegistration component', async () => {
+        let group_created = new Group({
+            pk: 32,
+            project: project.pk,
+            extended_due_date: "2019-04-18T15:26:06.965696Z",
+            member_names: [
+                user.username
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
+        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+        let create_solo_group_stub = sinon.stub(Group, 'create_solo_group').callsFake(
+            () => Group.notify_group_created(group_created)
+        );
+        wrapper = mount(ProjectSubmission, {
+            localVue,
+            router
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+        // second await needs to be here
+        await component.$nextTick();
+
+        expect(project.max_group_size === 1).toBe(true);
+        expect(create_solo_group_stub.calledOnce);
+        expect(component.group).toEqual(group_created);
+        expect(wrapper.findAll('#group-registration').length).toEqual(0);
     });
 
-    test('multi-person group created', async () => {
-        fail();
+    test('user chooses to work alone', async () => {
+        project.max_group_size = 3;
+        let group_created = new Group({
+            pk: 32,
+            project: project.pk,
+            extended_due_date: "2019-04-18T15:26:06.965696Z",
+            member_names: [
+                user.username
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
+        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+        let create_solo_group_stub = sinon.stub(Group, 'create_solo_group').callsFake(
+            () => Group.notify_group_created(group_created)
+        );
+        wrapper = mount(ProjectSubmission, {
+            localVue,
+            router
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+        await component.$nextTick();
+        // second await needs to be here
+        await component.$nextTick();
+
+        let group_registration = wrapper.find({ref: 'group_registration'});
+
+        group_registration.find('.work-alone-button').trigger('click');
+        await component.$nextTick();
+
+        group_registration.find('.confirm-working-alone-button').trigger('click');
+        await component.$nextTick();
+
+        expect(create_solo_group_stub.calledOnce);
+        expect(component.group).toEqual(group_created);
+        expect(wrapper.findAll('#group-registration').length).toEqual(0);
+    });
+
+    test('last person to accept the group invitation accepts the invitation', async () => {
+        project.max_group_size = 3;
+        let group_created = new Group({
+            pk: 32,
+            project: project.pk,
+            extended_due_date: "2019-04-18T15:26:06.965696Z",
+            member_names: [
+                user.username,
+                "lauren@umich.edu",
+                "melissa@umich.edu"
+            ],
+            bonus_submissions_remaining: 0,
+            late_days_used: {},
+            num_submissions: 3,
+            num_submits_towards_limit: 2,
+            created_at: "9am",
+            last_modified: "10am"
+        });
+
+        let invitation_received = new GroupInvitation({
+            pk: 1,
+            invitation_creator: "melissa@umich.edu",
+            project: 15,
+            invited_usernames: ["alexis@umich.edu", "lauren@umich.edu"],
+            invitees_who_accepted: ["lauren@umich.edu"]
+        });
+        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
+        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
+        sinon.stub(user, 'group_invitations_received').returns(
+            Promise.resolve([invitation_received])
+        );
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        wrapper = mount(ProjectSubmission, {
+            localVue,
+            router
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+        await component.$nextTick();
+        // third await needs to be here
+        await component.$nextTick();
+
+        let group_registration = wrapper.find({ref: 'group_registration'});
+        expect(group_registration.findAll({ref: 'invitation_received'}).length).toEqual(1);
+
+        let invitation_to_accept = <InvitationReceived> group_registration.findAll(
+            {ref: 'invitation_received'}
+        ).at(0).vm;
+        group_registration.find('.accept-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        let create_multi_person_group = sinon.stub(
+            invitation_to_accept.d_invitation!, 'accept'
+        ).returns(
+            Promise.resolve(group_created)
+        );
+
+        group_registration.find('.confirm-accept-button').trigger('click');
+        await component.$nextTick();
+        await component.$nextTick();
+
+        expect(create_multi_person_group.calledOnce);
+        expect(component.group).toEqual(group_created);
+        expect(wrapper.findAll('#group-registration').length).toEqual(0);
     });
 });

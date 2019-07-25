@@ -36,14 +36,17 @@
             <li v-for="username of other_group_members">{{username}}</li>
           </ul>
         </div>
-        <div class="modal-button-container">
-          <APIErrors ref="api_errors"></APIErrors>
-
+        <div class="modal-footer">
+          <div>
+            <APIErrors ref="accept_invitation_api_errors"></APIErrors>
+          </div>
+          <div class="modal-button-container">
           <button class="light-gray-button cancel-accept-button"
                   @click="$refs.confirm_accept_modal.close()"> Cancel </button>
           <button class="blue-button confirm-accept-button"
                   :disabled="d_accepting"
                   @click="accept_invitation"> Accept </button>
+          </div>
         </div>
       </div>
     </modal>
@@ -58,12 +61,17 @@
             <li v-for="username of other_group_members">{{username}}</li>
           </ul>
         </div>
-        <div class="modal-button-container">
+        <div class="modal-footer">
+          <div>
+            <APIErrors ref="reject_invitation_api_errors"></APIErrors>
+          </div>
+          <div class="modal-button-container">
           <button class="light-gray-button cancel-reject-button"
                   @click="$refs.confirm_reject_modal.close()"> Cancel </button>
           <button class="red-button confirm-reject-button"
                   :disabled="d_rejecting"
                   @click="reject_invitation"> Reject </button>
+          </div>
         </div>
       </div>
     </modal>
@@ -111,7 +119,9 @@ export default class InvitationReceived extends Vue {
     this.d_loading = false;
   }
 
+  @handle_api_errors_async(handle_reject_invitation_error)
   async reject_invitation() {
+    (<APIErrors> this.$refs.reject_invitation_api_errors).clear();
     this.d_rejecting = true;
     await this.d_invitation!.reject();
     (<Modal> this.$refs.confirm_reject_modal).close();
@@ -123,13 +133,16 @@ export default class InvitationReceived extends Vue {
   async accept_invitation() {
     try {
       this.d_accepting = true;
+      (<APIErrors> this.$refs.accept_invitation_api_errors).clear();
       let result = await this.d_invitation!.accept();
       let copy_of_invitation = deep_copy(this.d_invitation!, GroupInvitation);
       this.$emit('input', copy_of_invitation);
       if (result !== null) {
         Group.notify_group_created(result);
       }
-      (<Modal> this.$refs.confirm_accept_modal).close();
+      else {
+          (<Modal> this.$refs.confirm_accept_modal).close();
+      }
     }
     finally {
       this.d_accepting = false;
@@ -137,9 +150,6 @@ export default class InvitationReceived extends Vue {
   }
 
   get other_group_members() {
-    if (this.user === null) {
-      return [];
-    }
     let other_invitees = [this.d_invitation!.invitation_creator];
     this.d_invitation!.invited_usernames.forEach((invitee: string) => {
       if (invitee !== this.user!.username) {
@@ -156,8 +166,12 @@ export default class InvitationReceived extends Vue {
   }
 }
 
+function handle_reject_invitation_error(component: InvitationReceived, error: unknown) {
+  (<APIErrors> component.$refs.reject_invitation_api_errors).show_errors_from_response(error);
+}
+
 function handle_accept_invitation_error(component: InvitationReceived, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.accept_invitation_api_errors).show_errors_from_response(error);
 }
 
 </script>
@@ -170,10 +184,15 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
   font-weight: bold;
 }
 
+.modal-message {
+  padding: 5px 0;
+}
+
 .modal-button-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  padding: 10px 0 0 0;
 }
 
 #invitation-received {

@@ -101,7 +101,7 @@ describe('InvitationReceived tests', () => {
         expect(confirm_reject_modal.is_open).toBe(false);
     });
 
-    test('reject an invitation - confirm action in modal', async () => {
+    test('reject an invitation - confirm action in modal - successful', async () => {
         let reject_invitation_stub = sinon.stub(component.d_invitation!, 'reject');
         let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
         expect(confirm_reject_modal.is_open).toBe(false);
@@ -114,6 +114,30 @@ describe('InvitationReceived tests', () => {
         wrapper.find('.confirm-reject-button').trigger('click');
         await component.$nextTick();
 
+        expect(reject_invitation_stub.calledOnce);
+    });
+
+    test('reject an invitation - confirm action in modal - unsuccessful', async () => {
+        let reject_invitation_stub = sinon.stub(component.d_invitation!, 'reject').returns(
+            Promise.reject(
+                new HttpError(400, {
+                    __all__: "Sorry, you can't reject this invitation at the moment."
+                })
+            )
+        );
+        let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
+        expect(confirm_reject_modal.is_open).toBe(false);
+
+        wrapper.find('.reject-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        expect(confirm_reject_modal.is_open).toBe(true);
+
+        wrapper.find('.confirm-reject-button').trigger('click');
+        await component.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'reject_invitation_api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
         expect(reject_invitation_stub.calledOnce);
     });
 
@@ -222,7 +246,7 @@ describe('InvitationReceived tests', () => {
         await component.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(confirm_accept_modal.is_open).toBe(true);
     });
 
     test('accept an invitation - confirm action in modal - unsuccessful', async () => {
@@ -246,7 +270,7 @@ describe('InvitationReceived tests', () => {
         wrapper.find('.confirm-accept-button').trigger('click');
         await component.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.find({ref: 'accept_invitation_api_errors'}).vm;
         expect(confirm_accept_modal.is_open).toBe(true);
         expect(accept_invitation_stub.calledOnce).toBe(true);
         expect(api_errors.d_api_errors.length).toBe(1);

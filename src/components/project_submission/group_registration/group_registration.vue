@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!d_loading">
+  <div v-if="!d_loading" id="group-registration">
     <div id="group-registration-title"> Group Registration </div>
 
     <div v-if="project.disallow_group_registration"
@@ -21,7 +21,8 @@
         <div id="invitations-received-title"> Invitations received </div>
         <div v-for="(invitation, index) of invitations_received"
              :key="invitation.pk">
-          <invitation-received v-model="invitations_received[index]"
+          <invitation-received ref="invitation_received"
+                               v-model="invitations_received[index]"
                                :project="project"
                                @invitation_rejected="invitations_received.splice(index, 1)">
           </invitation-received>
@@ -75,13 +76,17 @@
         </div>
 
         <div class="modal-button-container">
-          <APIErrors ref="work_alone_api_errors"> </APIErrors>
+          <div>
+            <APIErrors ref="work_alone_api_errors"> </APIErrors>
+          </div>
 
+          <div class="modal-footer">
           <button class="light-gray-button cancel-confirm-working-alone-button"
                   @click="$refs.confirm_working_alone_modal.close()"> Cancel </button>
           <button class="blue-button confirm-working-alone-button"
                   @click="work_alone"
                   :disabled="d_awaiting_action"> Work Alone </button>
+          </div>
         </div>
       </div>
     </modal>
@@ -90,8 +95,6 @@
       <div class="modal-header"> Send Group Invitation </div>
       <hr>
       <div class="modal-body">
-        <div class="modal-message">
-
           <validated-form ref="send_group_invitation_form"
                           autocomplete="off"
                           spellcheck="false"
@@ -134,26 +137,26 @@
                 </button>
               </div>
             </div>
+            <div class="modal-footer">
+              <div>
+                <APIErrors ref="send_invitation_api_errors"> </APIErrors>
+              </div>
 
-            <APIErrors ref="api_errors"> </APIErrors>
-
-            <div class="modal-button-container">
-              <button class="light-gray-button cancel-send-invitation-button"
-                      type="button"
-                      @click="$refs.send_group_invitation_modal.close()">
-                Cancel
-              </button>
-              <button class="blue-button confirm-send-invitation-button"
-                      type="submit"
-                      @click="send_invitation"
-                      :disabled="d_sending_invitation">
-                Send Invitation
-              </button>
+              <div class="modal-button-container">
+                <button class="light-gray-button cancel-send-invitation-button"
+                        type="button"
+                        @click="$refs.send_group_invitation_modal.close()">
+                  Cancel
+                </button>
+                <button class="blue-button confirm-send-invitation-button"
+                        type="submit"
+                        @click="send_invitation"
+                        :disabled="d_sending_invitation">
+                  Send Invitation
+                </button>
+              </div>
             </div>
           </validated-form>
-
-
-        </div>
       </div>
     </modal>
 
@@ -169,12 +172,17 @@
             </li>
           </ul>
         </div>
-        <div class="modal-button-container">
-          <button class="red-button confirm-cancel-sent-invitation-button"
-                  @click="cancel_invitation"
-                  :disabled="d_cancelling_invitation"> Cancel Invitation </button>
-          <button class="blue-button confirm-keep-sent-invitation-button"
-                  @click="$refs.cancel_group_invitation_modal.close()"> Keep Invitation </button>
+        <div class="modal-footer">
+          <div>
+            <APIErrors ref="cancel_invitation_api_errors"> </APIErrors>
+          </div>
+          <div class="modal-button-container">
+            <button class="red-button confirm-cancel-sent-invitation-button"
+                    @click="cancel_invitation"
+                    :disabled="d_cancelling_invitation"> Cancel Invitation </button>
+            <button class="blue-button confirm-keep-sent-invitation-button"
+                    @click="$refs.cancel_group_invitation_modal.close()"> Keep Invitation </button>
+          </div>
         </div>
       </div>
     </modal>
@@ -253,6 +261,8 @@ export default class GroupRegistration extends Vue {
     }
 
     this.invitations_received = await this.user.group_invitations_received();
+    console.log("Num invitations received: " + this.invitations_received.length);
+
     let invitations_sent = await this.user.group_invitations_sent();
 
     if (invitations_sent.length > 0) {
@@ -284,6 +294,7 @@ export default class GroupRegistration extends Vue {
   async work_alone() {
     try {
       this.d_awaiting_action = true;
+      // can't clear the api errors because the modal isnt open
       await Group.create_solo_group(this.project.pk);
     }
     finally {
@@ -296,7 +307,7 @@ export default class GroupRegistration extends Vue {
     try {
       this.d_sending_invitation = true;
       this.incomplete_input_present = false;
-      (<APIErrors> this.$refs.api_errors).clear();
+      (<APIErrors> this.$refs.send_invitation_api_errors).clear();
 
       let usernames: string[] = [];
       this.users_to_invite = this.users_to_invite.filter(
@@ -333,6 +344,7 @@ export default class GroupRegistration extends Vue {
   async cancel_invitation() {
     try {
       this.d_cancelling_invitation = true;
+      (<APIErrors> this.$refs.cancel_invitation_api_errors).clear();
       await this.invitation_sent!.reject();
       this.invitation_sent = null;
       (<Modal> this.$refs.cancel_group_invitation_modal).close();
@@ -348,11 +360,11 @@ function handle_work_alone_error(component: GroupRegistration, error: unknown) {
 }
 
 function handle_cancel_invitation_error(component: GroupRegistration, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.cancel_invitation_api_errors).show_errors_from_response(error);
 }
 
 function handle_send_invitation_error(component: GroupRegistration, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.send_invitation_api_errors).show_errors_from_response(error);
 }
 
 </script>
@@ -380,11 +392,15 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+  padding: 10px 0 0 0;
+}
+
+.group-members-label {
   padding: 10px 0;
 }
 
 .modal-message {
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 .modal-header {
