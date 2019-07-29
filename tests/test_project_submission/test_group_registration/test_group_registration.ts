@@ -757,7 +757,7 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('#group-registration-options').length).toEqual(0);
     });
 
-    test('send invitation - invalid input present', async () => {
+    test('send invitation - incomplete input present', async () => {
         let group_invitation_created =  new GroupInvitation({
             pk: 2,
             invitation_creator: user.username,
@@ -786,6 +786,7 @@ describe('GroupRegistration tests', () => {
 
         expect(send_group_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(null);
+        expect(component.incomplete_input_present).toBe(false);
 
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
@@ -800,6 +801,7 @@ describe('GroupRegistration tests', () => {
 
         expect(send_invitation_stub.calledOnce).toBe(false);
         expect(send_group_invitation_modal.is_open).toBe(true);
+        expect(component.incomplete_input_present).toBe(true);
         expect(component.invitation_sent).toEqual(null);
         expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
     });
@@ -931,6 +933,8 @@ describe('GroupRegistration tests', () => {
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
+        expect(component.incomplete_input_present).toBe(false);
+
         wrapper.find('.add-member-button').trigger('click');
         await component.$nextTick();
 
@@ -966,12 +970,12 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
         let member_1_name_input = wrapper.findAll('.member-name-input').at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = "milo";
+        (<HTMLInputElement> member_1_name_input.element).value = "milo@umich.edu";
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
         let member_2_name_input = wrapper.findAll('.member-name-input').at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = "keiko";
+        (<HTMLInputElement> member_2_name_input.element).value = "keiko@umich.edu";
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
@@ -984,6 +988,8 @@ describe('GroupRegistration tests', () => {
 
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
+
+        expect(component.incomplete_input_present).toBe(false);
 
         wrapper.find('.add-member-button').trigger('click');
         await component.$nextTick();
@@ -1034,6 +1040,8 @@ describe('GroupRegistration tests', () => {
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
+        expect(component.incomplete_input_present).toBe(false);
+
         wrapper.find('.add-member-button').trigger('click');
         await component.$nextTick();
 
@@ -1077,12 +1085,12 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
         let member_1_name_input = wrapper.findAll('.member-name-input').at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = "milo";
+        (<HTMLInputElement> member_1_name_input.element).value = "milo@umich.edu";
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
         let member_2_name_input = wrapper.findAll('.member-name-input').at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = "michael";
+        (<HTMLInputElement> member_2_name_input.element).value = "michael@umich.edu";
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
@@ -1098,6 +1106,59 @@ describe('GroupRegistration tests', () => {
 
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
+
+        expect(component.incomplete_input_present).toBe(false);
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+        expect(wrapper.findAll('.member-name-input').at(0).text()).toEqual("");
+        expect(wrapper.findAll('.member-name-input').at(1).text()).toEqual("");
+    });
+
+
+    test('group member inputs are reset whenever the send_group_invitation_modal is opened' +
+        '- after trying to submit with incomplete input present',
+         async () => {
+        let send_invitation_stub = sinon.stub(GroupInvitation, 'send_invitation');
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.invitation_sent).toEqual(null);
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.add-member-button').trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
+
+        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        expect(send_invitation_stub.callCount).toEqual(0);
+        expect(component.incomplete_input_present).toBe(true);
+        expect(component.invitation_sent).toEqual(null);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
+
+        wrapper.find('#modal-mask').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
+        expect(component.incomplete_input_present).toBe(false);
 
         wrapper.find('.add-member-button').trigger('click');
         await component.$nextTick();

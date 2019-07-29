@@ -280,6 +280,7 @@ export default class GroupRegistration extends Vue {
 
   reset_group_member_inputs() {
     this.users_to_invite = [];
+    this.incomplete_input_present = false;
 
     let min_num_inputs = this.project.min_group_size === this.project.max_group_size
       ? this.project.min_group_size - 1 :  this.project.min_group_size - 1;
