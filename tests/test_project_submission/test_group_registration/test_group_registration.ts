@@ -15,7 +15,7 @@ import Modal from '@/components/modal.vue';
 import GroupRegistration from '@/components/project_submission/group_registration/group_registration.vue';
 import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
 
-describe('GroupRegistration tests involving the created function', () => {
+describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
     let component: GroupRegistration;
     let course: Course;
@@ -27,7 +27,7 @@ describe('GroupRegistration tests involving the created function', () => {
             pk: 44,
             name: "Project 200",
             last_modified: "today",
-            course: 1,
+            course: 2,
             visible_to_students: true,
             closing_time: null,
             soft_closing_time: null,
@@ -143,18 +143,18 @@ describe('GroupRegistration tests involving the created function', () => {
         expect(component.invitation_sent).toEqual(null);
     });
 
-    test('created - user has sent an invitation', async () => {
+    test('created - user has sent an invitation for this project', async () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
-            project: 15,
+            project: project.pk,
             invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
             invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
         });
         sinon.stub(user, 'group_invitations_sent').returns(
             Promise.resolve([
-                group_invitation_sent
-            ])
+                                group_invitation_sent
+                            ])
         );
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
 
@@ -173,25 +173,63 @@ describe('GroupRegistration tests involving the created function', () => {
         expect(component.invitations_received.length).toEqual(0);
     });
 
+    test('created - user has sent an invitation but not for this project', async () => {
+        let group_invitation_sent = new GroupInvitation({
+            pk: 1,
+            invitation_creator: "alexis@umich.edu",
+            project: project.pk + 5,
+            invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
+        });
+        sinon.stub(user, 'group_invitations_sent').returns(
+            Promise.resolve([
+                                group_invitation_sent
+                            ])
+        );
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.d_loading).toBe(false);
+        expect(wrapper.findAll('#registration-open').length).toEqual(1);
+        expect(component.invitation_sent).toEqual(null);
+        expect(component.invitations_received.length).toEqual(0);
+    });
+
     test('created - user has received an invitation', async () => {
         let group_invitation_received_1 = new GroupInvitation({
             pk: 1,
             invitation_creator: "laura@umich.edu",
-            project: 15,
+            project: project.pk + 1,
             invited_usernames: ["alexis@umich.edu", "george@umich.edu"],
             invitees_who_accepted: []
         });
         let group_invitation_received_2 = new GroupInvitation({
             pk: 2,
             invitation_creator: "linda@umich.edu",
-            project: 15,
+            project: project.pk,
             invited_usernames: ["alexis@umich.edu", "liz@umich.edu"],
             invitees_who_accepted: ["liz@umich.edu"]
+        });
+        let group_invitation_received_3 = new GroupInvitation({
+            pk: 3,
+            invitation_creator: "james@umich.edu",
+            project: project.pk + 10,
+            invited_usernames: ["alexis@umich.edu", "violet@umich.edu"],
+            invitees_who_accepted: ["alexis@umich.edu"]
         });
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([
             group_invitation_received_1,
-            group_invitation_received_2
+            group_invitation_received_2,
+            group_invitation_received_3
         ]));
 
         wrapper = mount(GroupRegistration, {
@@ -204,71 +242,16 @@ describe('GroupRegistration tests involving the created function', () => {
         await component.$nextTick();
         await component.$nextTick();
 
-        expect(component.invitations_received.length).toEqual(2);
-    });
-});
-
-describe('GroupRegistration tests', () => {
-    let wrapper: Wrapper<GroupRegistration>;
-    let component: GroupRegistration;
-    let course: Course;
-    let project: Project;
-    let user: User;
-
-    beforeEach(() => {
-        project = new Project({
-            pk: 44,
-            name: "Project 200",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: false,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 3,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false
-        });
-
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
-        });
-
-        user = new User({
-            pk: 3,
-            username: "alexis@umich.edu",
-            first_name: "Alexis",
-            last_name: "Bledel",
-            email: "RoryGilmore@umich.edu",
-            is_superuser: true
-        });
-
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
-    });
-
-    afterEach(() => {
-        sinon.restore();
+        expect(component.invitations_received.length).toEqual(1);
+        expect(component.invitations_received[0]).toEqual(group_invitation_received_2);
     });
 
     test('add_group_member', async () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
+        project.min_group_size = 1;
+        project.max_group_size = 4;
         wrapper = mount(GroupRegistration, {
             propsData: {
                 project: project,
@@ -276,32 +259,39 @@ describe('GroupRegistration tests', () => {
             }
         });
         component = wrapper.vm;
+        await component.$nextTick();
 
         expect(component.users_to_invite.length).toEqual(0);
 
-        component.add_group_member();
+        wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.users_to_invite.length).toEqual(1);
-        expect(component.users_to_invite[0]).toEqual({
-                id: 0,
-                username: course.allowed_guest_domain
-        });
-
-        component.add_group_member();
-        await component.$nextTick();
+        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(false);
+        wrapper.find('.add-member-button').trigger('click');
 
         expect(component.users_to_invite.length).toEqual(2);
-        expect(component.users_to_invite[1]).toEqual({
-            id: 1,
-            username: course.allowed_guest_domain
-        });
+        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(false);
+        wrapper.find('.add-member-button').trigger('click');
+
+        expect(component.users_to_invite.length).toEqual(3);
+        expect(component.users_to_invite.length === project.max_group_size - 1);
+        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(true);
+
+        for (let index = 0; index < component.users_to_invite.length; ++index) {
+            expect(component.users_to_invite[index]).toEqual({
+                id: index,
+                username: course.allowed_guest_domain
+            });
+        }
     });
 
-    test('remove_group_member', async () => {
+    test('removing a group member in the send_group_invitation_modal', async () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
+        project.min_group_size = 6;
+        project.max_group_size = 6;
         wrapper = mount(GroupRegistration, {
             propsData: {
                 project: project,
@@ -309,10 +299,11 @@ describe('GroupRegistration tests', () => {
             }
         });
         component = wrapper.vm;
+        await component.$nextTick();
 
-        for (let i = 0; i < 5; ++i) {
-            component.add_group_member();
-        }
+        wrapper.find('.send-group-invitation-button').trigger('click');
+        await component.$nextTick();
+
         expect(component.users_to_invite.length).toEqual(5);
         expect(component.users_to_invite[0].id).toEqual(0);
         expect(component.users_to_invite[1].id).toEqual(1);
@@ -320,30 +311,95 @@ describe('GroupRegistration tests', () => {
         expect(component.users_to_invite[3].id).toEqual(3);
         expect(component.users_to_invite[4].id).toEqual(4);
 
-        component.remove_group_member(3);
+        expect(wrapper.findAll('.remove-member-button').at(3).is(
+            '[disabled]'
+        )).toBe(false);
+        wrapper.findAll('.remove-member-button').at(3).trigger('click');
         expect(component.users_to_invite.length).toEqual(4);
         expect(component.users_to_invite[0].id).toEqual(0);
         expect(component.users_to_invite[1].id).toEqual(1);
         expect(component.users_to_invite[2].id).toEqual(2);
         expect(component.users_to_invite[3].id).toEqual(4);
 
-        component.remove_group_member(0);
+        expect(wrapper.findAll('.remove-member-button').at(0).is(
+            '[disabled]'
+        )).toBe(false);
+        wrapper.findAll('.remove-member-button').at(0).trigger('click');
         expect(component.users_to_invite.length).toEqual(3);
         expect(component.users_to_invite[0].id).toEqual(1);
         expect(component.users_to_invite[1].id).toEqual(2);
         expect(component.users_to_invite[2].id).toEqual(4);
 
-        component.remove_group_member(1);
+        expect(wrapper.findAll('.remove-member-button').at(1).is(
+            '[disabled]'
+        )).toBe(false);
+        wrapper.findAll('.remove-member-button').at(1).trigger('click');
         expect(component.users_to_invite.length).toEqual(2);
         expect(component.users_to_invite[0].id).toEqual(1);
         expect(component.users_to_invite[1].id).toEqual(4);
 
-        component.remove_group_member(0);
+        expect(wrapper.findAll('.remove-member-button').at(0).is(
+            '[disabled]'
+        )).toBe(false);
+        wrapper.findAll('.remove-member-button').at(0).trigger('click');
         expect(component.users_to_invite.length).toEqual(1);
         expect(component.users_to_invite[0].id).toEqual(4);
 
-        component.remove_group_member(0);
-        expect(component.users_to_invite.length).toEqual(0);
+        expect(wrapper.findAll('.remove-member-button').at(0).is(
+            '[disabled]'
+        )).toBe(true);
+        expect(component.users_to_invite.length).toEqual(1);
+    });
+
+    test('if invitation_sent is not null, it is an invitation sent by the user for ' +
+         'the current project',
+         async () => {
+        let invitation_sent_1 = new GroupInvitation({
+            pk: 1,
+            invitation_creator: user.username,
+            project: project.pk + 1,
+            invited_usernames: ["liz@umich.edu", "yanic@umich.edu"],
+            invitees_who_accepted: ["liz@umich.edu"]
+        });
+        let invitation_sent_2 = new GroupInvitation({
+            pk: 2,
+            invitation_creator: user.username,
+            project: project.pk,
+            invited_usernames: ["edward@umich.edu", "kelly@umich.edu"],
+            invitees_who_accepted: ["kelly@umich.edu"]
+        });
+        let invitation_sent_3 = new GroupInvitation({
+            pk: 3,
+            invitation_creator: user.username,
+            project: project.pk + 2,
+            invited_usernames: ["milo@umich.edu"],
+            invitees_who_accepted: [""]
+        });
+        let invitation_sent_4 = new GroupInvitation({
+            pk: 4,
+            invitation_creator: user.username,
+            project: project.pk + 3,
+            invited_usernames: ["melissa@umich.edu"],
+            invitees_who_accepted: [""]
+        });
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([
+            invitation_sent_1,
+            invitation_sent_2,
+            invitation_sent_3,
+            invitation_sent_4
+        ]));
+
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+
+        expect(component.invitation_sent).toEqual(invitation_sent_2);
     });
 
     test('work alone - cancel action in modal', async () => {
@@ -363,7 +419,7 @@ describe('GroupRegistration tests', () => {
             {ref: 'confirm_working_alone_modal'}
         ).vm;
 
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
         wrapper.find('.work-alone-button').trigger('click');
@@ -375,7 +431,7 @@ describe('GroupRegistration tests', () => {
         await component.$nextTick();
 
         expect(confirm_working_alone_modal.is_open).toBe(false);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
     });
 
     test('work alone - confirm action in modal - successful',  async () => {
@@ -413,7 +469,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toBeNull();
         expect(component.invitations_received.length).toEqual(0);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
         wrapper.find('.work-alone-button').trigger('click');
@@ -425,6 +481,7 @@ describe('GroupRegistration tests', () => {
         await component.$nextTick();
 
         expect(work_alone_stub.callCount).toEqual(1);
+        expect(work_alone_stub.firstCall.calledWith(project.pk)).toBe(true);
     });
 
     test('work alone - confirm action in modal - unsuccessful',  async () => {
@@ -454,7 +511,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toBeNull();
         expect(component.invitations_received.length).toEqual(0);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
         wrapper.find('.work-alone-button').trigger('click');
@@ -476,7 +533,7 @@ describe('GroupRegistration tests', () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
-            project: 15,
+            project: project.pk,
             invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
             invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
         });
@@ -519,7 +576,7 @@ describe('GroupRegistration tests', () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
-            project: 15,
+            project: project.pk,
             invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
             invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
         });
@@ -562,7 +619,7 @@ describe('GroupRegistration tests', () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
-            project: 15,
+            project: project.pk,
             invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
             invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
         });
@@ -692,9 +749,12 @@ describe('GroupRegistration tests', () => {
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
+        expect(send_invitation_stub.firstCall.calledWith(project.pk, ["milo@umich.edu"])).toBe(
+            true
+        );
         expect(send_group_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(group_invitation_created);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(0);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(0);
     });
 
     test('send invitation - invalid input present', async () => {
@@ -741,7 +801,7 @@ describe('GroupRegistration tests', () => {
         expect(send_invitation_stub.calledOnce).toBe(false);
         expect(send_group_invitation_modal.is_open).toBe(true);
         expect(component.invitation_sent).toEqual(null);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
     });
 
     test('send invitation - unsuccessful', async () => {
@@ -790,9 +850,10 @@ describe('GroupRegistration tests', () => {
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
+        expect(send_invitation_stub.firstCall.calledWith(project.pk, [user.username])).toBe(true);
         expect(send_group_invitation_modal.is_open).toBe(true);
         expect(component.invitation_sent).toEqual(null);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
 
         let api_errors = <APIErrors> wrapper.find({ref: 'send_invitation_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
@@ -839,21 +900,24 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
         let member_1_name_input = wrapper.findAll('.member-name-input').at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = "milo";
+        (<HTMLInputElement> member_1_name_input.element).value = "milo@umich.edu";
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
         let member_2_name_input = wrapper.findAll('.member-name-input').at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = "keiko";
+        (<HTMLInputElement> member_2_name_input.element).value = "keiko@umich.edu";
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
         wrapper.find('.confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
-        expect(send_invitation_stub.callCount).toEqual(1);
+        expect(send_invitation_stub.calledOnce).toBe(true);
+        expect(send_invitation_stub.firstCall.calledWith(
+            project.pk, ["milo@umich.edu", "keiko@umich.edu"]
+        )).toBe(true);
         expect(component.invitation_sent).toEqual(group_invitation_created);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(0);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(0);
 
         wrapper.find('.cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
@@ -861,7 +925,7 @@ describe('GroupRegistration tests', () => {
         wrapper.find('.confirm-cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
-        expect(reject_invitation_stub.callCount).toEqual(1);
+        expect(reject_invitation_stub.calledOnce).toBe(true);
         expect(component.invitation_sent).toEqual(null);
 
         wrapper.find('.send-group-invitation-button').trigger('click');
@@ -916,7 +980,7 @@ describe('GroupRegistration tests', () => {
 
         expect(send_invitation_stub.callCount).toEqual(0);
         expect(component.invitation_sent).toEqual(null);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
 
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
@@ -965,7 +1029,7 @@ describe('GroupRegistration tests', () => {
 
         expect(send_invitation_stub.callCount).toEqual(0);
         expect(component.invitation_sent).toEqual(null);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
 
         wrapper.find('.send-group-invitation-button').trigger('click');
         await component.$nextTick();
@@ -1027,7 +1091,7 @@ describe('GroupRegistration tests', () => {
 
         expect(send_invitation_stub.calledOnce).toBe(true);
         expect(component.invitation_sent).toEqual(null);
-        expect(wrapper.findAll('#button-decision-container').length).toEqual(1);
+        expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
 
         wrapper.find('#modal-mask').trigger('click');
         await component.$nextTick();

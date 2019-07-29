@@ -1,42 +1,57 @@
 <template>
   <div v-if="!d_loading">
     <div id="invitation-received">
-      <div>
-        You've been invited to be in a group with:
-      </div>
+      <div class="invitation-received-top">
+        <div>You've been invited to be in a group with:</div>
 
-      <ul>
-        <li v-for="username of other_group_members">{{username}}</li>
-      </ul>
-
-      <div v-if="d_invitation.invitees_who_accepted.length > 0">
-        Members who have already accepted this invitation are:
-        <ul>
-          <li v-for="username of d_invitation.invitees_who_accepted"
-              class="member-who-has-accepted">{{username}}</li>
+        <ul class="list-of-usernames">
+          <li v-for="(username, index) of other_group_members"
+              :class="[{'last-username': index === other_group_members.length - 1},
+              'username']">
+            {{username}}
+          </li>
         </ul>
+
+        <div v-if="d_invitation.invitees_who_accepted.length > 0">
+          Members who have already accepted this invitation are:
+          <ul class="list-of-usernames">
+            <li v-for="(username, index) of d_invitation.invitees_who_accepted"
+                :class="['username', 'already-accepted',
+                  {'last-username': index === d_invitation.invitees_who_accepted.length - 1}]">
+              {{username}}
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <div>
-        <button class="red-button reject-invitation-button"
-                @click="$refs.confirm_reject_modal.open()"> Reject </button>
-        <button class="green-button accept-invitation-button"
-                :disabled="already_accepted || d_accepting"
-                @click="$refs.confirm_accept_modal.open()"> Accept </button>
+      <div class="invitation-received-bottom">
+        <div class="accept-reject-invitation-buttons">
+          <button class="orange-button reject-invitation-button"
+                  @click="$refs.confirm_reject_modal.open()"> Reject </button>
+          <button class="blue-button accept-invitation-button"
+                  :disabled="already_accepted || d_accepting"
+                  @click="$refs.confirm_accept_modal.open()"> Accept </button>
+        </div>
       </div>
     </div>
 
-    <modal ref="confirm_accept_modal" size="medium">
+    <modal ref="confirm_accept_modal"
+           size="medium"
+           click_outside_to_close>
       <div class="modal-header"> Confirm Accept </div>
-      <hr>
+      <div class="modal-divider"> </div>
       <div class="modal-body">
         <div class="modal-message">
           Are you sure you want to <b>accept</b> the invitation for a group with:
-          <ul>
-            <li v-for="username of other_group_members">{{username}}</li>
+          <ul class="list-of-usernames">
+            <li v-for="(username, index) of other_group_members"
+                :class="['username', {'last-username': index === other_group_members.length - 1}]">
+              {{username}}
+            </li>
           </ul>
         </div>
         <div class="modal-footer">
+          <div class="modal-divider"> </div>
           <div>
             <APIErrors ref="accept_invitation_api_errors"></APIErrors>
           </div>
@@ -51,24 +66,30 @@
       </div>
     </modal>
 
-    <modal ref="confirm_reject_modal" size="medium">
+    <modal ref="confirm_reject_modal"
+           size="medium"
+           click_outside_to_close>
       <div class="modal-header"> Confirm Reject </div>
-      <hr>
+      <div class="modal-divider"> </div>
       <div class="modal-body">
         <div class="modal-message">
           Are you sure you want to <b>reject</b> the invitation for a group with:
-          <ul>
-            <li v-for="username of other_group_members">{{username}}</li>
+          <ul class="list-of-usernames">
+            <li v-for="(username, index) of other_group_members"
+                :class="['username', {'last-username': index === other_group_members.length - 1}]">
+              {{username}}
+            </li>
           </ul>
         </div>
         <div class="modal-footer">
+          <div class="modal-divider"> </div>
           <div>
             <APIErrors ref="reject_invitation_api_errors"></APIErrors>
           </div>
           <div class="modal-button-container">
           <button class="light-gray-button cancel-reject-button"
                   @click="$refs.confirm_reject_modal.close()"> Cancel </button>
-          <button class="red-button confirm-reject-button"
+          <button class="orange-button confirm-reject-button"
                   :disabled="d_rejecting"
                   @click="reject_invitation"> Reject </button>
           </div>
@@ -107,11 +128,11 @@ export default class InvitationReceived extends Vue {
       this.d_invitation = deep_copy(new_value, GroupInvitation);
   }
 
-  user: User | null = null;
-  d_loading = true;
   d_invitation: GroupInvitation | null = null;
   d_accepting = false;
+  d_loading = true;
   d_rejecting = false;
+  user: User | null = null;
 
   async created() {
     this.user = await User.get_current();
@@ -139,10 +160,9 @@ export default class InvitationReceived extends Vue {
       this.$emit('input', copy_of_invitation);
       if (result !== null) {
         Group.notify_group_created(result);
+        return;
       }
-      else {
-          (<Modal> this.$refs.confirm_accept_modal).close();
-      }
+      (<Modal> this.$refs.confirm_accept_modal).close();
     }
     finally {
       this.d_accepting = false;
@@ -179,9 +199,60 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 
+.list-of-usernames {
+  margin-top: 9px;
+  margin-bottom: 9px;
+}
+
+.username {
+  margin: 6px;
+  font-weight: bold;
+}
+
+.last-username {
+  margin-bottom: 0;
+}
+
+#invitation-received {
+  display: inline-block;
+}
+
+.reject-invitation-button,
+.cancel-accept-button,
+.cancel-reject-button {
+  margin-right: 10px;
+}
+
+.accept-reject-invitation-buttons {
+  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.invitation-received-top {
+  padding: 15px;
+  background-color: white;
+  border-radius: 5px 5px 0 0;
+  border: 2px solid darken($white-gray, 6);
+  border-bottom: none;
+}
+
+.invitation-received-bottom {
+  border: 2px solid darken($white-gray, 6);
+  border-radius: 0 0 5px 5px;
+  background-color: whitesmoke;
+}
+
 .modal-header {
   font-size: 20px;
-  font-weight: bold;
+  padding: 10px 0 5px 0;
+}
+
+.modal-divider {
+  height: 2px;
+  background-color: darken($white-gray, 3);
+  margin: 9px 0;
 }
 
 .modal-message {
@@ -193,17 +264,6 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
   flex-direction: row;
   justify-content: flex-end;
   padding: 10px 0 0 0;
-}
-
-#invitation-received {
-  padding: 10px 20px 10px 10px;
-  border: 1px solid $pebble-medium;
-  border-radius: 5px;
-  display: inline-block;
-}
-
-.reject-invitation-button, .cancel-accept-button, .cancel-reject-button {
-  margin-right: 10px;
 }
 
 </style>

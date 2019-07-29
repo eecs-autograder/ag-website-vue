@@ -35,7 +35,10 @@
               <div id="group-members-container">
                 <div id="group-members-title"><b> Group members: </b></div>
                 <div v-for="(member, index) of group.member_names">
-                  <div :class="['group-member', {'odd-row': index % 2 !== 0}]">{{member}}</div>
+                  <div :class="['group-member',
+                               {'odd-row': index % 2 !== 0}]">
+                    {{member}}
+                  </div>
                 </div>
               </div>
 
@@ -204,6 +207,7 @@ export default class ProjectSubmission extends Vue implements GroupObserver {
 
 #group-members-title {
   padding: 10px 15px 10px 15px;
+  border-bottom: 1px solid lighten($gray-blue-1, 2);
   background-color: $gray-blue-1;
 }
 

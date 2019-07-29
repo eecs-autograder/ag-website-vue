@@ -23,14 +23,6 @@ describe('InvitationReceived tests', () => {
 
     beforeEach(() => {
 
-        invitation = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "sean@umich.edu",
-            project: 15,
-            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu"]
-        });
-
         project = new Project({
             pk: 15,
             name: "Project 100",
@@ -57,6 +49,14 @@ describe('InvitationReceived tests', () => {
             instructor_files: [],
             expected_student_files: [],
             has_handgrading_rubric: false
+        });
+
+        invitation = new GroupInvitation({
+            pk: 1,
+            invitation_creator: "sean@umich.edu",
+            project: project.pk,
+            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            invitees_who_accepted: ["milo@umich.edu"]
         });
 
         user = new User({
@@ -295,7 +295,7 @@ describe('InvitationReceived tests', () => {
         expect(component.d_invitation!.invitees_who_accepted.length).toEqual(1);
         expect(component.d_invitation!.invitees_who_accepted).toContain("milo@umich.edu");
 
-        let members_who_have_accepted = wrapper.findAll('.member-who-has-accepted');
+        let members_who_have_accepted = wrapper.findAll('.already-accepted');
         expect(members_who_have_accepted.length).toEqual(1);
         expect(members_who_have_accepted.at(0).text()).toEqual("milo@umich.edu");
     });
@@ -316,5 +316,4 @@ describe('InvitationReceived tests', () => {
 
         expect(component.d_invitation).toEqual(updated_invitation);
     });
-
 });

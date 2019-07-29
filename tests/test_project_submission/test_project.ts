@@ -668,7 +668,7 @@ describe('GroupObserver tests for the Project Component', () => {
         let invitation_received = new GroupInvitation({
             pk: 1,
             invitation_creator: "melissa@umich.edu",
-            project: 15,
+            project: project.pk,
             invited_usernames: ["alexis@umich.edu", "lauren@umich.edu"],
             invitees_who_accepted: ["lauren@umich.edu"]
         });
