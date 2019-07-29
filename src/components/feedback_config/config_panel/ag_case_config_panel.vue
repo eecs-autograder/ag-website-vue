@@ -36,13 +36,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
 import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
-import Toggle from '@/components/toggle.vue';
 
-@Component({
-  components: {
-    Toggle
-  }
-})
+@Component
 export default class AGCaseConfigPanel extends Vue {
   @Prop({required: true, type: String})
   config_name!: string;
@@ -50,7 +45,7 @@ export default class AGCaseConfigPanel extends Vue {
   @Prop({required: true, type: Object})
   value!: AGTestCaseFeedbackConfig;
 
-  hyphenate = hyphenate;
+  readonly hyphenate = hyphenate;
   d_ag_test_case_settings: AGTestCaseFeedbackConfig | null = null;
 
   @Watch('value')
