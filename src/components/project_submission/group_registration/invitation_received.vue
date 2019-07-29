@@ -11,7 +11,8 @@
           </li>
         </ul>
 
-        <div v-if="d_invitation.invitees_who_accepted.length > 0">
+        <div v-if="d_invitation.invitees_who_accepted.length > 0"
+             id="invitees-that-accepted">
           Members who have already accepted this invitation are:
           <ul class="list-of-usernames">
             <li v-for="(username, index) of d_invitation.invitees_who_accepted"
@@ -76,7 +77,7 @@
       <div class="modal-divider"></div>
       <div class="modal-body">
         <div class="modal-message">
-          Are you sure you want to <b>reject</b> the invitation for a group with:
+          Are you sure you want to <b class="reject">reject</b> the invitation for a group with:
           <ul class="list-of-usernames">
             <li v-for="(username, index) of other_group_members"
                 :class="['username', {'last-username': index === other_group_members.length - 1}]">
@@ -242,6 +243,14 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
   border-radius: 5px 5px 0 0;
   border: 2px solid darken($white-gray, 6);
   border-bottom: none;
+}
+
+#invitees-that-accepted {
+  margin-top: 15px;
+
+  .list-of-usernames {
+    margin-bottom: 2px;
+  }
 }
 
 .invitation-received-bottom {

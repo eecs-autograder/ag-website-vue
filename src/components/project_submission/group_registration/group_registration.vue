@@ -1,6 +1,10 @@
 <template>
   <div v-if="!d_loading" id="group-registration">
     <div id="group-registration-title"> Group Registration </div>
+    <div class="resolve-invitation-message"
+         v-if="invitations_received > 0 || invitation_sent !== null">
+      (You must resolve pending invitations before sending a new one).
+    </div>
 
     <div v-if="project.disallow_group_registration"
          id="registration-closed">
@@ -33,38 +37,40 @@
 
       <div v-if="invitation_sent !== null">
         <div id="pending-invitations-title"> Pending Invitation Sent </div>
-        <div class="resolve-invitation-message"
-             v-if="invitations_received > 0 || invitation_sent !== null">
-          (You must resolve pending invitations before sending a new one).
-        </div>
         <div id="invitation-sent">
           <div>
-            <div> Invited Members: </div>
-            <ul class="list-of-usernames">
-              <li v-for="(username, index) of invitation_sent.invited_usernames"
-                  :class="['username',
-                   {'last-username': index === invitation_sent.invited_usernames.length - 1}]">
-                <b>{{username}}</b>
-              </li>
-            </ul>
+            <div>
+              <div> Invited Members: </div>
+              <ul class="list-of-usernames">
+                <li v-for="(username, index) of invitation_sent.invited_usernames"
+                    :class="['username',
+                     {'last-username': index === invitation_sent.invited_usernames.length - 1}]">
+                  <b>{{username}}</b>
+                </li>
+              </ul>
+            </div>
+
+            <div v-if="invitation_sent.invitees_who_accepted.length > 0"
+                 id="invitees-that-accepted">
+              <div> Members who have accepted: </div>
+              <ul class="list-of-usernames invitees-that-accepted">
+                <li v-for="(username, index) of invitation_sent.invitees_who_accepted"
+                    :class="['username',
+                    {'last-username': index
+                      === invitation_sent.invitees_who_accepted.length - 1}]">
+                  {{username}}
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div v-if="invitation_sent.invitees_who_accepted.length > 0">
-            <div> Members who have accepted: </div>
-            <ul class="list-of-usernames">
-              <li v-for="(username, index) of invitation_sent.invitees_who_accepted"
-                  :class="['username',
-                  {'last-username': index === invitation_sent.invitees_who_accepted.length - 1}]">
-                {{username}}
-              </li>
-            </ul>
+          <div class="cancel-invitation-button-container">
+            <button class="light-gray-button"
+                    id="cancel-sent-invitation-button"
+                    @click="$refs.cancel_group_invitation_modal.open()">
+              Cancel Invitation
+            </button>
           </div>
-
-          <button class="orange-button"
-                  id="cancel-sent-invitation-button"
-                  @click="$refs.cancel_group_invitation_modal.open()">
-            Cancel Invitation
-          </button>
         </div>
       </div>
     </div>
@@ -406,7 +412,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 
 .list-of-usernames {
   margin-top: 9px;
-  margin-bottom: 9px;
+  margin-bottom: 15px;
 }
 
 .username {
@@ -427,39 +433,33 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   margin-bottom: 15px;
 }
 
-#invitations-received-title {
+#invitations-received-title, #pending-invitations-title {
   padding: 5px 0;
   font-size: 18px;
 }
 
 .invitation {
-  margin-bottom: 10px;
-}
-
-#pending-invitations-title {
-  margin-top: 20px;
-  padding: 0px 0;
-  font-size: 18px;
-}
-
-#pending-invitations-title span {
-  font-size: 15px;
+  margin-bottom: 15px;
 }
 
 #invitation-sent {
-  padding: 10px 20px 10px 10px;
+  padding: 15px;
   border: 2px solid $pebble-medium;
   border-radius: 5px;
   display: inline-block;
 }
 
-#invitation-sent .list-of-usernames {
-  margin-bottom: 15px;
+#invitees-that-accepted {
+  margin-top: 15px;
 }
 
 .resolve-invitation-message {
   padding: 5px 0 10px 0;
   font-size: 15px;
+}
+
+#cancel-sent-invitation-button {
+  width: 100%;
 }
 
 #confirm-cancel-sent-invitation-button,
