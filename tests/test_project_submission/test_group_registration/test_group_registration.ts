@@ -263,7 +263,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.users_to_invite.length).toEqual(0);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.users_to_invite.length).toEqual(1);
@@ -301,7 +301,7 @@ describe('GroupRegistration tests', () => {
         component = wrapper.vm;
         await component.$nextTick();
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.users_to_invite.length).toEqual(5);
@@ -422,12 +422,12 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
-        wrapper.find('.work-alone-button').trigger('click');
+        wrapper.find('#work-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_working_alone_modal.is_open).toBe(true);
 
-        wrapper.find('.cancel-confirm-working-alone-button').trigger('click');
+        wrapper.find('#cancel-confirm-working-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_working_alone_modal.is_open).toBe(false);
@@ -472,12 +472,12 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
-        wrapper.find('.work-alone-button').trigger('click');
+        wrapper.find('#work-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_working_alone_modal.is_open).toBe(true);
 
-        wrapper.find('.confirm-working-alone-button').trigger('click');
+        wrapper.find('#confirm-working-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(work_alone_stub.callCount).toEqual(1);
@@ -514,12 +514,12 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
-        wrapper.find('.work-alone-button').trigger('click');
+        wrapper.find('#work-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_working_alone_modal.is_open).toBe(true);
 
-        wrapper.find('.confirm-working-alone-button').trigger('click');
+        wrapper.find('#confirm-working-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(work_alone_stub.callCount).toEqual(1);
@@ -559,12 +559,12 @@ describe('GroupRegistration tests', () => {
         expect(confirm_cancel_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(group_invitation_sent);
 
-        wrapper.find('.cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_cancel_invitation_modal.is_open).toBe(true);
 
-        wrapper.find('.confirm-keep-sent-invitation-button').trigger('click');
+        wrapper.find('#confirm-keep-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(reject_invitation_stub.callCount).toEqual(0);
@@ -602,12 +602,12 @@ describe('GroupRegistration tests', () => {
         expect(confirm_cancel_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(group_invitation_sent);
 
-        wrapper.find('.cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_cancel_invitation_modal.is_open).toBe(true);
 
-        wrapper.find('.confirm-cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#confirm-cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
@@ -652,12 +652,12 @@ describe('GroupRegistration tests', () => {
         expect(confirm_cancel_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(group_invitation_sent);
 
-        wrapper.find('.cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(confirm_cancel_invitation_modal.is_open).toBe(true);
 
-        wrapper.find('.confirm-cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#confirm-cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
@@ -689,12 +689,12 @@ describe('GroupRegistration tests', () => {
         expect(send_group_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_group_invitation_modal.is_open).toBe(true);
 
-        wrapper.find('.cancel-send-invitation-button').trigger('click');
+        wrapper.find('#cancel-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.callCount).toEqual(0);
@@ -732,7 +732,7 @@ describe('GroupRegistration tests', () => {
         expect(send_group_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_group_invitation_modal.is_open).toBe(true);
@@ -745,7 +745,7 @@ describe('GroupRegistration tests', () => {
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        wrapper.find('#confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
@@ -788,7 +788,7 @@ describe('GroupRegistration tests', () => {
         expect(component.invitation_sent).toEqual(null);
         expect(component.incomplete_input_present).toBe(false);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_group_invitation_modal.is_open).toBe(true);
@@ -796,7 +796,7 @@ describe('GroupRegistration tests', () => {
         let member_name_inputs = wrapper.findAll('.member-name-input');
         expect(member_name_inputs.length).toEqual(1);
 
-        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        wrapper.find('#confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(false);
@@ -835,7 +835,7 @@ describe('GroupRegistration tests', () => {
         expect(send_group_invitation_modal.is_open).toBe(false);
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_group_invitation_modal.is_open).toBe(true);
@@ -848,7 +848,7 @@ describe('GroupRegistration tests', () => {
         member_1_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        wrapper.find('#confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
@@ -893,7 +893,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-member-button').trigger('click');
@@ -911,7 +911,7 @@ describe('GroupRegistration tests', () => {
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        wrapper.find('#confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
@@ -921,16 +921,16 @@ describe('GroupRegistration tests', () => {
         expect(component.invitation_sent).toEqual(group_invitation_created);
         expect(wrapper.findAll('#group-registration-options').length).toEqual(0);
 
-        wrapper.find('.cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
-        wrapper.find('.confirm-cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#confirm-cancel-sent-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.incomplete_input_present).toBe(false);
@@ -961,7 +961,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-member-button').trigger('click');
@@ -979,14 +979,14 @@ describe('GroupRegistration tests', () => {
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('.cancel-send-invitation-button').trigger('click');
+        wrapper.find('#cancel-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.callCount).toEqual(0);
         expect(component.invitation_sent).toEqual(null);
         expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.incomplete_input_present).toBe(false);
@@ -1017,7 +1017,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-member-button').trigger('click');
@@ -1037,7 +1037,7 @@ describe('GroupRegistration tests', () => {
         expect(component.invitation_sent).toEqual(null);
         expect(wrapper.findAll('#group-registration-options').length).toEqual(1);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.incomplete_input_present).toBe(false);
@@ -1076,7 +1076,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-member-button').trigger('click');
@@ -1094,7 +1094,7 @@ describe('GroupRegistration tests', () => {
         member_2_name_input.trigger('input');
         await component.$nextTick();
 
-        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        wrapper.find('#confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
@@ -1104,7 +1104,7 @@ describe('GroupRegistration tests', () => {
         wrapper.find('#modal-mask').trigger('click');
         await component.$nextTick();
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.incomplete_input_present).toBe(false);
@@ -1136,7 +1136,7 @@ describe('GroupRegistration tests', () => {
 
         expect(component.invitation_sent).toEqual(null);
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-member-button').trigger('click');
@@ -1144,7 +1144,7 @@ describe('GroupRegistration tests', () => {
 
         expect(wrapper.findAll('.member-name-input').length).toEqual(2);
 
-        wrapper.find('.confirm-send-invitation-button').trigger('click');
+        wrapper.find('#confirm-send-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(send_invitation_stub.callCount).toEqual(0);
@@ -1155,7 +1155,7 @@ describe('GroupRegistration tests', () => {
         wrapper.find('#modal-mask').trigger('click');
         await component.$nextTick();
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.incomplete_input_present).toBe(false);
@@ -1186,7 +1186,7 @@ describe('GroupRegistration tests', () => {
          component = wrapper.vm;
          await component.$nextTick();
 
-         wrapper.find('.send-group-invitation-button').trigger('click');
+         wrapper.find('#send-group-invitation-button').trigger('click');
          await component.$nextTick();
 
          expect(wrapper.findAll('.member-name-input').length).toEqual(4);
@@ -1210,7 +1210,7 @@ describe('GroupRegistration tests', () => {
          component = wrapper.vm;
          await component.$nextTick();
 
-         wrapper.find('.send-group-invitation-button').trigger('click');
+         wrapper.find('#send-group-invitation-button').trigger('click');
          await component.$nextTick();
 
          expect(wrapper.findAll('.member-name-input').length).toEqual(2);
@@ -1234,7 +1234,7 @@ describe('GroupRegistration tests', () => {
          component = wrapper.vm;
          await component.$nextTick();
 
-         wrapper.find('.send-group-invitation-button').trigger('click');
+         wrapper.find('#send-group-invitation-button').trigger('click');
          await component.$nextTick();
 
          expect(wrapper.findAll('.member-name-input').length).toEqual(1);
@@ -1257,7 +1257,7 @@ describe('GroupRegistration tests', () => {
         component = wrapper.vm;
         await component.$nextTick();
 
-        wrapper.find('.send-group-invitation-button').trigger('click');
+        wrapper.find('#send-group-invitation-button').trigger('click');
         await component.$nextTick();
 
         expect(component.project.max_group_size).toEqual(5);
@@ -1340,12 +1340,12 @@ describe('GroupRegistration tests', () => {
 
         let invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(0);
         let invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('.reject-invitation-button').trigger('click');
+        invitation_to_reject.find('#reject-invitation-button').trigger('click');
         await component.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('.confirm-reject-button').trigger('click');
+        invitation_to_reject.find('#confirm-reject-button').trigger('click');
         await component.$nextTick();
 
         expect(component.invitations_received.length).toEqual(3);
@@ -1355,12 +1355,12 @@ describe('GroupRegistration tests', () => {
 
         invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(1);
         invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('.reject-invitation-button').trigger('click');
+        invitation_to_reject.find('#reject-invitation-button').trigger('click');
         await component.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('.confirm-reject-button').trigger('click');
+        invitation_to_reject.find('#confirm-reject-button').trigger('click');
         await component.$nextTick();
 
         expect(component.invitations_received.length).toEqual(2);
@@ -1369,12 +1369,12 @@ describe('GroupRegistration tests', () => {
 
         invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(1);
         invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('.reject-invitation-button').trigger('click');
+        invitation_to_reject.find('#reject-invitation-button').trigger('click');
         await component.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('.confirm-reject-button').trigger('click');
+        invitation_to_reject.find('#confirm-reject-button').trigger('click');
         await component.$nextTick();
 
         expect(component.invitations_received.length).toEqual(1);
@@ -1382,12 +1382,12 @@ describe('GroupRegistration tests', () => {
 
         invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(0);
         invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('.reject-invitation-button').trigger('click');
+        invitation_to_reject.find('#reject-invitation-button').trigger('click');
         await component.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('.confirm-reject-button').trigger('click');
+        invitation_to_reject.find('#confirm-reject-button').trigger('click');
         await component.$nextTick();
 
         expect(component.invitations_received.length).toEqual(0);

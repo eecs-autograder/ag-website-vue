@@ -635,10 +635,10 @@ describe('GroupObserver tests for the Project Component', () => {
 
         let group_registration = wrapper.find({ref: 'group_registration'});
 
-        group_registration.find('.work-alone-button').trigger('click');
+        group_registration.find('#work-alone-button').trigger('click');
         await component.$nextTick();
 
-        group_registration.find('.confirm-working-alone-button').trigger('click');
+        group_registration.find('#confirm-working-alone-button').trigger('click');
         await component.$nextTick();
 
         expect(create_solo_group_stub.calledOnce);
@@ -696,7 +696,7 @@ describe('GroupObserver tests for the Project Component', () => {
         let invitation_to_accept = <InvitationReceived> group_registration.findAll(
             {ref: 'invitation_received'}
         ).at(0).vm;
-        group_registration.find('.accept-invitation-button').trigger('click');
+        group_registration.find('#accept-invitation-button').trigger('click');
         await component.$nextTick();
 
         let create_multi_person_group = sinon.stub(
@@ -705,7 +705,7 @@ describe('GroupObserver tests for the Project Component', () => {
             Promise.resolve(group_created)
         );
 
-        group_registration.find('.confirm-accept-button').trigger('click');
+        group_registration.find('#confirm-accept-button').trigger('click');
         await component.$nextTick();
         await component.$nextTick();
 

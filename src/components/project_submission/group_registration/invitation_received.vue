@@ -3,7 +3,6 @@
     <div id="invitation-received">
       <div class="invitation-received-top">
         <div>You've been invited to be in a group with:</div>
-
         <ul class="list-of-usernames">
           <li v-for="(username, index) of other_group_members"
               :class="[{'last-username': index === other_group_members.length - 1},
@@ -26,9 +25,11 @@
 
       <div class="invitation-received-bottom">
         <div class="accept-reject-invitation-buttons">
-          <button class="orange-button reject-invitation-button"
+          <button class="orange-button"
+                  id="reject-invitation-button"
                   @click="$refs.confirm_reject_modal.open()"> Reject </button>
-          <button class="blue-button accept-invitation-button"
+          <button class="blue-button"
+                  id="accept-invitation-button"
                   :disabled="already_accepted || d_accepting"
                   @click="$refs.confirm_accept_modal.open()"> Accept </button>
         </div>
@@ -39,7 +40,7 @@
            size="medium"
            click_outside_to_close>
       <div class="modal-header"> Confirm Accept </div>
-      <div class="modal-divider"> </div>
+      <div class="modal-divider"></div>
       <div class="modal-body">
         <div class="modal-message">
           Are you sure you want to <b>accept</b> the invitation for a group with:
@@ -51,14 +52,16 @@
           </ul>
         </div>
         <div class="modal-footer">
-          <div class="modal-divider"> </div>
+          <div class="modal-divider"></div>
           <div>
             <APIErrors ref="accept_invitation_api_errors"></APIErrors>
           </div>
           <div class="modal-button-container">
-          <button class="light-gray-button cancel-accept-button"
+          <button class="light-gray-button"
+                  id="cancel-accept-button"
                   @click="$refs.confirm_accept_modal.close()"> Cancel </button>
-          <button class="blue-button confirm-accept-button"
+          <button class="blue-button"
+                  id="confirm-accept-button"
                   :disabled="d_accepting"
                   @click="accept_invitation"> Accept </button>
           </div>
@@ -70,7 +73,7 @@
            size="medium"
            click_outside_to_close>
       <div class="modal-header"> Confirm Reject </div>
-      <div class="modal-divider"> </div>
+      <div class="modal-divider"></div>
       <div class="modal-body">
         <div class="modal-message">
           Are you sure you want to <b>reject</b> the invitation for a group with:
@@ -82,14 +85,16 @@
           </ul>
         </div>
         <div class="modal-footer">
-          <div class="modal-divider"> </div>
+          <div class="modal-divider"></div>
           <div>
             <APIErrors ref="reject_invitation_api_errors"></APIErrors>
           </div>
           <div class="modal-button-container">
-          <button class="light-gray-button cancel-reject-button"
+          <button class="light-gray-button"
+                  id="cancel-reject-button"
                   @click="$refs.confirm_reject_modal.close()"> Cancel </button>
-          <button class="orange-button confirm-reject-button"
+          <button class="orange-button"
+                  id="confirm-reject-button"
                   :disabled="d_rejecting"
                   @click="reject_invitation"> Reject </button>
           </div>
@@ -128,8 +133,8 @@ export default class InvitationReceived extends Vue {
       this.d_invitation = deep_copy(new_value, GroupInvitation);
   }
 
-  d_invitation: GroupInvitation | null = null;
   d_accepting = false;
+  d_invitation: GroupInvitation | null = null;
   d_loading = true;
   d_rejecting = false;
   user: User | null = null;
@@ -138,16 +143,6 @@ export default class InvitationReceived extends Vue {
     this.user = await User.get_current();
     this.d_invitation = deep_copy(this.value, GroupInvitation);
     this.d_loading = false;
-  }
-
-  @handle_api_errors_async(handle_reject_invitation_error)
-  async reject_invitation() {
-    (<APIErrors> this.$refs.reject_invitation_api_errors).clear();
-    this.d_rejecting = true;
-    await this.d_invitation!.reject();
-    (<Modal> this.$refs.confirm_reject_modal).close();
-    this.$emit('invitation_rejected');
-    this.d_rejecting = false;
   }
 
   @handle_api_errors_async(handle_accept_invitation_error)
@@ -169,6 +164,13 @@ export default class InvitationReceived extends Vue {
     }
   }
 
+  get already_accepted() {
+    let index = this.d_invitation!.invitees_who_accepted.findIndex(
+      (invitee: string) => invitee === this.user!.username
+    );
+    return index !== -1;
+  }
+
   get other_group_members() {
     let other_invitees = [this.d_invitation!.invitation_creator];
     this.d_invitation!.invited_usernames.forEach((invitee: string) => {
@@ -179,10 +181,14 @@ export default class InvitationReceived extends Vue {
     return other_invitees;
   }
 
-  get already_accepted() {
-    let index = this.d_invitation!.invitees_who_accepted.findIndex(
-      (invitee: string) => invitee === this.user!.username);
-    return index !== -1;
+  @handle_api_errors_async(handle_reject_invitation_error)
+  async reject_invitation() {
+    (<APIErrors> this.$refs.reject_invitation_api_errors).clear();
+    this.d_rejecting = true;
+    await this.d_invitation!.reject();
+    (<Modal> this.$refs.confirm_reject_modal).close();
+    this.$emit('invitation_rejected');
+    this.d_rejecting = false;
   }
 }
 
@@ -217,9 +223,9 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
   display: inline-block;
 }
 
-.reject-invitation-button,
-.cancel-accept-button,
-.cancel-reject-button {
+#reject-invitation-button,
+#cancel-accept-button,
+#cancel-reject-button {
   margin-right: 10px;
 }
 
