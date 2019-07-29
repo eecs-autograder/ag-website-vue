@@ -129,24 +129,24 @@ describe('FeedbackConfigAGSuite tests', () => {
     });
 
     test("update_config_settings in edit_feedback_settings_ag_suite - changes reflected in " +
-         "preset_selected in config_panel",
+         "selected_preset_name in config_panel",
          async () => {
         let normal_config_panel = wrapper.find({ref: 'normal'});
         let normal_config_panel_component = <ConfigPanel> normal_config_panel.vm;
 
-        expect(normal_config_panel_component.preset_selected).toEqual("Custom");
+        expect(normal_config_panel_component.selected_preset_name).toEqual("Custom");
 
         normal_config_panel.find('.advanced-settings-label').trigger('click');
         await component.$nextTick();
 
         wrapper.find('#normal-show-individual-tests').setChecked(true);
-        expect(normal_config_panel_component.preset_selected).toEqual("Private Setup");
+        expect(normal_config_panel_component.selected_preset_name).toEqual("Private Setup");
 
         wrapper.find('#normal-show-setup-return-code').setChecked(true);
-        expect(normal_config_panel_component.preset_selected).toEqual("Custom");
+        expect(normal_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#normal-show-setup-timed-out').setChecked(true);
-        expect(normal_config_panel_component.preset_selected).toEqual("Pass/Fail Setup");
+        expect(normal_config_panel_component.selected_preset_name).toEqual("Pass/Fail Setup");
     });
 
     test("checkboxes in config panels do not react to changes in " +

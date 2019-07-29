@@ -161,7 +161,7 @@ describe('FeedbackConfigMutationSuite tests', () => {
     });
 
     test("update config settings in edit_feedback_settings_mutation_suite - changes " +
-         "reflected in preset_selected in config_panel",
+         "reflected in selected_preset_name in config_panel",
          async () => {
         let ultimate_submission_config_panel = wrapper.find({ref: 'final_graded'});
         let ultimate_submission_config_panel_component =
@@ -170,24 +170,24 @@ describe('FeedbackConfigMutationSuite tests', () => {
         ultimate_submission_config_panel.find('.advanced-settings-label').trigger('click');
         await component.$nextTick();
 
-        expect(ultimate_submission_config_panel_component.preset_selected).toEqual("Custom");
+        expect(ultimate_submission_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#final-graded-bugs-exposed-fdbk-level').setValue(
             BugsExposedFeedbackLevel.no_feedback
         );
-        expect(ultimate_submission_config_panel_component.preset_selected).toEqual("Private");
+        expect(ultimate_submission_config_panel_component.selected_preset_name).toEqual("Private");
 
         wrapper.find('#final-graded-show-points').setChecked(true);
-        expect(ultimate_submission_config_panel_component.preset_selected).toEqual("Custom");
+        expect(ultimate_submission_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#final-graded-show-invalid-test-names').setChecked(true);
-        expect(ultimate_submission_config_panel_component.preset_selected).toEqual("Custom");
+        expect(ultimate_submission_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#final-graded-show-get-test-names-return-code').setChecked(true);
-        expect(ultimate_submission_config_panel_component.preset_selected).toEqual("Custom");
+        expect(ultimate_submission_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#final-graded-show-setup-return-code').setChecked(true);
-        expect(ultimate_submission_config_panel_component.preset_selected).toEqual(
+        expect(ultimate_submission_config_panel_component.selected_preset_name).toEqual(
             "False Positives"
         );
     });

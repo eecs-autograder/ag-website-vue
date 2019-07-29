@@ -8,8 +8,8 @@
            class="setting-selection-container">
         <span id="preset-label">Preset:</span>
         <select id="config-preset-select"
-                v-model="preset_selected"
-                @change="update_config"
+                v-model="selected_preset_name"
+                @change="change_preset"
                 class="select">
           <option hidden>Custom</option>
           <option v-for="preset_name of preset_names"
@@ -21,7 +21,7 @@
     </div>
 
     <div id="footer">
-        <slot name="settings"> </slot>
+      <slot name="settings"> </slot>
     </div>
   </div>
 </template>
@@ -55,7 +55,7 @@ export default class ConfigPanel extends Vue {
   @Prop({required: true, type: String})
   config_name!: string;
 
-  @Prop({required: true, type: Function})
+  @Prop({required: false})
   get_preset_fn!: (config_being_viewed: FeedbackConfigType,
                    preset_options: SafeMap<string, FeedbackPresetType>) => string;
 
@@ -67,30 +67,55 @@ export default class ConfigPanel extends Vue {
 
   d_configuration: FeedbackConfigType | null = null;
   preset_names: string[] = [];
-  preset_selected: string = "Custom";
+  selected_preset_name: string = "Custom";
 
   @Watch('value', {deep: true})
   on_value_changed(new_value: FeedbackConfigType, old_value: FeedbackConfigType) {
-    this.d_configuration = new_value === null ? null : JSON.parse(JSON.stringify(new_value));
-    if (this.d_configuration !== null) {
-      this.preset_selected = this.get_preset_fn(this.d_configuration, this.preset_options);
-    }
-  }
-
-  update_config() {
-    safe_assign(this.d_configuration!, this.preset_options.get(this.preset_selected));
-    let copy_of_config = JSON.parse(JSON.stringify(this.d_configuration));
-    this.$emit('input', copy_of_config);
+    this.set_d_configuration(new_value);
   }
 
   created() {
     for (let [preset_label, preset_settings] of this.preset_options) {
       this.preset_names.push(preset_label);
     }
+    this.set_d_configuration(this.value);
+  }
+
+  private set_d_configuration(feedback_config: FeedbackConfigType) {
     this.d_configuration = this.value === null ? null : JSON.parse(JSON.stringify(this.value));
-    if (this.d_configuration !== null) {
-      this.preset_selected = this.get_preset_fn(this.d_configuration, this.preset_options);
+    this.selected_preset_name = this.detect_current_preset();
+  }
+
+  private detect_current_preset(): string {
+    for (let [label, preset] of this.preset_options) {
+      if (this.config_matches_preset(this.d_configuration, preset)) {
+        return label;
+      }
     }
+    return "Custom";
+  }
+
+  private config_matches_preset(config: FeedbackConfigType, preset: FeedbackPresetType) {
+    if (config === null) {
+      return false;
+    }
+
+    // We have to use the keys of preset because they do not have the "visible"
+    // option that the config has.
+    for (let key of Object.keys(preset)) {
+      // @ts-ignore
+      if (config[key] !== preset[key]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private change_preset() {
+    let updated_config = JSON.parse(JSON.stringify(this.d_configuration));
+    safe_assign(updated_config, this.preset_options.get(this.selected_preset_name));
+    this.$emit('input', updated_config);
   }
 }
 </script>

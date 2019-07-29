@@ -65,7 +65,8 @@ describe('FeedbackConfigAGCommand tests', () => {
         await component.$nextTick();
 
         expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config).not.toBeNull();
-        expect(first_failure_config_component.preset_selected).toEqual("Pass/Fail + Exit Status");
+        expect(first_failure_config_component.selected_preset_name).toEqual(
+            "Pass/Fail + Exit Status");
         expect(first_failure_config.findAll('.setting-selection-container').length).toEqual(1);
         expect(first_failure_config.findAll('.advanced-settings-label').length).toEqual(1);
         expect(component.first_failed_config_is_enabled).toBe(true);
@@ -81,7 +82,7 @@ describe('FeedbackConfigAGCommand tests', () => {
         first_failure_config_is_enabled_input.setChecked(true);
 
         expect(component.d_ag_test_command!.first_failed_test_normal_fdbk_config).not.toBeNull();
-        expect(first_failure_config_component.preset_selected).toEqual("Public");
+        expect(first_failure_config_component.selected_preset_name).toEqual("Public");
         expect(first_failure_config.findAll('.setting-selection-container').length).toEqual(1);
         expect(first_failure_config.findAll('.advanced-settings-label').length).toEqual(1);
         expect(component.first_failed_config_is_enabled).toBe(true);
@@ -228,33 +229,33 @@ describe('FeedbackConfigAGCommand tests', () => {
     });
 
     test("update config settings in edit_feedback_settings_ag_command - changes reflected " +
-         "in preset_selected in config_panel",
+         "in selected_preset_name in config_panel",
          async () => {
         let past_limit_config_panel = wrapper.find({ref: 'past_limit'});
         let past_limit_config_panel_component = <ConfigPanel>  past_limit_config_panel.vm;
 
-        expect(past_limit_config_panel_component.preset_selected).toEqual("Custom");
+        expect(past_limit_config_panel_component.selected_preset_name).toEqual("Custom");
 
         past_limit_config_panel.find('.advanced-settings-label').trigger('click');
         await component.$nextTick();
 
         wrapper.find('#past-limit-show-points').setChecked(true);
-        expect(past_limit_config_panel_component.preset_selected).toEqual("Pass/Fail");
+        expect(past_limit_config_panel_component.selected_preset_name).toEqual("Pass/Fail");
 
         wrapper.find('#past-limit-return-code-fdbk-level').setValue(
             ValueFeedbackLevel.no_feedback
         );
-        expect(past_limit_config_panel_component.preset_selected).toEqual("Custom");
+        expect(past_limit_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#past-limit-stdout-fdbk-level').setValue(ValueFeedbackLevel.no_feedback);
-        expect(past_limit_config_panel_component.preset_selected).toEqual("Custom");
+        expect(past_limit_config_panel_component.selected_preset_name).toEqual("Custom");
 
 
         wrapper.find('#past-limit-stderr-fdbk-level').setValue(ValueFeedbackLevel.no_feedback);
-        expect(past_limit_config_panel_component.preset_selected).toEqual("Custom");
+        expect(past_limit_config_panel_component.selected_preset_name).toEqual("Custom");
 
         wrapper.find('#past-limit-show-points').setChecked(false);
-        expect(past_limit_config_panel_component.preset_selected).toEqual("Private");
+        expect(past_limit_config_panel_component.selected_preset_name).toEqual("Private");
     });
 
     test("checkboxes in config panels do not react to changes in other panels", async () => {
