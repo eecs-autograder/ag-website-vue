@@ -99,7 +99,7 @@ import { format_datetime, get_query_param } from '@/utils';
     Tabs
   }
 })
-export default class ProjectSubmission extends Vue implements GroupObserver {
+export default class ProjectView extends Vue implements GroupObserver {
   current_tab_index = 0;
   d_loading = true;
   user: User | null = null;

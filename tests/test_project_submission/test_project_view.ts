@@ -13,15 +13,15 @@ import {
 import * as sinon from 'sinon';
 
 import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
-import ProjectSubmission from '@/components/project_submission/project.vue';
+import ProjectView from '@/components/project_submission/project_view.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 describe('Changing Tabs', ()  => {
-    let wrapper: Wrapper<ProjectSubmission>;
-    let component: ProjectSubmission;
+    let wrapper: Wrapper<ProjectView>;
+    let component: ProjectView;
     let project: Project;
     let course: Course;
     let user: User;
@@ -34,7 +34,7 @@ describe('Changing Tabs', ()  => {
         {
             path: '/web/project/:project_id',
             name: "project_submission",
-            component: ProjectSubmission
+            component: ProjectView
         }
     ];
 
@@ -100,7 +100,7 @@ describe('Changing Tabs', ()  => {
             })
         });
 
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             localVue,
             router
         });
@@ -167,8 +167,8 @@ describe('Changing Tabs', ()  => {
 describe('select_tab function called with different values associated with "current_tab" ' +
          'key on create',
          ()  => {
-    let wrapper: Wrapper<ProjectSubmission>;
-    let component: ProjectSubmission;
+    let wrapper: Wrapper<ProjectView>;
+    let component: ProjectView;
     let project: Project;
     let course: Course;
     let user: User;
@@ -253,7 +253,7 @@ describe('select_tab function called with different values associated with "curr
     test('current_tab parameter value = submit', async () => {
         $route.query = { current_tab: 'submit' };
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -303,7 +303,7 @@ describe('select_tab function called with different values associated with "curr
             }),
         ]));
 
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -358,7 +358,7 @@ describe('select_tab function called with different values associated with "curr
         $route.query = { current_tab: 'submit' };
 
 
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -381,7 +381,7 @@ describe('select_tab function called with different values associated with "curr
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
 
         $route.query = { current_tab: 'my_submissions' };
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -399,7 +399,7 @@ describe('select_tab function called with different values associated with "curr
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
 
         $route.query = { current_tab: 'student_lookup' };
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -417,7 +417,7 @@ describe('select_tab function called with different values associated with "curr
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
 
         $route.query = { current_tab: '' };
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -435,7 +435,7 @@ describe('select_tab function called with different values associated with "curr
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
 
         $route.query = { current_tab: ['student_lookup', 'submit'] };
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -453,7 +453,7 @@ describe('select_tab function called with different values associated with "curr
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
 
         $route.query = { };
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             mocks: {
                 $route
             }
@@ -472,8 +472,8 @@ describe('select_tab function called with different values associated with "curr
 
 
 describe('GroupObserver tests for the Project Component', () => {
-    let wrapper: Wrapper<ProjectSubmission>;
-    let component: ProjectSubmission;
+    let wrapper: Wrapper<ProjectView>;
+    let component: ProjectView;
     let project: Project;
     let course: Course;
     let user: User;
@@ -486,7 +486,7 @@ describe('GroupObserver tests for the Project Component', () => {
         {
             path: '/web/project/:project_id',
             name: "project_submission",
-            component: ProjectSubmission
+            component: ProjectView
         }
     ];
 
@@ -584,7 +584,7 @@ describe('GroupObserver tests for the Project Component', () => {
         let create_solo_group_stub = sinon.stub(Group, 'create_solo_group').callsFake(
             () => Group.notify_group_created(group_created)
         );
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             localVue,
             router
         });
@@ -623,7 +623,7 @@ describe('GroupObserver tests for the Project Component', () => {
         let create_solo_group_stub = sinon.stub(Group, 'create_solo_group').callsFake(
             () => Group.notify_group_created(group_created)
         );
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             localVue,
             router
         });
@@ -680,7 +680,7 @@ describe('GroupObserver tests for the Project Component', () => {
         );
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(ProjectSubmission, {
+        wrapper = mount(ProjectView, {
             localVue,
             router
         });
