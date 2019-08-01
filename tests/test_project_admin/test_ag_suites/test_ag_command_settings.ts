@@ -910,7 +910,6 @@ describe('AGTestCommandSettings tests', () => {
         return do_invalid_text_input_test(wrapper, {ref: 'stack_size_limit'}, '0', '.save-button');
     });
 
-
     test('process_spawn_limit binding', async () => {
         let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
 

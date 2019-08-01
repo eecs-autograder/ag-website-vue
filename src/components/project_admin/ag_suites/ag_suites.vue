@@ -4,6 +4,7 @@
       <div id="columns-container" class="scroll-column-container">
         <div id="ag-test-suite-sidebar" class="scroll-column">
           <div class="scroll-container">
+
             <div id="sidebar-header">
               <div id="ag-test-suites-title"> Suites </div>
               <button type="button"
@@ -506,7 +507,7 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/independent_scrolling.scss';;
+@import '@/styles/independent_scrolling.scss';
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/global.scss';

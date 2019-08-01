@@ -1,53 +1,100 @@
 <template>
   <div>
-    <validated-form id="ag-command-settings-form"
+    <validated-form id="ag-settings-form"
                     autocomplete="off"
                     spellcheck="false"
-                    @submit="save_ag_command_settings"
-                    @form_validity_changed="d_ag_command_settings_form_is_valid = $event">
+                    @form_validity_changed="d_ag_command_settings_form_is_valid = $event;
+                                            $emit('form_validity_changed',
+                                              d_ag_command_settings_form_is_valid)">
+      <div class="input-container"
+           v-if="include_command_name">
+        <label class="text-label"> Name </label>
+        <validated-input ref="name"
+                         id="name"
+                         v-model="d_ag_command.name"
+                         :validators="[is_not_empty]"
+                         input_style="max-width: 500px; width: 100%"
+                         @change="$emit('input', d_ag_command)">
+        </validated-input>
+      </div>
 
-      <validated-input ref="ag_command_cmd"
-                       id="command-cmd"
-                       v-model="d_ag_command.cmd"
-                       :validators="[is_not_empty]">
-      </validated-input>
+      <div class="input-container">
+        <label class="text-label"> Command </label>
+        <validated-input ref="cmd"
+                         id="cmd"
+                         v-model="d_ag_command.cmd"
+                         :validators="[is_not_empty]"
+                         input_style="max-width: 500px; width: 100%"
+                         @change="$emit('input', d_ag_command)">
+        </validated-input>
+      </div>
 
-      <validated-input ref="ag_command_time_limit"
-                       id="command-time-limit"
-                       v-model="d_ag_command.time_limit"
-                       :validators="[is_not_empty]">
-        <div slot="suffix" class="unit-of-measurement"> second(s) </div>
-      </validated-input>
+      <div class="input-container">
+        <label class="text-label"> Time limit </label>
+        <validated-input ref="time_limit"
+                         id="time-limit"
+                         v-model="d_ag_command.time_limit"
+                         :validators="[
+                           is_not_empty,
+                           is_integer,
+                           is_greater_than_or_equal_to_one
+                         ]"
+                         input_style="width: 150px"
+                         @change="$emit('input', d_ag_command)"
+                         :from_string_fn="string_to_num">
+          <div slot="suffix" class="unit-of-measurement"> second(s) </div>
+        </validated-input>
+      </div>
 
-      <validated-input ref="ag_command_stack_size_limit"
-                       id="command-stack-size-limit"
-                       v-model="d_ag_command.stack_size_limit"
-                       :validators="[is_not_empty]">
-        <div slot="suffix" class="unit-of-measurement"> bytes </div>
-      </validated-input>
+      <div class="input-container">
+        <label class="text-label"> Stack size limit </label>
+        <validated-input ref="stack_size_limit"
+                         id="stack-size-limit"
+                         v-model="d_ag_command.stack_size_limit"
+                         :validators="[
+                           is_not_empty,
+                           is_integer,
+                           is_greater_than_or_equal_to_one
+                         ]"
+                         input_style="width: 150px"
+                         @change="$emit('input', d_ag_command)"
+                         :from_string_fn="string_to_num">
+          <div slot="suffix" class="unit-of-measurement"> bytes </div>
+        </validated-input>
+      </div>
 
-      <validated-input ref="ag_command_virtual_memory_limit"
-                       id="command-virtual-memory-limit"
-                       v-model="d_ag_command.virtual_memory_limit"
-                       :validators="[is_not_empty]">
-        <div slot="suffix" class="unit-of-measurement"> bytes </div>
-      </validated-input>
+      <div class="input-container">
+        <label class="text-label"> Virtual memory limit </label>
+        <validated-input ref="virtual_memory_limit"
+                         id="virtual-memory-limit"
+                         v-model="d_ag_command.virtual_memory_limit"
+                         :validators="[
+                           is_not_empty,
+                           is_integer,
+                           is_greater_than_or_equal_to_one
+                         ]"
+                         input_style="width: 150px"
+                         @change="$emit('input', d_ag_command)"
+                         :from_string_fn="string_to_num">
+          <div slot="suffix" class="unit-of-measurement"> bytes </div>
+        </validated-input>
+      </div>
 
-      <validated-input ref="ag_command_process_spawn_limit"
-                       id="command-process-spawn-limit"
-                       v-model="d_ag_command.process_spawn_limit"
-                       :validators="[is_not_empty]">
-        <div slot="suffix" class="unit-of-measurement"> child processes </div>
-      </validated-input>
-
-      <div class="bottom-of-form">
-        <APIErrors ref="api_errors"></APIErrors>
-
-        <button type="submit"
-                class="save-button"
-                :disabled="!d_ag_command_settings_form_is_valid || d_saving">
-          Save
-        </button>
+      <div class="input-container">
+        <label class="text-label"> Process spawn limit </label>
+        <validated-input ref="process_spawn_limit"
+                         id="process-spawn-limit"
+                         v-model="d_ag_command.process_spawn_limit"
+                         :validators="[
+                           is_not_empty,
+                           is_integer,
+                           is_greater_than_or_equal_to_zero
+                         ]"
+                         input_style="width: 150px"
+                         @change="$emit('input', d_ag_command)"
+                         :from_string_fn="string_to_num">
+          <div slot="suffix" class="unit-of-measurement"> child processes </div>
+        </validated-input>
       </div>
 
     </validated-form>
@@ -55,50 +102,62 @@
 </template>
 
 <script lang="ts">
-import APIErrors from '@/components/api_errors.vue';
-import { handle_api_errors_async } from "@/utils";
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGCommand } from 'ag-client-typescript/dist/src/ag_command';
+
 import ValidatedForm from "@/components/validated_form.vue";
-import ValidatedInput, {ValidatorResponse} from "@/components/validated_input.vue";
-import { is_not_empty } from '@/validators';
+import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
+import {
+    is_integer,
+    is_not_empty,
+    make_min_value_validator,
+    string_to_num
+} from '@/validators';
 
 @Component({
-    components: {
-      ValidatedForm,
-      ValidatedInput
-    }
+  components: {
+    ValidatedForm,
+    ValidatedInput
+  }
 })
 export default class MutationCommand extends Vue {
   @Prop({required: true, type: Object})
-  ag_command!: AGCommand;
+  value!: AGCommand;
+
+  @Prop({default: false, type: Boolean})
+  include_command_name!: boolean;
 
   d_ag_command: AGCommand | null = null;
   d_ag_command_settings_form_is_valid = true;
-  d_saving = false;
 
   readonly is_not_empty = is_not_empty;
+  readonly is_integer = is_integer;
+  readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
+  readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
+  readonly string_to_num = string_to_num;
 
-  @Watch('ag_command')
-  on_ag_command_change(new_value: AGCommand, old_value:AGCommand) {
+  @Watch('value')
+  on_ag_command_change(new_value: AGCommand, old_value: AGCommand) {
     this.d_ag_command = JSON.parse(JSON.stringify(new_value));
   }
 
   created() {
-    this.d_ag_command = JSON.parse(JSON.stringify(this.ag_command));
+    this.d_ag_command = JSON.parse(JSON.stringify(this.value));
   }
-
-  @handle_api_errors_async(handle_save_mutation_command_settings_error)
-  save_ag_command_settings() {
-    console.log("trying to save");
-  }
-}
-
-function handle_save_mutation_command_settings_error(component: MutationCommand, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/forms.scss';
+
+.input-container {
+  margin: 10px 0;
+}
+
+.unit-of-measurement {
+  padding-left: 10px;
+  font-size: 14px;
+}
+
 </style>

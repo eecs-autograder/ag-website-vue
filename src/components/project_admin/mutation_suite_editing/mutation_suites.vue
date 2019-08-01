@@ -1,62 +1,176 @@
 <template>
-  <div id="mutation-suites" v-if="!d_loading">
+  <div id="mutation-test-suites-component" class="scroll-container">
+    <template v-if="!d_loading">
+      <div id="columns-container" class="scroll-column-container">
+        <div id="mutation-test-suite-sidebar" class="scroll-column">
+          <div class="scroll-container">
 
-    <div id="mutation-test-suite-sidebar">
-      <div> Mutation Testing Suites </div>
-      <div>
-        <button type="button"
-                id="add-mutation-test-suite-button"
-                @click="open_new_mutation_test_suite_modal">
-          <i class="fas fa-plus plus"></i> Add Suite
-        </button>
-      </div>
+            <div id="sidebar-header">
+              <div id="mutation-test-suites-title"> Suites </div>
+              <button type="button"
+                      id="add-mutation-test-suite-button"
+                      @click="open_new_mutation_test_suite_modal">
+                <i class="fas fa-plus plus"></i> Add Suite
+              </button>
+            </div>
 
-      <div id="suites">
-        <div v-for="mutation_test_suite of d_mutation_test_suites">
-          <mutation-suite-panel :mutation_test_suite="mutation_test_suite"
-                                @update_active_suite="update_active_mutation_test_suite($event)">
-          </mutation-suite-panel>
+            <div id="sidebar-body" class="scroll-column">
+              <div id="all-mutation-test-suites">
+                <div v-for="mutation_test_suite of d_mutation_test_suites"
+                     :class="['mutation-test-suite-panel',
+                       {'active-mutation-test-suite-panel': d_active_mutation_test_suite !== null
+                         && d_active_mutation_test_suite.pk === mutation_test_suite.pk}]"
+                     :key="mutation_test_suite.pk"
+                     @click="d_active_mutation_test_suite = mutation_test_suite">
+                  {{mutation_test_suite.name}}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="vertical-divider"></div>
+
+        <div id="viewing-window" class="scroll-column-grow">
+          <div v-if="d_active_mutation_test_suite !== null">
+            <tabs ref="mutation-test-suite-tabs"
+                  v-model="d_current_tab_index"
+                  tab_active_class="white-theme-active"
+                  tab_inactive_class="white-theme-inactive">
+              <tab>
+                <tab-header>
+                  <div class="tab-heading"> General </div>
+                </tab-header>
+                <template slot="body">
+                  <div class="tab-body">
+                    <mutation-suite-general-settings
+                      :mutation_test_suite="d_active_mutation_test_suite"
+                      :project="project">
+                    </mutation-suite-general-settings>
+                  </div>
+                </template>
+              </tab>
+
+              <tab>
+                <tab-header ref="project_settings_tab">
+                  <div class="tab-label">
+                    <p class="tab-header"> Buggy Implementations </p>
+                  </div>
+                </tab-header>
+                <template slot="body">
+                  <div class="tab-body">
+                    <buggy-implementations :mutation_test_suite="d_active_mutation_test_suite">
+                    </buggy-implementations>
+                  </div>
+                </template>
+              </tab>
+
+              <tab>
+                <tab-header ref="project_settings_tab">
+                  <div class="tab-label">
+                    <p class="tab-header"> Commands </p>
+                  </div>
+                </tab-header>
+                <template slot="body">
+                  <div class="tab-body">
+                    <mutation-commands :mutation_test_suite="d_active_mutation_test_suite">
+                    </mutation-commands>
+                  </div>
+                </template>
+              </tab>
+
+              <tab>
+                <tab-header ref="project_settings_tab">
+                  <div class="tab-label">
+                    <p class="tab-header"> Feedback </p>
+                  </div>
+                </tab-header>
+                <template slot="body">
+                  <div class="tab-body">
+                    Feedback Stuff
+                  </div>
+                </template>
+              </tab>
+
+              <tab>
+                <tab-header ref="project_settings_tab">
+                  <div class="tab-label">
+                    <p class="tab-header"> Danger Zone </p>
+                  </div>
+                </tab-header>
+                <template slot="body">
+                  <div class="tab-body">
+                    <button class="delete-mutation-test-suite-button"
+                            type="button"
+                            @click="$refs.delete_mutation_test_suite_modal.open()">
+                      Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
+                    </button>
+                  </div>
+                </template>
+              </tab>
+            </tabs>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="viewing-window">
-      <div v-if="d_active_mutation_test_suite !== null">
-        <mutation-suite-settings :mutation_test_suite="d_active_mutation_test_suite"
-                                 :project="project">
-        </mutation-suite-settings>
-      </div>
-    </div>
+      <modal ref="delete_mutation_test_suite_modal"
+             :size="'large'"
+             :include_closing_x="false">
+        <div class="modal-header">
+          Confirm Delete
+        </div>
+        <hr>
+        <div class="modal-body" v-if="d_active_mutation_test_suite !== null">
+          <p> Are you sure you want to delete the suite
+            <span class="item-to-delete">{{d_active_mutation_test_suite.name}}</span>?
+            This will delete all associated test cases and run results.
+            THIS ACTION CANNOT BE UNDONE. </p>
+          <div class="deletion-modal-button-footer">
+            <button class="modal-delete-button red-button"
+                    :disabled="d_saving"
+                    @click="delete_mutation_test_suite()"> Delete </button>
 
-    <modal ref="new_mutation_test_suite_modal"
-           click_outside_to_close
-           size="medium">
-      <div class="modal-header"> New Suite </div>
-      <hr>
-      <div class="modal-body">
-        <validated-form id="add-ag-test-suite-form"
-                        autocomplete="off"
-                        spellcheck="false"
-                        @submit="add_mutation_test_suite"
-                        @form_validity_changed="d_add_mutation_test_suite_form_is_valid = $event">
-          <div class="mutation-test-suite-name-container">
-            <label class="text-label"> Suite name </label>
-            <validated-input ref="new_mutation_test_suite_name"
-                             v-model="d_new_mutation_test_suite_name"
-                             :show_warnings_on_blur="true"
-                             :validators="[is_not_empty]">
-            </validated-input>
+            <button class="modal-cancel-button light-gray-button"
+                    @click="$refs.delete_mutation_test_suite_modal.close()"> Cancel </button>
           </div>
+        </div>
+      </modal>
 
-          <APIErrors ref="api_errors"></APIErrors>
+      <modal ref="new_mutation_test_suite_modal"
+             click_outside_to_close
+             size="medium">
+        <div class="modal-header"> New Suite </div>
+        <hr>
+        <div class="modal-body">
+          <validated-form
+            id="add-ag-test-suite-form"
+            autocomplete="off"
+            spellcheck="false"
+            @submit="add_mutation_test_suite"
+            @form_validity_changed="d_add_mutation_test_suite_form_is_valid = $event">
+            <div class="mutation-test-suite-name-container">
+              <label class="text-label"> Suite name </label>
+              <validated-input ref="new_mutation_test_suite_name"
+                               v-model="d_new_mutation_test_suite_name"
+                               :show_warnings_on_blur="true"
+                               :validators="[is_not_empty]">
+              </validated-input>
+            </div>
 
-          <button class="modal-create-suite-button"
-                  :disabled="!d_add_mutation_test_suite_form_is_valid || d_adding_suite"> Add Suite
-          </button>
-        </validated-form>
-      </div>
-    </modal>
+            <APIErrors ref="api_errors"></APIErrors>
 
+            <button class="modal-create-suite-button"
+                    :disabled="!d_add_mutation_test_suite_form_is_valid || d_adding_suite">
+              Add Suite
+            </button>
+          </validated-form>
+        </div>
+      </modal>
+    </template>
+    <template v-else>
+      <div class="loading-large"><i class="fa fa-spinner fa-pulse"></i></div>
+    </template>
   </div>
 </template>
 
@@ -70,8 +184,13 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import MutationSuitePanel from '@/components/project_admin/mutation_suite_editing/mutation_suite_panel.vue';
-import MutationSuiteSettings from "@/components/project_admin/mutation_suite_editing/mutation_suite_settings.vue";
+import BuggyImplementations from "@/components/project_admin/mutation_suite_editing/buggy_implementations.vue";
+import MutationCommand from "@/components/project_admin/mutation_suite_editing/mutation_command.vue";
+import MutationCommands from "@/components/project_admin/mutation_suite_editing/mutation_commands.vue";
+import MutationSuiteGeneralSettings from "@/components/project_admin/mutation_suite_editing/mutation_suite_general_settings.vue";
+import Tab from '@/components/tabs/tab.vue';
+import TabHeader from '@/components/tabs/tab_header.vue';
+import Tabs from '@/components/tabs/tabs.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -80,9 +199,14 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
+    BuggyImplementations,
     Modal,
-    MutationSuitePanel,
-    MutationSuiteSettings,
+    MutationCommand,
+    MutationCommands,
+    MutationSuiteGeneralSettings,
+    Tab,
+    TabHeader,
+    Tabs,
     ValidatedForm,
     ValidatedInput
   }
@@ -94,11 +218,13 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   readonly is_not_empty = is_not_empty;
 
   d_active_mutation_test_suite: MutationTestSuite | null = null;
-  d_mutation_test_suites: MutationTestSuite[] = [];
-  d_loading = true;
-  d_adding_suite = false;
   d_add_mutation_test_suite_form_is_valid = true;
+  d_adding_suite = false;
+  d_current_tab_index = 0;
+  d_loading = true;
+  d_mutation_test_suites: MutationTestSuite[] = [];
   d_new_mutation_test_suite_name = "";
+  d_saving = false;
 
   async created() {
     MutationTestSuite.subscribe(this);
@@ -125,8 +251,15 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     }
   }
 
+  async delete_mutation_test_suite() {
+    await this.d_active_mutation_test_suite!.delete();
+    (<Modal> this.$refs.delete_mutation_test_suite_modal).close();
+    this.d_active_mutation_test_suite = null;
+    this.d_current_tab_index = 0;
+  }
+
   update_active_mutation_test_suite(mutation_test_suite: MutationTestSuite) {
-      this.d_active_mutation_test_suite = mutation_test_suite;
+    this.d_active_mutation_test_suite = mutation_test_suite;
   }
 
   open_new_mutation_test_suite_modal() {
@@ -137,41 +270,104 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
-      this.d_mutation_test_suites.push(mutation_test_suite);
+    this.d_mutation_test_suites.push(mutation_test_suite);
   }
   update_mutation_test_suite_changed(mutation_test_suite: MutationTestSuite): void {
-      let index = this.d_mutation_test_suites.findIndex(
-          (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
-      );
-      Vue.set(this.d_mutation_test_suites,
-              index,
-              deep_copy(mutation_test_suite, MutationTestSuite)
-      );
+    let index = this.d_mutation_test_suites.findIndex(
+      (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
+    );
+    Vue.set(this.d_mutation_test_suites,
+            index,
+            deep_copy(mutation_test_suite, MutationTestSuite)
+    );
   }
   update_mutation_test_suite_deleted(mutation_test_suite: MutationTestSuite): void {
-      let index = this.d_mutation_test_suites.findIndex(
-          (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
-      );
-      this.d_mutation_test_suites.splice(index, 1);
+    let index = this.d_mutation_test_suites.findIndex(
+      (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
+    );
+    this.d_mutation_test_suites.splice(index, 1);
   }
-  update_mutation_test_suites_order_changed(project_pk: number, mutation_test_suite_order: number[]): void {
-      throw new Error("Method not implemented.");
+  update_mutation_test_suites_order_changed(project_pk: number,
+                                            mutation_test_suite_order: number[]): void {
+    throw new Error("Method not implemented.");
   }
 }
 
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/button_styles.scss';
+@import '@/styles/independent_scrolling.scss';
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#columns-container {
+  height: calc(100% - 55px);
+}
+
+#mutation-test-suite-sidebar {
+  min-width: 300px;
+}
+
+#sidebar-header {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-left: none;
+  border-bottom: none;
+  margin-top: 10px;
+}
 
 #mutation-suites {
   padding: 10px;
+}
+
+.vertical-divider {
+  border: 1px solid $pebble-medium;
+  margin: 10px 8px 10px 0;
+}
+
+.tab-body {
+  padding: 15px;
+}
+
+#sidebar-body {
+  padding-bottom: 10px;
+}
+
+#all-mutation-test-suites {
+  border-color: $white-gray;
+  border-style: solid;
+  border-width: 1px 0;
+}
+
+.mutation-test-suite-panel {
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px;
+  width: 100%;
+  border-bottom: 1px solid $white-gray;
+}
+
+.active-mutation-test-suite-panel {
+  background-color: $light-blue;
+}
+
+#mutation-test-suites-title {
+  font-size: 1.125rem;
+  display: inline-block;
 }
 
 #add-mutation-test-suite-button {
@@ -184,6 +380,10 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   font-weight: bold;
   margin: 0;
   padding: 5px 0;
+}
+
+#viewing-window {
+  padding-top: 20px;
 }
 
 .modal-create-suite-button {
@@ -199,10 +399,6 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   width: 200px;
 }
 
-#viewing-window {
-
-}
-
 .plus {
   margin-right: 3px;
   font-size: 14px;
@@ -210,6 +406,25 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 
 #suites {
   margin-top: 10px;
+}
+
+.item-to-delete {
+  color: $ocean-blue;
+  margin-left: 3px;
+}
+
+.deletion-modal-button-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.modal-delete-button {
+  margin-right: 10px;
+}
+
+.delete-mutation-test-suite-button {
+  @extend .red-button;
 }
 
 </style>
