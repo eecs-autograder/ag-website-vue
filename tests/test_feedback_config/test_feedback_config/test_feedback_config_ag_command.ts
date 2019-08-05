@@ -141,6 +141,8 @@ describe('FeedbackConfigAGCommand tests', () => {
     });
 
     test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
+        // FIXME: just fake something to emit the input event and make sure that we update our data
+
         expect(component.get_current_preset_fn(
             component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
