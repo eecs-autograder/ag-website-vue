@@ -496,7 +496,8 @@ function make_empty_project(): Project {
     ultimate_submission_policy: UltimateSubmissionPolicy.most_recent,
     hide_ultimate_submission_fdbk: false,
     instructor_files: [],
-    expected_student_files: []
+    expected_student_files: [],
+    has_handgrading_rubric: false,
   });
 }
 
