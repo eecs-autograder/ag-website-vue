@@ -75,7 +75,8 @@ describe('SingleProject.vue', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
 
         project_2 = new Project({
@@ -102,7 +103,8 @@ describe('SingleProject.vue', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
 
         projects = [project_1, project_2];
@@ -131,7 +133,8 @@ describe('SingleProject.vue', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best_with_normal_fdbk,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
 
         newly_cloned_project_2 = new Project({
@@ -158,7 +161,8 @@ describe('SingleProject.vue', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best_with_normal_fdbk,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
     });
 

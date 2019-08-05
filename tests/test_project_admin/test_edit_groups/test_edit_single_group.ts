@@ -74,7 +74,8 @@ describe('EditSingleGroup tests', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
 
         wrapper = mount(EditSingleGroup, {

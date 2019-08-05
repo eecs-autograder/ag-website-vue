@@ -92,7 +92,8 @@ describe('Changing tabs in project admin', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
@@ -306,7 +307,8 @@ describe('select_tab function called with different values associated with "curr
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
-            expected_student_files: []
+            expected_student_files: [],
+            has_handgrading_rubric: false,
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));

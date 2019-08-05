@@ -161,7 +161,8 @@ describe('AGSuiteSettings tests', () => {
             ultimate_submission_policy: UltimateSubmissionPolicy.best,
             hide_ultimate_submission_fdbk: false,
             expected_student_files: [student_file_1, student_file_2, student_file_3],
-            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3]
+            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3],
+            has_handgrading_rubric: false,
         });
 
         sandbox_docker_image_1 = {
