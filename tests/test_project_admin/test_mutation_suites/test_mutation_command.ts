@@ -5,7 +5,7 @@ import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
 import { AGCommand } from 'ag-client-typescript/dist/src/ag_command';
 import * as sinon from "sinon";
 
-import MutationCommand from '@/components/project_admin/mutation_suite_editing/mutation_command.vue';
+import MutationCommand from '@/components/project_admin/mutation_suites/mutation_command.vue';
 
 import {
     get_validated_input_text,

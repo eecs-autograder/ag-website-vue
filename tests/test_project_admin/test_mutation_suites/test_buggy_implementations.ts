@@ -16,10 +16,9 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import BuggyImplementation from '@/components/project_admin/mutation_suite_editing/buggy_implementations.vue';
+import BuggyImplementation from '@/components/project_admin/mutation_suites/buggy_implementations.vue';
 
 import {
-    checkbox_is_checked,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
@@ -109,7 +108,7 @@ export function create_mutation_suite(pk: number, suite_name: string,
         pk: pk,
         name: suite_name,
         project: project,
-        last_modified: "Today",
+        last_modified: '',
         read_only_instructor_files: true,
         buggy_impl_names: ["Bug_2", "Bug_12", "Bug_1", "Bug_4"],
         use_setup_command: false,
@@ -133,7 +132,7 @@ export function create_mutation_suite(pk: number, suite_name: string,
         past_limit_submission_fdbk_config: create_mutation_suite_feedback_config(),
         staff_viewer_fdbk_config: create_mutation_suite_feedback_config(),
         instructor_files_needed: [],
-        student_files_needed: [],
+        student_files_needed: []
     });
     return new_suite;
 }
@@ -186,69 +185,73 @@ describe('BuggyImplementation tests', () => {
         expect(component.d_mutation_test_suite!.points_per_exposed_bug).toEqual(905.5);
         expect(validated_input_is_valid(points_per_exposed_bug_input)).toEqual(true);
 
-        component.d_mutation_test_suite!.points_per_exposed_bug = 10.51;
+        component.d_mutation_test_suite!.points_per_exposed_bug = "10.51";
         expect(get_validated_input_text(points_per_exposed_bug_input)).toEqual('10.51');
     });
 
     test('Error: points_per_exposed_bug is blank or not a number', async () => {
         return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'points_per_exposed_bug'}, '#save-button');
+            wrapper, {ref: 'points_per_exposed_bug'}, '.save-button');
     });
 
     test('Error: points_per_exposed_bug must be >= 0', async () => {
         return do_invalid_text_input_test(
-            wrapper, {ref: 'points_per_exposed_bug'}, '-1', '#save-button');
+            wrapper, {ref: 'points_per_exposed_bug'}, '-1', '.save-button');
     });
 
     test('Error: points_per_exposed_bug must have less than or equal to four digits in ' +
          'total - no decimal present',
          async () => {
         return do_invalid_text_input_test(
-            wrapper, {ref: 'points_per_exposed_bug'}, '12345', '#save-button');
+            wrapper, {ref: 'points_per_exposed_bug'}, '12345', '.save-button');
     });
 
     test('Error: points_per_exposed_bug must have less than or equal to four digits in ' +
          'total - decimal present',
          async () => {
          return do_invalid_text_input_test(
-             wrapper, {ref: 'points_per_exposed_bug'}, '123.45', '#save-button');
+             wrapper, {ref: 'points_per_exposed_bug'}, '123.45', '.save-button');
     });
 
     test('Error: points_per_exposed_bug must have less than or equal to two decimal places',
          async () => {
          return do_invalid_text_input_test(
-             wrapper, {ref: 'points_per_exposed_bug'}, '12.345', '#save-button');
+             wrapper, {ref: 'points_per_exposed_bug'}, '12.345', '.save-button');
     });
 
     test('use_custom_max_points binding', async () => {
-        let checkbox = wrapper.find('#use-max-points');
+        let use_custom_max_points_toggle = wrapper.find({ref: 'use_custom_max_points'});
 
-        checkbox.setChecked(false);
+        use_custom_max_points_toggle.find('.off-border').trigger('click');
+        await component.$nextTick();
+
         expect(component.use_custom_max_points).toEqual(false);
         expect(wrapper.findAll('#max-points').length).toEqual(0);
         expect(component.d_mutation_test_suite!.max_points).toBeNull();
 
-        checkbox.setChecked(true);
+        use_custom_max_points_toggle.find('.on-border').trigger('click');
+        await component.$nextTick();
+
         expect(component.use_custom_max_points).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(component.d_mutation_test_suite!.max_points).toEqual(0);
 
-        checkbox.setChecked(false);
+        use_custom_max_points_toggle.find('.off-border').trigger('click');
+        await component.$nextTick();
+
         expect(component.use_custom_max_points).toEqual(false);
         expect(wrapper.findAll('#max-points').length).toEqual(0);
         expect(component.d_mutation_test_suite!.max_points).toBeNull();
 
         component.use_custom_max_points = true;
-        expect(checkbox_is_checked(checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
 
         component.use_custom_max_points = false;
-        expect(checkbox_is_checked(checkbox)).toEqual(false);
         expect(wrapper.findAll('#max-points').length).toEqual(0);
     });
 
     test('max_points binding', async () => {
-        wrapper.find('#use-max-points').setChecked(true);
+        component.use_custom_max_points = true;
         await component.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -263,23 +266,23 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: max_points is blank or not a number', async () => {
-        wrapper.find('#use-max-points').setChecked(true);
+        component.use_custom_max_points = true;
         await component.$nextTick();
 
         return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'max_points'}, '#save-button');
+            wrapper, {ref: 'max_points'}, '.save-button');
     });
 
     test('Error: max_points must be greater than or equal to zero', async () => {
-        wrapper.find('#use-max-points').setChecked(true);
+        component.use_custom_max_points = true;
         await component.$nextTick();
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'max_points'}, '-1', '#save-button');
+            wrapper, {ref: 'max_points'}, '-1', '.save-button');
     });
 
     test('max_num_student_tests binding', async () => {
-        wrapper.find('#use-max-points').setChecked(true);
+        component.use_custom_max_points = true;
         await component.$nextTick();
 
         let max_num_student_tests_input = wrapper.find({ref: 'max_num_student_tests'});
@@ -295,7 +298,7 @@ describe('BuggyImplementation tests', () => {
 
     test('Error: max_num_student_tests must be greater than or equal to zero', async () => {
         return do_invalid_text_input_test(
-            wrapper, {ref: 'max_num_student_tests'}, '-1', '#save-button');
+            wrapper, {ref: 'max_num_student_tests'}, '-1', '.save-button');
     });
 
     test('buggy_impl_names binding', async () => {
@@ -446,11 +449,12 @@ describe('BuggyImplementation tests', () => {
 
     test('saving d_mutation_test_suite without using custom_max_points - successful',
          async () => {
-        wrapper.find('#use-max-points').setChecked(false);
+        let use_custom_max_points_toggle = wrapper.find({ref: 'use_custom_max_points'});
+        use_custom_max_points_toggle.find('.off-border').trigger('click');
         await component.$nextTick();
 
         let save_stub = sinon.stub(component.d_mutation_test_suite!, 'save');
-        expect(wrapper.find('#save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#buggy-implementation-settings-form').trigger('submit');
         await component.$nextTick();
@@ -462,14 +466,14 @@ describe('BuggyImplementation tests', () => {
 
     test('saving d_mutation_test_suite using custom_max_points - successful',
          async () => {
-        wrapper.find('#use-max-points').setChecked(true);
+        component.use_custom_max_points = true;
         await component.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
         set_validated_input_text(max_points_input, '5');
 
         let save_stub = sinon.stub(component.d_mutation_test_suite!, 'save');
-        expect(wrapper.find('#save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#buggy-implementation-settings-form').trigger('submit');
         await component.$nextTick();
@@ -488,7 +492,7 @@ describe('BuggyImplementation tests', () => {
                 )
             )
         );
-        expect(wrapper.find('#save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#buggy-implementation-settings-form').trigger('submit');
         await component.$nextTick();
@@ -502,12 +506,12 @@ describe('BuggyImplementation tests', () => {
     test('mutation_test_suite - Watcher', async () => {
         let another_mutation_suite = create_mutation_suite(2, "Suite 2", 1);
 
-        expect(component.d_mutation_test_suite.pk).toEqual(mutation_test_suite.pk);
+        expect(component.d_mutation_test_suite!.pk).toEqual(mutation_test_suite.pk);
 
         wrapper.setProps({mutation_test_suite: another_mutation_suite});
         await component.$nextTick();
 
-        expect(component.d_mutation_test_suite.pk).toEqual(another_mutation_suite.pk);
+        expect(component.d_mutation_test_suite!.pk).toEqual(another_mutation_suite.pk);
     });
 });
 

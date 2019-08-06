@@ -14,7 +14,7 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import MutationCommands from '@/components/project_admin/mutation_suite_editing/mutation_commands.vue';
+import MutationCommands from '@/components/project_admin/mutation_suites/mutation_commands.vue';
 
 import {
     checkbox_is_checked,
@@ -203,7 +203,7 @@ describe('MutationCommands tests', () => {
 
         expect(component.command_settings_forms_are_valid).toBe(true);
 
-        wrapper.find('#save-commands').trigger('click');
+        wrapper.find('.save-button').trigger('click');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
@@ -221,7 +221,7 @@ describe('MutationCommands tests', () => {
 
         expect(component.command_settings_forms_are_valid).toBe(true);
 
-        wrapper.find('#save-commands').trigger('click');
+        wrapper.find('.save-button').trigger('click');
         await component.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
@@ -244,49 +244,49 @@ describe('MutationCommands tests', () => {
 
         set_validated_input_text(get_student_test_names_command.find('#cmd'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(get_student_test_names_command.find('#cmd'), "Hi");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(get_student_test_names_command.find('#time-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(get_student_test_names_command.find('#time-limit'), "2");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(get_student_test_names_command.find('#stack-size-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(get_student_test_names_command.find('#stack-size-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(
             get_student_test_names_command.find('#virtual-memory-limit'), " "
         );
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
             get_student_test_names_command.find('#virtual-memory-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(get_student_test_names_command.find('#process-spawn-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
             get_student_test_names_command.find('#process-spawn-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('command_settings_forms_are_valid - d_grade_buggy_impl_command_is_valid is false',
@@ -302,43 +302,43 @@ describe('MutationCommands tests', () => {
 
         set_validated_input_text(grade_buggy_impl_command.find('#cmd'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(grade_buggy_impl_command.find('#cmd'), "Hi");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(grade_buggy_impl_command.find('#time-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(grade_buggy_impl_command.find('#time-limit'), "2");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(grade_buggy_impl_command.find('#stack-size-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(grade_buggy_impl_command.find('#stack-size-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(grade_buggy_impl_command.find('#virtual-memory-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(grade_buggy_impl_command.find('#virtual-memory-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(grade_buggy_impl_command.find('#process-spawn-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(grade_buggy_impl_command.find('#process-spawn-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('command_settings_forms_are_valid - d_setup_command_is_valid is false',
@@ -356,43 +356,43 @@ describe('MutationCommands tests', () => {
 
         set_validated_input_text(setup_command.find('#cmd'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(setup_command.find('#cmd'), "Hi");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(setup_command.find('#time-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(setup_command.find('#time-limit'), "2");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(setup_command.find('#stack-size-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(setup_command.find('#stack-size-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(setup_command.find('#virtual-memory-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(setup_command.find('#virtual-memory-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(setup_command.find('#process-spawn-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(setup_command.find('#process-spawn-limit'), "10");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('command_settings_forms_are_valid - d_student_test_validity_check_is_valid ' +
@@ -409,55 +409,55 @@ describe('MutationCommands tests', () => {
 
         set_validated_input_text(student_test_validity_check_command.find('#cmd'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(student_test_validity_check_command.find('#cmd'), "Hi");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(student_test_validity_check_command.find('#time-limit'), " ");
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(student_test_validity_check_command.find('#time-limit'), "2");
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(
             student_test_validity_check_command.find('#stack-size-limit'), " "
         );
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
             student_test_validity_check_command.find('#stack-size-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(
             student_test_validity_check_command.find('#virtual-memory-limit'), " "
         );
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
             student_test_validity_check_command.find('#virtual-memory-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(
             student_test_validity_check_command.find('#process-spawn-limit'), " "
         );
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
             student_test_validity_check_command.find('#process-spawn-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('command_settings_forms_are_valid - true', async () => {
@@ -469,7 +469,7 @@ describe('MutationCommands tests', () => {
         component.d_student_test_validity_check_is_valid = true;
 
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('command_settings_forms_are_valid - true', async () => {
@@ -481,7 +481,7 @@ describe('MutationCommands tests', () => {
         component.d_student_test_validity_check_is_valid = true;
 
         expect(component.command_settings_forms_are_valid).toBe(false);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
     });
 
     test('command_settings_forms_are_valid - true', async () => {
@@ -491,7 +491,7 @@ describe('MutationCommands tests', () => {
         component.d_student_test_validity_check_is_valid = true;
 
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('command_settings_forms_are_valid - false', async () => {
@@ -501,7 +501,7 @@ describe('MutationCommands tests', () => {
         component.d_student_test_validity_check_is_valid = true;
 
         expect(component.command_settings_forms_are_valid).toBe(true);
-        expect(wrapper.find('#save-commands').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
     });
 
     test('mutation_test_suite Watcher', async () => {

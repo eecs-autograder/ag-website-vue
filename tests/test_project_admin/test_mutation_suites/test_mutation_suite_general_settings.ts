@@ -14,9 +14,9 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import MutationSuiteGeneralSettings from '@/components/project_admin/mutation_suite_editing/mutation_suite_general_settings.vue';
+import MutationSuiteGeneralSettings from '@/components/project_admin/mutation_suites/mutation_suite_general_settings.vue';
 
-import { create_mutation_suite } from '@/tests/test_project_admin/test_mutation_suite_editing/test_buggy_implementations';
+import { create_mutation_suite } from '@/tests/test_project_admin/test_mutation_suites/test_buggy_implementations';
 import {
     checkbox_is_checked,
     get_validated_input_text,
@@ -111,7 +111,7 @@ describe('MutationSuiteGeneralSettings tests', () => {
         project = new Project({
             pk: 10,
             name: "Detroit Zoo",
-            last_modified: "today",
+            last_modified: "",
             course: 2,
             visible_to_students: true,
             closing_time: null,
@@ -327,15 +327,25 @@ describe('MutationSuiteGeneralSettings tests', () => {
         await dropdown_typeahead.$nextTick();
 
         expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(3);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
+        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+            instructor_file_1
+        );
+        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
+            instructor_file_2
+        );
+        expect(component.d_mutation_test_suite!.instructor_files_needed[2]).toEqual(
+            instructor_file_3
+        );
     });
 
     test('Deleting an instructor file', async () => {
         expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+            instructor_file_1
+        );
+        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
+            instructor_file_2
+        );
 
         let instructor_files_section = wrapper.find('.instructor-files');
         instructor_files_section.findAll('.file').at(1).find(
@@ -344,7 +354,9 @@ describe('MutationSuiteGeneralSettings tests', () => {
         await component.$nextTick();
 
         expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(1);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+            instructor_file_1
+        );
     });
 
     test('InstructorFile filter function on dropdown typeahead', async () => {
@@ -378,8 +390,12 @@ describe('MutationSuiteGeneralSettings tests', () => {
         expect(component.instructor_files_available).toEqual([instructor_file_3]);
 
         expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+            instructor_file_1
+        );
+        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
+            instructor_file_2
+        );
 
         let instructor_file_section = wrapper.find('.instructor-files');
         instructor_file_section.findAll('.file').at(1).find(

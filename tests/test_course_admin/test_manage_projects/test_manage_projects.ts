@@ -75,7 +75,11 @@ describe('ManageProjects.vue', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
+<<<<<<< d70669d2edb4d675e54a737e314b89158917f1d9
             has_handgrading_rubric: false,
+=======
+            has_handgrading_rubric: false
+>>>>>>> Added tests to test_mutation_suites. Cleaning up code in the mutation_suites directory.
         });
 
         project_2 = new Project({
@@ -103,7 +107,7 @@ describe('ManageProjects.vue', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         new_project = new Project ({
@@ -131,7 +135,7 @@ describe('ManageProjects.vue', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         projects = [project_1, project_2];
@@ -161,7 +165,7 @@ describe('ManageProjects.vue', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         courses = [current_course, another_course];

@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div id="buggy-implementations-component">
+
     <validated-form id="buggy-implementation-settings-form"
                     autocomplete="off"
                     spellcheck="false"
@@ -22,16 +23,17 @@
         </validated-input>
       </div>
 
-      <div class="checkbox-input-container">
-        <input id="use-max-points"
-               type="checkbox"
-               class="checkbox"
-               @change="toggle_custom_max_points"
-               v-model="use_custom_max_points"/>
-        <label class="checkbox-label"
-               for="use-max-points">
-          Use Custom Max Points
-        </label>
+      <div class="toggle-container">
+        <toggle v-model="use_custom_max_points"
+                @input="toggle_custom_max_points"
+                ref="use_custom_max_points">
+          <div slot="on">
+            Custom max points
+          </div>
+          <div slot="off">
+            Auto max points
+          </div>
+        </toggle>
       </div>
 
       <div v-if="use_custom_max_points"
@@ -82,14 +84,15 @@
         </button>
       </div>
 
-      <div id="buggy-implementation-names"
+      <div id="all-buggy-implementation-names"
            v-if="d_mutation_test_suite.buggy_impl_names.length !== 0">
         <div v-for="(buggy_name, index) of d_mutation_test_suite.buggy_impl_names"
-             :class="['buggy-implementation-row', {'odd-index': index % 2 !== 0}]">
-          <span class="buggy-name">{{buggy_name}}</span>
+             :class="['buggy-implementation-row',
+                     {'odd-buggy-implementation-row': index % 2 !== 0}]">
+          <span class="buggy-implementation-name">{{buggy_name}}</span>
           <div class="remove-buggy-impl-name-container"
                @click="remove_buggy_implementation_name(index)">
-            <i class="fas fa-times remove-buggy-impl-name"></i>
+            <i class="fas fa-times remove-buggy-impl-name-icon"></i>
           </div>
         </div>
       </div>
@@ -97,11 +100,14 @@
       <div class="bottom-of-form">
         <APIErrors ref="api_errors"></APIErrors>
 
-        <button class="green-button"
-                id="save-button"
-                :disabled="!d_mutation_test_suite_settings_form_is_valid || d_saving">
-          Save
+        <button class="save-button"
+                :disabled="!d_mutation_test_suite_settings_form_is_valid || d_saving"> Save
         </button>
+
+        <div v-show="!d_saving" class="last-saved-timestamp">
+          <span> Last Saved: </span>
+          {{format_datetime(d_mutation_test_suite.last_modified)}}
+        </div>
       </div>
 
     </validated-form>
@@ -117,9 +123,10 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
+import Toggle from "@/components/toggle.vue";
 import ValidatedForm from "@/components/validated_form.vue";
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from "@/utils";
+import { deep_copy, format_datetime, handle_api_errors_async } from "@/utils";
 import {
     is_integer,
     is_non_negative,
@@ -133,6 +140,7 @@ import {
 @Component({
   components: {
     APIErrors,
+    Toggle,
     ValidatedForm,
     ValidatedInput
   }
@@ -141,12 +149,6 @@ export default class BuggyImplementations extends Vue {
   @Prop({required: true, type: MutationTestSuite})
   mutation_test_suite!: MutationTestSuite;
 
-  buggy_impl_names = "";
-  d_mutation_test_suite: MutationTestSuite | null = null;
-  d_mutation_test_suite_settings_form_is_valid = true;
-  d_saving = false;
-  use_custom_max_points = false;
-
   readonly is_integer = is_integer;
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
@@ -154,6 +156,13 @@ export default class BuggyImplementations extends Vue {
   readonly has_less_than_or_equal_to_two_decimal_places = make_num_decimal_places_validator(2);
   readonly is_non_negative = is_non_negative;
   readonly string_to_num = string_to_num;
+  readonly format_datetime = format_datetime;
+
+  buggy_impl_names = "";
+  d_mutation_test_suite: MutationTestSuite | null = null;
+  d_mutation_test_suite_settings_form_is_valid = true;
+  d_saving = false;
+  use_custom_max_points = false;
 
   @Watch('mutation_test_suite')
   on_mutation_test_suite_change(new_value: MutationTestSuite, old_value: MutationTestSuite) {
@@ -167,11 +176,10 @@ export default class BuggyImplementations extends Vue {
   }
 
   toggle_custom_max_points() {
-    if (this.use_custom_max_points && this.d_mutation_test_suite!.max_points === null) {
+    if (this.use_custom_max_points) {
       this.d_mutation_test_suite!.max_points = 0;
-      return;
     }
-    if (!this.use_custom_max_points) {
+    else {
       this.d_mutation_test_suite!.max_points = null;
     }
   }
@@ -232,8 +240,25 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
+#buggy-implementations-component {
+ padding: 0 12px 12px 12px;
+}
+
 .input-container {
   margin: 10px 0;
+}
+
+.toggle-container {
+  font-size: 14px;
+  margin: 12px 5px 0 0;
+  padding-bottom: 5px;
+  min-width: 500px;
+}
+
+#all-buggy-implementation-names {
+  border: 2px solid $white-gray;
+  display: inline-block;
+  margin-top: 10px;
 }
 
 .buggy-implementation-row {
@@ -244,35 +269,40 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
   align-items: center;
 }
 
-#buggy-implementation-names {
-  display: inline-block;
-  margin-top: 10px;
-  border: 2px solid $white-gray;
+.odd-buggy-implementation-row {
+  background-color: hsl(210, 20%, 96%);
+}
+
+.buggy-implementation-name {
+  color: lighten(black, 40);
+  padding-right: 30px;
 }
 
 .remove-buggy-impl-name-container {
   cursor: pointer;
 }
 
-.buggy-name {
-  color: lighten(black, 40);
-  padding-right: 30px;
-}
-
-.remove-buggy-impl-name {
+.remove-buggy-impl-name-icon {
   color: hsl(220, 20%, 85%);
 }
 
-.remove-buggy-impl-name:hover {
+.remove-buggy-impl-name-icon:hover {
   color: hsl(220, 20%, 55%);
-}
-
-.odd-index {
-  background-color: hsl(210, 20%, 96%);
 }
 
 .bottom-of-form {
   padding: 20px 0;
+}
+
+.save-button {
+  @extend .green-button;
+  display: block;
+  margin: 0 10px 10px 0;
+}
+
+.last-saved-timestamp {
+  font-size: 14px;
+  color: lighten(black, 30);
 }
 
 </style>

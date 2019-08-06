@@ -6,7 +6,7 @@
           <div class="scroll-container">
 
             <div id="sidebar-header">
-              <div id="mutation-test-suites-title"> Suites </div>
+              <div id="sidebar-title"> Suites </div>
               <button type="button"
                       id="add-mutation-test-suite-button"
                       @click="open_new_mutation_test_suite_modal">
@@ -45,6 +45,7 @@
                 <template slot="body">
                   <div class="tab-body">
                     <mutation-suite-general-settings
+                      ref="mutation_suite_general_settings"
                       :mutation_test_suite="d_active_mutation_test_suite"
                       :project="project">
                     </mutation-suite-general-settings>
@@ -55,12 +56,13 @@
               <tab>
                 <tab-header ref="project_settings_tab">
                   <div class="tab-label">
-                    <p class="tab-header"> Buggy Implementations </p>
+                    <p class="tab-heading"> Buggy Implementations </p>
                   </div>
                 </tab-header>
                 <template slot="body">
                   <div class="tab-body">
-                    <buggy-implementations :mutation_test_suite="d_active_mutation_test_suite">
+                    <buggy-implementations ref="buggy_implementations"
+                                           :mutation_test_suite="d_active_mutation_test_suite">
                     </buggy-implementations>
                   </div>
                 </template>
@@ -69,12 +71,13 @@
               <tab>
                 <tab-header ref="project_settings_tab">
                   <div class="tab-label">
-                    <p class="tab-header"> Commands </p>
+                    <p class="tab-heading"> Commands </p>
                   </div>
                 </tab-header>
                 <template slot="body">
                   <div class="tab-body">
-                    <mutation-commands :mutation_test_suite="d_active_mutation_test_suite">
+                    <mutation-commands ref="mutation_commands"
+                                       :mutation_test_suite="d_active_mutation_test_suite">
                     </mutation-commands>
                   </div>
                 </template>
@@ -83,20 +86,18 @@
               <tab>
                 <tab-header ref="project_settings_tab">
                   <div class="tab-label">
-                    <p class="tab-header"> Feedback </p>
+                    <p class="tab-heading"> Feedback </p>
                   </div>
                 </tab-header>
                 <template slot="body">
-                  <div class="tab-body">
-                    Feedback Stuff
-                  </div>
+                  <div class="tab-body"></div>
                 </template>
               </tab>
 
               <tab>
                 <tab-header ref="project_settings_tab">
                   <div class="tab-label">
-                    <p class="tab-header"> Danger Zone </p>
+                    <p class="tab-heading"> Danger Zone </p>
                   </div>
                 </tab-header>
                 <template slot="body">
@@ -117,22 +118,25 @@
       <modal ref="delete_mutation_test_suite_modal"
              :size="'large'"
              :include_closing_x="false">
-        <div class="modal-header">
-          Confirm Delete
-        </div>
-        <hr>
+        <div class="modal-header"> Confirm Delete </div>
+        <div class="modal-divider"></div>
         <div class="modal-body" v-if="d_active_mutation_test_suite !== null">
-          <p> Are you sure you want to delete the suite
+          <div class="modal-message">
+            Are you sure you want to delete the suite:
             <span class="item-to-delete">{{d_active_mutation_test_suite.name}}</span>?
             This will delete all associated test cases and run results.
-            THIS ACTION CANNOT BE UNDONE. </p>
-          <div class="deletion-modal-button-footer">
-            <button class="modal-delete-button red-button"
-                    :disabled="d_saving"
-                    @click="delete_mutation_test_suite()"> Delete </button>
+            THIS ACTION CANNOT BE UNDONE.
+          </div>
 
-            <button class="modal-cancel-button light-gray-button"
-                    @click="$refs.delete_mutation_test_suite_modal.close()"> Cancel </button>
+          <div class="modal-footer">
+            <div class="modal-button-container">
+              <button class="modal-delete-button red-button"
+                      :disabled="d_saving"
+                      @click="delete_mutation_test_suite()"> Delete </button>
+
+              <button class="modal-cancel-button white-button"
+                      @click="$refs.delete_mutation_test_suite_modal.close()"> Cancel </button>
+            </div>
           </div>
         </div>
       </modal>
@@ -141,10 +145,10 @@
              click_outside_to_close
              size="medium">
         <div class="modal-header"> New Suite </div>
-        <hr>
+        <div class="modal-divider"></div>
         <div class="modal-body">
           <validated-form
-            id="add-ag-test-suite-form"
+            id="create-mutation-test-suite-form"
             autocomplete="off"
             spellcheck="false"
             @submit="add_mutation_test_suite"
@@ -159,11 +163,12 @@
             </div>
 
             <APIErrors ref="api_errors"></APIErrors>
-
-            <button class="modal-create-suite-button"
-                    :disabled="!d_add_mutation_test_suite_form_is_valid || d_adding_suite">
-              Add Suite
-            </button>
+            <div class="modal-button-container">
+              <button class="modal-create-suite-button"
+                      :disabled="!d_add_mutation_test_suite_form_is_valid || d_adding_suite">
+                Add Suite
+              </button>
+            </div>
           </validated-form>
         </div>
       </modal>
@@ -184,10 +189,10 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import BuggyImplementations from "@/components/project_admin/mutation_suite_editing/buggy_implementations.vue";
-import MutationCommand from "@/components/project_admin/mutation_suite_editing/mutation_command.vue";
-import MutationCommands from "@/components/project_admin/mutation_suite_editing/mutation_commands.vue";
-import MutationSuiteGeneralSettings from "@/components/project_admin/mutation_suite_editing/mutation_suite_general_settings.vue";
+import BuggyImplementations from "@/components/project_admin/mutation_suites/buggy_implementations.vue";
+import MutationCommand from "@/components/project_admin/mutation_suites/mutation_command.vue";
+import MutationCommands from "@/components/project_admin/mutation_suites/mutation_commands.vue";
+import MutationSuiteGeneralSettings from "@/components/project_admin/mutation_suites/mutation_suite_general_settings.vue";
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -240,7 +245,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async add_mutation_test_suite() {
     try {
       this.d_adding_suite = true;
-      let new_suite = await MutationTestSuite.create(
+      await MutationTestSuite.create(
         this.project.pk, {name: this.d_new_mutation_test_suite_name}
       );
       (<Modal> this.$refs.new_mutation_test_suite_modal).close();
@@ -258,35 +263,40 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.d_current_tab_index = 0;
   }
 
-  update_active_mutation_test_suite(mutation_test_suite: MutationTestSuite) {
-    this.d_active_mutation_test_suite = mutation_test_suite;
-  }
-
   open_new_mutation_test_suite_modal() {
+    this.d_new_mutation_test_suite_name = "";
     (<Modal> this.$refs.new_mutation_test_suite_modal).open();
-    Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_mutation_test_suite_name).focus();
-    });
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
+    console.log("Update mutation test suite created");
     this.d_mutation_test_suites.push(mutation_test_suite);
   }
+
   update_mutation_test_suite_changed(mutation_test_suite: MutationTestSuite): void {
+    console.log("Update mutation test suite changed");
     let index = this.d_mutation_test_suites.findIndex(
       (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
     );
+    let changed_suite_is_active = this.d_mutation_test_suites[index]
+                                  === this.d_active_mutation_test_suite;
     Vue.set(this.d_mutation_test_suites,
             index,
             deep_copy(mutation_test_suite, MutationTestSuite)
     );
+    if (changed_suite_is_active) {
+        this.d_active_mutation_test_suite = this.d_mutation_test_suites[index];
+    }
   }
+
   update_mutation_test_suite_deleted(mutation_test_suite: MutationTestSuite): void {
+    console.log("Update mutation test suite deleted");
     let index = this.d_mutation_test_suites.findIndex(
       (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
     );
     this.d_mutation_test_suites.splice(index, 1);
   }
+
   update_mutation_test_suites_order_changed(project_pk: number,
                                             mutation_test_suite_order: number[]): void {
     throw new Error("Method not implemented.");
@@ -311,12 +321,24 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   box-sizing: border-box;
 }
 
+.tab-heading {
+  background-color: inherit;
+  margin: 0;
+  overflow: hidden;
+  height: 20px;
+}
+
+.tab-body {
+  padding: 15px 0 0 0;
+}
+
 #columns-container {
   height: calc(100% - 55px);
 }
 
 #mutation-test-suite-sidebar {
   min-width: 300px;
+  width: 200px;
 }
 
 #sidebar-header {
@@ -330,17 +352,19 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   margin-top: 10px;
 }
 
-#mutation-suites {
-  padding: 10px;
+#sidebar-title {
+  display: inline-block;
+  font-size: 1.125rem;
 }
 
-.vertical-divider {
-  border: 1px solid $pebble-medium;
-  margin: 10px 8px 10px 0;
+#add-mutation-test-suite-button {
+  @extend .white-button;
+  box-shadow: none;
 }
 
-.tab-body {
-  padding: 15px;
+.plus {
+  font-size: 13px;
+  margin-right: 3px;
 }
 
 #sidebar-body {
@@ -354,77 +378,72 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 }
 
 .mutation-test-suite-panel {
+  border-bottom: 1px solid $white-gray;
   cursor: pointer;
   font-size: 14px;
   padding: 8px;
   width: 100%;
-  border-bottom: 1px solid $white-gray;
 }
 
 .active-mutation-test-suite-panel {
   background-color: $light-blue;
 }
 
-#mutation-test-suites-title {
-  font-size: 1.125rem;
-  display: inline-block;
-}
-
-#add-mutation-test-suite-button {
-  @extend .white-button;
-  box-shadow: none;
-}
-
-.modal-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-  padding: 5px 0;
+.vertical-divider {
+  border: 1px solid $pebble-medium;
+  margin: 10px 8px 10px 0;
 }
 
 #viewing-window {
   padding-top: 20px;
 }
 
+.delete-mutation-test-suite-button {
+  @extend .red-button;
+  margin-left: 8px;
+}
+
+// MODAL stuff ----------------------------------------------------
+
+.modal-header {
+  font-size: 20px;
+  padding: 10px 0 5px 0;
+}
+
+.modal-divider {
+  background-color: darken($white-gray, 3);
+  height: 2px;
+  margin: 9px 0;
+}
+
+.modal-message {
+  line-height: 22px;
+  padding: 5px 0;
+}
+
+.modal-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 10px 0 0 0;
+}
+
+// create modal -----------------------------------------
+
 .modal-create-suite-button {
   @extend .green-button;
   float: right;
 }
 
-.mutation-test-suite-name-container {
-  padding: 0 0 22px 0;
-}
-
-#mutation-test-suite-sidebar {
-  width: 200px;
-}
-
-.plus {
-  margin-right: 3px;
-  font-size: 14px;
-}
-
-#suites {
-  margin-top: 10px;
-}
-
-.item-to-delete {
-  color: $ocean-blue;
-  margin-left: 3px;
-}
-
-.deletion-modal-button-footer {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
+// delete modal -----------------------------------------
 
 .modal-delete-button {
   margin-right: 10px;
 }
 
-.delete-mutation-test-suite-button {
-  @extend .red-button;
+.item-to-delete {
+  color: $ocean-blue;
+  margin-left: 3px;
 }
 
 </style>

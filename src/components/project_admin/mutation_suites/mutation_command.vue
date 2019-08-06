@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="mutation-command-component">
     <validated-form id="ag-settings-form"
                     autocomplete="off"
                     spellcheck="false"
@@ -88,7 +88,7 @@
                          :validators="[
                            is_not_empty,
                            is_integer,
-                           is_greater_than_or_equal_to_zero
+                           is_non_negative
                          ]"
                          input_style="width: 150px"
                          @change="$emit('input', d_ag_command)"
@@ -110,6 +110,7 @@ import ValidatedForm from "@/components/validated_form.vue";
 import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
 import {
     is_integer,
+    is_non_negative,
     is_not_empty,
     make_min_value_validator,
     string_to_num
@@ -128,14 +129,14 @@ export default class MutationCommand extends Vue {
   @Prop({default: false, type: Boolean})
   include_command_name!: boolean;
 
-  d_ag_command: AGCommand | null = null;
-  d_ag_command_settings_form_is_valid = true;
-
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
-  readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
+  readonly is_non_negative = is_non_negative;
   readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
   readonly string_to_num = string_to_num;
+
+  d_ag_command: AGCommand | null = null;
+  d_ag_command_settings_form_is_valid = true;
 
   @Watch('value')
   on_ag_command_change(new_value: AGCommand, old_value: AGCommand) {
@@ -156,8 +157,8 @@ export default class MutationCommand extends Vue {
 }
 
 .unit-of-measurement {
-  padding-left: 10px;
   font-size: 14px;
+  padding-left: 10px;
 }
 
 </style>
