@@ -88,58 +88,6 @@ describe('FeedbackConfigAGCommand tests', () => {
         expect(component.first_failed_config_is_enabled).toBe(true);
     });
 
-    test("get_current_preset_fn", async () => {
-        let public_preset = component.fdbk_presets.get('Public');
-        let pass_fail_plus_output = component.fdbk_presets.get('Pass/Fail + Output');
-        let pass_fail_plus_diff_preset = component.fdbk_presets.get('Pass/Fail + Diff');
-        let pass_fail_plus_exit_status_preset = component.fdbk_presets.get(
-            'Pass/Fail + Exit Status'
-        );
-        let pass_fail_preset = component.fdbk_presets.get('Pass/Fail');
-        let private_preset = component.fdbk_presets.get('Private');
-
-        let ag_test_command_config: AGTestCommandFeedbackConfig | null
-            = create_ag_command_feedback_config();
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Custom");
-
-        safe_assign(ag_test_command_config!, pass_fail_plus_output);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail + Output");
-
-        safe_assign(ag_test_command_config!, pass_fail_plus_diff_preset);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail + Diff");
-
-        safe_assign(ag_test_command_config!, pass_fail_plus_exit_status_preset);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail + Exit Status");
-
-        safe_assign(ag_test_command_config!, pass_fail_preset);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Pass/Fail");
-
-        safe_assign(ag_test_command_config!, private_preset);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Private");
-
-        safe_assign(ag_test_command_config!, public_preset);
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Public");
-
-        ag_test_command_config = null;
-        expect(component.get_current_preset_fn(
-            ag_test_command_config, component.fdbk_presets
-        )).toEqual("Custom");
-    });
-
     test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
         // FIXME: just fake something to emit the input event and make sure that we update our data
         fail();
@@ -228,6 +176,10 @@ describe('FeedbackConfigAGCommand tests', () => {
             staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Private");
+    });
+
+    test('config panel and settings v-model bindings', async () => {
+        fail();
     });
 
     test("update config settings in edit_feedback_settings_ag_command - changes reflected " +

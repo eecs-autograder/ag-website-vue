@@ -6,7 +6,6 @@
         <config-panel ref="normal"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_ag_test_command.normal_fdbk_config"
-                      :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
@@ -20,7 +19,6 @@
         <config-panel ref="first_failure"
                       :config_name="FeedbackConfigLabel.first_failure"
                       v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                      :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <div class="checkbox-input-container">
@@ -47,7 +45,6 @@
           ref="final_graded"
           :config_name="FeedbackConfigLabel.ultimate_submission"
           v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-          :get_preset_fn="get_current_preset_fn"
           :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGCommand
@@ -62,7 +59,6 @@
         <config-panel ref="past_limit"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                      :get_preset_fn="get_current_preset_fn"
                       :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGCommand
@@ -78,7 +74,6 @@
           ref="student_lookup"
           :config_name="FeedbackConfigLabel.staff_viewer"
           v-model="d_ag_test_command.staff_viewer_fdbk_config"
-          :get_preset_fn="get_current_preset_fn"
           :preset_options="fdbk_presets">
           <template slot="settings">
             <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
@@ -139,9 +134,9 @@ export default class FeedbackConfigAGCommand extends Vue {
   @Prop({required: true, type: AGTestCase})
   ag_test_case!: AGTestCase;
 
-  safe_assign = safe_assign;
+  readonly safe_assign = safe_assign;
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
-  hyphenate = hyphenate;
+  readonly hyphenate = hyphenate;
 
   d_ag_test_command: AGTestCommand | null = null;
   d_saving = false;
@@ -230,39 +225,14 @@ export default class FeedbackConfigAGCommand extends Vue {
   @Watch('ag_test_command')
   on_ag_test_command_change(new_value: AGTestCommand, old_value: AGTestCommand) {
     this.d_ag_test_command = deep_copy(new_value, AGTestCommand);
+    console.log(this.d_ag_test_command.cmd);
   }
 
   created() {
     this.d_ag_test_command = deep_copy(this.ag_test_command, AGTestCommand);
+    console.log(this.d_ag_test_command.cmd);
     this.first_failed_config_is_enabled =
       this.d_ag_test_command!.first_failed_test_normal_fdbk_config !== null;
-  }
-
-  get_current_preset_fn(current_config: AGTestCommandFeedbackConfig | null,
-                        preset_options: SafeMap<string, AGTestCommandFeedbackPreset>) {
-    if (current_config !== null) {
-      for (let [preset_label, potential_match] of preset_options) {
-        if ((potential_match.return_code_fdbk_level ===
-             current_config!.return_code_fdbk_level) &&
-            (potential_match.stdout_fdbk_level ===
-             current_config!.stdout_fdbk_level) &&
-            (potential_match.stderr_fdbk_level ===
-             current_config!.stderr_fdbk_level) &&
-            (potential_match.show_points ===
-             current_config!.show_points) &&
-            (potential_match.show_actual_return_code ===
-             current_config!.show_actual_return_code) &&
-            (potential_match.show_actual_stdout ===
-             current_config!.show_actual_stdout) &&
-            (potential_match.show_actual_stderr ===
-             current_config!.show_actual_stderr) &&
-            (potential_match.show_whether_timed_out ===
-             current_config!.show_whether_timed_out)) {
-          return preset_label;
-        }
-      }
-    }
-    return "Custom";
   }
 
   @handle_api_errors_async(handle_save_ag_command_feedback_config_settings)

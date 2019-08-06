@@ -161,24 +161,24 @@ describe('ConfigPanel tests', () => {
 
         config_preset_select_input.setValue(component.preset_names[2]);
         expect(
-            emitted_config_is_preset(wrapper.emitted().input[0][0],
-                                     ag_test_suite_fdbk_presets.get(component.preset_names[2]))
+            config_is_preset(wrapper.emitted().input[0][0],
+                             ag_test_suite_fdbk_presets.get(component.preset_names[2]))
         ).toEqual(true);
 
         config_preset_select_input.setValue(component.preset_names[1]);
         expect(
-            emitted_config_is_preset(wrapper.emitted().input[1][0],
-                                     ag_test_suite_fdbk_presets.get(component.preset_names[1]))
+            config_is_preset(wrapper.emitted().input[1][0],
+                             ag_test_suite_fdbk_presets.get(component.preset_names[1]))
         ).toEqual(true);
 
         config_preset_select_input.setValue(component.preset_names[0]);
         expect(
-            emitted_config_is_preset(wrapper.emitted().input[2][0],
-                                     ag_test_suite_fdbk_presets.get(component.preset_names[0]))
+            config_is_preset(wrapper.emitted().input[2][0],
+                             ag_test_suite_fdbk_presets.get(component.preset_names[0]))
         ).toEqual(true);
     });
 
-    function emitted_config_is_preset(fdbk_config: object, preset: object) {
+    function config_is_preset(fdbk_config: object, preset: object) {
         for (let key of Object.keys(preset)) {
             if (key === 'visible') {
                 fail('Feedback presets should not modify visibility');
