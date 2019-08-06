@@ -86,6 +86,7 @@ describe('FeedbackConfigAGCommand tests', () => {
         expect(first_failure_config.findAll('.setting-selection-container').length).toEqual(1);
         expect(first_failure_config.findAll('.advanced-settings-label').length).toEqual(1);
         expect(component.first_failed_config_is_enabled).toBe(true);
+        fail('test that it keeps whatever the last settings were');
     });
 
     test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {

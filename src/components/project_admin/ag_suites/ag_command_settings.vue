@@ -1,17 +1,7 @@
 <template>
   <div id="ag-test-command-settings-component" v-if="d_ag_test_command !== null">
-    <tabs ref="tabs-gray"
-          v-model="d_current_tab_index"
-          tab_active_class="white-theme-active"
-          tab_inactive_class="white-theme-inactive">
 
 <!------------------------ Command Settings Tab ------------------------------------->
-      <tab>
-        <tab-header>
-          <div class="tab-heading"> Settings </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
             <validated-form id="ag-test-command-settings-form"
                             autocomplete="off"
                             spellcheck="false"
@@ -455,7 +445,7 @@
 
               <div class="section-container">
                 <fieldset class="fieldset">
-                  <legend class="legend"> Resource Settings </legend>
+                  <legend class="legend"> Resource Limits </legend>
                   <div id="time-and-virtual">
                     <div id="time-limit-container">
                       <label class="text-label"> Time limit </label>
@@ -536,7 +526,103 @@
                 </fieldset>
               </div>
 
-              <div class="bottom-of-form">
+<!------------------------ Feedback ------------------------------------->
+
+<div class="section-container">
+                <fieldset class="fieldset">
+                  <legend class="legend"> Feedback </legend>
+  <div class="feedback-config-container">
+    <div class="inner">
+      <div class="config-panels-container">
+
+        <config-panel ref="normal"
+                      :config_name="FeedbackConfigLabel.normal"
+                      v-model="d_ag_test_command.normal_fdbk_config"
+                      :preset_options="fdbk_presets">
+          <template slot="settings">
+            <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
+                                           v-model="d_ag_test_command.normal_fdbk_config"
+                                           :ag_test_case="ag_test_case"
+                                           :config_name="FeedbackConfigLabel.normal">
+            </EditFeedbackSettingsAGCommand>
+          </template>
+        </config-panel>
+
+        <config-panel ref="first_failure"
+                      :config_name="FeedbackConfigLabel.first_failure"
+                      v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+                      :preset_options="fdbk_presets">
+          <template slot="settings">
+            <div class="checkbox-input-container">
+              <input id="first-failure-config-enabled"
+                     type="checkbox"
+                     @change="d_ag_test_command.first_failed_test_normal_fdbk_config
+                              = d_first_failed_config_is_enabled ? fdbk_presets.get('Public') : null"
+                     class="checkbox"
+                     v-model="d_first_failed_config_is_enabled">
+              <label for="first-failure-config-enabled">
+                Enabled
+              </label>
+            </div>
+            <EditFeedbackSettingsAGCommand
+              ref="first_failure_edit_feedback_settings"
+              v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.first_failure">
+            </EditFeedbackSettingsAGCommand>
+          </template>
+        </config-panel>
+
+        <config-panel
+          ref="final_graded"
+          :config_name="FeedbackConfigLabel.ultimate_submission"
+          v-model="d_ag_test_command.ultimate_submission_fdbk_config"
+          :preset_options="fdbk_presets">
+          <template slot="settings">
+            <EditFeedbackSettingsAGCommand
+              ref="final_graded_edit_feedback_settings"
+              v-model="d_ag_test_command.ultimate_submission_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.ultimate_submission">
+            </EditFeedbackSettingsAGCommand>
+          </template>
+        </config-panel>
+
+        <config-panel ref="past_limit"
+                      :config_name="FeedbackConfigLabel.past_limit"
+                      v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+                      :preset_options="fdbk_presets">
+          <template slot="settings">
+            <EditFeedbackSettingsAGCommand
+              ref="past_limit_edit_feedback_settings"
+              v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.past_limit">
+            </EditFeedbackSettingsAGCommand>
+          </template>
+        </config-panel>
+
+        <config-panel
+          ref="student_lookup"
+          :config_name="FeedbackConfigLabel.staff_viewer"
+          v-model="d_ag_test_command.staff_viewer_fdbk_config"
+          :preset_options="fdbk_presets">
+          <template slot="settings">
+            <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
+                                           v-model="d_ag_test_command.staff_viewer_fdbk_config"
+                                           :ag_test_case="ag_test_case"
+                                           :config_name="FeedbackConfigLabel.staff_viewer">
+            </EditFeedbackSettingsAGCommand>
+          </template>
+        </config-panel>
+      </div>
+
+    </div>
+
+  </div>
+                </fieldset>
+</div>
+                <div class="bottom-of-form">
                 <APIErrors ref="api_errors"></APIErrors>
 
                 <button type="submit"
@@ -553,36 +639,13 @@
               </div>
 
             </validated-form>
-          </div>
-        </template>
-      </tab>
 
-<!------------------------ Command Feedback Tab ------------------------------------->
-      <tab>
-        <tab-header>
-          <div class="tab-heading">
-            Feedback
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <FeedbackConfigAGCommand :ag_test_command="d_ag_test_command"
-                                     :ag_test_case="d_ag_test_case">
-            </FeedbackConfigAGCommand>
-          </div>
-        </template>
-      </tab>
 
 <!--------------------------- Danger Zone Tab --------------------------------------->
-      <tab>
-        <tab-header>
-          <div class="tab-heading">
-            Danger Zone
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
 
+<div id="danger-zone-container" class="section-container">
+                <fieldset class="fieldset">
+  <legend class="legend">Danger Zone</legend>
             <button class="delete-ag-test-command-button"
                     type="button"
                     @click="$refs.delete_ag_test_command_modal.open()">
@@ -625,12 +688,8 @@
                 </div>
               </div>
             </modal>
-
-          </div>
-        </template>
-      </tab>
-
-    </tabs>
+                </fieldset>
+</div>
   </div>
 </template>
 
@@ -644,12 +703,20 @@ import {
   ExpectedOutputSource,
   ExpectedReturnCode,
   Project,
-  StdinSource
+  StdinSource,
+  ValueFeedbackLevel,
+  AGTestCommandFeedbackConfig
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
-import FeedbackConfigAGCommand from '@/components/feedback_config/feedback_config/feedback_config_ag_command.vue';
+import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
+import {
+  AGTestCommandFeedbackPreset,
+  FeedbackConfigLabel,
+  hyphenate
+} from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -657,6 +724,7 @@ import Tabs from '@/components/tabs/tabs.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
 import {
   is_integer,
@@ -668,8 +736,9 @@ import {
 @Component({
   components: {
     APIErrors,
+    ConfigPanel,
     Dropdown,
-    FeedbackConfigAGCommand,
+    EditFeedbackSettingsAGCommand,
     Modal,
     Tab,
     TabHeader,
@@ -697,6 +766,9 @@ export default class AGCommandSettings extends Vue {
   d_saving = false;
   d_settings_form_is_valid = true;
 
+  d_first_failed_config_is_enabled = false;
+  d_latest_first_failed_config_value: AGTestCommandFeedbackConfig | null = null;
+
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
   readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
@@ -705,7 +777,7 @@ export default class AGCommandSettings extends Vue {
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
-
+  readonly FeedbackConfigLabel = FeedbackConfigLabel;
   readonly format_datetime = format_datetime;
 
   @Watch('ag_test_command')
@@ -754,6 +826,87 @@ export default class AGCommandSettings extends Vue {
       this.d_saving = false;
     }
   }
+
+  readonly fdbk_presets = new SafeMap<string, AGTestCommandFeedbackPreset>([
+    [
+      'Public',
+      {
+        return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        stdout_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        stderr_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        show_points: true,
+        show_actual_return_code: true,
+        show_actual_stdout: true,
+        show_actual_stderr: true,
+        show_whether_timed_out: true
+      }
+    ],
+    [
+      'Pass/Fail + Output',
+      {
+        return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        show_points: true,
+        show_actual_return_code: true,
+        show_actual_stdout: true,
+        show_actual_stderr: true,
+        show_whether_timed_out: true
+      }
+    ],
+    [
+      'Pass/Fail + Diff',
+      {
+        return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        stdout_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        stderr_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        show_points: true,
+        show_actual_return_code: true,
+        show_actual_stdout: false,
+        show_actual_stderr: false,
+        show_whether_timed_out: true
+      }
+    ],
+    [
+      'Pass/Fail + Exit Status',
+      {
+        return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        show_points: true,
+        show_actual_return_code: true,
+        show_actual_stdout: false,
+        show_actual_stderr: false,
+        show_whether_timed_out: true
+      }
+    ],
+    [
+      'Pass/Fail',
+      {
+        return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
+        show_points: true,
+        show_actual_return_code: false,
+        show_actual_stdout: false,
+        show_actual_stderr: false,
+        show_whether_timed_out: false
+      }
+    ],
+    [
+      'Private',
+      {
+        return_code_fdbk_level: ValueFeedbackLevel.no_feedback,
+        stdout_fdbk_level: ValueFeedbackLevel.no_feedback,
+        stderr_fdbk_level: ValueFeedbackLevel.no_feedback,
+        show_points: false,
+        show_actual_return_code: false,
+        show_actual_stdout: false,
+        show_actual_stderr: false,
+        show_whether_timed_out: false
+      }
+    ]
+  ]);
 }
 
 function handle_save_ag_command_settings_error(component: AGCommandSettings, error: unknown) {
@@ -765,14 +918,11 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/components/ag_tests.scss';
+@import '@/styles/components/feedback_config.scss';
 @import '@/styles/forms.scss';
 
 .tab-body {
   padding: 15px;
-}
-
-.delete-ag-test-command-button {
-  @extend .delete-level-button;
 }
 
 .ag-test-command-input-container {
@@ -879,6 +1029,20 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
 
 #time-limit-and-stack-size {
   padding: 0 0 0 0;
+}
+
+#danger-zone-container {
+  margin-top: 40px;
+
+  .legend {
+    color: black;
+    font-size: 24px;
+  }
+
+  .delete-ag-test-command-button {
+    margin-top: 10px;
+    @extend .delete-level-button;
+  }
 }
 
 @media only screen and (min-width: 481px) {
