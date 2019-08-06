@@ -20,7 +20,7 @@ export function make_num_decimal_places_validator(num_decimals: number) {
 export function make_max_num_digits_validator(num_digits: number) {
     return (value: string) => {
         return {
-            is_valid: is_not_empty(value) && (value.includes("."))
+            is_valid: is_not_empty(value).is_valid && (value.includes("."))
                       ? value.split('.')[0].length
                         + value.split('.')[1].length <= num_digits
                       : value.length <= num_digits,

@@ -252,7 +252,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
       this.d_new_mutation_test_suite_name = "";
     }
     finally {
-      this.d_adding_suite = false;
+        this.d_adding_suite = false;
     }
   }
 
@@ -269,12 +269,10 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
-    console.log("Update mutation test suite created");
     this.d_mutation_test_suites.push(mutation_test_suite);
   }
 
   update_mutation_test_suite_changed(mutation_test_suite: MutationTestSuite): void {
-    console.log("Update mutation test suite changed");
     let index = this.d_mutation_test_suites.findIndex(
       (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
     );
@@ -285,28 +283,24 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
             deep_copy(mutation_test_suite, MutationTestSuite)
     );
     if (changed_suite_is_active) {
-        this.d_active_mutation_test_suite = this.d_mutation_test_suites[index];
+      this.d_active_mutation_test_suite = this.d_mutation_test_suites[index];
     }
   }
 
   update_mutation_test_suite_deleted(mutation_test_suite: MutationTestSuite): void {
-    console.log("Update mutation test suite deleted");
     let index = this.d_mutation_test_suites.findIndex(
       (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
     );
     this.d_mutation_test_suites.splice(index, 1);
   }
-
   update_mutation_test_suites_order_changed(project_pk: number,
                                             mutation_test_suite_order: number[]): void {
     throw new Error("Method not implemented.");
   }
 }
-
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
-
 </script>
 
 <style scoped lang="scss">
@@ -404,7 +398,6 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 }
 
 // MODAL stuff ----------------------------------------------------
-
 .modal-header {
   font-size: 20px;
   padding: 10px 0 5px 0;
@@ -429,14 +422,12 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 }
 
 // create modal -----------------------------------------
-
 .modal-create-suite-button {
   @extend .green-button;
   float: right;
 }
 
 // delete modal -----------------------------------------
-
 .modal-delete-button {
   margin-right: 10px;
 }

@@ -123,29 +123,29 @@ import {
   }
 })
 export default class MutationCommand extends Vue {
-  @Prop({required: true, type: Object})
-  value!: AGCommand;
+    @Prop({required: true, type: Object})
+    value!: AGCommand;
 
-  @Prop({default: false, type: Boolean})
-  include_command_name!: boolean;
+    @Prop({default: false, type: Boolean})
+    include_command_name!: boolean;
 
-  readonly is_not_empty = is_not_empty;
-  readonly is_integer = is_integer;
-  readonly is_non_negative = is_non_negative;
-  readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
-  readonly string_to_num = string_to_num;
+    readonly is_not_empty = is_not_empty;
+    readonly is_integer = is_integer;
+    readonly is_non_negative = is_non_negative;
+    readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
+    readonly string_to_num = string_to_num;
 
-  d_ag_command: AGCommand | null = null;
-  d_ag_command_settings_form_is_valid = true;
+    d_ag_command: AGCommand | null = null;
+    d_ag_command_settings_form_is_valid = true;
 
-  @Watch('value')
-  on_ag_command_change(new_value: AGCommand, old_value: AGCommand) {
-    this.d_ag_command = JSON.parse(JSON.stringify(new_value));
-  }
+    @Watch('value')
+    on_ag_command_change(new_value: AGCommand, old_value: AGCommand) {
+        this.d_ag_command = JSON.parse(JSON.stringify(new_value));
+    }
 
-  created() {
-    this.d_ag_command = JSON.parse(JSON.stringify(this.value));
-  }
+    created() {
+        this.d_ag_command = JSON.parse(JSON.stringify(this.value));
+    }
 }
 </script>
 

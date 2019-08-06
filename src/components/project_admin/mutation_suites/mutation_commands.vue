@@ -138,7 +138,6 @@ export default class MutationCommands extends Vue {
            && this.d_student_test_validity_check_is_valid
            && this.d_grade_buggy_impl_command_is_valid;
   }
-
   @handle_api_errors_async(handle_save_mutation_commands_error)
   async save_command_settings() {
     try {
@@ -150,9 +149,8 @@ export default class MutationCommands extends Vue {
     }
   }
 }
-
 function handle_save_mutation_commands_error(component: MutationCommands, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -192,5 +190,4 @@ function handle_save_mutation_commands_error(component: MutationCommands, error:
   font-size: 14px;
   color: lighten(black, 30);
 }
-
 </style>

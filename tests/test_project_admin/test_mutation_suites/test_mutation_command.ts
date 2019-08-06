@@ -231,8 +231,8 @@ async function do_invalid_text_input_test_without_save_button(component_wrapper:
 }
 
 async function do_input_blank_or_not_integer_test_without_save_button(
-        component_wrapper: Wrapper<Vue>,
-        input_selector: string | RefSelector) {
+    component_wrapper: Wrapper<Vue>,
+    input_selector: string | RefSelector) {
     // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
     let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
     let original_text = get_validated_input_text(input_wrapper);

@@ -121,10 +121,10 @@ export function create_mutation_suite(pk: number, suite_name: string,
         max_points: 0,
         deferred: false,
         sandbox_docker_image: {
-            pk: 1,
-            name: "Sandy",
-            tag: "",
-            display_name: "Hi everyone"
+        pk: 1,
+        name: "Sandy",
+        tag: "",
+        display_name: "Hi everyone"
         },
         allow_network_access: false,
         normal_fdbk_config: create_mutation_suite_feedback_config(),
@@ -202,21 +202,21 @@ describe('BuggyImplementation tests', () => {
     test('Error: points_per_exposed_bug must have less than or equal to four digits in ' +
          'total - no decimal present',
          async () => {
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'points_per_exposed_bug'}, '12345', '.save-button');
+         return do_invalid_text_input_test(
+             wrapper, {ref: 'points_per_exposed_bug'}, '12345', '.save-button');
     });
 
     test('Error: points_per_exposed_bug must have less than or equal to four digits in ' +
          'total - decimal present',
          async () => {
-         return do_invalid_text_input_test(
-             wrapper, {ref: 'points_per_exposed_bug'}, '123.45', '.save-button');
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_per_exposed_bug'}, '123.45', '.save-button');
     });
 
     test('Error: points_per_exposed_bug must have less than or equal to two decimal places',
          async () => {
-         return do_invalid_text_input_test(
-             wrapper, {ref: 'points_per_exposed_bug'}, '12.345', '.save-button');
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_per_exposed_bug'}, '12.345', '.save-button');
     });
 
     test('use_custom_max_points binding', async () => {

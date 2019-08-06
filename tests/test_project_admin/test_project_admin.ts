@@ -7,7 +7,8 @@ import {
     Course,
     ExpectedStudentFile,
     Group,
-    InstructorFile, MutationTestSuite,
+    InstructorFile,
+    MutationTestSuite,
     Project,
     Semester,
     UltimateSubmissionPolicy
@@ -93,11 +94,7 @@ describe('Changing tabs in project admin', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-<<<<<<< d70669d2edb4d675e54a737e314b89158917f1d9
-            has_handgrading_rubric: false,
-=======
             has_handgrading_rubric: false
->>>>>>> Added tests to test_mutation_suites. Cleaning up code in the mutation_suites directory.
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));

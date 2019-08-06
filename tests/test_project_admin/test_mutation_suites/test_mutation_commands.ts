@@ -118,10 +118,10 @@ export function create_mutation_suite(pk: number, suite_name: string,
         max_points: 3,
         deferred: false,
         sandbox_docker_image: {
-            pk: 1,
-            name: "Sandy",
-            tag: "",
-            display_name: "Hi everyone"
+        pk: 1,
+        name: "Sandy",
+        tag: "",
+        display_name: "Hi everyone"
         },
         allow_network_access: false,
         normal_fdbk_config: create_mutation_suite_feedback_config(),
@@ -239,7 +239,7 @@ describe('MutationCommands tests', () => {
         expect(component.d_student_test_validity_check_is_valid).toBe(true);
 
         let get_student_test_names_command = wrapper.find(
-            {ref: 'get_student_test_names_command'}
+        {ref: 'get_student_test_names_command'}
         );
 
         set_validated_input_text(get_student_test_names_command.find('#cmd'), " ");
@@ -267,13 +267,13 @@ describe('MutationCommands tests', () => {
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         set_validated_input_text(
-            get_student_test_names_command.find('#virtual-memory-limit'), " "
+        get_student_test_names_command.find('#virtual-memory-limit'), " "
         );
         expect(component.command_settings_forms_are_valid).toBe(false);
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
-            get_student_test_names_command.find('#virtual-memory-limit'), "10"
+        get_student_test_names_command.find('#virtual-memory-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
@@ -283,7 +283,7 @@ describe('MutationCommands tests', () => {
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
-            get_student_test_names_command.find('#process-spawn-limit'), "10"
+        get_student_test_names_command.find('#process-spawn-limit'), "10"
         );
         expect(component.command_settings_forms_are_valid).toBe(true);
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
@@ -297,7 +297,7 @@ describe('MutationCommands tests', () => {
         expect(component.d_student_test_validity_check_is_valid).toBe(true);
 
         let grade_buggy_impl_command = wrapper.find(
-            {ref: 'grade_buggy_impl_command'}
+        {ref: 'grade_buggy_impl_command'}
         );
 
         set_validated_input_text(grade_buggy_impl_command.find('#cmd'), " ");
@@ -351,7 +351,7 @@ describe('MutationCommands tests', () => {
         wrapper.find('#use-setup-command').setChecked(true);
 
         let setup_command = wrapper.find(
-            {ref: 'setup_command'}
+        {ref: 'setup_command'}
         );
 
         set_validated_input_text(setup_command.find('#cmd'), " ");

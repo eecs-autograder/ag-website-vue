@@ -119,7 +119,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
-  MutationTestSuite
+    MutationTestSuite
 } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
@@ -195,15 +195,13 @@ export default class BuggyImplementations extends Vue {
     let replace_regex = /,+/g;
     let trimmed_input = this.buggy_impl_names.trim();
     if (trimmed_input.length === 0) {
-        return;
+      return;
     }
     let split_buggy_impl_names = trimmed_input.replace(replace_regex, " ").split(split_regex);
     split_buggy_impl_names = split_buggy_impl_names.filter((name: string) =>
-          (this.d_mutation_test_suite!.buggy_impl_names.findIndex(
-            (buggy_name: string) => buggy_name === name) === -1)
-          && name.trim() !== ""
+      (this.d_mutation_test_suite!.buggy_impl_names.findIndex(
+        (buggy_name: string) => buggy_name === name) === -1) && name.trim() !== ""
     );
-
     for (let buggy_name of split_buggy_impl_names) {
       this.d_mutation_test_suite!.buggy_impl_names.push(buggy_name);
     }
@@ -226,22 +224,18 @@ export default class BuggyImplementations extends Vue {
     }
   }
 }
-
 function handle_save_mutation_suite_settings_error(component: BuggyImplementations,
                                                    error: unknown) {
     (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
-
-
 </script>
-
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
 #buggy-implementations-component {
- padding: 0 12px 12px 12px;
+  padding: 0 12px 12px 12px;
 }
 
 .input-container {

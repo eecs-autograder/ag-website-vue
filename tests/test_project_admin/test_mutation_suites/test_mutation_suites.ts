@@ -497,6 +497,50 @@ describe('MutationSuites tests', () => {
         expect(component.d_current_tab_index).toEqual(0);
     });
 
+    test('update_mutation_test_suite_changed and was the active mutation suite',
+         async () => {
+        let updated_mutation_test_suite_1 = create_mutation_suite(1, "Suite 1", project.pk);
+        updated_mutation_test_suite_1.use_setup_command = true;
+        updated_mutation_test_suite_1.setup_command.name = "Updated Setup Command";
+        updated_mutation_test_suite_1.get_student_test_names_command.time_limit = 11;
+        updated_mutation_test_suite_1.student_test_validity_check_command.stack_size_limit
+            = 200000;
+        updated_mutation_test_suite_1.grade_buggy_impl_command.virtual_memory_limit = 6000000;
+
+        wrapper.findAll('.mutation-test-suite-panel').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
+        expect(component.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
+
+        MutationTestSuite.notify_mutation_test_suite_changed(updated_mutation_test_suite_1);
+
+        expect(component.d_active_mutation_test_suite).toEqual(updated_mutation_test_suite_1);
+        expect(component.d_mutation_test_suites[0]).toEqual(updated_mutation_test_suite_1);
+    });
+
+    test('update_mutation_test_suite_changed and was not the active mutation suite',
+         async () => {
+        let updated_mutation_test_suite_3 = create_mutation_suite(3, "Suite 3", project.pk);
+        updated_mutation_test_suite_3.use_setup_command = true;
+        updated_mutation_test_suite_3.setup_command.name = "Updated Setup Command";
+        updated_mutation_test_suite_3.get_student_test_names_command.time_limit = 11;
+        updated_mutation_test_suite_3.student_test_validity_check_command.stack_size_limit
+            = 200000;
+        updated_mutation_test_suite_3.grade_buggy_impl_command.virtual_memory_limit = 6000000;
+
+        wrapper.findAll('.mutation-test-suite-panel').at(0).trigger('click');
+        await component.$nextTick();
+
+        expect(component.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
+        expect(component.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
+
+        MutationTestSuite.notify_mutation_test_suite_changed(updated_mutation_test_suite_3);
+
+        expect(component.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
+        expect(component.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
+    });
+
     test('update_mutation_test_suites_order_changed', () => {
         expect(() => MutationTestSuite.notify_mutation_test_suite_order_updated(
             project.pk, [1, 2])

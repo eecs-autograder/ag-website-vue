@@ -211,8 +211,6 @@ export default class MutationSuiteGeneralSettings extends Vue {
   async created() {
     this.d_mutation_test_suite = deep_copy(this.mutation_test_suite, MutationTestSuite);
     this.d_docker_images = await get_sandbox_docker_images();
-    // this.sort_instructor_files_needed();
-    // this.sort_expected_student_files_needed();
     this.d_loading = false;
   }
 
@@ -223,39 +221,21 @@ export default class MutationSuiteGeneralSettings extends Vue {
     });
   }
 
-  sort_instructor_files_needed() {
-    this.d_mutation_test_suite!.instructor_files_needed =
-        this.d_mutation_test_suite!.instructor_files_needed.sort(
-        (instructor_file_a: InstructorFile, instructor_file_b: InstructorFile) =>
-          instructor_file_a.name.localeCompare(instructor_file_b.name, undefined, {numeric: true})
-    );
-  }
-
   get expected_student_files_available() {
     return this.project.expected_student_files.filter(
       (expected_student_file: ExpectedStudentFile) => {
         return this.d_mutation_test_suite!.student_files_needed.findIndex(
           (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
-      }
-    );
-  }
-
-  sort_expected_student_files_needed() {
-    this.d_mutation_test_suite!.student_files_needed =
-      this.d_mutation_test_suite!.student_files_needed.sort(
-        (student_file_a: ExpectedStudentFile, student_file_b: ExpectedStudentFile) =>
-          student_file_a.pattern.localeCompare(student_file_b.pattern, undefined, {numeric: true})
+        }
     );
   }
 
   add_instructor_file(instructor_file: InstructorFile) {
     this.d_mutation_test_suite!.instructor_files_needed.push(instructor_file);
-    this.sort_instructor_files_needed();
   }
 
   add_student_file(student_file: ExpectedStudentFile) {
     this.d_mutation_test_suite!.student_files_needed.push(student_file);
-    this.sort_expected_student_files_needed();
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
@@ -286,18 +266,15 @@ export default class MutationSuiteGeneralSettings extends Vue {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
       await this.d_mutation_test_suite!.save();
-      // save is rearranging the files????????????????
-      // theyre in lexico order after save, not local
     }
     finally {
-      this.d_saving = false;
+        this.d_saving = false;
     }
   }
 }
-
 function handle_save_mutation_suite_settings_error(component: MutationSuiteGeneralSettings,
                                                    error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
