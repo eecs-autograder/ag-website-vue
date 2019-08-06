@@ -535,7 +535,7 @@
     <div class="inner">
       <div class="config-panels-container">
 
-        <config-panel ref="normal"
+        <config-panel ref="normal_config_panel"
                       :config_name="FeedbackConfigLabel.normal"
                       v-model="d_ag_test_command.normal_fdbk_config"
                       :preset_options="fdbk_presets">
@@ -548,7 +548,7 @@
           </template>
         </config-panel>
 
-        <config-panel ref="first_failure"
+        <config-panel ref="first_failure_config_panel"
                       :config_name="FeedbackConfigLabel.first_failure"
                       v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
                       :preset_options="fdbk_presets">
@@ -556,8 +556,7 @@
             <div class="checkbox-input-container">
               <input id="first-failure-config-enabled"
                      type="checkbox"
-                     @change="d_ag_test_command.first_failed_test_normal_fdbk_config
-                              = d_first_failed_config_is_enabled ? fdbk_presets.get('Public') : null"
+                     @change="toggle_first_failure_feedback"
                      class="checkbox"
                      v-model="d_first_failed_config_is_enabled">
               <label for="first-failure-config-enabled">
@@ -574,7 +573,7 @@
         </config-panel>
 
         <config-panel
-          ref="final_graded"
+          ref="final_graded_config_panel"
           :config_name="FeedbackConfigLabel.ultimate_submission"
           v-model="d_ag_test_command.ultimate_submission_fdbk_config"
           :preset_options="fdbk_presets">
@@ -588,7 +587,7 @@
           </template>
         </config-panel>
 
-        <config-panel ref="past_limit"
+        <config-panel ref="past_limit_config_panel"
                       :config_name="FeedbackConfigLabel.past_limit"
                       v-model="d_ag_test_command.past_limit_submission_fdbk_config"
                       :preset_options="fdbk_presets">
@@ -603,7 +602,7 @@
         </config-panel>
 
         <config-panel
-          ref="student_lookup"
+          ref="student_lookup_config_panel"
           :config_name="FeedbackConfigLabel.staff_viewer"
           v-model="d_ag_test_command.staff_viewer_fdbk_config"
           :preset_options="fdbk_presets">
@@ -824,6 +823,25 @@ export default class AGCommandSettings extends Vue {
     }
     finally {
       this.d_saving = false;
+    }
+  }
+
+  toggle_first_failure_feedback() {
+    if (this.d_first_failed_config_is_enabled) {
+      this.d_ag_test_command!.first_failed_test_normal_fdbk_config = {
+        visible: true,
+        return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        stdout_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        stderr_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+        show_points: true,
+        show_actual_return_code: true,
+        show_actual_stdout: true,
+        show_actual_stderr: true,
+        show_whether_timed_out: true
+      };
+    }
+    else {
+      this.d_ag_test_command!.first_failed_test_normal_fdbk_config = null;
     }
   }
 

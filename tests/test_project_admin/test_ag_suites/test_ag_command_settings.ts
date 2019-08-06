@@ -15,10 +15,13 @@ import {
     StdinSource,
     UltimateSubmissionPolicy,
     ValueFeedbackLevel,
+    AGTestSuite,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
+import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
 import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 
 import {
@@ -28,201 +31,60 @@ import {
     set_validated_input_text,
     validated_input_is_valid
 } from '@/tests/utils';
+import { make_ag_test_command_fdbk_config, make_ag_test_command, make_ag_test_suite, make_project, make_ag_test_case, make_course } from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+let ag_test_suite: AGTestSuite;
+let ag_test_case: AGTestCase;
+let ag_test_command: AGTestCommand;
+let instructor_file_1: InstructorFile;
+let instructor_file_2: InstructorFile;
+let instructor_file_3: InstructorFile;
+let project: Project;
+
+beforeEach(() => {
+    let course = make_course();
+    project = make_project(course.pk);
+
+    instructor_file_1 = new InstructorFile({
+        pk: 1,
+        project: 10,
+        name: "antarctica.cpp",
+        size: 2,
+        last_modified: "now"
+    });
+    instructor_file_2 = new InstructorFile({
+        pk: 2,
+        project: 10,
+        name: "africa.cpp",
+        size: 2,
+        last_modified: "now"
+    });
+    instructor_file_3 = new InstructorFile({
+        pk: 3,
+        project: 10,
+        name: "asia.cpp",
+        size: 2,
+        last_modified: "now"
+    });
+
+    project.instructor_files = [instructor_file_1, instructor_file_2, instructor_file_3];
+
+    ag_test_suite = make_ag_test_suite(project.pk);
+    ag_test_case = make_ag_test_case(ag_test_suite.pk);
+    ag_test_command = make_ag_test_command(ag_test_case.pk);
+
+    ag_test_case = make_ag_test_case(ag_test_suite.pk);
+    ag_test_case.ag_test_commands = [ag_test_command];
+});
+
 describe('AGCommandSettings tests', () => {
     let wrapper: Wrapper<AGCommandSettings>;
-    let component: AGCommandSettings;
-    let ag_test_case: AGTestCase;
-    let ag_test_command: AGTestCommand;
-    let another_command: AGTestCommand;
-    let case_with_two_commands: AGTestCase;
-    let instructor_file_1: InstructorFile;
-    let instructor_file_2: InstructorFile;
-    let instructor_file_3: InstructorFile;
-    let project: Project;
-    let default_case_feedback_config: AGTestCaseFeedbackConfig;
-    let default_command_feedback_config: AGTestCommandFeedbackConfig;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        default_command_feedback_config = {
-            visible: false,
-            return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            show_points: false,
-            show_actual_return_code: false,
-            show_actual_stdout: false,
-            show_actual_stderr: false,
-            show_whether_timed_out: false
-        };
-
-        default_case_feedback_config = {
-            visible: false,
-            show_individual_commands: false
-        };
-
-        ag_test_command = new AGTestCommand({
-            pk: 1,
-            name: "Command 1",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
-
-        another_command = new AGTestCommand({
-            pk: 2,
-            name: "Command 2",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Say sorry",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
-
-        ag_test_case = new AGTestCase({
-            pk: 1,
-            name: "Case A",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_test_command]
-        });
-
-        case_with_two_commands = new AGTestCase({
-            pk: 1,
-            name: "Case A",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_test_command, another_command]
-        });
-
-        instructor_file_1 = new InstructorFile({
-            pk: 1,
-            project: 10,
-            name: "antarctica.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        instructor_file_2 = new InstructorFile({
-            pk: 2,
-            project: 10,
-            name: "africa.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        instructor_file_3 = new InstructorFile({
-            pk: 3,
-            project: 10,
-            name: "asia.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        project = new Project({
-            pk: 10,
-            name: "Detroit Zoo",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            expected_student_files: [],
-            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3],
-            has_handgrading_rubric: false,
-        });
-
         wrapper = mount(AGCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
@@ -230,15 +92,10 @@ describe('AGCommandSettings tests', () => {
                 project: project
             }
         });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();
@@ -246,34 +103,28 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('command name binding', async () => {
-        wrapper.setProps({ag_test_case: case_with_two_commands});
-        await component.$nextTick();
+        let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
+        two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
+
+        wrapper.setProps({ag_test_case: two_cmd_test});
+        await wrapper.vm.$nextTick();
 
         let command_name_input = wrapper.find({ref: 'command_name'});
         set_validated_input_text(command_name_input, 'Name');
 
-        expect(component.d_ag_test_command!.name).toEqual('Name');
+        expect(wrapper.vm.d_ag_test_command!.name).toEqual('Name');
         expect(validated_input_is_valid(command_name_input)).toEqual(true);
 
-        component.d_ag_test_command!.name = 'Fame';
+        wrapper.vm.d_ag_test_command!.name = 'Fame';
         expect(get_validated_input_text(command_name_input)).toEqual('Fame');
     });
 
     test('error - command name is blank (case has more than one command)', async () => {
-        let another_case = new AGTestCase({
-            pk: 1,
-            name: "Another Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_test_command, another_command]
-        });
+        let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
+        two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
 
-        wrapper.setProps({ag_test_case: another_case});
-        await component.$nextTick();
+        wrapper.setProps({ag_test_case: two_cmd_test});
+        await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(wrapper, {ref: "command_name"}, ' ', '.save-button');
     });
@@ -283,10 +134,10 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(command_name_input, 'Tim Hortons');
 
-        expect(component.d_ag_test_command!.cmd).toEqual('Tim Hortons');
+        expect(wrapper.vm.d_ag_test_command!.cmd).toEqual('Tim Hortons');
         expect(validated_input_is_valid(command_name_input)).toEqual(true);
 
-        component.d_ag_test_command!.cmd = 'Starbucks';
+        wrapper.vm.d_ag_test_command!.cmd = 'Starbucks';
         expect(get_validated_input_text(command_name_input)).toEqual('Starbucks');
     });
 
@@ -298,91 +149,91 @@ describe('AGCommandSettings tests', () => {
         let stdin_source_input = wrapper.find('#stdin-source');
 
         stdin_source_input.setValue(StdinSource.none);
-        expect(component.d_ag_test_command!.stdin_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.stdin_source).toEqual(
             StdinSource.none
         );
 
         stdin_source_input.setValue(StdinSource.text);
-        expect(component.d_ag_test_command!.stdin_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.stdin_source).toEqual(
             StdinSource.text
         );
 
         stdin_source_input.setValue(StdinSource.instructor_file);
-        expect(component.d_ag_test_command!.stdin_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.stdin_source).toEqual(
             StdinSource.instructor_file
         );
 
-        component.d_ag_test_command!.stdin_source = StdinSource.none;
+        wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.none;
         expect_html_element_has_value(stdin_source_input,
                                       StdinSource.none);
 
-        component.d_ag_test_command!.stdin_source = StdinSource.text;
+        wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.text;
         expect_html_element_has_value(stdin_source_input,
                                       StdinSource.text);
 
-        component.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
         expect_html_element_has_value(stdin_source_input,
                                       StdinSource.instructor_file);
     });
 
     test('stdin_text binding', async () => {
-        component.d_ag_test_command!.stdin_source = StdinSource.text;
+        wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.text;
 
         let stdin_text_input = wrapper.find({ref: 'stdin_text'});
         set_validated_input_text(stdin_text_input, 'Hot');
 
-        expect(component.d_ag_test_command!.stdin_text).toEqual('Hot');
+        expect(wrapper.vm.d_ag_test_command!.stdin_text).toEqual('Hot');
         expect(validated_input_is_valid(stdin_text_input)).toEqual(true);
 
         set_validated_input_text(stdin_text_input, '');
 
-        expect(component.d_ag_test_command!.stdin_text).toEqual('');
+        expect(wrapper.vm.d_ag_test_command!.stdin_text).toEqual('');
         expect(validated_input_is_valid(stdin_text_input)).toEqual(true);
 
-        component.d_ag_test_command!.stdin_text = 'Cold';
+        wrapper.vm.d_ag_test_command!.stdin_text = 'Cold';
         expect(get_validated_input_text(stdin_text_input)).toEqual('Cold');
     });
 
     test('stdin_instructor_file binding', async () => {
-        component.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
+        await wrapper.vm.$nextTick();
 
         let stdin_instructor_file_input = wrapper.find('#stdin-instructor-file');
         stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let dropdown_container_wrapper = wrapper.find('#dropdown-container');
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_2.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_2);
+        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_2);
         expect(stdin_instructor_file_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(instructor_file_2.name);
 
         stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_3.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_3);
+        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_3);
         expect(stdin_instructor_file_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(instructor_file_3.name);
 
         stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
@@ -390,9 +241,9 @@ describe('AGCommandSettings tests', () => {
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_1.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_1);
+        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_1);
         expect(stdin_instructor_file_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(instructor_file_1.name);
@@ -402,35 +253,35 @@ describe('AGCommandSettings tests', () => {
         let expected_return_code_input = wrapper.find('#expected-return-code');
 
         expected_return_code_input.setValue(ExpectedReturnCode.none);
-        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_return_code).toEqual(
             ExpectedReturnCode.none
         );
 
         expected_return_code_input.setValue(ExpectedReturnCode.zero);
-        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_return_code).toEqual(
             ExpectedReturnCode.zero
         );
 
         expected_return_code_input.setValue(ExpectedReturnCode.nonzero);
-        expect(component.d_ag_test_command!.expected_return_code).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_return_code).toEqual(
             ExpectedReturnCode.nonzero
         );
 
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.none;
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.none;
         expect_html_element_has_value(expected_return_code_input,
                                       ExpectedReturnCode.none);
 
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         expect_html_element_has_value(expected_return_code_input,
                                       ExpectedReturnCode.zero);
 
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.nonzero;
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.nonzero;
         expect_html_element_has_value(expected_return_code_input,
                                       ExpectedReturnCode.nonzero);
     });
 
     test('points_for_correct_return_code binding', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
 
         let points_for_correct_return_code_input = wrapper.find(
             {ref: 'points_for_correct_return_code'}
@@ -438,31 +289,31 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(points_for_correct_return_code_input, '2');
 
-        expect(component.d_ag_test_command!.points_for_correct_return_code).toEqual(2);
+        expect(wrapper.vm.d_ag_test_command!.points_for_correct_return_code).toEqual(2);
         expect(validated_input_is_valid(points_for_correct_return_code_input)).toEqual(true);
 
-        component.d_ag_test_command!.points_for_correct_return_code = 3;
+        wrapper.vm.d_ag_test_command!.points_for_correct_return_code = 3;
         expect(get_validated_input_text(points_for_correct_return_code_input)).toEqual('3');
     });
 
     test('error - points_for_correct_return_code is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await wrapper.vm.$nextTick();
 
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: "points_for_correct_return_code"}, '.save-button');
     });
 
     test('error - points_for_correct_return_code must be >= 0', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'points_for_correct_return_code'}, '-2', '.save-button');
     });
 
     test('deduction_for_wrong_return_code binding', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
 
         let deduction_for_wrong_return_code_input = wrapper.find(
             {ref: 'deduction_for_wrong_return_code'}
@@ -470,24 +321,24 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(deduction_for_wrong_return_code_input, '2');
 
-        expect(component.d_ag_test_command!.deduction_for_wrong_return_code).toEqual(2);
+        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_return_code).toEqual(2);
         expect(validated_input_is_valid(deduction_for_wrong_return_code_input)).toEqual(true);
 
-        component.d_ag_test_command!.deduction_for_wrong_return_code = 3;
+        wrapper.vm.d_ag_test_command!.deduction_for_wrong_return_code = 3;
         expect(get_validated_input_text(deduction_for_wrong_return_code_input)).toEqual('3');
     });
 
     test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await wrapper.vm.$nextTick();
 
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: 'deduction_for_wrong_return_code'}, '.save-button');
     });
 
     test('error - deduction_for_wrong_return_code must be >= 0', async () => {
-        component.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
+        await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'deduction_for_wrong_return_code'}, '-1', '.save-button');
@@ -497,71 +348,71 @@ describe('AGCommandSettings tests', () => {
         let expected_stdout_source_input = wrapper.find('#expected-stdout-source');
 
         expected_stdout_source_input.setValue(ExpectedOutputSource.none);
-        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_source).toEqual(
             ExpectedOutputSource.none
         );
 
         expected_stdout_source_input.setValue(ExpectedOutputSource.text);
-        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_source).toEqual(
             ExpectedOutputSource.text
         );
 
         expected_stdout_source_input.setValue(ExpectedOutputSource.instructor_file);
-        expect(component.d_ag_test_command!.expected_stdout_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_source).toEqual(
             ExpectedOutputSource.instructor_file
         );
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         expect_html_element_has_value(expected_stdout_source_input,
                                       ExpectedOutputSource.none);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         expect_html_element_has_value(expected_stdout_source_input,
                                       ExpectedOutputSource.text);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
         expect_html_element_has_value(expected_stdout_source_input,
                                       ExpectedOutputSource.instructor_file);
     });
 
     test('expected_stdout_text binding', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
 
         let expected_stdout_text = wrapper.find({ref: 'expected_stdout_text'});
         set_validated_input_text(expected_stdout_text, 'Not');
 
-        expect(component.d_ag_test_command!.expected_stdout_text).toEqual('Not');
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_text).toEqual('Not');
         expect(validated_input_is_valid(expected_stdout_text)).toEqual(true);
 
         set_validated_input_text(expected_stdout_text, '');
 
-        expect(component.d_ag_test_command!.expected_stdout_text).toEqual('');
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_text).toEqual('');
         expect(validated_input_is_valid(expected_stdout_text)).toEqual(true);
 
-        component.d_ag_test_command!.expected_stdout_text = 'Cot';
+        wrapper.vm.d_ag_test_command!.expected_stdout_text = 'Cot';
         expect(get_validated_input_text(expected_stdout_text)).toEqual('Cot');
     });
 
     test('expected_stdout_instructor_file binding', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        await wrapper.vm.$nextTick();
 
         let expected_stdout_instructor_file_input = wrapper.find(
             '#expected-stdout-instructor-file'
         );
         expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let dropdown_container_wrapper = wrapper.find('#dropdown-container');
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_2.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
             instructor_file_2
         );
         expect(expected_stdout_instructor_file_input.find(
@@ -569,17 +420,17 @@ describe('AGCommandSettings tests', () => {
         ).text()).toEqual(instructor_file_2.name);
 
         expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_3.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
             instructor_file_3
         );
         expect(expected_stdout_instructor_file_input.find(
@@ -587,7 +438,7 @@ describe('AGCommandSettings tests', () => {
         ).text()).toEqual(instructor_file_3.name);
 
         expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
@@ -595,9 +446,9 @@ describe('AGCommandSettings tests', () => {
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_1.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
             instructor_file_1
         );
         expect(expected_stdout_instructor_file_input.find(
@@ -606,61 +457,61 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('points_for_correct_stdout binding', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
 
         let points_for_correct_stdout_input = wrapper.find({ref: 'points_for_correct_stdout'});
 
         set_validated_input_text(points_for_correct_stdout_input, '21');
 
-        expect(component.d_ag_test_command!.points_for_correct_stdout).toEqual(21);
+        expect(wrapper.vm.d_ag_test_command!.points_for_correct_stdout).toEqual(21);
         expect(validated_input_is_valid(points_for_correct_stdout_input)).toEqual(true);
 
-        component.d_ag_test_command!.points_for_correct_stdout = 5;
+        wrapper.vm.d_ag_test_command!.points_for_correct_stdout = 5;
         expect(get_validated_input_text(points_for_correct_stdout_input)).toEqual('5');
     });
 
 
     test('error - points_for_correct_stdout is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: 'points_for_correct_stdout'}, '.save-button');
     });
 
     test('error - points_for_correct_stdout must be >= 0', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'points_for_correct_stdout'}, '-1', '.save-button');
     });
 
     test('deduction_for_wrong_stdout binding', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
 
         let deduction_for_wrong_stdout_input = wrapper.find({ref: 'deduction_for_wrong_stdout'});
 
         set_validated_input_text(deduction_for_wrong_stdout_input, '9');
 
-        expect(component.d_ag_test_command!.deduction_for_wrong_stdout).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_stdout).toEqual(9);
         expect(validated_input_is_valid(deduction_for_wrong_stdout_input)).toEqual(true);
 
-        component.d_ag_test_command!.deduction_for_wrong_stdout = 4;
+        wrapper.vm.d_ag_test_command!.deduction_for_wrong_stdout = 4;
         expect(get_validated_input_text(deduction_for_wrong_stdout_input)).toEqual('4');
     });
 
     test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: 'deduction_for_wrong_stdout'}, '.save-button');
     });
 
     test('error - deduction_for_wrong_stdout must be >= 0', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stdout_text = "Hi there";
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'deduction_for_wrong_stdout'}, '-1', '.save-button');
@@ -670,71 +521,71 @@ describe('AGCommandSettings tests', () => {
         let expected_stderr_source_input = wrapper.find('#expected-stderr-source');
 
         expected_stderr_source_input.setValue(ExpectedOutputSource.none);
-        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_source).toEqual(
             ExpectedOutputSource.none
         );
 
         expected_stderr_source_input.setValue(ExpectedOutputSource.text);
-        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_source).toEqual(
             ExpectedOutputSource.text
         );
 
         expected_stderr_source_input.setValue(ExpectedOutputSource.instructor_file);
-        expect(component.d_ag_test_command!.expected_stderr_source).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_source).toEqual(
             ExpectedOutputSource.instructor_file
         );
 
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
         expect_html_element_has_value(expected_stderr_source_input,
                                       ExpectedOutputSource.none);
 
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
         expect_html_element_has_value(expected_stderr_source_input,
                                       ExpectedOutputSource.text);
 
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
         expect_html_element_has_value(expected_stderr_source_input,
                                       ExpectedOutputSource.instructor_file);
     });
 
     test('expected_stderr_text binding', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         let expected_stderr_text = wrapper.find({ref: 'expected_stderr_text'});
         set_validated_input_text(expected_stderr_text, 'Rot');
 
-        expect(component.d_ag_test_command!.expected_stderr_text).toEqual('Rot');
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_text).toEqual('Rot');
         expect(validated_input_is_valid(expected_stderr_text)).toEqual(true);
 
         set_validated_input_text(expected_stderr_text, '');
 
-        expect(component.d_ag_test_command!.expected_stderr_text).toEqual('');
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_text).toEqual('');
         expect(validated_input_is_valid(expected_stderr_text)).toEqual(true);
 
-        component.d_ag_test_command!.expected_stderr_text = 'Jot';
+        wrapper.vm.d_ag_test_command!.expected_stderr_text = 'Jot';
         expect(get_validated_input_text(expected_stderr_text)).toEqual('Jot');
     });
 
     test('expected_stderr_instructor_file binding', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        await wrapper.vm.$nextTick();
 
         let expected_stderr_instructor_file_input = wrapper.find(
             '#expected-stderr-instructor-file'
         );
         expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let dropdown_container_wrapper = wrapper.find('#dropdown-container');
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_2.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
             instructor_file_2
         );
         expect(expected_stderr_instructor_file_input.find(
@@ -742,17 +593,17 @@ describe('AGCommandSettings tests', () => {
         ).text()).toEqual(instructor_file_2.name);
 
         expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_3.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
             instructor_file_3
         );
         expect(expected_stderr_instructor_file_input.find(
@@ -760,7 +611,7 @@ describe('AGCommandSettings tests', () => {
         ).text()).toEqual(instructor_file_3.name);
 
         expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
@@ -768,9 +619,9 @@ describe('AGCommandSettings tests', () => {
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(instructor_file_1.name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
+        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
             instructor_file_1
         );
         expect(expected_stderr_instructor_file_input.find(
@@ -779,64 +630,64 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('points_for_correct_stderr binding', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         let points_for_correct_stderr_input = wrapper.find({ref: 'points_for_correct_stderr'});
 
         set_validated_input_text(points_for_correct_stderr_input, '9');
 
-        expect(component.d_ag_test_command!.points_for_correct_stderr).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.points_for_correct_stderr).toEqual(9);
         expect(validated_input_is_valid(points_for_correct_stderr_input)).toEqual(true);
 
-        component.d_ag_test_command!.points_for_correct_stderr = 4;
+        wrapper.vm.d_ag_test_command!.points_for_correct_stderr = 4;
         expect(get_validated_input_text(points_for_correct_stderr_input)).toEqual('4');
     });
 
     test('error - points_for_correct_stderr is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stderr_text = "Hi there";
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_text = "Hi there";
+        await wrapper.vm.$nextTick();
 
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: 'points_for_correct_stderr'}, '.save-button');
     });
 
     test('error - points_for_correct_stderr must be >= 0', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stderr_text = "Hi there";
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_text = "Hi there";
+        await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'points_for_correct_stderr'}, '-1', '.save-button');
     });
 
     test('deduction_for_wrong_stderr binding', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         let deduction_for_wrong_stderr_input = wrapper.find({ref: 'deduction_for_wrong_stderr'});
 
         set_validated_input_text(deduction_for_wrong_stderr_input, '9');
 
-        expect(component.d_ag_test_command!.deduction_for_wrong_stderr).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_stderr).toEqual(9);
         expect(validated_input_is_valid(deduction_for_wrong_stderr_input)).toEqual(true);
 
-        component.d_ag_test_command!.deduction_for_wrong_stderr = 4;
+        wrapper.vm.d_ag_test_command!.deduction_for_wrong_stderr = 4;
         expect(get_validated_input_text(deduction_for_wrong_stderr_input)).toEqual('4');
     });
 
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stderr_text = "Hi there";
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_text = "Hi there";
+        await wrapper.vm.$nextTick();
 
         return do_input_blank_or_not_integer_test(
             wrapper, {ref: 'deduction_for_wrong_stderr'}, '.save-button');
     });
 
     test('error - deduction_for_wrong_stderr must be >= 0', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stderr_text = "Hi there";
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_text = "Hi there";
+        await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(
             wrapper, {ref: 'deduction_for_wrong_stderr'}, '-1', '.save-button');
@@ -845,139 +696,139 @@ describe('AGCommandSettings tests', () => {
     test('Diff options appear when expected_stdout_source !== none ' +
          'OR expected_stderr_source !== none',
          async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(0);
     });
 
     test('ignore_case binding', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
 
         let ignore_case = wrapper.find('#ignore-case');
 
         ignore_case.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_case).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_case).toBe(true);
         expect(checkbox_is_checked(ignore_case)).toEqual(true);
 
         ignore_case.setChecked(false);
-        expect(component.d_ag_test_command!.ignore_case).toBe(false);
+        expect(wrapper.vm.d_ag_test_command!.ignore_case).toBe(false);
         expect(checkbox_is_checked(ignore_case)).toEqual(false);
 
         ignore_case.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_case).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_case).toBe(true);
         expect(checkbox_is_checked(ignore_case)).toEqual(true);
 
-        component.d_ag_test_command!.ignore_case = false;
+        wrapper.vm.d_ag_test_command!.ignore_case = false;
         expect(checkbox_is_checked(ignore_case)).toBe(false);
 
-        component.d_ag_test_command!.ignore_case = true;
+        wrapper.vm.d_ag_test_command!.ignore_case = true;
         expect(checkbox_is_checked(ignore_case)).toBe(true);
     });
 
     test('ignore_whitespace binding', async () => {
-        component.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         let ignore_whitespace = wrapper.find('#ignore-whitespace');
 
         ignore_whitespace.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_whitespace).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_whitespace).toBe(true);
         expect(checkbox_is_checked(ignore_whitespace)).toEqual(true);
 
         ignore_whitespace.setChecked(false);
-        expect(component.d_ag_test_command!.ignore_whitespace).toBe(false);
+        expect(wrapper.vm.d_ag_test_command!.ignore_whitespace).toBe(false);
         expect(checkbox_is_checked(ignore_whitespace)).toEqual(false);
 
         ignore_whitespace.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_whitespace).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_whitespace).toBe(true);
         expect(checkbox_is_checked(ignore_whitespace)).toEqual(true);
 
-        component.d_ag_test_command!.ignore_whitespace = false;
+        wrapper.vm.d_ag_test_command!.ignore_whitespace = false;
         expect(checkbox_is_checked(ignore_whitespace)).toBe(false);
 
-        component.d_ag_test_command!.ignore_whitespace = true;
+        wrapper.vm.d_ag_test_command!.ignore_whitespace = true;
         expect(checkbox_is_checked(ignore_whitespace)).toBe(true);
     });
 
     test('ignore_whitespace_changes binding', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
 
         let ignore_whitespace_changes = wrapper.find('#ignore-whitespace-changes');
 
         ignore_whitespace_changes.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_whitespace_changes).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_whitespace_changes).toBe(true);
         expect(checkbox_is_checked(ignore_whitespace_changes)).toEqual(true);
 
         ignore_whitespace_changes.setChecked(false);
-        expect(component.d_ag_test_command!.ignore_whitespace_changes).toBe(false);
+        expect(wrapper.vm.d_ag_test_command!.ignore_whitespace_changes).toBe(false);
         expect(checkbox_is_checked(ignore_whitespace_changes)).toEqual(false);
 
         ignore_whitespace_changes.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_whitespace_changes).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_whitespace_changes).toBe(true);
         expect(checkbox_is_checked(ignore_whitespace_changes)).toEqual(true);
 
-        component.d_ag_test_command!.ignore_whitespace_changes = false;
+        wrapper.vm.d_ag_test_command!.ignore_whitespace_changes = false;
         expect(checkbox_is_checked(ignore_whitespace_changes)).toBe(false);
 
-        component.d_ag_test_command!.ignore_whitespace_changes = true;
+        wrapper.vm.d_ag_test_command!.ignore_whitespace_changes = true;
         expect(checkbox_is_checked(ignore_whitespace_changes)).toBe(true);
     });
 
     test('ignore_blank_lines binding', async () => {
-        component.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
         let ignore_blank_lines = wrapper.find('#ignore-blank-lines');
 
         ignore_blank_lines.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_blank_lines).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_blank_lines).toBe(true);
         expect(checkbox_is_checked(ignore_blank_lines)).toEqual(true);
 
         ignore_blank_lines.setChecked(false);
-        expect(component.d_ag_test_command!.ignore_blank_lines).toBe(false);
+        expect(wrapper.vm.d_ag_test_command!.ignore_blank_lines).toBe(false);
         expect(checkbox_is_checked(ignore_blank_lines)).toEqual(false);
 
         ignore_blank_lines.setChecked(true);
-        expect(component.d_ag_test_command!.ignore_blank_lines).toBe(true);
+        expect(wrapper.vm.d_ag_test_command!.ignore_blank_lines).toBe(true);
         expect(checkbox_is_checked(ignore_blank_lines)).toEqual(true);
 
-        component.d_ag_test_command!.ignore_blank_lines = false;
+        wrapper.vm.d_ag_test_command!.ignore_blank_lines = false;
         expect(checkbox_is_checked(ignore_blank_lines)).toBe(false);
 
-        component.d_ag_test_command!.ignore_blank_lines = true;
+        wrapper.vm.d_ag_test_command!.ignore_blank_lines = true;
         expect(checkbox_is_checked(ignore_blank_lines)).toBe(true);
     });
 
@@ -986,10 +837,10 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(time_limit_input, '9');
 
-        expect(component.d_ag_test_command!.time_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.time_limit).toEqual(9);
         expect(validated_input_is_valid(time_limit_input)).toEqual(true);
 
-        component.d_ag_test_command!.time_limit = 4;
+        wrapper.vm.d_ag_test_command!.time_limit = 4;
         expect(get_validated_input_text(time_limit_input)).toEqual('4');
     });
 
@@ -1006,10 +857,10 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(virtual_memory_limit_input, '9');
 
-        expect(component.d_ag_test_command!.virtual_memory_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.virtual_memory_limit).toEqual(9);
         expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
 
-        component.d_ag_test_command!.virtual_memory_limit = 4;
+        wrapper.vm.d_ag_test_command!.virtual_memory_limit = 4;
         expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
     });
 
@@ -1028,10 +879,10 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(stack_size_limit_input, '9');
 
-        expect(component.d_ag_test_command!.stack_size_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.stack_size_limit).toEqual(9);
         expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
 
-        component.d_ag_test_command!.stack_size_limit = 4;
+        wrapper.vm.d_ag_test_command!.stack_size_limit = 4;
         expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
     });
 
@@ -1050,10 +901,10 @@ describe('AGCommandSettings tests', () => {
 
         set_validated_input_text(process_spawn_limit_input, '9');
 
-        expect(component.d_ag_test_command!.process_spawn_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.process_spawn_limit).toEqual(9);
         expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
 
-        component.d_ag_test_command!.process_spawn_limit = 4;
+        wrapper.vm.d_ag_test_command!.process_spawn_limit = 4;
         expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
     });
 
@@ -1068,17 +919,17 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Save command settings - successful', async () => {
-        let save_stub = sinon.stub(component.d_ag_test_command!, 'save');
+        let save_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'save');
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#ag-test-command-settings-form').trigger('submit');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
     });
 
     test('Save command settings - unsuccessful', async () => {
-        let save_stub = sinon.stub(component.d_ag_test_command!, 'save');
+        let save_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'save');
         save_stub.returns(
             Promise.reject(
                 new HttpError(
@@ -1090,7 +941,7 @@ describe('AGCommandSettings tests', () => {
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#ag-test-command-settings-form').trigger('submit');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(save_stub.calledOnce).toBe(true);
 
@@ -1099,79 +950,317 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('Delete command', async () => {
-        wrapper.setProps({ag_test_case: case_with_two_commands});
+        let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
+        two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
 
-        let delete_command_stub = sinon.stub(component.d_ag_test_command!, 'delete');
+        wrapper.setProps({ag_test_case: two_cmd_test});
+
+        let delete_command_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'delete');
 
         wrapper.setData({d_current_tab_index: 2});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find('.delete-ag-test-command-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(delete_command_stub.calledOnce).toBe(true);
     });
 
     test('Delete case with exactly one command', async () => {
-        let delete_case_stub = sinon.stub(component.d_ag_test_case!, 'delete');
+        let delete_case_stub = sinon.stub(wrapper.vm.d_ag_test_case!, 'delete');
 
         wrapper.setData({d_current_tab_index: 2});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find('.delete-ag-test-command-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {
-        expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
+        expect(wrapper.vm.d_current_tab_index).toEqual(0);
 
-        wrapper.setProps({'ag_test_command': another_command});
-        await component.$nextTick();
+        let other_cmd = make_ag_test_command(ag_test_case.pk);
+        wrapper.setProps({'ag_test_command': other_cmd});
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.pk).toEqual(another_command.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_ag_test_command!.pk).toEqual(other_cmd.pk);
+        expect(wrapper.vm.d_current_tab_index).toEqual(0);
 
         wrapper.setData({d_current_tab_index: 2});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_current_tab_index).toEqual(2);
+        expect(wrapper.vm.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_command': ag_test_command});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
+        expect(wrapper.vm.d_current_tab_index).toEqual(0);
     });
 
     test('Parent component changes the value supplied to the test_case prop', async () => {
-        expect(component.d_ag_test_case!.pk).toEqual(ag_test_case.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_ag_test_case!.pk).toEqual(ag_test_case.pk);
+        expect(wrapper.vm.d_current_tab_index).toEqual(0);
 
-        wrapper.setProps({'ag_test_case': case_with_two_commands});
-        await component.$nextTick();
+        let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
+        two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
 
-        expect(component.d_ag_test_case!.pk).toEqual(case_with_two_commands.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+        wrapper.setProps({'ag_test_case': two_cmd_test});
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_case!.pk).toEqual(two_cmd_test.pk);
+        expect(wrapper.vm.d_current_tab_index).toEqual(0);
 
         wrapper.setData({d_current_tab_index: 2});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_current_tab_index).toEqual(2);
+        expect(wrapper.vm.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_case': ag_test_case});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
+        expect(wrapper.vm.d_current_tab_index).toEqual(0);
+    });
+});
+
+describe('AG test command feedback tests', () => {
+    test('Normal fdbk binding', () => {
+        ag_test_command.normal_fdbk_config = make_ag_test_command_fdbk_config({
+            show_actual_return_code: true,
+            show_whether_timed_out: false,
+        });
+
+        let wrapper = mount(AGCommandSettings, {
+            propsData: {
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
+                project: project
+            }
+        });
+
+        let normal_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
+        expect(normal_config_panel.vm.value).toEqual(ag_test_command.normal_fdbk_config);
+
+        let normal_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+                {ref: 'normal_edit_feedback_settings'});
+        expect(normal_advanced_settings.vm.value).toEqual(ag_test_command.normal_fdbk_config);
+
+        let new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: true,
+        });
+        normal_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.normal_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: false,
+        });
+        normal_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.normal_fdbk_config).toEqual(new_val);
+    });
+
+    test('First failure fdbk binding', () => {
+        ag_test_command.first_failed_test_normal_fdbk_config = make_ag_test_command_fdbk_config({
+            show_actual_return_code: true,
+            show_whether_timed_out: false,
+        });
+
+        let wrapper = mount(AGCommandSettings, {
+            propsData: {
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
+                project: project
+            }
+        });
+
+        let first_failure_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'first_failure_config_panel'});
+        expect(first_failure_config_panel.vm.value).toEqual(
+            ag_test_command.first_failed_test_normal_fdbk_config);
+
+        let first_failure_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+                {ref: 'first_failure_edit_feedback_settings'});
+        expect(first_failure_advanced_settings.vm.value).toEqual(
+            ag_test_command.first_failed_test_normal_fdbk_config);
+
+        let new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: true,
+        });
+        first_failure_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: false,
+        });
+        first_failure_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toEqual(new_val);
+    });
+
+    test('Final graded fdbk binding', () => {
+        ag_test_command.ultimate_submission_fdbk_config = make_ag_test_command_fdbk_config({
+            show_actual_return_code: true,
+            show_whether_timed_out: false,
+        });
+
+        let wrapper = mount(AGCommandSettings, {
+            propsData: {
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
+                project: project
+            }
+        });
+
+        let final_graded_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
+        expect(final_graded_config_panel.vm.value).toEqual(
+            ag_test_command.ultimate_submission_fdbk_config);
+
+        let final_graded_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+                {ref: 'final_graded_edit_feedback_settings'});
+        expect(final_graded_advanced_settings.vm.value).toEqual(
+            ag_test_command.ultimate_submission_fdbk_config);
+
+        let new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: true,
+        });
+        final_graded_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.ultimate_submission_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: false,
+        });
+        final_graded_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.ultimate_submission_fdbk_config).toEqual(new_val);
+    });
+
+    test('Past limit fdbk binding', () => {
+        ag_test_command.past_limit_submission_fdbk_config = make_ag_test_command_fdbk_config({
+            show_actual_return_code: true,
+            show_whether_timed_out: false,
+        });
+
+        let wrapper = mount(AGCommandSettings, {
+            propsData: {
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
+                project: project
+            }
+        });
+
+        let past_limit_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
+        expect(past_limit_config_panel.vm.value).toEqual(
+            ag_test_command.past_limit_submission_fdbk_config);
+
+        let past_limit_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+                {ref: 'past_limit_edit_feedback_settings'});
+        expect(past_limit_advanced_settings.vm.value).toEqual(
+            ag_test_command.past_limit_submission_fdbk_config);
+
+        let new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: true,
+        });
+        past_limit_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.past_limit_submission_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: false,
+        });
+        past_limit_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.past_limit_submission_fdbk_config).toEqual(new_val);
+    });
+
+    test('Student lookup fdbk binding', () => {
+        ag_test_command.staff_viewer_fdbk_config = make_ag_test_command_fdbk_config({
+            show_actual_return_code: true,
+            show_whether_timed_out: false,
+        });
+
+        let wrapper = mount(AGCommandSettings, {
+            propsData: {
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
+                project: project
+            }
+        });
+
+        let student_lookup_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
+        expect(student_lookup_config_panel.vm.value).toEqual(
+            ag_test_command.staff_viewer_fdbk_config);
+
+        let student_lookup_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+                {ref: 'student_lookup_edit_feedback_settings'});
+        expect(student_lookup_advanced_settings.vm.value).toEqual(
+            ag_test_command.staff_viewer_fdbk_config);
+
+        let new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: true,
+        });
+        student_lookup_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.staff_viewer_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_command_fdbk_config({
+            show_actual_return_code: false,
+            show_whether_timed_out: false,
+        });
+        student_lookup_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_command.staff_viewer_fdbk_config).toEqual(new_val);
+    });
+
+    test('Enable/disable first failure fdbk', async () => {
+        ag_test_command.first_failed_test_normal_fdbk_config = null;
+        let wrapper = mount(AGCommandSettings, {
+            propsData: {
+                ag_test_case: ag_test_case,
+                ag_test_command: ag_test_command,
+                project: project
+            }
+        });
+
+        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toBeNull();
+        let checkbox = wrapper.find('#first-failure-config-enabled');
+        expect(checkbox_is_checked(checkbox)).toBe(false);
+
+        checkbox.setChecked(true);
+        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toEqual({
+            visible: true,
+            return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+            stdout_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+            stderr_fdbk_level: ValueFeedbackLevel.expected_and_actual,
+            show_points: true,
+            show_actual_return_code: true,
+            show_actual_stdout: true,
+            show_actual_stderr: true,
+            show_whether_timed_out: true
+        });
+
+        checkbox.setChecked(false);
+        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toBeNull();
     });
 });
 
