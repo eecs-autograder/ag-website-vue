@@ -142,7 +142,7 @@ describe('FeedbackConfigAGCommand tests', () => {
 
     test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
         // FIXME: just fake something to emit the input event and make sure that we update our data
-
+        fail();
         expect(component.get_current_preset_fn(
             component.d_ag_test_command!.staff_viewer_fdbk_config,
             component.fdbk_presets
@@ -163,7 +163,7 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.fdbk_presets
         )).toEqual("Public");
         expect(component.get_current_preset_fn(
-            staff_viewer_edit_settings.d_ag_test_command_settings,
+            staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Public");
 
@@ -175,7 +175,7 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.fdbk_presets
         )).toEqual("Pass/Fail + Output");
         expect(component.get_current_preset_fn(
-            staff_viewer_edit_settings.d_ag_test_command_settings,
+            staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Output");
 
@@ -187,7 +187,7 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.fdbk_presets
         )).toEqual("Pass/Fail + Diff");
         expect(component.get_current_preset_fn(
-            staff_viewer_edit_settings.d_ag_test_command_settings,
+            staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Diff");
 
@@ -201,7 +201,7 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.fdbk_presets
         )).toEqual("Pass/Fail + Exit Status");
         expect(component.get_current_preset_fn(
-            staff_viewer_edit_settings.d_ag_test_command_settings,
+            staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail + Exit Status");
 
@@ -213,7 +213,7 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.fdbk_presets
         )).toEqual("Pass/Fail");
         expect(component.get_current_preset_fn(
-            staff_viewer_edit_settings.d_ag_test_command_settings,
+            staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail");
 
@@ -225,7 +225,7 @@ describe('FeedbackConfigAGCommand tests', () => {
             component.fdbk_presets
         )).toEqual("Private");
         expect(component.get_current_preset_fn(
-            staff_viewer_edit_settings.d_ag_test_command_settings,
+            staff_viewer_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Private");
     });

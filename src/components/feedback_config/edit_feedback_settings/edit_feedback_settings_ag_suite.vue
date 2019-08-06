@@ -1,33 +1,33 @@
 <template>
   <div class="edit-feedback">
-    <div id="edit-feedback-toggle-zone" v-if="d_ag_test_suite_settings !== null">
+    <div id="edit-feedback-toggle-zone" v-if="d_feedback_config !== null">
 
       <div class="non-advanced">
         <div class="checkbox-input-container">
           <input :id="`${hyphenate(config_name)}-visible`"
                  type="checkbox"
-                 @change="$emit('input', d_ag_test_suite_settings)"
+                 @change="$emit('input', d_feedback_config)"
                  class="checkbox"
-                 v-model="d_ag_test_suite_settings.visible">
+                 v-model="d_feedback_config.visible">
           <label :for="`${hyphenate(config_name)}-visible`"> Suite is Visible </label>
         </div>
       </div>
 
       <div class="advanced-settings-label" @click="toggle_is_open">
-        <i v-if="is_open" class="fas fa-caret-down caret-down"></i>
+        <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
         <i v-else class="fas fa-caret-right caret-right"></i>
         <span> Advanced Settings </span>
-        <div class="advanced-settings-divider" v-if="is_open"> </div>
+        <div class="advanced-settings-divider" v-if="d_is_open"> </div>
       </div>
 
-      <div v-if="is_open"
+      <div v-if="d_is_open"
            class="advanced-settings">
         <div class="checkbox-input-container">
           <input :id="`${hyphenate(config_name)}-show-individual-tests`"
                  type="checkbox"
-                 @change="$emit('input', d_ag_test_suite_settings)"
+                 @change="$emit('input', d_feedback_config)"
                  class="checkbox"
-                 v-model="d_ag_test_suite_settings.show_individual_tests">
+                 v-model="d_feedback_config.show_individual_tests">
           <label :for="`${hyphenate(config_name)}-show-individual-tests`"> Show Individual Tests
           </label>
         </div>
@@ -35,9 +35,9 @@
         <div class="checkbox-input-container">
           <input :id="`${hyphenate(config_name)}-show-setup-return-code`"
                  type="checkbox"
-                 @change="$emit('input', d_ag_test_suite_settings)"
+                 @change="$emit('input', d_feedback_config)"
                  class="checkbox"
-                 v-model="d_ag_test_suite_settings.show_setup_return_code">
+                 v-model="d_feedback_config.show_setup_return_code">
           <label :for="`${hyphenate(config_name)}-show-setup-return-code`"> Show Setup Return Code
           </label>
         </div>
@@ -45,9 +45,9 @@
         <div class="checkbox-input-container">
           <input :id="`${hyphenate(config_name)}-show-setup-timed-out`"
                  type="checkbox"
-                 @change="$emit('input', d_ag_test_suite_settings)"
+                 @change="$emit('input', d_feedback_config)"
                  class="checkbox"
-                 v-model="d_ag_test_suite_settings.show_setup_timed_out">
+                 v-model="d_feedback_config.show_setup_timed_out">
           <label :for="`${hyphenate(config_name)}-show-setup-timed-out`"> Show Setup Timed Out
           </label>
         </div>
@@ -55,9 +55,9 @@
         <div class="checkbox-input-container">
           <input :id="`${hyphenate(config_name)}-show-setup-stdout`"
                  type="checkbox"
-                 @change="$emit('input', d_ag_test_suite_settings)"
+                 @change="$emit('input', d_feedback_config)"
                  class="checkbox"
-                 v-model="d_ag_test_suite_settings.show_setup_stdout">
+                 v-model="d_feedback_config.show_setup_stdout">
           <label :for="`${hyphenate(config_name)}-show-setup-stdout`"> Show Setup Stdout
           </label>
         </div>
@@ -65,9 +65,9 @@
         <div class="checkbox-input-container">
           <input :id="`${hyphenate(config_name)}-show-setup-stderr`"
                  type="checkbox"
-                 @change="$emit('input', d_ag_test_suite_settings)"
+                 @change="$emit('input', d_feedback_config)"
                  class="checkbox"
-                 v-model="d_ag_test_suite_settings.show_setup_stderr">
+                 v-model="d_feedback_config.show_setup_stderr">
           <label :for="`${hyphenate(config_name)}-show-setup-stderr`"> Show Setup Stderr
           </label>
         </div>
@@ -96,27 +96,29 @@ export default class EditFeedbackSettingsAGSuite extends Vue {
   @Prop({required: true, type: Object})
   value!: AGTestSuiteFeedbackConfig | null;
 
-  d_ag_test_suite_settings: AGTestSuiteFeedbackConfig | null = null;
-  hyphenate = hyphenate;
-  is_open = false;
+  d_feedback_config: AGTestSuiteFeedbackConfig | null = null;
+  d_is_open = false;
+
+  readonly hyphenate = hyphenate;
 
   @Watch('value')
   on_value_changed(new_value: AGTestSuiteFeedbackConfig, old_value: AGTestSuiteFeedbackConfig) {
-    this.d_ag_test_suite_settings = JSON.parse(JSON.stringify(new_value));
+    this.d_feedback_config = JSON.parse(JSON.stringify(new_value));
   }
 
   toggle_is_open() {
-    this.is_open = !this.is_open;
+    this.d_is_open = !this.d_is_open;
   }
 
   created() {
-    this.d_ag_test_suite_settings = JSON.parse(JSON.stringify(this.value));
+    this.d_feedback_config = JSON.parse(JSON.stringify(this.value));
   }
 }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/components/feedback_config.scss';
+
 .divider {
   border-top: 1px solid darken($white-gray, 10);
   width: 100%;

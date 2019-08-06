@@ -75,6 +75,8 @@ describe('FeedbackConfigAGSuite tests', () => {
     });
 
     test("apply_preset called from config_panel - updates EditFeedbackSettings", async () => {
+        fail('Fake the input event');
+
         expect(component.get_current_preset_fn(
             component.d_ag_test_suite!.staff_viewer_fdbk_config, component.fdbk_presets
         )).toEqual("Custom");
@@ -94,7 +96,7 @@ describe('FeedbackConfigAGSuite tests', () => {
             component.fdbk_presets
         )).toEqual("Pass/Fail Setup");
         expect(component.get_current_preset_fn(
-            ultimate_submission_edit_settings.d_ag_test_suite_settings,
+            ultimate_submission_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Pass/Fail Setup");
 
@@ -108,7 +110,7 @@ describe('FeedbackConfigAGSuite tests', () => {
             component.fdbk_presets
         )).toEqual("Public Setup");
         expect(component.get_current_preset_fn(
-            ultimate_submission_edit_settings.d_ag_test_suite_settings,
+            ultimate_submission_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Public Setup");
 
@@ -122,7 +124,7 @@ describe('FeedbackConfigAGSuite tests', () => {
             component.fdbk_presets
         )).toEqual("Private Setup");
         expect(component.get_current_preset_fn(
-            ultimate_submission_edit_settings.d_ag_test_suite_settings,
+            ultimate_submission_edit_settings.d_feedback_config,
             component.fdbk_presets
         )).toEqual("Private Setup");
 
