@@ -15,7 +15,7 @@ import * as sinon from "sinon";
 import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
-import EditFeedbackSettingsAGSuite from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
+import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 
 import {
@@ -599,7 +599,7 @@ describe('AG test suite feedback tests', () => {
         expect(normal_config_panel.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
 
         let normal_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'normal_edit_feedback_settings'});
         expect(normal_advanced_settings.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
 
@@ -638,7 +638,7 @@ describe('AG test suite feedback tests', () => {
             ag_test_suite.ultimate_submission_fdbk_config);
 
         let final_graded_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'final_graded_edit_feedback_settings'});
         expect(final_graded_advanced_settings.vm.value).toEqual(
             ag_test_suite.ultimate_submission_fdbk_config);
@@ -678,7 +678,7 @@ describe('AG test suite feedback tests', () => {
             ag_test_suite.past_limit_submission_fdbk_config);
 
         let past_limit_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'past_limit_edit_feedback_settings'});
         expect(past_limit_advanced_settings.vm.value).toEqual(
             ag_test_suite.past_limit_submission_fdbk_config);
@@ -718,7 +718,7 @@ describe('AG test suite feedback tests', () => {
             ag_test_suite.staff_viewer_fdbk_config);
 
         let student_lookup_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'student_lookup_edit_feedback_settings'});
         expect(student_lookup_advanced_settings.vm.value).toEqual(
             ag_test_suite.staff_viewer_fdbk_config);

@@ -10,7 +10,7 @@ import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
-import AGCaseConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
+import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -144,7 +144,8 @@ describe('AG test case settings form tests', () => {
         await component.$nextTick();
 
         let past_limit_config_panel = wrapper.find({ref: 'past_limit'});
-        let past_limit_config_panel_component = <AGCaseConfigPanel>  past_limit_config_panel.vm;
+        let past_limit_config_panel_component
+            = <AGTestCaseFdbkConfigPanel>  past_limit_config_panel.vm;
 
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(false);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);

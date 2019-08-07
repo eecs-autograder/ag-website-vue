@@ -614,8 +614,8 @@
           </feedback-config-panel>
 
           <feedback-config-panel ref="student_lookup_config_panel"
-                        v-model="d_ag_test_command.staff_viewer_fdbk_config"
-                        :preset_options="fdbk_presets">
+                                 v-model="d_ag_test_command.staff_viewer_fdbk_config"
+                                 :preset_options="fdbk_presets">
             <template slot="header">
               <div class="config-name">
                 {{FeedbackConfigLabel.staff_viewer}}

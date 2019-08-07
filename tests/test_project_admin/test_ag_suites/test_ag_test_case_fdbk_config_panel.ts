@@ -2,7 +2,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
-import AGCaseConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
+import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
 
 import { make_ag_test_case_feedback_config } from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
@@ -11,15 +11,15 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('AGCaseConfigPanel tests', () => {
-    let wrapper: Wrapper<AGCaseConfigPanel>;
-    let component: AGCaseConfigPanel;
+describe('AGTestCaseFdbkConfigPanel tests', () => {
+    let wrapper: Wrapper<AGTestCaseFdbkConfigPanel>;
+    let component: AGTestCaseFdbkConfigPanel;
     let ag_test_case_normal_feedback_config: AGTestCaseFeedbackConfig;
 
     beforeEach(() => {
         ag_test_case_normal_feedback_config = make_ag_test_case_feedback_config();
 
-        wrapper = mount(AGCaseConfigPanel, {
+        wrapper = mount(AGTestCaseFdbkConfigPanel, {
             propsData: {
                 config_name: "Normal",
                 value: ag_test_case_normal_feedback_config,

@@ -170,10 +170,10 @@
                 </div>
               </template>
               <template slot="settings">
-                <EditFeedbackSettingsAGSuite ref="normal_edit_feedback_settings"
-                                             v-model="d_ag_test_suite.normal_fdbk_config"
-                                             :config_name="FeedbackConfigLabel.normal">
-                </EditFeedbackSettingsAGSuite>
+                <AGTestSuiteAdvancedFdbkSettings ref="normal_edit_feedback_settings"
+                                                 v-model="d_ag_test_suite.normal_fdbk_config"
+                                                 :config_name="FeedbackConfigLabel.normal">
+                </AGTestSuiteAdvancedFdbkSettings>
               </template>
             </feedback-config-panel>
 
@@ -191,11 +191,11 @@
                 </div>
               </template>
               <template slot="settings">
-                <EditFeedbackSettingsAGSuite
+                <AGTestSuiteAdvancedFdbkSettings
                   ref="final_graded_edit_feedback_settings"
                   v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
                   :config_name="FeedbackConfigLabel.ultimate_submission">
-                </EditFeedbackSettingsAGSuite>
+                </AGTestSuiteAdvancedFdbkSettings>
               </template>
             </feedback-config-panel>
 
@@ -213,11 +213,11 @@
                 </div>
               </template>
               <template slot="settings">
-                <EditFeedbackSettingsAGSuite
+                <AGTestSuiteAdvancedFdbkSettings
                   ref="past_limit_edit_feedback_settings"
                   v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
                   :config_name="FeedbackConfigLabel.past_limit">
-                </EditFeedbackSettingsAGSuite>
+                </AGTestSuiteAdvancedFdbkSettings>
               </template>
             </feedback-config-panel>
 
@@ -235,10 +235,10 @@
                 </div>
               </template>
               <template slot="settings">
-                <EditFeedbackSettingsAGSuite ref="student_lookup_edit_feedback_settings"
-                                             v-model="d_ag_test_suite.staff_viewer_fdbk_config"
-                                             :config_name="FeedbackConfigLabel.staff_viewer">
-                </EditFeedbackSettingsAGSuite>
+                <AGTestSuiteAdvancedFdbkSettings ref="student_lookup_edit_feedback_settings"
+                                                 v-model="d_ag_test_suite.staff_viewer_fdbk_config"
+                                                 :config_name="FeedbackConfigLabel.staff_viewer">
+                </AGTestSuiteAdvancedFdbkSettings>
               </template>
             </feedback-config-panel>
           </div>
@@ -318,7 +318,7 @@ import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
-import EditFeedbackSettingsAGSuite from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
+import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_utils';
 import Tab from '@/components/tabs/tab.vue';
@@ -338,7 +338,7 @@ import { is_not_empty } from '@/validators';
     FeedbackConfigPanel,
     Dropdown,
     DropdownTypeahead,
-    EditFeedbackSettingsAGSuite,
+    AGTestSuiteAdvancedFdbkSettings,
     Modal,
     Tab,
     TabHeader,

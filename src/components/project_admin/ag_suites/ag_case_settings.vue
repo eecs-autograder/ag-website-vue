@@ -17,9 +17,9 @@
 
           <div v-if="d_ag_test_case.ag_test_commands.length > 1"
                class="ag-case-feedback-panels">
-            <AGCaseConfigPanel ref="normal"
-                               v-model="d_ag_test_case.normal_fdbk_config"
-                               :config_name="FeedbackConfigLabel.normal">
+            <AGTestCaseFdbkConfigPanel ref="normal"
+                                       v-model="d_ag_test_case.normal_fdbk_config"
+                                       :config_name="FeedbackConfigLabel.normal">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.normal}}
@@ -30,11 +30,11 @@
                   </i>
                 </div>
               </template>
-            </AGCaseConfigPanel>
+            </AGTestCaseFdbkConfigPanel>
 
-            <AGCaseConfigPanel ref="final_graded"
-                               v-model="d_ag_test_case.ultimate_submission_fdbk_config"
-                               :config_name="FeedbackConfigLabel.ultimate_submission">
+            <AGTestCaseFdbkConfigPanel ref="final_graded"
+                                       v-model="d_ag_test_case.ultimate_submission_fdbk_config"
+                                       :config_name="FeedbackConfigLabel.ultimate_submission">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.ultimate_submission}}
@@ -45,11 +45,11 @@
                   </i>
                 </div>
               </template>
-            </AGCaseConfigPanel>
+            </AGTestCaseFdbkConfigPanel>
 
-            <AGCaseConfigPanel ref="past_limit"
-                               v-model="d_ag_test_case.past_limit_submission_fdbk_config"
-                               :config_name="FeedbackConfigLabel.past_limit">
+            <AGTestCaseFdbkConfigPanel ref="past_limit"
+                                       v-model="d_ag_test_case.past_limit_submission_fdbk_config"
+                                       :config_name="FeedbackConfigLabel.past_limit">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.past_limit}}
@@ -60,11 +60,11 @@
                   </i>
                 </div>
               </template>
-            </AGCaseConfigPanel>
+            </AGTestCaseFdbkConfigPanel>
 
-            <AGCaseConfigPanel ref="student_lookup"
-                               v-model="d_ag_test_case.staff_viewer_fdbk_config"
-                               :config_name="FeedbackConfigLabel.staff_viewer">
+            <AGTestCaseFdbkConfigPanel ref="student_lookup"
+                                       v-model="d_ag_test_case.staff_viewer_fdbk_config"
+                                       :config_name="FeedbackConfigLabel.staff_viewer">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.staff_viewer}}
@@ -75,7 +75,7 @@
                   </i>
                 </div>
               </template>
-            </AGCaseConfigPanel>
+            </AGTestCaseFdbkConfigPanel>
           </div>
 
         <div id="button-footer">
@@ -100,7 +100,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import AGCaseConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
+import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
 import { FeedbackConfigLabel, FeedbackDescriptions } from "@/components/project_admin/feedback_config_utils";
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -111,7 +111,7 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
-    AGCaseConfigPanel,
+    AGTestCaseFdbkConfigPanel,
     Tooltip,
     ValidatedForm,
     ValidatedInput

@@ -39,7 +39,7 @@ import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
 @Component({
   components: {FeedbackConfigPanel}
 })
-export default class AGCaseConfigPanel extends Vue {
+export default class AGTestCaseFdbkConfigPanel extends Vue {
   @Prop({required: true, type: String})
   config_name!: string;
 
