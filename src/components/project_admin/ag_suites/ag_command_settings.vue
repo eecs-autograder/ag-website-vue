@@ -513,9 +513,18 @@
         <legend class="legend"> Feedback </legend>
         <div class="config-panels-container">
           <config-panel ref="normal_config_panel"
-                        :config_name="FeedbackConfigLabel.normal"
                         v-model="d_ag_test_command.normal_fdbk_config"
                         :preset_options="fdbk_presets">
+            <template slot="header">
+              <div class="config-name">
+                {{FeedbackConfigLabel.normal}}
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="large" placement="right">
+                    {{FeedbackDescriptions.normal}}
+                  </tooltip>
+                </i>
+              </div>
+            </template>
             <template slot="settings">
               <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
                                              v-model="d_ag_test_command.normal_fdbk_config"
@@ -526,9 +535,18 @@
           </config-panel>
 
           <config-panel ref="first_failure_config_panel"
-                        :config_name="FeedbackConfigLabel.first_failure"
                         v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
                         :preset_options="fdbk_presets">
+            <template slot="header">
+              <div class="config-name">
+                {{FeedbackConfigLabel.first_failure}}
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="large" placement="right">
+                    {{FeedbackDescriptions.first_failure}}
+                  </tooltip>
+                </i>
+              </div>
+            </template>
             <template slot="settings">
               <div class="checkbox-input-container">
                 <input id="first-failure-config-enabled"
@@ -551,9 +569,18 @@
 
           <config-panel
             ref="final_graded_config_panel"
-            :config_name="FeedbackConfigLabel.ultimate_submission"
             v-model="d_ag_test_command.ultimate_submission_fdbk_config"
             :preset_options="fdbk_presets">
+            <template slot="header">
+              <div class="config-name">
+                {{FeedbackConfigLabel.ultimate_submission}}
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="large" placement="right">
+                    {{FeedbackDescriptions.ultimate_submission}}
+                  </tooltip>
+                </i>
+              </div>
+            </template>
             <template slot="settings">
               <EditFeedbackSettingsAGCommand
                 ref="final_graded_edit_feedback_settings"
@@ -565,9 +592,18 @@
           </config-panel>
 
           <config-panel ref="past_limit_config_panel"
-                        :config_name="FeedbackConfigLabel.past_limit"
                         v-model="d_ag_test_command.past_limit_submission_fdbk_config"
                         :preset_options="fdbk_presets">
+            <template slot="header">
+              <div class="config-name">
+                {{FeedbackConfigLabel.past_limit}}
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="large" placement="right">
+                    {{FeedbackDescriptions.past_limit}}
+                  </tooltip>
+                </i>
+              </div>
+            </template>
             <template slot="settings">
               <EditFeedbackSettingsAGCommand
                 ref="past_limit_edit_feedback_settings"
@@ -578,11 +614,19 @@
             </template>
           </config-panel>
 
-          <config-panel
-            ref="student_lookup_config_panel"
-            :config_name="FeedbackConfigLabel.staff_viewer"
-            v-model="d_ag_test_command.staff_viewer_fdbk_config"
-            :preset_options="fdbk_presets">
+          <config-panel ref="student_lookup_config_panel"
+                        v-model="d_ag_test_command.staff_viewer_fdbk_config"
+                        :preset_options="fdbk_presets">
+            <template slot="header">
+              <div class="config-name">
+                {{FeedbackConfigLabel.staff_viewer}}
+                <i class="fas fa-question-circle input-tooltip">
+                  <tooltip width="large" placement="right">
+                    {{FeedbackDescriptions.staff_viewer}}
+                  </tooltip>
+                </i>
+              </div>
+            </template>
             <template slot="settings">
               <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
                                              v-model="d_ag_test_command.staff_viewer_fdbk_config"
@@ -687,6 +731,7 @@ import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_fee
 import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
+  FeedbackDescriptions,
   hyphenate
 } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import Modal from '@/components/modal.vue';
@@ -743,6 +788,7 @@ export default class AGTestCommandSettings extends Vue {
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
+  readonly FeedbackDescriptions = FeedbackDescriptions;
   readonly format_datetime = format_datetime;
 
   @Watch('ag_test_command')

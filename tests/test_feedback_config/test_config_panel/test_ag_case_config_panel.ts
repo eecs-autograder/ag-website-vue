@@ -35,34 +35,34 @@ describe('AGCaseConfigPanel tests', () => {
     });
 
     test('Value Watcher', async () => {
-        expect(component.d_ag_test_case_settings).toEqual(ag_test_case_normal_feedback_config);
+        expect(component.d_feedback_config).toEqual(ag_test_case_normal_feedback_config);
 
         let another_ag_case_feedback = make_ag_test_case_feedback_config();
 
         wrapper.setProps({value: another_ag_case_feedback});
         await component.$nextTick();
 
-        expect(component.d_ag_test_case_settings).toEqual(another_ag_case_feedback);
+        expect(component.d_feedback_config).toEqual(another_ag_case_feedback);
     });
 
     test('visible binding', async () => {
         let visible_input = wrapper.find('#normal-visible');
 
         visible_input.setChecked(true);
-        expect(component.d_ag_test_case_settings!.visible).toEqual(true);
+        expect(component.d_feedback_config!.visible).toEqual(true);
 
         visible_input.setChecked(false);
-        expect(component.d_ag_test_case_settings!.visible).toEqual(false);
+        expect(component.d_feedback_config!.visible).toEqual(false);
 
         visible_input.setChecked(true);
-        expect(component.d_ag_test_case_settings!.visible).toEqual(true);
+        expect(component.d_feedback_config!.visible).toEqual(true);
 
         expect(checkbox_is_checked(visible_input)).toEqual(true);
 
-        component.d_ag_test_case_settings!.visible = false;
+        component.d_feedback_config!.visible = false;
         expect(checkbox_is_checked(visible_input)).toEqual(false);
 
-        component.d_ag_test_case_settings!.visible = true;
+        component.d_feedback_config!.visible = true;
         expect(checkbox_is_checked(visible_input)).toEqual(true);
     });
 
@@ -70,20 +70,20 @@ describe('AGCaseConfigPanel tests', () => {
         let show_individual_commands_input = wrapper.find('#normal-show-individual-commands');
 
         show_individual_commands_input.setChecked(true);
-        expect(component.d_ag_test_case_settings!.show_individual_commands).toEqual(true);
+        expect(component.d_feedback_config!.show_individual_commands).toEqual(true);
 
         show_individual_commands_input.setChecked(false);
-        expect(component.d_ag_test_case_settings!.show_individual_commands).toEqual(false);
+        expect(component.d_feedback_config!.show_individual_commands).toEqual(false);
 
         show_individual_commands_input.setChecked(true);
-        expect(component.d_ag_test_case_settings!.show_individual_commands).toEqual(true);
+        expect(component.d_feedback_config!.show_individual_commands).toEqual(true);
 
         expect(checkbox_is_checked(show_individual_commands_input)).toEqual(true);
 
-        component.d_ag_test_case_settings!.show_individual_commands = false;
+        component.d_feedback_config!.show_individual_commands = false;
         expect(checkbox_is_checked(show_individual_commands_input)).toEqual(false);
 
-        component.d_ag_test_case_settings!.show_individual_commands = true;
+        component.d_feedback_config!.show_individual_commands = true;
         expect(checkbox_is_checked(show_individual_commands_input)).toEqual(true);
     });
 });

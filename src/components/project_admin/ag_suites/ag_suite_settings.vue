@@ -157,9 +157,18 @@
           <legend class="legend">Feedback</legend>
           <div class="config-panels-container">
             <config-panel ref="normal_config_panel"
-                          :config_name="FeedbackConfigLabel.normal"
                           v-model="d_ag_test_suite.normal_fdbk_config"
                           :preset_options="fdbk_presets">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.normal}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.normal}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
               <template slot="settings">
                 <EditFeedbackSettingsAGSuite ref="normal_edit_feedback_settings"
                                              v-model="d_ag_test_suite.normal_fdbk_config"
@@ -169,9 +178,18 @@
             </config-panel>
 
             <config-panel ref="final_graded_config_panel"
-                          :config_name="FeedbackConfigLabel.ultimate_submission"
                           v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
                           :preset_options="fdbk_presets">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.ultimate_submission}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.ultimate_submission}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
               <template slot="settings">
                 <EditFeedbackSettingsAGSuite
                   ref="final_graded_edit_feedback_settings"
@@ -181,11 +199,19 @@
               </template>
             </config-panel>
 
-            <config-panel
-              ref="past_limit_config_panel"
-              :config_name="FeedbackConfigLabel.past_limit"
-              v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
-              :preset_options="fdbk_presets">
+            <config-panel ref="past_limit_config_panel"
+                          v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
+                          :preset_options="fdbk_presets">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.past_limit}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.past_limit}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
               <template slot="settings">
                 <EditFeedbackSettingsAGSuite
                   ref="past_limit_edit_feedback_settings"
@@ -199,6 +225,16 @@
                           :config_name="FeedbackConfigLabel.staff_viewer"
                           v-model="d_ag_test_suite.staff_viewer_fdbk_config"
                           :preset_options="fdbk_presets">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.staff_viewer}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.staff_viewer}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
               <template slot="settings">
                 <EditFeedbackSettingsAGSuite ref="student_lookup_edit_feedback_settings"
                                              v-model="d_ag_test_suite.staff_viewer_fdbk_config"
@@ -284,7 +320,7 @@ import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
-import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel } from '@/components/feedback_config/feedback_config/feedback_config_utils';
+import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/feedback_config/feedback_config/feedback_config_utils';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -334,6 +370,7 @@ export default class AGSuiteSettings extends Vue {
   d_settings_form_is_valid = true;
 
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
+  readonly FeedbackDescriptions = FeedbackDescriptions;
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 

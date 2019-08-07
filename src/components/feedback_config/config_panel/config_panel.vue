@@ -2,13 +2,13 @@
   <div id="config-panel">
 
     <div id="header">
-      <p id="config-name">{{config_name}}</p>
+      <slot name="header"></slot>
 
-      <div v-if="d_configuration !== null"
+      <div v-if="d_configuration !== null && preset_names.length"
            class="setting-selection-container">
         <span id="preset-label">Preset:</span>
         <select id="config-preset-select"
-                v-model="selected_preset_name"
+                v-model="d_selected_preset_name"
                 @change="change_preset"
                 class="select">
           <option hidden>Custom</option>
@@ -52,22 +52,18 @@ export type FeedbackConfigType = AGTestCommandFeedbackConfig
                                  | null;
 @Component
 export default class ConfigPanel extends Vue {
-  @Prop({required: true, type: String})
-  config_name!: string;
-
-  @Prop({required: false})
-  get_preset_fn!: (config_being_viewed: FeedbackConfigType,
-                   preset_options: SafeMap<string, FeedbackPresetType>) => string;
-
-  @Prop({required: true, type: SafeMap})
-  preset_options!: SafeMap<string, FeedbackPresetType>;
+  @Prop({default: null, type: SafeMap})
+  preset_options!: SafeMap<string, FeedbackPresetType> | null;
 
   @Prop({required: false, type: Object})
   value!: FeedbackConfigType | null;
 
   d_configuration: FeedbackConfigType | null = null;
   preset_names: string[] = [];
-  selected_preset_name: string = "Custom";
+  get selected_preset_name() {
+    return this.d_selected_preset_name;
+  }
+  d_selected_preset_name: string = "Custom";
 
   @Watch('value', {deep: true})
   on_value_changed(new_value: FeedbackConfigType, old_value: FeedbackConfigType) {
@@ -75,18 +71,24 @@ export default class ConfigPanel extends Vue {
   }
 
   created() {
-    for (let [preset_label, preset_settings] of this.preset_options) {
-      this.preset_names.push(preset_label);
+    if (this.preset_options !== null) {
+      for (let [preset_label, preset_settings] of this.preset_options) {
+        this.preset_names.push(preset_label);
+      }
     }
     this.set_d_configuration(this.value);
   }
 
   private set_d_configuration(feedback_config: FeedbackConfigType) {
     this.d_configuration = this.value === null ? null : JSON.parse(JSON.stringify(this.value));
-    this.selected_preset_name = this.detect_current_preset();
+    this.d_selected_preset_name = this.detect_current_preset();
   }
 
   private detect_current_preset(): string {
+    if (this.preset_options === null) {
+      return '';
+    }
+
     for (let [label, preset] of this.preset_options) {
       if (this.config_matches_preset(this.d_configuration, preset)) {
         return label;
@@ -114,7 +116,7 @@ export default class ConfigPanel extends Vue {
 
   private change_preset() {
     let updated_config = JSON.parse(JSON.stringify(this.d_configuration));
-    safe_assign(updated_config, this.preset_options.get(this.selected_preset_name));
+    safe_assign(updated_config, this.preset_options!.get(this.d_selected_preset_name));
     this.$emit('input', updated_config);
   }
 }
@@ -123,5 +125,37 @@ export default class ConfigPanel extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/components/feedback_config.scss';
+
+#config-panel {
+    margin-bottom: 10px;
+    box-shadow: 0 1px 1px $white-gray;
+    border-radius: 3px;
+    min-width: 600px;
+}
+
+#header {
+    background-color: hsl(220, 30%, 94%);
+    border: 2px solid hsl(220, 30%, 92%);
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 33px;
+    padding: 4px 4px 5px 10px;
+}
+
+#preset-label {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+#footer {
+    border: 2px solid hsl(210, 20%, 92%);
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background-color: white;
+    padding: 5px;
+}
 </style>

@@ -47,3 +47,33 @@ export function hyphenate(str: string) {
     let hyphenated_str = str.toLowerCase().replace(' ', '-');
     return hyphenated_str;
 }
+
+export class FeedbackDescriptions {
+    static normal = `
+        The feedback students get before the deadline has passed on submissions
+        within their daily limit.
+    `;
+
+    static first_failure = `
+        When enabled, this will override the "Normal" feedback settings for
+        the first failed test case of each suite in a students' submission.
+    `;
+
+    static ultimate_submission = `
+        The feedback students get after the deadline has passed and grades have
+        been published. Students will get this feedback ONLY on their
+        most recent or best submission, depending on which policy was chosen.
+    `;
+
+    static past_limit = `
+        The feedback students get on submissions that exceed their daily limit.
+        Note that "Final Graded" feedback takes precedence over this when applicable.
+    `;
+
+    static staff_viewer = `
+        The feedback staff get when viewing another user's submission.
+        Once the deadline has passed and grades have been published, staff will
+        be able to choose between this and "Final Graded" feedback when viewing
+        another user's final graded submission.
+    `;
+}

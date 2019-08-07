@@ -17,29 +17,64 @@
 
           <div v-if="d_ag_test_case.ag_test_commands.length > 1"
                class="ag-case-feedback-panels">
-            <AGCaseConfigPanel
-              ref="normal"
-              v-model="d_ag_test_case.normal_fdbk_config"
-              :config_name="FeedbackConfigLabel.normal">
+            <AGCaseConfigPanel ref="normal"
+                               v-model="d_ag_test_case.normal_fdbk_config"
+                               :config_name="FeedbackConfigLabel.normal">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.normal}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.normal}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
             </AGCaseConfigPanel>
 
-            <AGCaseConfigPanel
-              ref="final_graded"
-              v-model="d_ag_test_case.ultimate_submission_fdbk_config"
-              :config_name="FeedbackConfigLabel.ultimate_submission">
+            <AGCaseConfigPanel ref="final_graded"
+                               v-model="d_ag_test_case.ultimate_submission_fdbk_config"
+                               :config_name="FeedbackConfigLabel.ultimate_submission">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.ultimate_submission}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.ultimate_submission}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
             </AGCaseConfigPanel>
 
-
-            <AGCaseConfigPanel
-              ref="past_limit"
-              v-model="d_ag_test_case.past_limit_submission_fdbk_config"
-              :config_name="FeedbackConfigLabel.past_limit">
+            <AGCaseConfigPanel ref="past_limit"
+                               v-model="d_ag_test_case.past_limit_submission_fdbk_config"
+                               :config_name="FeedbackConfigLabel.past_limit">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.past_limit}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.past_limit}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
             </AGCaseConfigPanel>
 
-            <AGCaseConfigPanel
-              ref="student_lookup"
-              v-model="d_ag_test_case.staff_viewer_fdbk_config"
-              :config_name="FeedbackConfigLabel.staff_viewer">
+            <AGCaseConfigPanel ref="student_lookup"
+                               v-model="d_ag_test_case.staff_viewer_fdbk_config"
+                               :config_name="FeedbackConfigLabel.staff_viewer">
+              <template slot="header">
+                <div class="config-name">
+                  {{FeedbackConfigLabel.staff_viewer}}
+                  <i class="fas fa-question-circle input-tooltip">
+                    <tooltip width="large" placement="right">
+                      {{FeedbackDescriptions.staff_viewer}}
+                    </tooltip>
+                  </i>
+                </div>
+              </template>
             </AGCaseConfigPanel>
           </div>
 
@@ -66,7 +101,8 @@ import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case_config_panel.vue';
-import { FeedbackConfigLabel } from "@/components/feedback_config/feedback_config/feedback_config_utils";
+import { FeedbackConfigLabel, FeedbackDescriptions } from "@/components/feedback_config/feedback_config/feedback_config_utils";
+import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -76,6 +112,7 @@ import { is_not_empty } from '@/validators';
   components: {
     APIErrors,
     AGCaseConfigPanel,
+    Tooltip,
     ValidatedForm,
     ValidatedInput
   }
@@ -86,7 +123,8 @@ export default class AGCaseSettings extends Vue {
   ag_test_case!: AGTestCase;
 
   readonly is_not_empty = is_not_empty;
-  FeedbackConfigLabel = FeedbackConfigLabel;
+  readonly FeedbackConfigLabel = FeedbackConfigLabel;
+  readonly FeedbackDescriptions = FeedbackDescriptions;
 
   d_ag_test_case: AGTestCase | null = null;
   d_saving = false;
@@ -122,6 +160,7 @@ function handle_save_ag_test_case_settings_error(component: AGCaseSettings, erro
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/components/feedback_config.scss';
 
 #button-footer {
   margin: 12px 0 0 0;

@@ -23,9 +23,6 @@ describe('ConfigPanel tests', () => {
     let ag_test_suite_normal_feedback_config: AGTestSuiteFeedbackConfig;
     let ag_test_suite_default_config: AGTestSuiteFeedbackConfig;
     let ag_test_suite_fdbk_presets: SafeMap<string, AGTestSuiteFeedbackPreset>;
-    let get_current_preset_fn:
-        (config_being_viewed: AGTestSuiteFeedbackConfig,
-         preset_options: SafeMap<string, AGTestSuiteFeedbackPreset>) => string;
 
     beforeEach(() => {
         ag_test_suite_normal_feedback_config = make_ag_test_suite_fdbk_config();
@@ -62,26 +59,6 @@ describe('ConfigPanel tests', () => {
                 }
             ]
         ]);
-
-        get_current_preset_fn = function(
-            current_config: AGTestSuiteFeedbackConfig,
-            preset_options: SafeMap<string, AGTestSuiteFeedbackPreset>) {
-            for (let [preset_label, potential_match] of preset_options) {
-                if ((potential_match.show_individual_tests ===
-                     current_config.show_individual_tests) &&
-                    (potential_match.show_setup_return_code ===
-                     current_config.show_setup_return_code) &&
-                    (potential_match.show_setup_timed_out ===
-                     current_config.show_setup_timed_out) &&
-                    (potential_match.show_setup_stdout ===
-                     current_config.show_setup_stdout) &&
-                    (potential_match.show_setup_stderr ===
-                     current_config.show_setup_stderr)) {
-                    return preset_label;
-                }
-            }
-            return "Custom";
-        };
     });
 
     afterEach(() => {
@@ -93,8 +70,6 @@ describe('ConfigPanel tests', () => {
     test('created with value = null', () => {
         wrapper = mount(ConfigPanel, {
             propsData: {
-                config_name: FeedbackConfigLabel.normal,
-                get_preset_fn: get_current_preset_fn,
                 preset_options: ag_test_suite_fdbk_presets,
                 value: null
             }
@@ -108,8 +83,6 @@ describe('ConfigPanel tests', () => {
     test('selected_preset_name binding', async () => {
         wrapper = mount(ConfigPanel, {
             propsData: {
-                config_name: FeedbackConfigLabel.normal,
-                get_preset_fn: get_current_preset_fn,
                 preset_options: ag_test_suite_fdbk_presets,
                 value: ag_test_suite_normal_feedback_config
             }
@@ -143,7 +116,6 @@ describe('ConfigPanel tests', () => {
     test("Change preset", async () => {
         wrapper = mount(ConfigPanel, {
             propsData: {
-                config_name: FeedbackConfigLabel.normal,
                 preset_options: ag_test_suite_fdbk_presets,
                 value: ag_test_suite_normal_feedback_config
             }
@@ -206,8 +178,6 @@ describe('ConfigPanel tests', () => {
 
         wrapper = mount(ConfigPanel, {
             propsData: {
-                config_name: FeedbackConfigLabel.normal,
-                get_preset_fn: get_current_preset_fn,
                 preset_options: ag_test_suite_fdbk_presets,
                 value: public_setup_fdbk_config
             }
@@ -239,8 +209,6 @@ describe('ConfigPanel tests', () => {
     test('Value prop changed to a configuration that is null', async () => {
         wrapper = mount(ConfigPanel, {
             propsData: {
-                config_name: FeedbackConfigLabel.normal,
-                get_preset_fn: get_current_preset_fn,
                 preset_options: ag_test_suite_fdbk_presets,
                 value: ag_test_suite_normal_feedback_config
             }
@@ -255,5 +223,17 @@ describe('ConfigPanel tests', () => {
 
         expect(component.d_configuration).toEqual(null);
         expect(wrapper.findAll('#config-preset-select').length).toEqual(0);
+    });
+
+    test('Presets not provided, no preset dropdown', async () => {
+        wrapper = mount(ConfigPanel, {
+            propsData: {
+                preset_options: new SafeMap([]),
+                value: ag_test_suite_normal_feedback_config
+            }
+        });
+
+        expect(wrapper.exists()).toBe(true);
+        expect(wrapper.find('#config-preset-select').exists()).toBe(false);
     });
 });

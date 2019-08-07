@@ -146,16 +146,16 @@ describe('AG test case settings form tests', () => {
         let past_limit_config_panel = wrapper.find({ref: 'past_limit'});
         let past_limit_config_panel_component = <AGCaseConfigPanel>  past_limit_config_panel.vm;
 
-        expect(past_limit_config_panel_component.d_ag_test_case_settings!.visible).toBe(false);
+        expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(false);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);
 
         wrapper.find('#past-limit-visible').setChecked(true);
 
-        expect(past_limit_config_panel_component.d_ag_test_case_settings!.visible).toBe(true);
+        expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(true);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(true);
 
         expect(
-            past_limit_config_panel_component.d_ag_test_case_settings!.show_individual_commands
+            past_limit_config_panel_component.d_feedback_config!.show_individual_commands
         ).toBe(false);
         expect(
             component.d_ag_test_case!.past_limit_submission_fdbk_config.show_individual_commands
@@ -164,7 +164,7 @@ describe('AG test case settings form tests', () => {
         wrapper.find('#past-limit-show-individual-commands').setChecked(true);
 
         expect(
-            past_limit_config_panel_component.d_ag_test_case_settings!.show_individual_commands
+            past_limit_config_panel_component.d_feedback_config!.show_individual_commands
         ).toBe(true);
         expect(
             component.d_ag_test_case!.past_limit_submission_fdbk_config.show_individual_commands
