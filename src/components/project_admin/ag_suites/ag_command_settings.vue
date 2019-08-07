@@ -1,7 +1,7 @@
 <template>
   <div id="ag-test-command-settings-component" v-if="d_ag_test_command !== null">
 
-<!------------------------ Command Settings Tab ------------------------------------->
+<!------------------------ Command Settings ------------------------------------->
     <validated-form id="ag-test-command-settings-form"
                     autocomplete="off"
                     spellcheck="false"
@@ -621,8 +621,7 @@
 
     </validated-form>
 
-
-<!--------------------------- Danger Zone Tab --------------------------------------->
+<!--------------------------- Danger Zone --------------------------------------->
 
     <div id="danger-zone-container" class="section-container">
       <fieldset class="fieldset">
@@ -699,9 +698,6 @@ import {
   hyphenate
 } from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
 import Modal from '@/components/modal.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -721,9 +717,6 @@ import {
     Dropdown,
     EditFeedbackSettingsAGCommand,
     Modal,
-    Tab,
-    TabHeader,
-    Tabs,
     Tooltip,
     ValidatedForm,
     ValidatedInput
@@ -740,7 +733,6 @@ export default class AGCommandSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  d_current_tab_index = 0;
   d_ag_test_command: AGTestCommand | null = null;
   d_ag_test_case: AGTestCase | null = null;
 
@@ -764,18 +756,12 @@ export default class AGCommandSettings extends Vue {
   @Watch('ag_test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
     this.d_ag_test_command = deep_copy(new_test_command, AGTestCommand);
-    if (this.d_current_tab_index === 2) {
-      this.d_current_tab_index = 0;
-    }
   }
 
-  // deep needs to be here to pick up on the deletion of commands from the ag_suites component
+  // We need a deep watcher to pick up on the deletion of commands from the ag_suites component
   @Watch('ag_test_case', {deep: true})
   on_test_case_change(new_ag_test_case: AGTestCase, old_ag_test_case: AGTestCase) {
     this.d_ag_test_case = deep_copy(new_ag_test_case, AGTestCase);
-    if (this.d_current_tab_index === 2) {
-      this.d_current_tab_index = 0;
-    }
   }
 
   async created() {
@@ -921,9 +907,6 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
 @import '@/styles/components/feedback_config.scss';
 @import '@/styles/forms.scss';
 
-.tab-body {
-  padding: 15px;
-}
 
 .ag-test-command-input-container {
   padding: 10px 0 10px 3px;
