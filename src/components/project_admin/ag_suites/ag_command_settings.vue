@@ -10,9 +10,9 @@
       <div id="ag-test-command-name-container" v-if="!case_has_exactly_one_command">
         <label class="text-label"> Name </label>
         <validated-input ref="command_name"
-                          id="input-name"
-                          v-model="d_ag_test_command.name"
-                          :validators="[is_not_empty]">
+                         id="input-name"
+                         v-model="d_ag_test_command.name"
+                         :validators="[is_not_empty]">
         </validated-input>
       </div>
 
@@ -28,10 +28,10 @@
           </i>
         </label>
         <validated-input ref="cmd"
-                          id="input-cmd"
-                          v-model="d_ag_test_command.cmd"
-                          :num_rows="2"
-                          :validators="[is_not_empty]">
+                         id="input-cmd"
+                         v-model="d_ag_test_command.cmd"
+                         :num_rows="2"
+                         :validators="[is_not_empty]">
         </validated-input>
       </div>
 
@@ -65,10 +65,10 @@
               class="text-container">
           <label class="text-label"> Stdin source text: </label>
           <validated-input ref="stdin_text"
-                            placeholder="Enter the stdin input here."
-                            :num_rows="5"
-                            v-model="d_ag_test_command.stdin_text"
-                            :validators="[]">
+                           placeholder="Enter the stdin input here."
+                           :num_rows="5"
+                           v-model="d_ag_test_command.stdin_text"
+                           :validators="[]">
           </validated-input>
         </div>
 
@@ -128,15 +128,14 @@
             <label class="text-label"> Correct return code </label>
             <div>
               <validated-input ref="points_for_correct_return_code"
-                                v-model="d_ag_test_command.points_for_correct_return_code"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                input_style="width: 80px;"
-                                :from_string_fn="string_to_num">
+                               v-model="d_ag_test_command.points_for_correct_return_code"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               input_style="width: 80px;"
+                               :from_string_fn="string_to_num">
                 <div slot="prefix" class="plus-sign">
                   <i class="fas fa-plus"></i>
                 </div>
@@ -149,15 +148,15 @@
             <label class="text-label"> Wrong return code </label>
             <div>
               <validated-input ref="deduction_for_wrong_return_code"
-                                v-model="
-                                d_ag_test_command.deduction_for_wrong_return_code"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                input_style="width: 80px;"
-                                :from_string_fn="string_to_num">
+                               v-model="
+                               d_ag_test_command.deduction_for_wrong_return_code"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               input_style="width: 80px;"
+                               :from_string_fn="string_to_num">
                 <div slot="prefix" class="minus-sign">
                   <i class="fas fa-minus"></i>
                 </div>
@@ -194,10 +193,10 @@
               class="text-container">
           <label class="text-label"> Expected stdout text: </label>
           <validated-input ref="expected_stdout_text"
-                            placeholder="Enter the expected stdout output here."
-                            v-model="d_ag_test_command.expected_stdout_text"
-                            :num_rows="5"
-                            :validators="[]">
+                           placeholder="Enter the expected stdout output here."
+                           v-model="d_ag_test_command.expected_stdout_text"
+                           :num_rows="5"
+                           :validators="[]">
           </validated-input>
         </div>
 
@@ -237,14 +236,14 @@
             <label class="text-label"> Correct stdout </label>
             <div>
               <validated-input ref="points_for_correct_stdout"
-                                v-model="d_ag_test_command.points_for_correct_stdout"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                input_style="width: 80px;"
-                                :from_string_fn="string_to_num">
+                               v-model="d_ag_test_command.points_for_correct_stdout"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               input_style="width: 80px;"
+                               :from_string_fn="string_to_num">
                 <div slot="prefix" class="plus-sign">
                   <i class="fas fa-plus"></i>
                 </div>
@@ -258,14 +257,14 @@
 
             <div>
               <validated-input ref="deduction_for_wrong_stdout"
-                                v-model="d_ag_test_command.deduction_for_wrong_stdout"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                input_style="width: 80px;"
-                                :from_string_fn="string_to_num">
+                               v-model="d_ag_test_command.deduction_for_wrong_stdout"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               input_style="width: 80px;"
+                               :from_string_fn="string_to_num">
                 <div slot="prefix" class="minus-sign">
                   <i class="fas fa-minus"></i>
                 </div>
@@ -302,10 +301,10 @@
               class="text-container">
           <label class="text-label"> Expected stderr text: </label>
           <validated-input ref="expected_stderr_text"
-                            placeholder="Enter the expected stderr output here."
-                            v-model="d_ag_test_command.expected_stderr_text"
-                            :num_rows="5"
-                            :validators="[]">
+                           placeholder="Enter the expected stderr output here."
+                           v-model="d_ag_test_command.expected_stderr_text"
+                           :num_rows="5"
+                           :validators="[]">
           </validated-input>
         </div>
 
@@ -345,14 +344,14 @@
             <label class="text-label"> Correct stderr </label>
             <div>
               <validated-input ref="points_for_correct_stderr"
-                                v-model="d_ag_test_command.points_for_correct_stderr"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                input_style="width: 80px;"
-                                :from_string_fn="string_to_num">
+                               v-model="d_ag_test_command.points_for_correct_stderr"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               input_style="width: 80px;"
+                               :from_string_fn="string_to_num">
                 <div slot="prefix" class="plus-sign">
                   <i class="fas fa-plus"></i>
                 </div>
@@ -365,14 +364,14 @@
             <label class="text-label">  Wrong stderr </label>
             <div>
               <validated-input ref="deduction_for_wrong_stderr"
-                                v-model="d_ag_test_command.deduction_for_wrong_stderr"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                input_style="width: 80px;"
-                                :from_string_fn="string_to_num">
+                               v-model="d_ag_test_command.deduction_for_wrong_stderr"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               input_style="width: 80px;"
+                               :from_string_fn="string_to_num">
                 <div slot="prefix" class="minus-sign">
                   <i class="fas fa-minus"></i>
                 </div>
@@ -435,15 +434,15 @@
             <label class="text-label"> Time limit </label>
             <div class="resource-input">
               <validated-input ref="time_limit"
-                                id="input-time-limit"
-                                v-model="d_ag_test_command.time_limit"
-                                input_style="width: 150px;"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_one
-                                ]"
-                                :from_string_fn="string_to_num">
+                               id="input-time-limit"
+                               v-model="d_ag_test_command.time_limit"
+                               input_style="width: 150px;"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_one
+                               ]"
+                               :from_string_fn="string_to_num">
                 <div slot="suffix" class="unit-of-measurement"> seconds </div>
               </validated-input>
             </div>
@@ -453,15 +452,15 @@
             <label class="text-label"> Virtual memory limit </label>
             <div class="resource-input">
               <validated-input ref="virtual_memory_limit"
-                                id="input-virtual-memory-limit"
-                                v-model="d_ag_test_command.virtual_memory_limit"
-                                input_style="width: 150px;"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_one
-                                ]"
-                                :from_string_fn="string_to_num">
+                               id="input-virtual-memory-limit"
+                               v-model="d_ag_test_command.virtual_memory_limit"
+                               input_style="width: 150px;"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_one
+                               ]"
+                               :from_string_fn="string_to_num">
                 <div slot="suffix" class="unit-of-measurement"> bytes </div>
               </validated-input>
             </div>
@@ -474,15 +473,15 @@
             <label class="text-label"> Stack size limit </label>
             <div class="resource-input">
               <validated-input ref="stack_size_limit"
-                                id="input-stack-size-limit"
-                                v-model="d_ag_test_command.stack_size_limit"
-                                input_style="width: 150px;"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_one
-                                ]"
-                                :from_string_fn="string_to_num">
+                               id="input-stack-size-limit"
+                               v-model="d_ag_test_command.stack_size_limit"
+                               input_style="width: 150px;"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_one
+                               ]"
+                               :from_string_fn="string_to_num">
                 <div slot="suffix" class="unit-of-measurement"> bytes </div>
               </validated-input>
             </div>
@@ -492,15 +491,15 @@
             <label class="text-label"> Process spawn limit </label>
             <div class="resource-input">
               <validated-input ref="process_spawn_limit"
-                                id="input-process-spawn-limit"
-                                v-model="d_ag_test_command.process_spawn_limit"
-                                input_style="width: 150px;"
-                                :validators="[
-                                  is_not_empty,
-                                  is_integer,
-                                  is_greater_than_or_equal_to_zero
-                                ]"
-                                :from_string_fn="string_to_num">
+                               id="input-process-spawn-limit"
+                               v-model="d_ag_test_command.process_spawn_limit"
+                               input_style="width: 150px;"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_zero
+                               ]"
+                               :from_string_fn="string_to_num">
                 <div slot="suffix" class="unit-of-measurement"> child processes </div>
               </validated-input>
             </div>
@@ -509,98 +508,91 @@
         </div>
       </fieldset>
 
-<!------------------------ Feedback ------------------------------------->
-
+      <!------------------------ Feedback ------------------------------------->
       <fieldset class="fieldset">
         <legend class="legend"> Feedback </legend>
-        <div class="feedback-config-container">
-          <div class="inner">
-            <div class="config-panels-container">
+        <div class="config-panels-container">
+          <config-panel ref="normal_config_panel"
+                        :config_name="FeedbackConfigLabel.normal"
+                        v-model="d_ag_test_command.normal_fdbk_config"
+                        :preset_options="fdbk_presets">
+            <template slot="settings">
+              <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
+                                             v-model="d_ag_test_command.normal_fdbk_config"
+                                             :ag_test_case="ag_test_case"
+                                             :config_name="FeedbackConfigLabel.normal">
+              </EditFeedbackSettingsAGCommand>
+            </template>
+          </config-panel>
 
-              <config-panel ref="normal_config_panel"
-                            :config_name="FeedbackConfigLabel.normal"
-                            v-model="d_ag_test_command.normal_fdbk_config"
-                            :preset_options="fdbk_presets">
-                <template slot="settings">
-                  <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
-                                                v-model="d_ag_test_command.normal_fdbk_config"
-                                                :ag_test_case="ag_test_case"
-                                                :config_name="FeedbackConfigLabel.normal">
-                  </EditFeedbackSettingsAGCommand>
-                </template>
-              </config-panel>
+          <config-panel ref="first_failure_config_panel"
+                        :config_name="FeedbackConfigLabel.first_failure"
+                        v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+                        :preset_options="fdbk_presets">
+            <template slot="settings">
+              <div class="checkbox-input-container">
+                <input id="first-failure-config-enabled"
+                       type="checkbox"
+                       @change="toggle_first_failure_feedback"
+                       class="checkbox"
+                       v-model="d_first_failed_config_is_enabled">
+                <label for="first-failure-config-enabled">
+                  Enabled
+                </label>
+              </div>
+              <EditFeedbackSettingsAGCommand
+                ref="first_failure_edit_feedback_settings"
+                v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+                :ag_test_case="ag_test_case"
+                :config_name="FeedbackConfigLabel.first_failure">
+              </EditFeedbackSettingsAGCommand>
+            </template>
+          </config-panel>
 
-              <config-panel ref="first_failure_config_panel"
-                            :config_name="FeedbackConfigLabel.first_failure"
-                            v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                            :preset_options="fdbk_presets">
-                <template slot="settings">
-                  <div class="checkbox-input-container">
-                    <input id="first-failure-config-enabled"
-                          type="checkbox"
-                          @change="toggle_first_failure_feedback"
-                          class="checkbox"
-                          v-model="d_first_failed_config_is_enabled">
-                    <label for="first-failure-config-enabled">
-                      Enabled
-                    </label>
-                  </div>
-                  <EditFeedbackSettingsAGCommand
-                    ref="first_failure_edit_feedback_settings"
-                    v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                    :ag_test_case="ag_test_case"
-                    :config_name="FeedbackConfigLabel.first_failure">
-                  </EditFeedbackSettingsAGCommand>
-                </template>
-              </config-panel>
-
-              <config-panel
-                ref="final_graded_config_panel"
-                :config_name="FeedbackConfigLabel.ultimate_submission"
+          <config-panel
+            ref="final_graded_config_panel"
+            :config_name="FeedbackConfigLabel.ultimate_submission"
+            v-model="d_ag_test_command.ultimate_submission_fdbk_config"
+            :preset_options="fdbk_presets">
+            <template slot="settings">
+              <EditFeedbackSettingsAGCommand
+                ref="final_graded_edit_feedback_settings"
                 v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-                :preset_options="fdbk_presets">
-                <template slot="settings">
-                  <EditFeedbackSettingsAGCommand
-                    ref="final_graded_edit_feedback_settings"
-                    v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-                    :ag_test_case="ag_test_case"
-                    :config_name="FeedbackConfigLabel.ultimate_submission">
-                  </EditFeedbackSettingsAGCommand>
-                </template>
-              </config-panel>
+                :ag_test_case="ag_test_case"
+                :config_name="FeedbackConfigLabel.ultimate_submission">
+              </EditFeedbackSettingsAGCommand>
+            </template>
+          </config-panel>
 
-              <config-panel ref="past_limit_config_panel"
-                            :config_name="FeedbackConfigLabel.past_limit"
-                            v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                            :preset_options="fdbk_presets">
-                <template slot="settings">
-                  <EditFeedbackSettingsAGCommand
-                    ref="past_limit_edit_feedback_settings"
-                     v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                    :ag_test_case="ag_test_case"
-                    :config_name="FeedbackConfigLabel.past_limit">
-                  </EditFeedbackSettingsAGCommand>
-                </template>
-              </config-panel>
+          <config-panel ref="past_limit_config_panel"
+                        :config_name="FeedbackConfigLabel.past_limit"
+                        v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+                        :preset_options="fdbk_presets">
+            <template slot="settings">
+              <EditFeedbackSettingsAGCommand
+                ref="past_limit_edit_feedback_settings"
+                  v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+                :ag_test_case="ag_test_case"
+                :config_name="FeedbackConfigLabel.past_limit">
+              </EditFeedbackSettingsAGCommand>
+            </template>
+          </config-panel>
 
-              <config-panel
-                ref="student_lookup_config_panel"
-                :config_name="FeedbackConfigLabel.staff_viewer"
-                v-model="d_ag_test_command.staff_viewer_fdbk_config"
-                :preset_options="fdbk_presets">
-                <template slot="settings">
-                  <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
-                                                v-model="d_ag_test_command.staff_viewer_fdbk_config"
-                                                :ag_test_case="ag_test_case"
-                                                 :config_name="FeedbackConfigLabel.staff_viewer">
-                  </EditFeedbackSettingsAGCommand>
-                </template>
-              </config-panel>
-            </div>
-
-          </div>
-
+          <config-panel
+            ref="student_lookup_config_panel"
+            :config_name="FeedbackConfigLabel.staff_viewer"
+            v-model="d_ag_test_command.staff_viewer_fdbk_config"
+            :preset_options="fdbk_presets">
+            <template slot="settings">
+              <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
+                                             v-model="d_ag_test_command.staff_viewer_fdbk_config"
+                                             :ag_test_case="ag_test_case"
+                                             :config_name="FeedbackConfigLabel.staff_viewer">
+              </EditFeedbackSettingsAGCommand>
+            </template>
+          </config-panel>
         </div>
+
       </fieldset>
 
       <div class="bottom-of-form">
@@ -623,7 +615,7 @@
 
 <!--------------------------- Danger Zone --------------------------------------->
 
-    <div id="danger-zone-container" class="section-container">
+    <div id="danger-zone-container">
       <fieldset class="fieldset">
         <legend class="legend">Danger Zone</legend>
         <button class="delete-ag-test-command-button"
@@ -680,12 +672,12 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
   AGTestCase,
   AGTestCommand,
+  AGTestCommandFeedbackConfig,
   ExpectedOutputSource,
   ExpectedReturnCode,
   Project,
   StdinSource,
   ValueFeedbackLevel,
-  AGTestCommandFeedbackConfig
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -722,7 +714,7 @@ import {
     ValidatedInput
   }
 })
-export default class AGCommandSettings extends Vue {
+export default class AGTestCommandSettings extends Vue {
 
   @Prop({required: true, type: AGTestCommand})
   ag_test_command!: AGTestCommand;
@@ -895,7 +887,7 @@ export default class AGCommandSettings extends Vue {
   ]);
 }
 
-function handle_save_ag_command_settings_error(component: AGCommandSettings, error: unknown) {
+function handle_save_ag_command_settings_error(component: AGTestCommandSettings, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
@@ -1023,8 +1015,8 @@ function handle_save_ag_command_settings_error(component: AGCommandSettings, err
   }
 
   .delete-ag-test-command-button {
-    margin-top: 10px;
     @extend .delete-level-button;
+    margin-top: 10px;
   }
 }
 

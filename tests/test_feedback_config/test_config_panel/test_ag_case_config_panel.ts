@@ -4,7 +4,7 @@ import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
 import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case_config_panel.vue';
 
-import { create_ag_case_feedback_config } from '@/tests/data_utils';
+import { make_ag_test_case_feedback_config } from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
 
 beforeAll(() => {
@@ -17,7 +17,7 @@ describe('AGCaseConfigPanel tests', () => {
     let ag_test_case_normal_feedback_config: AGTestCaseFeedbackConfig;
 
     beforeEach(() => {
-        ag_test_case_normal_feedback_config = create_ag_case_feedback_config();
+        ag_test_case_normal_feedback_config = make_ag_test_case_feedback_config();
 
         wrapper = mount(AGCaseConfigPanel, {
             propsData: {
@@ -37,7 +37,7 @@ describe('AGCaseConfigPanel tests', () => {
     test('Value Watcher', async () => {
         expect(component.d_ag_test_case_settings).toEqual(ag_test_case_normal_feedback_config);
 
-        let another_ag_case_feedback = create_ag_case_feedback_config();
+        let another_ag_case_feedback = make_ag_test_case_feedback_config();
 
         wrapper.setProps({value: another_ag_case_feedback});
         await component.$nextTick();

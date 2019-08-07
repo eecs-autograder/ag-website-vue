@@ -5,6 +5,7 @@ import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
 import {
     AGTestCase,
     AGTestCommand,
+    AGTestSuite,
     ExpectedOutputSource,
     ExpectedReturnCode,
     HttpError,
@@ -12,15 +13,22 @@ import {
     Project,
     StdinSource,
     ValueFeedbackLevel,
-    AGTestSuite,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
 import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
-import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
+import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 
+import {
+    make_ag_test_case,
+    make_ag_test_command,
+    make_ag_test_command_fdbk_config,
+    make_ag_test_suite,
+    make_course,
+    make_project,
+} from '@/tests/data_utils';
 import {
     checkbox_is_checked,
     expect_html_element_has_value,
@@ -28,7 +36,6 @@ import {
     set_validated_input_text,
     validated_input_is_valid
 } from '@/tests/utils';
-import { make_ag_test_command_fdbk_config, make_ag_test_command, make_ag_test_suite, make_project, make_ag_test_case, make_course } from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -78,11 +85,11 @@ beforeEach(() => {
     ag_test_case.ag_test_commands = [ag_test_command];
 });
 
-describe('AGCommandSettings tests', () => {
-    let wrapper: Wrapper<AGCommandSettings>;
+describe('AGTestCommandSettings tests', () => {
+    let wrapper: Wrapper<AGTestCommandSettings>;
 
     beforeEach(() => {
-        wrapper = mount(AGCommandSettings, {
+        wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -367,7 +374,8 @@ describe('AGCommandSettings tests', () => {
         expect_html_element_has_value(expected_stdout_source_input,
                                       ExpectedOutputSource.text);
 
-        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source
+            = ExpectedOutputSource.instructor_file;
         expect_html_element_has_value(expected_stdout_source_input,
                                       ExpectedOutputSource.instructor_file);
     });
@@ -391,7 +399,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('expected_stdout_instructor_file binding', async () => {
-        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source
+            = ExpectedOutputSource.instructor_file;
         await wrapper.vm.$nextTick();
 
         let expected_stdout_instructor_file_input = wrapper.find(
@@ -540,7 +549,8 @@ describe('AGCommandSettings tests', () => {
         expect_html_element_has_value(expected_stderr_source_input,
                                       ExpectedOutputSource.text);
 
-        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source
+            = ExpectedOutputSource.instructor_file;
         expect_html_element_has_value(expected_stderr_source_input,
                                       ExpectedOutputSource.instructor_file);
     });
@@ -564,7 +574,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('expected_stderr_instructor_file binding', async () => {
-        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source
+            = ExpectedOutputSource.instructor_file;
         await wrapper.vm.$nextTick();
 
         let expected_stderr_instructor_file_input = wrapper.find(
@@ -693,18 +704,22 @@ describe('AGCommandSettings tests', () => {
     test('Diff options appear when expected_stdout_source !== none ' +
          'OR expected_stderr_source !== none',
          async () => {
-        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source
+            = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source
+            = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
-        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
-        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source
+            = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source
+            = ExpectedOutputSource.instructor_file;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
@@ -724,7 +739,8 @@ describe('AGCommandSettings tests', () => {
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
-        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source
+            = ExpectedOutputSource.instructor_file;
 
         expect(wrapper.findAll('.diff-options').length).toEqual(1);
 
@@ -735,7 +751,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('ignore_case binding', async () => {
-        wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stderr_source
+            = ExpectedOutputSource.instructor_file;
 
         let ignore_case = wrapper.find('#ignore-case');
 
@@ -807,7 +824,8 @@ describe('AGCommandSettings tests', () => {
     });
 
     test('ignore_blank_lines binding', async () => {
-        wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.instructor_file;
+        wrapper.vm.d_ag_test_command!.expected_stdout_source
+            = ExpectedOutputSource.instructor_file;
         let ignore_blank_lines = wrapper.find('#ignore-blank-lines');
 
         ignore_blank_lines.setChecked(true);
@@ -953,8 +971,6 @@ describe('AGCommandSettings tests', () => {
         wrapper.setProps({ag_test_case: two_cmd_test});
 
         let delete_command_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'delete');
-
-        wrapper.setData({d_current_tab_index: 2});
         await wrapper.vm.$nextTick();
 
         wrapper.find('.delete-ag-test-command-button').trigger('click');
@@ -968,8 +984,6 @@ describe('AGCommandSettings tests', () => {
 
     test('Delete case with exactly one command', async () => {
         let delete_case_stub = sinon.stub(wrapper.vm.d_ag_test_case!, 'delete');
-
-        wrapper.setData({d_current_tab_index: 2});
         await wrapper.vm.$nextTick();
 
         wrapper.find('.delete-ag-test-command-button').trigger('click');
@@ -983,30 +997,21 @@ describe('AGCommandSettings tests', () => {
 
     test('Parent component changes the value supplied to the test_command prop', async () => {
         expect(wrapper.vm.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(wrapper.vm.d_current_tab_index).toEqual(0);
 
         let other_cmd = make_ag_test_command(ag_test_case.pk);
         wrapper.setProps({'ag_test_command': other_cmd});
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.pk).toEqual(other_cmd.pk);
-        expect(wrapper.vm.d_current_tab_index).toEqual(0);
-
-        wrapper.setData({d_current_tab_index: 2});
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_command': ag_test_command});
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(wrapper.vm.d_current_tab_index).toEqual(0);
     });
 
     test('Parent component changes the value supplied to the test_case prop', async () => {
         expect(wrapper.vm.d_ag_test_case!.pk).toEqual(ag_test_case.pk);
-        expect(wrapper.vm.d_current_tab_index).toEqual(0);
 
         let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
         two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
@@ -1015,18 +1020,11 @@ describe('AGCommandSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_case!.pk).toEqual(two_cmd_test.pk);
-        expect(wrapper.vm.d_current_tab_index).toEqual(0);
-
-        wrapper.setData({d_current_tab_index: 2});
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_case': ag_test_case});
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.pk).toEqual(ag_test_command.pk);
-        expect(wrapper.vm.d_current_tab_index).toEqual(0);
     });
 });
 
@@ -1037,7 +1035,7 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: false,
         });
 
-        let wrapper = mount(AGCommandSettings, {
+        let wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -1059,14 +1057,14 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: true,
         });
         normal_config_panel.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.normal_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.normal_fdbk_config).toEqual(new_val);
 
         new_val = make_ag_test_command_fdbk_config({
             show_actual_return_code: false,
             show_whether_timed_out: false,
         });
         normal_advanced_settings.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.normal_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.normal_fdbk_config).toEqual(new_val);
     });
 
     test('First failure fdbk binding', () => {
@@ -1075,7 +1073,7 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: false,
         });
 
-        let wrapper = mount(AGCommandSettings, {
+        let wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -1099,14 +1097,14 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: true,
         });
         first_failure_config_panel.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.first_failed_test_normal_fdbk_config).toEqual(new_val);
 
         new_val = make_ag_test_command_fdbk_config({
             show_actual_return_code: false,
             show_whether_timed_out: false,
         });
         first_failure_advanced_settings.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.first_failed_test_normal_fdbk_config).toEqual(new_val);
     });
 
     test('Final graded fdbk binding', () => {
@@ -1115,7 +1113,7 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: false,
         });
 
-        let wrapper = mount(AGCommandSettings, {
+        let wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -1139,14 +1137,14 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: true,
         });
         final_graded_config_panel.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.ultimate_submission_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.ultimate_submission_fdbk_config).toEqual(new_val);
 
         new_val = make_ag_test_command_fdbk_config({
             show_actual_return_code: false,
             show_whether_timed_out: false,
         });
         final_graded_advanced_settings.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.ultimate_submission_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.ultimate_submission_fdbk_config).toEqual(new_val);
     });
 
     test('Past limit fdbk binding', () => {
@@ -1155,7 +1153,7 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: false,
         });
 
-        let wrapper = mount(AGCommandSettings, {
+        let wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -1179,14 +1177,14 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: true,
         });
         past_limit_config_panel.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.past_limit_submission_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.past_limit_submission_fdbk_config).toEqual(new_val);
 
         new_val = make_ag_test_command_fdbk_config({
             show_actual_return_code: false,
             show_whether_timed_out: false,
         });
         past_limit_advanced_settings.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.past_limit_submission_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.past_limit_submission_fdbk_config).toEqual(new_val);
     });
 
     test('Student lookup fdbk binding', () => {
@@ -1195,7 +1193,7 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: false,
         });
 
-        let wrapper = mount(AGCommandSettings, {
+        let wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -1219,19 +1217,19 @@ describe('AG test command feedback tests', () => {
             show_whether_timed_out: true,
         });
         student_lookup_config_panel.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.staff_viewer_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.staff_viewer_fdbk_config).toEqual(new_val);
 
         new_val = make_ag_test_command_fdbk_config({
             show_actual_return_code: false,
             show_whether_timed_out: false,
         });
         student_lookup_advanced_settings.vm.$emit('input', new_val);
-        expect(wrapper.vm.d_ag_test_command.staff_viewer_fdbk_config).toEqual(new_val);
+        expect(wrapper.vm.d_ag_test_command!.staff_viewer_fdbk_config).toEqual(new_val);
     });
 
     test('Enable/disable first failure fdbk', async () => {
         ag_test_command.first_failed_test_normal_fdbk_config = null;
-        let wrapper = mount(AGCommandSettings, {
+        let wrapper = mount(AGTestCommandSettings, {
             propsData: {
                 ag_test_case: ag_test_case,
                 ag_test_command: ag_test_command,
@@ -1239,12 +1237,12 @@ describe('AG test command feedback tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toBeNull();
+        expect(wrapper.vm.d_ag_test_command!.first_failed_test_normal_fdbk_config).toBeNull();
         let checkbox = wrapper.find('#first-failure-config-enabled');
         expect(checkbox_is_checked(checkbox)).toBe(false);
 
         checkbox.setChecked(true);
-        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toEqual({
+        expect(wrapper.vm.d_ag_test_command!.first_failed_test_normal_fdbk_config).toEqual({
             visible: true,
             return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
             stdout_fdbk_level: ValueFeedbackLevel.expected_and_actual,
@@ -1257,7 +1255,7 @@ describe('AG test command feedback tests', () => {
         });
 
         checkbox.setChecked(false);
-        expect(wrapper.vm.d_ag_test_command.first_failed_test_normal_fdbk_config).toBeNull();
+        expect(wrapper.vm.d_ag_test_command!.first_failed_test_normal_fdbk_config).toBeNull();
     });
 });
 

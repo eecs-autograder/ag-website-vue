@@ -10,7 +10,7 @@ import {
 import { SafeMap } from '@/safe_map';
 
 import {
-    create_ag_suite_feedback_config
+    make_ag_test_suite_fdbk_config
 } from '@/tests/data_utils';
 
 beforeAll(() => {
@@ -28,8 +28,8 @@ describe('ConfigPanel tests', () => {
          preset_options: SafeMap<string, AGTestSuiteFeedbackPreset>) => string;
 
     beforeEach(() => {
-        ag_test_suite_normal_feedback_config = create_ag_suite_feedback_config();
-        ag_test_suite_default_config = create_ag_suite_feedback_config();
+        ag_test_suite_normal_feedback_config = make_ag_test_suite_fdbk_config();
+        ag_test_suite_default_config = make_ag_test_suite_fdbk_config();
         ag_test_suite_fdbk_presets = new SafeMap<string, AGTestSuiteFeedbackPreset>([
             [
                 'Public Setup',

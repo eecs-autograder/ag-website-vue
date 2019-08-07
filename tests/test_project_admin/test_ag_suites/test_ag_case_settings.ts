@@ -3,7 +3,8 @@ import { mount, Wrapper } from '@vue/test-utils';
 import {
     AGTestCase,
     AGTestCaseFeedbackConfig,
-    HttpError
+    AGTestSuite,
+    HttpError,
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
@@ -12,7 +13,7 @@ import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { create_ag_case, create_ag_command } from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -22,6 +23,7 @@ import {
 describe('AG test case settings form tests', () => {
     let wrapper: Wrapper<AGCaseSettings>;
     let component: AGCaseSettings;
+    let ag_test_suite: AGTestSuite;
     let ag_case: AGTestCase;
     let ag_case_with_multiple_commands: AGTestCase;
     let default_case_feedback_config: AGTestCaseFeedbackConfig;
@@ -32,22 +34,14 @@ describe('AG test case settings form tests', () => {
             show_individual_commands: false
         };
 
-        ag_case = new AGTestCase({
-            pk: 1,
-            name: "Case 1",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
+        ag_test_suite = data_ut.make_ag_test_suite(
+            data_ut.make_project(data_ut.make_course().pk).pk);
+        ag_case = data_ut.make_ag_test_case(ag_test_suite.pk);
 
-        ag_case_with_multiple_commands = create_ag_case(2, "Case 2", 1);
+        ag_case_with_multiple_commands = data_ut.make_ag_test_case(ag_test_suite.pk);
         ag_case_with_multiple_commands.ag_test_commands = [
-            create_ag_command(40, "Command 40", 2),
-            create_ag_command(50, "Command 50", 2)
+            data_ut.make_ag_test_command(ag_case_with_multiple_commands.pk),
+            data_ut.make_ag_test_command(ag_case_with_multiple_commands.pk),
         ];
 
         wrapper = mount(AGCaseSettings, {
@@ -131,9 +125,9 @@ describe('AG test case settings form tests', () => {
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(2);
         expect(wrapper.findAll('.ag-case-feedback-panels').length).toEqual(1);
 
-        let case_3 = create_ag_case(2, "Case 3", 1);
+        let case_3 = data_ut.make_ag_test_case(ag_test_suite.pk);
         case_3.ag_test_commands = [
-            create_ag_command(60, "Command 60", 3)
+            data_ut.make_ag_test_command(case_3.pk)
         ];
 
         wrapper.setProps({ag_test_case: case_3});

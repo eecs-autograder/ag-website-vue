@@ -1,253 +1,268 @@
 <template>
   <div id="ag-test-suite-settings-component" v-if="d_ag_test_suite !== null">
     <div v-if="!d_loading">
-      <tabs ref="tabs-gray"
-            v-model="d_current_tab_index"
-            tab_active_class="white-theme-active"
-            tab_inactive_class="white-theme-inactive">
+      <!------------------------ Suite Settings ------------------------------------->
 
-        <!------------------------ Suite Settings Tab ------------------------------------->
-        <tab>
-          <tab-header>
-            <div class="tab-heading"> Settings </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
+      <validated-form id="ag-test-suite-settings-form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit="save_ag_test_suite_settings"
+                      @form_validity_changed="d_settings_form_is_valid = $event">
 
-              <validated-form id="ag-test-suite-settings-form"
-                              autocomplete="off"
-                              spellcheck="false"
-                              @submit="save_ag_test_suite_settings"
-                              @form_validity_changed="d_settings_form_is_valid = $event">
+        <div id="ag-test-suite-name-container">
+          <label class="text-label"> Suite name </label>
+          <validated-input ref="suite_name"
+                            id="input-name"
+                            v-model="d_ag_test_suite.name"
+                            :validators="[is_not_empty]">
+          </validated-input>
+        </div>
 
-                <div id="ag-test-suite-name-container">
-                  <label class="text-label"> Suite name </label>
-                  <validated-input ref="suite_name"
-                                   id="input-name"
-                                   v-model="d_ag_test_suite.name"
-                                   :validators="[is_not_empty]">
-                  </validated-input>
-                </div>
+        <div class="checkbox-container">
+          <input id="synchronous-or-deferred"
+                  type="checkbox"
+                  class="checkbox"
+                  :checked="!d_ag_test_suite.deferred"
+                  @change="d_ag_test_suite.deferred = !$event.target.checked"/>
+          <label class="checkbox-label"
+                  for="synchronous-or-deferred">
+            Suite must finish before students can submit again
+          </label>
+        </div>
 
-                <div class="checkbox-container">
-                  <input id="synchronous-or-deferred"
-                         type="checkbox"
-                         class="checkbox"
-                         :checked="!d_ag_test_suite.deferred"
-                         @change="d_ag_test_suite.deferred = !$event.target.checked"/>
-                  <label class="checkbox-label"
-                         for="synchronous-or-deferred">
-                    Suite must finish before students can submit again
-                  </label>
-                </div>
-
-                <div class="section-container">
-                  <fieldset class="fieldset">
-                    <legend class="legend"> Grading Environment </legend>
-                    <div class="sandbox-container">
-                      <label class="text-label"> Sandbox environment </label>
-                      <div class="dropdown">
-                        <dropdown id="sandbox-docker-image"
-                                  :items="d_docker_images"
-                                  dropdown_height="250px"
-                                  @update_item_selected="
-                                    d_ag_test_suite.sandbox_docker_image = $event">
-                          <template slot="header">
-                            <div tabindex="1" class="dropdown-header-wrapper">
-                              <div class="dropdown-header sandbox-docker-image-dropdown">
-                                {{d_ag_test_suite.sandbox_docker_image === null ? ' '
-                                : d_ag_test_suite.sandbox_docker_image.display_name}}
-                                <i class="fas fa-caret-down dropdown-caret"></i>
-                              </div>
-                            </div>
-                          </template>
-                          <div slot-scope="{item}">
-                          <span>
-                            {{item.display_name}}
-                          </span>
-                          </div>
-                        </dropdown>
-                      </div>
+        <fieldset class="fieldset">
+          <legend class="legend"> Grading Environment </legend>
+          <div class="sandbox-container">
+            <label class="text-label"> Sandbox environment </label>
+            <div class="dropdown">
+              <dropdown id="sandbox-docker-image"
+                        :items="d_docker_images"
+                        dropdown_height="250px"
+                        @update_item_selected="
+                          d_ag_test_suite.sandbox_docker_image = $event">
+                <template slot="header">
+                  <div tabindex="1" class="dropdown-header-wrapper">
+                    <div class="dropdown-header sandbox-docker-image-dropdown">
+                      {{d_ag_test_suite.sandbox_docker_image === null ? ' '
+                      : d_ag_test_suite.sandbox_docker_image.display_name}}
+                      <i class="fas fa-caret-down dropdown-caret"></i>
                     </div>
-
-                    <div class="toggle-container">
-                      <toggle v-model="d_ag_test_suite.allow_network_access"
-                              ref="allow_network_access">
-                        <div slot="on">
-                          Allow network access
-                        </div>
-                        <div slot="off">
-                          Block network access
-                        </div>
-                      </toggle>
-                    </div>
-
-                  </fieldset>
-                </div>
-
-                <div class="section-container">
-                  <fieldset class="fieldset">
-                    <legend class="legend"> Instructor Files </legend>
-                    <div class="typeahead-search-bar">
-                      <dropdown-typeahead ref="instructor_files_typeahead"
-                                          placeholder_text="Enter a filename"
-                                          :choices="instructor_files_available"
-                                          :filter_fn="instructor_file_filter_fn"
-                                          @update_item_chosen="add_instructor_file($event)">
-                        <template slot-scope="{item}">
-                          <span class="typeahead-row">
-                            {{item.name}}
-                          </span>
-                        </template>
-                      </dropdown-typeahead>
-                    </div>
-
-                    <div class="instructor-files">
-                      <div v-for="(file, index) of d_ag_test_suite.instructor_files_needed"
-                           :class="['file', {'odd-index': index % 2 !== 0}]">
-                        <span class="file-name"> {{file.name}} </span>
-                        <div class="delete-file-icon-container"
-                             @click="delete_instructor_file(file)">
-                          <span><i class="fas fa-times delete-file"></i></span>
-                        </div>
-                      </div>
-                    </div>
-
-                  </fieldset>
-                </div>
-
-                <div class="section-container">
-                  <fieldset class="fieldset">
-                    <legend class="legend"> Student Files </legend>
-                    <div class="typeahead-search-bar">
-                      <dropdown-typeahead ref="student_files_typeahead"
-                                          placeholder_text="Enter a filename"
-                                          :choices="expected_student_files_available"
-                                          :filter_fn="expected_student_file_filter_fn"
-                                          @update_item_chosen="add_student_file($event)">
-                        <template slot-scope="{item}">
-                          <span class="typeahead-row">
-                            {{item.pattern}}
-                          </span>
-                        </template>
-                      </dropdown-typeahead>
-                    </div>
-
-                    <div class="student-files">
-                      <div v-for="(file, index) of d_ag_test_suite.student_files_needed"
-                           :class="['file', {'odd-index': index % 2 !== 0}]">
-                        <span class="file-name"> {{file.pattern}} </span>
-                        <div class="delete-file-icon-container"
-                             @click="delete_student_file(file)">
-                          <span><i class="fas fa-times delete-file"></i></span>
-                        </div>
-                      </div>
-                    </div>
-
-                  </fieldset>
-                </div>
-
-                <div class="section-container">
-                  <fieldset class="fieldset">
-                    <legend class="legend"> Setup </legend>
-
-                    <div id="setup-command-label-container">
-                      <label class="text-label"> Setup command label </label>
-                      <validated-input ref="setup_suite_cmd_name"
-                                       v-model="d_ag_test_suite.setup_suite_cmd_name"
-                                       :validators="[]">
-                      </validated-input>
-                    </div>
-
-                    <div id="setup-command-container">
-                      <label class="text-label"> Setup command </label>
-                      <validated-input ref="setup_suite_cmd"
-                                       v-model="d_ag_test_suite.setup_suite_cmd"
-                                       :validators="[]">
-                      </validated-input>
-                    </div>
-
-                  </fieldset>
-                </div>
-
-                <div class="bottom-of-form">
-                  <APIErrors ref="api_errors"></APIErrors>
-
-                  <button type="submit"
-                          class="save-button"
-                          :disabled="!d_settings_form_is_valid || d_saving">Save</button>
-
-                  <div v-show="!d_saving" class="last-saved-timestamp">
-                    <span> Last Saved: </span> {{format_datetime(d_ag_test_suite.last_modified)}}
                   </div>
-
-                  <div v-show="d_saving" class="last-saved-spinner">
-                    <i class="fa fa-spinner fa-pulse"></i>
-                  </div>
+                </template>
+                <div slot-scope="{item}">
+                <span>
+                  {{item.display_name}}
+                </span>
                 </div>
-
-              </validated-form>
+              </dropdown>
             </div>
-          </template>
-        </tab>
+          </div>
 
-        <!------------------------ Command Feedback Tab ------------------------------------->
-        <tab>
-          <tab-header>
-            <div class="tab-heading">
-              Feedback
+          <div class="toggle-container">
+            <toggle v-model="d_ag_test_suite.allow_network_access"
+                    ref="allow_network_access">
+              <div slot="on">
+                Allow network access
+              </div>
+              <div slot="off">
+                Block network access
+              </div>
+            </toggle>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="legend"> Instructor Files </legend>
+          <div class="typeahead-search-bar">
+            <dropdown-typeahead ref="instructor_files_typeahead"
+                                placeholder_text="Enter a filename"
+                                :choices="instructor_files_available"
+                                :filter_fn="instructor_file_filter_fn"
+                                @update_item_chosen="add_instructor_file($event)">
+              <template slot-scope="{item}">
+                <span class="typeahead-row">
+                  {{item.name}}
+                </span>
+              </template>
+            </dropdown-typeahead>
+          </div>
+
+          <div class="instructor-files">
+            <div v-for="(file, index) of d_ag_test_suite.instructor_files_needed"
+                  :class="['file', {'odd-index': index % 2 !== 0}]">
+              <span class="file-name"> {{file.name}} </span>
+              <div class="delete-file-icon-container"
+                    @click="delete_instructor_file(file)">
+                <span><i class="fas fa-times delete-file"></i></span>
+              </div>
             </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-              <FeedbackConfigAGSuite :ag_test_suite="d_ag_test_suite">
-              </FeedbackConfigAGSuite>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="legend"> Student Files </legend>
+          <div class="typeahead-search-bar">
+            <dropdown-typeahead ref="student_files_typeahead"
+                                placeholder_text="Enter a filename"
+                                :choices="expected_student_files_available"
+                                :filter_fn="expected_student_file_filter_fn"
+                                @update_item_chosen="add_student_file($event)">
+              <template slot-scope="{item}">
+                <span class="typeahead-row">
+                  {{item.pattern}}
+                </span>
+              </template>
+            </dropdown-typeahead>
+          </div>
+
+          <div class="student-files">
+            <div v-for="(file, index) of d_ag_test_suite.student_files_needed"
+                  :class="['file', {'odd-index': index % 2 !== 0}]">
+              <span class="file-name"> {{file.pattern}} </span>
+              <div class="delete-file-icon-container"
+                    @click="delete_student_file(file)">
+                <span><i class="fas fa-times delete-file"></i></span>
+              </div>
             </div>
-          </template>
-        </tab>
-        <!--------------------------- Danger Zone Tab --------------------------------------->
-        <tab>
-          <tab-header>
-            <div class="tab-heading">
-              Danger Zone
+          </div>
+
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="legend"> Setup </legend>
+
+          <div id="setup-command-label-container">
+            <label class="text-label"> Setup command label </label>
+            <validated-input ref="setup_suite_cmd_name"
+                              v-model="d_ag_test_suite.setup_suite_cmd_name"
+                              :validators="[]">
+            </validated-input>
+          </div>
+
+          <div id="setup-command-container">
+            <label class="text-label"> Setup command </label>
+            <validated-input ref="setup_suite_cmd"
+                              v-model="d_ag_test_suite.setup_suite_cmd"
+                              :validators="[]">
+            </validated-input>
+          </div>
+
+        </fieldset>
+
+        <!------------------------ Feedback Settings ------------------------------------->
+
+        <fieldset class="fieldset">
+          <legend class="legend">Feedback</legend>
+          <div class="config-panels-container">
+            <config-panel ref="normal_config_panel"
+                          :config_name="FeedbackConfigLabel.normal"
+                          v-model="d_ag_test_suite.normal_fdbk_config"
+                          :preset_options="fdbk_presets">
+              <template slot="settings">
+                <EditFeedbackSettingsAGSuite ref="normal_edit_feedback_settings"
+                                             v-model="d_ag_test_suite.normal_fdbk_config"
+                                             :config_name="FeedbackConfigLabel.normal">
+                </EditFeedbackSettingsAGSuite>
+              </template>
+            </config-panel>
+
+            <config-panel ref="final_graded_config_panel"
+                          :config_name="FeedbackConfigLabel.ultimate_submission"
+                          v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
+                          :preset_options="fdbk_presets">
+              <template slot="settings">
+                <EditFeedbackSettingsAGSuite
+                  ref="final_graded_edit_feedback_settings"
+                  v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
+                  :config_name="FeedbackConfigLabel.ultimate_submission">
+                </EditFeedbackSettingsAGSuite>
+              </template>
+            </config-panel>
+
+            <config-panel
+              ref="past_limit_config_panel"
+              :config_name="FeedbackConfigLabel.past_limit"
+              v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
+              :preset_options="fdbk_presets">
+              <template slot="settings">
+                <EditFeedbackSettingsAGSuite
+                  ref="past_limit_feedback_settings"
+                  v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
+                  :config_name="FeedbackConfigLabel.past_limit">
+                </EditFeedbackSettingsAGSuite>
+              </template>
+            </config-panel>
+
+            <config-panel ref="student_lookup_config_panel"
+                          :config_name="FeedbackConfigLabel.staff_viewer"
+                          v-model="d_ag_test_suite.staff_viewer_fdbk_config"
+                          :preset_options="fdbk_presets">
+              <template slot="settings">
+                <EditFeedbackSettingsAGSuite ref="student_lookup_edit_feedback_settings"
+                                             v-model="d_ag_test_suite.staff_viewer_fdbk_config"
+                                             :config_name="FeedbackConfigLabel.staff_viewer">
+                </EditFeedbackSettingsAGSuite>
+              </template>
+            </config-panel>
+          </div>
+
+        </fieldset>
+
+        <div class="bottom-of-form">
+          <APIErrors ref="api_errors"></APIErrors>
+
+          <button type="submit"
+                  class="save-button"
+                  :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+
+          <div v-show="!d_saving" class="last-saved-timestamp">
+            <span> Last Saved: </span> {{format_datetime(d_ag_test_suite.last_modified)}}
+          </div>
+
+          <div v-show="d_saving" class="last-saved-spinner">
+            <i class="fa fa-spinner fa-pulse"></i>
+          </div>
+        </div>
+
+      </validated-form>
+
+      <!--------------------------- Danger Zone --------------------------------------->
+
+      <div id="danger-zone-container">
+        <fieldset class="fieldset">
+          <legend class="legend">Danger Zone</legend>
+          <button class="delete-ag-test-suite-button"
+                  type="button"
+                  @click="$refs.delete_ag_test_suite_modal.open()">
+            Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
+          </button>
+
+          <modal ref="delete_ag_test_suite_modal"
+                  :size="'large'"
+                  :include_closing_x="false">
+            <div class="modal-header">
+              Confirm Delete
             </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
+            <hr>
+            <div class="modal-body">
+              <p> Are you sure you want to delete the suite
+                <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
+                This will delete all associated test cases and run results.
+                THIS ACTION CANNOT BE UNDONE. </p>
+              <div class="deletion-modal-button-footer">
+                <button class="modal-delete-button"
+                        :disabled="d_saving"
+                        @click="delete_ag_test_suite()"> Delete </button>
 
-              <button class="delete-ag-test-suite-button"
-                      type="button"
-                      @click="$refs.delete_ag_test_suite_modal.open()">
-                Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
-              </button>
-
-              <modal ref="delete_ag_test_suite_modal"
-                     :size="'large'"
-                     :include_closing_x="false">
-                <div class="modal-header">
-                  Confirm Delete
-                </div>
-                <hr>
-                <div class="modal-body">
-                  <p> Are you sure you want to delete the suite
-                    <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
-                    This will delete all associated test cases and run results.
-                    THIS ACTION CANNOT BE UNDONE. </p>
-                  <div class="deletion-modal-button-footer">
-                    <button class="modal-delete-button"
-                            :disabled="d_saving"
-                            @click="delete_ag_test_suite()"> Delete </button>
-
-                    <button class="modal-cancel-button"
-                            @click="$refs.delete_ag_test_suite_modal.close()"> Cancel </button>
-                  </div>
-                </div>
-              </modal>
+                <button class="modal-cancel-button"
+                        @click="$refs.delete_ag_test_suite_modal.close()"> Cancel </button>
+              </div>
             </div>
-          </template>
-        </tab>
-
-      </tabs>
+          </modal>
+        </fieldset>
+      </div>
     </div>
   </div>
 </template>
@@ -267,7 +282,10 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
 import FeedbackConfigAGSuite from '@/components/feedback_config/feedback_config/feedback_config_ag_suite.vue';
+import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel } from '@/components/feedback_config/feedback_config/feedback_config_utils';
 import Modal from '@/components/modal.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -276,14 +294,17 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
     APIErrors,
+    ConfigPanel,
     Dropdown,
     DropdownTypeahead,
+    EditFeedbackSettingsAGSuite,
     FeedbackConfigAGSuite,
     Modal,
     Tab,
@@ -306,18 +327,15 @@ export default class AGSuiteSettings extends Vue {
   @Watch('ag_test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
     this.d_ag_test_suite = deep_copy(new_test_suite, AGTestSuite);
-    if (this.d_current_tab_index === 2) {
-      this.d_current_tab_index = 0;
-    }
   }
 
-  d_current_tab_index = 0;
   d_ag_test_suite: AGTestSuite | null = null;
   d_docker_images: SandboxDockerImageData[] = [];
   d_loading = true;
   d_saving = false;
   d_settings_form_is_valid = true;
 
+  readonly FeedbackConfigLabel = FeedbackConfigLabel;
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
@@ -388,6 +406,39 @@ export default class AGSuiteSettings extends Vue {
       this.d_saving = false;
     }
   }
+
+  readonly fdbk_presets = new SafeMap<string, AGTestSuiteFeedbackPreset>([
+    [
+      'Public Setup',
+      {
+        show_individual_tests: true,
+        show_setup_return_code: true,
+        show_setup_timed_out: true,
+        show_setup_stdout: true,
+        show_setup_stderr: true
+      }
+    ],
+    [
+      'Pass/Fail Setup',
+      {
+        show_individual_tests: true,
+        show_setup_return_code: true,
+        show_setup_timed_out: true,
+        show_setup_stdout: false,
+        show_setup_stderr: false
+      }
+    ],
+    [
+      'Private Setup',
+      {
+        show_individual_tests: true,
+        show_setup_return_code: false,
+        show_setup_timed_out: false,
+        show_setup_stdout: false,
+        show_setup_stderr: false
+      }
+    ]
+  ]);
 }
 
 function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: unknown) {
@@ -459,12 +510,22 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
   background-color: hsl(210, 20%, 96%);
 }
 
-.delete-ag-test-suite-button {
-  @extend .delete-level-button;
-}
+#danger-zone-container {
+   margin-top: 40px;
 
-.delete-ag-test-suite-button span {
-  margin-left: 5px;
+  .legend {
+    color: black;
+    font-size: 24px;
+  }
+
+  .delete-ag-test-suite-button {
+    @extend .delete-level-button;
+    margin-top: 10px;
+  }
+
+  .delete-ag-test-suite-button span {
+    margin-left: 5px;
+  }
 }
 
 .sandbox-container {

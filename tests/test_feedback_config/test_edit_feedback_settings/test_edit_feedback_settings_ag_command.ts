@@ -1,14 +1,10 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { AGTestCase, AGTestCommandFeedbackConfig, ValueFeedbackLevel } from 'ag-client-typescript';
+import { AGTestCase, AGTestCommandFeedbackConfig, AGTestSuite, ValueFeedbackLevel } from 'ag-client-typescript';
 
 import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
 
-import {
-    create_ag_case,
-    create_ag_command,
-    create_ag_command_feedback_config
-} from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
 
 beforeAll(() => {
@@ -18,23 +14,27 @@ beforeAll(() => {
 describe('EditFeedbackSettingsAGCommand tests', () => {
     let wrapper: Wrapper<EditFeedbackSettingsAGCommand>;
     let component: EditFeedbackSettingsAGCommand;
+    let ag_test_suite: AGTestSuite;
     let ag_test_case: AGTestCase;
-    let ag_test_command_normal_feedback_config: AGTestCommandFeedbackConfig;
-    let ag_test_command_first_failure_feedback_config: AGTestCommandFeedbackConfig;
+    let feedback_config: AGTestCommandFeedbackConfig;
 
     beforeEach(() => {
-        ag_test_command_normal_feedback_config = create_ag_command_feedback_config();
-        ag_test_command_first_failure_feedback_config = create_ag_command_feedback_config();
-        ag_test_case = create_ag_case(1, "Case 1", 1);
-        ag_test_case.ag_test_commands = [
-            create_ag_command(1, "Command 1", 1)
-        ];
+        let course = data_ut.make_course();
+        let project = data_ut.make_project(course.pk);
+        ag_test_suite = data_ut.make_ag_test_suite(project.pk);
+        feedback_config = data_ut.make_ag_test_command_fdbk_config({
+            show_actual_stdout: false,
+            show_actual_stderr: true,
+        });
+        ag_test_case = data_ut.make_ag_test_case(
+            ag_test_suite.pk,
+            {ag_test_commands: [data_ut.make_ag_test_command(ag_test_case.pk)]});
 
         wrapper = mount(EditFeedbackSettingsAGCommand, {
             propsData: {
                 config_name: "normal",
                 ag_test_case: ag_test_case,
-                value: ag_test_command_normal_feedback_config
+                value: feedback_config
             }
         });
         component = wrapper.vm;
@@ -60,10 +60,10 @@ describe('EditFeedbackSettingsAGCommand tests', () => {
     });
 
     test('visible binding - case has more than one command', async () => {
-        let case_with_more_than_one_command = create_ag_case(2, "Case 2", 1);
+        let case_with_more_than_one_command = data_ut.make_ag_test_case(ag_test_suite.pk);
         case_with_more_than_one_command.ag_test_commands = [
-            create_ag_command(3, "Command 3", 2),
-            create_ag_command(4, "Command 4", 2)
+            data_ut.make_ag_test_command(case_with_more_than_one_command.pk),
+            data_ut.make_ag_test_command(case_with_more_than_one_command.pk),
         ];
         wrapper.setProps({ag_test_case: case_with_more_than_one_command});
         await component.$nextTick();
@@ -251,16 +251,16 @@ describe('EditFeedbackSettingsAGCommand tests', () => {
     test('value Watcher', async () => {
         wrapper.setData({d_is_open: true});
 
-        expect(component.d_feedback_config!).toEqual(
-            ag_test_command_normal_feedback_config
-        );
+        expect(component.d_feedback_config!).toEqual(feedback_config);
 
-        wrapper.setProps({'value': ag_test_command_first_failure_feedback_config});
+        let new_config = data_ut.make_ag_test_command_fdbk_config({
+            show_actual_stdout: !feedback_config.show_actual_stdout,
+            show_actual_stderr: !feedback_config.show_actual_stderr
+        });
+        wrapper.setProps({'value': new_config});
         await component.$nextTick();
 
-        expect(component.d_feedback_config!).toEqual(
-            ag_test_command_first_failure_feedback_config
-        );
+        expect(component.d_feedback_config!).toEqual(new_config);
     });
 
     test('config_name Prop', async () => {

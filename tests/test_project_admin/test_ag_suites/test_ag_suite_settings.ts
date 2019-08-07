@@ -15,9 +15,16 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
+import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 
-import { create_ag_suite } from '@/tests/data_utils';
+import {
+    make_ag_test_suite,
+    make_ag_test_suite_fdbk_config,
+    make_course,
+    make_project,
+} from '@/tests/data_utils';
 import {
     checkbox_is_checked,
     get_validated_input_text,
@@ -43,16 +50,8 @@ describe('AGSuiteSettings tests', () => {
     let sandbox_docker_image_2: SandboxDockerImageData;
     let sandbox_docker_image_3: SandboxDockerImageData;
     let default_feedback_config: AGTestSuiteFeedbackConfig;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         default_feedback_config = {
             show_individual_tests: false,
             show_setup_return_code: false,
@@ -113,7 +112,7 @@ describe('AGSuiteSettings tests', () => {
             last_modified: "now"
         });
 
-        ag_suite = create_ag_suite(1, "Suite 1", 10);
+        ag_suite = make_ag_test_suite(project.pk);
         ag_suite.instructor_files_needed = [instructor_file_1, instructor_file_2];
         ag_suite.student_files_needed = [student_file_1, student_file_2];
 
@@ -183,10 +182,6 @@ describe('AGSuiteSettings tests', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();
@@ -555,8 +550,6 @@ describe('AGSuiteSettings tests', () => {
 
     test('Delete a Suite', async () => {
         let delete_stub = sinon.stub(component.d_ag_test_suite!, 'delete');
-
-        wrapper.setData({d_current_tab_index: 2});
         await component.$nextTick();
 
         wrapper.find('.delete-ag-test-suite-button').trigger('click');
@@ -569,28 +562,183 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Parent component changes the value of the test_suite prop', async () => {
-        let another_ag_suite = create_ag_suite(2, "Suite 2", 1);
+        let another_ag_suite = make_ag_test_suite(project.pk);
         another_ag_suite.instructor_files_needed = [instructor_file_2, instructor_file_1];
         another_ag_suite.student_files_needed = [student_file_2, student_file_1];
 
         expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
-        expect(component.d_current_tab_index).toEqual(0);
 
         wrapper.setProps({'ag_test_suite': another_ag_suite});
         await component.$nextTick();
 
         expect(component.d_ag_test_suite!.pk).toEqual(another_ag_suite.pk);
-        expect(component.d_current_tab_index).toEqual(0);
-
-        wrapper.setData({d_current_tab_index: 2});
-        await component.$nextTick();
-
-        expect(component.d_current_tab_index).toEqual(2);
 
         wrapper.setProps({'ag_test_suite': ag_suite});
         await component.$nextTick();
 
         expect(component.d_ag_test_suite!.pk).toEqual(ag_suite.pk);
-        expect(component.d_current_tab_index).toEqual(0);
+    });
+});
+
+describe('AG test command feedback tests', () => {
+    let ag_test_suite: AGTestSuite;
+    let project: Project = make_project(make_course().pk);
+
+    beforeEach(() => {
+        ag_test_suite = make_ag_test_suite(project.pk);
+    });
+
+    test('Normal fdbk binding', () => {
+        ag_test_suite.normal_fdbk_config = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: true,
+            show_setup_stdout: false,
+        });
+
+        let wrapper = mount(AGSuiteSettings, {
+            propsData: {
+                ag_test_suite: ag_test_suite,
+                project: project
+            }
+        });
+
+        let normal_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
+        expect(normal_config_panel.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
+
+        let normal_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+                {ref: 'normal_edit_feedback_settings'});
+        expect(normal_advanced_settings.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
+
+        let new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: true,
+        });
+        normal_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.normal_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: false,
+        });
+        normal_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.normal_fdbk_config).toEqual(new_val);
+    });
+
+    test('Final graded fdbk binding', () => {
+        ag_test_suite.ultimate_submission_fdbk_config = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: true,
+            show_setup_stdout: false,
+        });
+
+        let wrapper = mount(AGSuiteSettings, {
+            propsData: {
+                ag_test_suite: ag_test_suite,
+                project: project
+            }
+        });
+
+        let final_graded_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
+        expect(final_graded_config_panel.vm.value).toEqual(
+            ag_test_suite.ultimate_submission_fdbk_config);
+
+        let final_graded_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+                {ref: 'final_graded_edit_feedback_settings'});
+        expect(final_graded_advanced_settings.vm.value).toEqual(
+            ag_test_suite.ultimate_submission_fdbk_config);
+
+        let new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: true,
+        });
+        final_graded_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.ultimate_submission_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: false,
+        });
+        final_graded_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.ultimate_submission_fdbk_config).toEqual(new_val);
+    });
+
+    test('Past limit fdbk binding', () => {
+        ag_test_suite.past_limit_submission_fdbk_config = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: true,
+            show_setup_stdout: false,
+        });
+
+        let wrapper = mount(AGSuiteSettings, {
+            propsData: {
+                ag_test_suite: ag_test_suite,
+                project: project
+            }
+        });
+
+        let past_limit_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
+        expect(past_limit_config_panel.vm.value).toEqual(
+            ag_test_suite.past_limit_submission_fdbk_config);
+
+        let past_limit_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+                {ref: 'past_limit_edit_feedback_settings'});
+        expect(past_limit_advanced_settings.vm.value).toEqual(
+            ag_test_suite.past_limit_submission_fdbk_config);
+
+        let new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: true,
+        });
+        past_limit_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.past_limit_submission_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: false,
+        });
+        past_limit_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.past_limit_submission_fdbk_config).toEqual(new_val);
+    });
+
+    test('Student lookup fdbk binding', () => {
+        ag_test_suite.staff_viewer_fdbk_config = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: true,
+            show_setup_stdout: false,
+        });
+
+        let wrapper = mount(AGSuiteSettings, {
+            propsData: {
+                ag_test_suite: ag_test_suite,
+                project: project
+            }
+        });
+
+        let student_lookup_config_panel
+            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
+        expect(student_lookup_config_panel.vm.value).toEqual(
+            ag_test_suite.staff_viewer_fdbk_config);
+
+        let student_lookup_advanced_settings
+            = <Wrapper<EditFeedbackSettingsAGSuite>> wrapper.find(
+                {ref: 'student_lookup_edit_feedback_settings'});
+        expect(student_lookup_advanced_settings.vm.value).toEqual(
+            ag_test_suite.staff_viewer_fdbk_config);
+
+        let new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: true,
+        });
+        student_lookup_config_panel.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.staff_viewer_fdbk_config).toEqual(new_val);
+
+        new_val = make_ag_test_suite_fdbk_config({
+            show_setup_return_code: false,
+            show_setup_stdout: false,
+        });
+        student_lookup_advanced_settings.vm.$emit('input', new_val);
+        expect(wrapper.vm.d_ag_test_suite!.staff_viewer_fdbk_config).toEqual(new_val);
     });
 });

@@ -4,7 +4,7 @@ import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
 import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
 
-import { create_ag_suite_feedback_config } from '@/tests/data_utils';
+import { make_ag_test_suite_fdbk_config } from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
 
 beforeAll(() => {
@@ -14,17 +14,18 @@ beforeAll(() => {
 describe('EditFeedbackSettingsAGSuite tests', () => {
     let wrapper: Wrapper<EditFeedbackSettingsAGSuite>;
     let component: EditFeedbackSettingsAGSuite;
-    let ag_test_suite_normal_feedback_config: AGTestSuiteFeedbackConfig;
-    let ag_test_suite_past_limit_feedback_config: AGTestSuiteFeedbackConfig;
+    let feedback_config: AGTestSuiteFeedbackConfig;
 
     beforeEach(() => {
-        ag_test_suite_normal_feedback_config = create_ag_suite_feedback_config();
-        ag_test_suite_past_limit_feedback_config = create_ag_suite_feedback_config();
+        feedback_config = make_ag_test_suite_fdbk_config({
+            show_setup_stdout: false,
+            show_setup_stderr: true,
+        });
 
         wrapper = mount(EditFeedbackSettingsAGSuite, {
             propsData: {
                 config_name: "normal",
-                value: ag_test_suite_normal_feedback_config
+                value: feedback_config
             }
         });
         component = wrapper.vm;
@@ -173,14 +174,16 @@ describe('EditFeedbackSettingsAGSuite tests', () => {
     });
 
     test('value Watcher', async () => {
-        expect(component.d_feedback_config!).toEqual(ag_test_suite_normal_feedback_config);
+        expect(component.d_feedback_config!).toEqual(feedback_config);
 
-        wrapper.setProps({'value': ag_test_suite_past_limit_feedback_config});
+        let new_val = make_ag_test_suite_fdbk_config({
+            show_setup_stdout: !feedback_config.show_setup_stdout,
+            show_setup_stderr: !feedback_config.show_setup_stderr,
+        });
+        wrapper.setProps({'value': new_val});
         await component.$nextTick();
 
-        expect(component.d_feedback_config!).toEqual(
-            ag_test_suite_past_limit_feedback_config
-        );
+        expect(component.d_feedback_config!).toEqual(new_val);
     });
 
     test('config_name Prop', async () => {

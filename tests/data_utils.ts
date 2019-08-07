@@ -1,4 +1,5 @@
 import {
+    AGCommand,
     AGTestCase,
     AGTestCaseFeedbackConfig,
     AGTestCommand,
@@ -19,7 +20,6 @@ import {
 } from 'ag-client-typescript';
 
 import { safe_assign } from "@/utils";
-import { AGCommand } from 'ag-client-typescript/dist/src/ag_command';
 
 function* counter() {
     let count = 1;

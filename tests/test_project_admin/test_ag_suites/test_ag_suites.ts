@@ -7,17 +7,16 @@ import {
     HttpError,
     InstructorFile,
     Project,
-    UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
-import { create } from 'domain';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import { deep_copy } from '@/utils';
 
-import { create_ag_case, create_ag_command, create_ag_suite } from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -61,60 +60,8 @@ describe('AGSuites tests', () => {
     let instructor_file_2: InstructorFile;
     let instructor_file_3: InstructorFile;
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        ag_suite_colors = create_ag_suite(1, "Colors Suite", 10);
-        ag_case_purple = create_ag_case(1, "Purple Case", 1);
-        ag_command_purple_1 = create_ag_command(1, "Purple Command 1", 1);
-        ag_command_purple_2 = create_ag_command(2, "Purple Command 2", 1);
-        ag_case_blue = create_ag_case(2, "Blue Case", 1);
-        ag_command_blue_1 = create_ag_command(3, "Blue Command 1", 2);
-        ag_case_green = create_ag_case(3, "Green Case", 1);
-        ag_command_green_1 = create_ag_command(4, "Green Command 1", 3);
-        ag_command_green_2 = create_ag_command(5, "Green Command 1", 3);
-        ag_command_green_3 = create_ag_command(6, "Green Command 1", 3);
-
-        ag_case_purple.ag_test_commands = [
-            ag_command_purple_1,
-            ag_command_purple_2
-        ];
-        ag_case_blue.ag_test_commands = [
-            ag_command_blue_1
-        ];
-        ag_case_green.ag_test_commands = [
-            ag_command_green_1,
-            ag_command_green_2,
-            ag_command_green_3
-        ];
-        ag_suite_colors.ag_test_cases = [
-            ag_case_purple, ag_case_blue, ag_case_green
-        ];
-
-        ag_suite_pets = create_ag_suite(2, "Pets Suite", 10);
-        ag_case_dog = create_ag_case(4, "Dog Case", 2);
-        ag_command_dog_1 = create_ag_command(7, "Dog Command 1", 4);
-        ag_case_bird = create_ag_case(5, "Bird Case", 2);
-        ag_command_bird_1 = create_ag_command(8, "Bird Command 1", 5);
-
-        ag_case_dog.ag_test_commands = [ag_command_dog_1];
-        ag_case_bird.ag_test_commands = [ag_command_bird_1];
-        ag_suite_pets.ag_test_cases = [ag_case_dog, ag_case_bird];
-
-        ag_suite_beverages = create_ag_suite(3, "Beverages Suite", 10);
-        ag_case_sprite = create_ag_case(6, "Sprite Case", 3);
-        ag_command_sprite_1 = create_ag_command(9, "Sprite Command 1", 6);
-
-        ag_case_sprite.ag_test_commands = [ag_command_sprite_1];
-        ag_suite_beverages.ag_test_cases = [ag_case_sprite];
-
         instructor_file_1 = new InstructorFile({
             pk: 1,
             project: 10,
@@ -139,33 +86,51 @@ describe('AGSuites tests', () => {
             last_modified: "now"
         });
 
-        project = new Project({
-            pk: 10,
-            name: "Detroit Zoo",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            expected_student_files: [],
-            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3],
-            has_handgrading_rubric: false,
-        });
+        project = data_ut.make_project(data_ut.make_course().pk);
+
+        ag_suite_colors = data_ut.make_ag_test_suite(project.pk);
+        ag_case_purple = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_purple_1 = data_ut.make_ag_test_command(ag_case_purple.pk);
+        ag_command_purple_2 = data_ut.make_ag_test_command(ag_case_purple.pk);
+        ag_case_blue = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_blue_1 = data_ut.make_ag_test_command(ag_case_blue.pk);
+        ag_case_green = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_green_1 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_command_green_2 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_command_green_3 = data_ut.make_ag_test_command(ag_case_green.pk);
+
+        ag_case_purple.ag_test_commands = [
+            ag_command_purple_1,
+            ag_command_purple_2
+        ];
+        ag_case_blue.ag_test_commands = [
+            ag_command_blue_1
+        ];
+        ag_case_green.ag_test_commands = [
+            ag_command_green_1,
+            ag_command_green_2,
+            ag_command_green_3
+        ];
+        ag_suite_colors.ag_test_cases = [
+            ag_case_purple, ag_case_blue, ag_case_green
+        ];
+
+        ag_suite_pets = data_ut.make_ag_test_suite(project.pk);
+        ag_case_dog = data_ut.make_ag_test_case(ag_suite_pets.pk);
+        ag_command_dog_1 = data_ut.make_ag_test_command(ag_case_dog.pk);
+        ag_case_bird = data_ut.make_ag_test_case(ag_suite_pets.pk);
+        ag_command_bird_1 = data_ut.make_ag_test_command(ag_case_bird.pk);
+
+        ag_case_dog.ag_test_commands = [ag_command_dog_1];
+        ag_case_bird.ag_test_commands = [ag_command_bird_1];
+        ag_suite_pets.ag_test_cases = [ag_case_dog, ag_case_bird];
+
+        ag_suite_beverages = data_ut.make_ag_test_suite(project.pk);
+        ag_case_sprite = data_ut.make_ag_test_case(ag_suite_beverages.pk);
+        ag_command_sprite_1 = data_ut.make_ag_test_command(ag_case_sprite.pk);
+
+        ag_case_sprite.ag_test_commands = [ag_command_sprite_1];
+        ag_suite_beverages.ag_test_cases = [ag_case_sprite];
 
         sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
 
@@ -183,10 +148,6 @@ describe('AGSuites tests', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();
@@ -210,7 +171,7 @@ describe('AGSuites tests', () => {
     });
 
     test('Creating a suite - successfully', async () => {
-        let new_suite = create_ag_suite(4, "New Suite", 10);
+        let new_suite = data_ut.make_ag_test_suite(project.pk);
 
         wrapper.find('#add-ag-test-suite-button').trigger('click');
         await component.$nextTick();
@@ -346,15 +307,15 @@ describe('AGSuites tests', () => {
     });
 
     test('Suite changed', async () => {
-        let updated_ag_suite_pets = create_ag_suite(ag_suite_pets.pk, "Pets 2 Suite", 10);
+        let original_name = ag_suite_pets.name;
+        ag_suite_pets.name = 'Updated name';
 
-        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
-        expect(ag_suite_pets).not.toEqual(updated_ag_suite_pets);
+        expect(component.d_ag_test_suites[1].name).toEqual(original_name);
 
-        AGTestSuite.notify_ag_test_suite_changed(updated_ag_suite_pets);
+        AGTestSuite.notify_ag_test_suite_changed(ag_suite_pets);
         await component.$nextTick();
 
-        expect(component.d_ag_test_suites[1].name).toEqual(updated_ag_suite_pets.name);
+        expect(component.d_ag_test_suites[1].name).toEqual(ag_suite_pets.name);
     });
 
     // Case Related ------------------------------------------------------------------------------
@@ -363,7 +324,7 @@ describe('AGSuites tests', () => {
         expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
         expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
 
-        let ag_case_cat = create_ag_case(6, "Cat Case", ag_suite_pets.pk);
+        let ag_case_cat = data_ut.make_ag_test_case(ag_suite_pets.pk);
 
         AGTestCase.notify_ag_test_case_created(ag_case_cat);
         await component.$nextTick();
@@ -372,7 +333,8 @@ describe('AGSuites tests', () => {
     });
 
     test('Case changed', async () => {
-        let updated_ag_case_bird = create_ag_case(ag_case_bird.pk, "Updated Bird Case", 2);
+        let updated_ag_case_bird = deep_copy(ag_case_bird, AGTestCase);
+        updated_ag_case_bird.name = 'Updated name';
 
         expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
         expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
@@ -485,7 +447,7 @@ describe('AGSuites tests', () => {
     // Command Related ---------------------------------------------------------------------------
 
     test('Command created', async () => {
-        let ag_command_blue_2 = create_ag_command(50, "Blue Command 2", ag_case_blue.pk);
+        let ag_command_blue_2 = data_ut.make_ag_test_command(ag_case_blue.pk);
 
         expect(component.d_ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(1);
 
@@ -497,11 +459,8 @@ describe('AGSuites tests', () => {
     });
 
     test('Command changed', async () => {
-        let updated_ag_command_purple_2 = create_ag_command(
-            ag_command_purple_2.pk,
-            "Updated Purple Command 2",
-            ag_command_purple_2.ag_test_case
-        );
+        let updated_ag_command_purple_2 = deep_copy(ag_command_purple_2, AGTestCommand);
+        updated_ag_command_purple_2.name = 'Updated name';
 
         expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
         expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
@@ -628,7 +587,7 @@ describe('AGSuites tests', () => {
     test("prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, " +
          "prev suite's last case doesnt have enough commands",
          async () => {
-        let ag_case_cat = create_ag_case(6, "Cat Case", ag_suite_pets.pk);
+        let ag_case_cat = data_ut.make_ag_test_case(ag_suite_pets.pk);
 
         AGTestCase.notify_ag_test_case_created(ag_case_cat);
         await component.$nextTick();
@@ -663,11 +622,7 @@ describe('AGSuites tests', () => {
     test('prev_ag_test_case_is_available (true) - suite index is 0, case index != 0, prev ' +
          'case has enough commands',
          async () => {
-        let ag_command_blue_2 = create_ag_command(
-            50,
-            "Blue Command 2",
-            ag_case_blue.pk
-        );
+        let ag_command_blue_2 = data_ut.make_ag_test_command(ag_case_blue.pk);
 
         AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
         await component.$nextTick();
@@ -754,7 +709,7 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
          'case is the last case in the suite, next suite doesnt have any cases',
          async () => {
-        let new_suite = create_ag_suite(4, "New Suite", 10);
+        let new_suite = data_ut.make_ag_test_suite(project.pk);
 
         AGTestSuite.notify_ag_test_suite_created(new_suite);
         await component.$nextTick();
