@@ -726,15 +726,15 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
-import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
-import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
+import Modal from '@/components/modal.vue';
+import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
   FeedbackDescriptions,
   hyphenate
-} from '@/components/feedback_config/feedback_config/feedback_config_utils.ts';
-import Modal from '@/components/modal.vue';
+} from '@/components/project_admin/feedback_config_utils.ts';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';

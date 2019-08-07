@@ -100,8 +100,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case_config_panel.vue';
-import { FeedbackConfigLabel, FeedbackDescriptions } from "@/components/feedback_config/feedback_config/feedback_config_utils";
+import AGCaseConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
+import { FeedbackConfigLabel, FeedbackDescriptions } from "@/components/project_admin/feedback_config_utils";
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';

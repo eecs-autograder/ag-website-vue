@@ -17,9 +17,9 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
-import EditFeedbackSettingsAGCommand from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_command.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
+import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 
 import {
     make_ag_test_case,

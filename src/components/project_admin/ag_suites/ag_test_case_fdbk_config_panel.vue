@@ -33,8 +33,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
-import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
-import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
+import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
 
 @Component({
   components: {ConfigPanel}

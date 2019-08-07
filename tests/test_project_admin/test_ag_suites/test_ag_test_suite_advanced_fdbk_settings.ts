@@ -2,7 +2,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
-import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
+import EditFeedbackSettingsAGSuite from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 
 import { make_ag_test_suite_fdbk_config } from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';

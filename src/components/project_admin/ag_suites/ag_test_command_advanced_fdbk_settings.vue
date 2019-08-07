@@ -148,7 +148,7 @@ import { AGTestCase,
          ValueFeedbackLevel
 } from 'ag-client-typescript';
 
-import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
+import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
 import Toggle from '@/components/toggle.vue';
 
 @Component({

@@ -81,7 +81,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript/dist/src/ag_test_suite';
 
-import { hyphenate } from "@/components/feedback_config/feedback_config/feedback_config_utils.ts";
+import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
 import Toggle from '@/components/toggle.vue';
 
 @Component({

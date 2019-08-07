@@ -38,7 +38,7 @@ import {
   AGTestCommandFeedbackPreset,
   AGTestSuiteFeedbackPreset,
   MutationTestSuiteFeedbackPreset
-} from '@/components/feedback_config/feedback_config/feedback_config_utils';
+} from '@/components/project_admin/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
 import { safe_assign } from "@/utils";
 
@@ -115,6 +115,7 @@ export default class ConfigPanel extends Vue {
   }
 
   private change_preset() {
+    console.assert(this.d_selected_preset_name !== "Custom");
     let updated_config = JSON.parse(JSON.stringify(this.d_configuration));
     safe_assign(updated_config, this.preset_options!.get(this.d_selected_preset_name));
     this.$emit('input', updated_config);

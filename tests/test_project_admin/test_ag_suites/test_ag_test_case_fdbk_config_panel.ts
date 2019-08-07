@@ -2,7 +2,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
-import AGCaseConfigPanel from '@/components/feedback_config/config_panel/ag_case_config_panel.vue';
+import AGCaseConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
 
 import { make_ag_test_case_feedback_config } from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';

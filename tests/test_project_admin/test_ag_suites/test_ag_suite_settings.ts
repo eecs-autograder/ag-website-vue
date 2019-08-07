@@ -14,9 +14,9 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import ConfigPanel from '@/components/feedback_config/config_panel/config_panel.vue';
-import EditFeedbackSettingsAGSuite from '@/components/feedback_config/edit_feedback_settings/edit_feedback_settings_ag_suite.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
+import EditFeedbackSettingsAGSuite from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
+import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 
 import {
     make_ag_test_suite,
