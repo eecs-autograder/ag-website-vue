@@ -7,7 +7,6 @@ import {
     HttpError,
     InstructorFile,
     Project, SandboxDockerImageData,
-    UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
@@ -112,37 +111,24 @@ describe('AGSuiteSettings tests', () => {
             last_modified: "now"
         });
 
+        project = make_project(
+            make_course().pk,
+            {
+                expected_student_files: [
+                    student_file_1,
+                    student_file_2,
+                    student_file_3
+                ],
+                instructor_files: [
+                    instructor_file_1,
+                    instructor_file_2,
+                    instructor_file_3
+                ]
+            }
+        );
         ag_suite = make_ag_test_suite(project.pk);
         ag_suite.instructor_files_needed = [instructor_file_1, instructor_file_2];
         ag_suite.student_files_needed = [student_file_1, student_file_2];
-
-        project = new Project({
-            pk: 10,
-            name: "Detroit Zoo",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            expected_student_files: [student_file_1, student_file_2, student_file_3],
-            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3],
-            has_handgrading_rubric: false,
-        });
 
         sandbox_docker_image_1 = {
             pk: 1,
@@ -580,15 +566,20 @@ describe('AGSuiteSettings tests', () => {
     });
 });
 
-describe('AG test command feedback tests', () => {
+describe('AG test suite feedback tests', () => {
     let ag_test_suite: AGTestSuite;
     let project: Project = make_project(make_course().pk);
 
     beforeEach(() => {
         ag_test_suite = make_ag_test_suite(project.pk);
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
     });
 
-    test('Normal fdbk binding', () => {
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    test('Normal fdbk binding', async () => {
         ag_test_suite.normal_fdbk_config = make_ag_test_suite_fdbk_config({
             show_setup_return_code: true,
             show_setup_stdout: false,
@@ -600,6 +591,8 @@ describe('AG test command feedback tests', () => {
                 project: project
             }
         });
+
+        await wrapper.vm.$nextTick();
 
         let normal_config_panel
             = <Wrapper<ConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
@@ -625,7 +618,7 @@ describe('AG test command feedback tests', () => {
         expect(wrapper.vm.d_ag_test_suite!.normal_fdbk_config).toEqual(new_val);
     });
 
-    test('Final graded fdbk binding', () => {
+    test('Final graded fdbk binding', async () => {
         ag_test_suite.ultimate_submission_fdbk_config = make_ag_test_suite_fdbk_config({
             show_setup_return_code: true,
             show_setup_stdout: false,
@@ -637,6 +630,7 @@ describe('AG test command feedback tests', () => {
                 project: project
             }
         });
+        await wrapper.vm.$nextTick();
 
         let final_graded_config_panel
             = <Wrapper<ConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
@@ -664,7 +658,7 @@ describe('AG test command feedback tests', () => {
         expect(wrapper.vm.d_ag_test_suite!.ultimate_submission_fdbk_config).toEqual(new_val);
     });
 
-    test('Past limit fdbk binding', () => {
+    test('Past limit fdbk binding', async () => {
         ag_test_suite.past_limit_submission_fdbk_config = make_ag_test_suite_fdbk_config({
             show_setup_return_code: true,
             show_setup_stdout: false,
@@ -676,6 +670,7 @@ describe('AG test command feedback tests', () => {
                 project: project
             }
         });
+        await wrapper.vm.$nextTick();
 
         let past_limit_config_panel
             = <Wrapper<ConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
@@ -703,7 +698,7 @@ describe('AG test command feedback tests', () => {
         expect(wrapper.vm.d_ag_test_suite!.past_limit_submission_fdbk_config).toEqual(new_val);
     });
 
-    test('Student lookup fdbk binding', () => {
+    test('Student lookup fdbk binding', async () => {
         ag_test_suite.staff_viewer_fdbk_config = make_ag_test_suite_fdbk_config({
             show_setup_return_code: true,
             show_setup_stdout: false,
@@ -715,6 +710,7 @@ describe('AG test command feedback tests', () => {
                 project: project
             }
         });
+        await wrapper.vm.$nextTick();
 
         let student_lookup_config_panel
             = <Wrapper<ConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});

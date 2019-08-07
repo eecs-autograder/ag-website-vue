@@ -188,7 +188,7 @@
               :preset_options="fdbk_presets">
               <template slot="settings">
                 <EditFeedbackSettingsAGSuite
-                  ref="past_limit_feedback_settings"
+                  ref="past_limit_edit_feedback_settings"
                   v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
                   :config_name="FeedbackConfigLabel.past_limit">
                 </EditFeedbackSettingsAGSuite>

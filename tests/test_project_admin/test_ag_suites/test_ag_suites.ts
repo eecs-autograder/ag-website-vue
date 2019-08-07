@@ -86,7 +86,16 @@ describe('AGSuites tests', () => {
             last_modified: "now"
         });
 
-        project = data_ut.make_project(data_ut.make_course().pk);
+        project = data_ut.make_project(
+            data_ut.make_course().pk,
+            {
+                instructor_files: [
+                    instructor_file_1,
+                    instructor_file_2,
+                    instructor_file_3
+                ]
+            }
+        );
 
         ag_suite_colors = data_ut.make_ag_test_suite(project.pk);
         ag_case_purple = data_ut.make_ag_test_case(ag_suite_colors.pk);
@@ -307,15 +316,15 @@ describe('AGSuites tests', () => {
     });
 
     test('Suite changed', async () => {
-        let original_name = ag_suite_pets.name;
-        ag_suite_pets.name = 'Updated name';
+        let updated_suite_pets = deep_copy(ag_suite_pets, AGTestSuite);
+        updated_suite_pets.name = 'Updated name';
 
-        expect(component.d_ag_test_suites[1].name).toEqual(original_name);
+        expect(component.d_ag_test_suites[1]).not.toEqual(updated_suite_pets);
 
-        AGTestSuite.notify_ag_test_suite_changed(ag_suite_pets);
+        AGTestSuite.notify_ag_test_suite_changed(updated_suite_pets);
         await component.$nextTick();
 
-        expect(component.d_ag_test_suites[1].name).toEqual(ag_suite_pets.name);
+        expect(component.d_ag_test_suites[1].name).toEqual(updated_suite_pets.name);
     });
 
     // Case Related ------------------------------------------------------------------------------

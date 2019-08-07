@@ -26,9 +26,8 @@ describe('EditFeedbackSettingsAGCommand tests', () => {
             show_actual_stdout: false,
             show_actual_stderr: true,
         });
-        ag_test_case = data_ut.make_ag_test_case(
-            ag_test_suite.pk,
-            {ag_test_commands: [data_ut.make_ag_test_command(ag_test_case.pk)]});
+        ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
+        ag_test_case.ag_test_commands = [data_ut.make_ag_test_command(ag_test_case.pk)];
 
         wrapper = mount(EditFeedbackSettingsAGCommand, {
             propsData: {
