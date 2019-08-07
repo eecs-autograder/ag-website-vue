@@ -31,7 +31,7 @@
 
       <div class="section-container">
         <fieldset class="fieldset">
-          <legend class="legend"> Grading Environment </legend>
+<!--          <legend class="legend"> Grading Environment </legend>-->
           <div class="sandbox-container">
             <label class="text-label"> Sandbox environment </label>
             <div class="dropdown">
@@ -134,22 +134,22 @@
         </fieldset>
       </div>
 
-      <div class="bottom-of-form">
-        <APIErrors ref="api_errors"></APIErrors>
+<!--      <div class="bottom-of-form">-->
+<!--        <APIErrors ref="api_errors"></APIErrors>-->
 
-        <button type="submit"
-                class="save-button"
-                :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+<!--        <button type="submit"-->
+<!--                class="save-button"-->
+<!--                :disabled="!d_settings_form_is_valid || d_saving">Save</button>-->
 
-        <div v-show="!d_saving" class="last-saved-timestamp">
-          <span> Last Saved: </span>
-          {{format_datetime(d_mutation_test_suite.last_modified)}}
-        </div>
+<!--        <div v-show="!d_saving" class="last-saved-timestamp">-->
+<!--          <span> Last Saved: </span>-->
+<!--          {{format_datetime(d_mutation_test_suite.last_modified)}}-->
+<!--        </div>-->
 
-        <div v-show="d_saving" class="last-saved-spinner">
-          <i class="fa fa-spinner fa-pulse"></i>
-        </div>
-      </div>
+<!--        <div v-show="d_saving" class="last-saved-spinner">-->
+<!--          <i class="fa fa-spinner fa-pulse"></i>-->
+<!--        </div>-->
+<!--      </div>-->
     </validated-form>
   </div>
 </template>
@@ -238,14 +238,6 @@ export default class MutationSuiteGeneralSettings extends Vue {
     this.d_mutation_test_suite!.student_files_needed.push(student_file);
   }
 
-  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-    return file.name.indexOf(filter_text) >= 0;
-  }
-
-  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-    return file.pattern.indexOf(filter_text) >= 0;
-  }
-
   delete_instructor_file(instructor_file: InstructorFile) {
     let index = this.d_mutation_test_suite!.instructor_files_needed.findIndex(
       (file: InstructorFile) => file.pk === instructor_file.pk
@@ -258,6 +250,14 @@ export default class MutationSuiteGeneralSettings extends Vue {
       (file: ExpectedStudentFile) => file.pk === student_file.pk
     );
     this.d_mutation_test_suite!.student_files_needed.splice(index, 1);
+  }
+
+  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
+    return file.name.indexOf(filter_text) >= 0;
+  }
+
+  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
+    return file.pattern.indexOf(filter_text) >= 0;
   }
 
   @handle_api_errors_async(handle_save_mutation_suite_settings_error)
@@ -283,7 +283,7 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
 @import '@/styles/forms.scss';
 
 #mutation-test-suite-name-container {
-  padding: 0 12px 22px 12px;
+  padding: 0px 12px 22px 12px;
 }
 
 .checkbox-container {
@@ -363,5 +363,4 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
   font-size: 14px;
   color: lighten(black, 30);
 }
-
 </style>

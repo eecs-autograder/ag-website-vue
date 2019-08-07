@@ -34,85 +34,44 @@
 
         <div id="viewing-window" class="scroll-column-grow">
           <div v-if="d_active_mutation_test_suite !== null">
-            <tabs ref="mutation-test-suite-tabs"
-                  v-model="d_current_tab_index"
-                  tab_active_class="white-theme-active"
-                  tab_inactive_class="white-theme-inactive">
-              <tab>
-                <tab-header>
-                  <div class="tab-heading"> General </div>
-                </tab-header>
-                <template slot="body">
-                  <div class="tab-body">
-                    <mutation-suite-general-settings
-                      ref="mutation_suite_general_settings"
-                      :mutation_test_suite="d_active_mutation_test_suite"
-                      :project="project">
-                    </mutation-suite-general-settings>
-                  </div>
-                </template>
-              </tab>
+            <div class="section-header"> General Settings </div>
 
-              <tab>
-                <tab-header ref="project_settings_tab">
-                  <div class="tab-label">
-                    <p class="tab-heading"> Buggy Implementations </p>
-                  </div>
-                </tab-header>
-                <template slot="body">
-                  <div class="tab-body">
-                    <buggy-implementations ref="buggy_implementations"
-                                           :mutation_test_suite="d_active_mutation_test_suite">
-                    </buggy-implementations>
-                  </div>
-                </template>
-              </tab>
+            <mutation-suite-general-settings ref="mutation_suite_general_settings"
+                                             :mutation_test_suite="d_active_mutation_test_suite"
+                                             :project="project">
+            </mutation-suite-general-settings>
 
-              <tab>
-                <tab-header ref="project_settings_tab">
-                  <div class="tab-label">
-                    <p class="tab-heading"> Commands </p>
-                  </div>
-                </tab-header>
-                <template slot="body">
-                  <div class="tab-body">
-                    <mutation-commands ref="mutation_commands"
-                                       :mutation_test_suite="d_active_mutation_test_suite">
-                    </mutation-commands>
-                  </div>
-                </template>
-              </tab>
+            <div class="section-header"> Buggy Implementations </div>
+            <buggy-implementations ref="buggy_implementations"
+                                   :mutation_test_suite="d_active_mutation_test_suite">
+            </buggy-implementations>
 
-              <tab>
-                <tab-header ref="project_settings_tab">
-                  <div class="tab-label">
-                    <p class="tab-heading"> Feedback </p>
-                  </div>
-                </tab-header>
-                <template slot="body">
-                  <div class="tab-body"></div>
-                </template>
-              </tab>
+            <div class="section-header"> Commands </div>
+            <mutation-commands ref="mutation_commands"
+                               :mutation_test_suite="d_active_mutation_test_suite">
+            </mutation-commands>
 
-              <tab>
-                <tab-header ref="project_settings_tab">
-                  <div class="tab-label">
-                    <p class="tab-heading"> Danger Zone </p>
-                  </div>
-                </tab-header>
-                <template slot="body">
-                  <div class="tab-body">
-                    <button class="delete-mutation-test-suite-button"
-                            type="button"
-                            @click="$refs.delete_mutation_test_suite_modal.open()">
-                      Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
-                    </button>
-                  </div>
-                </template>
-              </tab>
-            </tabs>
+            <div class="section-header"> Feedback Settings </div>
+
+            <div class="bottom-of-form">
+              <APIErrors ref="api_errors"></APIErrors>
+
+              <button type="submit"
+                      class="save-button"
+                      :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+
+<!--              <div v-show="!d_saving" class="last-saved-timestamp">-->
+<!--                <span> Last Saved: </span>-->
+<!--                {{format_datetime(d_mutation_test_suite.last_modified)}}-->
+<!--              </div>-->
+
+              <div v-show="d_saving" class="last-saved-spinner">
+                <i class="fa fa-spinner fa-pulse"></i>
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
 
       <modal ref="delete_mutation_test_suite_modal"
@@ -193,9 +152,6 @@ import BuggyImplementations from "@/components/project_admin/mutation_suites/bug
 import MutationCommand from "@/components/project_admin/mutation_suites/mutation_command.vue";
 import MutationCommands from "@/components/project_admin/mutation_suites/mutation_commands.vue";
 import MutationSuiteGeneralSettings from "@/components/project_admin/mutation_suites/mutation_suite_general_settings.vue";
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -209,9 +165,6 @@ import { is_not_empty } from '@/validators';
     MutationCommand,
     MutationCommands,
     MutationSuiteGeneralSettings,
-    Tab,
-    TabHeader,
-    Tabs,
     ValidatedForm,
     ValidatedInput
   }
@@ -225,11 +178,11 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   d_active_mutation_test_suite: MutationTestSuite | null = null;
   d_add_mutation_test_suite_form_is_valid = true;
   d_adding_suite = false;
-  d_current_tab_index = 0;
   d_loading = true;
   d_mutation_test_suites: MutationTestSuite[] = [];
   d_new_mutation_test_suite_name = "";
   d_saving = false;
+  d_settings_form_is_valid = true;
 
   async created() {
     MutationTestSuite.subscribe(this);
@@ -260,7 +213,6 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     await this.d_active_mutation_test_suite!.delete();
     (<Modal> this.$refs.delete_mutation_test_suite_modal).close();
     this.d_active_mutation_test_suite = null;
-    this.d_current_tab_index = 0;
   }
 
   open_new_mutation_test_suite_modal() {
@@ -293,13 +245,14 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     );
     this.d_mutation_test_suites.splice(index, 1);
   }
+
   update_mutation_test_suites_order_changed(project_pk: number,
                                             mutation_test_suite_order: number[]): void {
     throw new Error("Method not implemented.");
   }
 }
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -392,6 +345,10 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   padding-top: 20px;
 }
 
+#delete-mutation-test-suite-section {
+  padding: 20px 0;
+}
+
 .delete-mutation-test-suite-button {
   @extend .red-button;
   margin-left: 8px;
@@ -428,6 +385,7 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 }
 
 // delete modal -----------------------------------------
+
 .modal-delete-button {
   margin-right: 10px;
 }
@@ -435,6 +393,38 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 .item-to-delete {
   color: $ocean-blue;
   margin-left: 3px;
+}
+
+.save-button {
+  @extend .green-button;
+  display: block;
+  margin: 0 0 30px 15px;
+}
+
+/*.section-header {*/
+/*  margin: 5px 10px;*/
+/*  padding: 5px;*/
+/*  font-size: 20px;*/
+/*  font-weight: bold;*/
+/*  //border: 1px solid $white-gray;*/
+/*  //background-color: $white-gray;*/
+/*  display: inline-block;*/
+/*  //color: $navy-blue;*/
+/*}*/
+
+.section-header {
+  box-sizing: border-box;
+  margin: 5px 12px 8px 12px;
+  padding: 5px;
+  font-size: 20px;
+  font-weight: bold;
+  padding-left: 50px;
+  //border-top: 2px solid $white-gray;
+  //border-bottom: 2px solid $navy-blue;
+  background-color: black;
+  display: inline-block;
+  color: white;
+  border-radius: 1px;
 }
 
 </style>

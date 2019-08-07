@@ -91,24 +91,25 @@
                      {'odd-buggy-implementation-row': index % 2 !== 0}]">
           <span class="buggy-implementation-name">{{buggy_name}}</span>
           <div class="remove-buggy-impl-name-container"
-               @click="remove_buggy_implementation_name(index)">
+               @click="remove_buggy_implementation_name(index)"
+               :title="`Remove ${buggy_name}`">
             <i class="fas fa-times remove-buggy-impl-name-icon"></i>
           </div>
         </div>
       </div>
 
-      <div class="bottom-of-form">
-        <APIErrors ref="api_errors"></APIErrors>
+<!--      <div class="bottom-of-form">-->
+<!--        <APIErrors ref="api_errors"></APIErrors>-->
 
-        <button class="save-button"
-                :disabled="!d_mutation_test_suite_settings_form_is_valid || d_saving"> Save
-        </button>
+<!--        <button class="save-button"-->
+<!--                :disabled="!d_mutation_test_suite_settings_form_is_valid || d_saving"> Save-->
+<!--        </button>-->
 
-        <div v-show="!d_saving" class="last-saved-timestamp">
-          <span> Last Saved: </span>
-          {{format_datetime(d_mutation_test_suite.last_modified)}}
-        </div>
-      </div>
+<!--        <div v-show="!d_saving" class="last-saved-timestamp">-->
+<!--          <span> Last Saved: </span>-->
+<!--          {{format_datetime(d_mutation_test_suite.last_modified)}}-->
+<!--        </div>-->
+<!--      </div>-->
 
     </validated-form>
 
@@ -239,12 +240,12 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
 }
 
 .input-container {
-  margin: 10px 0;
+  margin: 5px 0 10px 0;
 }
 
 .toggle-container {
   font-size: 14px;
-  margin: 12px 5px 0 0;
+  margin: 13px 5px 3px 0;
   padding-bottom: 5px;
   min-width: 500px;
 }
@@ -261,6 +262,31 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
+  .remove-buggy-impl-name-container {
+    cursor: pointer;
+    padding: 0 5px;
+  }
+
+  .remove-buggy-impl-name-icon {
+    color: hsl(220, 20%, 85%);
+  }
+}
+
+.buggy-implementation-row:hover {
+  background-color: hsl(210, 20%, 90%);
+
+  .buggy-implementation-name {
+    color: lighten(black, 20);
+  }
+
+  .remove-buggy-impl-name-icon {
+    color: hsl(212, 10%, 47%);
+  }
+
+  .remove-buggy-impl-name-icon:hover {
+    color: $navy-blue;
+  }
 }
 
 .odd-buggy-implementation-row {
@@ -270,18 +296,7 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
 .buggy-implementation-name {
   color: lighten(black, 40);
   padding-right: 30px;
-}
-
-.remove-buggy-impl-name-container {
-  cursor: pointer;
-}
-
-.remove-buggy-impl-name-icon {
-  color: hsl(220, 20%, 85%);
-}
-
-.remove-buggy-impl-name-icon:hover {
-  color: hsl(220, 20%, 55%);
+  cursor: default;
 }
 
 .bottom-of-form {

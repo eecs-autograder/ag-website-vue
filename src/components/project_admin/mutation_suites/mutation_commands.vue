@@ -64,22 +64,22 @@
       </fieldset>
     </div>
 
-    <div class="save-button-container">
-      <APIErrors ref="api_errors"></APIErrors>
-      <div>
-        <button class="green-button save-button"
-                id="save-commands"
-                :disabled="!command_settings_forms_are_valid || d_saving"
-                @click="save_command_settings">
-          Save
-        </button>
+<!--    <div class="save-button-container">-->
+<!--      <APIErrors ref="api_errors"></APIErrors>-->
+<!--      <div>-->
+<!--        <button class="green-button save-button"-->
+<!--                id="save-commands"-->
+<!--                :disabled="!command_settings_forms_are_valid || d_saving"-->
+<!--                @click="save_command_settings">-->
+<!--          Save-->
+<!--        </button>-->
 
-        <div v-show="!d_saving" class="last-saved-timestamp">
-          <span> Last Saved: </span>
-          {{format_datetime(d_mutation_test_suite.last_modified)}}
-        </div>
-      </div>
-    </div>
+<!--        <div v-show="!d_saving" class="last-saved-timestamp">-->
+<!--          <span> Last Saved: </span>-->
+<!--          {{format_datetime(d_mutation_test_suite.last_modified)}}-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
   </div>
 </template>
