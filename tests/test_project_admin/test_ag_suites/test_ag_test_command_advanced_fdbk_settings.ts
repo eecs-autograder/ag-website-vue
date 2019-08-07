@@ -2,7 +2,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestCase, AGTestCommandFeedbackConfig, AGTestSuite, ValueFeedbackLevel } from 'ag-client-typescript';
 
-import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
@@ -11,9 +11,9 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('EditFeedbackSettingsAGCommand tests', () => {
-    let wrapper: Wrapper<EditFeedbackSettingsAGCommand>;
-    let component: EditFeedbackSettingsAGCommand;
+describe('AGTestCommandAdvancedFdbkSettings tests', () => {
+    let wrapper: Wrapper<AGTestCommandAdvancedFdbkSettings>;
+    let component: AGTestCommandAdvancedFdbkSettings;
     let ag_test_suite: AGTestSuite;
     let ag_test_case: AGTestCase;
     let feedback_config: AGTestCommandFeedbackConfig;
@@ -29,7 +29,7 @@ describe('EditFeedbackSettingsAGCommand tests', () => {
         ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
         ag_test_case.ag_test_commands = [data_ut.make_ag_test_command(ag_test_case.pk)];
 
-        wrapper = mount(EditFeedbackSettingsAGCommand, {
+        wrapper = mount(AGTestCommandAdvancedFdbkSettings, {
             propsData: {
                 config_name: "normal",
                 ag_test_case: ag_test_case,

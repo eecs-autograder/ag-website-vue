@@ -18,7 +18,7 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
-import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 
 import {
@@ -1048,7 +1048,7 @@ describe('AG test command feedback tests', () => {
         expect(normal_config_panel.vm.value).toEqual(ag_test_command.normal_fdbk_config);
 
         let normal_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+            = <Wrapper<AGTestCommandAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'normal_edit_feedback_settings'});
         expect(normal_advanced_settings.vm.value).toEqual(ag_test_command.normal_fdbk_config);
 
@@ -1087,7 +1087,7 @@ describe('AG test command feedback tests', () => {
             ag_test_command.first_failed_test_normal_fdbk_config);
 
         let first_failure_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+            = <Wrapper<AGTestCommandAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'first_failure_edit_feedback_settings'});
         expect(first_failure_advanced_settings.vm.value).toEqual(
             ag_test_command.first_failed_test_normal_fdbk_config);
@@ -1127,7 +1127,7 @@ describe('AG test command feedback tests', () => {
             ag_test_command.ultimate_submission_fdbk_config);
 
         let final_graded_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+            = <Wrapper<AGTestCommandAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'final_graded_edit_feedback_settings'});
         expect(final_graded_advanced_settings.vm.value).toEqual(
             ag_test_command.ultimate_submission_fdbk_config);
@@ -1167,7 +1167,7 @@ describe('AG test command feedback tests', () => {
             ag_test_command.past_limit_submission_fdbk_config);
 
         let past_limit_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+            = <Wrapper<AGTestCommandAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'past_limit_edit_feedback_settings'});
         expect(past_limit_advanced_settings.vm.value).toEqual(
             ag_test_command.past_limit_submission_fdbk_config);
@@ -1207,7 +1207,7 @@ describe('AG test command feedback tests', () => {
             ag_test_command.staff_viewer_fdbk_config);
 
         let student_lookup_advanced_settings
-            = <Wrapper<EditFeedbackSettingsAGCommand>> wrapper.find(
+            = <Wrapper<AGTestCommandAdvancedFdbkSettings>> wrapper.find(
                 {ref: 'student_lookup_edit_feedback_settings'});
         expect(student_lookup_advanced_settings.vm.value).toEqual(
             ag_test_command.staff_viewer_fdbk_config);

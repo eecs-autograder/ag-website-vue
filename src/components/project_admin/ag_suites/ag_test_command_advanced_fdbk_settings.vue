@@ -156,7 +156,7 @@ import Toggle from '@/components/toggle.vue';
     Toggle
   }
 })
-export default class EditFeedbackSettingsAGCommand extends Vue {
+export default class AGTestCommandAdvancedFdbkSettings extends Vue {
   @Prop({required: true, type: String})
   config_name!: string;
 

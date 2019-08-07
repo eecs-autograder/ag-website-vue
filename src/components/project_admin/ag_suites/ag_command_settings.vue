@@ -526,11 +526,11 @@
               </div>
             </template>
             <template slot="settings">
-              <EditFeedbackSettingsAGCommand ref="normal_edit_feedback_settings"
+              <AGTestCommandAdvancedFdbkSettings ref="normal_edit_feedback_settings"
                                              v-model="d_ag_test_command.normal_fdbk_config"
                                              :ag_test_case="ag_test_case"
                                              :config_name="FeedbackConfigLabel.normal">
-              </EditFeedbackSettingsAGCommand>
+              </AGTestCommandAdvancedFdbkSettings>
             </template>
           </feedback-config-panel>
 
@@ -558,12 +558,12 @@
                   Enabled
                 </label>
               </div>
-              <EditFeedbackSettingsAGCommand
+              <AGTestCommandAdvancedFdbkSettings
                 ref="first_failure_edit_feedback_settings"
                 v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
                 :ag_test_case="ag_test_case"
                 :config_name="FeedbackConfigLabel.first_failure">
-              </EditFeedbackSettingsAGCommand>
+              </AGTestCommandAdvancedFdbkSettings>
             </template>
           </feedback-config-panel>
 
@@ -581,12 +581,12 @@
               </div>
             </template>
             <template slot="settings">
-              <EditFeedbackSettingsAGCommand
+              <AGTestCommandAdvancedFdbkSettings
                 ref="final_graded_edit_feedback_settings"
                 v-model="d_ag_test_command.ultimate_submission_fdbk_config"
                 :ag_test_case="ag_test_case"
                 :config_name="FeedbackConfigLabel.ultimate_submission">
-              </EditFeedbackSettingsAGCommand>
+              </AGTestCommandAdvancedFdbkSettings>
             </template>
           </feedback-config-panel>
 
@@ -604,12 +604,12 @@
               </div>
             </template>
             <template slot="settings">
-              <EditFeedbackSettingsAGCommand
+              <AGTestCommandAdvancedFdbkSettings
                 ref="past_limit_edit_feedback_settings"
                   v-model="d_ag_test_command.past_limit_submission_fdbk_config"
                 :ag_test_case="ag_test_case"
                 :config_name="FeedbackConfigLabel.past_limit">
-              </EditFeedbackSettingsAGCommand>
+              </AGTestCommandAdvancedFdbkSettings>
             </template>
           </feedback-config-panel>
 
@@ -627,11 +627,11 @@
               </div>
             </template>
             <template slot="settings">
-              <EditFeedbackSettingsAGCommand ref="student_lookup_edit_feedback_settings"
+              <AGTestCommandAdvancedFdbkSettings ref="student_lookup_edit_feedback_settings"
                                              v-model="d_ag_test_command.staff_viewer_fdbk_config"
                                              :ag_test_case="ag_test_case"
                                              :config_name="FeedbackConfigLabel.staff_viewer">
-              </EditFeedbackSettingsAGCommand>
+              </AGTestCommandAdvancedFdbkSettings>
             </template>
           </feedback-config-panel>
         </div>
@@ -726,7 +726,7 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
-import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import {
   AGTestCommandFeedbackPreset,
@@ -751,7 +751,7 @@ import {
     APIErrors,
     FeedbackConfigPanel,
     Dropdown,
-    EditFeedbackSettingsAGCommand,
+    AGTestCommandAdvancedFdbkSettings,
     Modal,
     Tooltip,
     ValidatedForm,
