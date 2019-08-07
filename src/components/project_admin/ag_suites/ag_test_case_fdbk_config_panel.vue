@@ -1,5 +1,5 @@
 <template>
-  <config-panel v-model="d_feedback_config">
+  <feedback-config-panel v-model="d_feedback_config">
     <template v-slot:header>
       <slot name="header"></slot>
     </template>
@@ -25,7 +25,7 @@
         </label>
       </div>
     </template>
-  </config-panel>
+  </feedback-config-panel>
 </template>
 
 <script lang="ts">
@@ -33,11 +33,11 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
-import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
 
 @Component({
-  components: {ConfigPanel}
+  components: {FeedbackConfigPanel}
 })
 export default class AGCaseConfigPanel extends Vue {
   @Prop({required: true, type: String})

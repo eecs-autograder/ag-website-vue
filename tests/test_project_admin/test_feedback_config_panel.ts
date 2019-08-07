@@ -2,7 +2,7 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
-import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import {
     AGTestSuiteFeedbackPreset,
 } from '@/components/project_admin/feedback_config_utils';
@@ -16,9 +16,9 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('ConfigPanel tests', () => {
-    let wrapper: Wrapper<ConfigPanel>;
-    let component: ConfigPanel;
+describe('FeedbackConfigPanel tests', () => {
+    let wrapper: Wrapper<FeedbackConfigPanel>;
+    let component: FeedbackConfigPanel;
     let ag_test_suite_normal_feedback_config: AGTestSuiteFeedbackConfig;
     let ag_test_suite_default_config: AGTestSuiteFeedbackConfig;
     let ag_test_suite_fdbk_presets: SafeMap<string, AGTestSuiteFeedbackPreset>;
@@ -67,7 +67,7 @@ describe('ConfigPanel tests', () => {
     });
 
     test('created with value = null', () => {
-        wrapper = mount(ConfigPanel, {
+        wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: ag_test_suite_fdbk_presets,
                 value: null
@@ -80,7 +80,7 @@ describe('ConfigPanel tests', () => {
     });
 
     test('selected_preset_name binding', async () => {
-        wrapper = mount(ConfigPanel, {
+        wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: ag_test_suite_fdbk_presets,
                 value: ag_test_suite_normal_feedback_config
@@ -113,7 +113,7 @@ describe('ConfigPanel tests', () => {
     });
 
     test("Change preset", async () => {
-        wrapper = mount(ConfigPanel, {
+        wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: ag_test_suite_fdbk_presets,
                 value: ag_test_suite_normal_feedback_config
@@ -175,7 +175,7 @@ describe('ConfigPanel tests', () => {
             ag_test_suite_fdbk_presets.get("Private Setup")
         ));
 
-        wrapper = mount(ConfigPanel, {
+        wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: ag_test_suite_fdbk_presets,
                 value: public_setup_fdbk_config
@@ -206,7 +206,7 @@ describe('ConfigPanel tests', () => {
     });
 
     test('Value prop changed to a configuration that is null', async () => {
-        wrapper = mount(ConfigPanel, {
+        wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: ag_test_suite_fdbk_presets,
                 value: ag_test_suite_normal_feedback_config
@@ -225,7 +225,7 @@ describe('ConfigPanel tests', () => {
     });
 
     test('Presets not provided, no preset dropdown', async () => {
-        wrapper = mount(ConfigPanel, {
+        wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: new SafeMap([]),
                 value: ag_test_suite_normal_feedback_config

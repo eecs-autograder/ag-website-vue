@@ -512,9 +512,9 @@
       <fieldset class="fieldset">
         <legend class="legend"> Feedback </legend>
         <div class="config-panels-container">
-          <config-panel ref="normal_config_panel"
-                        v-model="d_ag_test_command.normal_fdbk_config"
-                        :preset_options="fdbk_presets">
+          <feedback-config-panel ref="normal_config_panel"
+                                 v-model="d_ag_test_command.normal_fdbk_config"
+                                 :preset_options="fdbk_presets">
             <template slot="header">
               <div class="config-name">
                 {{FeedbackConfigLabel.normal}}
@@ -532,11 +532,11 @@
                                              :config_name="FeedbackConfigLabel.normal">
               </EditFeedbackSettingsAGCommand>
             </template>
-          </config-panel>
+          </feedback-config-panel>
 
-          <config-panel ref="first_failure_config_panel"
-                        v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                        :preset_options="fdbk_presets">
+          <feedback-config-panel ref="first_failure_config_panel"
+                                 v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+                                 :preset_options="fdbk_presets">
             <template slot="header">
               <div class="config-name">
                 {{FeedbackConfigLabel.first_failure}}
@@ -565,12 +565,11 @@
                 :config_name="FeedbackConfigLabel.first_failure">
               </EditFeedbackSettingsAGCommand>
             </template>
-          </config-panel>
+          </feedback-config-panel>
 
-          <config-panel
-            ref="final_graded_config_panel"
-            v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-            :preset_options="fdbk_presets">
+          <feedback-config-panel ref="final_graded_config_panel"
+                                 v-model="d_ag_test_command.ultimate_submission_fdbk_config"
+                                 :preset_options="fdbk_presets">
             <template slot="header">
               <div class="config-name">
                 {{FeedbackConfigLabel.ultimate_submission}}
@@ -589,11 +588,11 @@
                 :config_name="FeedbackConfigLabel.ultimate_submission">
               </EditFeedbackSettingsAGCommand>
             </template>
-          </config-panel>
+          </feedback-config-panel>
 
-          <config-panel ref="past_limit_config_panel"
-                        v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                        :preset_options="fdbk_presets">
+          <feedback-config-panel ref="past_limit_config_panel"
+                                 v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+                                 :preset_options="fdbk_presets">
             <template slot="header">
               <div class="config-name">
                 {{FeedbackConfigLabel.past_limit}}
@@ -612,9 +611,9 @@
                 :config_name="FeedbackConfigLabel.past_limit">
               </EditFeedbackSettingsAGCommand>
             </template>
-          </config-panel>
+          </feedback-config-panel>
 
-          <config-panel ref="student_lookup_config_panel"
+          <feedback-config-panel ref="student_lookup_config_panel"
                         v-model="d_ag_test_command.staff_viewer_fdbk_config"
                         :preset_options="fdbk_presets">
             <template slot="header">
@@ -634,7 +633,7 @@
                                              :config_name="FeedbackConfigLabel.staff_viewer">
               </EditFeedbackSettingsAGCommand>
             </template>
-          </config-panel>
+          </feedback-config-panel>
         </div>
 
       </fieldset>
@@ -728,7 +727,7 @@ import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
-import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
@@ -750,7 +749,7 @@ import {
 @Component({
   components: {
     APIErrors,
-    ConfigPanel,
+    FeedbackConfigPanel,
     Dropdown,
     EditFeedbackSettingsAGCommand,
     Modal,

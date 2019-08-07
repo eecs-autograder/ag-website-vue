@@ -19,7 +19,7 @@ import * as sinon from "sinon";
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import EditFeedbackSettingsAGCommand from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
-import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 
 import {
     make_ag_test_case,
@@ -1044,7 +1044,7 @@ describe('AG test command feedback tests', () => {
         });
 
         let normal_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
         expect(normal_config_panel.vm.value).toEqual(ag_test_command.normal_fdbk_config);
 
         let normal_advanced_settings
@@ -1082,7 +1082,7 @@ describe('AG test command feedback tests', () => {
         });
 
         let first_failure_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'first_failure_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'first_failure_config_panel'});
         expect(first_failure_config_panel.vm.value).toEqual(
             ag_test_command.first_failed_test_normal_fdbk_config);
 
@@ -1122,7 +1122,7 @@ describe('AG test command feedback tests', () => {
         });
 
         let final_graded_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
         expect(final_graded_config_panel.vm.value).toEqual(
             ag_test_command.ultimate_submission_fdbk_config);
 
@@ -1162,7 +1162,7 @@ describe('AG test command feedback tests', () => {
         });
 
         let past_limit_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
         expect(past_limit_config_panel.vm.value).toEqual(
             ag_test_command.past_limit_submission_fdbk_config);
 
@@ -1202,7 +1202,7 @@ describe('AG test command feedback tests', () => {
         });
 
         let student_lookup_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
         expect(student_lookup_config_panel.vm.value).toEqual(
             ag_test_command.staff_viewer_fdbk_config);
 

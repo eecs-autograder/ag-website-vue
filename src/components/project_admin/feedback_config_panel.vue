@@ -51,7 +51,7 @@ export type FeedbackConfigType = AGTestCommandFeedbackConfig
                                  | MutationTestSuiteFeedbackPreset
                                  | null;
 @Component
-export default class ConfigPanel extends Vue {
+export default class FeedbackConfigPanel extends Vue {
   @Prop({default: null, type: SafeMap})
   preset_options!: SafeMap<string, FeedbackPresetType> | null;
 

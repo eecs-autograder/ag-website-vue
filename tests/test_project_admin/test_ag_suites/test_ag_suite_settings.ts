@@ -16,7 +16,7 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import EditFeedbackSettingsAGSuite from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
-import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 
 import {
     make_ag_test_suite,
@@ -595,7 +595,7 @@ describe('AG test suite feedback tests', () => {
         await wrapper.vm.$nextTick();
 
         let normal_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
         expect(normal_config_panel.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
 
         let normal_advanced_settings
@@ -633,7 +633,7 @@ describe('AG test suite feedback tests', () => {
         await wrapper.vm.$nextTick();
 
         let final_graded_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
         expect(final_graded_config_panel.vm.value).toEqual(
             ag_test_suite.ultimate_submission_fdbk_config);
 
@@ -673,7 +673,7 @@ describe('AG test suite feedback tests', () => {
         await wrapper.vm.$nextTick();
 
         let past_limit_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
         expect(past_limit_config_panel.vm.value).toEqual(
             ag_test_suite.past_limit_submission_fdbk_config);
 
@@ -713,7 +713,7 @@ describe('AG test suite feedback tests', () => {
         await wrapper.vm.$nextTick();
 
         let student_lookup_config_panel
-            = <Wrapper<ConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
         expect(student_lookup_config_panel.vm.value).toEqual(
             ag_test_suite.staff_viewer_fdbk_config);
 

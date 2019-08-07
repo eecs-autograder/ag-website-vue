@@ -156,9 +156,9 @@
         <fieldset class="fieldset">
           <legend class="legend">Feedback</legend>
           <div class="config-panels-container">
-            <config-panel ref="normal_config_panel"
-                          v-model="d_ag_test_suite.normal_fdbk_config"
-                          :preset_options="fdbk_presets">
+            <feedback-config-panel ref="normal_config_panel"
+                                   v-model="d_ag_test_suite.normal_fdbk_config"
+                                   :preset_options="fdbk_presets">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.normal}}
@@ -175,11 +175,11 @@
                                              :config_name="FeedbackConfigLabel.normal">
                 </EditFeedbackSettingsAGSuite>
               </template>
-            </config-panel>
+            </feedback-config-panel>
 
-            <config-panel ref="final_graded_config_panel"
-                          v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
-                          :preset_options="fdbk_presets">
+            <feedback-config-panel ref="final_graded_config_panel"
+                                   v-model="d_ag_test_suite.ultimate_submission_fdbk_config"
+                                   :preset_options="fdbk_presets">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.ultimate_submission}}
@@ -197,11 +197,11 @@
                   :config_name="FeedbackConfigLabel.ultimate_submission">
                 </EditFeedbackSettingsAGSuite>
               </template>
-            </config-panel>
+            </feedback-config-panel>
 
-            <config-panel ref="past_limit_config_panel"
-                          v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
-                          :preset_options="fdbk_presets">
+            <feedback-config-panel ref="past_limit_config_panel"
+                                   v-model="d_ag_test_suite.past_limit_submission_fdbk_config"
+                                   :preset_options="fdbk_presets">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.past_limit}}
@@ -219,12 +219,11 @@
                   :config_name="FeedbackConfigLabel.past_limit">
                 </EditFeedbackSettingsAGSuite>
               </template>
-            </config-panel>
+            </feedback-config-panel>
 
-            <config-panel ref="student_lookup_config_panel"
-                          :config_name="FeedbackConfigLabel.staff_viewer"
-                          v-model="d_ag_test_suite.staff_viewer_fdbk_config"
-                          :preset_options="fdbk_presets">
+            <feedback-config-panel ref="student_lookup_config_panel"
+                                   v-model="d_ag_test_suite.staff_viewer_fdbk_config"
+                                   :preset_options="fdbk_presets">
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.staff_viewer}}
@@ -241,7 +240,7 @@
                                              :config_name="FeedbackConfigLabel.staff_viewer">
                 </EditFeedbackSettingsAGSuite>
               </template>
-            </config-panel>
+            </feedback-config-panel>
           </div>
 
         </fieldset>
@@ -320,7 +319,7 @@ import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
 import EditFeedbackSettingsAGSuite from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
-import ConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_utils';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -336,7 +335,7 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     APIErrors,
-    ConfigPanel,
+    FeedbackConfigPanel,
     Dropdown,
     DropdownTypeahead,
     EditFeedbackSettingsAGSuite,
