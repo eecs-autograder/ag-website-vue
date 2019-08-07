@@ -38,10 +38,10 @@
             </AGSuiteSettings>
           </template>
           <template v-else-if="active_level_is_command">
-            <AGCommandSettings :ag_test_command="d_active_ag_test_command"
+            <AGTestCommandSettings :ag_test_command="d_active_ag_test_command"
                               :ag_test_case="parent_ag_test_case"
                               :project="project">
-            </AGCommandSettings>
+            </AGTestCommandSettings>
           </template>
         </div>
       </div>
@@ -116,7 +116,7 @@ import { ID } from 'ag-client-typescript/dist/src/base';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
-import AGCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
+import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -127,7 +127,7 @@ import { is_not_empty } from '@/validators';
 @Component({
   components: {
     AGCaseSettings,
-    AGCommandSettings,
+    AGTestCommandSettings,
     AGSuitePanel,
     AGSuiteSettings,
     APIErrors,

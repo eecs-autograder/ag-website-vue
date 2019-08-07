@@ -70,7 +70,7 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            MUTATION TESTING - TODO
+            <!-- <mutation-suites :project="project"></mutation-suites> -->
           </div>
         </template>
       </tab>
