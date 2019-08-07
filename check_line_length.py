@@ -21,7 +21,7 @@ def main():
                     if ignore_line(line, args.ignore_startswith):
                         continue
 
-                    if len(line) > args.max_line_length:
+                    if len(line.rstrip('\n')) > args.max_line_length:
                         too_long_lines.append((filename, line_num, len(line)))
 
     for filename, line_num, line_len in too_long_lines:
@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument('max_line_length', type=int)
     parser.add_argument('file_patterns', nargs='+')
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-i', '--ignore_startswith', action='append', 
+    parser.add_argument('-i', '--ignore_startswith', action='append',
                         help='Ignore lines that start with this string')
 
     return parser.parse_args()
