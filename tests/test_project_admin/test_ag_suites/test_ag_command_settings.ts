@@ -4,16 +4,13 @@ import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
-    AGTestCaseFeedbackConfig,
     AGTestCommand,
-    AGTestCommandFeedbackConfig,
     ExpectedOutputSource,
     ExpectedReturnCode,
     HttpError,
     InstructorFile,
     Project,
     StdinSource,
-    UltimateSubmissionPolicy,
     ValueFeedbackLevel,
     AGTestSuite,
 } from 'ag-client-typescript';
