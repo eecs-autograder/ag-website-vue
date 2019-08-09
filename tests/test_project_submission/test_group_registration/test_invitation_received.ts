@@ -291,15 +291,6 @@ describe('InvitationReceived tests', () => {
         ]);
     });
 
-    test('Members who have already accepted', async () => {
-        expect(component.d_invitation!.invitees_who_accepted.length).toEqual(1);
-        expect(component.d_invitation!.invitees_who_accepted).toContain("milo@umich.edu");
-
-        let members_who_have_accepted = wrapper.findAll('.already-accepted');
-        expect(members_who_have_accepted.length).toEqual(1);
-        expect(members_who_have_accepted.at(0).text()).toEqual("milo@umich.edu");
-    });
-
     test('value Watcher', async () => {
         let updated_invitation = new GroupInvitation({
             pk: 1,

@@ -33,7 +33,7 @@
               </div>
 
               <div id="group-members-container">
-                <div id="group-members-title"><b> Group members: </b></div>
+                <div id="group-members-title"> Group members: </div>
                 <div v-for="(member, index) of group.member_names">
                   <div :class="['group-member',
                                {'odd-row': index % 2 !== 0}]">
@@ -200,15 +200,15 @@ export default class ProjectView extends Vue implements GroupObserver {
 #group-members-container {
   min-width: 25%;
   border-collapse: collapse;
-  border: 2px solid $gray-blue-1;
+  border: 2px solid $stormy-gray-dark;
   border-radius: 3px;
   display: inline-block;
 }
 
 #group-members-title {
   padding: 10px 15px 10px 15px;
-  border-bottom: 1px solid lighten($gray-blue-1, 2);
-  background-color: $gray-blue-1;
+  background-color: $stormy-gray-dark;
+  color: white;
 }
 
 .group-member {

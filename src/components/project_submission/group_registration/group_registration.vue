@@ -1,9 +1,14 @@
 <template>
   <div v-if="!d_loading" id="group-registration">
-    <div id="group-registration-title"> Group Registration </div>
-    <div class="resolve-invitation-message"
-         v-if="invitations_received > 0 || invitation_sent !== null">
-      (You must resolve pending invitations before sending a new one).
+    <div id="group-registration-title">
+      <div id="blah"> Group Registration </div>
+      <div id="group-registration-options"
+           v-if="invitation_sent === null && invitations_received.length === 0">
+        <button id="work-alone-button"
+                @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
+        <button id="send-group-invitation-button"
+                @click="open_send_group_invitation_modal()"> Create new invitation </button>
+      </div>
     </div>
 
     <div v-if="project.disallow_group_registration"
@@ -11,19 +16,48 @@
       Group registration has been closed for this project.
       Please email the course staff if you need to create a group.
     </div>
+
     <div v-else id="registration-open">
-      <div id="group-registration-options"
-           v-if="invitation_sent === null && invitations_received.length === 0">
-        <button class="blue-button"
-                id="work-alone-button"
-                @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
-        <button class="green-button"
-                id="send-group-invitation-button"
-                @click="open_send_group_invitation_modal()"> Create new invitation </button>
+      <div v-if="invitation_sent !== null"
+           id="invitation-sent-container">
+
+        <div id="invitation-sent">
+          <div id="invitation-sent-header">
+
+            <div id="invitation-sent-title"> Invitation: Pending </div>
+
+          </div>
+          <div id="invitation-sent-body">
+            <table id="invitation-sent-table">
+              <tr class="invitation-sent-tr">
+                <td> Member Name </td>
+                <td> Status </td>
+              </tr>
+              <tr v-for="(username, index) of invitation_sent.invited_usernames"
+                  :class="['invited-member',
+                     {'last-username': index === invitation_sent.invited_usernames.length - 1},
+                     {'odd-row': index % 2 == 1}]">
+                <td>
+                  <div class="invited-member-name"> {{username}} </div>
+                </td>
+                <td class="invited-member-acceptance-status">
+                  {{invitee_has_accepted(username)}}
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div id="invitation-sent-footer">
+            <button id="cancel-sent-invitation-button"
+                    @click="$refs.cancel_group_invitation_modal.open()">
+              Cancel Invitation
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div v-if="invitations_received.length > 0">
-        <div id="invitations-received-title"> Invitations received </div>
+      <div v-if="invitations_received.length > 0"
+           id="invitations-received-container">
         <div v-for="(invitation, index) of invitations_received"
              :key="invitation.pk"
              class="invitation">
@@ -32,45 +66,6 @@
                                :project="project"
                                @invitation_rejected="invitations_received.splice(index, 1)">
           </invitation-received>
-        </div>
-      </div>
-
-      <div v-if="invitation_sent !== null">
-        <div id="pending-invitations-title"> Pending Invitation Sent </div>
-        <div id="invitation-sent">
-          <div>
-            <div>
-              <div> Invited Members: </div>
-              <ul class="list-of-usernames">
-                <li v-for="(username, index) of invitation_sent.invited_usernames"
-                    :class="['username',
-                     {'last-username': index === invitation_sent.invited_usernames.length - 1}]">
-                  <b>{{username}}</b>
-                </li>
-              </ul>
-            </div>
-
-            <div v-if="invitation_sent.invitees_who_accepted.length > 0"
-                 id="invitees-that-accepted">
-              <div> Members who have accepted: </div>
-              <ul class="list-of-usernames invitees-that-accepted">
-                <li v-for="(username, index) of invitation_sent.invitees_who_accepted"
-                    :class="['username',
-                    {'last-username': index
-                      === invitation_sent.invitees_who_accepted.length - 1}]">
-                  {{username}}
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="cancel-invitation-button-container">
-            <button class="light-gray-button"
-                    id="cancel-sent-invitation-button"
-                    @click="$refs.cancel_group_invitation_modal.open()">
-              Cancel Invitation
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -83,7 +78,7 @@
       <div class="modal-body">
         <div class="modal-message">
           Are you sure you want to <b>work alone</b>?
-          Once you accept you cannot have a partner for this project.
+          Once you accept, you cannot have a partner for this project.
         </div>
 
         <div class="modal-footer">
@@ -159,14 +154,12 @@
               </div>
 
               <div class="modal-button-container">
-                <button class="light-gray-button"
-                        id="cancel-send-invitation-button"
+                <button id="cancel-send-invitation-button"
                         type="button"
                         @click="$refs.send_group_invitation_modal.close()">
                   Cancel
                 </button>
-                <button class="blue-button"
-                        id="confirm-send-invitation-button"
+                <button id="confirm-send-invitation-button"
                         type="submit"
                         @click="send_invitation"
                         :disabled="d_sending_invitation">
@@ -198,13 +191,11 @@
             <APIErrors ref="cancel_invitation_api_errors"> </APIErrors>
           </div>
           <div class="modal-button-container">
-            <button class="orange-button"
-                    id="confirm-cancel-sent-invitation-button"
+            <button id="confirm-keep-sent-invitation-button"
+                    @click="$refs.cancel_group_invitation_modal.close()"> Keep Invitation </button>
+            <button id="confirm-cancel-sent-invitation-button"
                     @click="cancel_invitation"
                     :disabled="d_canceling_invitation"> Cancel Invitation </button>
-            <button class="blue-button"
-                    id="confirm-keep-sent-invitation-button"
-                    @click="$refs.cancel_group_invitation_modal.close()"> Keep Invitation </button>
           </div>
         </div>
       </div>
@@ -323,6 +314,11 @@ export default class GroupRegistration extends Vue {
     }
   }
 
+  invitee_has_accepted(username: string) {
+    return this.invitation_sent!.invitees_who_accepted.findIndex(
+        (name: string) => username === name) !== -1 ? 'Accepted' : 'Pending';
+  }
+
   @handle_api_errors_async(handle_send_invitation_error)
   async send_invitation() {
     try {
@@ -393,9 +389,33 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
 
+#blah {
+  padding: 15px 10px 15px 20px;
+}
+
 #group-registration-title {
   font-size: 24px;
-  font-weight: 500;
+  color: white;
+  background-color: lighten(black, 15);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.list-of-usernames {
+  margin-top: 9px;
+  margin-bottom: 9px;
+}
+
+.username {
+  margin: 6px;
+  font-weight: bold;
+}
+
+.last-username {
+  margin-bottom: 0;
 }
 
 #group-registration-options {
@@ -403,21 +423,11 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 0;
+  padding: 0 15px;
 }
 
 #registration-closed {
   padding: 10px 0;
-}
-
-.list-of-usernames {
-  margin-top: 9px;
-  margin-bottom: 15px;
-}
-
-.username {
-  margin: 6px;
-  font-weight: bold;
 }
 
 .last-username {
@@ -433,20 +443,89 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   margin-bottom: 15px;
 }
 
-#invitations-received-title, #pending-invitations-title {
-  padding: 5px 0;
+#invitations-received-title {
+  padding: 10px 27px 20px 27px;
   font-size: 18px;
+  font-weight: bold;
+}
+
+#invitation-sent-container-title {
+  padding: 10px 27px 20px 30px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .invitation {
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 #invitation-sent {
-  padding: 15px;
-  border: 2px solid $pebble-medium;
   border-radius: 5px;
-  display: inline-block;
+  width: 95%;
+  margin: 15px 2.5%;
+  //border: 2px solid darken($white-gray, 2);
+}
+
+#invitation-sent-header {
+  padding: 12px 18px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 3px 3px 0 0;
+  background-color: $base-teal;
+  color: white;
+}
+
+#invitation-sent-title {
+  font-size: 20px;
+}
+
+#invitation-sent-body {
+  padding: 10px 40px 6px 18px;
+  border: 2px solid $base-teal;
+  border-top: none;
+  border-bottom: none;
+}
+
+#invitation-sent-table {
+  border-collapse: collapse;
+}
+
+.invitation-sent-tr {
+  font-weight: bold;
+  //background-color: $base-teal;
+
+  td {
+    padding: 2px 0 10px 0;
+  }
+}
+
+.invited-member {
+  td {
+    padding: 0 40px 10px 0;
+  }
+}
+
+#invited-members-title {
+  padding: 2px 0 8px 0;
+}
+
+.invited-member-name {
+  padding-right: 100px;
+}
+
+#invitation-sent-footer {
+  padding: 9px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-content: center;
+  background-color: $base-teal;
+  border-radius: 0 0 3px 3px;
+}
+
+#cancel-sent-invitation-button {
+  @extend .white-button;
+  box-shadow: none;
 }
 
 #invitees-that-accepted {
@@ -454,15 +533,11 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 }
 
 .resolve-invitation-message {
-  padding: 5px 0 10px 0;
+  padding: 5px 0 15px 0;
   font-size: 15px;
 }
 
-#cancel-sent-invitation-button {
-  width: 100%;
-}
-
-#confirm-cancel-sent-invitation-button,
+#confirm-keep-sent-invitation-button,
 #cancel-send-invitation-button,
 #cancel-confirm-working-alone-button,
 #work-alone-button {
@@ -489,6 +564,65 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   flex-direction: row;
   justify-content: flex-end;
   padding: 10px 0 0 0;
+}
+
+.status-square {
+  color: $save-green;
+}
+
+.inner {
+  text-align: left;
+}
+
+#registration-open {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: space-between;
+}
+
+#invitation-sent-container {
+  /*padding-right: 100px;*/
+  /*padding-bottom: 20px;*/
+  width: 50%;
+}
+
+#invitations-received-container {
+  width: 50%;
+}
+
+#work-alone-button {
+  @extend .teal-button;
+  box-shadow: none;
+}
+
+#send-group-invitation-button {
+  @extend .purple-button;
+  box-shadow: none;
+}
+
+#cancel-confirm-working-alone-button {
+  @extend .white-button;
+}
+
+#confirm-working-alone-button {
+  @extend .teal-button;
+}
+
+#confirm-cancel-sent-invitation-button {
+  @extend .red-button;
+}
+
+#confirm-keep-sent-invitation-button {
+  @extend .white-button;
+}
+
+#confirm-send-invitation-button {
+  @extend .purple-button;
+}
+
+#cancel-send-invitation-button {
+  @extend .white-button;
 }
 
 </style>
