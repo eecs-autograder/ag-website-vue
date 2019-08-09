@@ -214,36 +214,37 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/group_registration.scss';
 
-  #invitation-received {
-    @extend .invitation-container;
-  }
+#invitation-received {
+  @extend .invitation-container;
+}
 
-  #invitation-received-header {
-    @include invitation_container_header($white-gray, darken($white-gray, 2));
-  }
+#invitation-received-header {
+  @include invitation_container_header($white-gray, darken($white-gray, 2));
+}
 
-  #invitation-received-body {
-    @include invitation_container_body(darken($white-gray, 2));
-  }
+#invitation-received-body {
+  @include invitation_container_body(darken($white-gray, 2));
+}
 
-  .invitation-received-table-row {
-    @extend .invitation-table-row;
-  }
+#invitation-received-footer {
+  @include invitation_container_footer($white-gray, darken($white-gray, 2));
+}
 
-  #invitation-received-footer {
-    @include invitation_container_footer($white-gray, darken($white-gray, 2));
-  }
+.invitation-received-table-row {
+  @extend .invitation-table-row;
+}
 
-  #accept-invitation-button {
-    box-shadow: none;
-  }
+#accept-invitation-button {
+  box-shadow: none;
+}
 
-  #reject-invitation-button {
-    box-shadow: none;
-    margin-right: 10px;
-  }
+#reject-invitation-button {
+  box-shadow: none;
+  margin-right: 10px;
+}
 
-  #cancel-reject-button, #cancel-accept-button {
-    margin-right: 10px;
-  }
+#cancel-reject-button, #cancel-accept-button {
+  margin-right: 10px;
+}
+
 </style>

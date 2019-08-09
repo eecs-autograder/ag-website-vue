@@ -102,7 +102,7 @@
                   class="white-button"
                   @click="$refs.confirm_working_alone_modal.close()"> Cancel </button>
           <button id="confirm-working-alone-button"
-                  class="purple-button"
+                  class="teal-button"
                   @click="work_alone"
                   :disabled="d_awaiting_action"> Work Alone </button>
           </div>
