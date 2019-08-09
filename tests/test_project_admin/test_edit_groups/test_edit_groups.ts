@@ -126,7 +126,7 @@ describe('EditGroups tests', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false
+            has_handgrading_rubric: false,
         });
 
         let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project');
