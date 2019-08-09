@@ -200,20 +200,20 @@ export default class ProjectView extends Vue implements GroupObserver {
 #group-members-container {
   min-width: 25%;
   border-collapse: collapse;
-  border: 2px solid $stormy-gray-dark;
-  border-radius: 3px;
+  border: 2px solid lighten(black, 15);
+  border-radius: 5px;
   display: inline-block;
 }
 
 #group-members-title {
-  padding: 10px 15px 10px 15px;
-  background-color: $stormy-gray-dark;
+  padding: 14px 15px 14px 15px;
+  background-color: lighten(black, 15);
   color: white;
 }
 
 .group-member {
   font-size: 16px;
-  padding: 10px 15px 10px 15px;
+  padding: 12px 15px 12px 15px;
   border-radius: 0 0 2px 2px;
 }
 

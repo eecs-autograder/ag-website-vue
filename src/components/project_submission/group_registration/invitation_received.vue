@@ -2,22 +2,22 @@
   <div v-if="!d_loading">
 
     <div id="invitation-received">
-      <div id="invitation-received-header"> <b>{{d_invitation.invitation_creator}}</b>
-        has invited you to join a group! </div>
+      <div id="invitation-received-header">
+        <b>{{d_invitation.invitation_creator}}</b> has invited you to join a group!
+      </div>
       <div id="invitation-received-body">
-        <table id="invitation-received-table">
-          <tr class="invitation-received-tr">
-            <td> Member Name </td>
-            <td> Status </td>
+        <table class="invitation-table">
+          <tr class="invitation-table-row">
+            <th> Member Name </th>
+            <th> Status </th>
           </tr>
           <tr v-for="(username, index) of other_group_members"
-              :class="['invited-member',
-                     {'last-username': index === other_group_members.length - 1},
-                     {'odd-row': index % 2 == 1}]">
+              :class="['invitation-received-table-row',
+                      {'last-username': index === other_group_members.length - 1}]">
             <td>
-              <div class="invitation-received-member-name"> {{username}} </div>
+              <div class="member-name-td">{{username}}</div>
             </td>
-            <td class="invitation-received-member-acceptance-status">
+            <td class="acceptance-status-td">
               {{member_acceptance_status(username)}}
             </td>
           </tr>
@@ -26,8 +26,10 @@
 
       <div id="invitation-received-footer">
           <button id="reject-invitation-button"
+                  class="orange-button"
                   @click="$refs.confirm_reject_modal.open()"> Reject </button>
           <button id="accept-invitation-button"
+                  class="teal-button"
                   :disabled="already_accepted || d_accepting"
                   @click="$refs.confirm_accept_modal.open()"> Accept </button>
       </div>
@@ -55,11 +57,13 @@
             <APIErrors ref="accept_invitation_api_errors"></APIErrors>
           </div>
           <div class="modal-button-container">
-          <button id="cancel-accept-button"
-                  @click="$refs.confirm_accept_modal.close()"> Cancel </button>
-          <button id="confirm-accept-button"
-                  :disabled="d_accepting"
-                  @click="accept_invitation"> Accept </button>
+            <button id="cancel-accept-button"
+                    class="white-button"
+                    @click="$refs.confirm_accept_modal.close()"> Cancel </button>
+            <button id="confirm-accept-button"
+                    class="teal-button"
+                    :disabled="d_accepting"
+                    @click="accept_invitation"> Accept </button>
           </div>
         </div>
       </div>
@@ -72,7 +76,7 @@
       <div class="modal-divider"></div>
       <div class="modal-body">
         <div class="modal-message">
-          Are you sure you want to <b class="reject">reject</b> the invitation for a group with:
+          Are you sure you want to <b>reject</b> the invitation for a group with:
           <ul class="list-of-usernames">
             <li v-for="(username, index) of other_group_members"
                 :class="['username', {'last-username': index === other_group_members.length - 1}]">
@@ -86,11 +90,13 @@
             <APIErrors ref="reject_invitation_api_errors"></APIErrors>
           </div>
           <div class="modal-button-container">
-          <button id="cancel-reject-button"
-                  @click="$refs.confirm_reject_modal.close()"> Cancel </button>
-          <button id="confirm-reject-button"
-                  :disabled="d_rejecting"
-                  @click="reject_invitation"> Reject </button>
+            <button id="cancel-reject-button"
+                    class="white-button"
+                    @click="$refs.confirm_reject_modal.close()"> Cancel </button>
+            <button id="confirm-reject-button"
+                    class="orange-button"
+                    :disabled="d_rejecting"
+                    @click="reject_invitation"> Reject </button>
           </div>
         </div>
       </div>
@@ -206,144 +212,38 @@ function handle_accept_invitation_error(component: InvitationReceived, error: un
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
+@import '@/styles/components/group_registration.scss';
 
-.list-of-usernames {
-  margin-top: 9px;
-  margin-bottom: 9px;
-}
-
-.username {
-  margin: 6px;
-  font-weight: bold;
-}
-
-.last-username {
-  margin-bottom: 0;
-}
-
-#invitation-received {
-  border-radius: 5px;
-  width: 95%;
-  margin: 0 2.5%;
-  border: 2px solid darken($white-gray, 2);
-}
-
-#invitation-received-header {
-  padding: 11px 40px 11px 18px;
-  font-size: 18px;
-  border-radius: 3px 3px 0 0;
-  background-color: $white-gray;
-  border-bottom: 2px solid darken($white-gray, 2);
-}
-
-#invitation-received-body {
-  padding: 10px 18px 6px 18px;
-}
-
-#invitation-received-table {
-  border-collapse: collapse;
-}
-
-.invitation-received-tr {
-  font-weight: bold;
-
-  td {
-    padding: 2px 0 10px 0;
+  #invitation-received {
+    @extend .invitation-container;
   }
-}
 
-.invited-member {
-  td {
-    padding: 0 40px 10px 0;
+  #invitation-received-header {
+    @include invitation_container_header($white-gray, darken($white-gray, 2));
   }
-}
 
-#invited-members-title {
-  padding: 2px 0 8px 0;
-}
-
-.invitation-received-member-name {
-  padding-right: 100px;
-}
-
-#invitation-received-footer {
-  padding: 9px;
-  background-color: $white-gray;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-content: center;
-  border-top: 2px solid darken($white-gray, 2);
-  border-radius: 0 0 3px 3px;
-}
-
-#accept-invitation-button {
-  @extend .teal-button;
-  box-shadow: none;
-}
-
-#reject-invitation-button {
-  @extend .orange-button;
-  box-shadow: none;
-}
-
-#reject-invitation-button,
-#cancel-accept-button,
-#cancel-reject-button {
-  margin-right: 10px;
-}
-
-#cancel-reject-button {
-  @extend .white-button;
-}
-
-#confirm-reject-button {
-  @extend .orange-button;
-}
-
-#confirm-accept-button {
-  @extend .teal-button;
-}
-
-#cancel-accept-button {
-  @extend .white-button;
-}
-
-.accept-reject-invitation-buttons {
-  padding: 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-#invitees-that-accepted {
-  margin-top: 15px;
-
-  .list-of-usernames {
-    margin-bottom: 2px;
+  #invitation-received-body {
+    @include invitation_container_body(darken($white-gray, 2));
   }
-}
 
-.modal-header {
-  font-size: 20px;
-  padding: 10px 0 5px 0;
-}
+  .invitation-received-table-row {
+    @extend .invitation-table-row;
+  }
 
-.modal-divider {
-  height: 2px;
-  background-color: darken($white-gray, 3);
-  margin: 9px 0;
-}
+  #invitation-received-footer {
+    @include invitation_container_footer($white-gray, darken($white-gray, 2));
+  }
 
-.modal-message {
-  padding: 5px 0;
-}
+  #accept-invitation-button {
+    box-shadow: none;
+  }
 
-.modal-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  padding: 10px 0 0 0;
-}
+  #reject-invitation-button {
+    box-shadow: none;
+    margin-right: 10px;
+  }
 
+  #cancel-reject-button, #cancel-accept-button {
+    margin-right: 10px;
+  }
 </style>
