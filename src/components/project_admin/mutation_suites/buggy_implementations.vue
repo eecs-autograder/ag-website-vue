@@ -70,18 +70,16 @@
         <label class="text-label"> Buggy Implementation Names </label>
         <validated-input ref="buggy_implementation_names"
                          id="buggy-implementation-names-input"
-                         num_rows="3"
+                         num_rows="2"
                          v-model="buggy_impl_names"
                          :validators="[]"
                          input_style="max-width: 500px; width: 100%">
+          <div slot="suffix"
+               id="add-buggy-impl-names-button"
+               @click="add_buggy_implementation_names">
+            Add Names
+          </div>
         </validated-input>
-      </div>
-
-      <div>
-        <button class="blue-button add-buggy-impl-names-button"
-                type="button"
-                @click="add_buggy_implementation_names"> Add
-        </button>
       </div>
 
       <div id="all-buggy-implementation-names"
@@ -253,7 +251,6 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
 #all-buggy-implementation-names {
   border: 2px solid $white-gray;
   display: inline-block;
-  margin-top: 10px;
 }
 
 .buggy-implementation-row {
@@ -312,6 +309,15 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
 .last-saved-timestamp {
   font-size: 14px;
   color: lighten(black, 30);
+}
+
+#add-buggy-impl-names-button {
+  @extend .teal-button;
+  margin-left: 10px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 </style>

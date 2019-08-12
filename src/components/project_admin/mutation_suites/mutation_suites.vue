@@ -190,6 +190,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.d_loading = false;
   }
 
+
+
   beforeDestroy() {
     MutationTestSuite.unsubscribe(this);
   }
@@ -414,13 +416,11 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 
 .section-header {
   box-sizing: border-box;
-  margin: 5px 12px 8px 12px;
+  margin: 12px 12px 8px 12px;
   padding: 5px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   padding-left: 50px;
-  //border-top: 2px solid $white-gray;
-  //border-bottom: 2px solid $navy-blue;
   background-color: black;
   display: inline-block;
   color: white;

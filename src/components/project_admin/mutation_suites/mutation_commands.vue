@@ -1,8 +1,7 @@
 <template>
   <div id="mutation-commands-component">
 
-    <div class="checkbox-input-container"
-         id="use-setup-command-container">
+    <div id="use-setup-command-container">
       <input id="use-setup-command"
              type="checkbox"
              class="checkbox"
@@ -14,54 +13,48 @@
       </label>
     </div>
 
-    <div id="setup-command-container">
-      <fieldset class="fieldset">
-        <legend :class="['legend',
-                        {'setup-command-not-in-use': !d_mutation_test_suite.use_setup_command}]">
-          1. Setup Command
-        </legend>
-
-        <div v-if="d_mutation_test_suite.use_setup_command">
-          <mutation-command ref="setup_command"
-                            id="setup-command"
-                            v-model="d_mutation_test_suite.setup_command"
-                            include_command_name
-                            @form_validity_changed="d_setup_command_is_valid = $event">
-          </mutation-command>
-        </div>
-
-      </fieldset>
+    <div class="mutation-command-container"
+         v-if="d_mutation_test_suite.use_setup_command">
+      <div class="command-name"> 1. Setup Command </div>
+      <div class="command">
+        <mutation-command ref="setup_command"
+                          id="setup-command"
+                          v-model="d_mutation_test_suite.setup_command"
+                          include_command_name
+                          @form_validity_changed="d_setup_command_is_valid = $event">
+        </mutation-command>
+      </div>
     </div>
 
     <div class="mutation-command-container">
-      <fieldset class="fieldset">
-        <legend class="legend"> 2. Get student test names </legend>
+      <div class="command-name"> 2. Command to get student test names </div>
+      <div class="command">
         <mutation-command
           ref="get_student_test_names_command"
           v-model="d_mutation_test_suite.get_student_test_names_command"
           @form_validity_changed="d_get_student_test_names_command_is_valid = $event">
         </mutation-command>
-      </fieldset>
+      </div>
     </div>
 
     <div class="mutation-command-container">
-      <fieldset class="fieldset">
-        <legend class="legend"> 3. Validity check student tests </legend>
+      <div class="command-name"> 3. Command to check validity of student tests </div>
+      <div class="command">
         <mutation-command ref="student_test_validity_check_command"
                           v-model="d_mutation_test_suite.student_test_validity_check_command"
                           @form_validity_changed="d_student_test_validity_check_is_valid = $event">
         </mutation-command>
-      </fieldset>
+      </div>
     </div>
 
     <div class="mutation-command-container">
-      <fieldset class="fieldset">
-        <legend class="legend"> 4. Run student tests with buggy implementations </legend>
+      <div class="command-name"> 4. Command to run student tests with buggy implementations </div>
+      <div class="command">
         <mutation-command ref="grade_buggy_impl_command"
                           v-model="d_mutation_test_suite.grade_buggy_impl_command"
                           @form_validity_changed="d_grade_buggy_impl_command_is_valid = $event">
         </mutation-command>
-      </fieldset>
+      </div>
     </div>
 
 <!--    <div class="save-button-container">-->
@@ -159,21 +152,24 @@ function handle_save_mutation_commands_error(component: MutationCommands, error:
 @import '@/styles/forms.scss';
 
 .mutation-command-container {
-  margin: 0 0 15px 0;
+  padding: 10px 12px 2px 12px;
+  border-radius: 5px;
+}
+
+.command-name {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 5px 0 0 0;
+  display: inline-block;
+}
+
+.command {
+  padding: 2px 12px 10px 0px;
 }
 
 #use-setup-command-container {
-  padding-left: 12px;
-  margin-bottom: 10px;
-}
-
-#setup-command-container {
-  margin-top: 10px;
-  margin-bottom: 8px;
-}
-
-.setup-command-not-in-use {
-  color: $stormy-gray-dark;
+  padding: 10px 5px 0 12px;
+  position: relative;
 }
 
 .save-button-container {

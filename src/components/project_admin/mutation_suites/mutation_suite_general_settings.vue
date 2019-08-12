@@ -1,37 +1,34 @@
 <template>
-  <div v-if="d_mutation_test_suite !== null">
+  <div v-if="d_mutation_test_suite !== null"
+       id="mutation-suite-general-settings-component">
     <validated-form id="mutation-test-suite-settings-form"
                     autocomplete="off"
                     spellcheck="false"
                     @submit="save_mutation_test_suite_settings"
                     @form_validity_changed="d_settings_form_is_valid = $event">
 
-      <div id="name-and-deferred-container">
-        <div id="mutation-test-suite-name-container">
-          <label class="text-label"> Suite name </label>
-          <validated-input ref="suite_name"
-                           id="input-name"
-                           v-model="d_mutation_test_suite.name"
-                           :validators="[is_not_empty]">
-          </validated-input>
-        </div>
+      <div id="mutation-test-suite-name-container">
+        <label class="text-label"> Suite name </label>
+        <validated-input ref="suite_name"
+                         id="input-name"
+                         v-model="d_mutation_test_suite.name"
+                         :validators="[is_not_empty]">
+        </validated-input>
+      </div>
 
-        <div class="checkbox-container">
-          <input id="synchronous-or-deferred"
-                 type="checkbox"
-                 class="checkbox"
-                 :checked="!d_mutation_test_suite.deferred"
-                 @change="d_mutation_test_suite.deferred = !$event.target.checked"/>
-          <label class="checkbox-label"
-                 for="synchronous-or-deferred">
-            Suite must finish before students can submit again
-          </label>
-        </div>
+      <div class="checkbox-container">
+        <input id="synchronous-or-deferred"
+               type="checkbox"
+               class="checkbox"
+               :checked="!d_mutation_test_suite.deferred"
+               @change="d_mutation_test_suite.deferred = !$event.target.checked"/>
+        <label class="checkbox-label"
+               for="synchronous-or-deferred">
+          Suite must finish before students can submit again
+        </label>
       </div>
 
       <div class="section-container">
-        <fieldset class="fieldset">
-<!--          <legend class="legend"> Grading Environment </legend>-->
           <div class="sandbox-container">
             <label class="text-label"> Sandbox environment </label>
             <div class="dropdown">
@@ -69,13 +66,11 @@
               </div>
             </toggle>
           </div>
-        </fieldset>
       </div>
 
       <div class="section-container">
-        <fieldset class="fieldset">
-          <legend class="legend"> Instructor Files </legend>
-          <div class="typeahead-search-bar">
+        <label class="text-label"> Instructor Files </label>
+        <div class="typeahead-search-bar">
             <dropdown-typeahead ref="instructor_files_typeahead"
                                 placeholder_text="Enter a filename"
                                 :choices="instructor_files_available"
@@ -99,14 +94,11 @@
               </div>
             </div>
           </div>
-
-        </fieldset>
       </div>
 
       <div class="section-container">
-        <fieldset class="fieldset">
-          <legend class="legend"> Student Files </legend>
-          <div class="typeahead-search-bar">
+        <label class="text-label"> Student Files </label>
+        <div class="typeahead-search-bar">
             <dropdown-typeahead ref="student_files_typeahead"
                                 placeholder_text="Enter a filename"
                                 :choices="expected_student_files_available"
@@ -130,8 +122,6 @@
               </div>
             </div>
           </div>
-
-        </fieldset>
       </div>
 
 <!--      <div class="bottom-of-form">-->
@@ -282,12 +272,16 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
+#mutation-suite-general-settings-component {
+  padding: 6px 12px 12px 12px;
+}
+
 #mutation-test-suite-name-container {
-  padding: 0px 12px 22px 12px;
+  width: 50%;
 }
 
 .checkbox-container {
-  padding: 0 12px 22px 12px;
+  padding: 17px 12px 6px 2px;
 }
 
 .toggle-container {
@@ -304,6 +298,10 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
 .sandbox-docker-image-dropdown {
   min-width: 400px;
   width: 100%;
+}
+
+.typeahead-search-bar {
+  width: 50%;
 }
 
 .instructor-files, .student-files {
@@ -351,9 +349,9 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
   margin: 0 10px 10px 0;
 }
 
-#name-and-deferred-container {
-  padding: 5px;
-}
+/*#name-and-deferred-container {*/
+/*  !*padding: 5px;*!*/
+/*}*/
 
 .bottom-of-form {
   padding: 0 15px;
