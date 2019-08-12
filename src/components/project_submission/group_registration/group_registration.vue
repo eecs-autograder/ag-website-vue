@@ -27,7 +27,9 @@
 
       <div id="resolve-invitation-message"
            v-if="invitations_received.length > 0 || invitation_sent !== null">
-        <i class="fas fa-square resolve-symbol"></i>
+        <i class="fas fa-square"
+           id="resolve-invitation-square">
+        </i>
         You must resolve pending invitations before sending a new one.
       </div>
 
@@ -445,7 +447,7 @@ $teal: hsl(180, 100%, 24%);
   width: 100%;
 }
 
-.resolve-symbol {
+#resolve-invitation-square {
   color: $purple;
   margin: 0 5px;
 }
