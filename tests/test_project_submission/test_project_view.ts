@@ -6,8 +6,6 @@ import {
     Course,
     Group, GroupInvitation,
     Project,
-    Semester,
-    UltimateSubmissionPolicy,
     User
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -15,13 +13,14 @@ import * as sinon from 'sinon';
 import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
 import ProjectView from '@/components/project_submission/project_view.vue';
 
+import { make_course, make_project } from '@/tests/data_utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 describe('Changing Tabs', ()  => {
     let wrapper: Wrapper<ProjectView>;
-    let component: ProjectView;
     let project: Project;
     let course: Course;
     let user: User;
@@ -44,39 +43,8 @@ describe('Changing Tabs', ()  => {
     });
 
     beforeEach(() => {
-
-        project = new Project({
-            pk: 44,
-            name: "Project 200",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false
-        });
-
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
-        });
+        course = make_course();
+        project = make_project(course.pk);
 
         user = new User({
             pk: 3,
@@ -104,7 +72,6 @@ describe('Changing Tabs', ()  => {
             localVue,
             router
         });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -120,44 +87,44 @@ describe('Changing Tabs', ()  => {
     });
 
     test('Clicking on submit tab', async () => {
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
         let tabs = wrapper.findAll('.tab-label');
         expect(tabs.length).toEqual(3);
         tabs.at(1).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         tabs.at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(0);
+        expect(wrapper.vm.current_tab_index).toEqual(0);
         expect(router_replace.calledTwice).toBe(true);
         expect(router_replace.secondCall.calledWith({ query: { current_tab: 'submit'}}));
     });
 
     test('Clicking on submissions tab', async () => {
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
         let tabs = wrapper.findAll('.tab-label');
         tabs.at(1).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(1);
+        expect(wrapper.vm.current_tab_index).toEqual(1);
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({ query: { current_tab: 'my_submissions'}}));
     });
 
     test('Clicking on student_lookup tab', async () => {
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
         let tabs = wrapper.findAll('.tab-label');
         tabs.at(2).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
+        expect(wrapper.vm.current_tab_index).toEqual(2);
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({ query: { current_tab: 'student_lookup'}}));
     });
@@ -168,7 +135,6 @@ describe('select_tab function called with different values associated with "curr
          'key on create',
          ()  => {
     let wrapper: Wrapper<ProjectView>;
-    let component: ProjectView;
     let project: Project;
     let course: Course;
     let user: User;
@@ -183,39 +149,8 @@ describe('select_tab function called with different values associated with "curr
     };
 
     beforeEach(() => {
-
-        project = new Project({
-            pk: 44,
-            name: "Project 200",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false
-        });
-
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
-        });
+        course = make_course();
+        project = make_project(course.pk);
 
         user = new User({
             pk: 3,
@@ -258,14 +193,13 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.group).toBeNull();
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.group).toBeNull();
+        expect(wrapper.vm.current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = submit - user is not in a group for this project',
@@ -308,14 +242,13 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.group).toBeNull();
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.group).toBeNull();
+        expect(wrapper.vm.current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = submit - user is in a group for this project',
@@ -363,18 +296,17 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         // this second await needs to be here
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.course).toEqual(course);
-        expect(component.user).toEqual(user);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.course).toEqual(course);
+        expect(wrapper.vm.user).toEqual(user);
         expect(groups_is_member_of_stub.calledOnce).toBe(true);
-        expect(component.group).toEqual(group_2);
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.group).toEqual(group_2);
+        expect(wrapper.vm.current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = my_submissions', async () => {
@@ -386,13 +318,12 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(1);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.current_tab_index).toEqual(1);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = student_lookup', async () => {
@@ -404,13 +335,12 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(2);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.current_tab_index).toEqual(2);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = empty string', async () => {
@@ -422,13 +352,12 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = array of values', async () => {
@@ -440,13 +369,12 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(2);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.current_tab_index).toEqual(2);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = null', async () => {
@@ -458,13 +386,12 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.d_loading).toEqual(false);
+        expect(wrapper.vm.project).toEqual(project);
+        expect(wrapper.vm.current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_loading).toEqual(false);
     });
 });
 
@@ -473,7 +400,6 @@ describe('select_tab function called with different values associated with "curr
 
 describe('GroupObserver tests for the Project Component', () => {
     let wrapper: Wrapper<ProjectView>;
-    let component: ProjectView;
     let project: Project;
     let course: Course;
     let user: User;
@@ -504,38 +430,14 @@ describe('GroupObserver tests for the Project Component', () => {
             })
         });
 
-        project = new Project({
-            pk: 44,
-            name: "Project 200",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: false,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false
-        });
+        course = make_course();
 
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
-        });
+        project = make_project(
+            course.pk,
+            {
+                disallow_group_registration: false
+            }
+        );
 
         user = new User({
             pk: 3,
@@ -588,14 +490,13 @@ describe('GroupObserver tests for the Project Component', () => {
             localVue,
             router
         });
-        component = wrapper.vm;
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         // second await needs to be here
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(project.max_group_size === 1).toBe(true);
         expect(create_solo_group_stub.calledOnce);
-        expect(component.group).toEqual(group_created);
+        expect(wrapper.vm.group).toEqual(group_created);
         expect(wrapper.findAll('#group-registration').length).toEqual(0);
     });
 
@@ -627,22 +528,21 @@ describe('GroupObserver tests for the Project Component', () => {
             localVue,
             router
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
-        // second await needs to be here
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        // third await needs to be here
+        await wrapper.vm.$nextTick();
 
         let group_registration = wrapper.find({ref: 'group_registration'});
 
         group_registration.find('#work-alone-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         group_registration.find('#confirm-working-alone-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(create_solo_group_stub.calledOnce);
-        expect(component.group).toEqual(group_created);
+        expect(wrapper.vm.group).toEqual(group_created);
         expect(wrapper.findAll('#group-registration').length).toEqual(0);
     });
 
@@ -684,11 +584,10 @@ describe('GroupObserver tests for the Project Component', () => {
             localVue,
             router
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
         // third await needs to be here
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let group_registration = wrapper.find({ref: 'group_registration'});
         expect(group_registration.findAll({ref: 'invitation_received'}).length).toEqual(1);
@@ -697,7 +596,7 @@ describe('GroupObserver tests for the Project Component', () => {
             {ref: 'invitation_received'}
         ).at(0).vm;
         group_registration.find('#accept-invitation-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let create_multi_person_group = sinon.stub(
             invitation_to_accept.d_invitation!, 'accept'
@@ -706,11 +605,11 @@ describe('GroupObserver tests for the Project Component', () => {
         );
 
         group_registration.find('#confirm-accept-button').trigger('click');
-        await component.$nextTick();
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(create_multi_person_group.calledOnce);
-        expect(component.group).toEqual(group_created);
+        expect(wrapper.vm.group).toEqual(group_created);
         expect(wrapper.findAll('#group-registration').length).toEqual(0);
     });
 });

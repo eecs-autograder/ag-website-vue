@@ -25,7 +25,7 @@
 
     <div v-else id="registration-open">
 
-      <div class="resolve-invitation-message"
+      <div id="resolve-invitation-message"
            v-if="invitations_received.length > 0 || invitation_sent !== null">
         <i class="fas fa-square resolve-symbol"></i>
         You must resolve pending invitations before sending a new one.
@@ -377,7 +377,6 @@ export default class GroupRegistration extends Vue {
   async work_alone() {
     try {
       this.d_awaiting_action = true;
-      // can't clear the api errors because the modal isnt open
       await Group.create_solo_group(this.project.pk);
     }
     finally {
@@ -404,6 +403,9 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/edit_groups.scss';
 @import '@/styles/components/group_registration.scss';
+
+$purple: hsl(275, 48%, 56%);
+$teal: hsl(180, 100%, 24%);
 
 * {
   box-sizing: border-box;
@@ -438,14 +440,14 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   padding: 15px 20px;
 }
 
-.resolve-invitation-message {
+#resolve-invitation-message {
   padding: 15px 20px 2px 20px;
   width: 100%;
 }
 
 .resolve-symbol {
+  color: $purple;
   margin: 0 5px;
-  color: $base-purple;
 }
 
 #registration-open-shared-space {
@@ -470,7 +472,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 }
 
 #invitation-sent-header {
-  @include invitation_container_header($base-teal, $base-teal);
+  @include invitation_container_header($teal, $teal);
   color: white;
   font-weight: bold;
 }
@@ -480,7 +482,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 }
 
 #invitation-sent-body {
-  @include invitation_container_body($base-teal);
+  @include invitation_container_body($teal);
 }
 
 .invitation-sent-table-row {
@@ -488,7 +490,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 }
 
 #invitation-sent-footer {
-  @include invitation_container_footer($base-teal, $base-teal);
+  @include invitation_container_footer($teal, $teal);
 }
 
 #cancel-sent-invitation-button {
@@ -528,7 +530,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   }
 
   #group-registration-bar-title {
-    padding: 15px 20px 10px 20px;
+    padding: 15px 20px 5px 20px;
     text-align: left;
   }
 
@@ -540,7 +542,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
   }
 
   #work-alone-button {
-    margin-right: 10px;
+    margin-right: 15px;
     margin-bottom: 0;
   }
 }
@@ -573,7 +575,7 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
     width: 50%;
   }
 
-  .resolve-invitation-message {
+  #resolve-invitation-message {
     padding-left: 20px;
     margin: 10px 0 2px 0;
     width: 100%;
