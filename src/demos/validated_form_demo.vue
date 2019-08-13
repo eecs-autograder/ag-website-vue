@@ -98,7 +98,7 @@
       return {
         is_valid: value !== '',
         error_msg: "This field is required!"
-      }
+      };
     }
 
     toggleable_input_value = 42;
