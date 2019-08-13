@@ -1,5 +1,9 @@
 <template>
   <div id="edit-single-group-component" v-if="d_group !== null">
+    <group-members-form :project="project" :course="course" @submit="update_group">
+
+    </group-members-form>
+
     <validated-form ref="edit_group_form"
                     autocomplete="off"
                     spellcheck="false"

@@ -1,4 +1,5 @@
 import { ValidatorResponse } from '@/components/validated_input.vue';
+import * as utils from '@/utils';
 
 export function is_non_negative(value: string): ValidatorResponse {
     return {
@@ -43,6 +44,13 @@ export function make_max_value_validator(max_value: number) {
             is_valid: string_to_num(value) <= max_value,
             error_msg: `Please enter a number <= ${max_value}`
         };
+    };
+}
+
+export function is_email(value: string): ValidatorResponse {
+    return {
+        is_valid: utils.is_email(value),
+        error_msg: "Please enter an email address"
     };
 }
 
