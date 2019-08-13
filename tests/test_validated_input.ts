@@ -477,7 +477,6 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.vm.is_valid).toBe(false);
         expect(wrapper.vm.d_show_warnings).toBe(true);
         expect(wrapper.find('#error-text').exists()).toBe(true);
-        fail();
     });
 
     test('reset_warning_state hides warnings', async () => {

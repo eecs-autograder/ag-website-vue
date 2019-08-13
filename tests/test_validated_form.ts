@@ -274,12 +274,12 @@ describe('ValidatedForm.vue', () => {
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
     });
 
-    test('enable_warnings enables warnings for all input fields', async () => {
+    test('enable_warnings enables warnings for all input fields', () => {
         const component = {
             template:  `<validated-form ref="form">
-                          <validated-input ref="validated_input" v-model="value1"
+                          <validated-input ref="validated_input1" v-model="value1"
                                            :validators="[is_number]"/>
-                          <validated-input ref="validated_input" v-model="value2"
+                          <validated-input ref="validated_input2" v-model="value2"
                                            :validators="[is_number]"/>
                         </validated-form>`,
             components: {
@@ -304,9 +304,8 @@ describe('ValidatedForm.vue', () => {
 
         const wrapper = mount(component);
         const form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
-        const inputs = wrapper.findAll({ref: 'validated_input'});
-        const input1 = <Wrapper<ValidatedInput>> inputs.at(0);
-        const input2 = <Wrapper<ValidatedInput>> inputs.at(1);
+        const input1 = <Wrapper<ValidatedInput>> wrapper.find({ref: 'validated_input1'});
+        const input2 = <Wrapper<ValidatedInput>> wrapper.find({ref: 'validated_input2'});
 
         expect(form.vm.is_valid).toBe(false);
         expect(input1.vm.d_show_warnings).toBe(false);
@@ -316,7 +315,6 @@ describe('ValidatedForm.vue', () => {
 
         expect(input1.vm.d_show_warnings).toBe(true);
         expect(input2.vm.d_show_warnings).toBe(true);
-        fail();
     });
 
     test('reset_warning_state hides warnings for all input fields ', async () => {
