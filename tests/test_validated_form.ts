@@ -274,6 +274,51 @@ describe('ValidatedForm.vue', () => {
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
     });
 
+    test('enable_warnings enables warnings for all input fields', async () => {
+        const component = {
+            template:  `<validated-form ref="form">
+                          <validated-input ref="validated_input" v-model="value1"
+                                           :validators="[is_number]"/>
+                          <validated-input ref="validated_input" v-model="value2"
+                                           :validators="[is_number]"/>
+                        </validated-form>`,
+            components: {
+                'validated-form': ValidatedForm,
+                'validated-input': ValidatedInput
+            },
+            data: () => {
+                return {
+                    value1: "not a number",
+                    value2: "also not a number"
+                };
+            },
+            methods: {
+                is_number: (value: string): ValidatorResponse => {
+                    return {
+                        is_valid: value !== "" && !isNaN(Number(value)),
+                        error_msg: "Invalid number!"
+                    };
+                }
+            }
+        };
+
+        const wrapper = mount(component);
+        const form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
+        const inputs = wrapper.findAll({ref: 'validated_input'});
+        const input1 = <Wrapper<ValidatedInput>> inputs.at(0);
+        const input2 = <Wrapper<ValidatedInput>> inputs.at(1);
+
+        expect(form.vm.is_valid).toBe(false);
+        expect(input1.vm.d_show_warnings).toBe(false);
+        expect(input2.vm.d_show_warnings).toBe(false);
+
+        form.vm.enable_warnings();
+
+        expect(input1.vm.d_show_warnings).toBe(true);
+        expect(input2.vm.d_show_warnings).toBe(true);
+        fail();
+    });
+
     test('reset_warning_state hides warnings for all input fields ', async () => {
         const component = {
             template:  `<validated-form ref="form">

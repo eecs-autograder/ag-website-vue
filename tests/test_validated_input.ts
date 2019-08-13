@@ -453,6 +453,33 @@ describe('ValidatedInput.vue', () => {
         expect(wrapper.find('#error-text').exists()).toBe(true);
     });
 
+    test('enable_warnings shows warnings immediately', async () => {
+        const wrapper = mount(ValidatedInput, {
+            propsData: {
+                value: "not number",
+                validators: [IS_NUMBER],
+                from_string_fn: (val: string) => parseInt(val, 10),
+                show_warnings_on_blur: true
+            }
+        });
+
+        await sleep(0.75);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.is_valid).toBe(false);
+        expect(wrapper.vm.d_show_warnings).toBe(false);
+        expect(wrapper.find('#error-text').exists()).toBe(false);
+
+        wrapper.vm.enable_warnings();
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.is_valid).toBe(false);
+        expect(wrapper.vm.d_show_warnings).toBe(true);
+        expect(wrapper.find('#error-text').exists()).toBe(true);
+        fail();
+    });
+
     test('reset_warning_state hides warnings', async () => {
         const wrapper = mount(ValidatedInput, {
             propsData: {

@@ -125,9 +125,15 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
     this.debounced_enable_warnings = debounce(() => this.d_show_warnings = true, 500);
   }
 
+  enable_warnings() {
+    this.d_show_warnings = true;
+  }
+
   focus() {
     let class_name = this.num_rows === 1 ? 'input' : 'textarea';
-    (<HTMLInputElement> this.$el.getElementsByClassName(class_name)[0]).focus();
+    let element = <HTMLInputElement> this.$el.getElementsByClassName(class_name)[0];
+    element.focus();
+    element.setSelectionRange(0, 0);
   }
 
   destroyed() {
