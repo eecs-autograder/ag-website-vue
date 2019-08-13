@@ -64,6 +64,12 @@ export default class ValidatedForm extends Vue {
     return true;
   }
 
+  enable_warnings() {
+    for (const validated_input of this.d_validated_inputs) {
+      validated_input.enable_warnings();
+    }
+  }
+
   reset_warning_state() {
     for (const validated_input of this.d_validated_inputs) {
       validated_input.reset_warning_state();
@@ -75,6 +81,7 @@ export default class ValidatedForm extends Vue {
     listeners.submit = (event: Event) => {
       event.preventDefault();
       event.stopPropagation();
+      this.enable_warnings();
       if (this.is_valid) {
         this.$emit('submit');
       }

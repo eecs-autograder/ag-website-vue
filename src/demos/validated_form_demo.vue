@@ -47,6 +47,20 @@
       <h3>Validated Form is_valid status: {{d_form_is_valid}}</h3>
       <br/><br/>
     </validated-form>
+
+    <h2>Errors display on submit</h2>
+    <validated-form>
+      <p>
+        Sometimes you'll have form inputs that start out invalid.
+        Warnings for those fields will be enabled when the user changes the
+        data or tries to submit the form.
+      </p>
+
+      <validated-input v-model="d_empty_val"
+                       :validators="[is_not_empty]"></validated-input>
+
+      <button type="submit" class="enabled">Submit</button>
+    </validated-form>
   </div>
 </template>
 
@@ -67,6 +81,8 @@
     };
     d_form_is_valid = false;
 
+    d_empty_val = '';
+
     save_data() {
       console.log("saved!");
     }
@@ -75,6 +91,13 @@
       return {
         is_valid: value !== "" && !isNaN(Number(value)),
         error_msg:  "Invalid number!",
+      };
+    }
+
+    is_not_empty(value: string): ValidatorResponse {
+      return {
+        is_valid: value !== '',
+        error_msg: "This field is required!"
       };
     }
 
@@ -90,5 +113,9 @@
 
   .enabled {
     background-color: lightblue;
+  }
+
+  .enabled, .disabled {
+    margin-top: 5px;
   }
 </style>
