@@ -25,19 +25,18 @@
       </div>
 
       <div id="invitation-received-footer">
-          <button id="reject-invitation-button"
-                  class="orange-button"
-                  @click="$refs.confirm_reject_modal.open()"> Reject </button>
-          <button id="accept-invitation-button"
-                  class="teal-button"
-                  :disabled="already_accepted || d_accepting"
-                  @click="$refs.confirm_accept_modal.open()"> Accept </button>
+        <button id="reject-invitation-button"
+                class="orange-button"
+                @click="$refs.confirm_reject_modal.open()"> Reject </button>
+        <button id="accept-invitation-button"
+                class="teal-button"
+                :disabled="already_accepted || d_accepting"
+                @click="$refs.confirm_accept_modal.open()"> Accept </button>
       </div>
-
     </div>
 
     <modal ref="confirm_accept_modal"
-           size="medium"
+           size="large"
            click_outside_to_close>
       <div class="modal-header"> Confirm Accept </div>
       <div class="modal-divider"></div>
@@ -70,7 +69,7 @@
     </modal>
 
     <modal ref="confirm_reject_modal"
-           size="medium"
+           size="large"
            click_outside_to_close>
       <div class="modal-header"> Confirm Reject </div>
       <div class="modal-divider"></div>

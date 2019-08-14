@@ -1,23 +1,22 @@
 <template>
   <div v-if="!d_loading" id="group-registration">
-    <div id="group-registration-bar">
-      <div id="group-registration-bar-title"> Group Registration </div>
-      <div id="group-registration-bar-buttons"
-           v-if="!project.disallow_group_registration
-                 && invitation_sent === null
-                 && invitations_received.length === 0">
-        <button id="work-alone-button"
-                class="teal-button"
-                @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
-        <button id="send-group-invitation-button"
-                class="purple-button"
-                @click="$refs.send_group_invitation_modal.open()"> Create new invitation </button>
-      </div>
+    <div id="registration-header"> Group Registration </div>
+    <div id="registration-buttons"
+          v-if="!project.disallow_group_registration
+                && invitation_sent === null
+                && invitations_received.length === 0">
+      <button id="work-alone-button"
+              class="teal-button"
+              @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
+      <div>- or -</div>
+      <button id="send-group-invitation-button"
+              class="purple-button"
+              @click="$refs.send_group_invitation_modal.open()"> Send group invitation </button>
     </div>
 
     <div v-if="project.disallow_group_registration"
          id="registration-closed">
-      Group registration has been closed for this project.
+      Group registration has been closed for this project. <br>
       Please email the course staff to proceed.
     </div>
     <div v-else id="registration-open">
@@ -35,7 +34,7 @@
              id="invitation-sent-container">
           <div id="invitation-sent">
             <div id="invitation-sent-header">
-              <div id="invitation-sent-title"> Invitation: Pending </div>
+              <div id="invitation-sent-title"> Invitation Sent </div>
             </div>
             <div id="invitation-sent-body">
               <table class="invitation-table">
@@ -314,31 +313,32 @@ $teal: hsl(180, 100%, 24%);
 
 * {
   box-sizing: border-box;
+  padding: 0;
 }
 
-#group-registration-bar {
-  color: white;
-  background-color: lighten(black, 15);
-  border-radius: 5px;
+#group-registration {
+  max-width: 600px;
+}
+
+#registration-header {
+  text-align: left;
   font-size: 24px;
-  padding: 15px;
+  margin-top: 15px;
 }
 
-#group-registration-bar-title {
-  padding: 15px 0;
-  text-align: center;
-}
-
-#group-registration-bar-buttons {
-  padding: 10px 0 0 0;
+#registration-buttons {
+  margin: 10px 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-content: stretch;
-}
+  justify-items: center;
+  align-items: center;
 
-#work-alone-button {
-  margin-bottom: 10px;
+  max-width: 300px;
+
+  .button {
+    width: 300px;
+    margin: 5px 0;
+  }
 }
 
 #registration-closed {
@@ -347,24 +347,11 @@ $teal: hsl(180, 100%, 24%);
 
 #resolve-invitation-message {
   padding: 15px 20px 2px 20px;
-  width: 100%;
 }
 
 #resolve-invitation-square {
   color: $purple;
   margin: 0 5px;
-}
-
-#registration-open-shared-space {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-content: space-between;
-  flex-wrap: wrap;
-}
-
-#invitation-sent-container, #invitations-received-container {
-  width: 100%;
 }
 
 .single-invitation-received {
@@ -376,9 +363,11 @@ $teal: hsl(180, 100%, 24%);
   margin-bottom: 0;
 }
 
+$lighter-teal: lighten($teal, 20%);
+$border-teal: darken($lighter-teal, 1%);
+
 #invitation-sent-header {
-  @include invitation_container_header($teal, $teal);
-  color: white;
+  @include invitation_container_header($lighter-teal, $border-teal);
   font-weight: bold;
 }
 
@@ -387,7 +376,7 @@ $teal: hsl(180, 100%, 24%);
 }
 
 #invitation-sent-body {
-  @include invitation_container_body($teal);
+  @include invitation_container_body($border-teal);
 }
 
 .invitation-sent-table-row {
@@ -395,11 +384,7 @@ $teal: hsl(180, 100%, 24%);
 }
 
 #invitation-sent-footer {
-  @include invitation_container_footer($teal, $teal);
-}
-
-#delete-invitation-button {
-  box-shadow: none;
+  @include invitation_container_footer($lighter-teal, $border-teal);
 }
 
 #work-alone-button {
@@ -419,68 +404,6 @@ $teal: hsl(180, 100%, 24%);
 .send-group-invitation-modal-title {
   padding: 10px 0;
   margin: 0;
-}
-
-@media only screen and (min-width: 500px) {
-  #group-registration-bar {
-    color: white;
-    background-color: lighten(black, 15);
-    border-radius: 5px;
-    font-size: 24px;
-    padding: 0;
-  }
-
-  #group-registration-bar-title {
-    padding: 15px 20px 5px 20px;
-    text-align: left;
-  }
-
-  #group-registration-bar-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    padding: 10px 20px 20px 20px;
-  }
-
-  #work-alone-button {
-    margin-right: 15px;
-    margin-bottom: 0;
-  }
-}
-
-@media only screen and (min-width: 900px) {
-  #group-registration-bar {
-    color: white;
-    background-color: lighten(black, 15);
-    border-radius: 5px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    font-size: 24px;
-    justify-content: space-between;
-  }
-
-  #group-registration-bar-title {
-    padding: 15px 10px 15px 20px;
-  }
-
-  #group-registration-bar-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 10px 15px;
-  }
-
-  #invitation-sent-container, #invitations-received-container {
-    width: 50%;
-  }
-
-  #resolve-invitation-message {
-    padding-left: 20px;
-    margin: 10px 0 2px 0;
-    width: 100%;
-  }
 }
 
 </style>
