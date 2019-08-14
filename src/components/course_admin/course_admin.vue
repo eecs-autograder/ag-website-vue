@@ -222,8 +222,6 @@ export enum RosterChoice {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import url('https://fonts.googleapis.com/css?family=Quicksand');
-$current-lang-choice: "Quicksand";
 
 .loading-spinner {
   color: $ocean-blue;
@@ -235,7 +233,6 @@ $current-lang-choice: "Quicksand";
 }
 
 .course-admin-component {
-  font-family: $current-lang-choice;
   position: relative;
 }
 
@@ -259,7 +256,6 @@ $current-lang-choice: "Quicksand";
 
 .roster-dropdown-row {
   font-size: 16px;
-  font-family: $current-lang-choice;
 }
 
 
