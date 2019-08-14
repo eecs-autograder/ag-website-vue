@@ -28,7 +28,7 @@
         <button class="add-member-button"
                 type="button"
                 :disabled="d_usernames.length >= max_num_inputs && !ignore_group_size_limits"
-                @click="d_usernames.push(course.allowed_guest_domain)">
+                @click="add_member">
           <i class="fas fa-plus"></i>
           Add Member
         </button>
@@ -107,6 +107,13 @@ export default class GroupMembersForm extends Vue {
       return 1;
     }
     return Math.min(this.project.min_group_size, this.max_num_inputs);
+  }
+
+  private add_member() {
+    this.d_usernames.push(this.course.allowed_guest_domain);
+    this.$nextTick().then(() => {
+      (<ValidatedInput> (<Vue[]> this.$refs.username_input)[this.d_usernames.length - 1]).focus();
+    });
   }
 
   private initialize(value: string[]) {
