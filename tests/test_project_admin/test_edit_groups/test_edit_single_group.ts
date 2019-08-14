@@ -5,8 +5,6 @@ import {
     Group,
     HttpError,
     Project,
-    Semester,
-    UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 // @ts-ignore
 import moment from 'moment';
@@ -14,8 +12,11 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
+import GroupMembersForm from '@/components/group_members_form.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+
+import * as data_ut from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -29,10 +30,7 @@ describe('EditSingleGroup tests', () => {
     let project: Project;
 
     beforeEach(() => {
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '@cornell.edu', last_modified: ''
-        });
+        course = data_ut.make_course({allowed_guest_domain: '@cornell.edu'});
 
         group = new Group({
             pk: 1,
@@ -50,32 +48,9 @@ describe('EditSingleGroup tests', () => {
             last_modified: "10am"
         });
 
-        project = new Project({
-            pk: 2,
-            name: "Project 1 - Statistics",
-            last_modified: "today",
-            course: 1,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
+        project = data_ut.make_project(course.pk, {
             min_group_size: 2,
             max_group_size: 3,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false,
         });
 
         wrapper = mount(EditSingleGroup, {
@@ -92,37 +67,13 @@ describe('EditSingleGroup tests', () => {
         sinon.restore();
     });
 
-    test('A group must have at most max_group_size members and at least one member', async () => {
-        expect(component.d_group!.member_names.length).toEqual(2);
-        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
-        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(false);
+    test('Group members form v-model binding', () => {
+        let edit_group_form = <Wrapper<GroupMembersForm>> wrapper.find({ref: 'edit_group_form'});
+        expect(edit_group_form.vm.value).toBe(wrapper.vm.d_group.member_names);
 
-        wrapper.find(".add-member-button").trigger('click');
-
-        expect(component.d_group!.member_names.length).toEqual(3);
-        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
-        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(true);
-
-        wrapper.find(".add-member-button").trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_group!.member_names.length).toEqual(3);
-        expect(wrapper.findAll('.member-name-input').length).toEqual(3);
-
-        wrapper.findAll(".remove-member-button").at(1).trigger('click');
-
-        expect(component.d_group!.member_names.length).toEqual(2);
-        expect(wrapper.findAll('.member-name-input').length).toEqual(2);
-
-        wrapper.findAll(".remove-member-button").at(1).trigger('click');
-
-        expect(component.d_group!.member_names.length).toEqual(1);
-        expect(wrapper.findAll('.member-name-input').length).toEqual(1);
-
-        wrapper.findAll(".remove-member-button").at(0).trigger('click');
-
-        expect(component.d_group!.member_names.length).toEqual(1);
-        expect(wrapper.findAll('.member-name-input').length).toEqual(1);
+        let new_members = ['wa@luigi.net', 'spam@egg.net'];
+        edit_group_form.vm.$emit('input', new_members);
+        expect(wrapper.vm.d_group.member_names).toEqual(new_members);
     });
 
     test('bonus_submissions_remaining cannot be a negative number', async () => {
@@ -159,169 +110,6 @@ describe('EditSingleGroup tests', () => {
 
         expect(component.edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
-    });
-
-    test('Usernames of group members are trimmed before attempt to create group',
-         async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
-
-        let group_members = [
-            "   abernard@cornell.edu  ",
-            "  amartin@cornell.edu",
-            "kelly@cornell.edu   "
-        ];
-
-        let trimmed_group_members = [
-            "abernard@cornell.edu",
-            "amartin@cornell.edu",
-            "kelly@cornell.edu"
-        ];
-
-        wrapper.find(".add-member-button").trigger('click');
-        await component.$nextTick();
-
-        let member_name_inputs = wrapper.findAll('.member-name-input');
-
-        let member_1_name_input = member_name_inputs.at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_2_name_input = member_name_inputs.at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
-        member_2_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_3_name_input = member_name_inputs.at(2);
-        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
-        member_3_name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(save_group_stub.firstCall.thisValue.member_names).toEqual(trimmed_group_members);
-    });
-
-    test('Member name inputs that are blank are thrown out before save', async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
-        let group_members = [
-            "    ",
-            "  amartin@cornell.edu",
-            " "
-        ];
-
-        let savable_group_members = [
-            "amartin@cornell.edu"
-        ];
-
-        wrapper.find(".add-member-button").trigger('click');
-        await component.$nextTick();
-
-        let member_name_inputs = wrapper.findAll('.member-name-input');
-
-        let member_1_name_input = member_name_inputs.at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_2_name_input = member_name_inputs.at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
-        member_2_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_3_name_input = member_name_inputs.at(2);
-        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
-        member_3_name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(save_group_stub.calledOnce);
-        expect(save_group_stub.firstCall.thisValue.member_names).toEqual(savable_group_members);
-    });
-
-    test('When all member names are blank in save(), all names are thrown out' +
-         ' and a single field with the allowed_guest_domain will replace them',
-         async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
-        let group_members = [
-            "    ",
-            "    ",
-            " "
-        ];
-
-        wrapper.find(".add-member-button").trigger('click');
-        await component.$nextTick();
-
-        let member_name_inputs = wrapper.findAll('.member-name-input');
-
-        let member_1_name_input = member_name_inputs.at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_2_name_input = member_name_inputs.at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
-        member_2_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_3_name_input = member_name_inputs.at(2);
-        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
-        member_3_name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(save_group_stub.callCount).toEqual(0);
-        expect(component.d_group.member_names.length).toEqual(1);
-        expect(component.d_group.member_names[0]).toEqual(component.course.allowed_guest_domain);
-    });
-
-    test('When a member name field contains just the allowed guest domain, the ' +
-         'attempt to save the group is unsuccessful and an error message is raised',
-         async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
-        let group_members = [
-            "jim@cornell.edu",
-            component.course.allowed_guest_domain,
-            component.course.allowed_guest_domain
-        ];
-
-        wrapper.find(".add-member-button").trigger('click');
-        await component.$nextTick();
-
-        let member_name_inputs = wrapper.findAll('.member-name-input');
-
-        let member_1_name_input = member_name_inputs.at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = group_members[0];
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_2_name_input = member_name_inputs.at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = group_members[1];
-        member_2_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_3_name_input = member_name_inputs.at(2);
-        (<HTMLInputElement> member_3_name_input.element).value = group_members[2];
-        member_3_name_input.trigger('input');
-        await component.$nextTick();
-
-        expect(component.edit_group_form_is_valid).toBe(true);
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(save_group_stub.callCount).toEqual(0);
-        expect(component.d_group.member_names.length).toEqual(3);
-        expect(component.incomplete_input_present).toBe(true);
-        expect(wrapper.findAll('.error-input').length).toEqual(2);
-        expect(wrapper.findAll('.incomplete-input-msg').length).toEqual(2);
     });
 
     test('Clicking extension display opens datetime picker', () => {
@@ -361,18 +149,6 @@ describe('EditSingleGroup tests', () => {
             )
         );
 
-        let member_name_inputs = wrapper.findAll('.member-name-input');
-
-        let member_1_name_input = member_name_inputs.at(0);
-        (<HTMLInputElement> member_1_name_input.element).value = "michael@cornell.edu";
-        member_1_name_input.trigger('input');
-        await component.$nextTick();
-
-        let member_2_name_input = member_name_inputs.at(1);
-        (<HTMLInputElement> member_2_name_input.element).value = "ryan@cornell.edu";
-        member_2_name_input.trigger('input');
-        await component.$nextTick();
-
         wrapper.find({ref: 'edit_group_form'}).trigger('submit');
         await component.$nextTick();
 
@@ -381,14 +157,7 @@ describe('EditSingleGroup tests', () => {
         expect(save_group_stub.calledOnce);
     });
 
-    test("When the prop 'group' changes in the parent component, d_group is updated and" +
-         "incomplete_input_present is reset to false",
-         async () => {
-        wrapper.setData({incomplete_input_present: true});
-        await component.$nextTick();
-
-        expect(component.incomplete_input_present).toBe(true);
-
+    test("When the prop 'group' changes in the parent component, d_group is updated", async () => {
         let different_group = new Group({
             pk: 2,
             project: 2,
@@ -413,6 +182,5 @@ describe('EditSingleGroup tests', () => {
         await component.$nextTick();
 
         expect(component.d_group).toEqual(different_group);
-        expect(component.incomplete_input_present).toBe(false);
     });
 });

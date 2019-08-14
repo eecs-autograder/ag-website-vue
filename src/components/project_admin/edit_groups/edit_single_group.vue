@@ -1,93 +1,54 @@
 <template>
   <div id="edit-single-group-component" v-if="d_group !== null">
-    <group-members-form :project="project" :course="course" @submit="update_group">
-
-    </group-members-form>
-
-    <validated-form ref="edit_group_form"
-                    autocomplete="off"
-                    spellcheck="false"
-                    @submit="update_group"
-                    @form_validity_changed="edit_group_form_is_valid = $event">
-      <div class="edit-group-members-container">
-        <p class="group-members-label"> Group members: </p>
-        <div v-for="(member, index) of d_group.member_names">
-          <div class="group-member-editing">
-            <div class="username-container">
-              <input :class="['member-name-input',
-                              {'error-input': incomplete_input_present
-                                              && member === course.allowed_guest_domain}]"
-                     type="text"
-                     v-model="d_group.member_names[index]"/>
-              <button slot="suffix"
-                      class="remove-member-button"
-                      :title="`Remove ${member} from group`"
-                      :disabled="d_group.member_names.length === 1"
-                      type="button"
-                      @click="remove_group_member(index)">
-                <i class="fas fa-times"></i>
-              </button>
-              <div>
-                <div v-if="incomplete_input_present
-                            && member === course.allowed_guest_domain"
-                     class="incomplete-input-msg">
-                  Incomplete member name
-                </div>
-              </div>
-            </div>
+    <group-members-form v-model="d_group.member_names"
+                        ref="edit_group_form"
+                        :project="project"
+                        :course="course"
+                        @submit="update_group"
+                        @form_validity_changed="edit_group_form_is_valid = $event"
+                        :ignore_group_size_limits="true">
+      <template v-slot:footer>
+        <div id="datetime-picker-container" class="clearable-datetime-picker">
+          <div class="label">Extension</div>
+          <div id="extension" class="datetime-input"
+              @click="$refs.extension_datetime_picker.toggle_visibility()">
+            {{format_datetime(d_group.extended_due_date)}}
+            <i class="far fa-calendar-alt"></i>
           </div>
-        </div>
-        <div class="add-member-container">
-          <button class="add-member-button"
-                  :disabled="d_group.member_names.length >= project.max_group_size"
-                  type="button"
-                  @click="add_group_member">
-            <i class="fas fa-plus"></i>
-            Add Another Member
+          <button type="button" id="revoke-extension"
+                  class="clear-button"
+                  @click.stop="d_group.extended_due_date = null"
+                  :disabled="d_group.extended_due_date === null">
+            <i class="fas fa-times"></i>
+            <span class="clear-text">Revoke</span>
           </button>
+
+          <datetime-picker v-model="d_group.extended_due_date"
+                          ref="extension_datetime_picker">
+          </datetime-picker>
         </div>
-      </div>
 
-      <div id="datetime-picker-container" class="clearable-datetime-picker">
-        <div class="label">Extension</div>
-        <div id="extension" class="datetime-input"
-             @click="$refs.extension_datetime_picker.toggle_visibility()">
-          {{format_datetime(d_group.extended_due_date)}}
-          <i class="far fa-calendar-alt"></i>
+        <div id="bonus-submissions-container">
+          <div id="bonus-submissions-label"> Bonus Submissions </div>
+          <validated-input ref="bonus_submissions_remaining_input"
+                          v-model="d_group.bonus_submissions_remaining"
+                          :validators="[is_integer, is_non_negative, is_not_empty]"
+                          :num_rows="1"
+                          input_style="width: 80px;
+                                        border: 1px solid #ced4da;"
+                          :from_string_fn="string_to_num">
+          </validated-input>
         </div>
-        <button type="button" id="revoke-extension"
-                class="clear-button"
-                @click.stop="d_group.extended_due_date = null"
-                :disabled="d_group.extended_due_date === null">
-          <i class="fas fa-times"></i>
-          <span class="clear-text">Revoke</span>
-        </button>
+        <APIErrors ref="api_errors"></APIErrors>
 
-        <datetime-picker v-model="d_group.extended_due_date"
-                         ref="extension_datetime_picker">
-        </datetime-picker>
-      </div>
-
-      <div id="bonus-submissions-container">
-        <div id="bonus-submissions-label"> Bonus Submissions </div>
-        <validated-input ref="bonus_submissions_remaining_input"
-                         v-model="d_group.bonus_submissions_remaining"
-                         :validators="[is_integer, is_non_negative, is_not_empty]"
-                         :num_rows="1"
-                         input_style="width: 80px;
-                                      border: 1px solid #ced4da;"
-                         :from_string_fn="string_to_num">
-        </validated-input>
-      </div>
-      <APIErrors ref="api_errors"></APIErrors>
-
-      <button class="update-group-button"
-              type="submit"
-              :disabled="d_saving || !edit_group_form_is_valid"> Update Group </button>
-      <div v-show="d_saving" class="saving-spinner">
-        <i class="fa fa-spinner fa-pulse"></i>
-      </div>
-    </validated-form>
+        <button class="update-group-button"
+                type="submit"
+                :disabled="d_saving"> Update Group </button>
+        <div v-show="d_saving" class="saving-spinner">
+          <i class="fa fa-spinner fa-pulse"></i>
+        </div>
+      </template>
+    </group-members-form>
   </div>
 </template>
 
@@ -98,6 +59,7 @@ import { Course, Group, Project } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
+import GroupMembersForm from '@/components/group_members_form.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -107,10 +69,11 @@ import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/vali
 @Component({
   components: {
     APIErrors,
+    DatetimePicker,
+    GroupMembersForm,
     Toggle,
     ValidatedForm,
     ValidatedInput,
-    DatetimePicker
   }
 })
 export default class EditSingleGroup extends Vue {
@@ -145,11 +108,9 @@ export default class EditSingleGroup extends Vue {
   d_saving = false;
 
   edit_group_form_is_valid = true;
-  incomplete_input_present = false;
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
-    this.incomplete_input_present = false;
     this.d_group = deep_copy(new_group, Group);
   }
 
@@ -169,27 +130,8 @@ export default class EditSingleGroup extends Vue {
   async update_group() {
     try {
       this.d_saving = true;
-      this.incomplete_input_present = false;
       (<APIErrors> this.$refs.api_errors).clear();
-
-      this.d_group.member_names = this.d_group.member_names.filter(
-        name => name.trim() !== ""
-      );
-
-      if (this.d_group.member_names.length === 0) {
-        this.add_group_member();
-      }
-
-      for (let i = 0; i < this.d_group.member_names.length; ++i) {
-        if (this.d_group.member_names[i] === this.course.allowed_guest_domain) {
-          this.incomplete_input_present = true;
-          return;
-        }
-        Vue.set(this.d_group.member_names, i, this.d_group.member_names[i].trim());
-      }
-
       await this.d_group.save();
-      (<ValidatedForm> this.$refs.edit_group_form).reset_warning_state();
     }
     finally {
       this.d_saving = false;
@@ -214,18 +156,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 
 #edit-single-group-component {
   font-size: 15px;
-}
-
-.edit-group-members-container {
   padding-top: 16px;
-}
-
-.username-container {
-  min-width: 400px;
-}
-
-.member-name-input {
-  width: 240px;
 }
 
 #datetime-picker-container {
