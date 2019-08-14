@@ -65,6 +65,7 @@ import { User } from 'ag-client-typescript';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { is_email } from '@/utils';
 
 @Component({
   components: {
@@ -119,11 +120,10 @@ export default class Roster extends Vue {
     this.first_invalid_email = null;
     string_of_emails = string_of_emails.replace(/,+/g, " ");
     let split_regex = /\s+/g;
-    let valid_email_regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     let trimmed_input = string_of_emails.trim();
     let usernames = trimmed_input.split(split_regex);
     for (let username of usernames) {
-      if (valid_email_regex.test(username)) {
+      if (is_email(username)) {
         valid_usernames.push(username);
       }
       else {

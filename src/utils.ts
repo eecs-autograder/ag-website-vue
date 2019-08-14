@@ -155,3 +155,9 @@ export function format_time(time: string | null): string {
     }
     return moment(time, ['HH:mm', 'HH:mm:ss']).format('hh:mm A');
 }
+
+const VALID_EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+export function is_email(str: string): boolean {
+    return VALID_EMAIL_REGEX.test(str);
+}
