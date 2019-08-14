@@ -148,7 +148,7 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findAll('#resolve-invitation-message').length).toEqual(0);
     });
 
-    test('created - user has received an invitation', async () => {
+    test('created - user has received a invitations from several projects', async () => {
         let group_invitation_received_1 = new GroupInvitation({
             pk: 1,
             invitation_creator: "laura@umich.edu",
@@ -166,7 +166,7 @@ describe('GroupRegistration tests', () => {
         let group_invitation_received_3 = new GroupInvitation({
             pk: 3,
             invitation_creator: "james@umich.edu",
-            project: project.pk + 10,
+            project: project.pk,
             invited_usernames: ["alexis@umich.edu", "violet@umich.edu"],
             invitees_who_accepted: ["alexis@umich.edu"]
         });
@@ -186,9 +186,11 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.invitations_received.length).toEqual(1);
-        expect(wrapper.vm.invitations_received[0]).toEqual(group_invitation_received_2);
+        expect(wrapper.vm.invitations_received.length).toEqual(2);
+        expect(wrapper.vm.invitations_received).toEqual(
+            [group_invitation_received_2, group_invitation_received_3]);
         expect(wrapper.findAll('#resolve-invitation-message').length).toEqual(1);
+        expect(wrapper.findAll({name: 'InvitationReceived'}).length).toEqual(2);
     });
 
     test('if invitation_sent is not null, it is an invitation sent by the user for ' +
