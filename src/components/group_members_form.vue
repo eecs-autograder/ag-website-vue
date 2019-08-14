@@ -10,13 +10,14 @@
         <div class="group-member-editing">
           <div class="username-container">
             <validated-input v-model="d_usernames[index]" :validators="[is_email]"
-                             ref="username_input">
+                             ref="username_input"
+                             @input="$emit('input', d_usernames)">
               <button slot="suffix"
                       class="remove-member-button"
                       :disabled="d_usernames.length <= min_num_inputs"
                       :title="`Remove ${member} from group`"
                       type="button"
-                      @click="d_usernames.splice(index, 1)">
+                      @click="d_usernames.splice(index, 1); $emit('input', d_usernames)">
                 <i class="fas fa-times"></i>
               </button>
             </validated-input>

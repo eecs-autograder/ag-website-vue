@@ -194,6 +194,8 @@ describe('GroupMembersForm tests', () => {
         expect(inputs.length).toEqual(1);
 
         expect(get_validated_input_text(inputs.at(0))).toEqual('spam');
+
+        expect(wrapper.emitted().input).toEqual([[['spam']]]);
     });
 
     test('value watcher', () => {
@@ -229,6 +231,7 @@ describe('GroupMembersForm tests', () => {
         expect(wrapper.emitted().form_validity_changed).toEqual([[false]]);
         set_validated_input_text(inputs.at(0), 'wa@luigi.net');
         expect(wrapper.emitted().form_validity_changed).toEqual([[false], [true]]);
+        expect(wrapper.emitted().input).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
     });
 
     test('reset()', async () => {
