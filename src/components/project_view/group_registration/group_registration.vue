@@ -57,9 +57,9 @@
               </table>
             </div>
             <div id="invitation-sent-footer">
-              <button id="cancel-sent-invitation-button"
+              <button id="delete-invitation-button"
                       class="white-button"
-                      @click="$refs.cancel_group_invitation_modal.open()">
+                      @click="$refs.delete_invitation_modal.open()">
                 Delete Invitation
               </button>
             </div>
@@ -144,7 +144,7 @@
       </div>
     </modal>
 
-    <modal ref="cancel_group_invitation_modal" size="large">
+    <modal ref="delete_invitation_modal" size="large">
       <div class="modal-header"> Delete Invitation </div>
       <div class="modal-divider"></div>
       <div class="modal-body">
@@ -161,16 +161,16 @@
         <div class="modal-footer">
           <div class="modal-divider"></div>
           <div>
-            <APIErrors ref="cancel_invitation_api_errors"> </APIErrors>
+            <APIErrors ref="delete_invitation_api_errors"> </APIErrors>
           </div>
           <div class="modal-button-container">
             <button id="confirm-keep-sent-invitation-button"
                     class="white-button"
-                    @click="$refs.cancel_group_invitation_modal.close()"> Keep Invitation </button>
-            <button id="confirm-cancel-sent-invitation-button"
+                    @click="$refs.delete_invitation_modal.close()"> Keep Invitation </button>
+            <button id="confirm-delete-invitation-button"
                     class="orange-button"
-                    @click="cancel_invitation"
-                    :disabled="d_canceling_invitation"> Delete Invitation </button>
+                    @click="delete_invitation"
+                    :disabled="d_deleting_invitation"> Delete Invitation </button>
           </div>
         </div>
       </div>
@@ -212,7 +212,7 @@ export default class GroupRegistration extends Vue {
   course!: Course;
 
   d_awaiting_action = false;
-  d_canceling_invitation = false;
+  d_deleting_invitation = false;
   d_loading = true;
   d_sending_invitation = false;
   invitation_sent: GroupInvitation | null = null;
@@ -245,17 +245,17 @@ export default class GroupRegistration extends Vue {
     this.d_loading = false;
   }
 
-  @handle_api_errors_async(handle_cancel_invitation_error)
-  async cancel_invitation() {
+  @handle_api_errors_async(handle_delete_invitation_error)
+  async delete_invitation() {
     try {
-      this.d_canceling_invitation = true;
-      (<APIErrors> this.$refs.cancel_invitation_api_errors).clear();
+      this.d_deleting_invitation = true;
+      (<APIErrors> this.$refs.delete_invitation_api_errors).clear();
       await this.invitation_sent!.reject();
       this.invitation_sent = null;
-      (<Modal> this.$refs.cancel_group_invitation_modal).close();
+      (<Modal> this.$refs.delete_invitation_modal).close();
     }
     finally {
-      this.d_canceling_invitation = false;
+      this.d_deleting_invitation = false;
     }
   }
 
@@ -294,8 +294,8 @@ function handle_work_alone_error(component: GroupRegistration, error: unknown) {
   (<APIErrors> component.$refs.work_alone_api_errors).show_errors_from_response(error);
 }
 
-function handle_cancel_invitation_error(component: GroupRegistration, error: unknown) {
-  (<APIErrors> component.$refs.cancel_invitation_api_errors).show_errors_from_response(error);
+function handle_delete_invitation_error(component: GroupRegistration, error: unknown) {
+  (<APIErrors> component.$refs.delete_invitation_api_errors).show_errors_from_response(error);
 }
 
 function handle_send_invitation_error(component: GroupRegistration, error: unknown) {
@@ -398,7 +398,7 @@ $teal: hsl(180, 100%, 24%);
   @include invitation_container_footer($teal, $teal);
 }
 
-#cancel-sent-invitation-button {
+#delete-invitation-button {
   box-shadow: none;
 }
 

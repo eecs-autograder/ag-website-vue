@@ -367,7 +367,7 @@ describe('GroupRegistration tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
-    test('cancel invitation - cancel action in modal', async () => {
+    test('delete invitation - cancel action in modal', async () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
@@ -389,27 +389,27 @@ describe('GroupRegistration tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let confirm_cancel_invitation_modal = <Modal> wrapper.find(
-            {ref: 'cancel_group_invitation_modal'}
+        let confirm_delete_invitation_modal = <Modal> wrapper.find(
+            {ref: 'delete_invitation_modal'}
         ).vm;
 
-        expect(confirm_cancel_invitation_modal.is_open).toBe(false);
+        expect(confirm_delete_invitation_modal.is_open).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
 
-        wrapper.find('#cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_cancel_invitation_modal.is_open).toBe(true);
+        expect(confirm_delete_invitation_modal.is_open).toBe(true);
 
         wrapper.find('#confirm-keep-sent-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.callCount).toEqual(0);
-        expect(confirm_cancel_invitation_modal.is_open).toBe(false);
+        expect(confirm_delete_invitation_modal.is_open).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
     });
 
-    test('cancel invitation - confirm action in modal - successful', async () => {
+    test('delete invitation - confirm action in modal - successful', async () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
@@ -431,27 +431,27 @@ describe('GroupRegistration tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let confirm_cancel_invitation_modal = <Modal> wrapper.find(
-            {ref: 'cancel_group_invitation_modal'}
+        let confirm_delete_invitation_modal = <Modal> wrapper.find(
+            {ref: 'delete_invitation_modal'}
         ).vm;
 
-        expect(confirm_cancel_invitation_modal.is_open).toBe(false);
+        expect(confirm_delete_invitation_modal.is_open).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
 
-        wrapper.find('#cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_cancel_invitation_modal.is_open).toBe(true);
+        expect(confirm_delete_invitation_modal.is_open).toBe(true);
 
-        wrapper.find('#confirm-cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#confirm-delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
-        expect(confirm_cancel_invitation_modal.is_open).toBe(false);
+        expect(confirm_delete_invitation_modal.is_open).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
     });
 
-    test('cancel invitation - confirm action in modal - unsuccessful', async () => {
+    test('delete invitation - confirm action in modal - unsuccessful', async () => {
         let group_invitation_sent = new GroupInvitation({
             pk: 1,
             invitation_creator: "alexis@umich.edu",
@@ -480,26 +480,26 @@ describe('GroupRegistration tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let confirm_cancel_invitation_modal = <Modal> wrapper.find(
-            {ref: 'cancel_group_invitation_modal'}
+        let confirm_delete_invitation_modal = <Modal> wrapper.find(
+            {ref: 'delete_invitation_modal'}
         ).vm;
 
-        expect(confirm_cancel_invitation_modal.is_open).toBe(false);
+        expect(confirm_delete_invitation_modal.is_open).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
 
-        wrapper.find('#cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_cancel_invitation_modal.is_open).toBe(true);
+        expect(confirm_delete_invitation_modal.is_open).toBe(true);
 
-        wrapper.find('#confirm-cancel-sent-invitation-button').trigger('click');
+        wrapper.find('#confirm-delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
-        expect(confirm_cancel_invitation_modal.is_open).toBe(true);
+        expect(confirm_delete_invitation_modal.is_open).toBe(true);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'cancel_invitation_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_invitation_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
