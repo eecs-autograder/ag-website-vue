@@ -2,7 +2,8 @@
   <validated-form ref="group_members_form"
                   autocomplete="off"
                   spellcheck="false"
-                  @submit="submit">
+                  @submit="submit"
+                  @form_validity_changed="$emit('form_validity_changed', $event)">
     <slot name="header"></slot>
     <div class="add-group-members-container">
       <div v-for="(member, index) of d_usernames">

@@ -225,6 +225,10 @@ describe('GroupMembersForm tests', () => {
         let inputs = wrapper.findAll({name: 'ValidatedInput'});
         expect((<ValidatedInput> inputs.at(0).vm).is_valid).toBe(false);
         expect((<ValidatedInput> inputs.at(1).vm).is_valid).toBe(true);
+
+        expect(wrapper.emitted().form_validity_changed).toEqual([[false]]);
+        set_validated_input_text(inputs.at(0), 'wa@luigi.net');
+        expect(wrapper.emitted().form_validity_changed).toEqual([[false], [true]]);
     });
 
     test('reset()', async () => {
