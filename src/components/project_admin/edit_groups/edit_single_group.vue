@@ -118,14 +118,6 @@ export default class EditSingleGroup extends Vue {
     this.d_group = deep_copy(this.group, Group);
   }
 
-  remove_group_member(index: number) {
-    this.d_group.member_names.splice(index, 1);
-  }
-
-  add_group_member() {
-    this.d_group.member_names.push(this.course.allowed_guest_domain);
-  }
-
   @handle_api_errors_async(handle_save_group_error)
   async update_group() {
     try {
