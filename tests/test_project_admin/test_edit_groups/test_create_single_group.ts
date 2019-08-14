@@ -25,9 +25,7 @@ describe('CreateSingleGroup tests', () => {
     let project: Project;
 
     beforeEach(() => {
-
         course = data_ut.make_course({allowed_guest_domain: '@cornell.edu'});
-
         project = data_ut.make_project(course.pk, {min_group_size: 2, max_group_size: 3});
 
         wrapper = mount(CreateSingleGroup, {

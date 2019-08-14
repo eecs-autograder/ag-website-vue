@@ -11,7 +11,7 @@ import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
+import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
 import { make_course, make_project } from '@/tests/data_utils';
 

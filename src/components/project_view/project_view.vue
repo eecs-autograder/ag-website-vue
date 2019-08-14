@@ -24,8 +24,7 @@
                                   :course="course">
               </group-registration>
             </div>
-
-            <div v-if="group !== null">
+            <div v-else>
               <div v-if="group.extended_due_date !== null">
                 <h4 id="extension">
                   Extension: {{format_datetime(group.extended_due_date)}}
@@ -85,7 +84,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupObserver, Project, User } from 'ag-client-typescript';
 
-import GroupRegistration from '@/components/project_submission/group_registration/group_registration.vue';
+import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';

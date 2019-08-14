@@ -11,18 +11,15 @@
                 @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
         <button id="send-group-invitation-button"
                 class="purple-button"
-                @click="open_send_group_invitation_modal()"> Create new invitation </button>
+                @click="$refs.send_group_invitation_modal.open()"> Create new invitation </button>
       </div>
-
-
     </div>
 
     <div v-if="project.disallow_group_registration"
          id="registration-closed">
       Group registration has been closed for this project.
-      Please email the course staff if you need to create a group.
+      Please email the course staff to proceed.
     </div>
-
     <div v-else id="registration-open">
 
       <div id="resolve-invitation-message"
@@ -62,7 +59,8 @@
             <div id="invitation-sent-footer">
               <button id="cancel-sent-invitation-button"
                       class="white-button"
-                      @click="$refs.cancel_group_invitation_modal.open()"> Cancel Invitation
+                      @click="$refs.cancel_group_invitation_modal.open()">
+                Delete Invitation
               </button>
             </div>
           </div>
@@ -86,27 +84,20 @@
     <modal ref="confirm_working_alone_modal"
            size="medium"
            click_outside_to_close>
-      <div class="modal-header"> Confirm Working Alone </div>
-      <div class="modal-divider"></div>
+      <div class="modal-header"> Are you sure you want to <b>work alone</b>? </div>
       <div class="modal-body">
-        <div class="modal-message">
-          Are you sure you want to <b>work alone</b>?
-          Once you accept, you cannot have a partner for this project.
-        </div>
-
         <div class="modal-footer">
-          <div class="modal-divider"></div>
           <div>
             <APIErrors ref="work_alone_api_errors"> </APIErrors>
           </div>
           <div class="modal-button-container">
-          <button id="cancel-confirm-working-alone-button"
-                  class="white-button"
-                  @click="$refs.confirm_working_alone_modal.close()"> Cancel </button>
-          <button id="confirm-working-alone-button"
-                  class="teal-button"
-                  @click="work_alone"
-                  :disabled="d_awaiting_action"> Work Alone </button>
+            <button id="cancel-confirm-working-alone-button"
+                    class="white-button"
+                    @click="$refs.confirm_working_alone_modal.close()"> Cancel </button>
+            <button id="confirm-working-alone-button"
+                    class="teal-button"
+                    @click="work_alone"
+                    :disabled="d_awaiting_action"> Work Alone </button>
           </div>
         </div>
       </div>
@@ -115,51 +106,18 @@
     <modal ref="send_group_invitation_modal"
            size="medium"
            click_outside_to_close>
-      <div class="modal-header"> Send Group Invitation </div>
+      <div class="modal-header"> Send Invitation </div>
       <div class="modal-divider"></div>
       <div class="modal-body">
-          <validated-form ref="send_group_invitation_form"
-                          autocomplete="off"
-                          spellcheck="false"
-                          @submit="send_invitation">
+        <group-members-form ref="send_invitation_form"
+                            :project="project"
+                            :course="course"
+                            :max_num_members="project.max_group_size - 1"
+                            @submit="send_invitation">
+          <template v-slot:header>
             <p class="send-group-invitation-modal-title"> Users to Invite: </p>
-            <div class="add-group-members-container">
-              <div v-for="(member, index) of users_to_invite">
-                <div class="group-member-editing">
-                  <div class="username-container">
-                    <input :class="['member-name-input',
-                                   {'error-input': incomplete_input_present
-                                    && member.username === course.allowed_guest_domain}]"
-                           :id="`group_member_name_${index}`"
-                           v-model="member.username"/>
-                    <button slot="suffix"
-                            class="remove-member-button"
-                            :disabled="users_to_invite.length === 1"
-                            :title="`Remove ${member.username} from group`"
-                            type="button"
-                            @click="users_to_invite.splice(index, 1)">
-                      <i class="fas fa-times"></i>
-                    </button>
-                    <div>
-                      <div v-if="incomplete_input_present
-                             && member.username === course.allowed_guest_domain"
-                           class="incomplete-input-msg">
-                        Incomplete member name
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="add-member-container">
-                <button class="add-member-button"
-                        type="button"
-                        :disabled="users_to_invite.length >= project.max_group_size - 1"
-                        @click="add_group_member">
-                  <i class="fas fa-plus"></i>
-                  Add Another Member
-                </button>
-              </div>
-            </div>
+          </template>
+          <template v-slot:footer>
             <div class="modal-footer">
               <div class="modal-divider"></div>
               <div>
@@ -176,22 +134,22 @@
                 <button id="confirm-send-invitation-button"
                         class="purple-button"
                         type="submit"
-                        @click="send_invitation"
                         :disabled="d_sending_invitation">
                   Send Invitation
                 </button>
               </div>
             </div>
-          </validated-form>
+          </template>
+        </group-members-form>
       </div>
     </modal>
 
     <modal ref="cancel_group_invitation_modal" size="large">
-      <div class="modal-header"> Cancel Group Invitation </div>
+      <div class="modal-header"> Delete Invitation </div>
       <div class="modal-divider"></div>
       <div class="modal-body">
         <div class="modal-message">
-          Are you sure you want to <b>cancel</b> the group invitation with:
+          Are you sure you want to <b>delete</b> your invitation to:
           <ul v-if="invitation_sent !== null" class="list-of-usernames">
             <li v-for="(username, index) of invitation_sent.invited_usernames"
                 :class="['username',
@@ -212,7 +170,7 @@
             <button id="confirm-cancel-sent-invitation-button"
                     class="orange-button"
                     @click="cancel_invitation"
-                    :disabled="d_canceling_invitation"> Cancel Invitation </button>
+                    :disabled="d_canceling_invitation"> Delete Invitation </button>
           </div>
         </div>
       </div>
@@ -228,9 +186,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Course, Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import GroupMembersForm from '@/components/group_members_form.vue';
 import Modal from '@/components/modal.vue';
 import { GroupMember } from "@/components/project_admin/edit_groups/create_single_group.vue";
-import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
+import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async } from '@/utils';
@@ -238,6 +197,7 @@ import { handle_api_errors_async } from '@/utils';
 @Component({
   components: {
     APIErrors,
+    GroupMembersForm,
     InvitationReceived,
     Modal,
     ValidatedForm,
@@ -255,7 +215,6 @@ export default class GroupRegistration extends Vue {
   d_canceling_invitation = false;
   d_loading = true;
   d_sending_invitation = false;
-  incomplete_input_present = false;
   invitation_sent: GroupInvitation | null = null;
   invitations_received: GroupInvitation[] = [];
   user: User | null = null;
@@ -286,13 +245,6 @@ export default class GroupRegistration extends Vue {
     this.d_loading = false;
   }
 
-  add_group_member() {
-    this.users_to_invite.push({
-      id: this.users_to_invite.length,
-      username: this.course.allowed_guest_domain
-    });
-  }
-
   @handle_api_errors_async(handle_cancel_invitation_error)
   async cancel_invitation() {
     try {
@@ -307,67 +259,18 @@ export default class GroupRegistration extends Vue {
     }
   }
 
-  open_send_group_invitation_modal() {
-    (<Modal> this.$refs.send_group_invitation_modal).open();
-    this.reset_group_member_inputs();
-  }
-
-  reset_group_member_inputs() {
-    this.users_to_invite = [];
-    this.incomplete_input_present = false;
-
-    let min_num_inputs = this.project.min_group_size === this.project.max_group_size
-      ? this.project.min_group_size - 1 :  this.project.min_group_size - 1;
-    if (min_num_inputs === 0) {
-        min_num_inputs = 1;
-    }
-    for (let i = 0; i < min_num_inputs; ++i) {
-      this.users_to_invite.push(
-        {
-          id: i,
-          username: this.course.allowed_guest_domain
-        }
-      );
-    }
-  }
-
   invitee_acceptance_status(username: string) {
     return this.invitation_sent!.invitees_who_accepted.findIndex(
         (name: string) => username === name) !== -1 ? 'Accepted' : 'Pending';
   }
 
   @handle_api_errors_async(handle_send_invitation_error)
-  async send_invitation() {
+  async send_invitation(usernames: string[]) {
     try {
-      let usernames: string[] = [];
       this.d_sending_invitation = true;
-      this.incomplete_input_present = false;
       (<APIErrors> this.$refs.send_invitation_api_errors).clear();
 
-      this.users_to_invite = this.users_to_invite.filter(
-        member => member.username.trim() !== ""
-      );
-
-      if (this.users_to_invite.length === 0) {
-        this.add_group_member();
-      }
-
-      for (let user_index = 0; user_index < this.users_to_invite.length; ++user_index) {
-        if (this.users_to_invite[user_index].username.trim()
-            === this.course.allowed_guest_domain) {
-          this.incomplete_input_present = true;
-          return;
-        }
-        usernames.push(this.users_to_invite[user_index].username.trim());
-        Vue.set(this.users_to_invite, user_index, {
-          id: user_index + 1,
-          username: this.users_to_invite[user_index].username.trim()
-        });
-      }
-
-      this.invitation_sent = await GroupInvitation.send_invitation(
-          this.project.pk, usernames
-      );
+      this.invitation_sent = await GroupInvitation.send_invitation(this.project.pk, usernames);
       (<Modal> this.$refs.send_group_invitation_modal).close();
     }
     finally {
@@ -516,10 +419,6 @@ $teal: hsl(180, 100%, 24%);
 .send-group-invitation-modal-title {
   padding: 10px 0;
   margin: 0;
-}
-
-.add-member-button {
-  margin-bottom: 15px;
 }
 
 @media only screen and (min-width: 500px) {

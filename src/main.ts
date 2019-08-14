@@ -7,7 +7,7 @@ import CourseAdmin from '@/components/course_admin/course_admin.vue';
 import CourseList from '@/components/course_list/course_list.vue';
 import ProjectList from '@/components/course_view.vue';
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
-import ProjectView from '@/components/project_submission/project_view.vue';
+import ProjectView from '@/components/project_view/project_view.vue';
 import UIDemos from '@/demos/ui_demos.vue';
 
 import App from './App.vue';

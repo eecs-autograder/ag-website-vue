@@ -10,8 +10,8 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import InvitationReceived from '@/components/project_submission/group_registration/invitation_received.vue';
-import ProjectView from '@/components/project_submission/project_view.vue';
+import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
+import ProjectView from '@/components/project_view/project_view.vue';
 
 import { make_course, make_project } from '@/tests/data_utils';
 
@@ -32,7 +32,7 @@ describe('Changing Tabs', ()  => {
     const routes = [
         {
             path: '/web/project/:project_id',
-            name: "project_submission",
+            name: "project_view",
             component: ProjectView
         }
     ];
@@ -411,7 +411,7 @@ describe('GroupObserver tests for the Project Component', () => {
     const routes = [
         {
             path: '/web/project/:project_id',
-            name: "project_submission",
+            name: "project_view",
             component: ProjectView
         }
     ];

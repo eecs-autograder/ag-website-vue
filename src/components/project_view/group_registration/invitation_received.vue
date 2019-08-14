@@ -3,7 +3,7 @@
 
     <div id="invitation-received">
       <div id="invitation-received-header">
-        <b>{{d_invitation.invitation_creator}}</b> has invited you to join a group!
+        <b>{{d_invitation.invitation_creator}}</b> has invited you work together!
       </div>
       <div id="invitation-received-body">
         <table class="invitation-table">
@@ -104,7 +104,6 @@
 
   </div>
 </template>
-
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
