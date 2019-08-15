@@ -30,7 +30,7 @@ import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import { handle_api_errors_async } from '@/utils';
 
-interface GroupMember {
+export interface GroupMember {
   id: number;
   username: string;
 }
