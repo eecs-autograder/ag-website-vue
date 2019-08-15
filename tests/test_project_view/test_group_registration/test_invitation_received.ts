@@ -203,9 +203,12 @@ describe('InvitationReceived tests', () => {
             })
         });
 
-        let accept_invitation_stub = sinon.stub(wrapper.vm.d_invitation!, 'accept').returns(
-            Promise.resolve(group_created)
-        );
+        let accept_invitation_stub = sinon.stub(
+            wrapper.vm.d_invitation!, 'accept'
+        ).callsFake(() => {
+            Group.notify_group_created(group_created);
+            return Promise.resolve(group_created);
+        });
         let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
         expect(confirm_accept_modal.is_open).toBe(false);
         expect(wrapper.find('#accept-invitation-button').is('[disabled]')).toBe(false);
@@ -219,6 +222,11 @@ describe('InvitationReceived tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
+        // When ProjectView is notified that a group was created,
+        // this component will be unmounted before we can close the modal
+        // (without an exception being raised).
+        // Therefore, InvitationReceived should NOT try to close the modal
+        // in that case.
         expect(confirm_accept_modal.is_open).toBe(true);
     });
 
