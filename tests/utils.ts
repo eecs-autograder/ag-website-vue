@@ -1,6 +1,6 @@
 import { Vue } from "vue-property-decorator";
 
-import { Wrapper } from "@vue/test-utils";
+import { RefSelector, Wrapper } from "@vue/test-utils";
 
 import ValidatedInput from "@/components/validated_input.vue";
 
@@ -72,4 +72,34 @@ function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelec
     return wrapper.name() === 'input'
            || wrapper.name() === 'select'
            || wrapper.name() === 'option';
+}
+
+export async function do_invalid_text_input_test_without_save_button(
+    component_wrapper: Wrapper<Vue>,
+    input_selector: string | RefSelector,
+    invalid_text: string) {
+    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
+    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
+    expect(validated_input_is_valid(input_wrapper)).toEqual(true);
+
+    set_validated_input_text(input_wrapper, invalid_text);
+    await component_wrapper.vm.$nextTick();
+
+    expect(validated_input_is_valid(input_wrapper)).toEqual(false);
+}
+
+export async function do_input_blank_or_not_integer_test_without_save_button(
+    component_wrapper: Wrapper<Vue>,
+    input_selector: string | RefSelector) {
+    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
+    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
+    let original_text = get_validated_input_text(input_wrapper);
+
+    await do_invalid_text_input_test_without_save_button(
+        component_wrapper, input_selector, ' '
+    );
+    set_validated_input_text(input_wrapper, original_text);
+    return do_invalid_text_input_test_without_save_button(
+        component_wrapper, input_selector, 'not num'
+    );
 }

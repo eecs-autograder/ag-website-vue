@@ -82,13 +82,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript/dist/src/ag_test_suite';
 
 import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
-import Toggle from '@/components/toggle.vue';
 
-@Component({
-  components: {
-    Toggle
-  }
-})
+@Component
 export default class AGTestSuiteAdvancedFdbkSettings extends Vue {
   @Prop({required: true, type: String})
   config_name!: string;

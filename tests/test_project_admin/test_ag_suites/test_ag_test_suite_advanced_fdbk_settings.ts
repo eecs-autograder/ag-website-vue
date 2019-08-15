@@ -65,9 +65,11 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
 
         show_individual_tests_input.setChecked(true);
         expect(component.d_feedback_config!.show_individual_tests).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
         show_individual_tests_input.setChecked(false);
         expect(component.d_feedback_config!.show_individual_tests).toEqual(false);
+        expect(wrapper.emitted().input.length).toEqual(2);
 
         show_individual_tests_input.setChecked(true);
         expect(component.d_feedback_config!.show_individual_tests).toEqual(true);

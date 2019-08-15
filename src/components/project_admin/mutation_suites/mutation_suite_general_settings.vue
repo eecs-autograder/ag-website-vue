@@ -1,17 +1,13 @@
 <template>
   <div v-if="d_mutation_test_suite !== null"
        id="mutation-suite-general-settings-component">
-    <validated-form id="mutation-test-suite-settings-form"
-                    autocomplete="off"
-                    spellcheck="false"
-                    @submit="save_mutation_test_suite_settings"
-                    @form_validity_changed="d_settings_form_is_valid = $event">
 
       <div id="mutation-test-suite-name-container">
         <label class="text-label"> Suite name </label>
         <validated-input ref="suite_name"
                          id="input-name"
                          v-model="d_mutation_test_suite.name"
+                         @input="$emit('input', d_mutation_test_suite)"
                          :validators="[is_not_empty]">
         </validated-input>
       </div>
@@ -21,7 +17,8 @@
                type="checkbox"
                class="checkbox"
                :checked="!d_mutation_test_suite.deferred"
-               @change="d_mutation_test_suite.deferred = !$event.target.checked"/>
+               @change="d_mutation_test_suite.deferred = !$event.target.checked;
+                        $emit('input', d_mutation_test_suite)"/>
         <label class="checkbox-label"
                for="synchronous-or-deferred">
           Suite must finish before students can submit again
@@ -35,8 +32,8 @@
               <dropdown id="sandbox-docker-image"
                         :items="d_docker_images"
                         dropdown_height="250px"
-                        @update_item_selected="
-                            d_mutation_test_suite.sandbox_docker_image = $event">
+                        @update_item_selected="d_mutation_test_suite.sandbox_docker_image = $event;
+                                               $emit('input', d_mutation_test_suite)">
                 <template slot="header">
                   <div tabindex="1" class="dropdown-header-wrapper">
                     <div class="dropdown-header sandbox-docker-image-dropdown">
@@ -57,7 +54,9 @@
 
           <div class="toggle-container">
             <toggle v-model="d_mutation_test_suite.allow_network_access"
-                    ref="allow_network_access">
+                    @input="$emit('input', d_mutation_test_suite)"
+                    ref="allow_network_access"
+                    id="allow-network-access">
               <div slot="on">
                 Allow network access
               </div>
@@ -72,6 +71,7 @@
         <label class="text-label"> Instructor Files </label>
         <div class="typeahead-search-bar">
             <dropdown-typeahead ref="instructor_files_typeahead"
+                                id="instructor-files-typeahead"
                                 placeholder_text="Enter a filename"
                                 :choices="instructor_files_available"
                                 :filter_fn="instructor_file_filter_fn"
@@ -84,7 +84,7 @@
             </dropdown-typeahead>
           </div>
 
-          <div class="instructor-files">
+          <div id="instructor-files">
             <div v-for="(file, index) of d_mutation_test_suite.instructor_files_needed"
                  :class="['file', {'odd-index': index % 2 !== 0}]">
               <span class="file-name"> {{file.name}} </span>
@@ -100,6 +100,7 @@
         <label class="text-label"> Student Files </label>
         <div class="typeahead-search-bar">
             <dropdown-typeahead ref="student_files_typeahead"
+                                id="student-files-typeahead"
                                 placeholder_text="Enter a filename"
                                 :choices="expected_student_files_available"
                                 :filter_fn="expected_student_file_filter_fn"
@@ -112,7 +113,7 @@
             </dropdown-typeahead>
           </div>
 
-          <div class="student-files">
+          <div id="student-files">
             <div v-for="(file, index) of d_mutation_test_suite.student_files_needed"
                  :class="['file', {'odd-index': index % 2 !== 0}]">
               <span class="file-name"> {{file.pattern}} </span>
@@ -123,24 +124,6 @@
             </div>
           </div>
       </div>
-
-<!--      <div class="bottom-of-form">-->
-<!--        <APIErrors ref="api_errors"></APIErrors>-->
-
-<!--        <button type="submit"-->
-<!--                class="save-button"-->
-<!--                :disabled="!d_settings_form_is_valid || d_saving">Save</button>-->
-
-<!--        <div v-show="!d_saving" class="last-saved-timestamp">-->
-<!--          <span> Last Saved: </span>-->
-<!--          {{format_datetime(d_mutation_test_suite.last_modified)}}-->
-<!--        </div>-->
-
-<!--        <div v-show="d_saving" class="last-saved-spinner">-->
-<!--          <i class="fa fa-spinner fa-pulse"></i>-->
-<!--        </div>-->
-<!--      </div>-->
-    </validated-form>
   </div>
 </template>
 
@@ -151,7 +134,8 @@ import {
     ExpectedStudentFile,
     get_sandbox_docker_images,
     InstructorFile,
-    MutationTestSuite, Project,
+    MutationTestSuite,
+    Project,
     SandboxDockerImageData
 } from 'ag-client-typescript';
 
@@ -160,9 +144,8 @@ import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
 import Toggle from '@/components/toggle.vue';
-import ValidatedForm from "@/components/validated_form.vue";
 import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
-import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
+import { deep_copy, format_datetime } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -172,13 +155,12 @@ import { is_not_empty } from '@/validators';
     DropdownTypeahead,
     Modal,
     Toggle,
-    ValidatedForm,
     ValidatedInput
   }
 })
 export default class MutationSuiteGeneralSettings extends Vue {
   @Prop({required: true, type: MutationTestSuite})
-  mutation_test_suite!: MutationTestSuite;
+  value!: MutationTestSuite;
 
   @Prop({required: true, type: Project})
   project!: Project;
@@ -189,17 +171,14 @@ export default class MutationSuiteGeneralSettings extends Vue {
   d_docker_images: SandboxDockerImageData[] = [];
   d_loading = true;
   d_mutation_test_suite: MutationTestSuite | null = null;
-  d_saving = false;
-  d_settings_form_is_valid = true;
 
-  @Watch('mutation_test_suite')
-  on_mutation_test_suite_change(new_test_suite: MutationTestSuite,
-                                old_test_suite: MutationTestSuite) {
+  @Watch('value')
+  on_value_changed(new_test_suite: MutationTestSuite, old_test_suite: MutationTestSuite) {
     this.d_mutation_test_suite = deep_copy(new_test_suite, MutationTestSuite);
   }
 
   async created() {
-    this.d_mutation_test_suite = deep_copy(this.mutation_test_suite, MutationTestSuite);
+    this.d_mutation_test_suite = deep_copy(this.value, MutationTestSuite);
     this.d_docker_images = await get_sandbox_docker_images();
     this.d_loading = false;
   }
@@ -222,10 +201,12 @@ export default class MutationSuiteGeneralSettings extends Vue {
 
   add_instructor_file(instructor_file: InstructorFile) {
     this.d_mutation_test_suite!.instructor_files_needed.push(instructor_file);
+    this.$emit('input', this.d_mutation_test_suite);
   }
 
   add_student_file(student_file: ExpectedStudentFile) {
     this.d_mutation_test_suite!.student_files_needed.push(student_file);
+    this.$emit('input', this.d_mutation_test_suite);
   }
 
   delete_instructor_file(instructor_file: InstructorFile) {
@@ -233,6 +214,7 @@ export default class MutationSuiteGeneralSettings extends Vue {
       (file: InstructorFile) => file.pk === instructor_file.pk
     );
     this.d_mutation_test_suite!.instructor_files_needed.splice(index, 1);
+    this.$emit('input', this.d_mutation_test_suite);
   }
 
   delete_student_file(student_file: ExpectedStudentFile) {
@@ -240,6 +222,7 @@ export default class MutationSuiteGeneralSettings extends Vue {
       (file: ExpectedStudentFile) => file.pk === student_file.pk
     );
     this.d_mutation_test_suite!.student_files_needed.splice(index, 1);
+    this.$emit('input', this.d_mutation_test_suite);
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
@@ -249,22 +232,6 @@ export default class MutationSuiteGeneralSettings extends Vue {
   expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
     return file.pattern.indexOf(filter_text) >= 0;
   }
-
-  @handle_api_errors_async(handle_save_mutation_suite_settings_error)
-  async save_mutation_test_suite_settings() {
-    try {
-      this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_mutation_test_suite!.save();
-    }
-    finally {
-        this.d_saving = false;
-    }
-  }
-}
-function handle_save_mutation_suite_settings_error(component: MutationSuiteGeneralSettings,
-                                                   error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -304,7 +271,7 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
   width: 50%;
 }
 
-.instructor-files, .student-files {
+#instructor-files, #student-files {
   margin: 10px 0;
   border: 1px solid hsl(210, 20%, 90%);
   display: inline-block;
@@ -343,22 +310,4 @@ function handle_save_mutation_suite_settings_error(component: MutationSuiteGener
   background-color: hsl(210, 20%, 96%);
 }
 
-.save-button {
-  @extend .green-button;
-  display: block;
-  margin: 0 10px 10px 0;
-}
-
-/*#name-and-deferred-container {*/
-/*  !*padding: 5px;*!*/
-/*}*/
-
-.bottom-of-form {
-  padding: 0 15px;
-}
-
-.last-saved-timestamp {
-  font-size: 14px;
-  color: lighten(black, 30);
-}
 </style>

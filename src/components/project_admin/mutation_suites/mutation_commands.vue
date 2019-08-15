@@ -1,10 +1,10 @@
 <template>
   <div id="mutation-commands-component">
-
     <div id="use-setup-command-container">
       <input id="use-setup-command"
              type="checkbox"
              class="checkbox"
+             @change="$emit('input', d_mutation_test_suite)"
              v-model="d_mutation_test_suite.use_setup_command"/>
       <label class="checkbox-label"
              id="use-setup-command-label"
@@ -21,7 +21,8 @@
                           id="setup-command"
                           v-model="d_mutation_test_suite.setup_command"
                           include_command_name
-                          @form_validity_changed="d_setup_command_is_valid = $event">
+                          @form_validity_changed="d_setup_command_is_valid = $event"
+                          @input="$emit('input', d_mutation_test_suite)">
         </mutation-command>
       </div>
     </div>
@@ -32,6 +33,7 @@
         <mutation-command
           ref="get_student_test_names_command"
           v-model="d_mutation_test_suite.get_student_test_names_command"
+          @input="$emit('input', d_mutation_test_suite)"
           @form_validity_changed="d_get_student_test_names_command_is_valid = $event">
         </mutation-command>
       </div>
@@ -42,6 +44,7 @@
       <div class="command">
         <mutation-command ref="student_test_validity_check_command"
                           v-model="d_mutation_test_suite.student_test_validity_check_command"
+                          @input="$emit('input', d_mutation_test_suite)"
                           @form_validity_changed="d_student_test_validity_check_is_valid = $event">
         </mutation-command>
       </div>
@@ -52,28 +55,11 @@
       <div class="command">
         <mutation-command ref="grade_buggy_impl_command"
                           v-model="d_mutation_test_suite.grade_buggy_impl_command"
+                          @input="$emit('input', d_mutation_test_suite)"
                           @form_validity_changed="d_grade_buggy_impl_command_is_valid = $event">
         </mutation-command>
       </div>
     </div>
-
-<!--    <div class="save-button-container">-->
-<!--      <APIErrors ref="api_errors"></APIErrors>-->
-<!--      <div>-->
-<!--        <button class="green-button save-button"-->
-<!--                id="save-commands"-->
-<!--                :disabled="!command_settings_forms_are_valid || d_saving"-->
-<!--                @click="save_command_settings">-->
-<!--          Save-->
-<!--        </button>-->
-
-<!--        <div v-show="!d_saving" class="last-saved-timestamp">-->
-<!--          <span> Last Saved: </span>-->
-<!--          {{format_datetime(d_mutation_test_suite.last_modified)}}-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-
   </div>
 </template>
 
@@ -87,7 +73,6 @@ import MutationCommand from "@/components/project_admin/mutation_suites/mutation
 import {
     deep_copy,
     format_datetime,
-    handle_api_errors_async
 } from "@/utils";
 import { is_not_empty } from '@/validators';
 
@@ -99,51 +84,21 @@ import { is_not_empty } from '@/validators';
 })
 export default class MutationCommands extends Vue {
   @Prop({required: true, type: MutationTestSuite})
-  mutation_test_suite!: MutationTestSuite;
+  value!: MutationTestSuite;
 
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
-  d_setup_command_is_valid = true;
-  d_get_student_test_names_command_is_valid = true;
-  d_student_test_validity_check_is_valid = true;
-  d_grade_buggy_impl_command_is_valid = true;
   d_mutation_test_suite: MutationTestSuite | null = null;
-  d_saving = false;
 
-  @Watch('mutation_test_suite')
-  on_mutation_test_suite_change(new_val: MutationTestSuite, old_val: MutationTestSuite) {
+  @Watch('value')
+  on_value_changed(new_val: MutationTestSuite, old_val: MutationTestSuite) {
     this.d_mutation_test_suite = deep_copy(new_val, MutationTestSuite);
   }
 
   created() {
-    this.d_mutation_test_suite = deep_copy(this.mutation_test_suite, MutationTestSuite);
+    this.d_mutation_test_suite = deep_copy(this.value, MutationTestSuite);
   }
-
-  get command_settings_forms_are_valid() {
-    if (!this.d_mutation_test_suite!.use_setup_command) {
-        return this.d_get_student_test_names_command_is_valid
-               && this.d_student_test_validity_check_is_valid
-               && this.d_grade_buggy_impl_command_is_valid;
-    }
-    return this.d_setup_command_is_valid
-           && this.d_get_student_test_names_command_is_valid
-           && this.d_student_test_validity_check_is_valid
-           && this.d_grade_buggy_impl_command_is_valid;
-  }
-  @handle_api_errors_async(handle_save_mutation_commands_error)
-  async save_command_settings() {
-    try {
-      this.d_saving = true;
-      await this.d_mutation_test_suite!.save();
-    }
-    finally {
-      this.d_saving = false;
-    }
-  }
-}
-function handle_save_mutation_commands_error(component: MutationCommands, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -153,18 +108,17 @@ function handle_save_mutation_commands_error(component: MutationCommands, error:
 
 .mutation-command-container {
   padding: 10px 12px 2px 12px;
-  border-radius: 5px;
 }
 
 .command-name {
+  display: inline-block;
   font-weight: bold;
   font-size: 20px;
   padding: 5px 0 0 0;
-  display: inline-block;
 }
 
 .command {
-  padding: 2px 12px 10px 0px;
+  padding: 2px 12px 10px 0;
 }
 
 #use-setup-command-container {
@@ -172,18 +126,4 @@ function handle_save_mutation_commands_error(component: MutationCommands, error:
   position: relative;
 }
 
-.save-button-container {
-  margin-left: 15px;
-}
-
-.save-button {
-  @extend .green-button;
-  display: block;
-  margin: 0 10px 10px 0;
-}
-
-.last-saved-timestamp {
-  font-size: 14px;
-  color: lighten(black, 30);
-}
 </style>

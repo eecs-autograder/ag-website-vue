@@ -1,11 +1,7 @@
 <template>
-  <div id="buggy-implementations-component">
+  <div id="buggy-implementations-component"
+       v-if="d_mutation_test_suite !== null">
 
-    <validated-form id="buggy-implementation-settings-form"
-                    autocomplete="off"
-                    spellcheck="false"
-                    @form_validity_changed="d_mutation_test_suite_settings_form_is_valid = $event"
-                    @submit="save_buggy_implementations_settings">
       <div class="input-container">
         <label class="text-label"> Points per exposed bug </label>
         <validated-input ref="points_per_exposed_bug"
@@ -19,14 +15,16 @@
                            has_less_than_or_equal_to_two_decimal_places
                          ]"
                          input_style="max-width: 500px; width: 100%"
-                         :from_string_fn="string_to_num">
+                         :from_string_fn="string_to_num"
+                         @input="$emit('input', d_mutation_test_suite)">
         </validated-input>
       </div>
 
       <div class="toggle-container">
         <toggle v-model="use_custom_max_points"
                 @input="toggle_custom_max_points"
-                ref="use_custom_max_points">
+                ref="use_custom_max_points"
+                id="use-custom-max-points">
           <div slot="on">
             Custom max points
           </div>
@@ -47,8 +45,9 @@
                            is_integer,
                            is_non_negative
                          ]"
+                         :from_string_fn="string_to_num"
                          input_style="max-width: 500px; width: 100%"
-                         :from_string_fn="string_to_num">
+                         @input="$emit('input', d_mutation_test_suite)">
         </validated-input>
       </div>
 
@@ -59,10 +58,12 @@
                          v-model="d_mutation_test_suite.max_num_student_tests"
                          :validators="[
                            is_not_empty,
+                           is_integer,
                            is_non_negative
                          ]"
+                         :from_string_fn="string_to_num"
                          input_style="max-width: 500px; width: 100%"
-                         :from_string_fn="string_to_num">
+                         @input="$emit('input', d_mutation_test_suite)">
         </validated-input>
       </div>
 
@@ -74,11 +75,11 @@
                          v-model="buggy_impl_names"
                          :validators="[]"
                          input_style="max-width: 500px; width: 100%">
-          <div slot="suffix"
+          <button slot="suffix"
                id="add-buggy-impl-names-button"
                @click="add_buggy_implementation_names">
             Add Names
-          </div>
+          </button>
         </validated-input>
       </div>
 
@@ -96,21 +97,6 @@
         </div>
       </div>
 
-<!--      <div class="bottom-of-form">-->
-<!--        <APIErrors ref="api_errors"></APIErrors>-->
-
-<!--        <button class="save-button"-->
-<!--                :disabled="!d_mutation_test_suite_settings_form_is_valid || d_saving"> Save-->
-<!--        </button>-->
-
-<!--        <div v-show="!d_saving" class="last-saved-timestamp">-->
-<!--          <span> Last Saved: </span>-->
-<!--          {{format_datetime(d_mutation_test_suite.last_modified)}}-->
-<!--        </div>-->
-<!--      </div>-->
-
-    </validated-form>
-
   </div>
 </template>
 
@@ -123,9 +109,8 @@ import {
 
 import APIErrors from "@/components/api_errors.vue";
 import Toggle from "@/components/toggle.vue";
-import ValidatedForm from "@/components/validated_form.vue";
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, format_datetime, handle_api_errors_async } from "@/utils";
+import { deep_copy, format_datetime } from "@/utils";
 import {
     is_integer,
     is_non_negative,
@@ -140,13 +125,12 @@ import {
   components: {
     APIErrors,
     Toggle,
-    ValidatedForm,
     ValidatedInput
   }
 })
 export default class BuggyImplementations extends Vue {
   @Prop({required: true, type: MutationTestSuite})
-  mutation_test_suite!: MutationTestSuite;
+  value!: MutationTestSuite;
 
   readonly is_integer = is_integer;
   readonly is_not_empty = is_not_empty;
@@ -163,14 +147,14 @@ export default class BuggyImplementations extends Vue {
   d_saving = false;
   use_custom_max_points = false;
 
-  @Watch('mutation_test_suite')
-  on_mutation_test_suite_change(new_value: MutationTestSuite, old_value: MutationTestSuite) {
+  @Watch('value')
+  on_value_changed(new_value: MutationTestSuite, old_value: MutationTestSuite) {
     this.d_mutation_test_suite = deep_copy(new_value, MutationTestSuite);
   }
 
   created() {
-    this.d_mutation_test_suite = deep_copy(this.mutation_test_suite, MutationTestSuite);
-    this.use_custom_max_points = this.d_mutation_test_suite.max_points !== null;
+    this.d_mutation_test_suite = deep_copy(this.value, MutationTestSuite);
+    this.use_custom_max_points = this.d_mutation_test_suite!.max_points !== null;
     this.sort_buggy_impl_names();
   }
 
@@ -181,6 +165,7 @@ export default class BuggyImplementations extends Vue {
     else {
       this.d_mutation_test_suite!.max_points = null;
     }
+    this.$emit('input', this.d_mutation_test_suite);
   }
 
   sort_buggy_impl_names() {
@@ -205,27 +190,14 @@ export default class BuggyImplementations extends Vue {
       this.d_mutation_test_suite!.buggy_impl_names.push(buggy_name);
     }
     this.buggy_impl_names = "";
+    this.$emit('input', this.d_mutation_test_suite);
     this.sort_buggy_impl_names();
   }
 
   remove_buggy_implementation_name(index: number) {
     this.d_mutation_test_suite!.buggy_impl_names.splice(index, 1);
+    this.$emit('input', this.d_mutation_test_suite);
   }
-
-  @handle_api_errors_async(handle_save_mutation_suite_settings_error)
-  async save_buggy_implementations_settings() {
-    try {
-      this.d_saving = true;
-      await this.d_mutation_test_suite!.save();
-    }
-    finally {
-      this.d_saving = false;
-    }
-  }
-}
-function handle_save_mutation_suite_settings_error(component: BuggyImplementations,
-                                                   error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -234,7 +206,7 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
 @import '@/styles/forms.scss';
 
 #buggy-implementations-component {
-  padding: 0 12px 12px 12px;
+  padding: 6px 12px 12px 12px;
 }
 
 .input-container {
@@ -296,23 +268,8 @@ function handle_save_mutation_suite_settings_error(component: BuggyImplementatio
   cursor: default;
 }
 
-.bottom-of-form {
-  padding: 20px 0;
-}
-
-.save-button {
-  @extend .green-button;
-  display: block;
-  margin: 0 10px 10px 0;
-}
-
-.last-saved-timestamp {
-  font-size: 14px;
-  color: lighten(black, 30);
-}
-
 #add-buggy-impl-names-button {
-  @extend .teal-button;
+  @extend .light-gray-button;
   margin-left: 10px;
   align-self: stretch;
   display: flex;

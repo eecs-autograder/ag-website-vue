@@ -1,6 +1,4 @@
-import { Vue } from 'vue-property-decorator';
-
-import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGCommand } from 'ag-client-typescript/dist/src/ag_command';
 import * as sinon from "sinon";
@@ -8,6 +6,8 @@ import * as sinon from "sinon";
 import MutationCommand from '@/components/project_admin/mutation_suites/mutation_command.vue';
 
 import {
+    do_input_blank_or_not_integer_test_without_save_button,
+    do_invalid_text_input_test_without_save_button,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
@@ -19,7 +19,6 @@ beforeAll(() => {
 
 describe('MutationCommand tests', () => {
     let wrapper: Wrapper<MutationCommand>;
-    let component: MutationCommand;
     let ag_command: AGCommand;
     let original_match_media: (query: string) => MediaQueryList;
 
@@ -45,7 +44,6 @@ describe('MutationCommand tests', () => {
                 value: ag_command
             }
         });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -62,22 +60,23 @@ describe('MutationCommand tests', () => {
 
     test('command name binding', async () => {
         wrapper.setProps({include_command_name: true});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let command_name_input = wrapper.find({ref: 'name'});
         set_validated_input_text(command_name_input, 'Tim Hortons');
 
-        expect(component.d_ag_command!.name).toEqual('Tim Hortons');
+        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.vm.d_ag_command!.name).toEqual('Tim Hortons');
         expect(validated_input_is_valid(command_name_input)).toEqual(true);
 
-        component.d_ag_command!.name = 'Starbucks';
+        wrapper.vm.d_ag_command!.name = 'Starbucks';
         expect(get_validated_input_text(command_name_input)).toEqual('Starbucks');
-        expect(component.d_ag_command_settings_form_is_valid).toBe(true);
+        expect(validated_input_is_valid(command_name_input)).toEqual(true);
     });
 
     test('Error: command name is blank', async () => {
         wrapper.setProps({include_command_name: true});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test_without_save_button(
             wrapper, {ref: "name"}, ' '
@@ -89,12 +88,13 @@ describe('MutationCommand tests', () => {
 
         set_validated_input_text(command_input, 'Tim Hortons');
 
-        expect(component.d_ag_command!.cmd).toEqual('Tim Hortons');
+        expect(wrapper.vm.d_ag_command!.cmd).toEqual('Tim Hortons');
         expect(validated_input_is_valid(command_input)).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
-        component.d_ag_command!.cmd = 'Starbucks';
+        wrapper.vm.d_ag_command!.cmd = 'Starbucks';
         expect(get_validated_input_text(command_input)).toEqual('Starbucks');
-        expect(component.d_ag_command_settings_form_is_valid).toBe(true);
+        expect(validated_input_is_valid(command_input)).toEqual(true);
     });
 
     test('Error: cmd is blank', async () => {
@@ -108,11 +108,13 @@ describe('MutationCommand tests', () => {
 
         set_validated_input_text(time_limit_input, '9');
 
-        expect(component.d_ag_command!.time_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_command!.time_limit).toEqual(9);
         expect(validated_input_is_valid(time_limit_input)).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
-        component.d_ag_command!.time_limit = 4;
+        wrapper.vm.d_ag_command!.time_limit = 4;
         expect(get_validated_input_text(time_limit_input)).toEqual('4');
+        expect(validated_input_is_valid(time_limit_input)).toEqual(true);
     });
 
     test('Error: time_limit is blank or not an integer', async () => {
@@ -132,11 +134,13 @@ describe('MutationCommand tests', () => {
 
         set_validated_input_text(stack_size_limit_input, '9');
 
-        expect(component.d_ag_command!.stack_size_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_command!.stack_size_limit).toEqual(9);
         expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
-        component.d_ag_command!.stack_size_limit = 4;
+        wrapper.vm.d_ag_command!.stack_size_limit = 4;
         expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
+        expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
     });
 
     test('Error: stack_size_limit is blank or not an integer', async () => {
@@ -156,11 +160,13 @@ describe('MutationCommand tests', () => {
 
         set_validated_input_text(virtual_memory_limit_input, '9');
 
-        expect(component.d_ag_command!.virtual_memory_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_command!.virtual_memory_limit).toEqual(9);
         expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
-        component.d_ag_command!.virtual_memory_limit = 4;
+        wrapper.vm.d_ag_command!.virtual_memory_limit = 4;
         expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
+        expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
     });
 
     test('Error: virtual_memory_limit is blank or not an integer', async () => {
@@ -180,11 +186,13 @@ describe('MutationCommand tests', () => {
 
         set_validated_input_text(process_spawn_limit_input, '9');
 
-        expect(component.d_ag_command!.process_spawn_limit).toEqual(9);
+        expect(wrapper.vm.d_ag_command!.process_spawn_limit).toEqual(9);
         expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
-        component.d_ag_command!.process_spawn_limit = 4;
+        wrapper.vm.d_ag_command!.process_spawn_limit = 4;
         expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
+        expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
     });
 
     test('Error: process_spawn_limit is blank or not an integer', async () => {
@@ -208,40 +216,11 @@ describe('MutationCommand tests', () => {
             virtual_memory_limit: 500000000,
             process_spawn_limit: 16
         };
-        expect(component.d_ag_command).toEqual(ag_command);
+        expect(wrapper.vm.d_ag_command).toEqual(ag_command);
 
         wrapper.setProps({value: another_ag_command});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_ag_command).toEqual(another_ag_command);
+        expect(wrapper.vm.d_ag_command).toEqual(another_ag_command);
     });
 });
-
-async function do_invalid_text_input_test_without_save_button(component_wrapper: Wrapper<Vue>,
-                                                              input_selector: string | RefSelector,
-                                                              invalid_text: string) {
-    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
-    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
-    expect(validated_input_is_valid(input_wrapper)).toEqual(true);
-
-    set_validated_input_text(input_wrapper, invalid_text);
-    await component_wrapper.vm.$nextTick();
-
-    expect(validated_input_is_valid(input_wrapper)).toEqual(false);
-}
-
-async function do_input_blank_or_not_integer_test_without_save_button(
-    component_wrapper: Wrapper<Vue>,
-    input_selector: string | RefSelector) {
-    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
-    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
-    let original_text = get_validated_input_text(input_wrapper);
-
-    await do_invalid_text_input_test_without_save_button(
-        component_wrapper, input_selector, ' '
-    );
-    set_validated_input_text(input_wrapper, original_text);
-    return do_invalid_text_input_test_without_save_button(
-        component_wrapper, input_selector, 'not num'
-    );
-}

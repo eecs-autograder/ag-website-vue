@@ -2,11 +2,10 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
     ExpectedStudentFile,
-    HttpError,
     InstructorFile,
     MutationTestSuite,
-    Project, SandboxDockerImageData,
-    UltimateSubmissionPolicy
+    Project,
+    SandboxDockerImageData
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
@@ -16,9 +15,9 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import MutationSuiteGeneralSettings from '@/components/project_admin/mutation_suites/mutation_suite_general_settings.vue';
 
-import { create_mutation_suite } from '@/tests/test_project_admin/test_mutation_suites/test_buggy_implementations';
+import { make_course, make_mutation_test_suite, make_project } from '@/tests/data_utils';
 import {
-    checkbox_is_checked,
+    checkbox_is_checked, do_invalid_text_input_test_without_save_button,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
@@ -30,7 +29,6 @@ beforeAll(() => {
 
 describe('MutationSuiteGeneralSettings tests', () => {
     let wrapper: Wrapper<MutationSuiteGeneralSettings>;
-    let component: MutationSuiteGeneralSettings;
     let mutation_test_suite: MutationTestSuite;
     let project: Project;
     let student_file_1: ExpectedStudentFile;
@@ -103,38 +101,29 @@ describe('MutationSuiteGeneralSettings tests', () => {
             last_modified: "now"
         });
 
-        mutation_test_suite = create_mutation_suite(1, "Suite 1", 2);
+        project = make_project(
+            make_course().pk,
+            {
+                instructor_files: [
+                    instructor_file_1,
+                    instructor_file_2,
+                    instructor_file_3
+                ],
+                expected_student_files: [
+                    student_file_1,
+                    student_file_2,
+                    student_file_3
+                ]
+            }
+        );
 
-        mutation_test_suite.instructor_files_needed = [instructor_file_1, instructor_file_2];
-        mutation_test_suite.student_files_needed = [student_file_1, student_file_2];
-
-        project = new Project({
-            pk: 10,
-            name: "Detroit Zoo",
-            last_modified: "",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            expected_student_files: [student_file_1, student_file_2, student_file_3],
-            instructor_files: [instructor_file_1, instructor_file_2, instructor_file_3],
-            has_handgrading_rubric: false
-        });
+        mutation_test_suite = make_mutation_test_suite(
+            project.pk,
+            {
+                instructor_files_needed: [instructor_file_1, instructor_file_2],
+                student_files_needed: [student_file_1, student_file_2]
+            }
+        );
 
         sandbox_docker_image_1 = {
             pk: 1,
@@ -165,11 +154,10 @@ describe('MutationSuiteGeneralSettings tests', () => {
 
         wrapper = mount(MutationSuiteGeneralSettings, {
             propsData: {
-                mutation_test_suite: mutation_test_suite,
+                value: mutation_test_suite,
                 project: project
             }
         });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -187,44 +175,49 @@ describe('MutationSuiteGeneralSettings tests', () => {
     test('suite name binding', async () => {
         let suite_name_input = wrapper.find({ref: 'suite_name'});
         set_validated_input_text(suite_name_input, 'Sweet Name');
+        expect(wrapper.emitted().input.length).toEqual(1);
 
-        expect(component.d_mutation_test_suite!.name).toEqual("Sweet Name");
+        expect(wrapper.vm.d_mutation_test_suite!.name).toEqual("Sweet Name");
         expect(validated_input_is_valid(suite_name_input)).toEqual(true);
 
-        component.d_mutation_test_suite!.name = "Thanks";
+        wrapper.vm.d_mutation_test_suite!.name = "Thanks";
         expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
     });
 
     test('Suite name cannot be empty - violates condition', async () => {
-        expect(component.d_settings_form_is_valid).toBe(true);
-
         let suite_name_input = wrapper.find({ref: 'suite_name'});
         set_validated_input_text(suite_name_input, '');
 
         expect(validated_input_is_valid(suite_name_input)).toBe(false);
-        expect(component.d_settings_form_is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+
+        set_validated_input_text(suite_name_input, 'hi');
+        return do_invalid_text_input_test_without_save_button(
+            wrapper, {ref: 'suite_name'}, ' ');
     });
 
     test('deferred binding', () => {
         let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
 
+        synchronous_checkbox.setChecked(false);
+        expect(wrapper.vm.d_mutation_test_suite!.deferred).toEqual(true);
+        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
+        expect(wrapper.emitted().input.length).toEqual(1);
+
         synchronous_checkbox.setChecked(true);
-        expect(component.d_mutation_test_suite!.deferred).toEqual(false);
+        expect(wrapper.vm.d_mutation_test_suite!.deferred).toEqual(false);
+        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(2);
 
         synchronous_checkbox.setChecked(false);
-        expect(component.d_mutation_test_suite!.deferred).toEqual(true);
-
-        synchronous_checkbox.setChecked(true);
-        expect(component.d_mutation_test_suite!.deferred).toEqual(false);
-
-        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
-
-        component.d_mutation_test_suite!.deferred = true;
+        expect(wrapper.vm.d_mutation_test_suite!.deferred).toEqual(true);
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
+        expect(wrapper.emitted().input.length).toEqual(3);
 
-        component.d_mutation_test_suite!.deferred = false;
+        wrapper.vm.d_mutation_test_suite!.deferred = false;
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
+
+        wrapper.vm.d_mutation_test_suite!.deferred = true;
+        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
     });
 
     test('sandbox_docker_image binding', async () => {
@@ -232,44 +225,46 @@ describe('MutationSuiteGeneralSettings tests', () => {
             '#sandbox-docker-image'
         );
         sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let dropdown_container_wrapper = wrapper.find('#dropdown-container');
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let highlighted_item = sandbox_docker_image_input.find(".highlight");
         expect(highlighted_item.text()).toContain(sandbox_docker_image_2.display_name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.sandbox_docker_image).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.sandbox_docker_image).toEqual(
             sandbox_docker_image_2
         );
         expect(sandbox_docker_image_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(sandbox_docker_image_2.display_name);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
         sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(sandbox_docker_image_3.display_name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.sandbox_docker_image).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.sandbox_docker_image).toEqual(
             sandbox_docker_image_3
         );
         expect(sandbox_docker_image_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(sandbox_docker_image_3.display_name);
+        expect(wrapper.emitted().input.length).toEqual(2);
 
         sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
         dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
@@ -277,33 +272,36 @@ describe('MutationSuiteGeneralSettings tests', () => {
         highlighted_item = wrapper.find(".highlight");
         expect(highlighted_item.text()).toContain(sandbox_docker_image_1.display_name);
         highlighted_item.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.sandbox_docker_image).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.sandbox_docker_image).toEqual(
             sandbox_docker_image_1
         );
         expect(sandbox_docker_image_input.find(
             '.dropdown-header-wrapper'
         ).text()).toEqual(sandbox_docker_image_1.display_name);
+        expect(wrapper.emitted().input.length).toEqual(3);
     });
 
     test('Toggle allow_network_access', async () => {
         let allow_network_access_toggle = wrapper.find({ref: 'allow_network_access'});
 
-        component.d_mutation_test_suite!.allow_network_access = true;
-        await component.$nextTick();
+        wrapper.vm.d_mutation_test_suite!.allow_network_access = true;
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.allow_network_access).toEqual(true);
+        expect(wrapper.vm.d_mutation_test_suite!.allow_network_access).toEqual(true);
 
         allow_network_access_toggle.find('.off-border').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.allow_network_access).toEqual(false);
+        expect(wrapper.vm.d_mutation_test_suite!.allow_network_access).toEqual(false);
+        expect(wrapper.emitted().input.length).toEqual(1);
 
         allow_network_access_toggle.find('.on-border').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.allow_network_access).toEqual(true);
+        expect(wrapper.vm.d_mutation_test_suite!.allow_network_access).toEqual(true);
+        expect(wrapper.emitted().input.length).toEqual(2);
     });
 
     test('Adding an instructor file', async () => {
@@ -318,7 +316,7 @@ describe('MutationSuiteGeneralSettings tests', () => {
         search_bar.trigger("click");
 
         dropdown_typeahead.filter_text = "a";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
@@ -326,35 +324,37 @@ describe('MutationSuiteGeneralSettings tests', () => {
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(3);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed.length).toEqual(3);
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
             instructor_file_1
         );
-        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
             instructor_file_2
         );
-        expect(component.d_mutation_test_suite!.instructor_files_needed[2]).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[2]).toEqual(
             instructor_file_3
         );
     });
 
     test('Deleting an instructor file', async () => {
-        expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
             instructor_file_1
         );
-        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
             instructor_file_2
         );
 
-        let instructor_files_section = wrapper.find('.instructor-files');
+        let instructor_files_section = wrapper.find('#instructor-files');
         instructor_files_section.findAll('.file').at(1).find(
             '.delete-file-icon-container'
         ).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(1);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed.length).toEqual(1);
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
             instructor_file_1
         );
     });
@@ -366,45 +366,45 @@ describe('MutationSuiteGeneralSettings tests', () => {
         expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
 
         dropdown_typeahead.filter_text = "a";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
 
-        let instructor_files_section = wrapper.find('.instructor-files');
+        let instructor_files_section = wrapper.find('#instructor-files');
         instructor_files_section.findAll('.file').at(0).find(
             '.delete-file-icon-container'
         ).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.choices).toEqual([instructor_file_1, instructor_file_3]);
 
         dropdown_typeahead.filter_text = "ui";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
     });
 
     test('instructor_files_available', async () => {
-        expect(component.instructor_files_available).toEqual([instructor_file_3]);
+        expect(wrapper.vm.instructor_files_available).toEqual([instructor_file_3]);
 
-        expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[0]).toEqual(
             instructor_file_1
         );
-        expect(component.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed[1]).toEqual(
             instructor_file_2
         );
 
-        let instructor_file_section = wrapper.find('.instructor-files');
+        let instructor_file_section = wrapper.find('#instructor-files');
         instructor_file_section.findAll('.file').at(1).find(
             '.delete-file-icon-container'
         ).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.instructor_files_needed.length).toEqual(1);
-        expect(component.instructor_files_available).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.instructor_files_needed.length).toEqual(1);
+        expect(wrapper.vm.instructor_files_available).toEqual(
             [instructor_file_2, instructor_file_3]
         );
     });
@@ -421,7 +421,7 @@ describe('MutationSuiteGeneralSettings tests', () => {
         search_bar.trigger("click");
 
         dropdown_typeahead.filter_text = "a";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
@@ -429,25 +429,27 @@ describe('MutationSuiteGeneralSettings tests', () => {
         search_bar.trigger('keydown', {code: 'Enter'});
         await dropdown_typeahead.$nextTick();
 
-        expect(component.d_mutation_test_suite!.student_files_needed.length).toEqual(3);
-        expect(component.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_mutation_test_suite!.student_files_needed[1]).toEqual(student_file_2);
-        expect(component.d_mutation_test_suite!.student_files_needed[2]).toEqual(student_file_3);
+        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed.length).toEqual(3);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[2]).toEqual(student_file_3);
     });
 
     test('Deleting a student file', async () => {
-        expect(component.d_mutation_test_suite!.student_files_needed.length).toEqual(2);
-        expect(component.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_mutation_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[1]).toEqual(student_file_2);
 
-        let student_files_section = wrapper.find('.student-files');
+        let student_files_section = wrapper.find('#student-files');
         student_files_section.findAll('.file').at(1).find(
             '.delete-file-icon-container'
         ).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.student_files_needed.length).toEqual(1);
-        expect(component.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed.length).toEqual(1);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
     });
 
     test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
@@ -457,82 +459,53 @@ describe('MutationSuiteGeneralSettings tests', () => {
         expect(dropdown_typeahead.choices).toEqual([student_file_3]);
 
         dropdown_typeahead.filter_text = "e";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
 
-        let student_files_section = wrapper.find('.student-files');
+        let student_files_section = wrapper.find('#student-files');
         student_files_section.findAll('.file').at(0).find(
             '.delete-file-icon-container'
         ).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.choices).toEqual([student_file_1, student_file_3]);
 
         dropdown_typeahead.filter_text = "ep";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_1);
     });
 
     test('expected_student_files_available', async () => {
-        expect(component.expected_student_files_available).toEqual([student_file_3]);
+        expect(wrapper.vm.expected_student_files_available).toEqual([student_file_3]);
 
-        expect(component.d_mutation_test_suite!.student_files_needed.length).toEqual(2);
-        expect(component.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_mutation_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed[1]).toEqual(student_file_2);
 
-        let student_files_section = wrapper.find('.student-files');
+        let student_files_section = wrapper.find('#student-files');
         student_files_section.findAll('.file').at(1).find(
             '.delete-file-icon-container'
         ).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_mutation_test_suite!.student_files_needed.length).toEqual(1);
-        expect(component.expected_student_files_available).toEqual(
+        expect(wrapper.vm.d_mutation_test_suite!.student_files_needed.length).toEqual(1);
+        expect(wrapper.vm.expected_student_files_available).toEqual(
             [student_file_2, student_file_3]
         );
     });
 
-    test('Save suite settings - successful', async () => {
-        let save_stub = sinon.stub(component.d_mutation_test_suite!, 'save');
+    test('value watcher', async () => {
+        let another_mutation_suite =  make_mutation_test_suite(project.pk);
 
-        wrapper.find('#mutation-test-suite-settings-form').trigger('submit');
-        await component.$nextTick();
+        expect(wrapper.vm.d_mutation_test_suite).toEqual(mutation_test_suite);
 
-        expect(save_stub.calledOnce).toBe(true);
-    });
+        wrapper.setProps({'value': another_mutation_suite});
+        await wrapper.vm.$nextTick();
 
-    test('Save suite settings - unsuccessful', async () => {
-        let save_stub = sinon.stub(component.d_mutation_test_suite!, 'save');
-        save_stub.returns(
-            Promise.reject(
-                new HttpError(
-                    400,
-                    {__all__: "Mutation test suite with this Name and Project already exists."}
-                )
-            )
-        );
-
-        wrapper.find('#mutation-test-suite-settings-form').trigger('submit');
-        await component.$nextTick();
-
-        expect(save_stub.calledOnce).toBe(true);
-
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
-    });
-
-    test('Parent component changes the value of the mutation_test_suite prop', async () => {
-        let another_mutation_suite = create_mutation_suite(2, "Suite 2", 2);
-
-        expect(component.d_mutation_test_suite).toEqual(mutation_test_suite);
-
-        wrapper.setProps({'mutation_test_suite': another_mutation_suite});
-        await component.$nextTick();
-
-        expect(component.d_mutation_test_suite).toEqual(another_mutation_suite);
+        expect(wrapper.vm.d_mutation_test_suite).toEqual(another_mutation_suite);
     });
 });

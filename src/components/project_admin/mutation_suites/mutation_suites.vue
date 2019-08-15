@@ -34,41 +34,152 @@
 
         <div id="viewing-window" class="scroll-column-grow">
           <div v-if="d_active_mutation_test_suite !== null">
-            <div class="section-header"> General Settings </div>
+            <validated-form id="mutation-test-suite-form"
+                            autocomplete="off"
+                            spellcheck="false"
+                            @submit="save_mutation_test_suite"
+                            @form_validity_changed="d_settings_form_is_valid = $event">
 
-            <mutation-suite-general-settings ref="mutation_suite_general_settings"
-                                             :mutation_test_suite="d_active_mutation_test_suite"
-                                             :project="project">
-            </mutation-suite-general-settings>
+              <div class="section-header"> General Settings </div>
+              <mutation-suite-general-settings ref="mutation_suite_general_settings"
+                                               v-model="d_active_mutation_test_suite"
+                                               :project="project">
+              </mutation-suite-general-settings>
 
-            <div class="section-header"> Buggy Implementations </div>
-            <buggy-implementations ref="buggy_implementations"
-                                   :mutation_test_suite="d_active_mutation_test_suite">
-            </buggy-implementations>
+              <div class="section-header"> Buggy Implementations </div>
+              <buggy-implementations ref="buggy_implementations"
+                                     v-model="d_active_mutation_test_suite">
+              </buggy-implementations>
 
-            <div class="section-header"> Commands </div>
-            <mutation-commands ref="mutation_commands"
-                               :mutation_test_suite="d_active_mutation_test_suite">
-            </mutation-commands>
+              <div class="section-header"> Commands </div>
+              <mutation-commands ref="mutation_commands"
+                                 v-model="d_active_mutation_test_suite">
+              </mutation-commands>
 
-            <div class="section-header"> Feedback Settings </div>
+              <div class="section-header"> Feedback Settings </div>
+              <div id="config-panels-container">
 
-            <div class="bottom-of-form">
-              <APIErrors ref="api_errors"></APIErrors>
 
-              <button type="submit"
-                      class="save-button"
-                      :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+                <feedback-config-panel ref="normal_config_panel"
+                                   v-model="d_active_mutation_test_suite.normal_fdbk_config"
+                                       :preset_options="fdbk_presets">
+                  <template slot="header">
+                    <div class="config-name">
+                      {{FeedbackConfigLabel.normal}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.normal}}
+                        </tooltip>
+                      </i>
+                    </div>
+                  </template>
+                  <template slot="settings">
+                    <MutationTestSuiteAdvancedFdbkSettings
+                      ref="normal_edit_feedback_settings"
+                      v-model="d_active_mutation_test_suite.normal_fdbk_config"
+                      :config_name="FeedbackConfigLabel.normal">
+                    </MutationTestSuiteAdvancedFdbkSettings>
+                  </template>
+                </feedback-config-panel>
 
-<!--              <div v-show="!d_saving" class="last-saved-timestamp">-->
-<!--                <span> Last Saved: </span>-->
-<!--                {{format_datetime(d_mutation_test_suite.last_modified)}}-->
-<!--              </div>-->
+                <feedback-config-panel
+                  ref="final_graded_config_panel"
+                  v-model="d_active_mutation_test_suite.ultimate_submission_fdbk_config"
+                  :preset_options="fdbk_presets">
+                  <template slot="header">
+                    <div class="config-name">
+                      {{FeedbackConfigLabel.ultimate_submission}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.ultimate_submission}}
+                        </tooltip>
+                      </i>
+                    </div>
+                  </template>
+                  <template slot="settings">
+                    <MutationTestSuiteAdvancedFdbkSettings
+                      ref="final_graded_edit_feedback_settings"
+                      v-model="d_active_mutation_test_suite.ultimate_submission_fdbk_config"
+                      :config_name="FeedbackConfigLabel.ultimate_submission">
+                    </MutationTestSuiteAdvancedFdbkSettings>
+                  </template>
+                </feedback-config-panel>
 
-              <div v-show="d_saving" class="last-saved-spinner">
-                <i class="fa fa-spinner fa-pulse"></i>
+                <feedback-config-panel
+                  ref="past_limit_config_panel"
+                  v-model="d_active_mutation_test_suite.past_limit_submission_fdbk_config"
+                  :preset_options="fdbk_presets">
+                  <template slot="header">
+                    <div class="config-name">
+                      {{FeedbackConfigLabel.past_limit}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.past_limit}}
+                        </tooltip>
+                      </i>
+                    </div>
+                  </template>
+                  <template slot="settings">
+                    <MutationTestSuiteAdvancedFdbkSettings
+                      ref="past_limit_edit_feedback_settings"
+                      v-model="d_active_mutation_test_suite.past_limit_submission_fdbk_config"
+                      :config_name="FeedbackConfigLabel.past_limit">
+                    </MutationTestSuiteAdvancedFdbkSettings>
+                  </template>
+                </feedback-config-panel>
+
+                <feedback-config-panel
+                  ref="student_lookup_config_panel"
+                  v-model="d_active_mutation_test_suite.staff_viewer_fdbk_config"
+                  :preset_options="fdbk_presets">
+                  <template slot="header">
+                    <div class="config-name">
+                      {{FeedbackConfigLabel.staff_viewer}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.staff_viewer}}
+                        </tooltip>
+                      </i>
+                    </div>
+                  </template>
+                  <template slot="settings">
+                    <MutationTestSuiteAdvancedFdbkSettings
+                      ref="student_lookup_edit_feedback_settings"
+                      v-model="d_active_mutation_test_suite.staff_viewer_fdbk_config"
+                      :config_name="FeedbackConfigLabel.staff_viewer">
+                    </MutationTestSuiteAdvancedFdbkSettings>
+                  </template>
+                </feedback-config-panel>
               </div>
+
+              <div id="bottom-of-form">
+                <APIErrors ref="api_errors"></APIErrors>
+
+                <button type="submit"
+                        class="save-button"
+                        id="save-mutation-test-suite-button"
+                        :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+
+                <div v-show="!d_saving" class="last-saved-timestamp">
+                  <span> Last Saved: </span>
+                  {{format_datetime(d_active_mutation_test_suite.last_modified)}}
+                </div>
+
+                <div v-show="d_saving" class="last-saved-spinner">
+                  <i class="fa fa-spinner fa-pulse"></i>
+                </div>
+              </div>
+            </validated-form>
+
+            <div class="section-header"> Danger Zone </div>
+            <div id="delete-mutation-suite-button-container">
+              <button class="delete-mutation-test-suite-button"
+                      type="button"
+                      @click="$refs.delete_mutation_test_suite_modal.open()">
+                Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
+              </button>
             </div>
+
           </div>
         </div>
 
@@ -142,29 +253,43 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
-    MutationTestSuite, MutationTestSuiteObserver,
+    BugsExposedFeedbackLevel,
+    MutationTestSuite,
+    MutationTestSuiteObserver,
     Project
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
+import FeedbackConfigPanel from "@/components/project_admin/feedback_config_panel.vue";
+import {
+    FeedbackConfigLabel,
+    FeedbackDescriptions,
+    MutationTestSuiteFeedbackPreset
+} from '@/components/project_admin/feedback_config_utils';
 import BuggyImplementations from "@/components/project_admin/mutation_suites/buggy_implementations.vue";
 import MutationCommand from "@/components/project_admin/mutation_suites/mutation_command.vue";
 import MutationCommands from "@/components/project_admin/mutation_suites/mutation_commands.vue";
 import MutationSuiteGeneralSettings from "@/components/project_admin/mutation_suites/mutation_suite_general_settings.vue";
+import MutationTestSuiteAdvancedFdbkSettings from '@/components/project_admin/mutation_suites/mutation_test_suite_advanced_fdbk_settings.vue';
+import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { SafeMap } from '@/safe_map';
+import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
     APIErrors,
     BuggyImplementations,
+    FeedbackConfigPanel,
     Modal,
     MutationCommand,
     MutationCommands,
     MutationSuiteGeneralSettings,
+    MutationTestSuiteAdvancedFdbkSettings,
+    Tooltip,
     ValidatedForm,
     ValidatedInput
   }
@@ -173,7 +298,10 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   @Prop({required: true, type: Project})
   project!: Project;
 
+  readonly FeedbackConfigLabel = FeedbackConfigLabel;
+  readonly FeedbackDescriptions = FeedbackDescriptions;
   readonly is_not_empty = is_not_empty;
+  readonly format_datetime = format_datetime;
 
   d_active_mutation_test_suite: MutationTestSuite | null = null;
   d_add_mutation_test_suite_form_is_valid = true;
@@ -189,8 +317,6 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
     this.d_loading = false;
   }
-
-
 
   beforeDestroy() {
     MutationTestSuite.unsubscribe(this);
@@ -252,7 +378,116 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
                                             mutation_test_suite_order: number[]): void {
     throw new Error("Method not implemented.");
   }
+
+  readonly fdbk_presets = new SafeMap<string, MutationTestSuiteFeedbackPreset>([
+    [
+      'Public',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: true,
+        show_setup_stderr: true,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: true,
+        show_get_test_names_stderr: true,
+        show_validity_check_stdout: true,
+        show_validity_check_stderr: true,
+        show_grade_buggy_impls_stdout: true,
+        show_grade_buggy_impls_stderr: true,
+        show_invalid_test_names: true,
+        show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.exposed_bug_names
+      }
+    ],
+    [
+      'Num Bugs + Prep Output',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: true,
+        show_setup_stderr: true,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: true,
+        show_get_test_names_stderr: true,
+        show_validity_check_stdout: true,
+        show_validity_check_stderr: true,
+        show_grade_buggy_impls_stdout: false,
+        show_grade_buggy_impls_stderr: false,
+        show_invalid_test_names: true,
+        show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.num_bugs_exposed
+      }
+    ],
+    [
+      'Num Bugs Exposed',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: false,
+        show_setup_stderr: false,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: false,
+        show_get_test_names_stderr: false,
+        show_validity_check_stdout: false,
+        show_validity_check_stderr: false,
+        show_grade_buggy_impls_stdout: false,
+        show_grade_buggy_impls_stderr: false,
+        show_invalid_test_names: true,
+        show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.num_bugs_exposed
+      }
+    ],
+    [
+      'False Positives',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: false,
+        show_setup_stderr: false,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: false,
+        show_get_test_names_stderr: false,
+        show_validity_check_stdout: false,
+        show_validity_check_stderr: false,
+        show_grade_buggy_impls_stdout: false,
+        show_grade_buggy_impls_stderr: false,
+        show_invalid_test_names: true,
+        show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.no_feedback
+      }
+    ],
+    [
+      'Private',
+      {
+        show_setup_return_code: false,
+        show_setup_stdout: false,
+        show_setup_stderr: false,
+        show_get_test_names_return_code: false,
+        show_get_test_names_stdout: false,
+        show_get_test_names_stderr: false,
+        show_validity_check_stdout: false,
+        show_validity_check_stderr: false,
+        show_grade_buggy_impls_stdout: false,
+        show_grade_buggy_impls_stderr: false,
+        show_invalid_test_names: false,
+        show_points: false,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.no_feedback
+      }
+    ]
+  ]);
+
+  @handle_api_errors_async(handle_save_mutation_test_suite_error)
+  async save_mutation_test_suite() {
+    try {
+      this.d_saving = true;
+      await this.d_active_mutation_test_suite!.save();
+    }
+    finally {
+      this.d_saving = false;
+    }
+  }
 }
+
+function handle_save_mutation_test_suite_error(component: MutationSuites, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+}
+
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
@@ -353,7 +588,7 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 
 .delete-mutation-test-suite-button {
   @extend .red-button;
-  margin-left: 8px;
+  margin-left: 12px;
 }
 
 // MODAL stuff ----------------------------------------------------
@@ -400,31 +635,31 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 .save-button {
   @extend .green-button;
   display: block;
-  margin: 0 0 30px 15px;
 }
 
-/*.section-header {*/
-/*  margin: 5px 10px;*/
-/*  padding: 5px;*/
-/*  font-size: 20px;*/
-/*  font-weight: bold;*/
-/*  //border: 1px solid $white-gray;*/
-/*  //background-color: $white-gray;*/
-/*  display: inline-block;*/
-/*  //color: $navy-blue;*/
-/*}*/
-
 .section-header {
-  box-sizing: border-box;
   margin: 12px 12px 8px 12px;
-  padding: 5px;
-  font-size: 22px;
-  font-weight: bold;
-  padding-left: 50px;
-  background-color: black;
-  display: inline-block;
-  color: white;
-  border-radius: 1px;
+  font-size: 24px;
+  color: $ocean-blue;
+}
+
+#config-panels-container {
+  padding: 12px;
+  max-width: 50%;
+}
+
+#bottom-of-form {
+  padding: 12px;
+}
+
+.last-saved-timestamp {
+  font-size: 14px;
+  padding: 10px 0;
+  color: lighten(black, 30);
+}
+
+.last-saved-spinner {
+  padding: 10px 0;
 }
 
 </style>

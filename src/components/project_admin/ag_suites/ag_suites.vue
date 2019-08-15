@@ -35,7 +35,7 @@
         <div id="viewing-window" class="scroll-column-grow">
           <template v-if="d_active_ag_test_suite !== null">
             <AGSuiteSettings :ag_test_suite="d_active_ag_test_suite"
-                            :project="project">
+                             :project="project">
             </AGSuiteSettings>
           </template>
           <template v-else-if="active_level_is_command">
