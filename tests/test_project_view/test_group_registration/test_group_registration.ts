@@ -259,7 +259,6 @@ describe('GroupRegistration tests', () => {
             {ref: 'confirm_working_alone_modal'}
         ).vm;
 
-        expect(wrapper.findAll('#group-registration-bar-buttons').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
         wrapper.find('#work-alone-button').trigger('click');
@@ -271,7 +270,6 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(confirm_working_alone_modal.is_open).toBe(false);
-        expect(wrapper.findAll('#group-registration-bar-buttons').length).toEqual(1);
     });
 
     test('work alone - confirm action in modal - successful',  async () => {
@@ -308,7 +306,6 @@ describe('GroupRegistration tests', () => {
 
         expect(wrapper.vm.invitation_sent).toBeNull();
         expect(wrapper.vm.invitations_received.length).toEqual(0);
-        expect(wrapper.findAll('#group-registration-bar-buttons').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
         wrapper.find('#work-alone-button').trigger('click');
@@ -349,7 +346,6 @@ describe('GroupRegistration tests', () => {
 
         expect(wrapper.vm.invitation_sent).toBeNull();
         expect(wrapper.vm.invitations_received.length).toEqual(0);
-        expect(wrapper.findAll('#group-registration-bar-buttons').length).toEqual(1);
         expect(confirm_working_alone_modal.is_open).toBe(false);
 
         wrapper.find('#work-alone-button').trigger('click');
@@ -622,7 +618,6 @@ describe('GroupRegistration tests', () => {
         expect(send_invitation_stub.firstCall.calledWith(project.pk, [user.username])).toBe(true);
         expect(send_group_invitation_modal.is_open).toBe(true);
         expect(wrapper.vm.invitation_sent).toEqual(null);
-        expect(wrapper.findAll('#group-registration-bar-buttons').length).toEqual(1);
 
         let api_errors = <APIErrors> wrapper.find({ref: 'send_invitation_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
