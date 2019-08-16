@@ -14,6 +14,7 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import Modal from '@/components/modal.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
@@ -322,14 +323,14 @@ describe('AGSuiteSettings tests', () => {
         expect(component.d_ag_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
     });
 
-    test('Deleting an instructor file', async () => {
+    test('Removing an instructor file', async () => {
         expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
         expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
         expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
 
         let instructor_files_section = wrapper.find('.instructor-files');
         instructor_files_section.findAll('.file').at(1).find(
-            '.delete-file-icon-container'
+            '.remove-file-icon-container'
         ).trigger('click');
         await component.$nextTick();
 
@@ -351,7 +352,7 @@ describe('AGSuiteSettings tests', () => {
 
         let instructor_files_section = wrapper.find('.instructor-files');
         instructor_files_section.findAll('.file').at(0).find(
-            '.delete-file-icon-container'
+            '.remove-file-icon-container'
         ).trigger('click');
         await component.$nextTick();
 
@@ -373,7 +374,7 @@ describe('AGSuiteSettings tests', () => {
 
         let instructor_file_section = wrapper.find('.instructor-files');
         instructor_file_section.findAll('.file').at(1).find(
-            '.delete-file-icon-container'
+            '.remove-file-icon-container'
         ).trigger('click');
         await component.$nextTick();
 
@@ -409,14 +410,14 @@ describe('AGSuiteSettings tests', () => {
         expect(component.d_ag_test_suite!.student_files_needed[2]).toEqual(student_file_3);
     });
 
-    test('Deleting a student file', async () => {
+    test('Removing a student file', async () => {
         expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
         expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
         expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
 
         let student_files_section = wrapper.find('.student-files');
         student_files_section.findAll('.file').at(1).find(
-            '.delete-file-icon-container'
+            '.remove-file-icon-container'
         ).trigger('click');
         await component.$nextTick();
 
@@ -438,7 +439,7 @@ describe('AGSuiteSettings tests', () => {
 
         let student_files_section = wrapper.find('.student-files');
         student_files_section.findAll('.file').at(0).find(
-            '.delete-file-icon-container'
+            '.remove-file-icon-container'
         ).trigger('click');
         await component.$nextTick();
 
@@ -460,7 +461,7 @@ describe('AGSuiteSettings tests', () => {
 
         let student_files_section = wrapper.find('.student-files');
         student_files_section.findAll('.file').at(1).find(
-            '.delete-file-icon-container'
+            '.remove-file-icon-container'
         ).trigger('click');
         await component.$nextTick();
 
@@ -545,6 +546,8 @@ describe('AGSuiteSettings tests', () => {
         await component.$nextTick();
 
         expect(delete_stub.calledOnce).toBe(true);
+        let modal = <Wrapper<Modal>> wrapper.find({ref: 'delete_ag_test_suite_modal'});
+        expect(modal.vm.is_open).toBe(false);
     });
 
     test('Parent component changes the value of the test_suite prop', async () => {

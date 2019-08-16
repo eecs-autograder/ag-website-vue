@@ -17,6 +17,7 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
@@ -980,6 +981,8 @@ describe('AGTestCommandSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(delete_command_stub.calledOnce).toBe(true);
+        let modal = <Wrapper<Modal>> wrapper.find({ref: 'delete_ag_test_command_modal'});
+        expect(modal.vm.is_open).toBe(false);
     });
 
     test('Delete case with exactly one command', async () => {
@@ -993,6 +996,8 @@ describe('AGTestCommandSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
+        let modal = <Wrapper<Modal>> wrapper.find({ref: 'delete_ag_test_command_modal'});
+        expect(modal.vm.is_open).toBe(false);
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {

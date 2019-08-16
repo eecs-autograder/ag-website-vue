@@ -1,6 +1,7 @@
+import { Vue } from 'vue-property-decorator';
 import { Dictionary } from 'vue-router/types/router';
 
-import { Course, HttpError } from 'ag-client-typescript';
+import { Course } from 'ag-client-typescript';
 // @ts-ignore
 import moment from "moment";
 
@@ -18,6 +19,39 @@ export function safe_assign<ToType extends FromType, FromType>(to: ToType, from:
 export function deep_copy<T, Constructor extends {new(args: T): T}>(instance: T,
                                                                     ctor: Constructor): T {
     return new ctor(JSON.parse(JSON.stringify(instance)));
+}
+
+// Given an object and a field name for that object, negates the field,
+// calls the given function (and awaiting on its returned promise), and
+// negates the field again, returning it to its original value.
+// IMPORTANT: make sure to either return or await the return value of this
+// function.
+// Usage examples:
+//
+// return toggle(this, 'd_saving', () => {
+//     (<APIErrors> this.$refs.api_errors).clear();
+//     return this.d_ag_test_command!.save();
+// });
+//
+// await toggle(this, 'd_saving', async () => {
+//   (<APIErrors> this.$refs.api_errors).clear();
+//   await this.d_ag_test_command!.save();
+// });
+export async function toggle<T, Key extends keyof T, ReturnType>(
+  obj: T, key: Key, body: () => Promise<ReturnType>
+) {
+    if (typeof obj[key] !== 'boolean') {
+        // istanbul ignore next
+        throw new TypeError(`Expected a property of boolean type, but got "${typeof obj[key]}"`);
+    }
+    let original = <boolean> <unknown> obj[key];
+    try {
+        (<boolean> <unknown> obj[key]) = !original;
+        return await body();
+    }
+    finally {
+        (<boolean> <unknown> obj[key]) = original;
+    }
 }
 
 type IterableType<T> = Iterable<T> | IterableIterator<T>;

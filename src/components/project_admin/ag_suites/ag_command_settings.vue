@@ -696,6 +696,7 @@
             </p>
             <div class="deletion-modal-button-footer">
               <button class="modal-delete-button"
+                      :disabled="d_deleting"
                       @click="delete_ag_test_command()"> Delete </button>
 
               <button class="modal-cancel-button"
@@ -738,7 +739,7 @@ import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
+import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -774,6 +775,7 @@ export default class AGTestCommandSettings extends Vue {
 
   d_saving = false;
   d_settings_form_is_valid = true;
+  d_deleting = false;
 
   d_first_failed_config_is_enabled = false;
   d_latest_first_failed_config_value: AGTestCommandFeedbackConfig | null = null;
@@ -810,25 +812,24 @@ export default class AGTestCommandSettings extends Vue {
     return this.d_ag_test_case!.ag_test_commands.length === 1;
   }
 
-  async delete_ag_test_command() {
-    if (this.case_has_exactly_one_command) {
-      await this.d_ag_test_case!.delete();
-    }
-    else {
-      await this.d_ag_test_command!.delete();
-    }
+  delete_ag_test_command() {
+    return toggle(this, 'd_deleting', async () => {
+      if (this.case_has_exactly_one_command) {
+        await this.d_ag_test_case!.delete();
+      }
+      else {
+        await this.d_ag_test_command!.delete();
+      }
+      (<Modal> this.$refs.delete_ag_test_command_modal).close();
+    });
   }
 
   @handle_api_errors_async(handle_save_ag_command_settings_error)
-  async save_ag_test_command_settings() {
-    try {
-      this.d_saving = true;
+  save_ag_test_command_settings() {
+    return toggle(this, 'd_saving', () => {
       (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_ag_test_command!.save();
-    }
-    finally {
-      this.d_saving = false;
-    }
+      return this.d_ag_test_command!.save();
+    });
   }
 
   toggle_first_failure_feedback() {

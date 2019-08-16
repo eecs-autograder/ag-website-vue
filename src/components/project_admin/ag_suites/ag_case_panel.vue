@@ -143,6 +143,7 @@
         </p>
         <div class="deletion-modal-button-footer">
           <button class="modal-delete-button"
+                  :disabled="d_deleting"
                   @click="delete_ag_test_case()"> Delete </button>
 
           <button class="modal-cancel-button"
@@ -178,7 +179,7 @@ import Modal from '@/components/modal.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -207,6 +208,7 @@ export default class AGCasePanel extends Vue {
 
   d_add_command_form_is_valid = false;
   d_adding_command = false;
+  d_deleting = false;
 
   get commands_are_visible() {
     return this.d_commands_are_visible;
@@ -269,8 +271,14 @@ export default class AGCasePanel extends Vue {
     }
   }
 
-  async delete_ag_test_case() {
-    await this.ag_test_case.delete();
+  delete_ag_test_case() {
+    return toggle(this, 'd_deleting', async () => {
+      await this.ag_test_case.delete();
+      let modal = (<Modal> this.$refs.delete_ag_test_case_modal);
+      if (modal !== undefined) {
+        modal.close();
+      }
+    });
   }
 
   @handle_api_errors_async(handle_add_ag_test_command_error)
