@@ -1,6 +1,4 @@
-import { Vue } from 'vue-property-decorator';
-
-import { config, mount, RefSelector, Wrapper } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -31,6 +29,8 @@ import {
 } from '@/tests/data_utils';
 import {
     checkbox_is_checked,
+    do_input_blank_or_not_integer_test,
+    do_invalid_text_input_test,
     expect_html_element_has_value,
     get_validated_input_text,
     set_validated_input_text,
@@ -1257,35 +1257,3 @@ describe('AG test command feedback tests', () => {
         expect(wrapper.vm.d_ag_test_command!.first_failed_test_normal_fdbk_config).toBeNull();
     });
 });
-
-async function do_invalid_text_input_test(component_wrapper: Wrapper<Vue>,
-                                          input_selector: string | RefSelector,
-                                          invalid_text: string,
-                                          save_button_selector: string | RefSelector) {
-    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
-    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
-    expect(validated_input_is_valid(input_wrapper)).toEqual(true);
-    // tslint:disable-next-line
-    expect(component_wrapper.find(<any> save_button_selector).is('[disabled]')).toBe(false);
-
-    set_validated_input_text(input_wrapper, invalid_text);
-    await component_wrapper.vm.$nextTick();
-
-    expect(validated_input_is_valid(input_wrapper)).toEqual(false);
-    // tslint:disable-next-line
-    let save_button_wrapper = component_wrapper.find(<any> save_button_selector);
-    expect(save_button_wrapper.is('[disabled]')).toBe(true);
-}
-
-async function do_input_blank_or_not_integer_test(component_wrapper: Wrapper<Vue>,
-                                                  input_selector: string | RefSelector,
-                                                  save_button_selector: string | RefSelector) {
-    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
-    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
-    let original_text = get_validated_input_text(input_wrapper);
-
-    await do_invalid_text_input_test(component_wrapper, input_selector, ' ', save_button_selector);
-    set_validated_input_text(input_wrapper, original_text);
-    return do_invalid_text_input_test(
-        component_wrapper, input_selector, 'not num', save_button_selector);
-}

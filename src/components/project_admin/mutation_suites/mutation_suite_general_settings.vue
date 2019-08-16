@@ -25,49 +25,47 @@
         </label>
       </div>
 
-      <div class="section-container">
-          <div class="sandbox-container">
-            <label class="text-label"> Sandbox environment </label>
-            <div class="dropdown">
-              <dropdown id="sandbox-docker-image"
-                        :items="d_docker_images"
-                        dropdown_height="250px"
-                        @update_item_selected="d_mutation_test_suite.sandbox_docker_image = $event;
-                                               $emit('input', d_mutation_test_suite)">
-                <template slot="header">
-                  <div tabindex="1" class="dropdown-header-wrapper">
-                    <div class="dropdown-header sandbox-docker-image-dropdown">
-                      {{d_mutation_test_suite.sandbox_docker_image === null ? ' '
-                      : d_mutation_test_suite.sandbox_docker_image.display_name}}
-                      <i class="fas fa-caret-down dropdown-caret"></i>
-                    </div>
-                  </div>
-                </template>
-                <div slot-scope="{item}">
-                  <span>
-                    {{item.display_name}}
-                  </span>
+      <div class="sandbox-container">
+        <label class="text-label"> Sandbox environment </label>
+        <div class="dropdown">
+          <dropdown id="sandbox-docker-image"
+                    :items="d_docker_images"
+                    dropdown_height="250px"
+                    @update_item_selected="d_mutation_test_suite.sandbox_docker_image = $event;
+                                           $emit('input', d_mutation_test_suite)">
+            <template slot="header">
+              <div tabindex="1" class="dropdown-header-wrapper">
+                <div class="dropdown-header sandbox-docker-image-dropdown">
+                  {{d_mutation_test_suite.sandbox_docker_image === null ? ' '
+                  : d_mutation_test_suite.sandbox_docker_image.display_name}}
+                  <i class="fas fa-caret-down dropdown-caret"></i>
                 </div>
-              </dropdown>
+              </div>
+            </template>
+            <div slot-scope="{item}">
+              <span>
+                {{item.display_name}}
+              </span>
             </div>
-          </div>
-
-          <div class="toggle-container">
-            <toggle v-model="d_mutation_test_suite.allow_network_access"
-                    @input="$emit('input', d_mutation_test_suite)"
-                    ref="allow_network_access"
-                    id="allow-network-access">
-              <div slot="on">
-                Allow network access
-              </div>
-              <div slot="off">
-                Block network access
-              </div>
-            </toggle>
-          </div>
+          </dropdown>
+        </div>
       </div>
 
-      <div class="section-container">
+      <div class="toggle-container">
+        <toggle v-model="d_mutation_test_suite.allow_network_access"
+                @input="$emit('input', d_mutation_test_suite)"
+                ref="allow_network_access"
+                id="allow-network-access">
+          <div slot="on">
+            Allow network access
+          </div>
+          <div slot="off">
+            Block network access
+          </div>
+        </toggle>
+      </div>
+
+      <div class="files-container">
         <label class="text-label"> Instructor Files </label>
         <div class="typeahead-search-bar">
             <dropdown-typeahead ref="instructor_files_typeahead"
@@ -84,7 +82,8 @@
             </dropdown-typeahead>
           </div>
 
-          <div id="instructor-files">
+          <div id="instructor-files"
+               v-if="d_mutation_test_suite.instructor_files_needed.length !== 0">
             <div v-for="(file, index) of d_mutation_test_suite.instructor_files_needed"
                  :class="['file', {'odd-index': index % 2 !== 0}]">
               <span class="file-name"> {{file.name}} </span>
@@ -96,7 +95,7 @@
           </div>
       </div>
 
-      <div class="section-container">
+      <div class="files-container">
         <label class="text-label"> Student Files </label>
         <div class="typeahead-search-bar">
             <dropdown-typeahead ref="student_files_typeahead"
@@ -113,7 +112,8 @@
             </dropdown-typeahead>
           </div>
 
-          <div id="student-files">
+          <div id="student-files"
+               v-if="d_mutation_test_suite.student_files_needed.length !== 0">
             <div v-for="(file, index) of d_mutation_test_suite.student_files_needed"
                  :class="['file', {'odd-index': index % 2 !== 0}]">
               <span class="file-name"> {{file.pattern}} </span>
@@ -240,7 +240,7 @@ export default class MutationSuiteGeneralSettings extends Vue {
 @import '@/styles/forms.scss';
 
 #mutation-suite-general-settings-component {
-  padding: 6px 12px 12px 12px;
+  padding: 6px 12px 14px 2px;
 }
 
 #mutation-test-suite-name-container {
@@ -248,18 +248,22 @@ export default class MutationSuiteGeneralSettings extends Vue {
 }
 
 .checkbox-container {
-  padding: 17px 12px 6px 2px;
+  padding: 17px 12px 6px 0;
+}
+
+.files-container {
+  padding: 5px 0 10px 0;
 }
 
 .toggle-container {
   font-size: 14px;
-  margin: 12px 5px 3px 3px;
+  margin: 12px 5px 3px 0;
   padding-bottom: 10px;
   min-width: 500px;
 }
 
 .sandbox-container {
-  padding: 10px 0 10px 3px;
+  padding: 10px 0 10px 0;
 }
 
 .sandbox-docker-image-dropdown {

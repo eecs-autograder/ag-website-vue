@@ -69,18 +69,18 @@
 
       <div class="input-container">
         <label class="text-label"> Buggy Implementation Names </label>
-        <validated-input ref="buggy_implementation_names"
-                         id="buggy-implementation-names-input"
-                         num_rows="2"
-                         v-model="buggy_impl_names"
-                         :validators="[]"
-                         input_style="max-width: 500px; width: 100%">
-          <button slot="suffix"
-               id="add-buggy-impl-names-button"
-               @click="add_buggy_implementation_names">
+        <div class="buggy-implementation-names-input-container">
+          <textarea ref="buggy_implementation_names"
+                    id="buggy-implementation-names-input"
+                    @keyup="handle_keyup_event($event)"
+                    v-model="buggy_impl_names">
+          </textarea>
+          <button id="add-buggy-impl-names-button"
+                  @click="add_buggy_implementation_names">
             Add Names
           </button>
-        </validated-input>
+
+        </div>
       </div>
 
       <div id="all-buggy-implementation-names"
@@ -174,6 +174,12 @@ export default class BuggyImplementations extends Vue {
         buggy_name_a.localeCompare(buggy_name_b, undefined, {numeric: true}));
   }
 
+  handle_keyup_event(key: KeyboardEvent) {
+      if (key.code === "Enter") {
+          this.add_buggy_implementation_names();
+      }
+  }
+
   add_buggy_implementation_names() {
     let split_regex = /\s+/g;
     let replace_regex = /,+/g;
@@ -205,8 +211,10 @@ export default class BuggyImplementations extends Vue {
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
+$periwinkle: hsl(220, 30%, 56%);
+
 #buggy-implementations-component {
-  padding: 6px 12px 12px 12px;
+  padding: 6px 12px 14px 2px;
 }
 
 .input-container {
@@ -220,8 +228,29 @@ export default class BuggyImplementations extends Vue {
   min-width: 500px;
 }
 
+.buggy-implementation-names-input-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: flex-start;
+}
+
+#buggy-implementation-names-input {
+  max-width: 500px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: .25rem;
+  border: 1px solid #ced4da;
+  box-sizing: border-box;
+  color: #495057;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 5px;
+  height: 38px;
+}
+
 #all-buggy-implementation-names {
-  border: 2px solid $white-gray;
+  border: 1px solid lighten($periwinkle, 20);
   display: inline-block;
 }
 
@@ -230,7 +259,7 @@ export default class BuggyImplementations extends Vue {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 
   .remove-buggy-impl-name-container {
     cursor: pointer;
@@ -238,28 +267,12 @@ export default class BuggyImplementations extends Vue {
   }
 
   .remove-buggy-impl-name-icon {
-    color: hsl(220, 20%, 85%);
-  }
-}
-
-.buggy-implementation-row:hover {
-  background-color: hsl(210, 20%, 90%);
-
-  .buggy-implementation-name {
-    color: lighten(black, 20);
-  }
-
-  .remove-buggy-impl-name-icon {
-    color: hsl(212, 10%, 47%);
-  }
-
-  .remove-buggy-impl-name-icon:hover {
-    color: $navy-blue;
+    color: darken($periwinkle, 20);
   }
 }
 
 .odd-buggy-implementation-row {
-  background-color: hsl(210, 20%, 96%);
+  background-color: lighten($periwinkle, 40);
 }
 
 .buggy-implementation-name {
@@ -269,12 +282,9 @@ export default class BuggyImplementations extends Vue {
 }
 
 #add-buggy-impl-names-button {
-  @extend .light-gray-button;
+  @extend .periwinkle-button;
   margin-left: 10px;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-self: flex-start;
 }
 
 </style>

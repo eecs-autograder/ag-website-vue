@@ -41,7 +41,8 @@ describe('MutationCommand tests', () => {
 
         wrapper = mount(MutationCommand, {
             propsData: {
-                value: ag_command
+                value: ag_command,
+                command_label: "Setup"
             }
         });
     });
@@ -59,7 +60,7 @@ describe('MutationCommand tests', () => {
     });
 
     test('command name binding', async () => {
-        wrapper.setProps({include_command_name: true});
+        wrapper.setProps({include_command_name_input: true});
         await wrapper.vm.$nextTick();
 
         let command_name_input = wrapper.find({ref: 'name'});
@@ -75,7 +76,7 @@ describe('MutationCommand tests', () => {
     });
 
     test('Error: command name is blank', async () => {
-        wrapper.setProps({include_command_name: true});
+        wrapper.setProps({include_command_name_input: true});
         await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test_without_save_button(
@@ -104,6 +105,8 @@ describe('MutationCommand tests', () => {
     });
 
     test('time_limit binding', async () => {
+        wrapper.setData({d_is_open: true});
+
         let time_limit_input = wrapper.find({ref: 'time_limit'});
 
         set_validated_input_text(time_limit_input, '9');
@@ -118,18 +121,24 @@ describe('MutationCommand tests', () => {
     });
 
     test('Error: time_limit is blank or not an integer', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_input_blank_or_not_integer_test_without_save_button(
             wrapper, {ref: 'time_limit'}
         );
     });
 
     test('Error: time_limit must be >= 1', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_invalid_text_input_test_without_save_button(
             wrapper, {ref: 'time_limit'}, '0'
         );
     });
 
     test('stack_size_limit binding', async () => {
+        wrapper.setData({d_is_open: true});
+
         let stack_size_limit_input = wrapper.find({ref: 'stack_size_limit'});
 
         set_validated_input_text(stack_size_limit_input, '9');
@@ -144,18 +153,24 @@ describe('MutationCommand tests', () => {
     });
 
     test('Error: stack_size_limit is blank or not an integer', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_input_blank_or_not_integer_test_without_save_button(
             wrapper, {ref: 'stack_size_limit'}
         );
     });
 
     test('Error: stack_size_limit must be >= 1', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_invalid_text_input_test_without_save_button(
             wrapper, {ref: 'stack_size_limit'}, '0'
         );
     });
 
     test('virtual_memory_limit binding', async () => {
+        wrapper.setData({d_is_open: true});
+
         let virtual_memory_limit_input = wrapper.find({ref: 'virtual_memory_limit'});
 
         set_validated_input_text(virtual_memory_limit_input, '9');
@@ -170,18 +185,24 @@ describe('MutationCommand tests', () => {
     });
 
     test('Error: virtual_memory_limit is blank or not an integer', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_input_blank_or_not_integer_test_without_save_button(
             wrapper, {ref: 'virtual_memory_limit'}
         );
     });
 
     test('Error: virtual_memory_limit must be >= 1', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_invalid_text_input_test_without_save_button(
             wrapper, {ref: 'virtual_memory_limit'}, '0'
         );
     });
 
     test('process_spawn_limit binding', async () => {
+        wrapper.setData({d_is_open: true});
+
         let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
 
         set_validated_input_text(process_spawn_limit_input, '9');
@@ -196,12 +217,16 @@ describe('MutationCommand tests', () => {
     });
 
     test('Error: process_spawn_limit is blank or not an integer', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_input_blank_or_not_integer_test_without_save_button(
             wrapper, {ref: 'process_spawn_limit'}
         );
     });
 
     test('Error: process_spawn_limit must be >= 0', async () => {
+        wrapper.setData({d_is_open: true});
+
         return do_invalid_text_input_test_without_save_button(
             wrapper, {ref: 'process_spawn_limit'}, '-1'
         );
@@ -222,5 +247,21 @@ describe('MutationCommand tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_command).toEqual(another_ag_command);
+    });
+
+    test('toggle_is_open', async () => {
+        expect(wrapper.vm.d_is_open).toBe(false);
+
+        wrapper.vm.toggle_is_open();
+        expect(wrapper.vm.d_is_open).toBe(true);
+
+        wrapper.vm.toggle_is_open();
+        expect(wrapper.vm.d_is_open).toBe(false);
+
+        wrapper.find('.resource-limits-label').trigger('click');
+        expect(wrapper.vm.d_is_open).toBe(true);
+
+        wrapper.find('.resource-limits-label').trigger('click');
+        expect(wrapper.vm.d_is_open).toBe(false);
     });
 });

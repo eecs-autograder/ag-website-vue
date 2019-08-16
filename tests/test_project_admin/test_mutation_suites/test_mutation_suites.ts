@@ -588,9 +588,8 @@ describe('MutationSuites tests', () => {
         // buggy implementation names
         expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toEqual([]);
 
-        set_validated_input_text(
-            wrapper.find('#buggy-implementation-names-input'), 'Bug_41 Bug_23 Bug_3'
-        );
+        wrapper.find('#buggy-implementation-names-input').setValue('Bug_41 Bug_23 Bug_3');
+
         wrapper.find('#add-buggy-impl-names-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -612,17 +611,22 @@ describe('MutationSuites tests', () => {
         await wrapper.vm.$nextTick();
 
         // setup command
+        expect(wrapper.vm.d_active_mutation_test_suite!.use_setup_command).toBe(false);
         wrapper.find('#use-setup-command').setChecked(true);
+        wrapper.find('#setup-command').find('.resource-limits-label').trigger('click');
 
         // name
         expect(
             wrapper.vm.d_active_mutation_test_suite!.setup_command.name
         ).not.toEqual("Tim Hortons");
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
 
         set_validated_input_text(
             wrapper.find('#setup-command').find('#name'), 'Tim Hortons'
         );
         expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.name).toEqual("Tim Hortons");
+        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+
 
         // command
         expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.cmd).not.toEqual("Bagel");
