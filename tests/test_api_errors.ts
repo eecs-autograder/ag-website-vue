@@ -1,8 +1,13 @@
 import { mount, Wrapper } from "@vue/test-utils";
 
 import { HttpError } from 'ag-client-typescript';
+import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
+
+afterEach(() => {
+    sinon.restore();
+});
 
 describe('APIErrors component tests', () => {
     let wrapper: Wrapper<APIErrors>;
@@ -14,6 +19,7 @@ describe('APIErrors component tests', () => {
     });
 
     test('Non-http error, exception re-thrown', () => {
+        sinon.stub(console, 'error');
         expect(() => {
             component.show_errors_from_response(new Error('Uncaught error'));
         }).toThrowError('Uncaught error');

@@ -1,5 +1,6 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
+import * as sinon from 'sinon';
 // @ts-ignore
 import * as timezone_mock from 'timezone-mock';
 
@@ -16,6 +17,7 @@ beforeEach(() => {
 
 afterEach(() => {
     timezone_mock.unregister();
+    sinon.restore();
 });
 
 describe('DatetimePicker tests', () => {
@@ -106,6 +108,8 @@ describe('DatetimePicker tests', () => {
     });
 
     test('Invalid date str throws exception', () => {
+        sinon.stub(console, 'error');
+        sinon.stub(console, 'warn');
         timezone_mock.unregister();
         expect(() => {
             mount(DatetimePicker, {

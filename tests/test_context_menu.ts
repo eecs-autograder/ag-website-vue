@@ -12,6 +12,10 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+afterEach(() => {
+    sinon.restore();
+});
+
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // Make sure that you call wrapper.vm.$destroy() at the end of each test case. Otherwise,
 // the lingering wheel event listeners attached to window could cause other tests to fail.
@@ -456,6 +460,7 @@ describe('ContextMenu tests', () => {
     });
 
     test('Invalid Context Menu Content', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<context_menu ref="context_menu">
                           <template slot="context_menu_items">

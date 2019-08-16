@@ -11,6 +11,10 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+afterEach(() => {
+    sinon.restore();
+});
+
 interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
 }
@@ -237,6 +241,7 @@ describe('File Upload tests not involving the empty files modal', () => {
     });
 
     test('add_files_from_button throws error when event.target is null', () => {
+        sinon.stub(console, 'error');
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_event = <HTMLInputEvent> <unknown> {
             target: null
@@ -248,6 +253,7 @@ describe('File Upload tests not involving the empty files modal', () => {
     });
 
     test('add_files_from_button throws an error when event.target.files is null', () => {
+        sinon.stub(console, 'error');
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_event = <HTMLInputEvent> {
             target: {
@@ -261,6 +267,7 @@ describe('File Upload tests not involving the empty files modal', () => {
     });
 
     test('add_dropped_files throws an error when event.target is null', () => {
+        sinon.stub(console, 'error');
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_event = <DragEvent> {
             target: null,

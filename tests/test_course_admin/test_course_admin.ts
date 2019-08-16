@@ -7,6 +7,8 @@ import * as sinon from 'sinon';
 
 import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
 
+import * as data_ut from '@/tests/data_utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -15,7 +17,7 @@ describe('Changing Tabs', ()  => {
     let wrapper: Wrapper<CourseAdmin>;
     let component: CourseAdmin;
     let course_1: Course;
-    let user_1: User;
+    let user: User;
     let roster: User[];
     let projects: Project[];
     let original_match_media: (query: string) => MediaQueryList;
@@ -33,17 +35,14 @@ describe('Changing Tabs', ()  => {
     });
 
     beforeEach(() => {
-        course_1 = new Course({
-            pk: 2, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: 'yesterday'
-        });
+        course_1 = data_ut.make_course();
 
-        user_1 = new User({
+        user = new User({
             pk: 1, username: "amandaplease@umich.edu", first_name: "Amanda", last_name: "Bynes",
             email: "amandaplease@umich.edu", is_superuser: true
         });
 
-        roster = [user_1];
+        roster = [user];
         projects = [];
 
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course_1));
@@ -241,7 +240,7 @@ describe('select_tab function called with different values associated with "curr
          ()  => {
     let wrapper: Wrapper<CourseAdmin>;
     let component: CourseAdmin;
-    let course_1: Course;
+    let course: Course;
     let roster: User[];
     let projects: Project[];
     let original_match_media: (query: string) => MediaQueryList;
@@ -255,18 +254,16 @@ describe('select_tab function called with different values associated with "curr
     };
 
     beforeEach(() => {
-        course_1 = new Course({
-            pk: 2, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: 'yesterday'
-        });
+        course = data_ut.make_course();
+
         roster = [];
         projects = [];
 
-        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course_1));
-        sinon.stub(course_1, 'get_admins').returns(Promise.resolve(roster));
-        sinon.stub(course_1, 'get_staff').returns(Promise.resolve(roster));
-        sinon.stub(course_1, 'get_students').returns(Promise.resolve(roster));
-        sinon.stub(course_1, 'get_handgraders').returns(Promise.resolve(roster));
+        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+        sinon.stub(course, 'get_admins').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_staff').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_students').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
         sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve(projects));
 
         original_match_media = window.matchMedia;
@@ -299,7 +296,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(0);
         expect(component.role_selected).toEqual("");
         expect(component.loading).toEqual(false);
@@ -315,7 +312,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.admin);
     });
@@ -330,7 +327,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.staff);
     });
@@ -345,7 +342,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.student);
     });
@@ -360,7 +357,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(1);
         expect(component.role_selected).toEqual(RosterChoice.handgrader);
     });
@@ -375,7 +372,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(2);
         expect(component.role_selected).toEqual("");
     });
@@ -390,7 +387,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(0);
         expect(component.role_selected).toEqual("");
     });
@@ -405,7 +402,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(2);
         expect(component.role_selected).toEqual("");
     });
@@ -420,7 +417,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.course).toEqual(course_1);
+        expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(0);
         expect(component.role_selected).toEqual("");
     });

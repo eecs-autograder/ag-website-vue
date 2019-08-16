@@ -1,9 +1,15 @@
 import { config, mount } from '@vue/test-utils';
 
+import * as sinon from 'sinon';
+
 import Diff from '@/components/diff.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+});
+
+afterEach(() => {
+    sinon.restore();
 });
 
 describe('Diff tests', () => {
@@ -185,6 +191,7 @@ describe('Diff test edge cases', () => {
     });
 
     test('Error invalid prefix', () => {
+        sinon.stub(console, 'error');
         expect(() => {
             mount(Diff, {
                 propsData: {

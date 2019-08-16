@@ -1,9 +1,15 @@
 import { config, mount } from '@vue/test-utils';
 
+import * as sinon from 'sinon';
+
 import Tooltip from '@/components/tooltip.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+});
+
+afterEach(() => {
+    sinon.restore();
 });
 
 describe('Tooltip.vue', () => {
@@ -154,6 +160,7 @@ describe('Tooltip.vue', () => {
     });
 
     test('Error invalid tooltip placement', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<div><tooltip placement="not_a_placement"></tooltip></div>`,
             components: {
@@ -167,6 +174,7 @@ describe('Tooltip.vue', () => {
     });
 
     test('Error invalid tootltip width', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<div><tooltip width="not_a_width"></tooltip></div>`,
             components: {
@@ -180,6 +188,7 @@ describe('Tooltip.vue', () => {
     });
 
     test('Error parent is null', () => {
+        sinon.stub(console, 'error');
         expect(() => mount(Tooltip)).toThrow('Tooltips must have a parent element.');
     });
 });

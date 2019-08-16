@@ -2,11 +2,17 @@ import Vue from 'vue';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
 
+import * as sinon from 'sinon';
+
 import Dropdown from '@/components/dropdown.vue';
 import { zip } from '@/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+});
+
+afterEach(() => {
+    sinon.restore();
 });
 
 
@@ -35,6 +41,7 @@ test('Scoped slot can be used to specify custom menu item text', () => {
 });
 
 test('Error missing header slot', () => {
+    sinon.stub(console, 'error');
     expect(() => {
         mount(Dropdown, {propsData: {items: [1, 2]}});
     }).toThrowError('Missing required slot: "header"');
