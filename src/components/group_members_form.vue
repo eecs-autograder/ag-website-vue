@@ -79,7 +79,7 @@ export default class GroupMembersForm extends Vue {
 
   created() {
     this.initialize(this.value);
-    this.$nextTick().then(() => {
+    Vue.nextTick(() => {
       (<ValidatedInput> (<Vue[]> this.$refs.username_input)[0]).focus();
     });
   }
@@ -111,7 +111,7 @@ export default class GroupMembersForm extends Vue {
 
   private add_member() {
     this.d_usernames.push(this.course.allowed_guest_domain);
-    this.$nextTick().then(() => {
+    Vue.nextTick(() => {
       (<ValidatedInput> (<Vue[]> this.$refs.username_input)[this.d_usernames.length - 1]).focus();
     });
   }
