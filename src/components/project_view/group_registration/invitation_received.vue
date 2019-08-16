@@ -3,7 +3,7 @@
 
     <div id="invitation-received">
       <div id="invitation-received-header">
-        <b>{{d_invitation.invitation_creator}}</b> has invited you work together!
+        <b>{{d_invitation.invitation_creator}}</b> has invited you to work together!
       </div>
       <div id="invitation-received-body">
         <table class="invitation-table">
