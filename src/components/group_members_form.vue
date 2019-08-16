@@ -79,9 +79,10 @@ export default class GroupMembersForm extends Vue {
 
   created() {
     this.initialize(this.value);
-    Vue.nextTick(() => {
-      (<ValidatedInput> (<Vue[]> this.$refs.username_input)[0]).focus();
-    });
+  }
+
+  mounted() {
+    (<ValidatedInput> (<Vue[]> this.$refs.username_input)[0]).focus();
   }
 
   @Watch('value', {deep: true})
