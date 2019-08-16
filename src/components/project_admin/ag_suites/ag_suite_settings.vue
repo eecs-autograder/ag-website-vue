@@ -92,9 +92,9 @@
             <div v-for="(file, index) of d_ag_test_suite.instructor_files_needed"
                   :class="['file', {'odd-index': index % 2 !== 0}]">
               <span class="file-name"> {{file.name}} </span>
-              <div class="delete-file-icon-container"
-                    @click="delete_instructor_file(file)">
-                <span><i class="fas fa-times delete-file"></i></span>
+              <div class="remove-file-icon-container"
+                    @click="d_ag_test_suite.instructor_files_needed.splice(index, 1)">
+                <span><i class="fas fa-times remove-file"></i></span>
               </div>
             </div>
           </div>
@@ -121,9 +121,9 @@
             <div v-for="(file, index) of d_ag_test_suite.student_files_needed"
                   :class="['file', {'odd-index': index % 2 !== 0}]">
               <span class="file-name"> {{file.pattern}} </span>
-              <div class="delete-file-icon-container"
-                    @click="delete_student_file(file)">
-                <span><i class="fas fa-times delete-file"></i></span>
+              <div class="remove-file-icon-container"
+                    @click="d_ag_test_suite.student_files_needed.splice(index, 1)">
+                <span><i class="fas fa-times remove-file"></i></span>
               </div>
             </div>
           </div>
@@ -276,7 +276,7 @@
 
           <modal ref="delete_ag_test_suite_modal"
                   :size="'large'"
-                  :include_closing_x="false">
+                  click_outside_to_close>
             <div class="modal-header">
               Confirm Delete
             </div>
@@ -288,7 +288,7 @@
                 THIS ACTION CANNOT BE UNDONE. </p>
               <div class="deletion-modal-button-footer">
                 <button class="modal-delete-button"
-                        :disabled="d_saving"
+                        :disabled="d_deleting"
                         @click="delete_ag_test_suite()"> Delete </button>
 
                 <button class="modal-cancel-button"
@@ -329,7 +329,7 @@ import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
+import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -367,6 +367,7 @@ export default class AGSuiteSettings extends Vue {
   d_loading = true;
   d_saving = false;
   d_settings_form_is_valid = true;
+  d_deleting = false;
 
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
   readonly FeedbackDescriptions = FeedbackDescriptions;
@@ -403,22 +404,11 @@ export default class AGSuiteSettings extends Vue {
     this.d_ag_test_suite!.student_files_needed.push(student_file);
   }
 
-  delete_instructor_file(instructor_file: InstructorFile) {
-    let index = this.d_ag_test_suite!.instructor_files_needed.findIndex(
-      (file: InstructorFile) => file.pk === instructor_file.pk
-    );
-    this.d_ag_test_suite!.instructor_files_needed.splice(index, 1);
-  }
-
-  delete_student_file(student_file: ExpectedStudentFile) {
-    let index = this.d_ag_test_suite!.student_files_needed.findIndex(
-      (file: ExpectedStudentFile) => file.pk === student_file.pk
-    );
-    this.d_ag_test_suite!.student_files_needed.splice(index, 1);
-  }
-
-  async delete_ag_test_suite() {
-    await this.d_ag_test_suite!.delete();
+  delete_ag_test_suite() {
+    return toggle(this, 'd_deleting', async () => {
+      await this.d_ag_test_suite!.delete();
+      (<Modal> this.$refs.delete_ag_test_suite_modal).close();
+    });
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
@@ -430,15 +420,11 @@ export default class AGSuiteSettings extends Vue {
   }
 
   @handle_api_errors_async(handle_save_ag_suite_settings_error)
-  async save_ag_test_suite_settings() {
-    try {
-      this.d_saving = true;
+  save_ag_test_suite_settings() {
+    return toggle(this, 'd_saving', () => {
       (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_ag_test_suite!.save();
-    }
-    finally {
-      this.d_saving = false;
-    }
+      return this.d_ag_test_suite!.save();
+    });
   }
 
   readonly fdbk_presets = new SafeMap<string, AGTestSuiteFeedbackPreset>([
@@ -524,18 +510,18 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
   padding-right: 30px;
 }
 
-.delete-file {
+.remove-file {
   color: hsl(220, 20%, 85%);
 }
 
-.delete-file-icon-container {
+.remove-file-icon-container {
   display: inline-block;
   padding: 0 4px;
 }
 
-.delete-file-icon-container:hover {
+.remove-file-icon-container:hover {
   cursor: pointer;
-  .delete-file {
+  .remove-file {
     color: hsl(220, 20%, 55%);
   }
 }

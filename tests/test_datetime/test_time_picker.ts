@@ -1,5 +1,7 @@
 import { mount, Wrapper } from "@vue/test-utils";
 
+import * as sinon from 'sinon';
+
 import TimePicker, {
     HourInputState,
     InvalidTimeStrError,
@@ -21,6 +23,7 @@ describe('TimePicker Tests', () => {
         if (wrapper.exists()) {
             wrapper.destroy();
         }
+        sinon.restore();
     });
 
     test('Default input value', () => {
@@ -56,6 +59,8 @@ describe('TimePicker Tests', () => {
     });
 
     test('Invalid time str throws exception', () => {
+        sinon.stub(console, 'error');
+        sinon.stub(console, 'warn');
         expect(() => {
             mount(TimePicker, {
                 propsData: {

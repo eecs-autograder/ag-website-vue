@@ -600,9 +600,10 @@ describe('GroupObserver tests for the Project Component', () => {
 
         let create_multi_person_group = sinon.stub(
             invitation_to_accept.d_invitation!, 'accept'
-        ).returns(
-            Promise.resolve(group_created)
-        );
+        ).callsFake(() => {
+            Group.notify_group_created(group_created);
+            return Promise.resolve(group_created);
+        });
 
         group_registration.find('#confirm-accept-button').trigger('click');
         await wrapper.vm.$nextTick();

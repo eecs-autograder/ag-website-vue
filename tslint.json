@@ -57,7 +57,7 @@
         "no-eval": true,
 
         "no-floating-promises": {
-            "severity": "warning"
+            "severity": "error"
         },
 
         "no-for-in-array": true,

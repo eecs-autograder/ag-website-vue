@@ -3,6 +3,8 @@ import Component from 'vue-class-component';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
 
+import * as sinon from 'sinon';
+
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -23,6 +25,7 @@ afterEach(() => {
     Object.defineProperty(window, "matchMedia", {
         value: original_match_media
     });
+    sinon.restore();
 });
 
 describe('Newly Added Tabs Test', () => {
@@ -938,6 +941,7 @@ describe('Tabs tests', () => {
     // --------------------------------------------------------------------------------------------
 
     test('Error no children in <tab>', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -957,6 +961,7 @@ describe('Tabs tests', () => {
     // --------------------------------------------------------------------------------------------
 
     test('Error only 1 child in <tab>', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -979,6 +984,7 @@ describe('Tabs tests', () => {
     // --------------------------------------------------------------------------------------------
 
     test('Error missing header in <tab>, extra child present', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -1003,6 +1009,7 @@ describe('Tabs tests', () => {
     // --------------------------------------------------------------------------------------------
 
     test('Error tab header not <template>', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -1028,6 +1035,7 @@ describe('Tabs tests', () => {
     // --------------------------------------------------------------------------------------------
 
     test('Error missing body in <tab>, extra child present', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
@@ -1051,6 +1059,7 @@ describe('Tabs tests', () => {
     // --------------------------------------------------------------------------------------------
 
     test('Error tab body not <template>', () => {
+        sinon.stub(console, 'error');
         const component = {
             template:  `<tabs ref="tabs">
   <tab>
