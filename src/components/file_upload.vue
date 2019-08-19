@@ -211,6 +211,10 @@ export default class FileUpload extends Vue {
   position: relative;
   text-align: center;
   width: 100%;
+
+  * {
+    pointer-events: none;
+  }
 }
 
 .drag-and-drop-hover {

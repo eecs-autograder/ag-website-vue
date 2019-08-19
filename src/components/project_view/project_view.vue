@@ -25,22 +25,7 @@
               </group-registration>
             </div>
             <div v-else>
-              <div v-if="group.extended_due_date !== null">
-                <h4 id="extension">
-                  Extension: {{format_datetime(group.extended_due_date)}}
-                </h4>
-              </div>
-
-              <div id="group-members-container">
-                <div id="group-members-title"> Group members: </div>
-                <div v-for="(member, index) of group.member_names">
-                  <div :class="['group-member',
-                               {'odd-row': index % 2 !== 0}]">
-                    {{member}}
-                  </div>
-                </div>
-              </div>
-
+              <submit :project="project" :group="group"></submit>
             </div>
 
             <!--TODO Submit component-->
@@ -85,6 +70,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Course, Group, GroupObserver, Project, User } from 'ag-client-typescript';
 
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
+import Submit from '@/components/project_view/submit.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -93,6 +79,7 @@ import { format_datetime, get_query_param } from '@/utils';
 @Component({
   components: {
     GroupRegistration,
+    Submit,
     Tab,
     TabHeader,
     Tabs
@@ -194,30 +181,6 @@ export default class ProjectView extends Vue implements GroupObserver {
 .tab-label {
   outline: none;
   cursor: pointer;
-}
-
-#group-members-container {
-  min-width: 25%;
-  border-collapse: collapse;
-  border: 2px solid lighten(black, 15);
-  border-radius: 5px;
-  display: inline-block;
-}
-
-#group-members-title {
-  padding: 14px 15px 14px 15px;
-  background-color: lighten(black, 15);
-  color: white;
-}
-
-.group-member {
-  font-size: 16px;
-  padding: 12px 15px 12px 15px;
-  border-radius: 0 0 2px 2px;
-}
-
-#group-members-container .odd-row {
-  background-color: $white-gray;
 }
 
 @media only screen and (min-width: 481px) {
