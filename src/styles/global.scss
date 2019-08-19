@@ -5,6 +5,9 @@
 
 .loading {
     color: $stormy-gray-light;
+}
+
+@mixin fully-center() {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -13,6 +16,6 @@
 }
 
 .loading-large {
-    @extend .loading;
     font-size: 55px;
+    @include fully-center();
 }

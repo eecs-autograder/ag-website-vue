@@ -25,7 +25,7 @@
               </group-registration>
             </div>
             <div v-else>
-              <submit :project="project" :group="group"></submit>
+              <submit :course="course" :project="project" :group="group"></submit>
             </div>
 
             <!--TODO Submit component-->
