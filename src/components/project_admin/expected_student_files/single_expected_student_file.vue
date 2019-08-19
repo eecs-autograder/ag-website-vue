@@ -11,7 +11,7 @@
         <div v-show="!editing" class="icon-holder">
           <div class="delete-file"
                :title="'Delete ' + expected_student_file.pattern"
-               @click="show_delete_expected_student_file_modal = true">
+               @click="d_show_delete_expected_student_file_modal = true">
             <i class="fas fa-trash delete-file-icon"></i>
           </div>
           <div class="edit-file"
@@ -56,8 +56,8 @@
       </expected-student-file-form>
     </div>
 
-    <modal v-if="show_delete_expected_student_file_modal"
-           @close="show_delete_expected_student_file_modal = false"
+    <modal v-if="d_show_delete_expected_student_file_modal"
+           @close="d_show_delete_expected_student_file_modal = false"
            ref="delete_expected_student_file_modal"
            size="large"
            :include_closing_x="false">
@@ -75,7 +75,7 @@
                 @click="delete_expected_student_file"> Delete </button>
         <button class="modal-cancel-button"
                 type="button"
-                @click="show_delete_expected_student_file_modal = false"> Cancel </button>
+                @click="d_show_delete_expected_student_file_modal = false"> Cancel </button>
       </div>
     </modal>
 
@@ -119,7 +119,7 @@ export default class SingleExpectedStudentFile extends Vue {
   });
   d_saving = false;
   pattern_is_valid = false;
-  show_delete_expected_student_file_modal = false;
+  d_show_delete_expected_student_file_modal = false;
 
   created() {
     this.d_expected_student_file = new ExpectedStudentFile(this.expected_student_file);
@@ -161,7 +161,7 @@ export default class SingleExpectedStudentFile extends Vue {
     try {
       this.d_delete_pending = true;
       await this.expected_student_file.delete();
-      this.show_delete_expected_student_file_modal = false;
+      this.d_show_delete_expected_student_file_modal = false;
     }
     finally {
       this.d_delete_pending = false;

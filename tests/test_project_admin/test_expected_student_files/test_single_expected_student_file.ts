@@ -128,10 +128,13 @@ describe('ExpectedStudentFiles tests', () => {
     test('Delete file', async () => {
         let delete_stub = sinon.stub(component.expected_student_file, 'delete');
 
+        expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(false);
+        expect(wrapper.find({ref: 'delete_expected_student_file_modal'}).exists()).toBe(false);
+
         wrapper.find('.delete-file').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.vm.show_delete_expected_student_file_modal).toBe(true);
+        expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(true);
         expect(wrapper.find({ref: 'delete_expected_student_file_modal'}).exists()).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
@@ -139,7 +142,7 @@ describe('ExpectedStudentFiles tests', () => {
 
         expect(delete_stub.callCount).toEqual(1);
         expect(component.d_delete_pending).toBe(false);
-        expect(wrapper.vm.show_delete_expected_student_file_modal).toBe(false);
+        expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(false);
         expect(wrapper.find({ref: 'delete_expected_student_file_modal'}).exists()).toBe(false);
     });
 

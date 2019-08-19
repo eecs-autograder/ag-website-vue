@@ -663,15 +663,15 @@
         <legend class="legend">Danger Zone</legend>
         <button class="delete-ag-test-command-button"
                 type="button"
-                @click="show_delete_ag_test_command_modal = true">
+                @click="d_show_delete_ag_test_command_modal = true">
           {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
           <span>
             {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
           </span>
         </button>
 
-        <modal v-if="show_delete_ag_test_command_modal"
-               @close="show_delete_ag_test_command_modal = false"
+        <modal v-if="d_show_delete_ag_test_command_modal"
+               @close="d_show_delete_ag_test_command_modal = false"
                ref="delete_ag_test_command_modal"
                :size="'large'"
                click_outside_to_close>
@@ -702,7 +702,7 @@
                       @click="delete_ag_test_command()"> Delete </button>
 
               <button class="modal-cancel-button"
-                      @click="show_delete_ag_test_command_modal = false"> Cancel </button>
+                      @click="d_show_delete_ag_test_command_modal = false"> Cancel </button>
             </div>
           </div>
         </modal>
@@ -778,7 +778,7 @@ export default class AGTestCommandSettings extends Vue {
   d_saving = false;
   d_settings_form_is_valid = true;
   d_deleting = false;
-  show_delete_ag_test_command_modal = false;
+  d_show_delete_ag_test_command_modal = false;
 
   d_first_failed_config_is_enabled = false;
   d_latest_first_failed_config_value: AGTestCommandFeedbackConfig | null = null;
@@ -823,7 +823,7 @@ export default class AGTestCommandSettings extends Vue {
       else {
         await this.d_ag_test_command!.delete();
       }
-      this.show_delete_ag_test_command_modal = false;
+      this.d_show_delete_ag_test_command_modal = false;
     });
   }
 

@@ -298,12 +298,12 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.vm.invitation_sent).toBeNull();
         expect(wrapper.vm.invitations_received.length).toEqual(0);
         expect(wrapper.find({ref: 'confirm_working_alone_modal'}).exists()).toBe(false);
-        expect(wrapper.vm.show_confirm_working_alone_modal).toBe(false);
+        expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(false);
 
         wrapper.find('#work-alone-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.show_confirm_working_alone_modal).toBe(true);
+        expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(true);
         expect(wrapper.find({ref: 'confirm_working_alone_modal'}).exists()).toBe(true);
 
         wrapper.find('#confirm-working-alone-button').trigger('click');
@@ -336,17 +336,20 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.vm.invitation_sent).toBeNull();
         expect(wrapper.vm.invitations_received.length).toEqual(0);
         expect(wrapper.find({ref: 'confirm_working_alone_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(false);
 
         wrapper.find('#work-alone-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'confirm_working_alone_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(true);
 
         wrapper.find('#confirm-working-alone-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(work_alone_stub.callCount).toEqual(1);
         expect(wrapper.find({ref: 'confirm_working_alone_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(true);
 
         let api_errors = <APIErrors> wrapper.find({ref: 'work_alone_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
@@ -375,18 +378,21 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
 
         wrapper.find('#delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
 
         wrapper.find('#confirm-keep-sent-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.callCount).toEqual(0);
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
     });
 
@@ -419,12 +425,14 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
 
         wrapper.find('#confirm-delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
     });
 
@@ -464,12 +472,14 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
 
         wrapper.find('#confirm-delete-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
         expect(wrapper.find({ref: 'delete_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
 
         let api_errors = <APIErrors> wrapper.find({ref: 'delete_invitation_api_errors'}).vm;
@@ -490,23 +500,26 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
         wrapper.find('#send-group-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
         wrapper.find('#cancel-send-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(send_invitation_stub.callCount).toEqual(0);
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
     });
 
     test('send invitation - successful', async () => {
-        let group_invitation_created =  new GroupInvitation({
+        let group_invitation_created = new GroupInvitation({
             pk: 2,
             invitation_creator: user.username,
             project: project.pk,
@@ -534,6 +547,7 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
         wrapper.find({ref: 'send_invitation_form'}).vm.$emit('submit', ['milo@umich.edu']);
         await wrapper.vm.$nextTick();
@@ -543,6 +557,7 @@ describe('GroupRegistration tests', () => {
             true
         );
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_created);
         expect(wrapper.findAll('#group-registration-bar-buttons').length).toEqual(0);
     });
@@ -569,12 +584,14 @@ describe('GroupRegistration tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
         wrapper.find('#send-group-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
         wrapper.find({ref: 'send_invitation_form'}).vm.$emit('submit', [user.username]);
         await wrapper.vm.$nextTick();
@@ -582,6 +599,7 @@ describe('GroupRegistration tests', () => {
         expect(send_invitation_stub.calledOnce).toBe(true);
         expect(send_invitation_stub.firstCall.calledWith(project.pk, [user.username])).toBe(true);
         expect(wrapper.find({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
         let api_errors = <APIErrors> wrapper.find({ref: 'send_invitation_api_errors'}).vm;

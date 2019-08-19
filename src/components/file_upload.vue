@@ -50,9 +50,9 @@
       <slot name="upload_button_text">Upload</slot>
     </button>
 
-    <modal v-if="show_empty_files_found_in_upload_attempt_modal"
-           @close="show_empty_files_found_in_upload_attempt_modal = false"
-           ref="empty_file_found_in_upload_attempt"
+    <modal v-if="d_show_empty_files_found_in_upload_attempt_modal"
+           @close="d_show_empty_files_found_in_upload_attempt_modal = false"
+           ref="empty_file_found_in_upload_attempt_modal"
            size="large"
            :include_closing_x="false">
       <h2>Empty Files detected</h2>
@@ -74,7 +74,7 @@
           Upload Anyway
         </button>
         <button class="cancel-upload-process-button red-button"
-                @click="show_empty_files_found_in_upload_attempt_modal = false">
+                @click="d_show_empty_files_found_in_upload_attempt_modal = false">
           Cancel
         </button>
       </div>
@@ -105,7 +105,7 @@ export default class FileUpload extends Vue {
   d_files: ArraySet<File, HasName> = new ArraySet<File, HasName>([], {less_func: name_less});
   d_files_dragged_over = false;
   d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
-  show_empty_files_found_in_upload_attempt_modal = false;
+  d_show_empty_files_found_in_upload_attempt_modal = false;
 
   table_row_styling(file_in: File, row_index: number): string {
     if (file_in.size === 0) {
@@ -151,7 +151,7 @@ export default class FileUpload extends Vue {
 
   attempt_to_upload() {
     if (!this.d_empty_filenames.empty()) {
-      this.show_empty_files_found_in_upload_attempt_modal = true;
+      this.d_show_empty_files_found_in_upload_attempt_modal = true;
     }
     else {
       this.$emit('upload_files', this.d_files.data);
@@ -160,7 +160,7 @@ export default class FileUpload extends Vue {
 
   continue_with_upload_despite_empty_files() {
     this.$emit('upload_files', this.d_files.data);
-    this.show_empty_files_found_in_upload_attempt_modal = false;
+    this.d_show_empty_files_found_in_upload_attempt_modal = false;
   }
 
   add_or_update_file(uploaded_file: File) {

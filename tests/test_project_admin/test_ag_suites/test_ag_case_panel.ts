@@ -468,8 +468,14 @@ describe('AGCasePanel tests', () => {
     test('Add command - successful', async () => {
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
+        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
+
         wrapper.findAll({ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
         component.d_new_command_name = "New command name";
         component.d_new_command = "New command";
@@ -478,6 +484,8 @@ describe('AGCasePanel tests', () => {
         await component.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
     });
 
     test('Add command - unsuccessful', async () => {
@@ -492,8 +500,14 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_case: ag_case_green});
         await component.$nextTick();
 
+        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
+
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
         component.d_new_command_name = "New command name";
         component.d_new_command = "New command";
@@ -505,6 +519,36 @@ describe('AGCasePanel tests', () => {
 
         let api_errors = <APIErrors> wrapper.find({ref: 'new_command_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
+    });
+
+    test('Clone case', async () => {
+        wrapper.setProps({active_case: ag_case_green});
+        await component.$nextTick();
+
+        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+    });
+
+    test('Edit AGTestCase settings', async () => {
+        wrapper.setProps({active_case: ag_case_green});
+        await component.$nextTick();
+
+        expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(false);
+        expect(wrapper.find({ref: 'ag_test_case_settings_modal'}).exists()).toBe(false);
+
+        wrapper.find({ref: 'edit_ag_test_case_menu_item'}).trigger('click');
+        await component.$nextTick();
+
+        expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(true);
+        expect(wrapper.find({ref: 'ag_test_case_settings_modal'}).exists()).toBe(true);
     });
 
     test('Delete case - successful', async () => {
@@ -512,17 +556,20 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_case: ag_case_green});
         await component.$nextTick();
 
+        expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(false);
+        expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
+
         wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.vm.show_delete_ag_test_case_modal).toBe(true);
+        expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(true);
-
 
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
+        expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
     });
 

@@ -38,8 +38,8 @@
       </div>
     </div>
 
-    <modal v-if="show_create_group_modal"
-           @close="show_create_group_modal = false"
+    <modal v-if="d_show_create_group_modal"
+           @close="d_show_create_group_modal = false"
            ref="create_group_modal"
            click_outside_to_close
            size="medium">
@@ -50,8 +50,8 @@
       </div>
     </modal>
 
-    <modal v-if="show_merge_groups_modal"
-           @close="show_merge_groups_modal = false"
+    <modal v-if="d_show_merge_groups_modal"
+           @close="d_show_merge_groups_modal = false"
            ref="merge_groups_modal"
            click_outside_to_close
            size="large">
@@ -68,13 +68,13 @@
     <div class="button-footer">
       <button class="create-group-button"
               type="button"
-              @click="show_create_group_modal = true"> Create New Group
+              @click="d_show_create_group_modal = true"> Create New Group
       </button>
 
       <button class="merge-groups-button"
               type="button"
               :disabled="groups_by_pk.data.length < 2"
-              @click="show_merge_groups_modal = true"> Merge Existing Groups
+              @click="d_show_merge_groups_modal = true"> Merge Existing Groups
       </button>
     </div>
   </div>
@@ -127,8 +127,8 @@ export default class EditGroups extends Vue implements GroupObserver {
   groups_by_pk = new ArraySet<Group, HasPK>([], {less_func: pk_less});
   private d_groups_with_extensions = new ArraySet<Group, HasPK>([], {less_func: pk_less});
   selected_group: Group | null = null;
-  show_create_group_modal = false;
-  show_merge_groups_modal = false;
+  d_show_create_group_modal = false;
+  d_show_merge_groups_modal = false;
 
   readonly format_datetime = format_datetime;
 
@@ -177,7 +177,7 @@ export default class EditGroups extends Vue implements GroupObserver {
     // Note: A newly created group won't have an extension.
 
     this.selected_group = copy;
-    this.show_create_group_modal = false;
+    this.d_show_create_group_modal = false;
   }
 
   update_group_changed(group: Group): void {
@@ -215,7 +215,7 @@ export default class EditGroups extends Vue implements GroupObserver {
     if (copy.extended_due_date !== null) {
       this.d_groups_with_extensions.insert(copy);
     }
-    this.show_merge_groups_modal = false;
+    this.d_show_merge_groups_modal = false;
   }
 }
 </script>

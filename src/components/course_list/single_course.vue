@@ -10,7 +10,7 @@
 
       <div class="toolbox">
         <div class="clone-course"
-             @click="show_clone_course_modal = true"
+             @click="d_show_clone_course_modal = true"
              :title="'Clone ' + course.name"
              v-if="is_admin">
           <p class="clone-course-label">
@@ -33,8 +33,8 @@
       </div>
     </div>
 
-    <modal v-if="show_clone_course_modal"
-           @close="show_clone_course_modal = false"
+    <modal v-if="d_show_clone_course_modal"
+           @close="d_show_clone_course_modal = false"
            ref="clone_course_modal"
            click_outside_to_close
            size="large">
@@ -132,7 +132,7 @@ export default class SingleCourse extends Vue {
   clone_course_form_is_valid = false;
 
   clone_course_pending = false;
-  show_clone_course_modal = false;
+  d_show_clone_course_modal = false;
 
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
@@ -155,7 +155,7 @@ export default class SingleCourse extends Vue {
       await this.course.copy(
         this.new_course_name, this.new_course_semester, this.new_course_year
       );
-      this.show_clone_course_modal = false;
+      this.d_show_clone_course_modal = false;
     }
     finally {
       this.clone_course_pending = false;

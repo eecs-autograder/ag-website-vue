@@ -201,7 +201,7 @@ describe('SingleProject.vue', () => {
         let validated_input = <ValidatedInput> wrapper.find({ref: "cloned_project_name"}).vm;
 
         expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
-        expect(wrapper.vm.show_clone_project_modal).toBe(true);
+        expect(wrapper.vm.d_show_clone_project_modal).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
         let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -215,7 +215,7 @@ describe('SingleProject.vue', () => {
         await single_project.$nextTick();
 
         expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(false);
-        expect(wrapper.vm.show_clone_project_modal).toBe(false);
+        expect(wrapper.vm.d_show_clone_project_modal).toBe(false);
     });
 
     test('Clone project to current course', async () => {
@@ -238,7 +238,7 @@ describe('SingleProject.vue', () => {
             {ref: "cloned_project_name"}).vm;
 
         expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
-        expect(wrapper.vm.show_clone_project_modal).toBe(true);
+        expect(wrapper.vm.d_show_clone_project_modal).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
         let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -256,7 +256,7 @@ describe('SingleProject.vue', () => {
         await single_project.$nextTick();
 
         expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(false);
-        expect(wrapper.vm.show_clone_project_modal).toBe(false);
+        expect(wrapper.vm.d_show_clone_project_modal).toBe(false);
         expect(wrapper.emitted().add_cloned_project.length).toEqual(1);
     });
 

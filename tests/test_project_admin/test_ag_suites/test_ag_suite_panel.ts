@@ -632,13 +632,13 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        expect(wrapper.vm.show_new_ag_test_case_modal).toBe(false);
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.vm.show_new_ag_test_case_modal).toBe(true);
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
         expect(component.d_new_case_name).toEqual("");
@@ -672,6 +672,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
         // clicking closing_x to close the modal
@@ -679,11 +680,13 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
 
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
         // clicking outside the modal to close the modal
@@ -691,6 +694,8 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
+
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
     });
 

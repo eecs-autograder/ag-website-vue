@@ -538,17 +538,20 @@ describe('AGSuiteSettings tests', () => {
         let delete_stub = sinon.stub(component.d_ag_test_suite!, 'delete');
         await component.$nextTick();
 
+        expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(false);
+        expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
+
         wrapper.find('.delete-ag-test-suite-button').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.vm.show_delete_ag_test_suite_modal).toBe(true);
+        expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(true);
         expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
         expect(delete_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.show_delete_ag_test_suite_modal).toBe(false);
+        expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(false);
         expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
     });
 
