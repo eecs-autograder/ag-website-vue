@@ -64,9 +64,11 @@
         </span>
       </div>
 
-      <modal ref="new_ag_test_suite_modal"
-            click_outside_to_close
-            size="medium">
+      <modal v-if="show_new_ag_test_suite_modal"
+             @close="show_new_ag_test_suite_modal = false"
+             ref="new_ag_test_suite_modal"
+             click_outside_to_close
+             size="medium">
         <div class="modal-header"> New Suite </div>
         <hr>
         <div class="modal-body">
@@ -147,6 +149,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   d_add_ag_test_suite_form_is_valid = false;
   d_new_ag_test_suite_name = "";
   d_adding_suite = false;
+  show_new_ag_test_suite_modal = false;
 
   d_active_ag_test_suite: AGTestSuite | null = null;
   d_active_ag_test_command: AGTestCommand | null = null;
@@ -201,7 +204,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   open_new_ag_test_suite_modal() {
-    (<Modal> this.$refs.new_ag_test_suite_modal).open();
+    this.show_new_ag_test_suite_modal = true;
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_ag_test_suite_name).focus();
     });
@@ -344,7 +347,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
       let new_suite = await AGTestSuite.create(
         this.project.pk, {name: this.d_new_ag_test_suite_name}
       );
-      (<Modal> this.$refs.new_ag_test_suite_modal).close();
+      this.show_new_ag_test_suite_modal = false;
       this.d_new_ag_test_suite_name = "";
     }
     finally {

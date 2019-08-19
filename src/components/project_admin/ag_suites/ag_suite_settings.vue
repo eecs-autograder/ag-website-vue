@@ -270,13 +270,15 @@
           <legend class="legend">Danger Zone</legend>
           <button class="delete-ag-test-suite-button"
                   type="button"
-                  @click="$refs.delete_ag_test_suite_modal.open()">
+                  @click="show_delete_ag_test_suite_modal = true">
             Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
           </button>
 
-          <modal ref="delete_ag_test_suite_modal"
-                  :size="'large'"
-                  click_outside_to_close>
+          <modal v-if="show_delete_ag_test_suite_modal"
+                 @close="show_delete_ag_test_suite_modal = false"
+                 ref="delete_ag_test_suite_modal"
+                 :size="'large'"
+                 click_outside_to_close>
             <div class="modal-header">
               Confirm Delete
             </div>
@@ -292,7 +294,7 @@
                         @click="delete_ag_test_suite()"> Delete </button>
 
                 <button class="modal-cancel-button"
-                        @click="$refs.delete_ag_test_suite_modal.close()"> Cancel </button>
+                        @click="show_delete_ag_test_suite_modal = false"> Cancel </button>
               </div>
             </div>
           </modal>
@@ -368,6 +370,7 @@ export default class AGSuiteSettings extends Vue {
   d_saving = false;
   d_settings_form_is_valid = true;
   d_deleting = false;
+  show_delete_ag_test_suite_modal = false;
 
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
   readonly FeedbackDescriptions = FeedbackDescriptions;
@@ -407,7 +410,7 @@ export default class AGSuiteSettings extends Vue {
   delete_ag_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_ag_test_suite!.delete();
-      (<Modal> this.$refs.delete_ag_test_suite_modal).close();
+      this.show_delete_ag_test_suite_modal = false;
     });
   }
 

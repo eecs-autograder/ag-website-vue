@@ -7,11 +7,11 @@
                 && invitations_received.length === 0">
       <button id="work-alone-button"
               class="teal-button"
-              @click="$refs.confirm_working_alone_modal.open()"> I am working alone </button>
+              @click="show_confirm_working_alone_modal = true"> I am working alone </button>
       <div>- or -</div>
       <button id="send-group-invitation-button"
               class="purple-button"
-              @click="$refs.send_group_invitation_modal.open()"> Send group invitation </button>
+              @click="show_send_group_invitation_modal = true"> Send group invitation </button>
     </div>
 
     <div v-if="project.disallow_group_registration"
@@ -58,7 +58,7 @@
             <div id="invitation-sent-footer">
               <button id="delete-invitation-button"
                       class="white-button"
-                      @click="$refs.delete_invitation_modal.open()">
+                      @click="show_delete_invitation_modal = true">
                 Delete Invitation
               </button>
             </div>
@@ -80,7 +80,9 @@
       </div>
     </div>
 
-    <modal ref="confirm_working_alone_modal"
+    <modal v-if="show_confirm_working_alone_modal"
+           @close="show_confirm_working_alone_modal = false"
+           ref="confirm_working_alone_modal"
            size="medium"
            click_outside_to_close>
       <div class="modal-header"> Are you sure you want to <b>work alone</b>? </div>
@@ -92,7 +94,7 @@
           <div class="modal-button-container">
             <button id="cancel-confirm-working-alone-button"
                     class="white-button"
-                    @click="$refs.confirm_working_alone_modal.close()"> Cancel </button>
+                    @click="show_confirm_working_alone_modal = false"> Cancel </button>
             <button id="confirm-working-alone-button"
                     class="teal-button"
                     @click="work_alone"
@@ -102,7 +104,9 @@
       </div>
     </modal>
 
-    <modal ref="send_group_invitation_modal"
+    <modal v-if="show_send_group_invitation_modal"
+           @close="show_send_group_invitation_modal = false"
+           ref="send_group_invitation_modal"
            size="medium"
            click_outside_to_close>
       <div class="modal-header"> Send Invitation </div>
@@ -127,7 +131,7 @@
                 <button id="cancel-send-invitation-button"
                         class="white-button"
                         type="button"
-                        @click="$refs.send_group_invitation_modal.close()">
+                        @click="show_send_group_invitation_modal = false">
                   Cancel
                 </button>
                 <button id="confirm-send-invitation-button"
@@ -143,7 +147,10 @@
       </div>
     </modal>
 
-    <modal ref="delete_invitation_modal" size="large">
+    <modal v-if="show_delete_invitation_modal"
+           @close="show_delete_invitation_modal = false"
+           ref="delete_invitation_modal"
+           size="large">
       <div class="modal-header"> Delete Invitation </div>
       <div class="modal-divider"></div>
       <div class="modal-body">
@@ -165,7 +172,7 @@
           <div class="modal-button-container">
             <button id="confirm-keep-sent-invitation-button"
                     class="white-button"
-                    @click="$refs.delete_invitation_modal.close()"> Keep Invitation </button>
+                    @click="show_delete_invitation_modal = false"> Keep Invitation </button>
             <button id="confirm-delete-invitation-button"
                     class="orange-button"
                     @click="delete_invitation"
@@ -218,6 +225,9 @@ export default class GroupRegistration extends Vue {
   invitations_received: GroupInvitation[] = [];
   user: User | null = null;
   users_to_invite: GroupMember[] = [];
+  show_confirm_working_alone_modal = false;
+  show_send_group_invitation_modal = false;
+  show_delete_invitation_modal = false;
 
   async created() {
     this.user = await User.get_current();
@@ -251,7 +261,7 @@ export default class GroupRegistration extends Vue {
       (<APIErrors> this.$refs.delete_invitation_api_errors).clear();
       await this.invitation_sent!.reject();
       this.invitation_sent = null;
-      (<Modal> this.$refs.delete_invitation_modal).close();
+      this.show_delete_invitation_modal = false;
     }
     finally {
       this.d_deleting_invitation = false;
@@ -268,9 +278,8 @@ export default class GroupRegistration extends Vue {
     try {
       this.d_sending_invitation = true;
       (<APIErrors> this.$refs.send_invitation_api_errors).clear();
-
       this.invitation_sent = await GroupInvitation.send_invitation(this.project.pk, usernames);
-      (<Modal> this.$refs.send_group_invitation_modal).close();
+      this.show_send_group_invitation_modal = false;
     }
     finally {
       this.d_sending_invitation = false;

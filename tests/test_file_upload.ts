@@ -44,7 +44,6 @@ class MockFileList implements FileList {
 describe('File Upload tests not involving the empty files modal', () => {
     let wrapper: Wrapper<FileUpload>;
     let component: FileUpload;
-    let empty_files_present_modal: Modal;
     let empty_file: File;
     let file_1: File;
     let file_2: File;
@@ -306,9 +305,6 @@ describe('File Upload tests not involving the empty files modal', () => {
 
     test('Users can successfully upload files when all files are non-empty', () => {
         let final_upload_button = wrapper.find('.upload-files-button');
-        empty_files_present_modal = <Modal> wrapper.find(
-            {ref: 'empty_file_found_in_upload_attempt'}
-        ).vm;
 
         component.d_files.insert(file_1);
         component.d_files.insert(file_2);
@@ -319,7 +315,9 @@ describe('File Upload tests not involving the empty files modal', () => {
         final_upload_button.trigger('click');
 
         expect(wrapper.emitted().upload_files.length).toBe(1);
-        expect(empty_files_present_modal.is_open).toBe(false);
+        expect(wrapper.find(
+            {ref: 'empty_file_found_in_upload_attempt'}
+        ).exists()).toBe(false);
     });
 });
 
@@ -327,7 +325,6 @@ describe("File Upload tests concerning the empty files modal", () => {
     let wrapper: Wrapper<FileUpload>;
     let component: FileUpload;
     let final_upload_button: Wrapper<Vue>;
-    let empty_files_present_modal: Modal;
     let file_1: File;
     let empty_file: File;
 
@@ -347,16 +344,11 @@ describe("File Upload tests concerning the empty files modal", () => {
         component.check_for_emptiness(empty_file);
 
         expect(component.d_empty_filenames.size()).toBeGreaterThan(0);
-
-        empty_files_present_modal = <Modal> wrapper.find(
-            {ref: 'empty_file_found_in_upload_attempt'}
-        ).vm;
-
-        expect(empty_files_present_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'empty_file_found_in_upload_attempt'}).exists()).toBe(false);
 
         final_upload_button.trigger('click');
 
-        expect(empty_files_present_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'empty_file_found_in_upload_attempt'}).exists()).toBe(true);
     });
 
     test('You can choose to upload despite having one or more empty files', () => {
@@ -364,7 +356,7 @@ describe("File Upload tests concerning the empty files modal", () => {
         upload_despite_empty_files_button.trigger('click');
 
         expect(wrapper.emitted().upload_files.length).toBe(1);
-        expect(empty_files_present_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'empty_file_found_in_upload_attempt'}).exists()).toBe(false);
     });
 
     test('You can choose not to upload after receiving the warning modal concerning ' +
@@ -374,6 +366,6 @@ describe("File Upload tests concerning the empty files modal", () => {
         cancel_upload_button.trigger('click');
 
         expect(wrapper.emitted('upload_click')).not.toBeTruthy();
-        expect(empty_files_present_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'empty_file_found_in_upload_attempt'}).exists()).toBe(false);
     });
 });

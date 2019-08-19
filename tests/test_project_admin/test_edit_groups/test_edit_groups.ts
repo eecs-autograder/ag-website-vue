@@ -9,7 +9,6 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
-import Modal from "@/components/modal.vue";
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import MergeGroups from "@/components/project_admin/edit_groups/merge_groups.vue";
 
@@ -330,8 +329,7 @@ describe('EditGroups tests', () => {
     });
 
     test('groups_by_members passed to merge-groups', async () => {
-        (<Modal> wrapper.find({ref: 'merge_groups_modal'}).vm).open();
-
+        component.show_merge_groups_modal = true;
         await component.$nextTick();
 
         let merge_groups = <Wrapper<MergeGroups>> wrapper.find({ref: 'merge_groups'});

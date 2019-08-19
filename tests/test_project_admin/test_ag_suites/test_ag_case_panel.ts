@@ -14,7 +14,6 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import Modal from '@/components/modal.vue';
 import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
@@ -516,12 +515,15 @@ describe('AGCasePanel tests', () => {
         wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
         await component.$nextTick();
 
+        expect(wrapper.vm.show_delete_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(true);
+
+
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
-        let modal = <Wrapper<Modal>> wrapper.find({ref: 'delete_ag_test_case_modal'});
-        expect(modal.vm.is_open).toBe(false);
+        expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
     });
 
     test('command in a different case changed', async () => {
