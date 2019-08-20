@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Progress bar tests Partial progress 1`] = `
+<div
+  id="total-progress"
+>
+  <div
+    id="completed-progress"
+    style="width: 51%;"
+  >
+    <div
+      id="progress-text"
+    >
+      51%
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests Progress 0 1`] = `
+<div
+  id="total-progress"
+>
+  <div
+    id="completed-progress"
+    style="width: 0%;"
+  >
+    <div
+      id="progress-text"
+    >
+      0%
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests Progress 100% custom slot 1`] = `
+<div
+  id="total-progress"
+>
+  <div
+    id="completed-progress"
+    style="width: 100%;"
+  >
+    <div
+      id="progress-text"
+    >
+      Finishing request
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests Progress 100% default slot 1`] = `
+<div
+  id="total-progress"
+>
+  <div
+    id="completed-progress"
+    style="width: 100%;"
+  >
+    <div
+      id="progress-text"
+    >
+      
+          Please wait...
+        
+    </div>
+  </div>
+</div>
+`;

@@ -3,7 +3,7 @@
     <div id="completed-progress" :style="{'width': `${progress}%`}">
       <div id="progress-text">
         <template v-if="progress === 100">
-          <slot name="finishing_text">
+          <slot>
             Please wait...
           </slot>
         </template>
