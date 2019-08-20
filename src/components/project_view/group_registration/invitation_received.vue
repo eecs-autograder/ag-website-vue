@@ -162,15 +162,7 @@ export default class InvitationReceived extends Vue {
     try {
       this.d_accepting = true;
       (<APIErrors> this.$refs.accept_invitation_api_errors).clear();
-      let result = await this.d_invitation!.accept();
-      if (result !== null) {
-        // When ProjectView is notified that a group was created,
-        // this component will be unmounted before we can close the modal
-        // (without an exception being raised).
-        // Therefore, InvitationReceived should NOT try to close the modal
-        // here.
-        return;
-      }
+      await this.d_invitation!.accept();
       let copy_of_invitation = deep_copy(this.d_invitation!, GroupInvitation);
       this.$emit('input', copy_of_invitation);
       this.d_show_confirm_accept_invitation_modal = false;
