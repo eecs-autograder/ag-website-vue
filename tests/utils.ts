@@ -73,3 +73,8 @@ function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelec
            || wrapper.name() === 'select'
            || wrapper.name() === 'option';
 }
+
+
+export function compress_whitespace(str: string): string {
+    return str.trim().replace(/\s+/g, ' ');
+}

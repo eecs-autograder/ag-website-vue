@@ -9,6 +9,16 @@
         Extension:
         <span id="extension" class="date">{{format_datetime(group.extended_due_date)}}</span>
       </div>
+      <template v-if="current_user !== null">
+        <div id="late-days-used"
+             class="limit-container"
+             v-if="current_user.username in group.late_days_used">
+          <span class="allotment">{{group.late_days_used[current_user.username]}}</span>
+          late day<template v-if="group.late_days_used[current_user.username] !== 1">s</template>
+          used on this project.
+        </div>
+      </template>
+      <i v-else class="loading fa fa-spinner fa-pulse"></i>
     </div>
 
     <div id="group-members-container" v-if="group.member_names.length > 1">
@@ -22,13 +32,15 @@
     </div>
 
     <div id="all-limits-container">
-      <div class="limit-container" v-if="project.submission_limit_per_day !== null">
+      <div id="submissions-used"
+           class="limit-container" v-if="project.submission_limit_per_day !== null">
         <span class="allotment">
           {{group.num_submits_towards_limit}}/{{num_submissions_per_day}}
         </span>
-        submission<template v-if="num_submissions_per_day !== 1">s</template> used today.
+        submissions used today.
       </div>
-      <div class="limit-container"
+      <div id="bonus-submissions-remaining"
+           class="limit-container"
            v-if="project.num_bonus_submissions !== 0 || group.bonus_submissions_remaining !== 0">
         <span class="allotment">
           {{group.bonus_submissions_remaining}}
@@ -36,7 +48,7 @@
         bonus submission<template v-if="group.bonus_submissions_remaining !== 1">s</template>
         remaining.
       </div>
-      <div class="limit-container" v-if="show_late_day_count">
+      <div id="late-days-remaining" class="limit-container" v-if="show_late_day_count">
         <i v-if="late_days_remaining === null"
             class="loading fa fa-spinner fa-pulse"></i>
         <span class="allotment">
@@ -48,7 +60,7 @@
 
     <file-upload ref="submit_file_upload" @upload_files="process_files">
       <template v-slot:upload_button_text>
-        Submit
+        Submit <template v-if="submission_might_use_late_day">(Use late day)</template>
       </template>
     </file-upload>
 
@@ -106,6 +118,7 @@
       </div>
       <div class="modal-footer">
         <button type="button"
+                ref="submit_button"
                 :class="file_mismatches_present ? 'orange-button' : 'green-button'"
                 @click="submit"
                 :disabled="d_submitting">
@@ -129,6 +142,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, ExpectedStudentFile, Group, Project, Submission, User } from 'ag-client-typescript';
 import * as minimatch from 'minimatch';
+// @ts-ignore
+import moment from "moment";
 
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
@@ -174,9 +189,11 @@ export default class Submit extends Vue {
 
   late_days_remaining: number | null = null;
 
+  current_user: User | null = null;
+
   async created() {
-    let current_user = await User.get_current();
-    let late_days = await User.get_num_late_days(this.course.pk, current_user.pk);
+    this.current_user = await User.get_current();
+    let late_days = await User.get_num_late_days(this.course.pk, this.current_user.pk);
     this.late_days_remaining = late_days.late_days_remaining;
   }
 
@@ -191,6 +208,26 @@ export default class Submit extends Vue {
   get show_late_day_count(): boolean {
     return this.course.num_late_days !== 0
            || (this.late_days_remaining !== null && this.late_days_remaining !== 0);
+  }
+
+  get submission_might_use_late_day() {
+    if (this.late_days_remaining === null || this.late_days_remaining === 0) {
+      return false;
+    }
+    if (this.project.soft_closing_time === null) {
+      return false;
+    }
+    let deadline = moment(this.project.soft_closing_time);
+    if (this.group.extended_due_date !== null) {
+      deadline = moment(this.group.extended_due_date);
+    }
+
+    let late_days_used = this.group.late_days_used[this.current_user!.username];
+    if (late_days_used !== undefined) {
+      deadline = deadline.add(late_days_used, 'd');
+    }
+
+    return moment().isAfter(deadline);
   }
 
   get file_mismatches_present() {
@@ -273,14 +310,15 @@ export default class Submit extends Vue {
 
   @handle_api_errors_async(handle_submit_error)
   submit() {
+    (<APIErrors> this.$refs.api_errors).clear();
+
     return toggle(this, 'd_submitting', async () => {
       await Submission.create(
         this.group.pk, this.submitted_files,
         (event: ProgressEvent) => {
-          console.log(event.lengthComputable);
-          this.d_submit_progress = 100 * (1.0 * event.loaded / event.total)
-          console.log(event.loaded);
-          console.log(event.total);
+          if (event.lengthComputable) {
+            this.d_submit_progress = 100 * (1.0 * event.loaded / event.total)
+          }
         }
       );
 
@@ -376,15 +414,15 @@ function num_matches(names: string[], pattern: string): number {
 #all-limits-container {
   margin: 15px 0;
   font-size: 1.2rem;
+}
 
-  .limit-container {
-    margin: 5px 0;
-  }
+.limit-container {
+  margin: 5px 0;
+}
 
-  .allotment {
-    color: darken($green, 5%);
-    font-weight: bold;
-  }
+.allotment {
+  color: darken($green, 5%);
+  font-weight: bold;
 }
 
 .file-list-header {
