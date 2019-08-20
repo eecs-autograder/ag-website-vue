@@ -1,6 +1,6 @@
 <template>
   <div id="mutation-command-component">
-    <div class="command-name"> Setup </div>
+    <div class="command-label"> {{command_label}} </div>
     <div class="command-content">
       <div class="input-container"
            v-if="include_command_name_input">
@@ -29,7 +29,6 @@
         <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
         <i v-else class="fas fa-caret-right caret-right"></i>
         <span> Resource Limits </span>
-        <div class="resource-limits-divider" v-if="d_is_open"> </div>
       </div>
 
       <div v-if="d_is_open">
@@ -168,53 +167,39 @@ export default class MutationCommand extends Vue {
 
 .caret-down, .caret-right {
   font-size: 15px;
-  width: 22px;
+  width: 20px;
 }
 
-.command-name {
+.command-label {
   align-items: center;
-  background-color: hsl(180, 100%, 24%);
   border-radius: 3px 3px 0 0;
-  color: white;
   display: flex;
-  font-size: 16px;
-  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .resource-limits-label {
   cursor: pointer;
   display: flex;
-  font-size: 16px;
+  font-size: 15px;
   flex-direction: row;
   justify-content: stretch;
   align-items: center;
-  padding: 10px 10px 10px 8px;
-}
-
-.resource-limits-label span {
-  padding-right: 20px;
-  font-weight: bold;
-}
-
-.resource-limits-divider {
-  border-top: 1px solid lighten($gray-blue-2, 10);
-  flex: 1;
+  padding: 0 8px;
 }
 
 .command-content {
-  border: 1px solid hsl(180, 100%, 24%);
   border-radius: 0 0 3px 3px;
-  padding: 0 5px 2px 5px;
+  padding: 0 0 2px 0;
 }
 
 .input-container {
-  margin: 10px 5px;
+  margin: 10px 0;
 }
 
 .unit-of-measurement {
   font-size: 14px;
   padding-left: 10px;
 }
-
 
 </style>

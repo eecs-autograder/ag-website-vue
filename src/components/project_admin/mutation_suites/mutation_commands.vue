@@ -18,7 +18,7 @@
       <mutation-command ref="setup_command"
                         id="setup-command"
                         v-model="d_mutation_test_suite.setup_command"
-                        command_label="Setup"
+                        command_label="1. Setup"
                         include_command_name_input
                         @form_validity_changed="d_setup_command_is_valid = $event"
                         @input="$emit('input', d_mutation_test_suite)">
@@ -30,7 +30,7 @@
         ref="get_student_test_names_command"
         id="get-student-test-names-command"
         v-model="d_mutation_test_suite.get_student_test_names_command"
-        command_label="Get student test names"
+        command_label="2. Get student test names"
         @input="$emit('input', d_mutation_test_suite)"
         @form_validity_changed="d_get_student_test_names_command_is_valid = $event">
       </mutation-command>
@@ -40,7 +40,7 @@
       <mutation-command ref="student_test_validity_check_command"
                         id="student-test-validity-check-command"
                         v-model="d_mutation_test_suite.student_test_validity_check_command"
-                        command_label="Check validity of student tests"
+                        command_label="3. Check validity of student tests"
                         @input="$emit('input', d_mutation_test_suite)"
                         @form_validity_changed="d_student_test_validity_check_is_valid = $event">
       </mutation-command>
@@ -50,7 +50,7 @@
       <mutation-command ref="grade_buggy_impl_command"
                         id="grade-buggy-impl-command"
                         v-model="d_mutation_test_suite.grade_buggy_impl_command"
-                        command_label="Run student tests with buggy implementations"
+                        command_label="4. Run student tests with buggy implementations"
                         @input="$emit('input', d_mutation_test_suite)"
                         @form_validity_changed="d_grade_buggy_impl_command_is_valid = $event">
       </mutation-command>
@@ -106,7 +106,7 @@ export default class MutationCommands extends Vue {
 }
 
 .mutation-command-container {
-  margin-bottom: 12px;
+  margin-bottom: 30px;
   min-width: 600px;
   width: 50%;
   max-width: 100%;
