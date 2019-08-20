@@ -1,6 +1,6 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
-import { Course, GradingStatus, Group, Project, Submission, User, HttpError } from "ag-client-typescript";
+import { Course, GradingStatus, Group, HttpError, Project, Submission, User } from "ag-client-typescript";
 // @ts-ignore
 import moment from "moment";
 import * as sinon from 'sinon';
@@ -528,9 +528,9 @@ describe('Submit tests', () => {
         expect(wrapper.vm.d_submit_progress).toEqual(0);
         wrapper.vm.d_submit_progress = 20;
 
-        let files = [new File(['spam'], 'required')];
+        let files_to_submit = [new File(['spam'], 'required')];
         let file_upload = wrapper.find({ref: 'submit_file_upload'});
-        file_upload.vm.$emit('upload_files', files);
+        file_upload.vm.$emit('upload_files', files_to_submit);
 
         await wrapper.vm.$nextTick();
 
@@ -541,7 +541,7 @@ describe('Submit tests', () => {
         submit_button.trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(submit_stub.calledWith(group.pk, files)).toBe(true);
+        expect(submit_stub.calledWith(group.pk, files_to_submit)).toBe(true);
         expect(wrapper.vm.d_submit_progress).toEqual(100);
 
         let modal = <Wrapper<Modal>> wrapper.find({ref: 'confirm_submit_modal'});

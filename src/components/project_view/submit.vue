@@ -280,10 +280,10 @@ export default class Submit extends Vue {
   private check_expected_file_counts(files: File[]) {
     let filenames = files.map((file) => file.name);
     for (let expected_file of this.project.expected_student_files) {
-      let count = num_matches(filenames, expected_file.pattern);
+      let count = num_glob_matches(filenames, expected_file.pattern);
 
       if (this.expected_file_is_missing(expected_file, count)) {
-        this.missing_files.push(expected_file.pattern)
+        this.missing_files.push(expected_file.pattern);
       }
       else if (count < expected_file.min_num_matches) {
         this.patterns_with_too_few_matches.push({
@@ -297,7 +297,7 @@ export default class Submit extends Vue {
           pattern: expected_file.pattern,
           num_expected: expected_file.max_num_matches,
           actual_num: count,
-        })
+        });
       }
     }
   }
@@ -317,7 +317,7 @@ export default class Submit extends Vue {
         this.group.pk, this.submitted_files,
         (event: ProgressEvent) => {
           if (event.lengthComputable) {
-            this.d_submit_progress = 100 * (1.0 * event.loaded / event.total)
+            this.d_submit_progress = 100 * (1.0 * event.loaded / event.total);
           }
         }
       );
@@ -338,13 +338,13 @@ const MINIMATCH_ARGS = {
   noext: true,
   nocomment: true,
   nonegate: true
-}
+};
 
 function matches(name: string, pattern: string): boolean {
   return minimatch.match([name], pattern).length !== 0;
 }
 
-function num_matches(names: string[], pattern: string): number {
+function num_glob_matches(names: string[], pattern: string): number {
   return minimatch.match(names, pattern).length;
 }
 </script>

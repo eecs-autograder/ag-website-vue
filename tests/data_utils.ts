@@ -10,6 +10,7 @@ import {
     Course,
     ExpectedOutputSource,
     ExpectedReturnCode,
+    ExpectedStudentFile,
     Group,
     MutationTestSuite,
     MutationTestSuiteFeedbackConfig,
@@ -19,7 +20,6 @@ import {
     UltimateSubmissionPolicy,
     User,
     ValueFeedbackLevel,
-    ExpectedStudentFile,
 } from 'ag-client-typescript';
 
 import { safe_assign } from "@/utils";
