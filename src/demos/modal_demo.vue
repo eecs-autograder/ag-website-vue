@@ -18,7 +18,7 @@
     <modal v-if="show_modal_2"
            @close="show_modal_2 = false"
            ref="modal2"
-           :size="'small'">
+           size="small">
       <h2>Title Example (Small)</h2>
       <hr>
       <p>The cool thing about this is that its totally reusable!</p>
@@ -30,7 +30,7 @@
     <modal v-if="show_modal_3"
            @close="show_modal_3 = false"
            ref="modal3"
-           :size="'medium'">
+           size="medium">
       <h2>Title Example (Medium)</h2>
       <hr>
       <p>The cool thing about this is that its totally reusable!</p>
@@ -42,7 +42,7 @@
     <modal v-if="show_modal_4"
            @close="show_modal_4 = false"
            ref="modal4"
-           :size="'large'">
+           size="large">
       <h2>Title Example (Large)</h2>
       <hr>
       <p>The cool thing about this is that its totally reusable!</p>
@@ -54,7 +54,7 @@
     <modal v-if="show_modal_5"
            @close="show_modal_5 = false"
            ref="modal5"
-           :custom_width="'900px'">
+           custom_width="900px">
       <h2>Title Example (900px)</h2>
       <hr>
       <p>The cool thing about this is that its totally reusable!</p>

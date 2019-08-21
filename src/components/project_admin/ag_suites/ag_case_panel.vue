@@ -254,7 +254,6 @@ export default class AGCasePanel extends Vue {
     this.d_new_command = "";
     this.d_new_command_name = "";
     this.d_show_new_ag_test_command_modal = true;
-    this.d_show_new_ag_test_command_modal = true;
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_ag_test_command_name).focus();
     });

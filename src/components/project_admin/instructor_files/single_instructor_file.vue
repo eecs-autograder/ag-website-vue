@@ -41,7 +41,7 @@
             </div>
           </div>
           <i class="far fa-trash-alt delete-file"
-             @click.stop="show_delete_instructor_file_modal = true"></i>
+             @click.stop="d_show_delete_instructor_file_modal = true"></i>
         </div>
       </div>
       <div class="display-timestamp">
@@ -49,8 +49,8 @@
       </div>
     </div>
 
-    <modal v-if="show_delete_instructor_file_modal"
-           @close="show_delete_instructor_file_modal = false"
+    <modal v-if="d_show_delete_instructor_file_modal"
+           @close="d_show_delete_instructor_file_modal = false"
            ref="delete_instructor_file_modal"
            size="large"
            :include_closing_x="false">
@@ -67,7 +67,7 @@
                 :disabled="d_delete_pending"
                 @click="delete_file_permanently"> Delete </button>
         <button class="modal-cancel-button"
-             @click="show_delete_instructor_file_modal = false"> Cancel </button>
+                @click="d_show_delete_instructor_file_modal = false"> Cancel </button>
       </div>
     </modal>
 
@@ -107,7 +107,7 @@ export default class SingleInstructorFile extends Vue {
   editing = false;
   new_file_name: string = "";
   new_name_is_valid = true;
-  show_delete_instructor_file_modal = false;
+  d_show_delete_instructor_file_modal = false;
 
   @handle_api_errors_async(handle_rename_file_error)
   async rename_file() {
@@ -129,7 +129,7 @@ export default class SingleInstructorFile extends Vue {
     try {
       this.d_delete_pending = true;
       await this.file.delete();
-      this.show_delete_instructor_file_modal = false;
+      this.d_show_delete_instructor_file_modal = false;
     }
     finally {
       this.d_delete_pending = false;

@@ -71,7 +71,7 @@
     </modal>
 
     <modal v-if="d_show_confirm_reject_invitation_modal"
-           @closes="d_show_confirm_reject_invitation_modal = false"
+           @close="d_show_confirm_reject_invitation_modal = false"
            ref="confirm_reject_modal"
            size="large"
            click_outside_to_close>

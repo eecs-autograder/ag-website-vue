@@ -277,7 +277,7 @@
           <modal v-if="d_show_delete_ag_test_suite_modal"
                  @close="d_show_delete_ag_test_suite_modal = false"
                  ref="delete_ag_test_suite_modal"
-                 :size="'large'"
+                 size="large"
                  click_outside_to_close>
             <div class="modal-header">
               Confirm Delete

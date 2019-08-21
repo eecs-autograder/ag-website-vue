@@ -27,11 +27,11 @@ export default class Modal extends Vue {
   @Prop({default: true, type: Boolean})
   include_closing_x!: boolean;
 
-  @Prop()
+  @Prop({required: true, type: String})
   size!: string;
 
-  @Prop()
-  custom_width!: number;
+  @Prop({type: String})
+  custom_width!: string;
 }
 </script>
 

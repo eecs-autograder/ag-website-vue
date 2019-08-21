@@ -200,7 +200,7 @@ describe('SingleProject.vue', () => {
 
         let validated_input = <ValidatedInput> wrapper.find({ref: "cloned_project_name"}).vm;
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_clone_project_modal).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
@@ -214,7 +214,7 @@ describe('SingleProject.vue', () => {
         wrapper.find("#close-button").trigger('click');
         await single_project.$nextTick();
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(false);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_project_modal).toBe(false);
     });
 
@@ -237,7 +237,7 @@ describe('SingleProject.vue', () => {
         let validated_input = <ValidatedInput> wrapper.find(
             {ref: "cloned_project_name"}).vm;
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_clone_project_modal).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
@@ -255,7 +255,7 @@ describe('SingleProject.vue', () => {
         wrapper.find('.clone-project-button').trigger('click');
         await single_project.$nextTick();
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(false);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_project_modal).toBe(false);
         expect(wrapper.emitted().add_cloned_project.length).toEqual(1);
     });
@@ -283,7 +283,7 @@ describe('SingleProject.vue', () => {
             {ref: "cloned_project_name"}
         ).vm;
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
         let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -302,7 +302,7 @@ describe('SingleProject.vue', () => {
         wrapper.find('.clone-project-button').trigger('click');
         await single_project.$nextTick();
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(false);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(false);
         expect(wrapper.emitted().add_cloned_project).toBeFalsy();
     });
 
@@ -328,7 +328,7 @@ describe('SingleProject.vue', () => {
             {ref: "cloned_project_name"}
         ).vm;
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
         let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
@@ -348,7 +348,7 @@ describe('SingleProject.vue', () => {
         wrapper.find('.clone-project-button').trigger('click');
         await single_project.$nextTick();
 
-        expect(wrapper.find({ ref: 'clone_project_modal'}).exists()).toBe(true);
+        expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
