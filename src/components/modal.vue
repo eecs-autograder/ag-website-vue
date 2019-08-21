@@ -27,7 +27,7 @@ export default class Modal extends Vue {
   @Prop({default: true, type: Boolean})
   include_closing_x!: boolean;
 
-  @Prop({required: true, type: String})
+  @Prop({default: 'large', type: String})
   size!: string;
 
   @Prop({type: String})
