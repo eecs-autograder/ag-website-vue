@@ -544,7 +544,6 @@ describe('Submit tests', () => {
         expect(submit_stub.calledWith(group.pk, files_to_submit)).toBe(true);
         expect(wrapper.vm.d_submit_progress).toEqual(100);
 
-        let modal = <Wrapper<Modal>> ;
         expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(false);
     });
 
@@ -575,7 +574,7 @@ describe('Submit tests', () => {
 
         let api_errors = <Wrapper<APIErrors>> wrapper.find({ref: 'api_errors'});
         expect(api_errors.vm.d_api_errors.length).toBe(1);
-        expect(submit_stub.calledOnce);
+        expect(submit_stub.calledOnce).toBe(true);
 
         expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(true);
     });
@@ -597,5 +596,6 @@ describe('Submit tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(false);
+        expect(submit_stub.calledOnce).toBe(false);
     });
 });

@@ -65,8 +65,8 @@
     </file-upload>
 
     <modal ref="confirm_submit_modal"
-           v-if="d_show_submit_modal"
-           @close="d_show_submit_modal = false"
+           v-if="d_show_confirm_submit_modal"
+           @close="d_show_confirm_submit_modal = false"
            size="large"
            :include_closing_x="false">
       <div class="modal-header">
@@ -127,6 +127,9 @@
           Submit <template v-if="file_mismatches_present">Anyway</template>
         </button>
         <button type="button"
+                class="white-button"
+                ref="cancel_submit_button"
+                @click="d_show_confirm_submit_modal = false"
                 :disabled="d_submitting">Cancel</button>
 
         <div id="submit-progress">
@@ -180,7 +183,7 @@ export default class Submit extends Vue {
 
   d_submitting = false;
   d_submit_progress = 0;
-  private d_show_submit_modal = false;
+  private d_show_confirm_submit_modal = false;
 
   submitted_files: File[] = [];
   submitted_filenames: string[] = [];
@@ -218,7 +221,7 @@ export default class Submit extends Vue {
     }
     if (this.project.soft_closing_time === null) {
       return false;
-
+    }
     let deadline = moment(this.project.soft_closing_time);
     if (this.group.extended_due_date !== null) {
       deadline = moment(this.group.extended_due_date);
@@ -244,7 +247,7 @@ export default class Submit extends Vue {
     this.submitted_files = files;
     this.submitted_filenames = files.map((file) => file.name);
     this.validate_files(files);
-    this.d_show_submit_modal = true;
+    this.d_show_confirm_submit_modal = true;
   }
 
   private validate_files(files: File[]) {
@@ -324,7 +327,7 @@ export default class Submit extends Vue {
       );
 
       (<FileUpload> this.$refs.submit_file_upload).clear_files();
-      this.d_show_submit_modal = false;
+      this.d_show_confirm_submit_modal = false;
     });
   }
 }
