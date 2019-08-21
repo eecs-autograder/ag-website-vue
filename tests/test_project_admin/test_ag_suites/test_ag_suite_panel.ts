@@ -16,7 +16,6 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import Modal from '@/components/modal.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
@@ -633,8 +632,14 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
+
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
         expect(component.d_new_case_name).toEqual("");
         expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
@@ -664,29 +669,34 @@ describe('AGSuitePanel tests', () => {
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
 
-        let new_ag_test_case_modal = <Modal> wrapper.find(
-            {ref: 'new_ag_test_case_modal'}
-        ).vm;
-
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
         // clicking closing_x to close the modal
         wrapper.find('#close-button').trigger('click');
         await component.$nextTick();
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
-        expect(new_ag_test_case_modal.is_open).toBe(false);
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
         wrapper.find('#ag-test-suite-menu').trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
         // clicking outside the modal to close the modal
         wrapper.find('#modal-mask').trigger('click');
         await component.$nextTick();
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
-        expect(new_ag_test_case_modal.is_open).toBe(false);
+        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
+
+        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
     });
 
     test('is_active_suite getter', async () => {
@@ -767,9 +777,7 @@ describe('AGSuitePanel tests', () => {
         await component.$nextTick();
 
         expect(new_case_name_validator.is_valid).toBe(false);
-        expect(wrapper.find('.modal-create-button').is(
-            '[disabled]'
-        )).toBe(true);
+        expect(wrapper.find('.modal-create-button').is('[disabled]')).toBe(true);
     });
 
     test('new_command.name binding', async () => {

@@ -33,7 +33,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="edit_ag_test_case_menu_item"
-                             @context_menu_item_clicked="$refs.ag_test_case_settings_modal.open()">
+                             @context_menu_item_clicked="d_show_ag_test_case_settings_modal = true">
             <template slot="label">
               <i class="fas fa-pencil-alt"></i>
               <span class="context-menu-item-text">Edit test case settings</span>
@@ -41,7 +41,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="clone_ag_test_case_menu_item"
-                             @context_menu_item_clicked="$refs.clone_ag_test_case_modal.open()">
+                             @context_menu_item_clicked="d_show_clone_ag_test_case_modal = true">
             <template slot="label">
               <i class="far fa-copy"></i>
               <span class="context-menu-item-text"> Clone test case </span>
@@ -49,7 +49,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="delete_ag_test_case_menu_item"
-                             @context_menu_item_clicked="$refs.delete_ag_test_case_modal.open()">
+                             @context_menu_item_clicked="d_show_delete_ag_test_case_modal = true">
             <template slot="label">
               <i class="fas fa-trash-alt"></i>
               <span id="delete-case-label" class="context-menu-item-text"> Delete test case </span>
@@ -77,7 +77,9 @@
       </div>
     </div>
 
-    <modal ref="new_ag_test_command_modal"
+    <modal v-if="d_show_new_ag_test_command_modal"
+           @close="d_show_new_ag_test_command_modal = false"
+           ref="new_ag_test_command_modal"
            click_outside_to_close
            size="medium">
       <div class="modal-header"> New Test Command </div>
@@ -117,7 +119,9 @@
       </div>
     </modal>
 
-    <modal ref="clone_ag_test_case_modal"
+    <modal v-if="d_show_clone_ag_test_case_modal"
+           @close="d_show_clone_ag_test_case_modal = false"
+           ref="clone_ag_test_case_modal"
            size="large"
            include_closing_x>
       <div class="modal-header">
@@ -127,7 +131,9 @@
       <div class="modal-body"></div>
     </modal>
 
-    <modal ref="delete_ag_test_case_modal"
+    <modal v-if="d_show_delete_ag_test_case_modal"
+           @close="d_show_delete_ag_test_case_modal = false"
+           ref="delete_ag_test_case_modal"
            size="large"
            click_outside_to_close>
       <div class="modal-header">
@@ -147,12 +153,14 @@
                   @click="delete_ag_test_case()"> Delete </button>
 
           <button class="modal-cancel-button"
-                  @click="$refs.delete_ag_test_case_modal.close()"> Cancel </button>
+                  @click="d_show_delete_ag_test_case_modal = false"> Cancel </button>
         </div>
       </div>
     </modal>
 
-    <modal ref="ag_test_case_settings_modal"
+    <modal v-if="d_show_ag_test_case_settings_modal"
+           @close="d_show_ag_test_case_settings_modal = false"
+           ref="ag_test_case_settings_modal"
            size="large"
            click_outside_to_close>
       <div class="modal-header">
@@ -209,6 +217,10 @@ export default class AGCasePanel extends Vue {
   d_add_command_form_is_valid = false;
   d_adding_command = false;
   d_deleting = false;
+  d_show_ag_test_case_settings_modal = false;
+  d_show_new_ag_test_command_modal = false;
+  d_show_clone_ag_test_case_modal = false;
+  d_show_delete_ag_test_case_modal = false;
 
   get commands_are_visible() {
     return this.d_commands_are_visible;
@@ -241,7 +253,7 @@ export default class AGCasePanel extends Vue {
   open_new_ag_test_command_modal() {
     this.d_new_command = "";
     this.d_new_command_name = "";
-    (<Modal> this.$refs.new_ag_test_command_modal).open();
+    this.d_show_new_ag_test_command_modal = true;
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_ag_test_command_name).focus();
     });
@@ -274,10 +286,7 @@ export default class AGCasePanel extends Vue {
   delete_ag_test_case() {
     return toggle(this, 'd_deleting', async () => {
       await this.ag_test_case.delete();
-      let modal = (<Modal> this.$refs.delete_ag_test_case_modal);
-      if (modal !== undefined) {
-        modal.close();
-      }
+      this.d_show_delete_ag_test_case_modal = false;
     });
   }
 
@@ -288,7 +297,7 @@ export default class AGCasePanel extends Vue {
       await AGTestCommand.create(
         this.ag_test_case!.pk, {name: this.d_new_command_name, cmd: this.d_new_command}
       );
-      (<Modal> this.$refs.new_ag_test_command_modal).close();
+      this.d_show_new_ag_test_command_modal = false;
     }
     finally {
       this.d_adding_command = false;

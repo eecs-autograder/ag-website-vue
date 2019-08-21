@@ -166,8 +166,14 @@ describe('AGSuites tests', () => {
     // Suite Related -----------------------------------------------------------------------------
 
     test('d_new_ag_test_suite_name binding', async () => {
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+
         wrapper.find('#add-ag-test-suite-button').trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
 
         let d_new_ag_test_suite_name_input = wrapper.find({ref: 'new_ag_test_suite_name'});
 
@@ -182,8 +188,14 @@ describe('AGSuites tests', () => {
     test('Creating a suite - successfully', async () => {
         let new_suite = data_ut.make_ag_test_suite(project.pk);
 
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+
         wrapper.find('#add-ag-test-suite-button').trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
 
         component.d_new_ag_test_suite_name = "Sweet";
 
@@ -200,6 +212,8 @@ describe('AGSuites tests', () => {
         expect(component.d_new_ag_test_suite_name).toBe("");
         expect(component.d_ag_test_suites.length).toEqual(4);
         expect(component.d_active_ag_test_suite).toEqual(new_suite);
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
     });
 
     test('Creating a suite - unsuccessfully', async () => {
@@ -211,9 +225,14 @@ describe('AGSuites tests', () => {
                 )
             )
         );
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
         wrapper.find('#add-ag-test-suite-button').trigger('click');
         await component.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
 
         component.d_new_ag_test_suite_name = "Sweet";
 
@@ -224,6 +243,8 @@ describe('AGSuites tests', () => {
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
     });
 
     test('Delete first suite in suites', async () => {

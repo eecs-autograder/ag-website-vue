@@ -26,7 +26,9 @@
         </div>
       </div>
 
-    <modal ref="new_ag_test_case_modal"
+    <modal v-if="d_show_new_ag_test_case_modal"
+           @close="d_show_new_ag_test_case_modal = false"
+           ref="new_ag_test_case_modal"
            click_outside_to_close
            size="large">
       <div class="modal-header"> New Test Case </div>
@@ -187,6 +189,7 @@ export default class AGSuitePanel extends Vue {
   @Prop({required: true, type: AGTestSuite})
   ag_test_suite!: AGTestSuite;
 
+  d_show_new_ag_test_case_modal = false;
   d_add_case_form_is_valid = false;
   d_cases_are_visible = false;
   d_creating_case = false;
@@ -262,7 +265,7 @@ export default class AGSuitePanel extends Vue {
     this.$emit('update_active_item', this.ag_test_suite);
     this.d_duplicate_command_name_in_case = false;
     this.d_new_case_name = "";
-    (<Modal> this.$refs.new_ag_test_case_modal).open();
+    this.d_show_new_ag_test_case_modal = true;
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_case_name).focus();
     });
@@ -307,7 +310,7 @@ export default class AGSuitePanel extends Vue {
         );
       }
       (<ValidatedForm> this.$refs.create_ag_test_case_form).reset_warning_state();
-      (<Modal> this.$refs.new_ag_test_case_modal).close();
+      this.d_show_new_ag_test_case_modal = false;
     }
     finally {
       this.d_creating_case = false;

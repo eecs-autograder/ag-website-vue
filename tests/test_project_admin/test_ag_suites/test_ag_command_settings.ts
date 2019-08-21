@@ -17,7 +17,6 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import Modal from '@/components/modal.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
@@ -974,30 +973,42 @@ describe('AGTestCommandSettings tests', () => {
         let delete_command_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'delete');
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
+
         wrapper.find('.delete-ag-test-command-button').trigger('click');
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(delete_command_stub.calledOnce).toBe(true);
-        let modal = <Wrapper<Modal>> wrapper.find({ref: 'delete_ag_test_command_modal'});
-        expect(modal.vm.is_open).toBe(false);
+        expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
     });
 
     test('Delete case with exactly one command', async () => {
         let delete_case_stub = sinon.stub(wrapper.vm.d_ag_test_case!, 'delete');
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
+
         wrapper.find('.delete-ag-test-command-button').trigger('click');
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
-        let modal = <Wrapper<Modal>> wrapper.find({ref: 'delete_ag_test_command_modal'});
-        expect(modal.vm.is_open).toBe(false);
+        expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {

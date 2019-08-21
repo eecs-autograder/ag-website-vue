@@ -10,7 +10,6 @@ import {
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
-import Modal from '@/components/modal.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
 import { make_course, make_project } from '@/tests/data_utils';
@@ -60,34 +59,38 @@ describe('InvitationReceived tests', () => {
         expect(wrapper.vm.d_invitation!).toEqual(invitation);
         expect(wrapper.vm.user).toEqual(user);
         expect(wrapper.vm.d_loading).toBe(false);
-        let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
-        expect(confirm_reject_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
 
         wrapper.find('#reject-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_reject_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(true);
 
         wrapper.find('#cancel-reject-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_reject_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
     });
 
     test('reject an invitation - confirm action in modal - successful', async () => {
         let reject_invitation_stub = sinon.stub(wrapper.vm.d_invitation!, 'reject');
-        let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
-        expect(confirm_reject_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
 
         wrapper.find('#reject-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_reject_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(true);
 
         wrapper.find('#confirm-reject-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
     });
 
     test('reject an invitation - confirm action in modal - unsuccessful', async () => {
@@ -98,13 +101,14 @@ describe('InvitationReceived tests', () => {
                 })
             )
         );
-        let confirm_reject_modal = <Modal> wrapper.find({ref: 'confirm_reject_modal'}).vm;
-        expect(confirm_reject_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
 
         wrapper.find('#reject-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_reject_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(true);
 
         wrapper.find('#confirm-reject-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -112,6 +116,8 @@ describe('InvitationReceived tests', () => {
         let api_errors = <APIErrors> wrapper.find({ref: 'reject_invitation_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(reject_invitation_stub.calledOnce);
+        expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(true);
     });
 
     test('already_accepted', async () => {
@@ -135,19 +141,21 @@ describe('InvitationReceived tests', () => {
     });
 
     test('accept an invitation - cancel action in modal', async () => {
-        let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
         expect(wrapper.find('#accept-invitation-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#accept-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_accept_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
 
         wrapper.find('#cancel-accept-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
     });
 
     test('accept an invitation - confirm action in modal - successful ' +
@@ -156,21 +164,25 @@ describe('InvitationReceived tests', () => {
         let accept_invitation_stub = sinon.stub(wrapper.vm.d_invitation!, 'accept').returns(
             Promise.resolve(null)
         );
-        let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
+
         expect(wrapper.find('#accept-invitation-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#accept-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_accept_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
+
 
         wrapper.find('#confirm-accept-button').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
     });
 
     test('accept an invitation - confirm action in modal - successful ' +
@@ -209,25 +221,22 @@ describe('InvitationReceived tests', () => {
             Group.notify_group_created(group_created);
             return Promise.resolve(group_created);
         });
-        let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
         expect(wrapper.find('#accept-invitation-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#accept-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_accept_modal.is_open).toBe(true);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(true);
 
         wrapper.find('#confirm-accept-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
-        // When ProjectView is notified that a group was created,
-        // this component will be unmounted before we can close the modal
-        // (without an exception being raised).
-        // Therefore, InvitationReceived should NOT try to close the modal
-        // in that case.
-        expect(confirm_accept_modal.is_open).toBe(true);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
     });
 
     test('accept an invitation - confirm action in modal - unsuccessful', async () => {
@@ -239,20 +248,23 @@ describe('InvitationReceived tests', () => {
             )
         );
 
-        let confirm_accept_modal = <Modal> wrapper.find({ref: 'confirm_accept_modal'}).vm;
-        expect(confirm_accept_modal.is_open).toBe(false);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(false);
+
         expect(wrapper.find('#accept-invitation-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#accept-invitation-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(confirm_accept_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
 
         wrapper.find('#confirm-accept-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'accept_invitation_api_errors'}).vm;
-        expect(confirm_accept_modal.is_open).toBe(true);
+        expect(wrapper.find({ref: 'confirm_accept_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
         expect(accept_invitation_stub.calledOnce).toBe(true);
         expect(api_errors.d_api_errors.length).toBe(1);
     });

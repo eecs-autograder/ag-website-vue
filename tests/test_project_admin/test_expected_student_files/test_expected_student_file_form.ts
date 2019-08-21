@@ -187,7 +187,7 @@ describe('Invalid input tests', () => {
 
     test('Error pattern is blank', async () => {
         let pattern_input = wrapper.find({ref: "pattern"}).find('#input');
-        let pattern_validator = <ValidatedInput> wrapper.find({ ref: "pattern" }).vm;
+        let pattern_validator = <ValidatedInput> wrapper.find({ref: "pattern" }).vm;
 
         (<HTMLInputElement> pattern_input.element).value = "hello*";
         pattern_input.trigger('input');
@@ -208,7 +208,7 @@ describe('Invalid input tests', () => {
 
         let min_num_matches_input = wrapper.find({ref: "min_num_matches"}).find('#input');
         let min_num_matches_validator = <ValidatedInput> wrapper.find(
-            { ref: "min_num_matches" }
+            {ref: "min_num_matches" }
         ).vm;
 
         (<HTMLInputElement> min_num_matches_input.element).value = "  ";
@@ -230,7 +230,7 @@ describe('Invalid input tests', () => {
 
         let min_num_matches_input = wrapper.find({ref: "min_num_matches"}).find('#input');
         let min_num_matches_validator = <ValidatedInput> wrapper.find(
-            { ref: "min_num_matches" }
+            {ref: "min_num_matches" }
         ).vm;
 
         (<HTMLInputElement> min_num_matches_input.element).value = "-2";
@@ -246,7 +246,7 @@ describe('Invalid input tests', () => {
 
         let max_num_matches_input = wrapper.find({ref: "max_num_matches"}).find('#input');
         let max_num_matches_validator = <ValidatedInput> wrapper.find(
-            { ref: "max_num_matches" }
+            {ref: "max_num_matches" }
         ).vm;
 
         (<HTMLInputElement> max_num_matches_input.element).value = "  ";

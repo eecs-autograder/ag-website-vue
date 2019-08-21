@@ -27,15 +27,17 @@
       <div id="invitation-received-footer">
         <button id="reject-invitation-button"
                 class="orange-button"
-                @click="$refs.confirm_reject_modal.open()"> Reject </button>
+                @click="d_show_confirm_reject_invitation_modal = true"> Reject </button>
         <button id="accept-invitation-button"
                 class="teal-button"
                 :disabled="already_accepted || d_accepting"
-                @click="$refs.confirm_accept_modal.open()"> Accept </button>
+                @click="d_show_confirm_accept_invitation_modal = true"> Accept </button>
       </div>
     </div>
 
-    <modal ref="confirm_accept_modal"
+    <modal v-if="d_show_confirm_accept_invitation_modal"
+           @close="d_show_confirm_accept_invitation_modal = false"
+           ref="confirm_accept_modal"
            size="large"
            click_outside_to_close>
       <div class="modal-header"> Confirm Accept </div>
@@ -58,7 +60,7 @@
           <div class="modal-button-container">
             <button id="cancel-accept-button"
                     class="white-button"
-                    @click="$refs.confirm_accept_modal.close()"> Cancel </button>
+                    @click="d_show_confirm_accept_invitation_modal = false"> Cancel </button>
             <button id="confirm-accept-button"
                     class="teal-button"
                     :disabled="d_accepting"
@@ -68,7 +70,9 @@
       </div>
     </modal>
 
-    <modal ref="confirm_reject_modal"
+    <modal v-if="d_show_confirm_reject_invitation_modal"
+           @close="d_show_confirm_reject_invitation_modal = false"
+           ref="confirm_reject_modal"
            size="large"
            click_outside_to_close>
       <div class="modal-header"> Confirm Reject </div>
@@ -91,7 +95,7 @@
           <div class="modal-button-container">
             <button id="cancel-reject-button"
                     class="white-button"
-                    @click="$refs.confirm_reject_modal.close()"> Cancel </button>
+                    @click="d_show_confirm_reject_invitation_modal = false"> Cancel </button>
             <button id="confirm-reject-button"
                     class="orange-button"
                     :disabled="d_rejecting"
@@ -136,6 +140,8 @@ export default class InvitationReceived extends Vue {
   d_loading = true;
   d_rejecting = false;
   user: User | null = null;
+  d_show_confirm_accept_invitation_modal = false;
+  d_show_confirm_reject_invitation_modal = false;
 
   async created() {
     this.user = await User.get_current();
@@ -156,18 +162,10 @@ export default class InvitationReceived extends Vue {
     try {
       this.d_accepting = true;
       (<APIErrors> this.$refs.accept_invitation_api_errors).clear();
-      let result = await this.d_invitation!.accept();
-      if (result !== null) {
-        // When ProjectView is notified that a group was created,
-        // this component will be unmounted before we can close the modal
-        // (without an exception being raised).
-        // Therefore, InvitationReceived should NOT try to close the modal
-        // here.
-        return;
-      }
+      await this.d_invitation!.accept();
       let copy_of_invitation = deep_copy(this.d_invitation!, GroupInvitation);
       this.$emit('input', copy_of_invitation);
-      (<Modal> this.$refs.confirm_accept_modal).close();
+      this.d_show_confirm_accept_invitation_modal = false;
     }
     finally {
       this.d_accepting = false;
@@ -196,7 +194,7 @@ export default class InvitationReceived extends Vue {
     (<APIErrors> this.$refs.reject_invitation_api_errors).clear();
     this.d_rejecting = true;
     await this.d_invitation!.reject();
-    (<Modal> this.$refs.confirm_reject_modal).close();
+    this.d_show_confirm_reject_invitation_modal = false;
     this.$emit('invitation_rejected');
     this.d_rejecting = false;
   }

@@ -27,7 +27,9 @@
       </div>
     </router-link>
 
-    <modal ref="clone_project_modal"
+    <modal v-if="d_show_clone_project_modal"
+           @close="d_show_clone_project_modal = false"
+           ref="clone_project_modal"
            size="large"
            click_outside_to_close>
       <span class="modal-container">
@@ -127,7 +129,7 @@ export default class SingleProject extends Vue {
   course_to_clone_to: Course | null = null;
   cloned_project_name: string = "";
   cloned_project_name_is_valid = false;
-
+  d_show_clone_project_modal = false;
   course_index: number = 0;
 
   async created() {
@@ -142,7 +144,7 @@ export default class SingleProject extends Vue {
     this.api_errors = [];
     this.cloned_project_name = "";
     this.course_to_clone_to = this.course;
-    (<Modal> this.$refs.clone_project_modal).open();
+    this.d_show_clone_project_modal = true;
   }
 
   @handle_api_errors_async(handle_add_cloned_project_error)
@@ -152,7 +154,7 @@ export default class SingleProject extends Vue {
       this.course_to_clone_to!.pk, this.cloned_project_name
     );
     (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
-    (<Modal> this.$refs.clone_project_modal).close();
+    this.d_show_clone_project_modal = false;
     if (this.course_to_clone_to!.pk === this.course.pk) {
       this.$emit('add_cloned_project', new_project);
     }
