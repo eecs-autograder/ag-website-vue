@@ -19,6 +19,14 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+beforeEach(() => {
+    sinon.stub(User, 'get_num_late_days').returns(Promise.resolve({late_days_remaining: 0}));
+});
+
+afterEach(() => {
+    sinon.restore();
+});
+
 describe('Changing Tabs', ()  => {
     let wrapper: Wrapper<ProjectView>;
     let project: Project;

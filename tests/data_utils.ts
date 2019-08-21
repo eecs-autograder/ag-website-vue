@@ -10,13 +10,16 @@ import {
     Course,
     ExpectedOutputSource,
     ExpectedReturnCode,
+    ExpectedStudentFile,
+    Group,
     MutationTestSuite,
     MutationTestSuiteFeedbackConfig,
     Project,
     Semester,
     StdinSource,
     UltimateSubmissionPolicy,
-    ValueFeedbackLevel
+    User,
+    ValueFeedbackLevel,
 } from 'ag-client-typescript';
 
 import { safe_assign } from "@/utils";
@@ -27,6 +30,21 @@ function* counter() {
         yield count;
         count += 1;
     }
+}
+
+const USER_PKS = counter();
+
+export function make_user(args: Partial<User> = {}): User {
+    let defaults = {
+        pk: USER_PKS.next().value,
+        username: `user_${random_id()}`,
+        first_name: `First${random_id()}`,
+        last_name: `Last${random_id()}`,
+        email: '',
+        is_superuser: false,
+    };
+    safe_assign(defaults, args);
+    return new User(defaults);
 }
 
 const COURSE_PKS = counter();
@@ -67,7 +85,7 @@ export function make_project(course_pk: number, args: Partial<Project> = {}): Pr
         groups_combine_daily_submissions: false,
         submission_limit_reset_time: "",
         submission_limit_reset_timezone: "",
-        num_bonus_submissions: 1,
+        num_bonus_submissions: 0,
         total_submission_limit: null,
         allow_late_days: true,
         ultimate_submission_policy: UltimateSubmissionPolicy.best,
@@ -80,6 +98,47 @@ export function make_project(course_pk: number, args: Partial<Project> = {}): Pr
     defaults.course = course_pk;
     return new Project(defaults);
 }
+
+const EXPECTED_STUDENT_FILE_PKS  = counter();
+
+export function make_expected_student_file(
+    project_pk: number, pattern: string, args: Partial<ExpectedStudentFile> = {}
+): ExpectedStudentFile {
+    let defaults = {
+        pk: EXPECTED_STUDENT_FILE_PKS.next().value,
+        project: project_pk,
+        pattern: pattern,
+        min_num_matches: 1,
+        max_num_matches: 1,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.project = project_pk;
+    return new ExpectedStudentFile(defaults);
+}
+
+const GROUP_PKS  = counter();
+
+export function make_group(project_pk: number,
+                           num_members: number = 1,
+                           args: Partial<Group> = {}): Group {
+    let defaults = {
+        pk: GROUP_PKS.next().value,
+        project: project_pk,
+        member_names: Array(num_members).fill('').map(() => `user_${random_id()}`),
+        extended_due_date: null,
+        bonus_submissions_remaining: 0,
+        late_days_used: {},
+        num_submissions: 0,
+        num_submits_towards_limit: 0,
+        created_at: now_str(),
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.project = project_pk;
+    return new Group(defaults);
+}
+
 
 const AG_TEST_SUITE_PKS  = counter();
 

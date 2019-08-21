@@ -109,12 +109,12 @@ describe('File Upload tests not involving the empty files modal', () => {
 
         drag_drop_zone.trigger('dragenter');
 
-        expect(component.d_files_dragged_over).toBe(true);
+        expect(component.files_dragged_over).toBe(true);
         expect(drag_drop_zone.classes()).toContain('drag-and-drop-hover');
 
         drag_drop_zone.trigger('dragleave');
 
-        expect(component.d_files_dragged_over).toBe(false);
+        expect(component.files_dragged_over).toBe(false);
         expect(drag_drop_zone.classes()).not.toContain('drag-and-drop-hover');
     });
 
