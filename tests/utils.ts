@@ -1,6 +1,6 @@
 import { Vue } from "vue-property-decorator";
 
-import { Wrapper } from "@vue/test-utils";
+import { RefSelector, Wrapper } from "@vue/test-utils";
 
 import ValidatedInput from "@/components/validated_input.vue";
 
