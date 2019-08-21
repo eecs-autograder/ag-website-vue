@@ -40,7 +40,7 @@ afterEach(() => {
 
 describe('Deadline info tests', () => {
     test('Project has soft closing time, group has no extension', () => {
-        project.soft_closing_time = moment([2018, 4, 18, 16, 33]).toString();
+        project.soft_closing_time = moment([2018, 4, 18, 16, 33]).toISOString();
 
         const wrapper = mount(Submit, {
             propsData: {
@@ -71,7 +71,7 @@ describe('Deadline info tests', () => {
     });
 
     test('Group has extension', () => {
-        group.extended_due_date = moment([2019, 5, 13, 18, 29]).toString();
+        group.extended_due_date = moment([2019, 5, 13, 18, 29]).toISOString();
 
         const wrapper = mount(Submit, {
             propsData: {
