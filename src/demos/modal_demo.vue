@@ -86,6 +86,26 @@
       <button @click="show_modal_7 = false">Close</button>
     </modal>
 
+    <button @click="show_modal_overflow = true"
+            class="open-modal-button">Overflow scrolling</button>
+    <modal v-if="show_modal_overflow"
+           @close="show_modal_overflow = false"
+           ref="modal_overflow"
+           :include_closing_x="true">
+      <h2>Modals scroll if their content overflows</h2>
+      one<br><br><br><br><br><br><br><br><br><br><br><br>
+      two<br><br><br><br><br><br><br><br><br><br><br><br>
+      three<br><br><br><br><br><br><br><br><br><br><br><br>
+      four<br><br><br><br><br><br><br><br><br><br><br><br>
+      five<br><br><br><br><br><br><br><br><br><br><br><br>
+      six<br><br><br><br><br><br><br><br><br><br><br><br>
+      seven<br><br><br><br><br><br><br><br><br><br><br><br>
+      eight<br><br><br><br><br><br><br><br><br><br><br><br>
+      nine<br><br><br><br><br><br><br><br><br><br><br><br>
+
+      <button @click="show_modal_overflow = false">Close</button>
+    </modal>
+
   </div>
 </template>
 
@@ -105,6 +125,7 @@ export default class ModalDemo extends Vue {
     show_modal_5 = false;
     show_modal_6 = false;
     show_modal_7 = false;
+    show_modal_overflow = false;
 }
 </script>
 
