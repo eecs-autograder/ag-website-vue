@@ -6,9 +6,9 @@
            @change="add_files_from_button($event)"
            multiple>
     <div id="drag-and-drop"
-         :class="{'drag-and-drop-hover': d_files_dragged_over}"
-         @dragenter="d_files_dragged_over = true"
-         @dragleave="d_files_dragged_over = false"
+         :class="{'drag-and-drop-hover': files_dragged_over}"
+         @dragenter="d_files_dragged_over_counter += 1"
+         @dragleave="d_files_dragged_over_counter -= 1"
          @dragover="on_file_hover($event)"
          @drop="add_dropped_files($event)">
       <div id="drag-and-drop-body">
@@ -103,9 +103,14 @@ function name_less(first: HasName, second: HasName) {
 })
 export default class FileUpload extends Vue {
   d_files: ArraySet<File, HasName> = new ArraySet<File, HasName>([], {less_func: name_less});
-  d_files_dragged_over = false;
   d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
   d_show_empty_files_found_in_upload_attempt_modal = false;
+
+  get files_dragged_over() {
+    return this.d_files_dragged_over_counter !== 0;
+  }
+
+  private d_files_dragged_over_counter = 0;
 
   table_row_styling(file_in: File, row_index: number): string {
     if (file_in.size === 0) {
@@ -141,7 +146,7 @@ export default class FileUpload extends Vue {
       this.add_or_update_file(file);
       this.check_for_emptiness(file);
     }
-    this.d_files_dragged_over = false;
+    this.d_files_dragged_over_counter = 0;
   }
 
   remove_file_from_upload(filename: string, file_index: number) {
@@ -211,10 +216,6 @@ export default class FileUpload extends Vue {
   position: relative;
   text-align: center;
   width: 100%;
-
-  * {
-    pointer-events: none;
-  }
 }
 
 .drag-and-drop-hover {

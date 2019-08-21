@@ -273,7 +273,6 @@ export default class Submit extends Vue {
         return true;
       }
     }
-
     return false;
   }
 
