@@ -181,6 +181,28 @@ describe('Submit button text tests', () => {
         ).toEqual('Submit (Use late day)');
     });
 
+    test("Submission would use late day but project doesn't allow late days", async () => {
+        project.soft_closing_time = moment().subtract(3, 'h').toISOString();
+        project.allow_late_days = false;
+        late_days_remaining = 1;
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+
+        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        await file_upload.vm.$nextTick();
+        expect(
+            file_upload.vm.$slots.upload_button_text![0].text!.trim()
+        ).toEqual('Submit');
+    });
+
     test('Deadline past and user has no late days', async () => {
         project.soft_closing_time = moment().subtract(3, 'h').toISOString();
 
@@ -384,6 +406,22 @@ describe('Submission limit, bonus submission, late day tests', () => {
         expect(
             compress_whitespace(wrapper.find('#late-days-remaining').text())
         ).toEqual('1 late day remaining.');
+    });
+
+    test("Course allots late days, project doesn't allow late days", async () => {
+        course.num_late_days = 2;
+        late_days_remaining = 2;
+        project.allow_late_days = false;
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#late-days-remaining').exists()).toBe(false);
     });
 });
 

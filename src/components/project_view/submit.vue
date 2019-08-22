@@ -211,11 +211,19 @@ export default class Submit extends Vue {
   }
 
   get show_late_day_count(): boolean {
-    return this.course.num_late_days !== 0
-           || (this.late_days_remaining !== null && this.late_days_remaining !== 0);
+    if (!this.project.allow_late_days) {
+      return false;
+    }
+    if (this.course.num_late_days !== 0) {
+      return true;
+    }
+    return this.late_days_remaining !== null && this.late_days_remaining !== 0;
   }
 
   get submission_might_use_late_day() {
+    if (!this.project.allow_late_days) {
+      return false;
+    }
     if (this.late_days_remaining === null || this.late_days_remaining === 0) {
       return false;
     }
