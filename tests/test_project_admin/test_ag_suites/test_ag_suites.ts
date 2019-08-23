@@ -121,7 +121,9 @@ describe('AGSuites tests', () => {
             ag_command_green_3
         ];
         ag_suite_colors.ag_test_cases = [
-            ag_case_purple, ag_case_blue, ag_case_green
+            ag_case_purple,
+            ag_case_blue,
+            ag_case_green
         ];
 
         ag_suite_pets = data_ut.make_ag_test_suite(project.pk);
@@ -376,6 +378,38 @@ describe('AGSuites tests', () => {
 
         expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
         expect(component.d_ag_test_suites[1].ag_test_cases[1]).toEqual(updated_ag_case_bird);
+    });
+
+    test('Clone an ag test case', async () => {
+        let new_case = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        let new_case_name = "New Case Name";
+        let clone_case_stub = sinon.stub(ag_case_blue, 'copy').callsFake(
+            () => AGTestCase.notify_ag_test_case_created(new_case)
+        );
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        wrapper.vm.update_active_item(ag_case_blue);
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('#ag-test-case-menu').trigger('click');
+        await component.$nextTick();
+
+        let ag_case_blue_panel = wrapper.findAll('#ag-test-case-panel').at(1);
+        ag_case_blue_panel.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let ag_test_case_clone_name = ag_case_blue_panel.find({ref: 'ag_test_case_clone_name'});
+        set_validated_input_text(ag_test_case_clone_name, new_case_name);
+
+        ag_case_blue_panel.find('#clone-ag-test-case-form').trigger('submit');
+        await wrapper.vm.$nextTick();
+
+        expect(clone_case_stub.calledOnce).toBe(true);
+        expect(clone_case_stub.firstCall.calledWith(new_case_name)).toBe(true);
+        expect(clone_case_stub.calledOn(ag_case_blue)).toBe(true);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(4);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[3]).toEqual(new_case);
     });
 
     test('First case deleted', async () => {
@@ -700,7 +734,6 @@ describe('AGSuites tests', () => {
     test('next_ag_test_case_is_available (false) - d_active_ag_test_command is null', async () => {
         component.update_active_item(ag_suite_colors);
         await component.$nextTick();
-
 
         expect(component.next_ag_test_case_is_available).toBe(false);
         expect(wrapper.findAll('#next-ag-test-case-button').length).toEqual(0);
