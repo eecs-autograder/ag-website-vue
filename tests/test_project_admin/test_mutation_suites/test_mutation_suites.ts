@@ -17,7 +17,7 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 
-import { make_course, make_mutation_test_suite, make_project } from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -131,8 +131,8 @@ describe('MutationSuites tests', () => {
             sandbox_docker_image_3
         ]));
 
-        project = make_project(
-            make_course().pk,
+        project = data_ut.make_project(
+            data_ut.make_course().pk,
             {
                 instructor_files: [
                     instructor_file_1,
@@ -147,9 +147,9 @@ describe('MutationSuites tests', () => {
             }
         );
 
-        mutation_test_suite_1 = make_mutation_test_suite(project.pk);
-        mutation_test_suite_2 = make_mutation_test_suite(project.pk);
-        mutation_test_suite_3 = make_mutation_test_suite(project.pk);
+        mutation_test_suite_1 = data_ut.make_mutation_test_suite(project.pk);
+        mutation_test_suite_2 = data_ut.make_mutation_test_suite(project.pk);
+        mutation_test_suite_3 = data_ut.make_mutation_test_suite(project.pk);
 
         sinon.stub(MutationTestSuite, 'get_all_from_project').returns(
             Promise.resolve([
@@ -199,14 +199,14 @@ describe('MutationSuites tests', () => {
     });
 
     test('d_new_mutation_test_suite_name binding', async () => {
-        expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("");
         wrapper.find('#add-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("");
 
         let d_new_mutation_test_suite_name_input = wrapper.find(
             {ref: 'new_mutation_test_suite_name'}
         );
-
         set_validated_input_text(d_new_mutation_test_suite_name_input, "Suite I");
         expect(validated_input_is_valid(d_new_mutation_test_suite_name_input)).toBe(true);
         expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("Suite I");
@@ -217,9 +217,12 @@ describe('MutationSuites tests', () => {
 
     test('add mutation_test_suite - successful', async () => {
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
+        expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'new_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
 
-        let new_mutation_suite = make_mutation_test_suite(project.pk);
-
+        let new_mutation_suite = data_ut.make_mutation_test_suite(project.pk);
         let create_stub = sinon.stub(MutationTestSuite, 'create').returns(
             Promise.resolve(
                 new_mutation_suite
@@ -228,8 +231,14 @@ describe('MutationSuites tests', () => {
         create_stub.callsFake(() => MutationTestSuite.notify_mutation_test_suite_created(
             new_mutation_suite
         ));
+
         wrapper.find('#add-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(true);
+        expect(wrapper.find(
+            {ref: 'new_mutation_test_suite_modal'}
+        ).exists()).toBe(true);
 
         let d_new_mutation_test_suite_name_input = wrapper.find(
             {ref: 'new_mutation_test_suite_name'}
@@ -246,6 +255,10 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("");
         expect(create_stub.firstCall.calledWith(project.pk, {name: "Suite 4"})).toBe(true);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(4);
+        expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'new_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
     });
 
     test('add mutation_test_suite - unsuccessful', async () => {
@@ -257,8 +270,18 @@ describe('MutationSuites tests', () => {
                 )
             )
         );
+        expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'new_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
+
         wrapper.find('#add-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(true);
+        expect(wrapper.find(
+            {ref: 'new_mutation_test_suite_modal'}
+        ).exists()).toBe(true);
 
         let d_new_mutation_test_suite_name_input = wrapper.find(
             {ref: 'new_mutation_test_suite_name'}
@@ -274,28 +297,13 @@ describe('MutationSuites tests', () => {
         expect(create_stub.calledOnce).toBe(true);
         expect(create_stub.firstCall.calledWith(project.pk, {name: "Suite 2"})).toBe(true);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
+        expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(true);
+        expect(wrapper.find(
+            {ref: 'new_mutation_test_suite_modal'}
+        ).exists()).toBe(true);
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
-    });
-
-    test('delete_mutation_test_suite - cancel deletion', async () => {
-        let delete_stub = sinon.stub(mutation_test_suite_2, 'delete');
-
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
-        expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
-
-        wrapper.find('.delete-mutation-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        wrapper.find('.modal-cancel-button').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(delete_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
     });
 
     test('save mutation_test_suite - successful', async () => {
@@ -333,10 +341,9 @@ describe('MutationSuites tests', () => {
         wrapper.find('#mutation-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
 
-        expect(save_stub.callCount).toEqual(1);
-
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+        expect(save_stub.callCount).toEqual(1);
     });
 
     test('delete_mutation_test_suite - confirm deletion', async () => {
@@ -350,9 +357,18 @@ describe('MutationSuites tests', () => {
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
+        expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'delete_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
 
         wrapper.find('.delete-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(true);
+        expect(wrapper.find(
+            {ref: 'delete_mutation_test_suite_modal'}
+        ).exists()).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -362,36 +378,46 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
         expect(wrapper.vm.d_mutation_test_suites[1]).toEqual(mutation_test_suite_3);
         expect(wrapper.vm.d_active_mutation_test_suite).toBeNull();
+        expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'delete_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
     });
 
     test('delete_mutation_test_suite - cancel deletion', async () => {
         let delete_stub = sinon.stub(mutation_test_suite_2, 'delete');
-        delete_stub.callsFake(
-            () => MutationTestSuite.notify_mutation_test_suite_deleted(mutation_test_suite_2)
-        );
 
         wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
+        expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'delete_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
 
         wrapper.find('.delete-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(true);
+        expect(wrapper.find(
+            {ref: 'delete_mutation_test_suite_modal'}
+        ).exists()).toBe(true);
+
         wrapper.find('.modal-cancel-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(delete_stub.calledOnce).toBe(false);
+        expect(delete_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
-        expect(wrapper.vm.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
-        expect(wrapper.vm.d_mutation_test_suites[1]).toEqual(mutation_test_suite_2);
-        expect(wrapper.vm.d_mutation_test_suites[2]).toEqual(mutation_test_suite_3);
-        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
+        expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
+        expect(wrapper.find(
+            {ref: 'delete_mutation_test_suite_modal'}
+        ).exists()).toBe(false);
     });
 
     test('update_mutation_test_suite_changed and was the active mutation suite', async () => {
-        let updated_mutation_test_suite_1 = make_mutation_test_suite(
+        let updated_mutation_test_suite_1 = data_ut.make_mutation_test_suite(
             project.pk,
             {
                 name: mutation_test_suite_1.name,
@@ -418,7 +444,7 @@ describe('MutationSuites tests', () => {
     });
 
     test('update_mutation_test_suite_changed and was not the active mutation suite', async () => {
-        let updated_mutation_test_suite_3 = make_mutation_test_suite(
+        let updated_mutation_test_suite_3 = data_ut.make_mutation_test_suite(
             project.pk,
             {
                 name : mutation_test_suite_3.name,

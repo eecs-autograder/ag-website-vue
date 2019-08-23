@@ -182,7 +182,7 @@
               <div id="delete-mutation-suite-button-container">
                 <button class="delete-mutation-test-suite-button"
                         type="button"
-                        @click="$refs.delete_mutation_test_suite_modal.open()">
+                        @click="d_show_delete_mutation_test_suite_modal = true">
                   Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
                 </button>
               </div>
@@ -193,7 +193,9 @@
 
       </div>
 
-      <modal ref="delete_mutation_test_suite_modal"
+      <modal v-if="d_show_delete_mutation_test_suite_modal"
+             @close="d_show_delete_mutation_test_suite_modal = false"
+             ref="delete_mutation_test_suite_modal"
              :size="'large'"
              :include_closing_x="false">
         <div class="modal-header"> Confirm Delete </div>
@@ -209,17 +211,19 @@
           <div class="modal-footer">
             <div class="modal-button-container">
               <button class="modal-delete-button red-button"
-                      :disabled="d_saving"
+                      :disabled="d_deleting"
                       @click="delete_mutation_test_suite()"> Delete </button>
 
               <button class="modal-cancel-button white-button"
-                      @click="$refs.delete_mutation_test_suite_modal.close()"> Cancel </button>
+                      @click="d_show_delete_mutation_test_suite_modal = false"> Cancel </button>
             </div>
           </div>
         </div>
       </modal>
 
-      <modal ref="new_mutation_test_suite_modal"
+      <modal v-if="d_show_new_mutation_test_suite_modal"
+             @close="d_show_new_mutation_test_suite_modal = false"
+             ref="new_mutation_test_suite_modal"
              click_outside_to_close
              size="medium">
         <div class="modal-header"> New Suite </div>
@@ -321,6 +325,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   d_deleting = false;
   d_saving = false;
   d_settings_form_is_valid = true;
+  d_show_new_mutation_test_suite_modal = false;
+  d_show_delete_mutation_test_suite_modal = false;
 
   async created() {
     MutationTestSuite.subscribe(this);
@@ -339,7 +345,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
       await MutationTestSuite.create(
         this.project.pk, {name: this.d_new_mutation_test_suite_name}
       );
-      (<Modal> this.$refs.new_mutation_test_suite_modal).close();
+      this.d_show_new_mutation_test_suite_modal = false;
       this.d_new_mutation_test_suite_name = "";
     }
     finally {
@@ -350,17 +356,17 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async delete_mutation_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_active_mutation_test_suite!.delete();
-      let modal = (<Modal> this.$refs.delete_mutation_test_suite_modal);
-      if (modal !== undefined) {
-        modal.close();
-        this.d_active_mutation_test_suite = null;
-      }
+      this.d_show_delete_mutation_test_suite_modal = false;
+      this.d_active_mutation_test_suite = null;
     });
   }
 
   open_new_mutation_test_suite_modal() {
     this.d_new_mutation_test_suite_name = "";
-    (<Modal> this.$refs.new_mutation_test_suite_modal).open();
+    this.d_show_new_mutation_test_suite_modal = true;
+    Vue.nextTick(() => {
+        (<ValidatedInput> this.$refs.new_mutation_test_suite_name).focus();
+    });
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {

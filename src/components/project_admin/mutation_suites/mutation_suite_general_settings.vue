@@ -139,10 +139,8 @@ import {
     SandboxDockerImageData
 } from 'ag-client-typescript';
 
-import APIErrors from "@/components/api_errors.vue";
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
-import Modal from '@/components/modal.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
 import { deep_copy, format_datetime } from '@/utils';
@@ -150,10 +148,8 @@ import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
-    APIErrors,
     Dropdown,
     DropdownTypeahead,
-    Modal,
     Toggle,
     ValidatedInput
   }
