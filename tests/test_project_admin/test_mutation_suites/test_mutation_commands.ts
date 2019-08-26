@@ -19,16 +19,8 @@ beforeAll(() => {
 describe('MutationCommands tests', () => {
     let wrapper: Wrapper<MutationCommands>;
     let mutation_test_suite: MutationTestSuite;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         mutation_test_suite = make_mutation_test_suite(make_course().pk);
 
         wrapper = mount(MutationCommands, {
@@ -40,10 +32,6 @@ describe('MutationCommands tests', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();

@@ -43,16 +43,8 @@ describe('MutationSuites tests', () => {
     let instructor_file_1: InstructorFile;
     let instructor_file_2: InstructorFile;
     let instructor_file_3: InstructorFile;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         student_file_1 = new ExpectedStudentFile({
             pk: 1,
             project: 10,
@@ -168,10 +160,6 @@ describe('MutationSuites tests', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();
@@ -468,12 +456,6 @@ describe('MutationSuites tests', () => {
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
         expect(wrapper.vm.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
-    });
-
-    test('update_mutation_test_suites_order_changed', () => {
-        expect(() => MutationTestSuite.notify_mutation_test_suite_order_updated(
-            project.pk, [1, 2])
-        ).toThrow(Error("Method not implemented."));
     });
 
     test('General Settings - d_active_mutation_test_suite binding', async () => {

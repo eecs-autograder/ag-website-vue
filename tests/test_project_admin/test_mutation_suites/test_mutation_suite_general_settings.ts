@@ -39,16 +39,8 @@ describe('MutationSuiteGeneralSettings tests', () => {
     let sandbox_docker_image_1: SandboxDockerImageData;
     let sandbox_docker_image_2: SandboxDockerImageData;
     let sandbox_docker_image_3: SandboxDockerImageData;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         student_file_1 = new ExpectedStudentFile({
             pk: 1,
             project: 10,
@@ -161,10 +153,6 @@ describe('MutationSuiteGeneralSettings tests', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();

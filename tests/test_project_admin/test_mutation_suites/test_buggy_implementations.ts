@@ -24,17 +24,8 @@ describe('BuggyImplementation tests', () => {
     let wrapper: Wrapper<BuggyImplementations>;
     let mutation_test_suite: MutationTestSuite;
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-
         project = make_project(make_course().pk);
         mutation_test_suite = make_mutation_test_suite(project.pk);
 
@@ -55,10 +46,6 @@ describe('BuggyImplementation tests', () => {
     afterEach(() => {
         sinon.restore();
 
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
         if (wrapper.exists()) {
             wrapper.destroy();
         }
@@ -77,35 +64,30 @@ describe('BuggyImplementation tests', () => {
         expect(get_validated_input_text(points_per_exposed_bug_input)).toEqual('10.51');
     });
 
-    test('Error: points_per_exposed_bug is blank or not a number', async () => {
+    test('Error: points_per_exposed_bug is blank or not a number', () => {
         return do_input_blank_or_not_integer_test_without_save_button(
             wrapper, {ref: 'points_per_exposed_bug'});
     });
 
-    test('Error: points_per_exposed_bug must be >= 0', async () => {
+    test('Error: points_per_exposed_bug must be >= 0', () => {
         return do_invalid_text_input_test_without_save_button(
             wrapper, {ref: 'points_per_exposed_bug'}, '-1');
     });
 
-    test('Error: points_per_exposed_bug must have less than or equal to four digits in ' +
-         'total - no decimal present',
-         async () => {
-             return do_invalid_text_input_test_without_save_button(
-                 wrapper, {ref: 'points_per_exposed_bug'}, '12345');
-         });
+    test('Error: points_per_exposed_bug must have <= four digits total', () => {
+        return do_invalid_text_input_test_without_save_button(
+            wrapper, {ref: 'points_per_exposed_bug'}, '12345');
+    });
 
-    test('Error: points_per_exposed_bug must have less than or equal to four digits in ' +
-         'total - decimal present',
-         async () => {
-             return do_invalid_text_input_test_without_save_button(
-                 wrapper, {ref: 'points_per_exposed_bug'}, '123.45');
-         });
+    test('Error: points_per_exposed_bug must have <= four digits total with decimal', () => {
+        return do_invalid_text_input_test_without_save_button(
+            wrapper, {ref: 'points_per_exposed_bug'}, '123.45');
+    });
 
-    test('Error: points_per_exposed_bug must have less than or equal to two decimal places',
-         async () => {
-             return do_invalid_text_input_test_without_save_button(
-                 wrapper, {ref: 'points_per_exposed_bug'}, '12.345');
-         });
+    test('Error: points_per_exposed_bug must have <= two decimal places', () => {
+        return do_invalid_text_input_test_without_save_button(
+            wrapper, {ref: 'points_per_exposed_bug'}, '12.345');
+    });
 
     test('use_custom_max_points binding', async () => {
         let use_custom_max_points_toggle = wrapper.find({ref: 'use_custom_max_points'});
@@ -260,10 +242,7 @@ describe('BuggyImplementation tests', () => {
         buggy_implementation_names_input.trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find('#buggy-implementation-names-input').trigger(
-            'keyup',
-            {code: 'Enter'}
-        );
+        wrapper.find('#buggy-implementation-names-input').trigger('keyup.enter');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(7);
@@ -276,41 +255,6 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[6]).toEqual("Bug_41");
         expect(wrapper.vm.buggy_impl_names).toEqual("");
         expect(wrapper.emitted().input.length).toEqual(1);
-    });
-
-    test('Only keyup.enter causes add_buggy_impl_names to be called', async () => {
-        let buggy_implementation_names_input = wrapper.find('#buggy-implementation-names-input');
-
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[1]).toEqual("Bug_2");
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[2]).toEqual("Bug_4");
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
-        expect(wrapper.vm.buggy_impl_names).toEqual("");
-
-        buggy_implementation_names_input.setValue('Bug_41 Bug_23 Bug_3');
-        expect(wrapper.vm.buggy_impl_names).toEqual('Bug_41 Bug_23 Bug_3');
-
-        buggy_implementation_names_input.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        wrapper.find('#buggy-implementation-names-input').trigger(
-            'keyup', {code: 'ArrowDown'}
-        );
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
-
-        wrapper.find('#buggy-implementation-names-input').trigger(
-            'keyup', {code: 'ArrowUp'}
-        );
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
-
-        wrapper.find('#buggy-implementation-names-input').trigger(
-            'keyup', {code: 'Space'}
-        );
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
     });
 
     test('adding buggy_impl_names - no duplicates allowed', async () => {

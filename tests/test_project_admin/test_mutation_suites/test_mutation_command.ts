@@ -20,7 +20,6 @@ beforeAll(() => {
 describe('MutationCommand tests', () => {
     let wrapper: Wrapper<MutationCommand>;
     let ag_command: AGCommand;
-    let original_match_media: (query: string) => MediaQueryList;
 
     ag_command = {
         name: "Command",
@@ -32,13 +31,6 @@ describe('MutationCommand tests', () => {
     };
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         wrapper = mount(MutationCommand, {
             propsData: {
                 value: ag_command,
@@ -49,10 +41,6 @@ describe('MutationCommand tests', () => {
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();

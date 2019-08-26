@@ -41,7 +41,7 @@
                             @form_validity_changed="d_settings_form_is_valid = $event">
 
               <fieldset class="fieldset">
-                <legend class="legend"> General Settings </legend>
+                <legend class="legend"> Settings and Environment </legend>
                 <mutation-suite-general-settings ref="mutation_suite_general_settings"
                                                  v-model="d_active_mutation_test_suite"
                                                  :project="project">
@@ -196,8 +196,8 @@
       <modal v-if="d_show_delete_mutation_test_suite_modal"
              @close="d_show_delete_mutation_test_suite_modal = false"
              ref="delete_mutation_test_suite_modal"
-             :size="'large'"
-             :include_closing_x="false">
+             size="large"
+             click_outside_to_close>
         <div class="modal-header"> Confirm Delete </div>
         <div class="modal-divider"></div>
         <div class="modal-body" v-if="d_active_mutation_test_suite !== null">
@@ -397,7 +397,6 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
 
   update_mutation_test_suites_order_changed(project_pk: number,
                                             mutation_test_suite_order: number[]): void {
-    throw new Error("Method not implemented.");
   }
 
   readonly fdbk_presets = new SafeMap<string, MutationTestSuiteFeedbackPreset>([
@@ -492,6 +491,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
       }
     ]
   ]);
+
   @handle_api_errors_async(handle_save_mutation_test_suite_error)
   async save_mutation_test_suite() {
     try {
@@ -503,9 +503,11 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     }
   }
 }
+
 function handle_save_mutation_test_suite_error(component: MutationSuites, error: unknown) {
     (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
+
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
     (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }

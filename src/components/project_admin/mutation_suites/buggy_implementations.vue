@@ -72,7 +72,7 @@
       <div class="buggy-implementation-names-input-container">
           <textarea ref="buggy_implementation_names"
                     id="buggy-implementation-names-input"
-                    @keyup="handle_keyup_event($event)"
+                    @keyup.enter="add_buggy_implementation_names"
                     v-model="buggy_impl_names">
           </textarea>
         <button id="add-buggy-impl-names-button"
@@ -164,16 +164,13 @@ export default class BuggyImplementations extends Vue {
     }
     this.$emit('input', this.d_mutation_test_suite);
   }
+
   sort_buggy_impl_names() {
     this.d_mutation_test_suite!.buggy_impl_names.sort(
       (buggy_name_a: string, buggy_name_b: string) =>
         buggy_name_a.localeCompare(buggy_name_b, undefined, {numeric: true}));
   }
-  handle_keyup_event(key: KeyboardEvent) {
-    if (key.code === "Enter") {
-      this.add_buggy_implementation_names();
-    }
-  }
+
   add_buggy_implementation_names() {
     let split_regex = /\s+/g;
     let replace_regex = /,+/g;
