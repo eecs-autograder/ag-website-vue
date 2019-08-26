@@ -572,12 +572,11 @@ describe('MutationSuites tests', () => {
         set_validated_input_text(wrapper.find('#points-per-exposed-bug'), '905.5');
         expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).toEqual(905.5);
 
-        // Use custom max points
+        // override max points
         expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toBeNull();
 
-        let use_custom_max_points_toggle = wrapper.find('#use-custom-max-points');
-        use_custom_max_points_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
+        let override_max_points_checkbox = wrapper.find('#override-max-points');
+        override_max_points_checkbox.setChecked(true);
 
         expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(0);
 

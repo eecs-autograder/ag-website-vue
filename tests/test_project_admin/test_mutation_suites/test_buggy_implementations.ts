@@ -9,6 +9,7 @@ import BuggyImplementations from '@/components/project_admin/mutation_suites/bug
 
 import { make_course, make_mutation_test_suite, make_project } from '@/tests/data_utils';
 import {
+    checkbox_is_checked,
     do_input_blank_or_not_integer_test_without_save_button,
     do_invalid_text_input_test_without_save_button,
     get_validated_input_text,
@@ -89,42 +90,39 @@ describe('BuggyImplementation tests', () => {
             wrapper, {ref: 'points_per_exposed_bug'}, '12.345');
     });
 
-    test('use_custom_max_points binding', async () => {
-        let use_custom_max_points_toggle = wrapper.find({ref: 'use_custom_max_points'});
+    test('override_max_points binding', async () => {
+        let override_max_points_checkbox = wrapper.find('#override-max-points');
 
-        use_custom_max_points_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.use_custom_max_points).toEqual(true);
+        override_max_points_checkbox.setChecked(true);
+        expect(wrapper.vm.override_max_points).toEqual(true);
+        expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
         expect(wrapper.emitted().input.length).toEqual(1);
 
-        use_custom_max_points_toggle.find('.off-border').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.use_custom_max_points).toEqual(false);
+        override_max_points_checkbox.setChecked(false);
+        expect(wrapper.vm.override_max_points).toEqual(false);
+        expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(false);
         expect(wrapper.findAll('#max-points').length).toEqual(0);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toBeNull();
         expect(wrapper.emitted().input.length).toEqual(2);
 
-        use_custom_max_points_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.use_custom_max_points).toEqual(true);
+        override_max_points_checkbox.setChecked(true);
+        expect(wrapper.vm.override_max_points).toEqual(true);
+        expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
         expect(wrapper.emitted().input.length).toEqual(3);
 
-        wrapper.vm.use_custom_max_points = true;
+        wrapper.vm.override_max_points = true;
         expect(wrapper.findAll('#max-points').length).toEqual(1);
 
-        wrapper.vm.use_custom_max_points = false;
+        wrapper.vm.override_max_points = false;
         expect(wrapper.findAll('#max-points').length).toEqual(0);
     });
 
     test('max_points binding', async () => {
-        wrapper.vm.use_custom_max_points = true;
+        wrapper.vm.override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -143,7 +141,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: max_points is blank or not a number', async () => {
-        wrapper.vm.use_custom_max_points = true;
+        wrapper.vm.override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -154,7 +152,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: max_points must be greater than or equal to zero', async () => {
-        wrapper.vm.use_custom_max_points = true;
+        wrapper.vm.override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -165,7 +163,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('max_num_student_tests binding', async () => {
-        wrapper.vm.use_custom_max_points = true;
+        wrapper.vm.override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_num_student_tests_input = wrapper.find({ref: 'max_num_student_tests'});

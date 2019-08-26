@@ -20,21 +20,20 @@
       </validated-input>
     </div>
 
-    <div class="toggle-container">
-      <toggle v-model="use_custom_max_points"
-              @input="toggle_custom_max_points"
-              ref="use_custom_max_points"
-              id="use-custom-max-points">
-        <div slot="on">
-          Custom max points
-        </div>
-        <div slot="off">
-          Auto max points
-        </div>
-      </toggle>
+    <div class="checkbox-container">
+      <input id="override-max-points"
+             type="checkbox"
+             class="checkbox"
+             @change="toggle_override_max_points"
+             v-model="override_max_points"/>
+      <label class="checkbox-label"
+             id="override-max-points-label"
+             for="override-max-points">
+        Override max points
+      </label>
     </div>
 
-    <div v-if="use_custom_max_points"
+    <div v-if="override_max_points"
          class="input-container">
       <label class="text-label"> Max points </label>
       <validated-input ref="max_points"
@@ -79,7 +78,6 @@
                 @click="add_buggy_implementation_names">
           Add Names
         </button>
-
       </div>
     </div>
 
@@ -118,13 +116,14 @@ import {
     make_num_decimal_places_validator,
     string_to_num
 } from '@/validators';
+
 @Component({
-               components: {
-                   APIErrors,
-                   Toggle,
-                   ValidatedInput
-               }
-           })
+  components: {
+    APIErrors,
+    Toggle,
+    ValidatedInput
+  }
+})
 export default class BuggyImplementations extends Vue {
   @Prop({required: true, type: MutationTestSuite})
   value!: MutationTestSuite;
@@ -142,7 +141,7 @@ export default class BuggyImplementations extends Vue {
   d_mutation_test_suite: MutationTestSuite | null = null;
   d_mutation_test_suite_settings_form_is_valid = true;
   d_saving = false;
-  use_custom_max_points = false;
+  override_max_points = false;
 
   @Watch('value')
   on_value_changed(new_value: MutationTestSuite, old_value: MutationTestSuite) {
@@ -151,12 +150,12 @@ export default class BuggyImplementations extends Vue {
 
   created() {
     this.d_mutation_test_suite = deep_copy(this.value, MutationTestSuite);
-    this.use_custom_max_points = this.d_mutation_test_suite!.max_points !== null;
+    this.override_max_points = this.d_mutation_test_suite!.max_points !== null;
     this.sort_buggy_impl_names();
   }
 
-  toggle_custom_max_points() {
-    if (this.use_custom_max_points) {
+  toggle_override_max_points() {
+    if (this.override_max_points) {
       this.d_mutation_test_suite!.max_points = 0;
     }
     else {
@@ -206,6 +205,10 @@ $periwinkle: hsl(220, 30%, 56%);
   padding: 6px 12px 14px 2px;
 }
 
+.checkbox-container {
+  padding: 6px 12px 6px 0;
+}
+
 .input-container {
   margin: 5px 0 10px 0;
 }
@@ -225,8 +228,6 @@ $periwinkle: hsl(220, 30%, 56%);
 }
 
 #buggy-implementation-names-input {
-  max-width: 500px;
-  width: 100%;
   background-color: #fff;
   border-radius: .25rem;
   border: 1px solid #ced4da;
@@ -235,7 +236,9 @@ $periwinkle: hsl(220, 30%, 56%);
   font-size: 1rem;
   line-height: 1;
   padding: 5px;
-  height: 38px;
+  min-height: 80px;
+  max-width: 500px;
+  width: 100%;
 }
 
 #all-buggy-implementation-names {

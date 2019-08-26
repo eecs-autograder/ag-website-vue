@@ -365,12 +365,13 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.d_new_mutation_test_suite_name = "";
     this.d_show_new_mutation_test_suite_modal = true;
     Vue.nextTick(() => {
-        (<ValidatedInput> this.$refs.new_mutation_test_suite_name).focus();
+      (<ValidatedInput> this.$refs.new_mutation_test_suite_name).focus();
     });
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
     this.d_mutation_test_suites.push(mutation_test_suite);
+    this.d_active_mutation_test_suite = mutation_test_suite;
   }
 
   update_mutation_test_suite_changed(mutation_test_suite: MutationTestSuite): void {
@@ -613,6 +614,7 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 .save-button {
   @extend .green-button;
   display: block;
+  margin-top: 10px;
 }
 
 .last-saved-timestamp {
