@@ -90,39 +90,39 @@ describe('BuggyImplementation tests', () => {
             wrapper, {ref: 'points_per_exposed_bug'}, '12.345');
     });
 
-    test('override_max_points binding', async () => {
+    test('d_override_max_points binding', async () => {
         let override_max_points_checkbox = wrapper.find('#override-max-points');
 
         override_max_points_checkbox.setChecked(true);
-        expect(wrapper.vm.override_max_points).toEqual(true);
+        expect(wrapper.vm.d_override_max_points).toEqual(true);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
         expect(wrapper.emitted().input.length).toEqual(1);
 
         override_max_points_checkbox.setChecked(false);
-        expect(wrapper.vm.override_max_points).toEqual(false);
+        expect(wrapper.vm.d_override_max_points).toEqual(false);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(false);
         expect(wrapper.findAll('#max-points').length).toEqual(0);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toBeNull();
         expect(wrapper.emitted().input.length).toEqual(2);
 
         override_max_points_checkbox.setChecked(true);
-        expect(wrapper.vm.override_max_points).toEqual(true);
+        expect(wrapper.vm.d_override_max_points).toEqual(true);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
         expect(wrapper.emitted().input.length).toEqual(3);
 
-        wrapper.vm.override_max_points = true;
+        wrapper.vm.d_override_max_points = true;
         expect(wrapper.findAll('#max-points').length).toEqual(1);
 
-        wrapper.vm.override_max_points = false;
+        wrapper.vm.d_override_max_points = false;
         expect(wrapper.findAll('#max-points').length).toEqual(0);
     });
 
     test('max_points binding', async () => {
-        wrapper.vm.override_max_points = true;
+        wrapper.vm.d_override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -141,7 +141,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: max_points is blank or not a number', async () => {
-        wrapper.vm.override_max_points = true;
+        wrapper.vm.d_override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -152,7 +152,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: max_points must be greater than or equal to zero', async () => {
-        wrapper.vm.override_max_points = true;
+        wrapper.vm.d_override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_points_input = wrapper.find({ref: 'max_points'});
@@ -163,7 +163,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('max_num_student_tests binding', async () => {
-        wrapper.vm.override_max_points = true;
+        wrapper.vm.d_override_max_points = true;
         await wrapper.vm.$nextTick();
 
         let max_num_student_tests_input = wrapper.find({ref: 'max_num_student_tests'});
@@ -188,15 +188,15 @@ describe('BuggyImplementation tests', () => {
         buggy_implementation_names_input.setValue('cricket, mosquito, bee');
         buggy_implementation_names_input.trigger('input');
 
-        expect(wrapper.vm.buggy_impl_names).toEqual('cricket, mosquito, bee');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual('cricket, mosquito, bee');
 
-        wrapper.vm.buggy_impl_names = "ladybug ant";
+        wrapper.vm.d_buggy_impl_names_text = "ladybug ant";
         expect(
             (<HTMLInputElement> wrapper.find('#buggy-implementation-names-input').element)
                 .value).toEqual('ladybug ant');
     });
 
-    test('adding buggy_impl_names by pressing the add-buggy-impl-names-button', async () => {
+    test('adding buggy impl names by pressing the add-buggy-impl-names-button', async () => {
         let buggy_implementation_names_input = wrapper.find('#buggy-implementation-names-input');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
@@ -204,10 +204,10 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[1]).toEqual("Bug_2");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[2]).toEqual("Bug_4");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
-        expect(wrapper.vm.buggy_impl_names).toEqual("");
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual("");
 
         buggy_implementation_names_input.setValue('Bug_41 Bug_23 Bug_3');
-        expect(wrapper.vm.buggy_impl_names).toEqual('Bug_41 Bug_23 Bug_3');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual('Bug_41 Bug_23 Bug_3');
 
         wrapper.find('#add-buggy-impl-names-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -220,11 +220,11 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[4]).toEqual("Bug_12");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[5]).toEqual("Bug_23");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[6]).toEqual("Bug_41");
-        expect(wrapper.vm.buggy_impl_names).toEqual("");
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual("");
         expect(wrapper.emitted().input.length).toEqual(1);
     });
 
-    test('adding buggy_impl_names by pressing enter', async () => {
+    test('adding buggy impl names by pressing enter', async () => {
         let buggy_implementation_names_input = wrapper.find('#buggy-implementation-names-input');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
@@ -232,10 +232,10 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[1]).toEqual("Bug_2");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[2]).toEqual("Bug_4");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
-        expect(wrapper.vm.buggy_impl_names).toEqual("");
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual("");
 
         buggy_implementation_names_input.setValue('Bug_41 Bug_23 Bug_3');
-        expect(wrapper.vm.buggy_impl_names).toEqual('Bug_41 Bug_23 Bug_3');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual('Bug_41 Bug_23 Bug_3');
 
         buggy_implementation_names_input.trigger('click');
         await wrapper.vm.$nextTick();
@@ -251,11 +251,11 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[4]).toEqual("Bug_12");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[5]).toEqual("Bug_23");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[6]).toEqual("Bug_41");
-        expect(wrapper.vm.buggy_impl_names).toEqual("");
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual("");
         expect(wrapper.emitted().input.length).toEqual(1);
     });
 
-    test('adding buggy_impl_names - no duplicates allowed', async () => {
+    test('adding buggy impl names - no duplicates allowed', async () => {
         let buggy_implementation_names_input = wrapper.find({ref: 'buggy_implementation_names'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
@@ -265,7 +265,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
 
         buggy_implementation_names_input.setValue('Bug_12 Bug_13 Bug_4');
-        expect(wrapper.vm.buggy_impl_names).toEqual('Bug_12 Bug_13 Bug_4');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual('Bug_12 Bug_13 Bug_4');
 
         wrapper.find('#add-buggy-impl-names-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -279,7 +279,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.emitted().input.length).toEqual(1);
     });
 
-    test('adding buggy_impl_names - empty strings cannot be added', async () => {
+    test('adding buggy impl names - empty strings cannot be added', async () => {
         let buggy_implementation_names_input = wrapper.find({ref: 'buggy_implementation_names'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
@@ -289,7 +289,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
 
         buggy_implementation_names_input.setValue('     ');
-        expect(wrapper.vm.buggy_impl_names).toEqual('     ');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual('     ');
 
         wrapper.find('#add-buggy-impl-names-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -301,7 +301,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
 
         buggy_implementation_names_input.setValue(' , , , , ');
-        expect(wrapper.vm.buggy_impl_names).toEqual(' , , , , ');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual(' , , , , ');
 
         wrapper.find('#add-buggy-impl-names-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -313,7 +313,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
 
         buggy_implementation_names_input.setValue(' ,    ,   Bug_3       ,   , ');
-        expect(wrapper.vm.buggy_impl_names).toEqual(' ,    ,   Bug_3       ,   , ');
+        expect(wrapper.vm.d_buggy_impl_names_text).toEqual(' ,    ,   Bug_3       ,   , ');
 
         wrapper.find('#add-buggy-impl-names-button').trigger('click');
         await wrapper.vm.$nextTick();

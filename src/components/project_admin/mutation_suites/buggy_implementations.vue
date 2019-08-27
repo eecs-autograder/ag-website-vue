@@ -25,7 +25,7 @@
              type="checkbox"
              class="checkbox"
              @change="toggle_override_max_points"
-             v-model="override_max_points"/>
+             v-model="d_override_max_points"/>
       <label class="checkbox-label"
              id="override-max-points-label"
              for="override-max-points">
@@ -33,7 +33,7 @@
       </label>
     </div>
 
-    <div v-if="override_max_points"
+    <div v-if="d_override_max_points"
          class="input-container">
       <label class="text-label"> Max points </label>
       <validated-input ref="max_points"
@@ -72,7 +72,7 @@
           <textarea ref="buggy_implementation_names"
                     id="buggy-implementation-names-input"
                     @keyup.enter="add_buggy_implementation_names"
-                    v-model="buggy_impl_names">
+                    v-model="d_buggy_impl_names_text">
           </textarea>
         <button id="add-buggy-impl-names-button"
                 @click="add_buggy_implementation_names">
@@ -137,11 +137,11 @@ export default class BuggyImplementations extends Vue {
   readonly string_to_num = string_to_num;
   readonly format_datetime = format_datetime;
 
-  buggy_impl_names = "";
+  d_buggy_impl_names_text = "";
   d_mutation_test_suite: MutationTestSuite | null = null;
   d_mutation_test_suite_settings_form_is_valid = true;
   d_saving = false;
-  override_max_points = false;
+  d_override_max_points = false;
 
   @Watch('value')
   on_value_changed(new_value: MutationTestSuite, old_value: MutationTestSuite) {
@@ -150,12 +150,12 @@ export default class BuggyImplementations extends Vue {
 
   created() {
     this.d_mutation_test_suite = deep_copy(this.value, MutationTestSuite);
-    this.override_max_points = this.d_mutation_test_suite!.max_points !== null;
+    this.d_override_max_points = this.d_mutation_test_suite!.max_points !== null;
     this.sort_buggy_impl_names();
   }
 
   toggle_override_max_points() {
-    if (this.override_max_points) {
+    if (this.d_override_max_points) {
       this.d_mutation_test_suite!.max_points = 0;
     }
     else {
@@ -173,7 +173,7 @@ export default class BuggyImplementations extends Vue {
   add_buggy_implementation_names() {
     let split_regex = /\s+/g;
     let replace_regex = /,+/g;
-    let trimmed_input = this.buggy_impl_names.trim();
+    let trimmed_input = this.d_buggy_impl_names_text.trim();
     if (trimmed_input.length === 0) {
       return;
     }
@@ -185,7 +185,7 @@ export default class BuggyImplementations extends Vue {
     for (let buggy_name of split_buggy_impl_names) {
       this.d_mutation_test_suite!.buggy_impl_names.push(buggy_name);
     }
-    this.buggy_impl_names = "";
+    this.d_buggy_impl_names_text = "";
     this.$emit('input', this.d_mutation_test_suite);
     this.sort_buggy_impl_names();
   }
