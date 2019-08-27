@@ -536,7 +536,7 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 }
 
 #columns-container {
-  height: calc(100% - 55px);
+  height: 100%;
 }
 
 #mutation-test-suite-sidebar {

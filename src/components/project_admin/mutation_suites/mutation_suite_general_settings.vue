@@ -12,7 +12,7 @@
       </validated-input>
     </div>
 
-    <div class="checkbox-container">
+    <div class="checkbox-input-container synchronous-or-deferred-container">
       <input id="synchronous-or-deferred"
              type="checkbox"
              class="checkbox"
@@ -244,7 +244,7 @@ export default class MutationSuiteGeneralSettings extends Vue {
   width: 50%;
 }
 
-.checkbox-container {
+.synchronous-or-deferred-container {
   padding: 17px 12px 6px 0;
 }
 

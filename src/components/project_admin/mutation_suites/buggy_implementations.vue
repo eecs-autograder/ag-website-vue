@@ -20,7 +20,7 @@
       </validated-input>
     </div>
 
-    <div class="checkbox-container">
+    <div class="checkbox-input-container override-max-points-container">
       <input id="override-max-points"
              type="checkbox"
              class="checkbox"
@@ -205,7 +205,7 @@ $periwinkle: hsl(220, 30%, 56%);
   padding: 6px 12px 14px 2px;
 }
 
-.checkbox-container {
+.override-max-points-container {
   padding: 6px 12px 6px 0;
 }
 

@@ -1,6 +1,7 @@
 <template>
   <div id="mutation-commands-component">
-    <div id="use-setup-command-container">
+    <div id="use-setup-command-container"
+         class="checkbox-input-container">
       <input id="use-setup-command"
              type="checkbox"
              class="checkbox"
