@@ -3,41 +3,42 @@
     <div class="panel">
       <div :class="['panel-header', {'panel-header-open': is_open}]"
            @click="toggle_is_open">
-        <div id="ag-test-case-name">
-          {{ag_test_case_result_feedback.ag_test_case_name}}
+        <span id="ag-test-case-name">{{ag_test_case_result_feedback.ag_test_case_name}}</span>
+
+        <span id="points">
+          {{ag_test_case_result_feedback.total_points}}/{{ag_test_case_result_feedback.total_points_possible}}
+        </span>
+      </div>
+
+      <div class="panel-body"
+           v-if="is_open">
+        <div v-for="(ag_test_command_result, index) of ag_test_case_result_feedback.ag_test_command_results">
+          <AGTestCommandResultPanel :submission="submission"
+                                    :ag_test_command_result_feedback="ag_test_command_result"
+                                    :fdbk_category="fdbk_category">
+          </AGTestCommandResultPanel>
         </div>
       </div>
-      <div class="panel-body" v-if="is_open">
-        <AGTestCommandResult
-          :submission="submission"
-          :ag_test_command_result_feedback="ag_test_case_result_feedback.ag_test_command_results[0]"
-          :fdbk_category="fdbk_category">
-        </AGTestCommandResult>
-      </div>
     </div>
-    <div></div>
   </div>
 </template>
-
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
     AGTestCaseResultFeedback,
-    FeedbackCategory,
     Submission
 } from "ag-client-typescript";
 
-import AGTestCommandResult from '@/components/project_view/submission_detail/ag_test_command_result.vue';
+import AGTestCommandResultPanel from '@/components/project_view/submission_detail/ag_test_command_result_panel.vue';
 
 @Component({
   components: {
-    AGTestCommandResult
+    AGTestCommandResultPanel
   }
 })
-export default class AGTestCaseResultPanelSingleCommand extends Vue {
-
+export default class AGTestCaseResultPanelMultipleCommands extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
@@ -45,13 +46,15 @@ export default class AGTestCaseResultPanelSingleCommand extends Vue {
   ag_test_case_result_feedback!: AGTestCaseResultFeedback;
 
   @Prop({required: true, type: String})
-  fdbk_category!: FeedbackCategory;
+  fdbk_category!: string;
 
   is_open = false;
 
   toggle_is_open() {
     this.is_open = !this.is_open;
   }
+
+  created() {}
 }
 </script>
 
@@ -63,11 +66,11 @@ export default class AGTestCaseResultPanelSingleCommand extends Vue {
 }
 
 .panel {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .panel-header {
-  background-color: $white-gray;
+  background-color: hotpink;
   padding: 5px;
   border-radius: 3px;
   display: flex;
@@ -82,7 +85,7 @@ export default class AGTestCaseResultPanelSingleCommand extends Vue {
 }
 
 .panel-body {
-  border: 1px solid $white-gray;
+  border: 1px solid hotpink;
   padding: 10px 10px 5px 10px;
   border-top: none;
   border-radius: 0 0 3px 3px;

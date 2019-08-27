@@ -101,8 +101,9 @@ services:
       - ./autograder-server:/usr/src/app
     command: /usr/local/bin/celery worker --beat -c 1 -A autograder -l info -Q periodic_tasks -n periodic_tasks@%h
 
-  #  environment:
-  #   AG_SUBMISSION_LISTENER_INTERVAL: 5
+
+   # environment:
+   #  AG_SUBMISSION_LISTENER_INTERVAL: 5
 
   grader:
     container_name: ag-vue-dev-grader
