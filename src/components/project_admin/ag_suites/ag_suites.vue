@@ -363,9 +363,8 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   update_ag_test_suite_created(ag_test_suite: AGTestSuite): void {
-    let suite_created = deep_copy(ag_test_suite, AGTestSuite);
-    this.d_ag_test_suites.push(suite_created);
-    this.update_active_item(suite_created);
+    this.d_ag_test_suites.push(ag_test_suite);
+    this.update_active_item(ag_test_suite);
   }
 
   update_ag_test_suite_deleted(ag_test_suite: AGTestSuite): void {
@@ -405,11 +404,10 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    let case_created = deep_copy(ag_test_case, AGTestCase);
-    let parent_suite = this.d_ag_test_suites[this.d_ag_test_suites.findIndex(
+    let parent_suite = this.d_ag_test_suites.find(
       (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
-    )];
-    parent_suite.ag_test_cases.push(case_created);
+    );
+    parent_suite!.ag_test_cases.push(ag_test_case);
   }
 
   update_ag_test_case_deleted(ag_test_case: AGTestCase): void {
