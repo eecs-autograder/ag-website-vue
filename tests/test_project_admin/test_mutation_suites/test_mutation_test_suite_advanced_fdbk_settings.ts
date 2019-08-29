@@ -59,7 +59,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     test('bugs_exposed_fdbk_level binding', async () => {
         wrapper.setData({d_is_open: true});
 
-        let bugs_exposed_fdbk_level_input = wrapper.find('#normal-return-code-correctness');
+        let bugs_exposed_fdbk_level_input = wrapper.find('#normal-bugs-exposed-fdbk-level');
 
         bugs_exposed_fdbk_level_input.setValue(BugsExposedFeedbackLevel.no_feedback);
         expect(wrapper.vm.d_feedback_config!.bugs_exposed_fdbk_level).toEqual(

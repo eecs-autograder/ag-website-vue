@@ -712,7 +712,7 @@ describe('MutationSuites tests', () => {
                 .bugs_exposed_fdbk_level
         ).toEqual(BugsExposedFeedbackLevel.exposed_bug_names);
 
-        wrapper.find('#past-limit-return-code-correctness').setValue(
+        wrapper.find('#past-limit-bugs-exposed-fdbk-level').setValue(
             BugsExposedFeedbackLevel.num_bugs_exposed
         );
         expect(

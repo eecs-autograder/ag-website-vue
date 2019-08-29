@@ -27,6 +27,7 @@
           <label class="setting-title"> Bugs Exposed </label>
           <div>
             <select ref="bugs_exposed_fdbk_level_select"
+                    :id="`${hyphenate(config_name)}-bugs-exposed-fdbk-level`"
                     v-model="d_feedback_config.bugs_exposed_fdbk_level"
                     @change="$emit('input', d_feedback_config)"
                     class="select">
