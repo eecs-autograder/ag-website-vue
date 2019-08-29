@@ -890,10 +890,10 @@ describe('AGSuitePanel tests', () => {
             setup_suite_cmd: "",
             setup_suite_cmd_name: "",
             sandbox_docker_image: {
-            pk: 1,
-            name: "Sandy",
-            tag: "",
-            display_name: "Hi everyone"
+                pk: 1,
+                name: "Sandy",
+                tag: "",
+                display_name: "Hi everyone"
             },
             allow_network_access: false,
             deferred: true,

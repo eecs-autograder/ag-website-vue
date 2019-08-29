@@ -39,8 +39,8 @@
           </template>
           <template v-else-if="active_level_is_command">
             <AGTestCommandSettings :ag_test_command="d_active_ag_test_command"
-                              :ag_test_case="parent_ag_test_case"
-                              :project="project">
+                                   :ag_test_case="parent_ag_test_case"
+                                   :project="project">
             </AGTestCommandSettings>
           </template>
         </div>
@@ -404,10 +404,10 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    let parent_suite = this.d_ag_test_suites[this.d_ag_test_suites.findIndex(
+    let parent_suite = this.d_ag_test_suites.find(
       (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
-    )];
-    parent_suite.ag_test_cases.push(ag_test_case);
+    );
+    parent_suite!.ag_test_cases.push(ag_test_case);
   }
 
   update_ag_test_case_deleted(ag_test_case: AGTestCase): void {

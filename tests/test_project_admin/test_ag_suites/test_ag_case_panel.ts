@@ -2,14 +2,10 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
-    AGTestCaseFeedbackConfig,
     AGTestCommand,
-    AGTestCommandFeedbackConfig, AGTestSuite, AGTestSuiteFeedbackConfig,
-    ExpectedOutputSource,
-    ExpectedReturnCode,
+    AGTestSuite,
     HttpError,
-    StdinSource,
-    ValueFeedbackLevel,
+    Project,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
@@ -17,6 +13,7 @@ import APIErrors from '@/components/api_errors.vue';
 import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import * as data_ut from '@/tests/data_utils';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -27,9 +24,9 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('AGCasePanel tests', () => {
+describe('commands_are_visible getter', () => {
     let wrapper: Wrapper<AGCasePanel>;
-    let component: AGCasePanel;
+    let project: Project;
     let ag_suite_colors: AGTestSuite;
     let ag_case_green: AGTestCase;
     let ag_case_yellow: AGTestCase;
@@ -37,279 +34,105 @@ describe('AGCasePanel tests', () => {
     let ag_command_green_2: AGTestCommand;
     let ag_command_green_3: AGTestCommand;
     let ag_command_yellow_1: AGTestCommand;
-    let command_in_different_case: AGTestCommand;
-    let default_suite_feedback_config: AGTestSuiteFeedbackConfig;
-    let default_case_feedback_config: AGTestCaseFeedbackConfig;
-    let default_command_feedback_config: AGTestCommandFeedbackConfig;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
+        project = data_ut.make_project(
+            data_ut.make_course().pk
+        );
+
+        ag_suite_colors = data_ut.make_ag_test_suite(project.pk);
+        ag_case_green = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_green_1 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_command_green_2 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_command_green_3 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_case_yellow = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_yellow_1 = data_ut.make_ag_test_command(ag_case_yellow.pk);
+
+        ag_case_green.ag_test_commands = [
+            ag_command_green_1,
+            ag_command_green_2,
+            ag_command_green_3
+        ];
+        ag_case_yellow.ag_test_commands = [
+            ag_command_yellow_1
+        ];
+
+        ag_suite_colors.ag_test_cases = [
+            ag_case_green,
+            ag_case_yellow
+        ];
+    });
+
+    afterEach(() => {
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('Command in case is active', async () => {
+        wrapper = mount(AGCasePanel, {
+            propsData: {
+                ag_test_case: ag_case_green,
+                ag_test_suite: ag_suite_colors,
+                active_ag_test_case: null,
+                active_ag_test_command: ag_command_green_2
+            }
         });
 
-        default_suite_feedback_config = {
-            show_individual_tests: false,
-            show_setup_return_code: false,
-            show_setup_stderr: false,
-            show_setup_stdout: false,
-            show_setup_timed_out: false,
-            visible: false
-        };
+        expect(wrapper.vm.commands_are_visible).toBe(true);
+    });
 
-        default_case_feedback_config = {
-            visible: false,
-            show_individual_commands: false
-        };
-
-        default_command_feedback_config = {
-            visible: false,
-            return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            show_points: false,
-            show_actual_return_code: false,
-            show_actual_stdout: false,
-            show_actual_stderr: false,
-            show_whether_timed_out: false
-        };
-
-        command_in_different_case = new AGTestCommand({
-            pk: 1,
-            name: "2012",
-            ag_test_case: 2,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
+    test('Command in case is not active', async () => {
+        wrapper = mount(AGCasePanel, {
+            propsData: {
+                ag_test_case: ag_case_green,
+                ag_test_suite: ag_suite_colors,
+                active_ag_test_case: null,
+                active_ag_test_command: ag_command_yellow_1
+            }
         });
 
-        ag_command_green_1 = new AGTestCommand({
-            pk: 1,
-            name: "Green Command 1",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
+        expect(wrapper.vm.commands_are_visible).toBe(false);
+    });
+});
 
-        ag_command_green_2 = new AGTestCommand({
-            pk: 2,
-            name: "Green Command 2",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
+describe('AGCasePanel tests', () => {
+    let wrapper: Wrapper<AGCasePanel>;
+    let project: Project;
+    let ag_suite_colors: AGTestSuite;
+    let ag_case_green: AGTestCase;
+    let ag_case_yellow: AGTestCase;
+    let ag_command_green_1: AGTestCommand;
+    let ag_command_green_2: AGTestCommand;
+    let ag_command_green_3: AGTestCommand;
+    let ag_command_yellow_1: AGTestCommand;
 
-        ag_command_green_3 = new AGTestCommand({
-            pk: 3,
-            name: "Green Command 3",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
+    beforeEach(() => {
+        project = data_ut.make_project(
+            data_ut.make_course().pk
+        );
 
-        ag_command_yellow_1 = new AGTestCommand({
-            pk: 1,
-            name: "Yellow Command 1",
-            ag_test_case: 2,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
+        ag_suite_colors = data_ut.make_ag_test_suite(project.pk);
+        ag_case_green = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_green_1 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_command_green_2 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_command_green_3 = data_ut.make_ag_test_command(ag_case_green.pk);
+        ag_case_yellow = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        ag_command_yellow_1 = data_ut.make_ag_test_command(ag_case_yellow.pk);
 
-        ag_case_green = new AGTestCase({
-            pk: 1,
-            name: "Green Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_command_green_1, ag_command_green_2, ag_command_green_3]
-        });
+        ag_case_green.ag_test_commands = [
+            ag_command_green_1,
+            ag_command_green_2,
+            ag_command_green_3
+        ];
+        ag_case_yellow.ag_test_commands = [
+            ag_command_yellow_1
+        ];
 
-        ag_case_yellow = new AGTestCase({
-            pk: 2,
-            name: "Yellow Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_command_yellow_1]
-        });
-
-        ag_suite_colors = new AGTestSuite({
-            pk: 1,
-            name: "Suite 1",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-            pk: 1,
-            name: "Sandy",
-            tag: "",
-            display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_suite_feedback_config,
-            past_limit_submission_fdbk_config: default_suite_feedback_config,
-            staff_viewer_fdbk_config: default_suite_feedback_config,
-            ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [ag_case_green, ag_case_yellow],
-            instructor_files_needed: [],
-            student_files_needed: []
-        });
+        ag_suite_colors.ag_test_cases = [
+            ag_case_green,
+            ag_case_yellow
+        ];
 
         wrapper = mount(AGCasePanel, {
             propsData: {
@@ -319,15 +142,10 @@ describe('AGCasePanel tests', () => {
                 active_ag_test_command: null
             }
         });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();
@@ -337,130 +155,125 @@ describe('AGCasePanel tests', () => {
     test('Case (closed and child command not active) is clicked on',
          async () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(
-            ag_case_green
-        );
-        expect(component.commands_are_visible).toBe(true);
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
     });
 
     test('Case (closed and child command is active) is clicked on',
          async () => {
         wrapper.setProps({active_ag_test_command: ag_command_green_2});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.command_in_case_is_active).toBe(true);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
-        expect(component.commands_are_visible).toBe(true);
-
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
-
-        expect(component.command_in_case_is_active).toBe(true);
-        expect(component.commands_are_visible).toBe(false);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.command_in_case_is_active).toBe(true);
-        expect(component.commands_are_visible).toBe(true);
-        expect(component.active_ag_test_command).toEqual(ag_command_green_2);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(false);
+        expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
+
+        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
+        expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
     });
 
     test('Case (open and child command not active) is clicked on',
          async () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
 
-        expect(component.commands_are_visible).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
         wrapper.setProps({active_ag_test_command: ag_command_yellow_1});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.commands_are_visible).toBe(true);
-        expect(component.command_in_case_is_active).toBe(false);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
+        expect(wrapper.vm.command_in_case_is_active).toBe(false);
 
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_case_green);
-
-        expect(component.commands_are_visible).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
     });
 
     test('Case (open and child command is active) is clicked on',
          async () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(
-            ag_case_green
-        );
+        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.commands_are_visible).toBe(true);
-        expect(component.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.commands_are_visible).toBe(false);
-        expect(component.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(false);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
     });
 
     test('Command in case becomes active',
          async () => {
         wrapper.setProps({active_ag_test_command: ag_command_green_2});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.commands_are_visible).toBe(true);
-        expect(component.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
     });
 
     test('When a case that is active is clicked on again, it closes', async () => {
-        expect(component.is_open).toBe(false);
+        expect(wrapper.vm.is_open).toBe(false);
 
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.is_open).toBe(true);
-        expect(component.commands_are_visible).toBe(true);
+        expect(wrapper.vm.is_open).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.command_in_case_is_active).toBe(true);
-        expect(component.commands_are_visible).toBe(false);
-        expect(component.is_open).toBe(false);
+        expect(wrapper.vm.command_in_case_is_active).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(false);
+        expect(wrapper.vm.is_open).toBe(false);
     });
 
     test('When a command is clicked on, an event is emitted',
          async () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
-        expect(component.commands_are_visible).toBe(true);
+        expect(wrapper.vm.commands_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-command').at(1).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_command_green_2);
     });
@@ -472,16 +285,16 @@ describe('AGCasePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
 
         wrapper.findAll({ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
-        component.d_new_command_name = "New command name";
-        component.d_new_command = "New command";
+        wrapper.vm.d_new_command_name = "New command name";
+        wrapper.vm.d_new_command = "New command";
 
         wrapper.find('#add-ag-test-command-form').trigger('submit');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
         expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
@@ -498,22 +311,22 @@ describe('AGCasePanel tests', () => {
             )
         );
         wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
 
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
-        component.d_new_command_name = "New command name";
-        component.d_new_command = "New command";
+        wrapper.vm.d_new_command_name = "New command name";
+        wrapper.vm.d_new_command = "New command";
 
         wrapper.find('#add-ag-test-command-form').trigger('submit');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
 
@@ -523,50 +336,200 @@ describe('AGCasePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
     });
 
-    test('Clone case', async () => {
+    test('d_cloned_case_name binding', async () => {
         wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
+
+        set_validated_input_text(ag_test_case_clone_name, 'Water');
+        expect(wrapper.vm.d_cloned_case_name).toEqual("Water");
+        expect(validated_input_is_valid(ag_test_case_clone_name)).toEqual(true);
+
+        wrapper.vm.d_cloned_case_name = "Air";
+        expect(get_validated_input_text(ag_test_case_clone_name)).toEqual("Air");
+    });
+
+    test('error - d_cloned_case_name is blank', async () => {
+        wrapper.setProps({active_case: ag_case_green});
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+
+        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
+        let case_clone_name_validator = <ValidatedInput> wrapper.find(
+            {ref: 'ag_test_case_clone_name'}
+        ).vm;
+        expect(case_clone_name_validator.is_valid).toBe(false);
+
+        set_validated_input_text(ag_test_case_clone_name, 'Stupendous');
+        expect(wrapper.vm.d_cloned_case_name).toEqual("Stupendous");
+        expect(case_clone_name_validator.is_valid).toBe(true);
+
+        set_validated_input_text(ag_test_case_clone_name, ' ');
+        expect(case_clone_name_validator.is_valid).toBe(false);
+    });
+
+    test('Clone case - successful', async () => {
+        let new_case = data_ut.make_ag_test_case(ag_suite_colors.pk);
+        let clone_case_stub = sinon.stub(wrapper.vm.ag_test_case, 'copy').returns(
+            Promise.resolve(
+                new_case
+            )
+        );
+        wrapper.setProps({active_case: ag_case_green});
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
 
         wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+
+        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
+        set_validated_input_text(ag_test_case_clone_name, 'Water');
+
+        expect(wrapper.find('#modal-clone-ag-test-case-button').is(
+            '[disabled]'
+        )).toBe(false);
+
+        wrapper.find('#clone-ag-test-case-form').trigger('submit');
+        await wrapper.vm.$nextTick();
+
+        expect(clone_case_stub.calledOnce).toBe(true);
+        expect(clone_case_stub.firstCall.calledWith("Water")).toBe(true);
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
+        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
+    });
+
+    test('d_cloned_case_name begins as the empty string whenever the clone_ag_test_case ' +
+         'modal is opened',
+         async () => {
+        wrapper.setProps({active_case: ag_case_green});
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+        expect(wrapper.vm.d_cloned_case_name).toEqual("");
+
+        set_validated_input_text(wrapper.find({ref: 'ag_test_case_clone_name'}), 'Fall');
+
+        expect(wrapper.vm.d_cloned_case_name).toEqual("Fall");
+
+        // clicking closing_x to close the modal
+        wrapper.find('#close-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+        expect(wrapper.vm.d_cloned_case_name).toEqual("");
+
+        set_validated_input_text(wrapper.find({ref: 'ag_test_case_clone_name'}), 'Winter');
+
+        expect(wrapper.vm.d_cloned_case_name).toEqual("Winter");
+
+        // clicking outside the modal to close the modal
+        wrapper.find('#modal-mask').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+        expect(wrapper.vm.d_cloned_case_name).toEqual("");
+    });
+
+    test('Clone case - unsuccessful', async () => {
+        let clone_case_stub = sinon.stub(wrapper.vm.ag_test_case, 'copy').returns(
+            Promise.reject(
+                new HttpError(
+                    400,
+                    {
+                        __all__: "Error: Ag test case with this Name and Ag " +
+                                 "test suite already exists."
+                    }
+                )
+            )
+        );
+
+        wrapper.setProps({active_case: ag_case_green});
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
+
+        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+
+        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
+        set_validated_input_text(ag_test_case_clone_name, 'Purple Case');
+
+        expect(wrapper.find('#modal-clone-ag-test-case-button').is(
+            '[disabled]'
+        )).toBe(false);
+
+        wrapper.find('#clone-ag-test-case-form').trigger('submit');
+        await wrapper.vm.$nextTick();
+
+        expect(clone_case_stub.calledOnce).toBe(true);
+        expect(clone_case_stub.firstCall.calledWith("Purple Case")).toBe(true);
+        expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
+        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'clone_case_api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
     });
 
     test('Edit AGTestCase settings', async () => {
         wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(false);
         expect(wrapper.find({ref: 'ag_test_case_settings_modal'}).exists()).toBe(false);
 
         wrapper.find({ref: 'edit_ag_test_case_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(true);
         expect(wrapper.find({ref: 'ag_test_case_settings_modal'}).exists()).toBe(true);
     });
 
     test('Delete case - successful', async () => {
-        let delete_case_stub = sinon.stub(component.ag_test_case, 'delete');
+        let delete_case_stub = sinon.stub(wrapper.vm.ag_test_case, 'delete');
         wrapper.setProps({active_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
 
         wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(false);
@@ -574,78 +537,46 @@ describe('AGCasePanel tests', () => {
     });
 
     test('command in a different case changed', async () => {
-        let updated_command_in_different_case = new AGTestCommand({
-            pk: 1,
-            name: "2019",
-            ag_test_case: 2,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
-        expect(component.ag_test_case.ag_test_commands!.length).toEqual(3);
-        expect(component.ag_test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
-        expect(component.ag_test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
-        expect(component.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
+        let updated_command_in_different_case = data_ut.make_ag_test_command(
+            data_ut.make_ag_test_case(ag_suite_colors.pk).pk
+        );
+
+        expect(wrapper.vm.ag_test_case.ag_test_commands!.length).toEqual(3);
+        expect(wrapper.vm.ag_test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
+        expect(wrapper.vm.ag_test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
+        expect(wrapper.vm.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
 
         AGTestCommand.notify_ag_test_command_changed(updated_command_in_different_case);
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.ag_test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
-        expect(component.ag_test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
-        expect(component.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
+        expect(wrapper.vm.ag_test_case.ag_test_commands[0].name).toEqual(ag_command_green_1.name);
+        expect(wrapper.vm.ag_test_case.ag_test_commands[1].name).toEqual(ag_command_green_2.name);
+        expect(wrapper.vm.ag_test_case.ag_test_commands[2].name).toEqual(ag_command_green_3.name);
     });
 
     test('d_new_command_name binding', async () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let new_ag_test_command_name_input = wrapper.find({ref: 'new_ag_test_command_name'});
         set_validated_input_text(new_ag_test_command_name_input, 'Sunny');
 
-        expect(component.d_new_command_name).toEqual("Sunny");
+        expect(wrapper.vm.d_new_command_name).toEqual("Sunny");
         expect(validated_input_is_valid(new_ag_test_command_name_input)).toEqual(true);
 
-        component.d_new_command_name = "Cloudy";
+        wrapper.vm.d_new_command_name = "Cloudy";
         expect(get_validated_input_text(new_ag_test_command_name_input)).toEqual("Cloudy");
     });
 
     test('error - new command name is blank', async () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let new_command_name_input = wrapper.find(
             {ref: 'new_ag_test_command_name'}
@@ -658,40 +589,40 @@ describe('AGCasePanel tests', () => {
 
         (<HTMLInputElement> new_command_name_input.element).value = "Great";
         new_command_name_input.trigger('input');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(new_command_name_validator.is_valid).toBe(true);
 
         (<HTMLInputElement> new_command_name_input.element).value = " ";
         new_command_name_input.trigger('input');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(new_command_name_validator.is_valid).toBe(false);
     });
 
     test('d_new_command binding', async () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let new_ag_test_command_input = wrapper.find({ref: 'new_ag_test_command'});
         set_validated_input_text(new_ag_test_command_input, 'Moo');
 
-        expect(component.d_new_command).toEqual("Moo");
+        expect(wrapper.vm.d_new_command).toEqual("Moo");
         expect(validated_input_is_valid(new_ag_test_command_input)).toEqual(true);
 
-        component.d_new_command = "Baa";
+        wrapper.vm.d_new_command = "Baa";
         expect(get_validated_input_text(new_ag_test_command_input)).toEqual("Baa");
     });
 
     test('error - new command is blank', async () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let new_command_input = wrapper.find({ref: 'new_ag_test_command'}).find('#input');
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_ag_test_command'}).vm;
@@ -700,56 +631,33 @@ describe('AGCasePanel tests', () => {
 
         (<HTMLInputElement> new_command_input.element).value = "Splenda";
         new_command_input.trigger('input');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(new_command_validator.is_valid).toBe(true);
 
         (<HTMLInputElement> new_command_input.element).value = " ";
         new_command_input.trigger('input');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(new_command_validator.is_valid).toBe(false);
     });
 
     test('Watcher for test_case', async () => {
-        expect(component.ag_test_case).toEqual(ag_case_green);
+        expect(wrapper.vm.ag_test_case).toEqual(ag_case_green);
 
         wrapper.setProps({ag_test_case: ag_case_yellow});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.ag_test_case).toEqual(ag_case_yellow);
+        expect(wrapper.vm.ag_test_case).toEqual(ag_case_yellow);
     });
 
     test('Watcher for test_suite', async () => {
-        let another_suite = new AGTestSuite({
-            pk: 2,
-            name: "Another Suite",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-                pk: 1,
-                name: "Sandy",
-                tag: "",
-                display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_suite_feedback_config,
-            past_limit_submission_fdbk_config: default_suite_feedback_config,
-            staff_viewer_fdbk_config: default_suite_feedback_config,
-            ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [],
-            instructor_files_needed: [],
-            student_files_needed: []
-        });
-        expect(component.ag_test_suite).toEqual(ag_suite_colors);
+        let another_suite = data_ut.make_ag_test_suite(project.pk);
+        expect(wrapper.vm.ag_test_suite).toEqual(ag_suite_colors);
 
         wrapper.setProps({ag_test_suite: another_suite});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.ag_test_suite).toEqual(another_suite);
+        expect(wrapper.vm.ag_test_suite).toEqual(another_suite);
     });
 });

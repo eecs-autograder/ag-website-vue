@@ -1,5 +1,6 @@
 <template>
-  <div v-if="ag_test_case !== null">
+  <div v-if="ag_test_case !== null"
+       id="ag-test-case-panel">
     <div :class="['ag-test-case',
                   {'closed-but-active': !is_open && command_in_case_is_active,
                    'active-ag-test-case-multiple-commands':
@@ -41,7 +42,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="clone_ag_test_case_menu_item"
-                             @context_menu_item_clicked="d_show_clone_ag_test_case_modal = true">
+                             @context_menu_item_clicked="open_clone_ag_test_case_modal">
             <template slot="label">
               <i class="far fa-copy"></i>
               <span class="context-menu-item-text"> Clone test case </span>
@@ -123,12 +124,32 @@
            @close="d_show_clone_ag_test_case_modal = false"
            ref="clone_ag_test_case_modal"
            size="large"
+           click_outside_to_close
            include_closing_x>
-      <div class="modal-header">
-        Clone AG Test Case
-      </div>
+      <div class="modal-header">Clone AG Test Case</div>
       <hr>
-      <div class="modal-body"></div>
+      <div class="modal-body">
+        <validated-form id="clone-ag-test-case-form"
+                        autocomplete="off"
+                        spellcheck="false"
+                        @submit="clone_ag_test_case"
+                        @form_validity_changed="d_clone_case_form_is_valid = $event">
+          <label class="text-label">Case Name</label>
+          <validated-input ref="ag_test_case_clone_name"
+                           v-model="d_cloned_case_name"
+                           :show_warnings_on_blur="true"
+                           :validators="[is_not_empty]">
+          </validated-input>
+          <APIErrors ref="clone_case_api_errors"></APIErrors>
+          <div class="modal-button-container">
+            <button id="modal-clone-ag-test-case-button"
+                    type="submit"
+                    :disabled="d_cloning || !d_clone_case_form_is_valid">
+              Clone Case
+            </button>
+          </div>
+        </validated-form>
+      </div>
     </modal>
 
     <modal v-if="d_show_delete_ag_test_case_modal"
@@ -215,20 +236,22 @@ export default class AGCasePanel extends Vue {
   readonly is_not_empty = is_not_empty;
 
   d_add_command_form_is_valid = false;
+  d_clone_case_form_is_valid = true;
   d_adding_command = false;
+  d_cloning = false;
   d_deleting = false;
   d_show_ag_test_case_settings_modal = false;
   d_show_new_ag_test_command_modal = false;
   d_show_clone_ag_test_case_modal = false;
   d_show_delete_ag_test_case_modal = false;
+  d_new_command_name = "";
+  d_new_command = "";
+  d_cloned_case_name: string = "";
 
   get commands_are_visible() {
     return this.d_commands_are_visible;
   }
   private d_commands_are_visible = false;
-
-  d_new_command_name = "";
-  d_new_command = "";
 
   @Watch('active_ag_test_command')
   on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
@@ -256,6 +279,14 @@ export default class AGCasePanel extends Vue {
     this.d_show_new_ag_test_command_modal = true;
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_ag_test_command_name).focus();
+    });
+  }
+
+  open_clone_ag_test_case_modal() {
+    this.d_cloned_case_name = "";
+    this.d_show_clone_ag_test_case_modal = true;
+    Vue.nextTick(() => {
+        (<ValidatedInput> this.$refs.ag_test_case_clone_name).focus();
     });
   }
 
@@ -290,6 +321,18 @@ export default class AGCasePanel extends Vue {
     });
   }
 
+  @handle_api_errors_async(handle_clone_ag_test_case_error)
+  async clone_ag_test_case() {
+    try {
+      this.d_cloning = true;
+      await this.ag_test_case.copy(this.d_cloned_case_name);
+      this.d_show_clone_ag_test_case_modal = false;
+    }
+    finally {
+      this.d_cloning = false;
+    }
+  }
+
   @handle_api_errors_async(handle_add_ag_test_command_error)
   async add_ag_test_command() {
     try {
@@ -307,6 +350,10 @@ export default class AGCasePanel extends Vue {
 
 function handle_add_ag_test_command_error(component: AGCasePanel, error: unknown) {
   (<APIErrors> component.$refs.new_command_api_errors).show_errors_from_response(error);
+}
+
+function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown) {
+    (<APIErrors> component.$refs.clone_case_api_errors).show_errors_from_response(error);
 }
 
 </script>
@@ -399,4 +446,14 @@ function handle_add_ag_test_command_error(component: AGCasePanel, error: unknown
   padding: 10px 0 10px 0;
 }
 
+#modal-clone-ag-test-case-button {
+  @extend .green-button;
+  margin-top: 10px;
+}
+
+.modal-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
 </style>
