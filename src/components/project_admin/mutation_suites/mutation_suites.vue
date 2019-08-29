@@ -402,7 +402,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
 
   readonly fdbk_presets = new SafeMap<string, MutationTestSuiteFeedbackPreset>([
     [
-      'Public',
+      'Everything',
       {
         show_setup_return_code: true,
         show_setup_stdout: true,
@@ -443,7 +443,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
         show_setup_return_code: true,
         show_setup_stdout: false,
         show_setup_stderr: false,
-        show_get_test_names_return_code: true,
+        show_get_test_names_return_code: false,
         show_get_test_names_stdout: false,
         show_get_test_names_stderr: false,
         show_validity_check_stdout: false,
@@ -461,7 +461,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
         show_setup_return_code: true,
         show_setup_stdout: false,
         show_setup_stderr: false,
-        show_get_test_names_return_code: true,
+        show_get_test_names_return_code: false,
         show_get_test_names_stdout: false,
         show_get_test_names_stderr: false,
         show_validity_check_stdout: false,
@@ -469,10 +469,11 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
         show_grade_buggy_impls_stdout: false,
         show_grade_buggy_impls_stderr: false,
         show_invalid_test_names: true,
-        show_points: true,
+        show_points: false,
         bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.no_feedback
       }
     ],
+
     [
       'Private',
       {
@@ -490,7 +491,44 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
         show_points: false,
         bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.no_feedback
       }
-    ]
+    ],
+
+    [
+      'Num Bugs Exposed (Old)',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: false,
+        show_setup_stderr: false,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: false,
+        show_get_test_names_stderr: false,
+        show_validity_check_stdout: false,
+        show_validity_check_stderr: false,
+        show_grade_buggy_impls_stdout: false,
+        show_grade_buggy_impls_stderr: false,
+        show_invalid_test_names: true,
+        show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.num_bugs_exposed
+      }
+    ],
+    [
+      'False Positives (old)',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: false,
+        show_setup_stderr: false,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: false,
+        show_get_test_names_stderr: false,
+        show_validity_check_stdout: false,
+        show_validity_check_stderr: false,
+        show_grade_buggy_impls_stdout: false,
+        show_grade_buggy_impls_stderr: false,
+        show_invalid_test_names: true,
+        show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.no_feedback
+      }
+    ],
   ]);
 
   @handle_api_errors_async(handle_save_mutation_test_suite_error)

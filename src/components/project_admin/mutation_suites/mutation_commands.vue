@@ -31,7 +31,7 @@
         ref="get_student_test_names_command"
         id="get-student-test-names-command"
         v-model="d_mutation_test_suite.get_student_test_names_command"
-        command_label="2. Get student test names"
+        command_label="2. Discover student test names"
         @input="$emit('input', d_mutation_test_suite)"
         @form_validity_changed="d_get_student_test_names_command_is_valid = $event">
       </mutation-command>

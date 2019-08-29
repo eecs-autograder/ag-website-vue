@@ -24,10 +24,9 @@
            class="advanced-settings">
 
         <div class="select-row">
-          <label class="setting-title"> Return Code Correctness </label>
+          <label class="setting-title"> Bugs Exposed </label>
           <div>
-            <select :id="`${hyphenate(config_name)}-return-code-correctness`"
-                    ref="bugs_exposed_fdbk_level_select"
+            <select ref="bugs_exposed_fdbk_level_select"
                     v-model="d_feedback_config.bugs_exposed_fdbk_level"
                     @change="$emit('input', d_feedback_config)"
                     class="select">
@@ -51,7 +50,7 @@
                  class="checkbox"
                  v-model="d_feedback_config.show_invalid_test_names">
           <label :for="`${hyphenate(config_name)}-show-invalid-test-names`">
-            Show Individual Student Test Names
+            Show Invalid Student Tests
           </label>
         </div>
 
@@ -104,7 +103,7 @@
                  class="checkbox"
                  v-model="d_feedback_config.show_get_test_names_return_code">
           <label :for="`${hyphenate(config_name)}-show-get-test-names-return-code`">
-            Show Get Test Names Return Code
+            Show Test Name Discovery Return Code
           </label>
         </div>
 
@@ -115,7 +114,7 @@
                  class="checkbox"
                  v-model="d_feedback_config.show_get_test_names_stdout">
           <label :for="`${hyphenate(config_name)}-show-get-test-names-stdout`">
-            Show Get Test Names Stdout
+            Show Test Name Discovery Stdout
           </label>
         </div>
 
@@ -126,7 +125,7 @@
                  class="checkbox"
                  v-model="d_feedback_config.show_get_test_names_stderr">
           <label :for="`${hyphenate(config_name)}-show-get-test-names-stderr`">
-            Show Get Test Names Stderr
+            Show Test Name Discovery Stderr
           </label>
         </div>
 
