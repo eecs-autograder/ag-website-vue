@@ -1,6 +1,8 @@
 <template>
   <div id="mutation-command-component">
-    <div class="command-label"> {{command_label}} </div>
+    <div class="command-label">
+      <slot name="command-label"></slot>
+    </div>
     <div class="command-content">
       <div class="input-container"
            v-if="include_command_name_input">
@@ -130,9 +132,6 @@ export default class MutationCommand extends Vue {
 
   @Prop({default: false, type: Boolean})
   include_command_name_input!: boolean;
-
-  @Prop({required: true, type: String})
-  command_label!: string;
 
   d_is_open = false;
   d_ag_command: AGCommand | null = null;

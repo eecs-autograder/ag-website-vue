@@ -37,7 +37,7 @@
                 Num bugs exposed
               </option>
               <option :value="BugsExposedFeedbackLevel.exposed_bug_names">
-                Expose bug names
+                Exposed bug names
               </option>
             </select>
           </div>
@@ -50,7 +50,7 @@
                  class="checkbox"
                  v-model="d_feedback_config.show_invalid_test_names">
           <label :for="`${hyphenate(config_name)}-show-invalid-test-names`">
-            Show Invalid Student Tests
+            Show False Positive Student Tests
           </label>
         </div>
 

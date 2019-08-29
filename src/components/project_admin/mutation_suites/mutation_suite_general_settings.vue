@@ -105,9 +105,9 @@
                             :filter_fn="expected_student_file_filter_fn"
                             @update_item_chosen="add_student_file($event)">
           <template slot-scope="{item}">
-                  <span class="typeahead-row">
-                    {{item.pattern}}
-                  </span>
+            <span class="typeahead-row">
+              {{item.pattern}}
+            </span>
           </template>
         </dropdown-typeahead>
       </div>
