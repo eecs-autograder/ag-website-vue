@@ -7,7 +7,8 @@ import {
     Course,
     ExpectedStudentFile,
     Group,
-    InstructorFile, MutationTestSuite,
+    InstructorFile,
+    MutationTestSuite,
     Project,
     Semester,
     UltimateSubmissionPolicy
@@ -21,18 +22,18 @@ beforeAll(() => {
 });
 
 let course = new Course({
-   pk: 4,
-   name: 'A Course',
-   semester: Semester.fall,
-   year: 2018,
-   subtitle: '',
-   num_late_days: 0,
-   allowed_guest_domain: '@llama.edu',
-   last_modified: ''
+    pk: 4,
+    name: 'A Course',
+    semester: Semester.fall,
+    year: 2018,
+    subtitle: '',
+    num_late_days: 0,
+    allowed_guest_domain: '@llama.edu',
+    last_modified: ''
 });
 
 beforeEach(() => {
-   sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+    sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
 });
 
 afterEach(() => {
@@ -93,13 +94,11 @@ describe('Changing tabs in project admin', () => {
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
-        sinon.stub(Group, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        sinon.stub(Group, 'get_all_from_project').returns(Promise.resolve([]));
 
         wrapper = mount(ProjectAdmin, {
             localVue,
@@ -141,9 +140,7 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Instructor Files tab', async () => {
-        sinon.stub(InstructorFile, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        sinon.stub(InstructorFile, 'get_all_from_project').returns(Promise.resolve([]));
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -158,9 +155,7 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Expected Student Files tab', async () => {
-        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(
-            Promise.resolve([])
-        );
+        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(Promise.resolve([]));
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -175,9 +170,7 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Test Cases tab', async () => {
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -192,9 +185,7 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Clicking on Mutation Testing tab', async () => {
-        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
@@ -204,7 +195,7 @@ describe('Changing tabs in project admin', () => {
 
         expect(component.current_tab_index).toEqual(4);
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'mutation_testing'}})
+        { query: { current_tab: 'mutation_testing'}})
         ).toBe(true);
     });
 
@@ -264,13 +255,13 @@ describe('Changing tabs in project admin', () => {
 
         expect(component.current_tab_index).toEqual(8);
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'configure_handgrading'}})
+        { query: { current_tab: 'configure_handgrading'}})
         ).toBe(true);
     });
 });
 
 describe('select_tab function called with different values associated with "current_tab" ' +
-         'key on create',
+    'key on create',
          () => {
     let wrapper: Wrapper<ProjectAdmin>;
     let component: ProjectAdmin;
@@ -311,13 +302,11 @@ describe('select_tab function called with different values associated with "curr
             hide_ultimate_submission_fdbk: false,
             instructor_files: [],
             expected_student_files: [],
-            has_handgrading_rubric: false,
+            has_handgrading_rubric: false
         });
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
-        sinon.stub(Group, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        sinon.stub(Group, 'get_all_from_project').returns(Promise.resolve([]));
 
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
@@ -340,28 +329,26 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current tab parameter value = settings', async () => {
-       $route.query = { current_tab: 'settings' };
-       wrapper = mount(ProjectAdmin, {
-           mocks: {
-               $route
-           }
-       });
-       component = wrapper.vm;
-       await component.$nextTick();
+        $route.query = { current_tab: 'settings' };
+        wrapper = mount(ProjectAdmin, {
+            mocks: {
+             $route
+            }
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
 
-       expect(component.project).toEqual(project_1);
-       expect(component.current_tab_index).toEqual(0);
-       expect(component.d_loading).toBe(false);
+        expect(component.project).toEqual(project_1);
+        expect(component.current_tab_index).toEqual(0);
+        expect(component.d_loading).toBe(false);
     });
 
     test('current tab parameter value = instructor_files', async () => {
-        sinon.stub(InstructorFile, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
+        sinon.stub(InstructorFile, 'get_all_from_project').returns(Promise.resolve([]));
         $route.query = { current_tab: 'instructor_files' };
         wrapper = mount(ProjectAdmin, {
             mocks: {
-                $route
+             $route
             }
         });
         component = wrapper.vm;
@@ -372,9 +359,7 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current tab parameter value = expected_student_files', async () => {
-        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(
-            Promise.resolve([])
-        );
+        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(Promise.resolve([]));
         $route.query = { current_tab: 'expected_student_files' };
         wrapper = mount(ProjectAdmin, {
             mocks: {
@@ -407,10 +392,7 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current tab parameter value = mutation_testing', async () => {
-        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
-
+        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
         $route.query = { current_tab: 'mutation_testing' };
         wrapper = mount(ProjectAdmin, {
             mocks: {
@@ -423,7 +405,6 @@ describe('select_tab function called with different values associated with "curr
         expect(component.project).toEqual(project_1);
         expect(component.current_tab_index).toEqual(4);
     });
-
 
     test('current tab parameter value = edit_groups', async () => {
         // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
@@ -442,7 +423,6 @@ describe('select_tab function called with different values associated with "curr
         expect(component.current_tab_index).toEqual(5);
         // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
-
 
     test('current tab parameter value = download_grades', async () => {
         $route.query = { current_tab: 'download_grades' };
