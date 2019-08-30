@@ -65,10 +65,11 @@
 
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupObserver, Project, User } from 'ag-client-typescript';
 
+import { GlobalData } from '@/App.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import Submit from '@/components/project_view/submit.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -86,6 +87,9 @@ import { format_datetime, get_query_param } from '@/utils';
   }
 })
 export default class ProjectView extends Vue implements GroupObserver {
+  @Inject({from: 'globals'})
+  globals!: GlobalData
+
   current_tab_index = 0;
   d_loading = true;
   user: User | null = null;
@@ -106,6 +110,8 @@ export default class ProjectView extends Vue implements GroupObserver {
         this.group = result;
       }
     }
+
+    this.globals.set_current_project(this.project, this.course);
     this.d_loading = false;
   }
 

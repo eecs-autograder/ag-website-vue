@@ -97,10 +97,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { Course } from 'ag-client-typescript';
 
+import { GlobalData } from '@/App.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
@@ -128,6 +129,8 @@ import { get_query_param } from "@/utils";
   }
 })
 export default class CourseAdmin extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
 
   current_tab_index = 0;
   loading = true;
@@ -142,6 +145,7 @@ export default class CourseAdmin extends Vue {
 
   async created() {
     this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
+    this.globals.set_current_course(this.course);
     this.loading = false;
   }
 

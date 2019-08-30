@@ -32,11 +32,11 @@
 
 <script lang="ts">
 
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Inject } from 'vue-property-decorator';
 
-import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
-import { AllCourses } from 'ag-client-typescript/src/course';
+import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
+import { GlobalData } from '@/App.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import {
   array_add_unique,
@@ -60,19 +60,23 @@ interface TermCourses {
   }
 })
 export default class CourseList extends Vue implements CourseObserver {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
 
   all_courses: AllCourses | null = null;
   courses_by_term: TermCourses[] = [];
   loading = true;
 
-  beforeDestroy() {
-    Course.unsubscribe(this);
-  }
 
   async created() {
     Course.subscribe(this);
     await this.get_and_sort_courses();
+    this.globals.set_current_course(null);
     this.loading = false;
+  }
+
+  beforeDestroy() {
+    Course.unsubscribe(this);
   }
 
   is_admin(course: Course) {
