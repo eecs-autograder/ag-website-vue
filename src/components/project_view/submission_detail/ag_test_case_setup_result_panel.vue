@@ -1,44 +1,60 @@
 <template>
-  <div>
+  <div id="ag-test-case-setup-result-panel">
     <div class="panel">
-      <div class="panel-header"
+      <div :class="[d_is_open ? 'panel-header-open' : 'panel-header-closed',
+                    `${hyphenate(ag_test_suite_setup_correctness_level)}-panel-header`]"
            @click="toggle_is_open">
-        <div id="ag-test-case-name">
-          {{ag_test_suite_result_feedback.setup_name ? ag_test_suite_result_feedback.setup_name : 'Setup'}}
-          <span> Correctness Icon </span>
+        <div class="column-1">
+          {{ag_test_suite_result.setup_name ? ag_test_suite_result.setup_name : 'Setup'}}
         </div>
+        <div class="column-2">
+          <span class="passed-status">
+            <correctness-icon :correctness_level="ag_test_suite_setup_correctness_level">
+            </correctness-icon>
+          </span>
+        </div>
+        <div class="column-3"></div>
       </div>
-      <div class="panel-body"
+      <div :class="`${hyphenate(ag_test_suite_setup_correctness_level)}-panel-body`"
            v-if="d_is_open">
 
         <div id="exit-status-section">
           <div class="feedback-label"> Exit status: </div>
-          {{ag_test_suite_result_feedback.setup_return_code}}
-          <span v-if="ag_test_suite_result_feedback.setup_timed_out"> Timed out </span>
+          <div class="feedback-output-content-short">
+            {{ag_test_suite_result.setup_return_code}}
+          </div>
+          <div v-if="ag_test_suite_result.setup_timed_out"
+               class="feedback-row"> Setup Command Timed out </div>
         </div>
 
-        <div id="stdout-section"
-             v-if="ag_test_suite_result_feedback.fdbk_settings.show_setup_stdout">
+        <div v-if="ag_test_suite_result.fdbk_settings.show_setup_stdout"
+             id="stdout-section"
+             class="feedback-row">
           <div class="feedback-label"> Output: </div>
-          <div v-if="!d_setup_stdout_loaded">
+          <template v-if="!d_setup_stdout_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
-          </div>
-          <div v-else>
-            <div v-if="!setup_stdout"> No Output </div>
-            <div v-else>{{setup_stdout}}</div>
-          </div>
+          </template>
+          <template v-else>
+            <div v-if="!setup_stdout"
+                 class="feedback-output-content-short"> No Output </div>
+            <pre v-else
+                 class="feedback-output-content-lengthy">{{setup_stdout}}</pre>
+          </template>
         </div>
 
-        <div id="stderr-section"
-             v-if="ag_test_suite_result_feedback.fdbk_settings.show_setup_stderr">
+        <div v-if="ag_test_suite_result.fdbk_settings.show_setup_stderr"
+             id="stderr-section"
+             class="feedback-row">
           <div class="feedback-label"> Error Output: </div>
-          <div v-if="!d_setup_stderr_loaded">
-            Loading Icon
-          </div>
-          <div v-else>
-            <div v-if="!setup_stderr"> No Output </div>
-            <div v-else>{{setup_stderr}}</div>
-          </div>
+          <template v-if="!d_setup_stderr_loaded">
+            <i class="fa fa-spinner fa-pulse fa-fw"></i>
+          </template>
+          <template v-else>
+            <div v-if="!setup_stderr"
+                 class="feedback-output-content-short"> No Output </div>
+            <pre v-else
+                 class="feedback-output-content-lengthy">{{setup_stderr}}</pre>
+          </template>
         </div>
 
       </div>
@@ -60,23 +76,38 @@ import {
 import get_ag_test_suite_result_setup_stdout = ResultOutput.get_ag_test_suite_result_setup_stdout;
 import get_ag_test_suite_result_setup_stderr = ResultOutput.get_ag_test_suite_result_setup_stderr;
 
-@Component
+import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
+import CorrectnessIcon, { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
+
+@Component({
+  components: {
+    CorrectnessIcon
+  }
+})
 export default class AGTestCaseSetupResultPanel extends Vue {
 
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
   @Prop({required: true, type: Object})
-  ag_test_suite_result_feedback!: AGTestSuiteResultFeedback;
+  ag_test_suite_result!: AGTestSuiteResultFeedback;
 
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
+
+  @Prop({required: true, type: String})
+  ag_test_suite_setup_correctness_level!: string;
+
+  @Prop({default: false, type: Boolean})
+  panel_is_active!: boolean;
 
   setup_stdout: string = "";
   setup_stderr: string = "";
   d_setup_stdout_loaded = false;
   d_setup_stderr_loaded = false;
   d_is_open = false;
+
+  readonly hyphenate = hyphenate;
 
   toggle_is_open() {
     this.d_is_open = !this.d_is_open;
@@ -85,14 +116,14 @@ export default class AGTestCaseSetupResultPanel extends Vue {
   async created() {
     this.setup_stdout = await get_ag_test_suite_result_setup_stdout(
       this.submission.pk,
-      this.ag_test_suite_result_feedback.pk,
+      this.ag_test_suite_result.pk,
       this.fdbk_category
     );
     this.d_setup_stdout_loaded = true;
 
     this.setup_stderr = await get_ag_test_suite_result_setup_stderr(
       this.submission.pk,
-      this.ag_test_suite_result_feedback.pk,
+      this.ag_test_suite_result.pk,
       this.fdbk_category
     );
     this.d_setup_stderr_loaded = true;
@@ -101,22 +132,5 @@ export default class AGTestCaseSetupResultPanel extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-
-#ag-test-case-name {
-  color: black;
-}
-
-.panel {
-  background-color: darkorange;
-  padding: 5px;
-  border-radius: 3px;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-content: center;
-  margin-bottom: 5px;
-  cursor: pointer;
-}
-
+@import '@/styles/components/submission_detail.scss';
 </style>

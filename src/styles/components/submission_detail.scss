@@ -1,0 +1,137 @@
+@import '@/styles/colors.scss';
+
+.panel {
+    margin-bottom: 5px;
+}
+
+.panel-header-open {
+    border-radius: 3px 3px 0 0;
+}
+
+.panel-header-closed {
+    border-radius: 3px;
+}
+
+%panel-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: center;
+    border: 1px solid;
+    font-weight: bold;
+}
+
+.column-1 {
+    width: calc(100% / 2);
+    padding: 10px;
+}
+
+.column-2 {
+    width: calc(100% / 4);
+    padding: 10px;
+}
+
+.column-3 {
+    width: calc(100% / 4);
+    padding: 10px;
+}
+
+%panel-body {
+    padding: 10px 10px 4px 10px;
+    background-color: white;
+    border-radius: 0 0 3px 3px;
+}
+
+@mixin panel-body-border($border-color: $white-gray) {
+    border: 1px solid $border-color;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+}
+
+$base-gray: darken($white-gray, 5);
+
+.not-available-panel-header {
+    @extend %panel-header;
+    background-color: $base-gray;
+    cursor: default;
+    color: $stormy-gray-dark;
+    border-color: darken($base-gray, 5);
+}
+
+$base-red: lighten($warning-red, 30);
+
+.none-correct-panel-header {
+    @extend %panel-header;
+    cursor: pointer;
+    background-color: $base-red;
+    border-color: darken($base-red, 5);
+}
+
+.none-correct-panel-header:hover {
+    background-color: darken($base-red, 5);
+    border-color: darken($base-red, 10);
+}
+
+.none-correct-panel-body {
+    @extend %panel-body;
+    @include panel-body-border($base-red);
+}
+
+$base-orange: $orange;
+
+.some-correct-panel-header {
+    @extend %panel-header;
+    cursor: pointer;
+    background-color: $base-orange;
+    border-color: darken($base-orange, 10);
+}
+
+.some-correct-panel-header:hover {
+    background-color: darken($base-orange, 10);
+    border-color: darken($base-orange, 15);
+}
+
+.some-correct-panel-body {
+    @extend %panel-body;
+    @include panel-body-border($base-orange);
+}
+
+$base-blue: darken($light-blue, 2);
+
+.all-correct-panel-header {
+    @extend %panel-header;
+    cursor: pointer;
+    background-color: $base-blue;
+    border-color: darken($base-blue, 5);
+}
+
+.all-correct-panel-header:hover {
+    background-color: darken($base-blue, 5);
+    border-color: darken($base-blue, 10);
+}
+
+.all-correct-panel-body {
+    @extend %panel-body;
+    @include panel-body-border($base-blue);
+}
+
+.feedback-label {
+    font-weight: bold;
+    display: inline;
+}
+
+.feedback-row {
+    padding: 0 0 4px 0;
+}
+
+.feedback-output-content-short {
+    display: inline-block;
+}
+
+.feedback-output-content-lengthy {
+    border: 1px solid $pebble-dark;
+    background-color: white;
+    border-radius: 3px;
+    padding: 10px;
+    margin: 8px 0 4px 0;
+}

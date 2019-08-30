@@ -1,16 +1,16 @@
 <template>
-  <div v-if="!d_loading">
-    <div v-if="submission_result !== null">
-      <h2> Mutation Suites </h2>
+  <div v-if="!d_loading"
+       id="submission_detail">
+    <div v-if="submission_result !== null"
+         id="view-submission">
       <mutation-test-suite-results
         :submission="submission"
         :mutation_test_suite_results="submission_result.student_test_suite_results"
         :fdbk_category="feedback_category">
       </mutation-test-suite-results>
-      <h2> AG Suites </h2>
       <div v-for="(ag_test_suite_result, index) of submission_result.ag_test_suite_results">
         <AGTestSuiteResult :submission="submission"
-                           :ag_test_suite_result_feedback="ag_test_suite_result"
+                           :ag_test_suite_result="ag_test_suite_result"
                            :fdbk_category="feedback_category">
         </AGTestSuiteResult>
       </div>
@@ -50,8 +50,9 @@ export default class SubmissionDetail extends Vue {
 
   async created() {
     let all_submissions = await Submission.get_all_from_group(this.group.pk);
+    console.log(all_submissions.length);
     if (all_submissions.length !== 0) {
-        this.submission = all_submissions[all_submissions.length - 1];
+        this.submission = all_submissions[0];
     }
     if (this.submission !== null) {
       this.submission_result = await get_submission_result(
@@ -67,6 +68,17 @@ export default class SubmissionDetail extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
+#submission_detail {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+#view-submission {
+  width: 50%;
+
+}
 
 @media only screen and (min-width: 481px) {
 

@@ -1,35 +1,26 @@
 <template>
-  <div>
-    <div class="expected-and-actual-return-code"
-         v-if="false">
-      <div v-if="ag_test_command_result_feedback.actual_return_code !== null">
-        Exit Status: {{ag_test_command_result_feedback.actual_return_code}}
-      </div>
-      <div v-if="ag_test_command_result_feedback.timed_out">
-        The command timed out.
-      </div>
-      <div v-if="ag_test_command_result_feedback.expected_return_code !== null
-                 && ag_test_command_result_feedback.expected_return_code !== ExpectedReturnCode.none">
-        Expected exit status:
-        {{ag_test_command_result_feedback.expected_return_code === ExpectedReturnCode.zero ? 0 : 'nonzero'}}
-      </div>
-    </div>
-
+  <div id="ag-test-command-result-panel">
     <div class="panel">
-      <div :class="['panel-header', {'panel-header-open': is_open}]"
-           @click="toggle_is_open">
-        <div id="ag-test-command-name">
-          {{ag_test_command_result_feedback.ag_test_command_name}}
+      <div :class="[`${hyphenate(ag_test_command_row_correctness_level)}-panel-header`,
+                    d_is_open ? 'panel-header-open' : 'panel-header-closed']"
+           @click="toggle_d_is_open">
+        <div class="column-1">
+          {{ag_test_command_result.ag_test_command_name}}
         </div>
+        <div class="column-2">
+          <correctness-icon :correctness_level="ag_test_command_row_correctness_level">
+          </correctness-icon>
+        </div>
+        <div class="column-3"> </div>
       </div>
 
-      <div class="panel-body" v-if="is_open">
+      <div v-if="d_is_open"
+           :class="`${hyphenate(ag_test_command_row_correctness_level)}-panel-body`">
         <AGTestCommandResult :submission="submission"
-                             :ag_test_command_result_feedback="ag_test_command_result_feedback"
+                             :ag_test_command_result="ag_test_command_result"
                              :fdbk_category="fdbk_category">
         </AGTestCommandResult>
       </div>
-
     </div>
   </div>
 </template>
@@ -39,22 +30,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
     AGTestCommandResultFeedback,
-    FeedbackCategory,
-    ResultOutput,
-    Submission,
     ExpectedReturnCode,
-    ValueFeedbackLevel
+    FeedbackCategory,
+    Submission,
 } from "ag-client-typescript";
-import get_ag_test_cmd_result_stdout = ResultOutput.get_ag_test_cmd_result_stdout;
-import get_ag_test_cmd_result_stderr = ResultOutput.get_ag_test_cmd_result_stderr;
-import get_ag_test_cmd_result_stdout_diff = ResultOutput.get_ag_test_cmd_result_stdout_diff;
-import get_ag_test_cmd_result_stderr_diff = ResultOutput.get_ag_test_cmd_result_stderr_diff;
 
+import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
 import AGTestCommandResult from '@/components/project_view/submission_detail/ag_test_command_result.vue';
+import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 
 @Component({
   components: {
-    AGTestCommandResult
+    AGTestCommandResult,
+    CorrectnessIcon
   }
 })
 export default class AGTestCommandResultPanel extends Vue {
@@ -62,54 +50,34 @@ export default class AGTestCommandResultPanel extends Vue {
   submission!: Submission;
 
   @Prop({required: true, type: Object})
-  ag_test_command_result_feedback!: AGTestCommandResultFeedback;
+  ag_test_command_result!: AGTestCommandResultFeedback;
 
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
-  is_open = false;
+  @Prop({required: true, type: String})
+  ag_test_command_row_correctness_level!: string;
+
+  @Prop({default: false, type: Boolean})
+  panel_is_active!: boolean;
+
+  @Prop({default: false, type: Boolean})
+  panel_is_odd!: boolean;
+
+  d_is_open = false;
 
   readonly ExpectedReturnCode = ExpectedReturnCode;
+  readonly hyphenate = hyphenate;
 
-  toggle_is_open() {
-    this.is_open = !this.is_open;
+  toggle_d_is_open() {
+    if (this.ag_test_command_row_correctness_level !== CorrectnessLevel.not_available) {
+      this.d_is_open = !this.d_is_open;
+    }
   }
 }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-
-#ag-test-command-name {
-  color: black;
-}
-
-.panel {
-  margin-bottom: 5px;
-}
-
-.panel-header {
-  background-color: $light-blue;
-  border-radius: 3px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-content: center;
-  padding: 5px;
-}
-
-.panel-header-open {
-  border-radius: 3px 3px 0 0;
-}
-
-.panel-body {
-  padding: 10px;
-}
-
-.feedback-label {
-  font-weight: bold;
-
-}
+@import '@/styles/components/submission_detail.scss';
 
 </style>
