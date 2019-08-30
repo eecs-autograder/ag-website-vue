@@ -375,7 +375,7 @@ function num_glob_matches(names: string[], pattern: string): number {
 }
 
 #submit-component {
-  padding: 5px;
+  padding: 15px;
 }
 
 #deadline-container {

@@ -183,6 +183,10 @@ export function format_datetime(datetime: string | null): string {
     return moment(datetime).format('MMMM DD, YYYY, hh:mm A');
 }
 
+export function format_datetime_short(datetime: string): string {
+    return moment(datetime).format("MMM DD, 'YY, hh:mm A");
+}
+
 export function format_time(time: string | null): string {
     if (time === null) {
         return '--:-- --';

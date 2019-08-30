@@ -42,7 +42,9 @@
         </tab-header>
         <template slot="body">
           <div class="tab-body">
-            <!--TODO Submissions-->
+            <submission-list :course="course"
+                  :project="project"
+                  :group="group"></submission-list>
           </div>
         </template>
       </tab>
@@ -72,6 +74,7 @@ import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 import { GlobalData } from '@/app.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import Submit from '@/components/project_view/submit.vue';
+import SubmissionList from '@/components/submission_list.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -80,6 +83,7 @@ import { format_datetime, get_query_param } from '@/utils';
 @Component({
   components: {
     GroupRegistration,
+    SubmissionList,
     Submit,
     Tab,
     TabHeader,
@@ -175,12 +179,6 @@ export default class ProjectView extends Vue implements GroupObserver {
   margin: 0;
   font-size: 14px;
   overflow: hidden;
-}
-
-.tab-body {
-  text-align: left;
-  position: relative;
-  padding: 10px;
 }
 
 .tab-label {
