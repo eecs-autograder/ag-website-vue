@@ -78,8 +78,8 @@ import {
 
 import { Created, Destroyed } from '@/lifecycle';
 import { deep_copy, format_datetime_short, safe_assign } from '@/utils';
-import { SubmissionData, GradingStatus } from 'ag-client-typescript/dist/src/submission';
-import { HttpError } from 'ag-client-typescript/src/http_client';
+import { SubmissionData, GradingStatus } from 'ag-client-typescript';
+import { HttpError } from 'ag-client-typescript';
 
 @Component({})
 export default class SubmissionList extends Vue implements SubmissionObserver, Created, Destroyed {
