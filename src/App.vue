@@ -64,6 +64,7 @@ import { safe_assign } from './utils';
 globals!: GlobalData;
 // We need the provided globals to be one of our reactive data members,
 // so we alias it here.
+// ALWAYS ACCESS GLOBALS THROUGH THIS VARIABLE!
 d_globals = this.globals;
 */
 export class GlobalData {
@@ -117,6 +118,7 @@ export default class App extends Vue {
   globals!: GlobalData;
   // We need the provided globals to be one of our reactive data members,
   // so we alias it here.
+  // ALWAYS ACCESS GLOBALS THROUGH THIS VARIABLE!
   d_globals = this.globals;
   */
   @Provide()

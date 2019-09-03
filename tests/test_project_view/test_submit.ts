@@ -1,12 +1,14 @@
 import { mount, Wrapper } from '@vue/test-utils';
+// tslint:disable-next-line: no-duplicate-imports
+import * as vue_test_utils from '@vue/test-utils';
 
 import { Course, GradingStatus, Group, HttpError, Project, Submission, User } from "ag-client-typescript";
 // @ts-ignore
 import moment from "moment";
 import * as sinon from 'sinon';
 
+import { GlobalData } from '@/App.vue';
 import APIErrors from "@/components/api_errors.vue";
-import Modal from '@/components/modal.vue';
 import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
@@ -28,7 +30,9 @@ beforeEach(() => {
 
     late_days_remaining = 0;
 
-    sinon.stub(User, 'get_current').returns(Promise.resolve(current_user));
+    let globals = new GlobalData();
+    globals.current_user = current_user;
+    vue_test_utils.config.provide!['globals'] = globals;
     sinon.stub(User, 'get_num_late_days').withArgs(course.pk, current_user.pk).callsFake(() => {
         return Promise.resolve({late_days_remaining: late_days_remaining});
     });

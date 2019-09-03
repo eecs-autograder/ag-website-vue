@@ -67,7 +67,7 @@
 <script lang="ts">
 import { Component, Inject, Vue } from 'vue-property-decorator';
 
-import { Course, Group, GroupObserver, Project, User } from 'ag-client-typescript';
+import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 
 import { GlobalData } from '@/App.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
@@ -88,11 +88,11 @@ import { format_datetime, get_query_param } from '@/utils';
 })
 export default class ProjectView extends Vue implements GroupObserver {
   @Inject({from: 'globals'})
-  globals!: GlobalData
+  globals!: GlobalData;
+  d_globals = this.globals;
 
   current_tab_index = 0;
   d_loading = true;
-  user: User | null = null;
   project: Project | null = null;
   course: Course | null = null;
   group: Group | null = null;
@@ -102,8 +102,7 @@ export default class ProjectView extends Vue implements GroupObserver {
     Group.subscribe(this);
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
     this.course = await Course.get_by_pk(this.project.course);
-    this.user = await User.get_current();
-    let groups_is_member_of = await this.user.groups_is_member_of();
+    let groups_is_member_of = await this.d_globals.current_user.groups_is_member_of();
     if (groups_is_member_of.length > 0) {
       let result = groups_is_member_of.find(group => group.project === this.project!.pk);
       if (result !== undefined) {
@@ -111,7 +110,7 @@ export default class ProjectView extends Vue implements GroupObserver {
       }
     }
 
-    this.globals.set_current_project(this.project, this.course);
+    this.d_globals.set_current_project(this.project, this.course);
     this.d_loading = false;
   }
 

@@ -9,6 +9,7 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
+import { GlobalData } from '@/App.vue';
 import APIErrors from '@/components/api_errors.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
@@ -41,12 +42,15 @@ describe('InvitationReceived tests', () => {
             is_superuser: true
         });
 
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
-
+        let globals = new GlobalData();
+        globals.current_user = user;
         wrapper = mount(InvitationReceived, {
             propsData: {
                 value: invitation,
                 project: project
+            },
+            provide: {
+                globals: globals
             }
         });
     });
@@ -57,7 +61,7 @@ describe('InvitationReceived tests', () => {
 
     test('reject an invitation - cancel action in modal', async () => {
         expect(wrapper.vm.d_invitation!).toEqual(invitation);
-        expect(wrapper.vm.user).toEqual(user);
+        expect(wrapper.vm.d_globals.current_user).toEqual(user);
         expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
@@ -275,7 +279,7 @@ describe('InvitationReceived tests', () => {
             "milo@umich.edu",
             "keiko@umich.edu"
         ]);
-        expect(wrapper.vm.user!.username).toEqual("alexis@umich.edu");
+        expect(wrapper.vm.d_globals.current_user.username).toEqual("alexis@umich.edu");
         expect(wrapper.vm.d_invitation!.invitation_creator).toEqual("sean@umich.edu");
         expect(wrapper.vm.other_group_members).toEqual([
             invitation.invitation_creator,

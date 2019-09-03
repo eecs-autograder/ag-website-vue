@@ -13,7 +13,7 @@ import * as sinon from 'sinon';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ProjectView from '@/components/project_view/project_view.vue';
 
-import { make_course, make_project } from '@/tests/data_utils';
+import { make_course, make_project, make_user_roles, set_global_current_user } from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -21,6 +21,8 @@ beforeAll(() => {
 
 beforeEach(() => {
     sinon.stub(User, 'get_num_late_days').returns(Promise.resolve({late_days_remaining: 0}));
+    sinon.stub(User, 'get_current_user_roles').returns(
+        Promise.resolve(make_user_roles()));
 });
 
 afterEach(() => {
@@ -62,10 +64,10 @@ describe('Changing Tabs', ()  => {
             email: "worldsbestbo$$@umich.edu",
             is_superuser: true
         });
+        set_global_current_user(user);
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
 
         config.logModifiedComponents = false;
@@ -168,10 +170,10 @@ describe('select_tab function called with different values associated with "curr
             email: "worldsbestbo$$@umich.edu",
             is_superuser: true
         });
+        set_global_current_user(user);
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
 
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {
@@ -310,7 +312,6 @@ describe('select_tab function called with different values associated with "curr
 
         expect(wrapper.vm.project).toEqual(project);
         expect(wrapper.vm.course).toEqual(course);
-        expect(wrapper.vm.user).toEqual(user);
         expect(groups_is_member_of_stub.calledOnce).toBe(true);
         expect(wrapper.vm.group).toEqual(group_2);
         expect(wrapper.vm.current_tab_index).toEqual(0);
@@ -455,6 +456,7 @@ describe('GroupObserver tests for the Project Component', () => {
             email: "alexis@umich.edu",
             is_superuser: true
         });
+        set_global_current_user(user);
 
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
     });
@@ -486,7 +488,6 @@ describe('GroupObserver tests for the Project Component', () => {
             created_at: "9am",
             last_modified: "10am"
         });
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
@@ -524,7 +525,6 @@ describe('GroupObserver tests for the Project Component', () => {
             created_at: "9am",
             last_modified: "10am"
         });
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
@@ -581,7 +581,6 @@ describe('GroupObserver tests for the Project Component', () => {
             invitees_who_accepted: ["lauren@umich.edu"]
         });
         sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(user, 'group_invitations_received').returns(
             Promise.resolve([invitation_received])

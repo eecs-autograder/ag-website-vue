@@ -1,3 +1,5 @@
+import * as vue_test_utils from '@vue/test-utils';
+
 import {
     AGCommand,
     AGTestCase,
@@ -23,6 +25,7 @@ import {
     ValueFeedbackLevel,
 } from 'ag-client-typescript';
 
+import { GlobalData } from '@/App.vue';
 import { safe_assign } from "@/utils";
 
 function* counter() {
@@ -31,6 +34,12 @@ function* counter() {
         yield count;
         count += 1;
     }
+}
+
+export function set_global_current_user(user: User) {
+    let globals = new GlobalData();
+    globals.current_user = user;
+    vue_test_utils.config.provide!['globals'] = globals;
 }
 
 const USER_PKS = counter();

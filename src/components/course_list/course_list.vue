@@ -62,6 +62,7 @@ interface TermCourses {
 export default class CourseList extends Vue implements CourseObserver {
   @Inject({from: 'globals'})
   globals!: GlobalData;
+  d_globals = this.globals;
 
   all_courses: AllCourses | null = null;
   courses_by_term: TermCourses[] = [];
@@ -71,7 +72,7 @@ export default class CourseList extends Vue implements CourseObserver {
   async created() {
     Course.subscribe(this);
     await this.get_and_sort_courses();
-    this.globals.set_current_course(null);
+    this.d_globals.set_current_course(null);
     this.loading = false;
   }
 
@@ -118,8 +119,7 @@ export default class CourseList extends Vue implements CourseObserver {
   }
 
   async get_and_sort_courses() {
-    let user = await User.get_current();
-    this.all_courses = await Course.get_courses_for_user(user);
+    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user);
     for (let [role, courses] of Object.entries(this.all_courses)) {
       this.sort_into_terms(courses);
     }

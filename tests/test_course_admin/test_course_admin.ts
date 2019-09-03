@@ -2,7 +2,7 @@ import VueRouter from 'vue-router';
 
 import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Project, Semester, User } from 'ag-client-typescript';
+import { Course, Project, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
@@ -13,13 +13,25 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
+let course: Course;
+let user: User;
+
+beforeEach(() => {
+    course = data_ut.make_course();
+
+    user = new User({
+        pk: 1, username: "amandaplease@umich.edu", first_name: "Amanda", last_name: "Bynes",
+        email: "amandaplease@umich.edu", is_superuser: true
+    });
+    data_ut.set_global_current_user(user);
+    sinon.stub(User, 'get_current_user_roles').returns(
+        Promise.resolve(data_ut.make_user_roles()));
+});
+
 describe('Changing Tabs', ()  => {
     let wrapper: Wrapper<CourseAdmin>;
     let component: CourseAdmin;
-    let course_1: Course;
-    let user: User;
     let roster: User[];
-    let projects: Project[];
     let original_match_media: (query: string) => MediaQueryList;
     // tslint:disable-next-line naming-convention
     const localVue = createLocalVue();
@@ -35,17 +47,8 @@ describe('Changing Tabs', ()  => {
     });
 
     beforeEach(() => {
-        course_1 = data_ut.make_course();
-
-        user = new User({
-            pk: 1, username: "amandaplease@umich.edu", first_name: "Amanda", last_name: "Bynes",
-            email: "amandaplease@umich.edu", is_superuser: true
-        });
-
         roster = [user];
-        projects = [];
-
-        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course_1));
+        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
 
         config.logModifiedComponents = false;
         original_match_media = window.matchMedia;
@@ -77,7 +80,7 @@ describe('Changing Tabs', ()  => {
     test('Clicking on roster tab with role selected = "Admin"', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course_1, 'get_admins').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_admins').returns(Promise.resolve(roster));
 
         wrapper.find('.roster-tab-header').trigger('click');
         await component.$nextTick();
@@ -96,7 +99,7 @@ describe('Changing Tabs', ()  => {
 
     test('Clicking on roster tab with role selected = "Staff"', async () => {
         let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course_1, 'get_staff').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_staff').returns(Promise.resolve(roster));
 
         await component.$nextTick();
         wrapper.find('.roster-tab-header').trigger('click');
@@ -121,7 +124,7 @@ describe('Changing Tabs', ()  => {
     test('Clicking on roster tab with role selected = "Student"', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course_1, 'get_students').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_students').returns(Promise.resolve(roster));
 
         wrapper.find('.roster-tab-header').trigger('click');
         await component.$nextTick();
@@ -146,7 +149,7 @@ describe('Changing Tabs', ()  => {
     test('Clicking on roster tab with role selected = "Handgrader"', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course_1, 'get_handgraders').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
 
         wrapper.find('.roster-tab-header').trigger('click');
         await component.$nextTick();
@@ -172,7 +175,7 @@ describe('Changing Tabs', ()  => {
     test('Pressing enter on roster tab with role selected = "Handgrader"', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course_1, 'get_handgraders').returns(Promise.resolve(roster));
+        sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
 
         wrapper.find('.roster-tab-header').trigger('click');
         await component.$nextTick();
@@ -200,7 +203,7 @@ describe('Changing Tabs', ()  => {
     test('Clicking on manage_projects tab', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve(projects));
+        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
 
         let tabs = wrapper.findAll('.tab-label');
         expect(tabs.length).toEqual(3);
@@ -240,31 +243,26 @@ describe('select_tab function called with different values associated with "curr
          ()  => {
     let wrapper: Wrapper<CourseAdmin>;
     let component: CourseAdmin;
-    let course: Course;
     let roster: User[];
-    let projects: Project[];
     let original_match_media: (query: string) => MediaQueryList;
 
     const $route = {
-      path: '/web/course_admin/:course_id',
-      params: {
-          course_id: '2'
-      },
-      query: { }
+        path: '/web/course_admin/:course_id',
+        params: {
+            course_id: '2'
+        },
+        query: { }
     };
 
     beforeEach(() => {
         course = data_ut.make_course();
 
-        roster = [];
-        projects = [];
-
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
-        sinon.stub(course, 'get_admins').returns(Promise.resolve(roster));
-        sinon.stub(course, 'get_staff').returns(Promise.resolve(roster));
-        sinon.stub(course, 'get_students').returns(Promise.resolve(roster));
-        sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
-        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve(projects));
+        sinon.stub(course, 'get_admins').returns(Promise.resolve([]));
+        sinon.stub(course, 'get_staff').returns(Promise.resolve([]));
+        sinon.stub(course, 'get_students').returns(Promise.resolve([]));
+        sinon.stub(course, 'get_handgraders').returns(Promise.resolve([]));
+        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
 
         original_match_media = window.matchMedia;
         Object.defineProperty(window, "matchMedia", {

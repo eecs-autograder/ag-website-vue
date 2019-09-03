@@ -8,6 +8,8 @@ import ManageProjects from '@/components/course_admin/manage_projects/manage_pro
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { set_global_current_user } from '@/tests/data_utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -166,7 +168,7 @@ describe('ManageProjects.vue', () => {
 
         courses = [current_course, another_course];
 
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        set_global_current_user(user);
         sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve(courses));
         sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve(projects));
 

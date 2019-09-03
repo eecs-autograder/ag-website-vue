@@ -1,8 +1,11 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
+// tslint:disable-next-line: no-duplicate-imports
+import * as vue_test_utils from '@vue/test-utils';
 
 import { Course, HttpError, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
+import { GlobalData } from '@/App.vue';
 import APIErrors from '@/components/api_errors.vue';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -34,7 +37,9 @@ describe('SingleProject.vue', () => {
             last_name: 'IceBerg', email: 'iceberg@umich.edu',
             is_superuser: false});
 
-        sinon.stub(User, "get_current").returns(Promise.resolve(user));
+        let globals = new GlobalData();
+        globals.current_user = user;
+        vue_test_utils.config.provide!['globals'] = globals;
 
         course_1 = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
