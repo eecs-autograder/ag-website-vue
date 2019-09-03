@@ -32,11 +32,11 @@
 
 <script lang="ts">
 
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue } from 'vue-property-decorator';
 
-import { Course, CourseObserver, Semester, User } from 'ag-client-typescript';
-import { AllCourses } from 'ag-client-typescript/src/course';
+import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import {
   array_add_unique,
@@ -60,19 +60,24 @@ interface TermCourses {
   }
 })
 export default class CourseList extends Vue implements CourseObserver {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
 
   all_courses: AllCourses | null = null;
   courses_by_term: TermCourses[] = [];
   loading = true;
 
-  beforeDestroy() {
-    Course.unsubscribe(this);
-  }
 
   async created() {
     Course.subscribe(this);
     await this.get_and_sort_courses();
+    await this.d_globals.set_current_course(null);
     this.loading = false;
+  }
+
+  beforeDestroy() {
+    Course.unsubscribe(this);
   }
 
   is_admin(course: Course) {
@@ -114,8 +119,7 @@ export default class CourseList extends Vue implements CourseObserver {
   }
 
   async get_and_sort_courses() {
-    let user = await User.get_current();
-    this.all_courses = await Course.get_courses_for_user(user);
+    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user);
     for (let [role, courses] of Object.entries(this.all_courses)) {
       this.sort_into_terms(courses);
     }

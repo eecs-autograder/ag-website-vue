@@ -10,7 +10,7 @@ import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import ProjectView from '@/components/project_view/project_view.vue';
 import UIDemos from '@/demos/ui_demos.vue';
 
-import App from './App.vue';
+import App from './app.vue';
 
 Vue.config.productionTip = false;
 Vue.use(VueRouter);

@@ -9,16 +9,16 @@
         Extension:
         <span id="extension" class="date">{{format_datetime(group.extended_due_date)}}</span>
       </div>
-      <template v-if="current_user !== null">
-        <div id="late-days-used"
-             class="limit-container"
-             v-if="current_user.username in group.late_days_used">
-          <span class="allotment">{{group.late_days_used[current_user.username]}}</span>
-          late day<template v-if="group.late_days_used[current_user.username] !== 1">s</template>
-          used on this project.
-        </div>
-      </template>
-      <i v-else class="loading fa fa-spinner fa-pulse"></i>
+      <div id="late-days-used"
+            class="limit-container"
+            v-if="d_globals.current_user.username in group.late_days_used">
+        <span class="allotment">{{group.late_days_used[d_globals.current_user.username]}}</span>
+        late
+        day<template
+              v-if="group.late_days_used[d_globals.current_user.username] !== 1"
+           >s</template>
+        used on this project.
+      </div>
     </div>
 
     <div id="group-members-container" v-if="group.member_names.length > 1">
@@ -142,13 +142,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, ExpectedStudentFile, Group, Project, Submission, User } from 'ag-client-typescript';
 import * as minimatch from 'minimatch';
 // @ts-ignore
 import moment from "moment";
 
+import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
@@ -170,6 +171,10 @@ interface ExpectedFilePatternMismatch {
   }
 })
 export default class Submit extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   @Prop({required: true, type: Course})
   course!: Course;
 
@@ -194,11 +199,8 @@ export default class Submit extends Vue {
 
   late_days_remaining: number | null = null;
 
-  current_user: User | null = null;
-
   async created() {
-    this.current_user = await User.get_current();
-    let late_days = await User.get_num_late_days(this.course.pk, this.current_user.pk);
+    let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user.pk);
     this.late_days_remaining = late_days.late_days_remaining;
   }
 
@@ -235,7 +237,7 @@ export default class Submit extends Vue {
       deadline = moment(this.group.extended_due_date);
     }
 
-    let late_days_used = this.group.late_days_used[this.current_user!.username];
+    let late_days_used = this.group.late_days_used[this.d_globals.current_user.username];
     if (late_days_used !== undefined) {
       deadline = deadline.add(late_days_used, 'd');
     }

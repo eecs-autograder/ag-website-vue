@@ -87,10 +87,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, Project, User } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
@@ -111,6 +112,9 @@ import { is_not_empty } from '@/validators';
   }
 })
 export default class SingleProject extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
 
   @Prop({required: true, type: Course})
   course!: Course;
@@ -134,8 +138,7 @@ export default class SingleProject extends Vue {
 
   async created() {
     this.course_to_clone_to = this.course;
-    let user = await User.get_current();
-    this.cloning_destinations = await user.courses_is_admin_for();
+    this.cloning_destinations = await this.d_globals.current_user.courses_is_admin_for();
     this.course_index = this.cloning_destinations.findIndex(
       course => course.pk === this.course.pk);
   }

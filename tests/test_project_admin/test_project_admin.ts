@@ -11,11 +11,14 @@ import {
     MutationTestSuite,
     Project,
     Semester,
-    UltimateSubmissionPolicy
+    UltimateSubmissionPolicy,
+    User
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
+
+import * as data_ut from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -34,6 +37,8 @@ let course = new Course({
 
 beforeEach(() => {
     sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+    sinon.stub(User, 'get_current_user_roles').returns(
+        Promise.resolve(data_ut.make_user_roles()));
 });
 
 afterEach(() => {
@@ -45,7 +50,7 @@ afterEach(() => {
 describe('Changing tabs in project admin', () => {
     let wrapper: Wrapper<ProjectAdmin>;
     let component: ProjectAdmin;
-    let project_1: Project;
+    let project: Project;
     let original_match_media: (query: string) => MediaQueryList;
     // tslint:disable-next-line naming-convention
     const localVue = createLocalVue();
@@ -69,35 +74,9 @@ describe('Changing tabs in project admin', () => {
             })
         });
 
-        project_1 = new Project({
-            pk: 3,
-            name: "Project 200",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false
-        });
+        project = data_ut.make_project(course.pk);
 
-        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
+        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(Group, 'get_all_from_project').returns(Promise.resolve([]));
 
         wrapper = mount(ProjectAdmin, {
@@ -265,7 +244,7 @@ describe('select_tab function called with different values associated with "curr
          () => {
     let wrapper: Wrapper<ProjectAdmin>;
     let component: ProjectAdmin;
-    let project_1: Project;
+    let project: Project;
     let original_match_media: (query: string) => MediaQueryList;
 
     const $route = {
@@ -277,7 +256,7 @@ describe('select_tab function called with different values associated with "curr
     };
 
     beforeEach(() => {
-        project_1 = new Project({
+        project = new Project({
             pk: 3,
             name: "Project 200",
             last_modified: "today",
@@ -305,7 +284,7 @@ describe('select_tab function called with different values associated with "curr
             has_handgrading_rubric: false
         });
 
-        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project_1));
+        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(Group, 'get_all_from_project').returns(Promise.resolve([]));
 
         original_match_media = window.matchMedia;
@@ -337,8 +316,10 @@ describe('select_tab function called with different values associated with "curr
         });
         component = wrapper.vm;
         await component.$nextTick();
+        await component.$nextTick();
+        await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(0);
         expect(component.d_loading).toBe(false);
     });
@@ -354,7 +335,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(1);
     });
 
@@ -369,7 +350,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(2);
     });
 
@@ -387,7 +368,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(3);
     });
 
@@ -402,7 +383,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(4);
     });
 
@@ -419,7 +400,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(5);
         // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
@@ -434,7 +415,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(6);
     });
 
@@ -448,7 +429,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(7);
     });
 
@@ -462,7 +443,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(8);
     });
 
@@ -476,7 +457,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(0);
     });
 
@@ -490,7 +471,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(5);
     });
 
@@ -504,7 +485,7 @@ describe('select_tab function called with different values associated with "curr
         component = wrapper.vm;
         await component.$nextTick();
 
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
         expect(component.current_tab_index).toEqual(0);
     });
 });

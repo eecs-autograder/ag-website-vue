@@ -7,6 +7,8 @@ import APIErrors from '@/components/api_errors.vue';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { set_global_current_user } from '@/tests/data_utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -34,7 +36,7 @@ describe('SingleProject.vue', () => {
             last_name: 'IceBerg', email: 'iceberg@umich.edu',
             is_superuser: false});
 
-        sinon.stub(User, "get_current").returns(Promise.resolve(user));
+        set_global_current_user(user);
 
         course_1 = new Course({
             pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',

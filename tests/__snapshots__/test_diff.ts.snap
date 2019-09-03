@@ -553,6 +553,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
        
       <div
         class="active-option-style off-border"
+        style="background-color: slategray;"
       >
         <p>
           Hide Whitespace
@@ -1110,6 +1111,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
     >
       <div
         class="active-option-style on-border"
+        style="background-color: slategray;"
       >
         <p>
           Show Whitespace
@@ -1118,6 +1120,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
        
       <div
         class="inactive-option-style off-border"
+        style=""
       >
         <p>
           Hide Whitespace

@@ -109,10 +109,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';
@@ -124,6 +125,10 @@ import { deep_copy, handle_api_errors_async } from '@/utils';
   }
 })
 export default class InvitationReceived extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   @Prop({required: true, type: GroupInvitation})
   value!: GroupInvitation;
 
@@ -139,12 +144,10 @@ export default class InvitationReceived extends Vue {
   d_invitation: GroupInvitation | null = null;
   d_loading = true;
   d_rejecting = false;
-  user: User | null = null;
   d_show_confirm_accept_invitation_modal = false;
   d_show_confirm_reject_invitation_modal = false;
 
   async created() {
-    this.user = await User.get_current();
     this.d_invitation = deep_copy(this.value, GroupInvitation);
     this.d_loading = false;
   }
@@ -174,7 +177,7 @@ export default class InvitationReceived extends Vue {
 
   get already_accepted() {
     let index = this.d_invitation!.invitees_who_accepted.findIndex(
-      (invitee: string) => invitee === this.user!.username
+      (invitee: string) => invitee === this.d_globals.current_user.username
     );
     return index !== -1;
   }
@@ -182,7 +185,7 @@ export default class InvitationReceived extends Vue {
   get other_group_members() {
     let other_invitees = [this.d_invitation!.invitation_creator];
     this.d_invitation!.invited_usernames.forEach((invitee: string) => {
-      if (invitee !== this.user!.username) {
+      if (invitee !== this.d_globals.current_user.username) {
         other_invitees.push(invitee);
       }
     });

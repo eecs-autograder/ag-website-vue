@@ -187,10 +187,11 @@
 
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import Modal from '@/components/modal.vue';
@@ -211,6 +212,10 @@ import { handle_api_errors_async } from '@/utils';
   }
 })
 export default class GroupRegistration extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -223,26 +228,23 @@ export default class GroupRegistration extends Vue {
   d_sending_invitation = false;
   invitation_sent: GroupInvitation | null = null;
   invitations_received: GroupInvitation[] = [];
-  user: User | null = null;
   users_to_invite: GroupMember[] = [];
   d_show_confirm_working_alone_modal = false;
   d_show_send_group_invitation_modal = false;
   d_show_delete_invitation_modal = false;
 
   async created() {
-    this.user = await User.get_current();
-
     if (!this.project.disallow_group_registration) {
       if (this.project.max_group_size === 1) {
         await this.work_alone();
       }
 
-      this.invitations_received = await this.user.group_invitations_received();
+      this.invitations_received = await this.d_globals.current_user.group_invitations_received();
       this.invitations_received = this.invitations_received.filter(
         (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
       );
 
-      let invitations_sent = await this.user.group_invitations_sent();
+      let invitations_sent = await this.d_globals.current_user.group_invitations_sent();
       invitations_sent = invitations_sent.filter(
         (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
       );

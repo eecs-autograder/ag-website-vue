@@ -1,3 +1,5 @@
+import * as vue_test_utils from '@vue/test-utils';
+
 import {
     AGCommand,
     AGTestCase,
@@ -19,9 +21,11 @@ import {
     StdinSource,
     UltimateSubmissionPolicy,
     User,
+    UserRoles,
     ValueFeedbackLevel,
 } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import { safe_assign } from "@/utils";
 
 function* counter() {
@@ -30,6 +34,12 @@ function* counter() {
         yield count;
         count += 1;
     }
+}
+
+export function set_global_current_user(user: User) {
+    let globals = new GlobalData();
+    globals.current_user = user;
+    vue_test_utils.config.provide!['globals'] = globals;
 }
 
 const USER_PKS = counter();
@@ -45,6 +55,17 @@ export function make_user(args: Partial<User> = {}): User {
     };
     safe_assign(defaults, args);
     return new User(defaults);
+}
+
+export function make_user_roles(args: Partial<UserRoles> = {}): UserRoles {
+    let defaults = {
+        is_admin: false,
+        is_staff: false,
+        is_student: false,
+        is_handgrader: false,
+    };
+    safe_assign(defaults, args);
+    return new UserRoles(defaults);
 }
 
 const COURSE_PKS = counter();

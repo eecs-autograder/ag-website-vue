@@ -12,7 +12,7 @@ import APIErrors from '@/components/api_errors.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
-import { make_course, make_project } from '@/tests/data_utils';
+import { make_course, make_project, set_global_current_user } from '@/tests/data_utils';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -40,7 +40,7 @@ describe('GroupRegistration tests', () => {
             is_superuser: true
         });
 
-        sinon.stub(User, 'get_current').returns(Promise.resolve(user));
+        set_global_current_user(user);
     });
 
     afterEach(() => {

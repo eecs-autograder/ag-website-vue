@@ -29,7 +29,7 @@
                        :to="`/web/project_admin/${project.pk}`"
                        :title="'Edit ' + project.name"
                        class="edit-project"
-                       v-if="is_admin">
+                       v-if="d_globals.user_roles.is_admin">
             <i class="fas fa-cog cog"></i>
           </router-link>
         </tr>
@@ -40,7 +40,7 @@
 
 <script lang="ts">
 
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import {
   Course,
@@ -48,22 +48,24 @@ import {
   User
 } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
+
 @Component
 export default class CourseView extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   course!: Course;
   d_loading = true;
-  is_admin = false;
   projects: Project[] = [];
 
+
   async created() {
-    let user = await User.get_current();
-    let courses_user_is_admin_for = await user.courses_is_admin_for();
     this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
-    let index = courses_user_is_admin_for.findIndex(course => course.pk === this.course.pk);
-    if (index !== -1) {
-      this.is_admin = true;
-    }
     this.projects = await Project.get_all_from_course(this.course.pk);
+
+    await this.d_globals.set_current_course(this.course);
     this.d_loading = false;
   }
 }

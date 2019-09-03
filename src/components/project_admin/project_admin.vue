@@ -132,10 +132,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { Project } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
@@ -161,12 +162,16 @@ import { get_query_param } from "@/utils";
   }
 })
 export default class ProjectAdmin extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+
   current_tab_index = 0;
   d_loading = true;
   project: Project | null = null;
 
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
+    await this.globals.set_current_project(this.project);
     this.d_loading = false;
   }
 
