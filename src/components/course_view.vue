@@ -29,7 +29,7 @@
                        :to="`/web/project_admin/${project.pk}`"
                        :title="'Edit ' + project.name"
                        class="edit-project"
-                       v-if="is_admin">
+                       v-if="d_globals.user_roles.is_admin">
             <i class="fas fa-cog cog"></i>
           </router-link>
         </tr>
@@ -54,21 +54,19 @@ import { GlobalData } from '@/App.vue';
 export default class CourseView extends Vue {
   @Inject({from: 'globals'})
   globals!: GlobalData;
+  d_globals = this.globals;
 
   course!: Course;
   d_loading = true;
   projects: Project[] = [];
 
+
   async created() {
     this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
     this.projects = await Project.get_all_from_course(this.course.pk);
 
-    this.globals.set_current_course(this.course);
+    this.d_globals.set_current_course(this.course);
     this.d_loading = false;
-  }
-
-  get is_admin() {
-    return this.globals.user_roles.is_admin;
   }
 }
 </script>

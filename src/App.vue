@@ -56,10 +56,18 @@ import { Component, Provide, Vue } from 'vue-property-decorator';
 import { Course, Project, User, UserRoles } from 'ag-client-typescript';
 
 import UIDemos from './demos/ui_demos.vue';
+import { safe_assign } from './utils';
 
 
+/* IMPORTANT! How to use the provided globals:
+@Inject({from: 'globals'})
+globals!: GlobalData;
+// We need the provided globals to be one of our reactive data members,
+// so we alias it here.
+d_globals = this.globals;
+*/
 export class GlobalData {
-  current_user: User | null = null;
+  current_user!: User;
   current_course: Course | null = null;
   current_project: Project | null = null;
 
@@ -104,6 +112,13 @@ export class GlobalData {
 
 @Component
 export default class App extends Vue {
+  /* IMPORTANT! How to use the provided globals:
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  // We need the provided globals to be one of our reactive data members,
+  // so we alias it here.
+  d_globals = this.globals;
+  */
   @Provide()
   globals: GlobalData = new GlobalData();
 

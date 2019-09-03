@@ -19,6 +19,7 @@ import {
     StdinSource,
     UltimateSubmissionPolicy,
     User,
+    UserRoles,
     ValueFeedbackLevel,
 } from 'ag-client-typescript';
 
@@ -45,6 +46,17 @@ export function make_user(args: Partial<User> = {}): User {
     };
     safe_assign(defaults, args);
     return new User(defaults);
+}
+
+export function make_user_roles(args: Partial<UserRoles> = {}): UserRoles {
+    let defaults = {
+        is_admin: false,
+        is_staff: false,
+        is_student: false,
+        is_handgrader: false,
+    };
+    safe_assign(defaults, args);
+    return new UserRoles(defaults);
 }
 
 const COURSE_PKS = counter();

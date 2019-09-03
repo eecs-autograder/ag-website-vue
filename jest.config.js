@@ -36,5 +36,5 @@ module.exports = {
         }
     },
 
-    setupFiles: ["./tests/setup.ts"]
+    setupTestFrameworkScriptFile: "./tests/setup.ts"
 };
