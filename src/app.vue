@@ -11,7 +11,7 @@
           </router-link>
           <template v-if="globals.current_course !== null">
             <router-link :to="`/web/course/${globals.current_course.pk}`"
-                          class="breadcrumb-link">
+                         class="breadcrumb-link">
               <span>{{globals.current_course.name}}</span>
               <span v-if="globals.current_course.semester !== null">
                 {{globals.current_course.semester}}
@@ -23,7 +23,7 @@
 
             <span v-if="globals.user_roles.is_admin">
               <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
-                          class="breadcrumb-link">
+                           class="breadcrumb-link">
                 <i class="fas fa-cog cog"></i>
               </router-link>
             </span>
@@ -31,13 +31,13 @@
             <span v-if="globals.current_project !== null">
               -
               <router-link :to="`/web/project/${globals.current_project.pk}`"
-                            class="breadcrumb-link">
+                           class="breadcrumb-link">
                 {{globals.current_project.name}}
               </router-link>
 
               <span v-if="globals.user_roles.is_admin">
                 <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
-                              class="breadcrumb-link">
+                             class="breadcrumb-link">
                   <i class="fas fa-cog cog"></i>
                 </router-link>
               </span>
