@@ -52,7 +52,7 @@ describe('Changing Tabs', ()  => {
         mode: 'history'
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
         course = make_course();
         project = make_project(course.pk);
 
@@ -82,6 +82,9 @@ describe('Changing Tabs', ()  => {
             localVue,
             router
         });
+
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
     });
 
     afterEach(() => {
@@ -97,7 +100,6 @@ describe('Changing Tabs', ()  => {
     });
 
     test('Clicking on submit tab', async () => {
-        await wrapper.vm.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
         let tabs = wrapper.findAll('.tab-label');
@@ -114,7 +116,6 @@ describe('Changing Tabs', ()  => {
     });
 
     test('Clicking on submissions tab', async () => {
-        await wrapper.vm.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
         let tabs = wrapper.findAll('.tab-label');
@@ -127,7 +128,6 @@ describe('Changing Tabs', ()  => {
     });
 
     test('Clicking on student_lookup tab', async () => {
-        await wrapper.vm.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
         let tabs = wrapper.findAll('.tab-label');
@@ -205,6 +205,7 @@ describe('select_tab function called with different values associated with "curr
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.project).toEqual(project);
         expect(wrapper.vm.group).toBeNull();
@@ -252,6 +253,7 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
@@ -307,7 +309,7 @@ describe('select_tab function called with different values associated with "curr
             }
         });
         await wrapper.vm.$nextTick();
-        // this second await needs to be here
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.project).toEqual(project);
@@ -329,6 +331,7 @@ describe('select_tab function called with different values associated with "curr
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.project).toEqual(project);
         expect(wrapper.vm.current_tab_index).toEqual(1);
@@ -344,6 +347,7 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
@@ -363,6 +367,7 @@ describe('select_tab function called with different values associated with "curr
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.project).toEqual(project);
         expect(wrapper.vm.current_tab_index).toEqual(0);
@@ -380,6 +385,7 @@ describe('select_tab function called with different values associated with "curr
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.project).toEqual(project);
         expect(wrapper.vm.current_tab_index).toEqual(2);
@@ -395,6 +401,7 @@ describe('select_tab function called with different values associated with "curr
                 $route
             }
         });
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
@@ -500,7 +507,7 @@ describe('GroupObserver tests for the Project Component', () => {
             router
         });
         await wrapper.vm.$nextTick();
-        // second await needs to be here
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         expect(project.max_group_size === 1).toBe(true);
@@ -538,7 +545,7 @@ describe('GroupObserver tests for the Project Component', () => {
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
-        // third await needs to be here
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         let group_registration = wrapper.find({ref: 'group_registration'});
@@ -593,7 +600,7 @@ describe('GroupObserver tests for the Project Component', () => {
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
-        // third await needs to be here
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         let group_registration = wrapper.find({ref: 'group_registration'});

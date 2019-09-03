@@ -145,7 +145,7 @@ export default class CourseAdmin extends Vue {
 
   async created() {
     this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
-    this.globals.set_current_course(this.course);
+    await this.globals.set_current_course(this.course);
     this.loading = false;
   }
 

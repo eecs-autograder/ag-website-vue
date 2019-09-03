@@ -293,6 +293,7 @@ describe('select_tab function called with different values associated with "curr
         });
         component = wrapper.vm;
         await component.$nextTick();
+        await component.$nextTick();
 
         expect(component.course).toEqual(course);
         expect(component.current_tab_index).toEqual(0);

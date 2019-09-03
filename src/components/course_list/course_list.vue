@@ -32,7 +32,7 @@
 
 <script lang="ts">
 
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
@@ -72,7 +72,7 @@ export default class CourseList extends Vue implements CourseObserver {
   async created() {
     Course.subscribe(this);
     await this.get_and_sort_courses();
-    this.d_globals.set_current_course(null);
+    await this.d_globals.set_current_course(null);
     this.loading = false;
   }
 

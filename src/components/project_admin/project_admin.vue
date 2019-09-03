@@ -171,7 +171,7 @@ export default class ProjectAdmin extends Vue {
 
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
-    this.globals.set_current_project(this.project);
+    await this.globals.set_current_project(this.project);
     this.d_loading = false;
   }
 

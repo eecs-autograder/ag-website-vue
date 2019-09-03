@@ -110,7 +110,7 @@ export default class ProjectView extends Vue implements GroupObserver {
       }
     }
 
-    this.d_globals.set_current_project(this.project, this.course);
+    await this.d_globals.set_current_project(this.project, this.course);
     this.d_loading = false;
   }
 

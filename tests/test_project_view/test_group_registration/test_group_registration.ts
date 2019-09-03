@@ -1,7 +1,4 @@
 import { mount, Wrapper } from '@vue/test-utils';
-// tslint:disable-next-line: no-duplicate-imports
-import * as vue_test_utils from '@vue/test-utils';
-
 
 import {
     Course,
@@ -11,12 +8,11 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import { GlobalData } from '@/App.vue';
 import APIErrors from '@/components/api_errors.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
-import { make_course, make_project } from '@/tests/data_utils';
+import { make_course, make_project, set_global_current_user } from '@/tests/data_utils';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -44,9 +40,7 @@ describe('GroupRegistration tests', () => {
             is_superuser: true
         });
 
-        let globals = new GlobalData();
-        globals.current_user = user;
-        vue_test_utils.config.provide!['globals'] = globals;
+        set_global_current_user(user);
     });
 
     afterEach(() => {

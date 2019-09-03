@@ -65,7 +65,7 @@ export default class CourseView extends Vue {
     this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
     this.projects = await Project.get_all_from_course(this.course.pk);
 
-    this.d_globals.set_current_course(this.course);
+    await this.d_globals.set_current_course(this.course);
     this.d_loading = false;
   }
 }
