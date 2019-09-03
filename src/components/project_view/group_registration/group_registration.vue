@@ -191,7 +191,7 @@ import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import Modal from '@/components/modal.vue';

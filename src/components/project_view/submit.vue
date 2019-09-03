@@ -149,7 +149,7 @@ import * as minimatch from 'minimatch';
 // @ts-ignore
 import moment from "moment";
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';

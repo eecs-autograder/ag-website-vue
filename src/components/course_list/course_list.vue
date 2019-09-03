@@ -36,7 +36,7 @@ import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import {
   array_add_unique,

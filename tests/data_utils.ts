@@ -25,7 +25,7 @@ import {
     ValueFeedbackLevel,
 } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import { safe_assign } from "@/utils";
 
 function* counter() {

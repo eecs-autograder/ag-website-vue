@@ -9,7 +9,7 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 

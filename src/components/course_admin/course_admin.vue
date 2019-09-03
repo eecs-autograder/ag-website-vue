@@ -101,7 +101,7 @@ import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { Course } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';

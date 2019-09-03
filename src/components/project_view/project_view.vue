@@ -69,7 +69,7 @@ import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import Submit from '@/components/project_view/submit.vue';
 import Tab from '@/components/tabs/tab.vue';

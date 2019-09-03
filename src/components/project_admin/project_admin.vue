@@ -136,7 +136,7 @@ import { Component, Inject, Vue } from 'vue-property-decorator';
 
 import { Project } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';

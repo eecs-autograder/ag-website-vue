@@ -113,7 +113,7 @@ import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import { deep_copy, handle_api_errors_async } from '@/utils';

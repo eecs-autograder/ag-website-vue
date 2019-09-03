@@ -48,7 +48,7 @@ import {
   User
 } from 'ag-client-typescript';
 
-import { GlobalData } from '@/App.vue';
+import { GlobalData } from '@/app.vue';
 
 @Component
 export default class CourseView extends Vue {

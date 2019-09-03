@@ -5,7 +5,7 @@ import { createLocalVue, mount, Wrapper } from "@vue/test-utils";
 import { Course, User, UserRoles } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import App, { GlobalData } from '@/App.vue';
+import App, { GlobalData } from '@/app.vue';
 
 import { make_course, make_project, make_user, make_user_roles } from '@/tests/data_utils';
 
@@ -13,7 +13,7 @@ afterEach(() => {
     sinon.restore();
 });
 
-describe('App.vue tests', () => {
+describe('app.vue tests', () => {
     let wrapper: Wrapper<App>;
     let user: User;
 
