@@ -176,6 +176,11 @@ body, #app {
   width: 100%;
 }
 
+#app {
+  display: flex;
+  flex-direction: column;
+}
+
 html {
   height: 100%;
 }
