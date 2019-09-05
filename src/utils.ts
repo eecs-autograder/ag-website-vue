@@ -1,9 +1,12 @@
-import { Vue } from 'vue-property-decorator';
 import { Dictionary } from 'vue-router/types/router';
 
 import { Course } from 'ag-client-typescript';
 // @ts-ignore
 import moment from "moment";
+
+export function sleep(seconds: number) {
+    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
 
 // A wrapper around Object.assign that adds type checking to enforce
 // that "to" is a derived class of "from".

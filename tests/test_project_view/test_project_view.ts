@@ -4,7 +4,9 @@ import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 
 import {
     Course,
-    Group, GroupInvitation,
+    Group,
+    GroupInvitation,
+    HttpError,
     Project,
     Submission,
     User,
@@ -30,6 +32,8 @@ beforeEach(() => {
     sinon.stub(User, 'get_num_late_days').returns(Promise.resolve({late_days_remaining: 0}));
     sinon.stub(User, 'get_current_user_roles').returns(
         Promise.resolve(make_user_roles()));
+    sinon.stub(Submission, 'get_final_graded_submission_from_group').rejects(
+        new HttpError(403, ''));
 });
 
 afterEach(() => {

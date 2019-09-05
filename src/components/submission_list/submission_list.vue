@@ -7,8 +7,10 @@
             <div class="sidebar-header">Final Graded Submission</div>
             <submission-panel
               :submission="d_ultimate_submission"
-              :class="{'selected-submission': d_selected_submission !== null
-                                              && d_selected_submission.pk === d_ultimate_submission.pk}"
+              :class="{
+                'selected-submission': d_selected_submission !== null
+                                       && d_selected_submission.pk === d_ultimate_submission.pk
+              }"
               @click.native="d_selected_submission = d_ultimate_submission"></submission-panel>
 
             <div id="sidebar-list-separator"></div>
@@ -22,7 +24,9 @@
           <template v-for="(submission, index) of d_submissions">
             <div v-if="index !== 0" class="divider"></div>
             <submission-panel
-              :submission="submission"
+              :submission="d_ultimate_submission !== null
+                             && d_ultimate_submission.pk === submission.pk
+                           ? d_ultimate_submission : submission"
               :key="submission.pk"
               :class="{'selected-submission': d_selected_submission !== null
                                               && d_selected_submission.pk === submission.pk}"
@@ -60,7 +64,41 @@ import {
 import { GlobalData } from '@/app.vue';
 import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
 import { Created, Destroyed } from '@/lifecycle';
-import { deep_copy, safe_assign, toggle } from '@/utils';
+import { deep_copy, safe_assign, sleep, toggle, zip } from '@/utils';
+
+class Poller {
+  private poll_fn: () => Promise<void>;
+  private delay_seconds: number;
+
+  get continue() {
+    return this._continue;
+  }
+  private _continue: boolean = false;
+
+  constructor(poll_fn: () => Promise<void>,
+              delay_seconds: number) {
+    this.poll_fn = poll_fn;
+    this.delay_seconds = delay_seconds;
+  }
+
+  async start_after_delay() {
+    if (this._continue) {
+      // istanbul ignore next
+      throw new Error('This poller has already been started');
+    }
+
+    this._continue = true;
+    await sleep(this.delay_seconds);
+    while (this._continue) {
+      await this.poll_fn();
+      await sleep(this.delay_seconds);
+    }
+  }
+
+  stop() {
+    this._continue = false;
+  }
+}
 
 @Component({
   components: {
@@ -88,6 +126,8 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
 
   d_ultimate_submission: SubmissionWithResults | null = null;
 
+  plain_submissions_poller: Poller | null = null;
+
   @Watch('group')
   on_group_changed(new_value: Group, old_value: Group) {
     return this.initialize(new_value);
@@ -100,6 +140,9 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
 
   destroyed() {
     Submission.unsubscribe(this);
+    if (this.plain_submissions_poller !== null) {
+      this.plain_submissions_poller.stop();
+    }
   }
 
   private async initialize(group: Group) {
@@ -115,7 +158,41 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
       );
     }
 
+    if (this.plain_submissions_poller !== null) {
+      this.plain_submissions_poller.stop();
+    }
+    this.plain_submissions_poller = new Poller(
+      () => this.refresh_submissions(),
+      30
+    );
+    // tslint:disable-next-line no-floating-promises
+    this.plain_submissions_poller.start_after_delay();
+
     this.d_loading = false;
+  }
+
+  private async refresh_submissions() {
+    let submissions = await Submission.get_all_from_group(this.group.pk);
+    if (this.submissions_differ(submissions)) {
+      this.d_submissions = await Submission.get_all_from_group_with_results(this.group.pk);
+    }
+  }
+
+  private submissions_differ(new_submissions: Submission[]): boolean {
+    if (new_submissions.length !== this.d_submissions.length) {
+      return true;
+    }
+
+    let current_statuses = this.d_submissions.map(s => s.status);
+    let new_statuses = new_submissions.map(s => s.status);
+
+    for (let [current_status, new_status] of zip(current_statuses, new_statuses)) {
+      if (current_status !== new_status) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private async get_ultimate_submission() {
@@ -132,6 +209,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
       // 403 status: can't view ultimate submission
       // 404 status: no submissions
       if (!(e instanceof HttpError) || (e.status !== 403 && e.status !== 404)) {
+        // istanbul ignore next
         throw e;
       }
     }
@@ -151,31 +229,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
     this.d_submissions.unshift(submission_with_empty_results);
   }
 
-  // NOTE: Only poll for submissions pre waiting for deferred.
-  // We can check for deferred -> finished when we reload the whole list.
-  async update_submission_changed(submission: Submission): Promise<void> {
-    // let index = this.d_submissions.findIndex((item) => item.pk === submission.pk);
-    // if (index !== -1) {
-    //   safe_assign(this.d_submissions[index], JSON.parse(JSON.stringify(submission)));
-    //   // FIXME: check for status change and reload results? (for results loading, we need feedback category deduction)
-    //   this.d_submissions[index].results = await get_submission_result(
-    //     submission.pk, this.deduce_fdbk_category(submission));
-    // }
-  }
-
-  private deduce_fdbk_category(submission: Submission): FeedbackCategory {
-    if (this.d_globals.user_roles.is_staff) {
-      let is_group_member = this.group.member_names.find(
-        username => username === this.d_globals.current_user.username
-      ) !== undefined;
-
-      return is_group_member ? FeedbackCategory.max : FeedbackCategory.staff_viewer;
-    }
-    else if (submission.is_past_daily_limit) {
-      return FeedbackCategory.past_limit_submission;
-    }
-
-    return FeedbackCategory.normal;
+  update_submission_changed(submission: Submission): void {
   }
 }
 </script>

@@ -2,8 +2,8 @@ import { mount } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import SubmissionPanel from '@/components/submission_list/submission_panel.vue'
-import {format_datetime_short} from '@/utils';
+import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
+import { format_datetime_short } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 
