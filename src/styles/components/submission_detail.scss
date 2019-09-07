@@ -23,27 +23,27 @@
 
 .column-1 {
     width: calc(100% / 2);
-    padding: 10px;
+    padding: 7px;
 }
 
 .column-2 {
     width: calc(100% / 4);
-    padding: 10px;
+    padding: 7px;
 }
 
 .column-3 {
     width: calc(100% / 4);
-    padding: 10px;
+    padding: 7px;
 }
 
 %panel-body {
-    padding: 10px 10px 4px 10px;
+    padding: 6px 10px;
     background-color: white;
     border-radius: 0 0 3px 3px;
 }
 
 @mixin panel-body-border($border-color: $white-gray) {
-    border: 1px solid $border-color;
+    border: 2px solid $border-color;
     border-top: none;
     border-radius: 0 0 3px 3px;
 }
@@ -121,7 +121,7 @@ $base-blue: darken($light-blue, 2);
 }
 
 .feedback-row {
-    padding: 0 0 4px 0;
+    padding: 3px 0;
 }
 
 .feedback-output-content-short {
@@ -129,9 +129,11 @@ $base-blue: darken($light-blue, 2);
 }
 
 .feedback-output-content-lengthy {
-    border: 1px solid $pebble-dark;
+    border: 2px solid $pebble-dark;
     background-color: white;
     border-radius: 3px;
-    padding: 10px;
-    margin: 8px 0 4px 0;
+    padding: 5px 10px;
+    margin: 4px 0 2px 0;
+    overflow: auto;
+    max-height: 400px;
 }

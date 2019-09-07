@@ -1,0 +1,141 @@
+<template>
+  <div class="ag-case-result" v-if="ag_test_case_result.ag_test_command_results.length">
+    <template v-if="ag_test_case_result.ag_test_command_results.length > 1">
+      <div id="multi-command-body">
+        <div v-for="(ag_test_command_result, index) of ag_test_case_result.ag_test_command_results">
+          <submission-detail-panel
+            :name="ag_test_command_result.ag_test_command_name"
+            :correctness_level="command_result_correctness(ag_test_command_result)">
+            <AGCommandResult :submission="submission"
+                             :ag_test_command_result="ag_test_command_result"
+                             :fdbk_category="fdbk_category">
+            </AGCommandResult>
+          </submission-detail-panel>
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <AGCommandResult :submission="submission"
+                       :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
+                       :fdbk_category="fdbk_category">
+      </AGCommandResult>
+    </template>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import {
+    AGTestCaseResultFeedback,
+    AGTestCommandResultFeedback,
+    FeedbackCategory,
+    Submission
+} from "ag-client-typescript";
+
+import AGCommandResult from '@/components/project_view/submission_detail/ag_command_result.vue';
+import CorrectnessIcon, { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
+import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
+
+@Component({
+  components: {
+    AGCommandResult,
+    SubmissionDetailPanel,
+    CorrectnessIcon
+  }
+})
+export default class AGCaseResult extends Vue {
+  @Prop({required: true, type: Submission})
+  submission!: Submission;
+
+  @Prop({required: true, type: Object})
+  ag_test_case_result!: AGTestCaseResultFeedback;
+
+  @Prop({required: true, type: String})
+  fdbk_category!: FeedbackCategory;
+
+  readonly CorrectnessLevel = CorrectnessLevel;
+
+  command_result_correctness(command_result: AGTestCommandResultFeedback) {
+    let return_code_correctness = this.command_result_return_code_correctness(command_result);
+    let output_correctness = this.command_result_output_correctness(command_result);
+
+    if (return_code_correctness === CorrectnessLevel.not_available) {
+      return output_correctness;
+    }
+
+    if (output_correctness === CorrectnessLevel.not_available) {
+      return return_code_correctness;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.all_correct &&
+        output_correctness === CorrectnessLevel.all_correct) {
+      return CorrectnessLevel.all_correct;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.none_correct &&
+        output_correctness === CorrectnessLevel.none_correct) {
+      return CorrectnessLevel.none_correct;
+    }
+
+    if (output_correctness === CorrectnessLevel.some_correct) {
+      return CorrectnessLevel.some_correct;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.all_correct &&
+        output_correctness === CorrectnessLevel.none_correct) {
+      return CorrectnessLevel.some_correct;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.none_correct &&
+        output_correctness === CorrectnessLevel.all_correct) {
+      return CorrectnessLevel.some_correct;
+    }
+    console.log("Does this ever happen?");
+    return CorrectnessLevel.not_available;
+  }
+
+  command_result_return_code_correctness(command_result: AGTestCommandResultFeedback) {
+    if (command_result.return_code_correct === null) {
+      return CorrectnessLevel.not_available;
+    }
+    else if (command_result.return_code_correct) {
+      return CorrectnessLevel.all_correct;
+    }
+    return CorrectnessLevel.none_correct;
+  }
+
+  command_result_output_correctness(command_result: AGTestCommandResultFeedback) {
+    let output_not_available = command_result.stdout_correct === null &&
+                               command_result.stderr_correct === null;
+
+    if (output_not_available) {
+      return CorrectnessLevel.not_available;
+    }
+
+    let output_correct = (
+      (command_result.stdout_correct || command_result.stdout_correct === null)
+      && (command_result.stderr_correct || command_result.stderr_correct === null)
+    );
+    if (output_correct) {
+      return CorrectnessLevel.all_correct;
+    }
+
+    let some_output_correct = command_result.stdout_correct || command_result.stderr_correct;
+
+    if (some_output_correct) {
+      return CorrectnessLevel.some_correct;
+    }
+    return CorrectnessLevel.none_correct;
+  }
+}
+</script>
+
+<style scoped lang="scss">
+@import '@/styles/components/submission_detail.scss';
+
+#multi-command-body {
+  padding: 15px 10px 10px 10px;
+}
+
+</style>

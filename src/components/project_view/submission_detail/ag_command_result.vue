@@ -1,11 +1,18 @@
 <template>
-  <div>
-    <div id="exit-status-section">
-      <div v-if="ag_test_command_result.return_code_correct !== null"
+  <div id="ag-command-result">
+    <div v-if="ag_test_command_result.return_code_correct !== null"
+         id="exit-status-section">
+
+      <div v-if="ag_test_command_result.timed_out"
            class="feedback-row">
+        <i class="far fa-clock timed-out-icon"></i>
+        <b> The command timed out </b>
+      </div>
+
+      <div class="feedback-row">
         <div class="feedback-label"> Exit Status: </div>
         <div class="feedback-output-content-short">
-          {{ag_test_command_result.return_code_correct ? 'Correct' : 'Incorrect'}}
+          {{return_code_correctness}}
 
           <span v-if="ag_test_command_result.fdbk_settings.return_code_fdbk_level
                       === ValueFeedbackLevel.expected_and_actual ||
@@ -33,16 +40,13 @@
           </span>
 
         </div>
-
-        <div v-if="ag_test_command_result.timed_out"><i class="far fa-clock"></i></div>
-
       </div>
     </div>
 
     <div id="stdout-section">
       <div v-if="ag_test_command_result.stdout_correct !== null">
         <div class="feedback-row">
-        <span class="feedback-label"> Output (Stdout) Correctness: </span>
+          <div class="feedback-label"> Output (Stdout) Correctness: </div>
           <div class="feedback-output-content-short">
             {{ag_test_command_result.stdout_correct ? 'Correct' : 'Incorrect'}}
           </div>
@@ -52,7 +56,7 @@
                    === ValueFeedbackLevel.expected_and_actual
                    && !ag_test_command_result.stdout_correct"
              class="feedback-row">
-          <span class="feedback-label"> Output (Stdout) Diff: </span>
+          <div class="feedback-label"> Output (Stdout) Diff: </div>
           <template v-if="!stdout_diff_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
           </template>
@@ -68,7 +72,7 @@
 
       <div v-if="ag_test_command_result.fdbk_settings.show_actual_stdout"
            class="feedback-row">
-        <span class="feedback-label"> Output: </span>
+        <div class="feedback-label"> Output: </div>
         <template v-if="!stdout_content_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
@@ -84,7 +88,7 @@
     <div id="stderr-section">
       <div v-if="ag_test_command_result.stderr_correct !== null">
         <div class="feedback-row">
-          <span class="feedback-label"> Error Output (Stderr) Correctness: </span>
+          <div class="feedback-label"> Error Output (Stderr) Correctness: </div>
           <div class="feedback-output-content-short">
             {{ag_test_command_result.stderr_correct ? 'Correct' : 'Incorrect'}}
           </div>
@@ -94,7 +98,7 @@
                    === ValueFeedbackLevel.expected_and_actual
                    && !ag_test_command_result.stderr_correct"
              class="feedback-row">
-          <span class="feedback-label"> Error Output (Stderr) Diff: </span>
+          <div class="feedback-label"> Error Output (Stderr) Diff: </div>
           <template v-if="!stderr_diff_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
           </template>
@@ -111,7 +115,7 @@
 
       <div v-if="ag_test_command_result.fdbk_settings.show_actual_stderr"
            class="feedback-row">
-        <span class="feedback-label"> Error Output: </span>
+        <div class="feedback-label"> Error Output: </div>
         <template v-if="!stderr_content_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
@@ -123,6 +127,7 @@
         </template>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -144,17 +149,14 @@ import get_ag_test_cmd_result_stderr_diff = ResultOutput.get_ag_test_cmd_result_
 
 import Diff from '@/components/diff.vue';
 import Tooltip from '@/components/tooltip.vue';
-import ViewFile from '@/components/view_file.vue';
 
 @Component({
   components: {
     Diff,
-    Tooltip,
-    ViewFile
+    Tooltip
   }
 })
-export default class AGTestCommandResult extends Vue {
-
+export default class AGCommandResult extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
@@ -182,6 +184,18 @@ export default class AGTestCommandResult extends Vue {
     await this.load_stderr_content();
     await this.load_stdout_diff();
     await this.load_stderr_diff();
+  }
+
+  get return_code_correctness() {
+    if (this.ag_test_command_result.return_code_correct) {
+      return 'Correct';
+    }
+    else {
+      if (this.ag_test_command_result.timed_out) {
+        return 'Timed out';
+      }
+      return 'Incorrect';
+    }
   }
 
   async load_stdout_content() {
@@ -224,4 +238,10 @@ export default class AGTestCommandResult extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
+
+.timed-out-icon {
+  color: $warning-red;
+  margin-right: 2px;
+}
+
 </style>

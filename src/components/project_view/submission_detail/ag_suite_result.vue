@@ -1,52 +1,42 @@
+import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div v-if="ag_test_suite_result !== null"
-       id="ag-test-suite-result">
+       id="ag-suite-result">
 
     <div id="ag-test-suite-name">{{ag_test_suite_result.ag_test_suite_name}}</div>
-    <div>
-      <div class="ag-test-case-results-header">
-        <div class="column-1">
-          <div id="ag-object"> Test Case </div>
-        </div>
-        <div class="column-2">
-          <div id="passed-status"> Passed </div>
-        </div>
-        <div class="column-3">
-          <div id="score"> Score </div>
-        </div>
-      </div>
+    <div class="ag-test-case-results-header">
+      <div class="column-1"> Test Case </div>
+      <div class="column-2"> Passed </div>
+      <div class="column-3"> Score </div>
     </div>
 
-    <div>
-      <div v-if="ag_test_suite_result.setup_return_code !== null
-                 || ag_test_suite_result.setup_timed_out">
-        <AGTestCaseSetupResultPanel
+    <submission-detail-panel
+      v-if="ag_test_suite_result.setup_return_code !== null
+            || ag_test_suite_result.setup_timed_out"
+      :name="ag_test_suite_result.setup_name ? ag_test_suite_result.setup_name : 'Setup'"
+      :correctness_level="setup_correctness_level"
+      :panel_is_active="is_first_suite && decide_whether_to_open_setup(setup_correctness_level)">
+      <AGCaseSetupResult :submission="submission"
+                         :ag_test_suite_result="ag_test_suite_result"
+                         :fdbk_category="fdbk_category">
+      </AGCaseSetupResult>
+    </submission-detail-panel>
+
+    <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
+      <submission-detail-panel
+        :name="ag_test_case_result.ag_test_case_name"
+        :correctness_level="case_result_correctness(ag_test_case_result)"
+        :points_awarded="ag_test_case_result.total_points"
+        :points_possible="ag_test_case_result.total_points_possible">
+        <AGCaseResult
           :submission="submission"
-          :ag_test_suite_result="ag_test_suite_result"
+          :ag_test_case_result="ag_test_case_result"
           :fdbk_category="fdbk_category"
-          :ag_test_suite_setup_correctness_level="setup_correctness_level">
-        </AGTestCaseSetupResultPanel>
-      </div>
+          :ag_test_case_row_correctness_level="case_result_correctness(ag_test_case_result)">
+        </AGCaseResult>
+      </submission-detail-panel>
+    </template>
 
-      <div v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
-        <div v-if="ag_test_case_result.ag_test_command_results.length === 1">
-          <AGTestCaseResultPanelSingleCommand
-            :submission="submission"
-            :ag_test_case_result="ag_test_case_result"
-            :fdbk_category="fdbk_category"
-            :ag_test_case_row_correctness_level="case_result_correctness(ag_test_case_result)">
-          </AGTestCaseResultPanelSingleCommand>
-        </div>
-        <div v-else>
-          <AGTestCaseResultPanelMultipleCommands
-            :submission="submission"
-            :ag_test_case_result="ag_test_case_result"
-            :fdbk_category="fdbk_category"
-            :ag_test_case_row_correctness_level="case_result_correctness(ag_test_case_result)">
-          </AGTestCaseResultPanelMultipleCommands>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -59,20 +49,19 @@ import {
     Submission
 } from "ag-client-typescript";
 
-import AGTestCaseResultPanelMultipleCommands from '@/components/project_view/submission_detail/ag_test_case_result_panel_multiple_commands.vue';
-import AGTestCaseResultPanelSingleCommand from '@/components/project_view/submission_detail/ag_test_case_result_panel_single_command.vue';
-import AGTestCaseSetupResultPanel from '@/components/project_view/submission_detail/ag_test_case_setup_result_panel.vue';
+import AGCaseResult from '@/components/project_view/submission_detail/ag_case_result.vue';
+import AGCaseSetupResult from '@/components/project_view/submission_detail/ag_case_setup_result.vue';
 import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
 
 @Component({
   components: {
-    AGTestCaseResultPanelSingleCommand,
-    AGTestCaseResultPanelMultipleCommands,
-    AGTestCaseSetupResultPanel
+    AGCaseResult,
+    AGCaseSetupResult,
+    SubmissionDetailPanel
   }
 })
 export default class AGTestSuiteResult extends Vue {
-
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
@@ -85,15 +74,10 @@ export default class AGTestSuiteResult extends Vue {
   @Prop({default: false, type: Boolean})
   is_first_suite!: boolean;
 
-  num_ag_test_cases = 0;
-  first_incorrect_setup: null | AGTestSuiteResultFeedback = null;
-  first_incorrect_case: null | AGTestCaseResultFeedback = null;
-
   readonly CorrectnessLevel = CorrectnessLevel;
 
-  created() {
-    this.num_ag_test_cases = this.ag_test_suite_result!.ag_test_case_results.length;
-  }
+  first_incorrect_setup: null | AGTestSuiteResultFeedback = null;
+  first_incorrect_case: null | AGTestCaseResultFeedback = null;
 
   get setup_correctness_level(): CorrectnessLevel {
     if (this.ag_test_suite_result.setup_return_code === 0) {
@@ -116,14 +100,19 @@ export default class AGTestSuiteResult extends Vue {
       return return_code_correctness;
     }
 
+    if (case_result.total_points === 0) {
+      if (case_result.total_points_possible === 0) {
+        return CorrectnessLevel.all_correct;
+      }
+      return CorrectnessLevel.none_correct;
+    }
+
     if (return_code_correctness === CorrectnessLevel.all_correct &&
         output_correctness === CorrectnessLevel.all_correct) {
-
       return CorrectnessLevel.all_correct;
     }
     if (return_code_correctness === CorrectnessLevel.none_correct &&
         output_correctness === CorrectnessLevel.none_correct) {
-
       return CorrectnessLevel.none_correct;
     }
     if (return_code_correctness === CorrectnessLevel.some_correct ||
@@ -190,7 +179,6 @@ export default class AGTestSuiteResult extends Vue {
     return CorrectnessLevel.some_correct;
   }
 
-
   decide_whether_to_open_setup(setup_level_correctness: CorrectnessLevel): boolean {
     if (this.first_incorrect_setup === null && this.first_incorrect_case === null &&
       (setup_level_correctness === CorrectnessLevel.none_correct ||
@@ -204,8 +192,8 @@ export default class AGTestSuiteResult extends Vue {
   decide_whether_to_open_case(case_level_correctness: CorrectnessLevel,
                               ag_test_case_result: AGTestCaseResultFeedback): boolean {
     if (this.first_incorrect_setup === null && this.first_incorrect_case === null &&
-      case_level_correctness === CorrectnessLevel.none_correct ||
-      case_level_correctness === CorrectnessLevel.some_correct) {
+        case_level_correctness === CorrectnessLevel.none_correct ||
+        case_level_correctness === CorrectnessLevel.some_correct) {
       this.first_incorrect_case = ag_test_case_result;
       return true;
     }
@@ -215,18 +203,18 @@ export default class AGTestSuiteResult extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/components/submission_detail.scss';
 
-#ag-test-suite-result {
-  border: 2px solid $white-gray;
+#ag-suite-result {
+  border: 2px solid #ebeef4;
   border-radius: 5px;
-  padding: 10px;
-  margin: 10px;
+  padding: 20px;
+  margin: 10px 0;
 }
 
 #ag-test-suite-name {
   font-size: 18px;
+  font-weight: bold;
   padding: 0 0 10px 0;
 }
 
