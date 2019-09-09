@@ -1,5 +1,5 @@
 <template>
-  <div id="sticky-sidebar"
+  <div class="sticky-sidebar"
        ref="sidebar"
        :style="{height: d_height}"
        v-on="$listeners">
@@ -19,7 +19,7 @@ export default class StickySidebar extends Vue {
   mounted() {
     this.scroll_handler = () => {
       let bounding_rect = (<HTMLElement> this.$refs.sidebar).getBoundingClientRect();
-      this.d_height = `calc(100vh - ${bounding_rect.top}px)`;
+      this.d_height = `calc(100vh - ${Math.ceil(bounding_rect.top)}px)`;
     };
     this.scroll_handler();
     window.addEventListener('scroll', this.scroll_handler);
@@ -33,8 +33,8 @@ export default class StickySidebar extends Vue {
 
 <style scoped lang="scss">
 
-#sticky-sidebar {
-  position: sticky;
+.sticky-sidebar {
+  position: sticky !important;
   top: 0;
   overflow: auto;
 }
