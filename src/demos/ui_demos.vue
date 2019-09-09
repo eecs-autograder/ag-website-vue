@@ -1,192 +1,97 @@
 <template>
-  <div id="demos-container">
+  <div id="ui-demos">
     <h2>UI Component Demos</h2>
-    <div id="sidebar-toggle" @click="d_show_sidebar = !d_show_sidebar">
-      Menu
-      <i class="fas fa-bars"></i>
-    </div>
-    <tabs tab_active_class="sidebar-tab-active"
-          tab_inactive_class="sidebar-tab-inactive"
-          tab_position="side"
-          :tab_headers_container_class="d_show_sidebar ? 'sidebar-container'
-                                                       : 'sidebar-container-hidden'"
-          :tab_body_container_class="d_show_sidebar ? 'demo-body' : 'demo-body-sidebar-collapsed'">
-      <tab>
-        <tab-header>Buttons</tab-header>
-        <template slot="body">
-          <ButtonDemo></ButtonDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Color Palette</tab-header>
-        <template slot="body">
-          <ColorPaletteDemo></ColorPaletteDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Context Menu</tab-header>
-        <template slot="body">
-          <ContextMenuDemo></ContextMenuDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Datetime Picker</tab-header>
-        <template slot="body">
-          <DatetimePickerDemo></DatetimePickerDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Diff</tab-header>
-        <template slot="body">
-          <DiffDemo></DiffDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Dropdown</tab-header>
-        <template slot="body">
-          <DropdownDemo></DropdownDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Dropdown Typeahead</tab-header>
-        <template slot="body">
-          <DropdownTypeaheadDemo></DropdownTypeaheadDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>File Upload</tab-header>
-        <template slot="body">
-          <FileUploadDemo></FileUploadDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Modal</tab-header>
-        <template slot="body">
-          <ModalDemo></ModalDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Multi-file Viewer</tab-header>
-        <template slot="body">
-          <MultiFileViewerDemo></MultiFileViewerDemo>
-        </template>
-      </tab>
+        <div id="sidebar-toggle" @click="d_show_sidebar = !d_show_sidebar">
+          Menu
+          <i class="fas fa-bars"></i>
+        </div>
+    <div class="wrapper">
+      <sticky-sidebar class="sidebar" v-if="d_show_sidebar">
+        <div :class="['sidebar-item', {active: d_current_tab === 'buttons'}]"
+            @click="d_current_tab ='buttons'">
+          Buttons
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'colors'}]"
+            @click="d_current_tab ='colors'">
+          Color Palette
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'context_menu'}]"
+            @click="d_current_tab ='context_menu'">
+          Context Menu
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'datetime'}]"
+            @click="d_current_tab ='datetime'">
+          Datetime Picker
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'diff'}]"
+            @click="d_current_tab ='diff'">
+          Diff
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'dropdown'}]"
+            @click="d_current_tab ='dropdown'">
+          Dropdown
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'typeahead'}]"
+            @click="d_current_tab ='typeahead'">
+          Dropdown Typeahead
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'upload'}]"
+            @click="d_current_tab ='upload'">
+          File Upload
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'modal'}]"
+            @click="d_current_tab ='modal'">
+          Modal
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'multi_file'}]"
+            @click="d_current_tab ='multi_file'">
+          Multi-file Viewer
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'tabs'}]"
+            @click="d_current_tab ='tabs'">
+          Tabs
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'tooltip'}]"
+            @click="d_current_tab ='tooltip'">
+          Tooltip
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'toggle'}]"
+            @click="d_current_tab ='toggle'">
+          Toggle
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'view_file'}]"
+            @click="d_current_tab ='view_file'">
+          View File
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'validated_input'}]"
+            @click="d_current_tab ='validated_input'">
+          Validated Input
+        </div>
+        <div :class="['sidebar-item', {active: d_current_tab === 'validated_form'}]"
+            @click="d_current_tab ='validated_form'">
+          Validated Form
+        </div>
+      </sticky-sidebar>
 
-      <tab>
-        <tab-header>Tabs</tab-header>
-        <template slot="body">
-          <TabsDemo></TabsDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Tabs (Body Scroll)</tab-header>
-        <template slot="body">
-          <tabs :scroll_body="true"
-                tab_active_class="gray-white-theme-active"
-                tab_inactive_class="gray-white-theme-inactive">
-            <tab>
-              <tab-header>Tab with scroll</tab-header>
-              <template slot="body">
-                Start<br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                <br>scroll<br><br><br><br><br><br><br><br><br>
-                End
-              </template>
-            </tab>
-          </tabs>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Tabs (Column Scroll)</tab-header>
-        <template slot="body">
-          <tabs :scroll_body="true"
-                tab_active_class="gray-white-theme-active"
-                tab_inactive_class="gray-white-theme-inactive">
-            <tab>
-              <tab-header>Tab with scroll</tab-header>
-              <template slot="body">
-                <div class="scroll-container">
-                  <h2>Fixed Top</h2>
-                  <div class="scroll-column-container">
-                    <div class="scroll-column">
-                      <div class="scroll-container">
-                        <h3>Column 1 (Only as wide as content)</h3>
-                        <div class="scroll-column">
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          End
-                        </div>
-                      </div>
-                    </div>
-                    <div class="scroll-column-grow">
-                      <div class="scroll-container">
-                        <h3>Column 2 (Fill space)</h3>
-                        <div class="scroll-column">
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          <br>scroll<br><br><br><br><br><br><br><br><br>
-                          End
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </tab>
-          </tabs>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Tooltip</tab-header>
-        <template slot="body">
-          <TooltipDemo></TooltipDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Toggle</tab-header>
-        <template slot="body">
-          <ToggleDemo></ToggleDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>View File</tab-header>
-        <template slot="body">
-          <ViewFileDemo></ViewFileDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Validated Input</tab-header>
-        <template slot="body">
-          <ValidatedInputDemo></ValidatedInputDemo>
-        </template>
-      </tab>
-      <tab>
-        <tab-header>Validated Form</tab-header>
-        <template slot="body">
-          <ValidatedFormDemo></ValidatedFormDemo>
-        </template>
-      </tab>
-    </tabs>
+      <div class="body">
+        <ButtonDemo v-show="d_current_tab === 'buttons'"></ButtonDemo>
+        <ColorPaletteDemo v-show="d_current_tab === 'colors'"></ColorPaletteDemo>
+        <ContextMenuDemo v-show="d_current_tab === 'context_menu'"></ContextMenuDemo>
+        <DatetimePickerDemo v-show="d_current_tab === 'datetime'"></DatetimePickerDemo>
+        <DiffDemo v-show="d_current_tab === 'diff'"></DiffDemo>
+        <DropdownDemo v-show="d_current_tab === 'dropdown'"></DropdownDemo>
+        <DropdownTypeaheadDemo v-show="d_current_tab === 'typeahead'"></DropdownTypeaheadDemo>
+        <FileUploadDemo v-show="d_current_tab === 'upload'"></FileUploadDemo>
+        <ModalDemo v-show="d_current_tab === 'modal'"></ModalDemo>
+        <MultiFileViewerDemo v-show="d_current_tab === 'multi_file'"></MultiFileViewerDemo>
+        <TabsDemo v-show="d_current_tab === 'tabs'"></TabsDemo>
+        <TooltipDemo v-show="d_current_tab === 'tooltip'"></TooltipDemo>
+        <ToggleDemo v-show="d_current_tab === 'toggle'"></ToggleDemo>
+        <ViewFileDemo v-show="d_current_tab === 'view_file'"></ViewFileDemo>
+        <ValidatedInputDemo v-show="d_current_tab === 'validated_input'"></ValidatedInputDemo>
+        <ValidatedFormDemo v-show="d_current_tab === 'validated_form'"></ValidatedFormDemo>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -194,6 +99,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
+import StickySidebar from '@/components/sticky_sidebar.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from "@/components/tabs/tab_header.vue";
 import Tabs from '@/components/tabs/tabs.vue';
@@ -230,6 +136,7 @@ import ViewFileDemo from './view_file_demo.vue';
     FileUploadDemo,
     ModalDemo,
     MultiFileViewerDemo,
+    StickySidebar,
     Tab,
     Tabs,
     TabHeader,
@@ -246,6 +153,8 @@ import ViewFileDemo from './view_file_demo.vue';
 export default class UIDemos extends Vue {
   d_show_sidebar = false;
 
+  d_current_tab: string = 'buttons';
+
   mounted() {
     this.d_show_sidebar = window.matchMedia('(min-width: 768px)').matches;
   }
@@ -254,72 +163,67 @@ export default class UIDemos extends Vue {
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
-  @import '@/styles/independent_scrolling.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/independent_scrolling.scss';
 
-  * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  }
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
 
-  #demos-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
+.wrapper {
+  display: flex;
+}
 
-  .scroll-column {
-    padding-right: 15px;
-  }
-</style>
+$sidebar-width: 220px;
+$sidebar-toggle-height: 30px;
 
-<style lang="scss">
-  @import '@/styles/colors.scss';
+@mixin sidebar-item() {
+  background-color: $pebble-light;
 
-  .sidebar-tab-active {
-    background-color: lighten($stormy-gray-light, 10%);
-  }
-
-  .sidebar-tab-inactive:hover {
+  &:not(.active):hover {
     background-color: lighten($stormy-gray-light, 20%);
+    cursor: pointer;
   }
+}
 
-  .sidebar-tab-active, .sidebar-tab-inactive {
+#sidebar-toggle {
+  @include sidebar-item();
+  width: $sidebar-width;
+  height: $sidebar-toggle-height;
+
+  border: 1px solid lighten($stormy-gray-light, 20%);
+  border-left: none;
+
+  text-align: center;
+  font-size: 20px;
+  padding: 3px 0;
+
+  position: sticky;
+  top: 0;
+}
+
+.sidebar {
+  min-width: $sidebar-width;
+  top: $sidebar-toggle-height;
+
+  border-right: 1px solid lighten($stormy-gray-light, 20%);
+
+  background-color: $pebble-light;
+
+  .sidebar-item {
+    @include sidebar-item();
     padding: 3px 20px 3px 8px;
     font-size: 1.2em;
   }
 
-  $sidebar-width: 220px;
-
-  #sidebar-toggle {
-    width: $sidebar-width;
-    background-color: $pebble-light;
-    font-size: 1.2em;
-    border: 1px solid lighten($stormy-gray-light, 20%);
-    border-left: 0;
-    text-align: center;
-    padding: 3px 0;
+  .active {
+    background-color: lighten($stormy-gray-light, 10%);
   }
+}
 
-  #sidebar-toggle:hover {
-    background-color: darken($pebble-light, 10%);
-    cursor: pointer;
-  }
-
-  .sidebar-container {
-    width: $sidebar-width;
-    border-right: 1px solid lighten($stormy-gray-light, 20%);
-
-    background-color: $pebble-light;
-  }
-
-  .sidebar-container-hidden {
-    display: none;
-  }
-
-  .demo-body-sidebar-collapsed, .demo-body {
-    margin-top: 5px;
-    margin-left: 8px;;
-  }
+.body {
+  flex-grow: 1;
+}
 </style>
