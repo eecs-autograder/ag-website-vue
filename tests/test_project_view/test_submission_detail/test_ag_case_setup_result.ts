@@ -1,19 +1,15 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
-    AGTestSuiteResultFeedback,
-    FeedbackCategory,
-    GradingStatus, ResultOutput,
-    Submission
+    ResultOutput
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import AGCaseSetupResult from '@/components/project_view/submission_detail/ag_case_setup_result.vue';
-import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
 
-import { make_ag_test_suite_fdbk_config } from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -21,11 +17,14 @@ beforeAll(() => {
 
 describe('AGCaseSetupResult tests', () => {
     let wrapper: Wrapper<AGCaseSetupResult>;
-    let submission: Submission;
-    let ag_test_suite_result: AGTestSuiteResultFeedback;
+    let submission: ag_cli.Submission;
+    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
+
+    let get_ag_test_suite_result_setup_stdout_stub: sinon.SinonStub;
+    let get_ag_test_suite_result_setup_stderr_stub: sinon.SinonStub;
 
     beforeEach(() => {
-        submission = new Submission({
+        submission = new ag_cli.Submission({
             pk: 5,
             group: 7,
             timestamp: "",
@@ -33,7 +32,7 @@ describe('AGCaseSetupResult tests', () => {
             submitted_filenames: ['spam', 'egg'],
             discarded_files: ['very', 'nope'],
             missing_files: {'oops': 1, '*.cpp': 3},
-            status: GradingStatus.being_graded,
+            status: ag_cli.GradingStatus.being_graded,
             count_towards_daily_limit: false,
             is_past_daily_limit: false,
             is_bonus_submission: true,
@@ -43,75 +42,287 @@ describe('AGCaseSetupResult tests', () => {
             last_modified: ""
         });
 
-        ag_test_suite_result = {
-            pk: 1,
-            ag_test_suite_name: "Suite Name",
-            ag_test_suite_pk: 1,
-            fdbk_settings: make_ag_test_suite_fdbk_config(),
-            total_points: 0,
-            total_points_possible: 2,
-            setup_name: null,
-            setup_return_code: 0,
-            setup_timed_out: false,
-            ag_test_case_results: []
-        };
+        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
     });
 
     afterEach(() => {
         sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
     });
 
     test('setup_stdout is null && show_setup_stdout is true', async () => {
-        fail();
-        sinon.stub(ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout').returns(
-            Promise.resolve("hi")
+        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
+
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve(null)
         );
-        sinon.stub(ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr').returns(
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
             Promise.resolve("bye")
         );
-
-        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
 
         wrapper = mount(AGCaseSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
-                fdbk_category: FeedbackCategory.max
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stdout).toBe(true);
+        expect(wrapper.find('#stdout-section').text()).toContain("No Output");
+    });
+
+    test('setup_stderr is null && show_setup_stderr is true', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
+
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve(null)
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stderr).toBe(true);
+        expect(wrapper.find('#stderr-section').text()).toContain("No Output");
+    });
+
+    test('setup_stdout is not null and show_setup_stdout is true', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
+
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stdout).toBe(true);
+        expect(wrapper.find('#stdout-section').text()).toContain("hi");
+    });
+
+    test('setup_stderr is not null and show_setup_stderr is true', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
+
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_setup_stdout_loaded).toBe(true);
-        expect(wrapper.find('#stdout-section').isVisible()).toBe(true);
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stderr).toBe(true);
+        expect(wrapper.find('#stderr-section').text()).toContain("bye");
     });
 
-    test.skip('setup_stderr is null', async () => {
+    test('show_setup_stdout is true', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
+
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stdout).toBe(true);
+        expect(wrapper.find('#stdout-section').exists()).toBe(true);
     });
 
-    test.skip('setup_stdout is not null', async () => {
+    test('show_setup_stdout is false', async () => {
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stdout).toBe(false);
+        expect(wrapper.find('#stdout-section').exists()).toBe(false);
     });
 
-    test.skip('setup_stderr is not null', async () => {
+    test('show_setup_stderr is true', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
+
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stderr).toBe(true);
+        expect(wrapper.find('#stderr-section').exists()).toBe(true);
     });
 
-    test.skip('show_setup_stdout is true', async () => {
+    test('show_setup_stderr is false', async () => {
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_stderr).toBe(false);
+        expect(wrapper.find('#stderr-section').exists()).toBe(false);
     });
 
-    test.skip('show_setup_stdout is false', async () => {
+    test('setup command timed out', async () => {
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
+
+        ag_test_suite_result.setup_timed_out = true;
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('#exit-status-section').text()).toContain("Timed out");
     });
 
-    test.skip('show_setup_stderr is true', async () => {
-    });
+    test('Exit status is displayed', async () => {
+        get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
+        ).returns(
+            Promise.resolve("hi")
+        );
+        get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
+        ).returns(
+            Promise.resolve("bye")
+        );
 
-    test.skip('show_setup_stderr is false', async () => {
-    });
+        ag_test_suite_result.setup_timed_out = false;
+        ag_test_suite_result.setup_return_code = 0;
 
-    test.skip('setup command timed out', async () => {
-    });
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
 
-    test.skip('Exit status is displayed', async () => {
+        expect(wrapper.find('#exit-status-section').text()).toContain("0");
     });
 });

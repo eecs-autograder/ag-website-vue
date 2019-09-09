@@ -5,7 +5,8 @@
         <div v-for="(ag_test_command_result, index) of ag_test_case_result.ag_test_command_results">
           <submission-detail-panel
             :name="ag_test_command_result.ag_test_command_name"
-            :correctness_level="command_result_correctness(ag_test_command_result)">
+            :correctness_level="command_result_correctness(ag_test_command_result)"
+            :is_command="true">
             <AGCommandResult :submission="submission"
                              :ag_test_command_result="ag_test_command_result"
                              :fdbk_category="fdbk_category">
@@ -91,7 +92,6 @@ export default class AGCaseResult extends Vue {
         output_correctness === CorrectnessLevel.all_correct) {
       return CorrectnessLevel.some_correct;
     }
-    console.log("Does this ever happen?");
     return CorrectnessLevel.not_available;
   }
 

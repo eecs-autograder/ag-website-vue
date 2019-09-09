@@ -45,15 +45,15 @@ export default class CorrectnessIcon extends Vue {
 }
 
 .all-correct {
-  color: darken($ocean-blue, 20);
+  //color: darken($ocean-blue, 20);
 }
 
 .some-correct {
-  color: darken(darkorange, 30);
+  //color: darken(darkorange, 30);
 }
 
 .none-correct {
-  color: darkred;
+  //color: darkred;
 }
 
 .correctness-level {

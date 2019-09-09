@@ -61,7 +61,7 @@ import SubmissionDetailPanel from "@/components/project_view/submission_detail/s
     SubmissionDetailPanel
   }
 })
-export default class AGTestSuiteResult extends Vue {
+export default class AGSuiteResult extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
@@ -100,12 +100,13 @@ export default class AGTestSuiteResult extends Vue {
       return return_code_correctness;
     }
 
-    if (case_result.total_points === 0) {
-      if (case_result.total_points_possible === 0) {
-        return CorrectnessLevel.all_correct;
-      }
-      return CorrectnessLevel.none_correct;
-    }
+    // if (case_result.total_points === 0) {
+    //   if (case_result.total_points_possible === 0) {
+    //       //is this necessary???
+    //     return CorrectnessLevel.all_correct;
+    //   }
+    //   return CorrectnessLevel.none_correct;
+    // }
 
     if (return_code_correctness === CorrectnessLevel.all_correct &&
         output_correctness === CorrectnessLevel.all_correct) {
@@ -128,6 +129,7 @@ export default class AGTestSuiteResult extends Vue {
         output_correctness === CorrectnessLevel.all_correct) {
       return CorrectnessLevel.some_correct;
     }
+    // Does this ever happen?
     return CorrectnessLevel.not_available;
   }
 

@@ -4,10 +4,12 @@ import {
     AGCommand,
     AGTestCase,
     AGTestCaseFeedbackConfig,
+    AGTestCaseResultFeedback,
     AGTestCommand,
     AGTestCommandFeedbackConfig,
+    AGTestCommandResultFeedback,
     AGTestSuite,
-    AGTestSuiteFeedbackConfig,
+    AGTestSuiteFeedbackConfig, AGTestSuiteResultFeedback,
     BugsExposedFeedbackLevel,
     Course,
     ExpectedOutputSource,
@@ -17,7 +19,7 @@ import {
     Group,
     InstructorFile,
     MutationTestSuite,
-    MutationTestSuiteFeedbackConfig,
+    MutationTestSuiteFeedbackConfig, MutationTestSuiteResultFeedback,
     Project,
     Semester,
     StdinSource,
@@ -435,6 +437,103 @@ export function make_mutation_test_suite_fdbk_config(
         show_validity_check_stderr: false,
         show_grade_buggy_impls_stdout: false,
         show_grade_buggy_impls_stderr: false
+    };
+    safe_assign(defaults, args);
+    return defaults;
+}
+
+const AG_TEST_COMMAND_RESULT_FEEDBACK_PKS = counter();
+
+export function make_ag_test_command_result_feedback(
+    ag_test_command_pk: number,
+    args: Partial<AGTestCommandResultFeedback> = {}): AGTestCommandResultFeedback {
+    let defaults = {
+        pk: AG_TEST_COMMAND_RESULT_FEEDBACK_PKS.next().value,
+        ag_test_command_pk: ag_test_command_pk,
+        ag_test_command_name: `AG Test Command ${ag_test_command_pk}`,
+        fdbk_settings: make_ag_test_command_fdbk_config(),
+        timed_out: false,
+        return_code_correct: null,
+        expected_return_code: null,
+        actual_return_code: null,
+        return_code_points: 0,
+        return_code_points_possible: 0,
+        stdout_correct: null,
+        stdout_points: 0,
+        stdout_points_possible: 0,
+        stderr_correct: null,
+        stderr_points: 0,
+        stderr_points_possible: 0,
+        total_points: 0,
+        total_points_possible: 0
+    };
+    safe_assign(defaults, args);
+    return defaults;
+}
+
+const AG_TEST_CASE_RESULT_FEEDBACK_PKS = counter();
+
+export function make_ag_test_case_result_feedback(
+    ag_test_case_pk: number,
+    args: Partial<AGTestCaseResultFeedback> = {}): AGTestCaseResultFeedback {
+    let defaults = {
+        pk: AG_TEST_CASE_RESULT_FEEDBACK_PKS.next().value,
+        ag_test_case_pk: ag_test_case_pk,
+        ag_test_case_name: `AG Test Case ${ag_test_case_pk}`,
+        fdbk_settings: make_ag_test_case_feedback_config(),
+        total_points: 0,
+        total_points_possible: 0,
+        ag_test_command_results: []
+    };
+    safe_assign(defaults, args);
+    return defaults;
+}
+
+const AG_TEST_SUITE_RESULT_FEEDBACK_PKS = counter();
+
+export function make_ag_test_suite_result_feedback(
+    ag_test_suite_pk: number,
+    args: Partial<AGTestSuiteResultFeedback> = {}): AGTestSuiteResultFeedback {
+    let defaults = {
+        pk: AG_TEST_SUITE_RESULT_FEEDBACK_PKS.next().value,
+        ag_test_suite_pk: ag_test_suite_pk,
+        ag_test_suite_name: `AG Test Suite ${ag_test_suite_pk}`,
+        fdbk_settings: make_ag_test_suite_fdbk_config(),
+        total_points: 0,
+        total_points_possible: 0,
+        setup_name: null,
+        setup_return_code: null,
+        setup_timed_out: null,
+        ag_test_case_results: []
+    };
+    safe_assign(defaults, args);
+    return defaults;
+}
+
+const MUTATION_TEST_SUITE_RESULT_FEEDBACK_PKS = counter();
+
+export function make_mutation_test_suite_result_feedback(
+    mutation_test_suite_pk: number,
+    args: Partial<MutationTestSuiteResultFeedback> = {}): MutationTestSuiteResultFeedback {
+    let defaults = {
+        pk: MUTATION_TEST_SUITE_RESULT_FEEDBACK_PKS.next().value,
+        student_test_suite_name: `Mutation Test Suite ${mutation_test_suite_pk}`,
+        student_test_suite_pk: mutation_test_suite_pk,
+        fdbk_settings: make_mutation_test_suite_fdbk_config(),
+        has_setup_command: false,
+        setup_command_name: null,
+        setup_return_code: null,
+        setup_timed_out: null,
+        get_student_test_names_return_code: null,
+        get_student_test_names_timed_out: null,
+        student_tests: [],
+        discarded_tests: [],
+        invalid_tests: null,
+        timed_out_tests: null,
+        num_bugs_exposed: null,
+        bugs_exposed: null,
+        total_points: 0,
+        total_points_possible: 0
     };
     safe_assign(defaults, args);
     return defaults;

@@ -3,15 +3,16 @@
     <div v-if="ag_test_command_result.return_code_correct !== null"
          id="exit-status-section">
 
-      <div v-if="ag_test_command_result.timed_out"
-           class="feedback-row">
-        <i class="far fa-clock timed-out-icon"></i>
-        <b> The command timed out </b>
-      </div>
+<!--      <div v-if="ag_test_command_result.timed_out"-->
+<!--           class="feedback-row">-->
+<!--        <i class="far fa-clock timed-out-icon"></i>-->
+<!--        <b> The command timed out </b>-->
+<!--      </div>-->
 
       <div class="feedback-row">
         <div class="feedback-label"> Exit Status: </div>
-        <div class="feedback-output-content-short">
+        <div class="feedback-output-content-short"
+             id="return-code-correctness">
           {{return_code_correctness}}
 
           <span v-if="ag_test_command_result.fdbk_settings.return_code_fdbk_level
@@ -19,7 +20,7 @@
                       ag_test_command_result.actual_return_code !== null ||
                       ag_test_command_result.timed_out">
             <i class="fas fa-question-circle"></i>
-            <tooltip ref="expected-and-actual-return-code"
+            <tooltip ref="expected_and_actual_return_code"
                      width="medium"
                      placement="top">
               <div class="expected-and-actual-return-code">
@@ -45,7 +46,8 @@
 
     <div id="stdout-section">
       <div v-if="ag_test_command_result.stdout_correct !== null">
-        <div class="feedback-row">
+        <div class="feedback-row"
+             id="stdout-correctness-section">
           <div class="feedback-label"> Output (Stdout) Correctness: </div>
           <div class="feedback-output-content-short">
             {{ag_test_command_result.stdout_correct ? 'Correct' : 'Incorrect'}}
@@ -55,7 +57,8 @@
         <div v-if="ag_test_command_result.fdbk_settings.stdout_fdbk_level
                    === ValueFeedbackLevel.expected_and_actual
                    && !ag_test_command_result.stdout_correct"
-             class="feedback-row">
+             class="feedback-row"
+             id="stdout-diff-section">
           <div class="feedback-label"> Output (Stdout) Diff: </div>
           <template v-if="!stdout_diff_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
@@ -142,10 +145,6 @@ import {
     Submission,
     ValueFeedbackLevel
 } from "ag-client-typescript";
-import get_ag_test_cmd_result_stdout = ResultOutput.get_ag_test_cmd_result_stdout;
-import get_ag_test_cmd_result_stderr = ResultOutput.get_ag_test_cmd_result_stderr;
-import get_ag_test_cmd_result_stdout_diff = ResultOutput.get_ag_test_cmd_result_stdout_diff;
-import get_ag_test_cmd_result_stderr_diff = ResultOutput.get_ag_test_cmd_result_stderr_diff;
 
 import Diff from '@/components/diff.vue';
 import Tooltip from '@/components/tooltip.vue';
@@ -183,6 +182,7 @@ export default class AGCommandResult extends Vue {
     await this.load_stdout_content();
     await this.load_stderr_content();
     await this.load_stdout_diff();
+    console.log(this.stdout_diff);
     await this.load_stderr_diff();
   }
 
@@ -199,7 +199,7 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stdout_content() {
-    this.stdout_content = await get_ag_test_cmd_result_stdout(
+    this.stdout_content = await ResultOutput.get_ag_test_cmd_result_stdout(
       this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category
@@ -208,7 +208,7 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stderr_content() {
-    this.stderr_content = await get_ag_test_cmd_result_stderr(
+    this.stderr_content = await ResultOutput.get_ag_test_cmd_result_stderr(
       this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category
@@ -217,7 +217,7 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stdout_diff() {
-    this.stdout_diff = await get_ag_test_cmd_result_stdout_diff(
+    this.stdout_diff = await ResultOutput.get_ag_test_cmd_result_stdout_diff(
       this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category
@@ -226,7 +226,7 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stderr_diff() {
-    this.stderr_diff = await get_ag_test_cmd_result_stderr_diff(
+    this.stderr_diff = await ResultOutput.get_ag_test_cmd_result_stderr_diff(
       this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category

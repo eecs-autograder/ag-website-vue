@@ -13,14 +13,6 @@
         <span id="setup_return_code_icon">
           {{get_setup_return_code_correctness()}}
         </span>
-
-      </div>
-
-<!--      // perhaps get rid of-->
-      <div v-if="mutation_test_suite_result.setup_timed_out"
-           class="timed-out-message">
-        <i class="far fa-clock timed-out-icon"></i>
-        The setup command timed out
       </div>
 
       <div v-if="mutation_test_suite_result.setup_return_code !== null"
@@ -269,13 +261,6 @@ import {
     ResultOutput,
     Submission
 } from 'ag-client-typescript';
-import get_mutation_test_suite_result_setup_stdout = ResultOutput.get_mutation_test_suite_result_setup_stdout;
-import get_mutation_test_suite_result_setup_stderr = ResultOutput.get_mutation_test_suite_result_setup_stderr;
-import get_mutation_test_suite_result_get_student_test_names_stdout = ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout;
-import get_mutation_test_suite_result_validity_check_stdout = ResultOutput.get_mutation_test_suite_result_validity_check_stdout;
-import get_mutation_test_suite_result_grade_buggy_impls_stdout = ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout;
-import get_mutation_test_suite_result_grade_buggy_impls_stderr = ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr;
-import get_mutation_test_suite_result_validity_check_stderr = ResultOutput.get_mutation_test_suite_result_validity_check_stderr;
 
 import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 
@@ -293,13 +278,6 @@ export default class MutationSuiteResult extends Vue {
 
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
-
-  @Watch('fdbk_category')
-  on_fdbk_category_change(new_fdbk_category: FeedbackCategory,
-                          old_fdbk_category: FeedbackCategory) {
-    // console.log("Fdbk_cat changed");
-    // this.d_fdbk_category = new_fdbk_category;
-  }
 
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
@@ -340,7 +318,7 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_setup_stdout_content() {
-    this.setup_stdout_content = await get_mutation_test_suite_result_setup_stdout(
+    this.setup_stdout_content = await ResultOutput.get_mutation_test_suite_result_setup_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -349,7 +327,7 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_setup_stderr_content() {
-    this.setup_stderr_content = await get_mutation_test_suite_result_setup_stderr(
+    this.setup_stderr_content = await ResultOutput.get_mutation_test_suite_result_setup_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -359,7 +337,7 @@ export default class MutationSuiteResult extends Vue {
 
   async load_test_names_stdout_content() {
     this.test_names_stdout_content
-      = await get_mutation_test_suite_result_get_student_test_names_stdout(
+      = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -369,7 +347,7 @@ export default class MutationSuiteResult extends Vue {
 
   async load_test_names_stderr_content() {
     this.test_names_stderr_content
-      = await get_mutation_test_suite_result_get_student_test_names_stdout(
+      = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -379,7 +357,7 @@ export default class MutationSuiteResult extends Vue {
 
   async load_validity_check_stdout_content() {
     this.validity_checkout_stdout_content =
-      await get_mutation_test_suite_result_validity_check_stdout(
+      await ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -389,7 +367,7 @@ export default class MutationSuiteResult extends Vue {
 
   async load_validity_check_stderr_content() {
     this.validity_checkout_stderr_content =
-      await get_mutation_test_suite_result_validity_check_stderr(
+      await ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -399,7 +377,7 @@ export default class MutationSuiteResult extends Vue {
 
   async load_grade_buggy_stdout_content() {
     this.grade_buggy_stdout_content =
-        await get_mutation_test_suite_result_grade_buggy_impls_stdout(
+        await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -409,7 +387,7 @@ export default class MutationSuiteResult extends Vue {
 
   async load_grade_buggy_stderr_content() {
     this.grade_buggy_stderr_content =
-        await get_mutation_test_suite_result_grade_buggy_impls_stderr(
+        await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -432,7 +410,7 @@ export default class MutationSuiteResult extends Vue {
   }
 
   get_setup_return_code_correctness() {
-    if (this.mutation_test_suite_result.setup_return_code === null) {
+    if (this.mutation_test_suite_result.setup_timed_out === null) {
         return "Timed Out";
     }
     else if (this.mutation_test_suite_result.setup_return_code === 0) {
@@ -498,9 +476,5 @@ export default class MutationSuiteResult extends Vue {
 #setup-return-code-icon {
   display: inline-block;
   color: $green;
-}
-
-.timed-out-message {
-
 }
 </style>

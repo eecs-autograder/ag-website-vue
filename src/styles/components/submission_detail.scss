@@ -15,24 +15,32 @@
 %panel-header {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-content: center;
     border: 1px solid;
     font-weight: bold;
 }
 
-.column-1 {
+.name, .column-1 {
     width: calc(100% / 2);
     padding: 7px;
 }
 
-.column-2 {
+.correctness, .column-2 {
     width: calc(100% / 4);
     padding: 7px;
 }
 
-.column-3 {
+.points, .column-3 {
     width: calc(100% / 4);
+    padding: 7px;
+}
+
+.command-name {
+    padding: 7px;
+}
+
+.command-correctness {
     padding: 7px;
 }
 
@@ -58,7 +66,7 @@ $base-gray: darken($white-gray, 5);
     border-color: darken($base-gray, 5);
 }
 
-$base-red: lighten($warning-red, 30);
+$base-red: lighten($warning-red, 25);
 
 .none-correct-panel-header {
     @extend %panel-header;
@@ -77,23 +85,42 @@ $base-red: lighten($warning-red, 30);
     @include panel-body-border($base-red);
 }
 
-$base-orange: $orange;
+$base-orange: hotpink;
 
-.some-correct-panel-header {
+.some-correct-full-points-panel-header {
     @extend %panel-header;
     cursor: pointer;
     background-color: $base-orange;
     border-color: darken($base-orange, 10);
 }
 
-.some-correct-panel-header:hover {
+.some-correct-full-points-panel-header:hover {
     background-color: darken($base-orange, 10);
     border-color: darken($base-orange, 15);
 }
 
-.some-correct-panel-body {
+.some-correct-full-points-panel-body {
     @extend %panel-body;
     @include panel-body-border($base-orange);
+}
+
+$base-pink: $orange;
+
+.some-correct-partial-points-panel-header {
+    @extend %panel-header;
+    cursor: pointer;
+    background-color: $base-pink;
+    border-color: darken($base-pink, 10);
+}
+
+.some-correct-partial-points-panel:hover {
+    background-color: darken($base-pink, 10);
+    border-color: darken($base-pink, 15);
+}
+
+.some-correct-partial-points-panel-body {
+    @extend %panel-body;
+    @include panel-body-border($base-pink);
 }
 
 $base-blue: darken($light-blue, 2);
@@ -113,6 +140,11 @@ $base-blue: darken($light-blue, 2);
 .all-correct-panel-body {
     @extend %panel-body;
     @include panel-body-border($base-blue);
+}
+
+.multi-command-header {
+    border-color: black;
+    background-color: white;
 }
 
 .feedback-label {

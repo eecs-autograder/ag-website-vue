@@ -51,8 +51,6 @@ import {
   ResultOutput,
   Submission
 } from "ag-client-typescript";
-import get_ag_test_suite_result_setup_stdout = ResultOutput.get_ag_test_suite_result_setup_stdout;
-import get_ag_test_suite_result_setup_stderr = ResultOutput.get_ag_test_suite_result_setup_stderr;
 
 @Component
 export default class AGCaseSetupResult extends Vue {
@@ -71,26 +69,21 @@ export default class AGCaseSetupResult extends Vue {
   d_setup_stderr_loaded = false;
 
   async created() {
-      console.log("Start Created");
     await this.load_setup_stdout();
     await this.load_setup_stderr();
-    console.log("Done created");
   }
 
   async load_setup_stdout() {
-    console.log("Got called");
-    this.setup_stdout = await get_ag_test_suite_result_setup_stdout(
+    this.setup_stdout = await ResultOutput.get_ag_test_suite_result_setup_stdout(
       this.submission.pk,
       this.ag_test_suite_result.pk,
       this.fdbk_category
     );
-    console.log("Finished awaiting");
     this.d_setup_stdout_loaded = true;
-    console.log("d_setup_stdout_loaded" + this.d_setup_stdout_loaded);
   }
 
   async load_setup_stderr() {
-    this.setup_stderr = await get_ag_test_suite_result_setup_stderr(
+    this.setup_stderr = await ResultOutput.get_ag_test_suite_result_setup_stderr(
       this.submission.pk,
       this.ag_test_suite_result.pk,
       this.fdbk_category
