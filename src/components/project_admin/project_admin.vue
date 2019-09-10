@@ -255,9 +255,8 @@ export default class ProjectAdmin extends Vue {
 }
 
 #project-admin {
-  height: 100vh;
-  width: 100vw;
-  position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 .loading-spinner {

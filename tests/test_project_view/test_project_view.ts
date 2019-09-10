@@ -4,16 +4,25 @@ import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
 
 import {
     Course,
-    Group, GroupInvitation,
+    Group,
+    GroupInvitation,
+    HttpError,
     Project,
-    User
+    Submission,
+    User,
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ProjectView from '@/components/project_view/project_view.vue';
 
-import { make_course, make_project, make_user_roles, set_global_current_user } from '@/tests/data_utils';
+import {
+    make_course,
+    make_group,
+    make_project,
+    make_user_roles,
+    set_global_current_user,
+} from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -23,6 +32,8 @@ beforeEach(() => {
     sinon.stub(User, 'get_num_late_days').returns(Promise.resolve({late_days_remaining: 0}));
     sinon.stub(User, 'get_current_user_roles').returns(
         Promise.resolve(make_user_roles()));
+    sinon.stub(Submission, 'get_final_graded_submission_from_group').rejects(
+        new HttpError(403, ''));
 });
 
 afterEach(() => {
@@ -68,7 +79,10 @@ describe('Changing Tabs', ()  => {
 
         sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
-        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
+        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([
+            make_group(project.pk, 1, {member_names: [user.username]})
+        ]));
+        sinon.stub(Submission, 'get_all_from_group_with_results').resolves([]);
 
         config.logModifiedComponents = false;
         original_match_media = window.matchMedia;
@@ -321,7 +335,10 @@ describe('select_tab function called with different values associated with "curr
     });
 
     test('current_tab parameter value = my_submissions', async () => {
-        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([]));
+        sinon.stub(user, 'groups_is_member_of').returns(Promise.resolve([
+            make_group(project.pk, 1, {member_names: [user.username]})
+        ]));
+        sinon.stub(Submission, 'get_all_from_group_with_results').resolves([]);
 
         $route.query = { current_tab: 'my_submissions' };
         wrapper = mount(ProjectView, {

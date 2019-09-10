@@ -65,73 +65,73 @@ services:
     expose:
       - "5672"
 
-  # celery_small_tasks:
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./autograder-server
-  #     dockerfile: Dockerfile-django-dev
-  #   container_name: ag-vue-dev-celery-small-tasks
-  #   volumes:
-  #     - ./autograder-server:/usr/src/app
-  #   command: /usr/local/bin/celery worker -c 1 -A autograder -l info -Q small_tasks -n small_tasks@%h
-  #   env_file:
-  #     - ./autograder-server/_dev.env
+  celery_small_tasks:
+    restart: unless-stopped
+    build:
+      context: ./autograder-server
+      dockerfile: Dockerfile-django-dev
+    container_name: ag-vue-dev-celery-small-tasks
+    volumes:
+      - ./autograder-server:/usr/src/app
+    command: /usr/local/bin/celery worker -c 1 -A autograder -l info -Q small_tasks -n small_tasks@%h
+    env_file:
+      - ./autograder-server/_dev.env
 
-  # celery_project_downloads:
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./autograder-server
-  #     dockerfile: Dockerfile-django-dev
-  #   container_name: ag-vue-dev-celery-project-downloads
-  #   volumes:
-  #     - ./autograder-server:/usr/src/app
-  #   command: /usr/local/bin/celery worker -c 1 -A autograder -l info -Q project_downloads -n project_downloads@%h
-  #   env_file:
-  #     - ./autograder-server/_dev.env
+  celery_project_downloads:
+    restart: unless-stopped
+    build:
+      context: ./autograder-server
+      dockerfile: Dockerfile-django-dev
+    container_name: ag-vue-dev-celery-project-downloads
+    volumes:
+      - ./autograder-server:/usr/src/app
+    command: /usr/local/bin/celery worker -c 1 -A autograder -l info -Q project_downloads -n project_downloads@%h
+    env_file:
+      - ./autograder-server/_dev.env
 
-  # celerybeat:
-  #   container_name: ag-vue-dev-celerybeat
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./autograder-server
-  #     dockerfile: Dockerfile-django-dev
-  #   env_file:
-  #     - ./autograder-server/_dev.env
-  #   volumes:
-  #     - ./autograder-server:/usr/src/app
-  #   command: /usr/local/bin/celery worker --beat -c 1 -A autograder -l info -Q periodic_tasks -n periodic_tasks@%h
+  celerybeat:
+    container_name: ag-vue-dev-celerybeat
+    restart: unless-stopped
+    build:
+      context: ./autograder-server
+      dockerfile: Dockerfile-django-dev
+    env_file:
+      - ./autograder-server/_dev.env
+    volumes:
+      - ./autograder-server:/usr/src/app
+    command: /usr/local/bin/celery worker --beat -c 1 -A autograder -l info -Q periodic_tasks -n periodic_tasks@%h
 
-   # environment:
-   #  AG_SUBMISSION_LISTENER_INTERVAL: 5
+  #  environment:
+  #   AG_SUBMISSION_LISTENER_INTERVAL: 5
 
-  # grader:
-  #   container_name: ag-vue-dev-grader
-  #   build:
-  #     dockerfile: Dockerfile-grader-dev
-  #     context: ./autograder-server
+  grader:
+    container_name: ag-vue-dev-grader
+    build:
+      dockerfile: Dockerfile-grader-dev
+      context: ./autograder-server
 
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ./autograder-server:/usr/src/app
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./autograder-server:/usr/src/app
 
-  #   env_file:
-  #     - ./autograder-server/_dev.env
+    env_file:
+      - ./autograder-server/_dev.env
 
-  #   command: /usr/local/bin/celery -A autograder worker -n submission_grader@%h --loglevel=info -c 1
+    command: /usr/local/bin/celery -A autograder worker -n submission_grader@%h --loglevel=info -c 1
 
-  # deferred_grader:
-  #   container_name: ag-vue-dev-deferred-grader
-  #   build:
-  #     dockerfile: Dockerfile-grader-dev
-  #     context: ./autograder-server
+  deferred_grader:
+    container_name: ag-vue-dev-deferred-grader
+    build:
+      dockerfile: Dockerfile-grader-dev
+      context: ./autograder-server
 
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ./autograder-server:/usr/src/app
-  #   env_file:
-  #     - ./autograder-server/_dev.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./autograder-server:/usr/src/app
+    env_file:
+      - ./autograder-server/_dev.env
 
-  #   command: /usr/local/bin/celery -A autograder worker -Q deferred,rerun -n deferred@%h --loglevel=info -c 1
+    command: /usr/local/bin/celery -A autograder worker -Q deferred,rerun -n deferred@%h --loglevel=info -c 1
 
 volumes:
   redisdata: {}

@@ -4,9 +4,7 @@ import { RefSelector, Wrapper } from "@vue/test-utils";
 
 import ValidatedInput from "@/components/validated_input.vue";
 
-export function sleep(seconds: number) {
-    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-}
+export { sleep } from '@/utils';
 
 // Sets the text for the given validaded input wrapper and triggers an update.
 // Prefer calling this function rather than inlining its definition so that our tests

@@ -13,12 +13,16 @@ import {
     ExpectedOutputSource,
     ExpectedReturnCode,
     ExpectedStudentFile,
+    GradingStatus,
     Group,
     MutationTestSuite,
     MutationTestSuiteFeedbackConfig,
     Project,
     Semester,
     StdinSource,
+    Submission,
+    SubmissionResultFeedback,
+    SubmissionWithResults,
     UltimateSubmissionPolicy,
     User,
     UserRoles,
@@ -160,6 +164,50 @@ export function make_group(project_pk: number,
     return new Group(defaults);
 }
 
+const SUBMISSION_PKS = counter();
+
+export function make_submission(group: Group, args: Partial<Submission> = {}): Submission {
+    let defaults = {
+        pk: SUBMISSION_PKS.next().value,
+        group: group.pk,
+        timestamp: now_str(),
+        submitter: group.member_names[0],
+        submitted_filenames: [],
+        discarded_files: [],
+        missing_files: {},
+        status: GradingStatus.received,
+        count_towards_daily_limit: true,
+        is_past_daily_limit: false,
+        is_bonus_submission: false,
+        count_towards_total_limit: true,
+        does_not_count_for: [],
+        position_in_queue: 0,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.group = group.pk;
+    return new Submission(defaults);
+}
+
+export function make_submission_with_results(
+    group: Group,
+    submission_args: Partial<Submission> = {},
+    result_args: Partial<SubmissionResultFeedback> = {}
+): SubmissionWithResults {
+    let submission = make_submission(group, submission_args);
+    let result_defaults = {
+        pk: submission.pk,
+        total_points: 0,
+        total_points_possible: 0,
+        ag_test_suite_results: [],
+        student_test_suite_results: [],
+    };
+    safe_assign(result_defaults, result_args);
+    return {
+        results: result_defaults,
+        ...submission
+    };
+}
 
 const AG_TEST_SUITE_PKS  = counter();
 
