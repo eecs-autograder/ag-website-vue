@@ -2,13 +2,6 @@
   <div id="ag-command-result">
     <div v-if="ag_test_command_result.return_code_correct !== null"
          id="exit-status-section">
-
-<!--      <div v-if="ag_test_command_result.timed_out"-->
-<!--           class="feedback-row">-->
-<!--        <i class="far fa-clock timed-out-icon"></i>-->
-<!--        <b> The command timed out </b>-->
-<!--      </div>-->
-
       <div class="feedback-row">
         <div class="feedback-label"> Exit Status: </div>
         <div class="feedback-output-content-short"
@@ -74,7 +67,8 @@
       </div>
 
       <div v-if="ag_test_command_result.fdbk_settings.show_actual_stdout"
-           class="feedback-row">
+           class="feedback-row"
+           id="stdout-actual-section">
         <div class="feedback-label"> Output: </div>
         <template v-if="!stdout_content_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
@@ -90,7 +84,8 @@
 
     <div id="stderr-section">
       <div v-if="ag_test_command_result.stderr_correct !== null">
-        <div class="feedback-row">
+        <div class="feedback-row"
+             id="stderr-correctness-section">
           <div class="feedback-label"> Error Output (Stderr) Correctness: </div>
           <div class="feedback-output-content-short">
             {{ag_test_command_result.stderr_correct ? 'Correct' : 'Incorrect'}}
@@ -100,7 +95,8 @@
         <div v-if="ag_test_command_result.fdbk_settings.stderr_fdbk_level
                    === ValueFeedbackLevel.expected_and_actual
                    && !ag_test_command_result.stderr_correct"
-             class="feedback-row">
+             class="feedback-row"
+             id="stderr-diff-section">
           <div class="feedback-label"> Error Output (Stderr) Diff: </div>
           <template v-if="!stderr_diff_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
@@ -117,7 +113,8 @@
       </div>
 
       <div v-if="ag_test_command_result.fdbk_settings.show_actual_stderr"
-           class="feedback-row">
+           class="feedback-row"
+           id="stderr-actual-section">
         <div class="feedback-label"> Error Output: </div>
         <template v-if="!stderr_content_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
@@ -182,7 +179,6 @@ export default class AGCommandResult extends Vue {
     await this.load_stdout_content();
     await this.load_stderr_content();
     await this.load_stdout_diff();
-    console.log(this.stdout_diff);
     await this.load_stderr_diff();
   }
 
