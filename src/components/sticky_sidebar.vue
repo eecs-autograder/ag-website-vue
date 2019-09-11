@@ -34,7 +34,7 @@ export default class StickySidebar extends Vue {
 <style scoped lang="scss">
 
 .sticky-sidebar {
-  position: sticky !important;
+  position: sticky;
   top: 0;
   overflow: auto;
 }

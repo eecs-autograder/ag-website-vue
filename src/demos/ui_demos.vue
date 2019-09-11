@@ -1,10 +1,10 @@
 <template>
   <div id="ui-demos">
     <h2>UI Component Demos</h2>
-        <div id="sidebar-toggle" @click="d_show_sidebar = !d_show_sidebar">
-          Menu
-          <i class="fas fa-bars"></i>
-        </div>
+    <div id="sidebar-toggle" @click="d_show_sidebar = !d_show_sidebar">
+      Menu
+      <i class="fas fa-bars"></i>
+    </div>
     <div class="wrapper">
       <sticky-sidebar class="sidebar" v-if="d_show_sidebar">
         <div :class="['sidebar-item', {active: d_current_tab === 'buttons'}]"
@@ -205,6 +205,9 @@ $sidebar-toggle-height: 30px;
 }
 
 .sidebar {
+  z-index: 1;
+  margin-right: -$sidebar-width;
+
   min-width: $sidebar-width;
   top: $sidebar-toggle-height;
 
@@ -225,5 +228,11 @@ $sidebar-toggle-height: 30px;
 
 .body {
   flex-grow: 1;
+}
+
+@media only screen and (min-width: 800px) {
+  .sidebar {
+    margin-right: 0;
+  }
 }
 </style>
