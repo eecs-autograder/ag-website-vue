@@ -59,6 +59,44 @@ describe('Submission list tests', () => {
         expect(wrapper.vm.d_submissions).toEqual([]);
     });
 
+    test('submission_detail is not visible when d_selected_submission === null', async () => {
+        get_submissions_with_results_stub.withArgs(group.pk).resolves([]);
+        let wrapper = mount(SubmissionList, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({ref: 'submission_detail'}).exists()).toBe(false);
+    });
+
+    test('submission_detail is not visible when d_selected_submission !== null', async () => {
+        let submission3 = data_ut.make_submission_with_results(group);
+        let submission2 = data_ut.make_submission_with_results(group);
+        let submission1 = data_ut.make_submission_with_results(group);
+        get_submissions_with_results_stub.withArgs(group.pk).resolves(
+            [submission1, submission2, submission3]);
+
+        let wrapper = mount(SubmissionList, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_selected_submission).toEqual(submission1);
+        expect(wrapper.find({ref: 'submission_detail'}).exists()).toBe(true);
+    });
+
     test('Most recent submission selected automatically on load', async () => {
         let submission3 = data_ut.make_submission_with_results(group);
         let submission2 = data_ut.make_submission_with_results(group);

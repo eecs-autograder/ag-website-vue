@@ -183,15 +183,14 @@ export default class AGCommandResult extends Vue {
   }
 
   get return_code_correctness() {
-    if (this.ag_test_command_result.return_code_correct) {
-      return 'Correct';
+    if (this.ag_test_command_result.timed_out !== null
+        && this.ag_test_command_result.timed_out) {
+        return "Timed Out";
     }
-    else {
-      if (this.ag_test_command_result.timed_out) {
-        return 'Timed out';
-      }
-      return 'Incorrect';
+    if (this.ag_test_command_result.return_code_correct !== null) {
+      return this.ag_test_command_result.return_code_correct ? "Correct" : "Incorrect";
     }
+    return "Not Available";
   }
 
   async load_stdout_content() {
@@ -234,10 +233,4 @@ export default class AGCommandResult extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
-
-.timed-out-icon {
-  color: $warning-red;
-  margin-right: 2px;
-}
-
 </style>

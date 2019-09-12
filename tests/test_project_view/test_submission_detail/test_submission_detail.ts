@@ -55,7 +55,7 @@ describe('SubmissionDetail tests', () => {
 
         group = data_ut.make_group(
             project.pk,
-            1,
+            3,
             {member_names: [user.username, "David", "Alexis"]}
         );
 
@@ -136,7 +136,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission.submitter).toEqual(user.username);
+        expect(wrapper.vm.d_submission!.submitter).toEqual(user.username);
         expect(wrapper.find('#submitter').text()).toEqual(user.username);
     });
 
@@ -158,7 +158,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission.status).toEqual(ag_cli.GradingStatus.received);
+        expect(wrapper.vm.d_submission!.status).toEqual(ag_cli.GradingStatus.received);
         expect(wrapper.find('#grading-status-section').text()).toContain(
             "We got your submission! It should be queued soon."
         );
@@ -182,7 +182,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission.is_bonus_submission).toBe(false);
+        expect(wrapper.vm.d_submission!.is_bonus_submission).toBe(false);
         expect(wrapper.find('#is-bonus-submission-message').exists()).toBe(false);
     });
 
@@ -209,7 +209,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission.is_bonus_submission).toBe(true);
+        expect(wrapper.vm.d_submission!.is_bonus_submission).toBe(true);
         expect(wrapper.find('#is-bonus-submission-message').exists()).toBe(true);
         expect(wrapper.find('#is-bonus-submission-message').text()).toEqual(
            "This submission used one of your bonus submissions."
@@ -393,7 +393,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        get_file_content_stub = sinon.stub(wrapper.vm.d_submission, 'get_file_content').returns(
+        get_file_content_stub = sinon.stub(wrapper.vm.d_submission!, 'get_file_content').returns(
             Promise.resolve(
                 "File b contents"
             )
@@ -435,7 +435,7 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
 
-        get_file_content_stub = sinon.stub(wrapper.vm.d_submission, 'get_file_content').returns(
+        get_file_content_stub = sinon.stub(wrapper.vm.d_submission!, 'get_file_content').returns(
             Promise.resolve(
                 Promise.resolve("File b contents")
             )
@@ -504,7 +504,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
-        expect(wrapper.vm.d_user_roles.is_admin).toBe(false);
+        expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
         expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(false);
@@ -537,7 +537,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(true);
-        expect(wrapper.vm.d_user_roles.is_admin).toBe(false);
+        expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
         expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(true);
@@ -573,7 +573,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
-        expect(wrapper.vm.d_user_roles.is_admin).toBe(true);
+        expect(wrapper.vm.d_user_roles!.is_admin).toBe(true);
         expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(true);
@@ -668,7 +668,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission_result.student_test_suite_results.length).toEqual(0);
+        expect(wrapper.vm.d_submission_result!.student_test_suite_results.length).toEqual(0);
         expect(wrapper.find({ref: 'mutation_suite_results'}).exists()).toBe(false);
     });
 
@@ -698,7 +698,7 @@ describe('SubmissionDetail tests', () => {
             }
         });
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_submission_result.student_test_suite_results.length).toEqual(2);
+        expect(wrapper.vm.d_submission_result!.student_test_suite_results.length).toEqual(2);
         expect(wrapper.find({ref: 'mutation_suite_results'}).exists()).toBe(true);
     });
 
@@ -721,7 +721,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission_result.ag_test_suite_results.length).toEqual(0);
+        expect(wrapper.vm.d_submission_result!.ag_test_suite_results.length).toEqual(0);
         expect(wrapper.find({ref: 'ag_test_suite_results'}).exists()).toBe(false);
     });
 
@@ -752,7 +752,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission_result.ag_test_suite_results.length).toEqual(2);
+        expect(wrapper.vm.d_submission_result!.ag_test_suite_results.length).toEqual(2);
         expect(wrapper.find({ref: 'ag_test_suite_results'}).exists()).toBe(true);
     });
 
@@ -782,22 +782,22 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.error;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.error;
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.finished_grading;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.queued;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.queued;
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(true);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.received;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.received;
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(true);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.removed_from_queue;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.removed_from_queue;
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.waiting_for_deferred;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.waiting_for_deferred;
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
     });
 
@@ -859,7 +859,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         remove_submission_from_queue_stub = sinon.stub(
-            wrapper.vm.d_submission, 'remove_from_queue'
+            wrapper.vm.d_submission!, 'remove_from_queue'
         );
 
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
@@ -873,7 +873,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_submission.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
+        expect(wrapper.vm.d_submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
     });
 
@@ -897,7 +897,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles.is_staff).toBe(true);
+        expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_group_member).toBe(true);
         expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.max);
     });
@@ -925,9 +925,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles.is_staff).toBe(true);
+        expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_ultimate_submission).toBe(true);
-        expect(wrapper.vm.d_user_roles.is_admin).toBe(true);
+        expect(wrapper.vm.d_user_roles!.is_admin).toBe(true);
         expect(wrapper.vm.is_group_member).toBe(false);
         expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.max);
     });
@@ -955,9 +955,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles.is_staff).toBe(true);
+        expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
-        expect(wrapper.vm.d_user_roles.is_admin).toBe(false);
+        expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
         expect(wrapper.vm.is_group_member).toBe(false);
         expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
     });
@@ -979,7 +979,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles.is_staff).toBe(false);
+        expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(true);
         expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
     });
@@ -1009,9 +1009,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles.is_staff).toBe(false);
+        expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
-        expect(wrapper.vm.d_submission.is_past_daily_limit).toBe(true);
+        expect(wrapper.vm.d_submission!.is_past_daily_limit).toBe(true);
         expect(wrapper.vm.d_feedback_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
@@ -1036,9 +1036,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles.is_staff).toBe(false);
+        expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
-        expect(wrapper.vm.d_submission.is_past_daily_limit).toBe(false);
+        expect(wrapper.vm.d_submission!.is_past_daily_limit).toBe(false);
         expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.normal);
     });
 
@@ -1066,22 +1066,22 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.being_processed).toBe(true);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.error;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.error;
         expect(wrapper.vm.being_processed).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.finished_grading;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
         expect(wrapper.vm.being_processed).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.received;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.received;
         expect(wrapper.vm.being_processed).toBe(true);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.removed_from_queue;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.removed_from_queue;
         expect(wrapper.vm.being_processed).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.queued;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.queued;
         expect(wrapper.vm.being_processed).toBe(true);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.waiting_for_deferred;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.waiting_for_deferred;
         expect(wrapper.vm.being_processed).toBe(true);
     });
 

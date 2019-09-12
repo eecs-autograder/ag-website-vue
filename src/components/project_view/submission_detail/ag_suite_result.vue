@@ -1,4 +1,3 @@
-import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div v-if="ag_test_suite_result !== null"
        id="ag-suite-result">
@@ -11,11 +10,12 @@ import {CorrectnessLevel} from "@/components/project_view/submission_detail/corr
     </div>
 
     <submission-detail-panel
+      ref="ag_case_setup_result_detail_panel"
       v-if="ag_test_suite_result.setup_return_code !== null
             || ag_test_suite_result.setup_timed_out"
       :name="ag_test_suite_result.setup_name ? ag_test_suite_result.setup_name : 'Setup'"
       :correctness_level="setup_correctness_level"
-      :panel_is_active="is_first_suite && decide_whether_to_open_setup(setup_correctness_level)">
+      :panel_is_active="is_first_suite && decide_whether_to_open_setup()">
       <AGCaseSetupResult :submission="submission"
                          :ag_test_suite_result="ag_test_suite_result"
                          :fdbk_category="fdbk_category">
@@ -24,10 +24,14 @@ import {CorrectnessLevel} from "@/components/project_view/submission_detail/corr
 
     <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
       <submission-detail-panel
+        ref="ag_case_result_detail_panel"
         :name="ag_test_case_result.ag_test_case_name"
         :correctness_level="case_result_correctness(ag_test_case_result)"
         :points_awarded="ag_test_case_result.total_points"
-        :points_possible="ag_test_case_result.total_points_possible">
+        :points_possible="ag_test_case_result.total_points_possible"
+        :panel_is_active="decide_whether_to_open_case(
+          case_result_correctness(ag_test_case_result), ag_test_case_result
+        )">
         <AGCaseResult
           :submission="submission"
           :ag_test_case_result="ag_test_case_result"
@@ -125,12 +129,7 @@ export default class AGSuiteResult extends Vue {
         output_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.some_correct;
     }
-    if (return_code_correctness === CorrectnessLevel.none_correct &&
-        output_correctness === CorrectnessLevel.all_correct) {
-      return CorrectnessLevel.some_correct;
-    }
-    // Does this ever happen?
-    return CorrectnessLevel.not_available;
+    return CorrectnessLevel.some_correct;
   }
 
   case_result_return_code_correctness(case_result: AGTestCaseResultFeedback) {
@@ -142,14 +141,13 @@ export default class AGSuiteResult extends Vue {
     }
 
     let all_correct = case_result.ag_test_command_results.every(
-      (cmd_result) => cmd_result.return_code_correct ||
-                      cmd_result.return_code_correct === null);
+      (cmd_result) => cmd_result.return_code_correct === null || cmd_result.return_code_correct);
     if (all_correct) {
       return CorrectnessLevel.all_correct;
     }
 
     let none_correct = !case_result.ag_test_command_results.some(
-      (cmd_result) => cmd_result.return_code_correct);
+      (cmd_result) => cmd_result.return_code_correct !== null && cmd_result.return_code_correct);
     if (none_correct) {
       return CorrectnessLevel.none_correct;
     }
@@ -165,25 +163,26 @@ export default class AGSuiteResult extends Vue {
     }
 
     let all_correct = case_result.ag_test_command_results.every(
-        (cmd_result) => (cmd_result.stdout_correct ||
-                         cmd_result.stdout_correct === null) &&
-                        (cmd_result.stderr_correct || cmd_result.stderr_correct === null));
+        (cmd_result) => (cmd_result.stdout_correct === null || cmd_result.stdout_correct) &&
+                        (cmd_result.stderr_correct === null || cmd_result.stderr_correct));
     if (all_correct) {
         return CorrectnessLevel.all_correct;
     }
 
     let none_correct = !case_result.ag_test_command_results.some(
-        (cmd_result) => cmd_result.stdout_correct || cmd_result.stderr_correct);
+        (cmd_result) => cmd_result.stdout_correct !== null && cmd_result.stdout_correct
+                        || cmd_result.stderr_correct !== null && cmd_result.stderr_correct);
     if (none_correct) {
         return CorrectnessLevel.none_correct;
     }
     return CorrectnessLevel.some_correct;
   }
 
-  decide_whether_to_open_setup(setup_level_correctness: CorrectnessLevel): boolean {
-    if (this.first_incorrect_setup === null && this.first_incorrect_case === null &&
-      (setup_level_correctness === CorrectnessLevel.none_correct ||
-       this.ag_test_suite_result.setup_timed_out)) {
+  decide_whether_to_open_setup(): boolean {
+    if (this.first_incorrect_setup === null && this.first_incorrect_case === null
+        && (this.setup_correctness_level === CorrectnessLevel.none_correct ||
+            (this.ag_test_suite_result.setup_timed_out !== null
+             && this.ag_test_suite_result.setup_timed_out))) {
       this.first_incorrect_setup = this.ag_test_suite_result;
       return true;
     }

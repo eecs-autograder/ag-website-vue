@@ -3,7 +3,6 @@
     <div v-if="mutation_test_suite_result.setup_return_code !== null
                || mutation_test_suite_result.setup_timed_out"
          id="setup-section">
-      <div> {{ fdbk_category }}</div>
 
       <div class="feedback-row">
         <div class="feedback-label"
@@ -424,7 +423,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   get_setup_return_code_correctness(): string {
-    if (this.mutation_test_suite_result.setup_timed_out) {
+    if (this.mutation_test_suite_result.setup_timed_out !== null
+        && this.mutation_test_suite_result.setup_timed_out) {
         return "Timed Out";
     }
     else if (this.mutation_test_suite_result.setup_return_code === 0) {
@@ -432,16 +432,6 @@ export default class MutationSuiteResult extends Vue {
     }
     return "Incorrect";
   }
-
-  // get_return_code_correctness(return_code: number) {
-  //   if (return_code === null) {
-  //     return CorrectnessLevel.not_available;
-  //   }
-  //   if (return_code === 0) {
-  //     return CorrectnessLevel.all_correct;
-  //   }
-  //   return CorrectnessLevel.none_correct;
-  // }
 }
 </script>
 

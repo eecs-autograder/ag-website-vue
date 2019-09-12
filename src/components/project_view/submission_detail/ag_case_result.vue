@@ -4,6 +4,7 @@
       <div id="multi-command-body">
         <div v-for="(ag_test_command_result, index) of ag_test_case_result.ag_test_command_results">
           <submission-detail-panel
+            ref="ag_test_command_panel"
             :name="ag_test_command_result.ag_test_command_name"
             :correctness_level="command_result_correctness(ag_test_command_result)"
             :is_command="true">
@@ -16,7 +17,8 @@
       </div>
     </template>
     <template v-else>
-      <AGCommandResult :submission="submission"
+      <AGCommandResult ref="ag_command_result"
+                       :submission="submission"
                        :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
                        :fdbk_category="fdbk_category">
       </AGCommandResult>
@@ -87,12 +89,7 @@ export default class AGCaseResult extends Vue {
         output_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.some_correct;
     }
-
-    if (return_code_correctness === CorrectnessLevel.none_correct &&
-        output_correctness === CorrectnessLevel.all_correct) {
-      return CorrectnessLevel.some_correct;
-    }
-    return CorrectnessLevel.not_available;
+    return CorrectnessLevel.some_correct;
   }
 
   command_result_return_code_correctness(command_result: AGTestCommandResultFeedback) {
@@ -114,14 +111,17 @@ export default class AGCaseResult extends Vue {
     }
 
     let output_correct = (
-      (command_result.stdout_correct || command_result.stdout_correct === null)
-      && (command_result.stderr_correct || command_result.stderr_correct === null)
+      (command_result.stdout_correct === null || command_result.stdout_correct)
+      && (command_result.stderr_correct === null || command_result.stderr_correct)
     );
     if (output_correct) {
       return CorrectnessLevel.all_correct;
     }
 
-    let some_output_correct = command_result.stdout_correct || command_result.stderr_correct;
+    let some_output_correct = (
+        (command_result.stdout_correct !== null && command_result.stdout_correct)
+        || (command_result.stderr_correct !== null && command_result.stderr_correct)
+    );
 
     if (some_output_correct) {
       return CorrectnessLevel.some_correct;

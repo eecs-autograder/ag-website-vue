@@ -4,8 +4,7 @@
         <div class="feedback-row">
           <div class="feedback-label"> Exit status: </div>
           <div class="feedback-output-content-short">
-            {{ag_test_suite_result.setup_timed_out
-              ? 'Timed out' : ag_test_suite_result.setup_return_code}}
+            {{setup_exit_status}}
           </div>
         </div>
       </div>
@@ -89,6 +88,17 @@ export default class AGCaseSetupResult extends Vue {
       this.fdbk_category
     );
     this.d_setup_stderr_loaded = true;
+  }
+
+  get setup_exit_status() {
+    if (this.ag_test_suite_result.setup_timed_out !== null
+        && this.ag_test_suite_result.setup_timed_out) {
+        return "Timed Out";
+    }
+    if (this.ag_test_suite_result.setup_return_code !== null) {
+        return this.ag_test_suite_result.setup_return_code;
+    }
+    return "Not Available";
   }
 }
 </script>

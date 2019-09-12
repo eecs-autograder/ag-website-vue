@@ -1,6 +1,7 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
+import * as sinon from 'sinon';
 
 import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
@@ -13,31 +14,16 @@ beforeAll(() => {
 
 describe('AGSuiteResult tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
+    let group: ag_cli.Group;
     let submission: ag_cli.Submission;
+    let user: ag_cli.User;
     let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
 
     beforeEach(() => {
-
-        submission = new ag_cli.Submission({
-            pk: 5,
-            group: 7,
-            timestamp: "",
-            submitter: 'batman',
-            submitted_filenames: ['spam', 'egg'],
-            discarded_files: ['very', 'nope'],
-            missing_files: {'oops': 1, '*.cpp': 3},
-            status: ag_cli.GradingStatus.being_graded,
-            count_towards_daily_limit: false,
-            is_past_daily_limit: false,
-            is_bonus_submission: true,
-            count_towards_total_limit: true,
-            does_not_count_for: ['robin'],
-            position_in_queue: 3,
-            last_modified: ""
-        });
-
-        let suite_pk = 1;
-        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(suite_pk);
+        user = data_ut.make_user();
+        group = data_ut.make_group(1, 1, {member_names: [user.username]});
+        submission = data_ut.make_submission(group);
+        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
 
         wrapper = mount(AGSuiteResult, {
             propsData: {
@@ -46,6 +32,105 @@ describe('AGSuiteResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
+    });
+
+    test('case_setup_result_panel - decide_whether_to_open_setup === true', async () => {
+        wrapper.setProps({is_first_suite: true});
+        await wrapper.vm.$nextTick();
+
+        sinon.stub(ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout');
+        sinon.stub(ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr');
+
+        let updated_ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(
+            1,
+            {
+                setup_return_code: 1,
+                setup_name: "Compile"
+            }
+        );
+        wrapper.setProps({ag_test_suite_result: updated_ag_test_suite_result});
+
+        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
+        expect(wrapper.vm.first_incorrect_setup).toEqual(updated_ag_test_suite_result);
+
+        let setup_panel = wrapper.find({ref: 'ag_case_setup_result_detail_panel'});
+        expect(setup_panel.find('.panel-header-open').exists()).toBe(true);
+    });
+
+    test('case_panel - decide_whether_to_open_case === true', async () => {
+        wrapper.setProps({is_first_suite: true});
+        await wrapper.vm.$nextTick();
+
+        sinon.stub(ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout');
+        sinon.stub(ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr');
+
+        let ag_case_result_maize = data_ut.make_ag_test_case_result_feedback(1);
+        let ag_command_result_maize_1 = data_ut.make_ag_test_command_result_feedback(
+          10,
+          {
+              return_code_correct: true,
+              stdout_correct: true,
+              stderr_correct: true
+          }
+        );
+        let ag_command_result_maize_2 = data_ut.make_ag_test_command_result_feedback(
+            20,
+            {
+                return_code_correct: true,
+                stdout_correct: true,
+                stderr_correct: true
+            }
+        );
+
+        ag_case_result_maize.ag_test_command_results = [
+            ag_command_result_maize_1,
+            ag_command_result_maize_2
+        ];
+
+        let ag_case_result_blue = data_ut.make_ag_test_case_result_feedback(1);
+        let ag_command_result_blue_1 = data_ut.make_ag_test_command_result_feedback(
+            10,
+            {
+                return_code_correct: true,
+                stdout_correct: true,
+                stderr_correct: true
+            }
+        );
+        let ag_command_result_blue_2 = data_ut.make_ag_test_command_result_feedback(
+            20,
+            {
+                return_code_correct: false,
+                stdout_correct: true,
+                stderr_correct: true
+            }
+        );
+
+        ag_case_result_blue.ag_test_command_results = [
+            ag_command_result_blue_1,
+            ag_command_result_blue_2
+        ];
+
+        let updated_ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(
+            1,
+            {
+                ag_test_case_results: [
+                    ag_case_result_maize,
+                    ag_case_result_blue
+                ]
+            }
+        );
+
+        wrapper.setProps({ag_test_suite_result: updated_ag_test_suite_result});
+
+        expect(wrapper.vm.case_result_correctness(ag_case_result_blue)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.first_incorrect_case).toEqual(ag_case_result_blue);
+
+        expect(wrapper.findAll({ref: 'ag_case_result_detail_panel'}).length).toEqual(2);
+        expect(wrapper.findAll({ref: 'ag_case_result_detail_panel'}).at(
+            1
+        ).find('.panel-header-open').exists()).toBe(true);
     });
 
     test('setup_correctness_level - setup_return_code === 0', async () => {
@@ -72,8 +157,6 @@ describe('AGSuiteResult tests', () => {
             CorrectnessLevel.none_correct
         );
     });
-
-    ////////////////////////////////////////////////////////////////
 
     test('case_result_correctness - return_code_correctness ' +
          '=== CorrectnessLevel.not_available',
@@ -154,58 +237,6 @@ describe('AGSuiteResult tests', () => {
         );
         expect(wrapper.vm.case_result_output_correctness(case_result)).toEqual(
             CorrectnessLevel.not_available
-        );
-        expect(wrapper.vm.case_result_correctness(case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-    });
-
-    test.skip('case_result_correctness - total_points === 0 && total_points_possible === 0',
-         async () => {
-        fail("Is this one even necessary?");
-        let case_pk = 1;
-        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = data_ut.make_ag_test_command_result_feedback(1);
-        let command_2_result = data_ut.make_ag_test_command_result_feedback(2);
-        let command_3_result = data_ut.make_ag_test_command_result_feedback(3);
-
-        case_result.ag_test_command_results = [
-            command_1_result,
-            command_2_result,
-            command_3_result
-        ];
-
-        expect(wrapper.vm.case_result_return_code_correctness(case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_correctness(case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-    });
-
-    test.skip('case_result_correctness - total_points === 0 && total_points_possible !== 0',
-         async () => {
-        fail("is this one either?");
-        let case_pk = 1;
-        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = data_ut.make_ag_test_command_result_feedback(1);
-        let command_2_result = data_ut.make_ag_test_command_result_feedback(2);
-        let command_3_result = data_ut.make_ag_test_command_result_feedback(3);
-
-        case_result.ag_test_command_results = [
-            command_1_result,
-            command_2_result,
-            command_3_result
-        ];
-
-        expect(wrapper.vm.case_result_return_code_correctness(case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(case_result)).toEqual(
-            CorrectnessLevel.all_correct
         );
         expect(wrapper.vm.case_result_correctness(case_result)).toEqual(
             CorrectnessLevel.all_correct
@@ -492,8 +523,6 @@ describe('AGSuiteResult tests', () => {
         );
     });
 
-    ////////////////////////////////////////////////////////////////
-
     test('case_result_return_code_correctness - all commands have ' +
          'return_code_correct === null',
          async () => {
@@ -673,8 +702,6 @@ describe('AGSuiteResult tests', () => {
             CorrectnessLevel.some_correct
         );
     });
-
-    ////////////////////////////////////////////////////////////////
 
     test('case_result_output_correctness - every command has stdout_correct = null ' +
          'AND stderr_correct = null',
@@ -872,8 +899,6 @@ describe('AGSuiteResult tests', () => {
         );
     });
 
-    ////////////////////////////////////////////////////////////////
-
     test('decide_whether_to_open_setup - first_incorrect_setup === null AND ' +
          'first_incorrect_case === null AND setup_level_correctness === none_correct',
          async () => {
@@ -883,7 +908,7 @@ describe('AGSuiteResult tests', () => {
         wrapper.vm.ag_test_suite_result.setup_return_code = 1;
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.decide_whether_to_open_setup(CorrectnessLevel.none_correct)).toBe(true);
+        expect(wrapper.vm.decide_whether_to_open_setup()).toBe(true);
     });
 
     test('decide_whether_to_open_setup - first_incorrect_setup === null AND ' +
@@ -894,7 +919,7 @@ describe('AGSuiteResult tests', () => {
 
         wrapper.vm.ag_test_suite_result.setup_timed_out = true;
 
-        expect(wrapper.vm.decide_whether_to_open_setup(CorrectnessLevel.some_correct)).toBe(true);
+        expect(wrapper.vm.decide_whether_to_open_setup()).toBe(true);
 
         expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
         expect(wrapper.vm.first_incorrect_case).toBeNull();
@@ -906,12 +931,12 @@ describe('AGSuiteResult tests', () => {
 
         wrapper.vm.ag_test_suite_result.setup_timed_out = true;
 
-        expect(wrapper.vm.decide_whether_to_open_setup(CorrectnessLevel.some_correct)).toBe(true);
+        expect(wrapper.vm.decide_whether_to_open_setup()).toBe(true);
 
         expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
-        expect(wrapper.vm.decide_whether_to_open_setup(CorrectnessLevel.some_correct)).toBe(true);
+        expect(wrapper.vm.decide_whether_to_open_setup()).toBe(true);
     });
 
     test('decide_whether_to_open_setup - first_incorrect_case !== null', async () => {
@@ -930,7 +955,7 @@ describe('AGSuiteResult tests', () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toEqual(case_1_result);
 
-        expect(wrapper.vm.decide_whether_to_open_setup(CorrectnessLevel.some_correct)).toBe(false);
+        expect(wrapper.vm.decide_whether_to_open_setup()).toBe(false);
 
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toEqual(case_1_result);
@@ -1027,10 +1052,7 @@ describe('AGSuiteResult tests', () => {
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
         wrapper.vm.ag_test_suite_result.setup_return_code = 1;
-
-        wrapper.vm.decide_whether_to_open_setup(
-            CorrectnessLevel.none_correct
-        );
+        wrapper.vm.decide_whether_to_open_setup();
 
         expect(wrapper.vm.first_incorrect_setup).not.toBeNull();
 

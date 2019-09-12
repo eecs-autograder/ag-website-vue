@@ -11,40 +11,25 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('AGCaseResult tests - ', () => {
+describe('AGCaseResult tests - multiple Commands versus single command in ag_test_case', () => {
     let wrapper: Wrapper<AGCaseResult>;
     let submission: ag_cli.Submission;
+    let user: ag_cli.User;
+    let group: ag_cli.Group;
     let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
 
     beforeEach(() => {
-        submission = new ag_cli.Submission({
-            pk: 5,
-            group: 7,
-            timestamp: "",
-            submitter: 'batman',
-            submitted_filenames: ['spam', 'egg'],
-            discarded_files: ['very', 'nope'],
-            missing_files: {'oops': 1, '*.cpp': 3},
-            status: ag_cli.GradingStatus.being_graded,
-            count_towards_daily_limit: false,
-            is_past_daily_limit: false,
-            is_bonus_submission: true,
-            count_towards_total_limit: true,
-            does_not_count_for: ['robin'],
-            position_in_queue: 3,
-            last_modified: ""
-        });
+        user = data_ut.make_user();
+        group = data_ut.make_group(1, 1, {member_names: [user.username]});
+        submission = data_ut.make_submission(group);
     });
 
     test('Multi Command Body class applied when case contains multiple commands', async () => {
         ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
 
-        let ag_test_command_1_result = data_ut.make_ag_test_command_result_feedback(1);
-        let ag_test_command_2_result = data_ut.make_ag_test_command_result_feedback(2);
-
         ag_test_case_result.ag_test_command_results = [
-            ag_test_command_1_result,
-            ag_test_command_2_result
+            data_ut.make_ag_test_command_result_feedback(1),
+            data_ut.make_ag_test_command_result_feedback(1)
         ];
 
         wrapper = mount(AGCaseResult, {
@@ -55,6 +40,7 @@ describe('AGCaseResult tests - ', () => {
             }
         });
 
+        expect(wrapper.findAll({ref: 'ag_test_command_panel'}).length).toEqual(2);
         expect(wrapper.find('#multi-command-body').exists()).toBe(true);
     });
 
@@ -62,10 +48,8 @@ describe('AGCaseResult tests - ', () => {
          async () => {
         ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
 
-        let ag_test_command_1_result = data_ut.make_ag_test_command_result_feedback(1);
-
         ag_test_case_result.ag_test_command_results = [
-            ag_test_command_1_result
+            data_ut.make_ag_test_command_result_feedback(1)
         ];
 
         wrapper = mount(AGCaseResult, {
@@ -76,33 +60,24 @@ describe('AGCaseResult tests - ', () => {
             }
         });
 
+        expect(wrapper.findAll({ref: 'ag_test_command_panel'}).length).toEqual(0);
         expect(wrapper.find('#multi-command-body').exists()).toBe(false);
     });
 });
 
 describe('AGCaseResult tests', () => {
     let wrapper: Wrapper<AGCaseResult>;
+    let group: ag_cli.Group;
+    let project: ag_cli.Project;
     let submission: ag_cli.Submission;
+    let user: ag_cli.User;
     let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
 
     beforeEach(() => {
-        submission = new ag_cli.Submission({
-            pk: 5,
-            group: 7,
-            timestamp: "",
-            submitter: 'batman',
-            submitted_filenames: ['spam', 'egg'],
-            discarded_files: ['very', 'nope'],
-            missing_files: {'oops': 1, '*.cpp': 3},
-            status: ag_cli.GradingStatus.being_graded,
-            count_towards_daily_limit: false,
-            is_past_daily_limit: false,
-            is_bonus_submission: true,
-            count_towards_total_limit: true,
-            does_not_count_for: ['robin'],
-            position_in_queue: 3,
-            last_modified: ""
-        });
+        user = data_ut.make_user();
+        project = data_ut.make_project(1);
+        group = data_ut.make_group(project.pk, 1, {member_names: [user.username]});
+        submission = data_ut.make_submission(group);
 
         let case_pk = 1;
         ag_test_case_result = data_ut.make_ag_test_case_result_feedback(case_pk);

@@ -9,6 +9,7 @@
 
     <template v-for="(mutation_test_suite_result, index) of mutation_test_suite_results">
       <submission-detail-panel
+        ref="mutation_test_suite_detail_panel"
         :name="mutation_test_suite_result.student_test_suite_name"
         :correctness_level="get_mutation_test_validity_correctness_level(
           mutation_test_suite_result
@@ -54,7 +55,7 @@ export default class MutationSuiteResults extends Vue {
   fdbk_category!: string;
 
   get_mutation_test_validity_correctness_level(suite_result: MutationTestSuiteResultFeedback) {
-    if (!suite_result.invalid_tests) {
+    if (suite_result.invalid_tests === null) {
       return CorrectnessLevel.not_available;
     }
     if (suite_result.has_setup_command && suite_result.setup_return_code !== 0) {

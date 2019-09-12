@@ -13,8 +13,11 @@ beforeAll(() => {
 
 describe('MutationSuiteResult tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
-    let submission: ag_cli.Submission;
+    let group: ag_cli.Group;
     let mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
+    let submission: ag_cli.Submission;
+    let user: ag_cli.User;
+
     let get_mutation_test_suite_result_setup_stdout_stub: sinon.SinonStub;
     let get_mutation_test_suite_result_setup_stderr_stub: sinon.SinonStub;
     let get_mutation_test_suite_result_get_student_test_names_stdout_stub: sinon.SinonStub;
@@ -25,23 +28,9 @@ describe('MutationSuiteResult tests', () => {
     let get_mutation_test_suite_result_grade_buggy_impls_stderr_stub: sinon.SinonStub;
 
     beforeEach(() => {
-        submission = new ag_cli.Submission({
-            pk: 5,
-            group: 7,
-            timestamp: "",
-            submitter: 'batman',
-            submitted_filenames: ['spam', 'egg'],
-            discarded_files: ['very', 'nope'],
-            missing_files: {'oops': 1, '*.cpp': 3},
-            status: ag_cli.GradingStatus.being_graded,
-            count_towards_daily_limit: false,
-            is_past_daily_limit: false,
-            is_bonus_submission: true,
-            count_towards_total_limit: true,
-            does_not_count_for: ['robin'],
-            position_in_queue: 3,
-            last_modified: ""
-        });
+        user = data_ut.make_user();
+        group = data_ut.make_group(1, 1, {member_names: [user.username]});
+        submission = data_ut.make_submission(group);
 
         mutation_test_suite_result = data_ut.make_mutation_test_suite_result_feedback(1);
 
@@ -1253,6 +1242,4 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.vm.test_timed_out("test_three")).toBe(true);
         expect(wrapper.vm.test_timed_out("test_four")).toBe(true);
     });
-
-
 });
