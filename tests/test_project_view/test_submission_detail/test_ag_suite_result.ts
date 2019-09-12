@@ -1,19 +1,11 @@
+import { config, mount, Wrapper } from '@vue/test-utils';
+
+import * as ag_cli from 'ag-client-typescript';
+
 import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
 
-import {
-    make_ag_test_case_result_feedback,
-    make_ag_test_command_result_feedback,
-    make_ag_test_suite_result_feedback
-} from '@/tests/data_utils';
-import { config, mount, Wrapper } from '@vue/test-utils';
-
-import {
-    AGTestSuiteResultFeedback,
-    FeedbackCategory,
-    GradingStatus,
-    Submission
-} from 'ag-client-typescript';
+import * as data_ut from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -21,12 +13,12 @@ beforeAll(() => {
 
 describe('AGSuiteResult tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
-    let submission: Submission;
-    let ag_test_suite_result: AGTestSuiteResultFeedback;
+    let submission: ag_cli.Submission;
+    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
 
     beforeEach(() => {
 
-        submission = new Submission({
+        submission = new ag_cli.Submission({
             pk: 5,
             group: 7,
             timestamp: "",
@@ -34,7 +26,7 @@ describe('AGSuiteResult tests', () => {
             submitted_filenames: ['spam', 'egg'],
             discarded_files: ['very', 'nope'],
             missing_files: {'oops': 1, '*.cpp': 3},
-            status: GradingStatus.being_graded,
+            status: ag_cli.GradingStatus.being_graded,
             count_towards_daily_limit: false,
             is_past_daily_limit: false,
             is_bonus_submission: true,
@@ -45,13 +37,13 @@ describe('AGSuiteResult tests', () => {
         });
 
         let suite_pk = 1;
-        ag_test_suite_result = make_ag_test_suite_result_feedback(suite_pk);
+        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(suite_pk);
 
         wrapper = mount(AGSuiteResult, {
             propsData: {
                 submission: submission,
                 ag_test_suite_result: ag_test_suite_result,
-                fdbk_category: FeedbackCategory.max
+                fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
     });
@@ -87,22 +79,22 @@ describe('AGSuiteResult tests', () => {
          '=== CorrectnessLevel.not_available',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 stdout_correct: false,
                 stderr_correct: false
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 stdout_correct: false,
                 stderr_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 stdout_correct: false,
@@ -131,20 +123,20 @@ describe('AGSuiteResult tests', () => {
          '=== CorrectnessLevel.not_available',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true
@@ -172,10 +164,10 @@ describe('AGSuiteResult tests', () => {
          async () => {
         fail("Is this one even necessary?");
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(1);
-        let command_2_result = make_ag_test_command_result_feedback(2);
-        let command_3_result = make_ag_test_command_result_feedback(3);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(1);
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(2);
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(3);
 
         case_result.ag_test_command_results = [
             command_1_result,
@@ -198,10 +190,10 @@ describe('AGSuiteResult tests', () => {
          async () => {
         fail("is this one either?");
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(1);
-        let command_2_result = make_ag_test_command_result_feedback(2);
-        let command_3_result = make_ag_test_command_result_feedback(3);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(1);
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(2);
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(3);
 
         case_result.ag_test_command_results = [
             command_1_result,
@@ -224,8 +216,8 @@ describe('AGSuiteResult tests', () => {
          'output_correctness === all_correct',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true,
@@ -233,7 +225,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: true,
@@ -241,7 +233,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true,
@@ -271,8 +263,8 @@ describe('AGSuiteResult tests', () => {
          'output_correctness === none_correct',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: false,
@@ -280,7 +272,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: false
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: false,
@@ -288,7 +280,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: false,
@@ -317,8 +309,8 @@ describe('AGSuiteResult tests', () => {
     test('case_result_correctness - return_code_correctness === some_correct',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: false,
@@ -326,7 +318,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: true,
@@ -334,7 +326,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true,
@@ -363,8 +355,8 @@ describe('AGSuiteResult tests', () => {
     test('case_result_correctness - output_correctness === some_correct',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true,
@@ -372,7 +364,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: true,
@@ -380,7 +372,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true,
@@ -410,8 +402,8 @@ describe('AGSuiteResult tests', () => {
          'output_correctness === none_correct',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true,
@@ -419,7 +411,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: false
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: true,
@@ -427,7 +419,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true,
@@ -457,8 +449,8 @@ describe('AGSuiteResult tests', () => {
          'output_correctness === all_correct',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: false,
@@ -466,7 +458,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: false,
@@ -474,7 +466,7 @@ describe('AGSuiteResult tests', () => {
                 stderr_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: false,
@@ -506,10 +498,10 @@ describe('AGSuiteResult tests', () => {
          'return_code_correct === null',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(1);
-        let command_2_result = make_ag_test_command_result_feedback(2);
-        let command_3_result = make_ag_test_command_result_feedback(3);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(1);
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(2);
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(3);
 
         case_result.ag_test_command_results = [
             command_1_result,
@@ -530,20 +522,20 @@ describe('AGSuiteResult tests', () => {
          'return_code_correct = true',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true
@@ -569,20 +561,20 @@ describe('AGSuiteResult tests', () => {
          'return_code_correct = true or return_code_correct = null',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: null
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true
@@ -608,20 +600,20 @@ describe('AGSuiteResult tests', () => {
          '= false',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: false
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: false
@@ -647,20 +639,20 @@ describe('AGSuiteResult tests', () => {
          '= false but not all',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 return_code_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 return_code_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 return_code_correct: true
@@ -688,22 +680,22 @@ describe('AGSuiteResult tests', () => {
          'AND stderr_correct = null',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 stdout_correct: null,
                 stderr_correct: null
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 stdout_correct: null,
                 stderr_correct: null
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 stdout_correct: null,
@@ -725,22 +717,22 @@ describe('AGSuiteResult tests', () => {
          'AND stderr_correct = true',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 stdout_correct: true,
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 stdout_correct: true,
                 stderr_correct: true
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 stdout_correct: true,
@@ -762,22 +754,22 @@ describe('AGSuiteResult tests', () => {
          'AND stderr_correct = true || false',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 stdout_correct: true,
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 stdout_correct: true,
                 stderr_correct: null
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 stdout_correct: null,
@@ -785,7 +777,7 @@ describe('AGSuiteResult tests', () => {
             }
         );
 
-        let command_4_result = make_ag_test_command_result_feedback(
+        let command_4_result = data_ut.make_ag_test_command_result_feedback(
             4,
             {
                 stdout_correct: null,
@@ -808,22 +800,22 @@ describe('AGSuiteResult tests', () => {
          'AND stderr_correct = false',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 stdout_correct: false,
                 stderr_correct: false
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 stdout_correct: false,
                 stderr_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 stdout_correct: false,
@@ -846,22 +838,22 @@ describe('AGSuiteResult tests', () => {
          'AND stderr_correct = false but not all',
          async () => {
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
-        let command_1_result = make_ag_test_command_result_feedback(
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
+        let command_1_result = data_ut.make_ag_test_command_result_feedback(
             1,
             {
                 stdout_correct: false,
                 stderr_correct: true
             }
         );
-        let command_2_result = make_ag_test_command_result_feedback(
+        let command_2_result = data_ut.make_ag_test_command_result_feedback(
             2,
             {
                 stdout_correct: true,
                 stderr_correct: false
             }
         );
-        let command_3_result = make_ag_test_command_result_feedback(
+        let command_3_result = data_ut.make_ag_test_command_result_feedback(
             3,
             {
                 stdout_correct: false,
@@ -883,7 +875,8 @@ describe('AGSuiteResult tests', () => {
     ////////////////////////////////////////////////////////////////
 
     test('decide_whether_to_open_setup - first_incorrect_setup === null AND ' +
-         'first_incorrect_case === null AND setup_level_correctness === none_correct', async () => {
+         'first_incorrect_case === null AND setup_level_correctness === none_correct',
+         async () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
@@ -894,7 +887,8 @@ describe('AGSuiteResult tests', () => {
     });
 
     test('decide_whether_to_open_setup - first_incorrect_setup === null AND ' +
-         'first_incorrect_case === null AND setup_timed_out === true', async () => {
+         'first_incorrect_case === null AND setup_timed_out === true',
+         async () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
@@ -926,7 +920,7 @@ describe('AGSuiteResult tests', () => {
 
         wrapper.vm.ag_test_suite_result.setup_timed_out = true;
 
-        let case_1_result = make_ag_test_case_result_feedback(1);
+        let case_1_result = data_ut.make_ag_test_case_result_feedback(1);
 
         expect(wrapper.vm.decide_whether_to_open_case(
             CorrectnessLevel.some_correct,
@@ -943,12 +937,13 @@ describe('AGSuiteResult tests', () => {
     });
 
     test('decide_whether_to_open_case - first_incorrect_setup === null AND ' +
-         'first_incorrect_case === null AND case_correctness_level = all_correct', async () => {
+         'first_incorrect_case === null AND case_correctness_level = all_correct',
+         async () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
         let case_level_correctness = CorrectnessLevel.all_correct;
 
         expect(wrapper.vm.decide_whether_to_open_case(
@@ -958,12 +953,13 @@ describe('AGSuiteResult tests', () => {
     });
 
     test('decide_whether_to_open_case - first_incorrect_setup === null AND ' +
-         'first_incorrect_case === null AND case_correctness_level = not_available', async () => {
+         'first_incorrect_case === null AND case_correctness_level = not_available',
+         async () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
         let case_level_correctness = CorrectnessLevel.not_available;
 
         expect(wrapper.vm.decide_whether_to_open_case(
@@ -973,12 +969,13 @@ describe('AGSuiteResult tests', () => {
     });
 
     test('decide_whether_to_open_case - first_incorrect_setup === null AND ' +
-         'first_incorrect_case === null AND case_correctness_level = some_correct', async () => {
+         'first_incorrect_case === null AND case_correctness_level = some_correct',
+         async () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
         let case_level_correctness = CorrectnessLevel.some_correct;
 
         expect(wrapper.vm.decide_whether_to_open_case(
@@ -988,12 +985,13 @@ describe('AGSuiteResult tests', () => {
     });
 
     test('decide_whether_to_open_case - first_incorrect_setup === null AND ' +
-         'first_incorrect_case === null AND case_correctness_level = none_correct', async () => {
+         'first_incorrect_case === null AND case_correctness_level = none_correct',
+         async () => {
         expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
         let case_pk = 1;
-        let case_result = make_ag_test_case_result_feedback(case_pk);
+        let case_result = data_ut.make_ag_test_case_result_feedback(case_pk);
         let case_level_correctness = CorrectnessLevel.none_correct;
 
         expect(wrapper.vm.decide_whether_to_open_case(
@@ -1004,7 +1002,7 @@ describe('AGSuiteResult tests', () => {
 
     test('decide_whether_to_open_case - first_incorrect_case !== null',
          async () => {
-        let case_1_result = make_ag_test_case_result_feedback(1);
+        let case_1_result = data_ut.make_ag_test_case_result_feedback(1);
 
         expect(wrapper.vm.first_incorrect_case).toBeNull();
 
@@ -1015,7 +1013,7 @@ describe('AGSuiteResult tests', () => {
 
         expect(wrapper.vm.first_incorrect_case).not.toBeNull();
 
-        let case_2_result = make_ag_test_case_result_feedback(2);
+        let case_2_result = data_ut.make_ag_test_case_result_feedback(2);
 
         expect(wrapper.vm.decide_whether_to_open_case(
             CorrectnessLevel.none_correct,
@@ -1036,7 +1034,7 @@ describe('AGSuiteResult tests', () => {
 
         expect(wrapper.vm.first_incorrect_setup).not.toBeNull();
 
-        let case_1_result = make_ag_test_case_result_feedback(1);
+        let case_1_result = data_ut.make_ag_test_case_result_feedback(1);
 
         expect(wrapper.vm.decide_whether_to_open_case(
             CorrectnessLevel.none_correct,

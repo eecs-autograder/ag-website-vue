@@ -3,6 +3,7 @@
     <div v-if="mutation_test_suite_result.setup_return_code !== null
                || mutation_test_suite_result.setup_timed_out"
          id="setup-section">
+      <div> {{ fdbk_category }}</div>
 
       <div class="feedback-row">
         <div class="feedback-label"
@@ -217,41 +218,41 @@
         </ul>
       </div>
 
-      <div v-if="mutation_test_suite_result.invalid_tests.length"
+      <div v-if="mutation_test_suite_result.invalid_tests !== null &&
+                 mutation_test_suite_result.invalid_tests.length"
            id="invalid-tests-section">
         <div class="list-label feedback-label">
           These tests incorrectly reported a bug when run against a correct implementation:
         </div>
         <ul id="list-of-incorrectly-reported-bug-tests"
             class="fa-ul">
-          <li class="list-item"
+          <li class="list-item invalid-test"
               v-for="invalid_test of mutation_test_suite_result.invalid_tests">
             <span class="fa-li">
               <i class="fas fa-exclamation-triangle incorrectly-reported-bug-icon"></i>
             </span>
             {{invalid_test}}
-<!--            <i v-if="test_timed_out(invalid_test)"-->
-<!--            <i class="far fa-clock"-->
-<!--               title="This test case exceeded the time limit">-->
-<!--            </i>-->
+            <i v-if="test_timed_out(invalid_test)"
+               class="test-timed-out"> (Timed Out) </i>
           </li>
         </ul>
       </div>
 
-<!--      <div v-if="get_valid_tests().length"-->
-<!--           class="feedback-row"-->
-<!--           id="valid-tests-section">-->
-<!--        <div class="feedback-label"> Valid test cases you submitted: </div>-->
-<!--        <ul id="list-of-valid-tests"-->
-<!--            class="fa-ul">-->
-<!--          <li class="list-item"-->
-<!--              v-for="valid_test of get_valid_tests()">-->
-<!--            <span class="fa-li">-->
-<!--              <i class="fas fa-check-circle valid-test-icon"></i>-->
-<!--            </span>{{valid_test}}-->
-<!--          </li>-->
-<!--        </ul>-->
-<!--      </div>-->
+      <div v-if="get_valid_tests().length"
+           class="feedback-row"
+           id="valid-tests-section">
+        <div class="feedback-label"> Valid test cases you submitted: </div>
+        <ul id="list-of-valid-tests"
+            class="fa-ul">
+          <li class="list-item"
+              v-for="valid_test of get_valid_tests()">
+            <span class="fa-li">
+              <i class="fas fa-check-circle valid-test-icon"></i>
+            </span>{{valid_test}}
+          </li>
+        </ul>
+      </div>
+
     </div>
 
   </div>
@@ -343,7 +344,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_test_names_stdout_content() {
-    this.test_names_stdout_content = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
+    this.test_names_stdout_content
+        = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -352,7 +354,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_test_names_stderr_content() {
-    this.test_names_stderr_content = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stderr(
+    this.test_names_stderr_content
+        = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -361,7 +364,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_validity_check_stdout_content() {
-    this.validity_checkout_stdout_content = await ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
+    this.validity_checkout_stdout_content
+        = await ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -370,7 +374,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_validity_check_stderr_content() {
-    this.validity_checkout_stderr_content = await ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
+    this.validity_checkout_stderr_content
+        = await ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -379,7 +384,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_grade_buggy_stdout_content() {
-    this.grade_buggy_stdout_content = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
+    this.grade_buggy_stdout_content
+        = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -388,7 +394,8 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_grade_buggy_stderr_content() {
-    this.grade_buggy_stderr_content = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
+    this.grade_buggy_stderr_content
+        = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
@@ -397,12 +404,18 @@ export default class MutationSuiteResult extends Vue {
   }
 
   test_timed_out(test: string): boolean {
+    if (this.mutation_test_suite_result.timed_out_tests === null) {
+        return false;
+    }
     return this.mutation_test_suite_result!.timed_out_tests!.findIndex(
         (item) => item === test
     ) !== -1;
   }
 
   get_valid_tests(): string[] {
+    if (this.mutation_test_suite_result.invalid_tests === null) {
+        return this.mutation_test_suite_result.student_tests;
+    }
     let valid_tests = this.mutation_test_suite_result.student_tests.filter(
       (student_test) => this.mutation_test_suite_result!.invalid_tests!.findIndex(
           (invalid_test) => invalid_test === student_test)
@@ -420,15 +433,15 @@ export default class MutationSuiteResult extends Vue {
     return "Incorrect";
   }
 
-  get_return_code_correctness(return_code: number) {
-    if (return_code === null) {
-      return CorrectnessLevel.not_available;
-    }
-    if (return_code === 0) {
-      return CorrectnessLevel.all_correct;
-    }
-    return CorrectnessLevel.none_correct;
-  }
+  // get_return_code_correctness(return_code: number) {
+  //   if (return_code === null) {
+  //     return CorrectnessLevel.not_available;
+  //   }
+  //   if (return_code === 0) {
+  //     return CorrectnessLevel.all_correct;
+  //   }
+  //   return CorrectnessLevel.none_correct;
+  // }
 }
 </script>
 

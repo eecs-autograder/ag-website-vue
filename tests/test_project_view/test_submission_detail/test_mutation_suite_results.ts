@@ -1,16 +1,11 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import {
-    FeedbackCategory,
-    GradingStatus,
-    MutationTestSuiteResultFeedback,
-    Submission
-} from 'ag-client-typescript';
+import * as ag_cli from 'ag-client-typescript';
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 
-import { make_mutation_test_suite_fdbk_config } from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -18,14 +13,13 @@ beforeAll(() => {
 
 describe('MutationSuiteResults tests', () => {
     let wrapper: Wrapper<MutationSuiteResults>;
-    let mutation_test_suite_results: MutationTestSuiteResultFeedback[];
-    let submission: Submission;
-    let suite_1_results: MutationTestSuiteResultFeedback;
-    let suite_2_results: MutationTestSuiteResultFeedback;
+    let mutation_test_suite_results: ag_cli.MutationTestSuiteResultFeedback[];
+    let submission: ag_cli.Submission;
+    let suite_1_results: ag_cli.MutationTestSuiteResultFeedback;
+    let suite_2_results: ag_cli.MutationTestSuiteResultFeedback;
 
     beforeEach(() => {
-
-        submission = new Submission({
+        submission = new ag_cli.Submission({
             pk: 5,
             group: 7,
             timestamp: "",
@@ -33,7 +27,7 @@ describe('MutationSuiteResults tests', () => {
             submitted_filenames: ['spam', 'egg'],
             discarded_files: ['very', 'nope'],
             missing_files: {'oops': 1, '*.cpp': 3},
-            status: GradingStatus.being_graded,
+            status: ag_cli.GradingStatus.being_graded,
             count_towards_daily_limit: false,
             is_past_daily_limit: false,
             is_bonus_submission: true,
@@ -47,7 +41,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 1,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: true,
@@ -68,7 +62,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 2,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: false,
@@ -91,15 +85,15 @@ describe('MutationSuiteResults tests', () => {
             propsData: {
                 mutation_test_suite_results: mutation_test_suite_results,
                 submission: submission,
-                fdbk_category: FeedbackCategory.past_limit_submission
+                fdbk_category: ag_cli.FeedbackCategory.past_limit_submission
             }
         });
     });
 
     test('Props', async () => {
-        expect(wrapper.vm.mutation_suite_results).toEqual([suite_1_results, suite_2_results]);
+        expect(wrapper.vm.mutation_test_suite_results).toEqual([suite_1_results, suite_2_results]);
         expect(wrapper.vm.submission).toEqual(submission);
-        expect(wrapper.vm.fdbk_category).toEqual(FeedbackCategory.past_limit_submission);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
     });
 
     test('get_mutation_test_validity_correctness_level - not_available', async () => {
@@ -107,7 +101,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 5,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: false,
@@ -134,7 +128,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 5,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: true,
@@ -161,7 +155,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 5,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: false,
@@ -190,7 +184,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 5,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: false,
@@ -217,7 +211,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 5,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: false,
@@ -244,7 +238,7 @@ describe('MutationSuiteResults tests', () => {
             pk: 5,
             bugs_exposed: [],
             discarded_tests: [],
-            fdbk_settings: make_mutation_test_suite_fdbk_config(),
+            fdbk_settings: data_ut.make_mutation_test_suite_fdbk_config(),
             get_student_test_names_return_code: 1,
             get_student_test_names_timed_out: false,
             has_setup_command: false,

@@ -579,7 +579,9 @@ describe('MutationSuiteResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(1);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
 
         expect(wrapper.find('#student-tests-section').exists()).toBe(false);
     });
@@ -597,7 +599,9 @@ describe('MutationSuiteResult tests', () => {
         for (let i = 0; i < 8; ++i) {
             await wrapper.vm.$nextTick();
         }
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(1);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
 
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
@@ -617,7 +621,9 @@ describe('MutationSuiteResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_validity_check_stdout).toBe(
+            false
+        );
         expect(wrapper.find('#validity-check-stdout-section').exists()).toBe(false);
     });
 
@@ -638,9 +644,13 @@ describe('MutationSuiteResult tests', () => {
         for (let i = 0; i < 8; ++i) {
             await wrapper.vm.$nextTick();
         }
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(1);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
 
-        expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_validity_check_stdout).toBe(true);
+        expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_validity_check_stdout).toBe(
+            true
+        );
         expect(wrapper.find('#validity-check-stdout-section').exists()).toBe(true);
         expect(wrapper.find('#validity-check-stdout-section').text()).toContain("No Output");
     });
@@ -666,8 +676,12 @@ describe('MutationSuiteResult tests', () => {
         for (let i = 0; i < 8; ++i) {
             await wrapper.vm.$nextTick();
         }
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(1);
-        expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_validity_check_stdout).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
+        expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_validity_check_stdout).toBe(
+            true
+        );
         expect(wrapper.find('#validity-check-stdout-section').exists()).toBe(true);
         expect(wrapper.find('#validity-check-stdout-section').text()).toContain(
             "validity check stdout content"
@@ -888,8 +902,9 @@ describe('MutationSuiteResult tests', () => {
         for (let i = 0; i < 8; ++i) {
             await wrapper.vm.$nextTick();
         }
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(1);
-
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
         expect(wrapper.find('#test-names-stderr-section').exists()).toBe(true);
         expect(wrapper.find('#test-names-stderr-section').text()).toContain(
             "test_names_stderr_content"
@@ -937,7 +952,28 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.find('#list-of-discarded-tests').text()).toContain("test_five");
     });
 
-    test.skip('invalid_tests.length === 0', async () => {
+    test('invalid_tests.length === null', async () => {
+        mutation_test_suite_result.student_tests = ["test_one", "test_two"];
+        mutation_test_suite_result.invalid_tests = null;
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
+        expect(wrapper.find('#invalid-tests-section').exists()).toBe(false);
+    });
+
+    test('invalid_tests.length === 0', async () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.invalid_tests = [];
 
@@ -958,7 +994,7 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.find('#invalid-tests-section').exists()).toBe(false);
     });
 
-    test('invalid_tests.length !== 0', async () => {
+    test('invalid_tests.length !== 0 AND no tests timed out', async () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.invalid_tests = ["test_three", "test_four"];
 
@@ -983,5 +1019,240 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.find('#list-of-incorrectly-reported-bug-tests').text()).toContain(
             "test_four"
         );
+        expect(wrapper.find('.test-timed-out').exists()).toBe(false);
     });
+
+    test('invalid_tests.length !== 0 AND tests timed out', async () => {
+        mutation_test_suite_result.student_tests = ["test_one", "test_two"];
+        mutation_test_suite_result.invalid_tests = ["test_three", "test_four"];
+        mutation_test_suite_result.timed_out_tests = ["test_three"];
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
+        expect(wrapper.find('#invalid-tests-section').exists()).toBe(true);
+        expect(wrapper.find('#list-of-incorrectly-reported-bug-tests').text()).toContain(
+            "test_three"
+        );
+        expect(wrapper.find('#list-of-incorrectly-reported-bug-tests').text()).toContain(
+            "test_four"
+        );
+        expect(wrapper.find('.test-timed-out').exists()).toBe(true);
+        expect(wrapper.findAll('.invalid-test').at(0).find(
+            '.test-timed-out'
+        ).exists()).toBe(true);
+        expect(wrapper.findAll('.invalid-test').at(1).find(
+            '.test-timed-out'
+        ).exists()).toBe(false);
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    test('get_valid_tests.length === 0', async () => {
+        mutation_test_suite_result.student_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+        mutation_test_suite_result.invalid_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
+        expect(wrapper.find('#valid-tests-section').exists()).toBe(false);
+    });
+
+    test('get_valid_tests.length !== 0', async () => {
+        mutation_test_suite_result.student_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+        mutation_test_suite_result.invalid_tests = [
+            "test_one",
+            "test_four"
+        ];
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            1
+        );
+        expect(wrapper.find('#valid-tests-section').exists()).toBe(true);
+        expect(wrapper.find('#list-of-valid-tests').text()).toContain('test_two');
+        expect(wrapper.find('#list-of-valid-tests').text()).toContain('test_three');
+    });
+
+    test('get_valid_tests() - invalid_tests !== null', async () => {
+        mutation_test_suite_result.student_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+        mutation_test_suite_result.invalid_tests = [
+            "test_one",
+            "test_four"
+        ];
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.get_valid_tests()).toEqual(
+            [
+                "test_two",
+                "test_three"
+            ]
+        );
+    });
+
+    test('get_valid_tests() - invalid_tests === null', async () => {
+        mutation_test_suite_result.student_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+        mutation_test_suite_result.invalid_tests = null;
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.get_valid_tests()).toEqual(
+            [
+                "test_one",
+                "test_two",
+                "test_three",
+                "test_four"
+            ]
+        );
+    });
+
+    test('test_timed_out() - timed_out_tests === null', async () => {
+        mutation_test_suite_result.student_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+        mutation_test_suite_result.timed_out_tests = null;
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.test_timed_out("test_one")).toBe(false);
+        expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
+        expect(wrapper.vm.test_timed_out("test_three")).toBe(false);
+        expect(wrapper.vm.test_timed_out("test_four")).toBe(false);
+    });
+
+    test('test_timed_out() - timed_out_tests !== null', async () => {
+        mutation_test_suite_result.student_tests = [
+            "test_one",
+            "test_two",
+            "test_three",
+            "test_four"
+        ];
+        mutation_test_suite_result.timed_out_tests = [
+            "test_three",
+            "test_four"
+        ];
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.test_timed_out("test_one")).toBe(false);
+        expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
+        expect(wrapper.vm.test_timed_out("test_three")).toBe(true);
+        expect(wrapper.vm.test_timed_out("test_four")).toBe(true);
+    });
+
+
 });

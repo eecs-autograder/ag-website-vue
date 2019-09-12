@@ -31,14 +31,20 @@
               :class="{'selected-submission': d_selected_submission !== null
                                               && d_selected_submission.pk === submission.pk}"
               @click.native="d_selected_submission = submission"></submission-panel>
-
           </template>
         </div>
       </div>
 
       <div class="divider"></div>
-
       <div class="scroll-column-grow">
+        <div v-if="d_selected_submission !== null">
+          <submission-detail ref="submission_detail"
+                             :selected_submission_with_results="d_selected_submission"
+                             :is_ultimate_submission="is_ultimate_submission"
+                             :course="course"
+                             :group="group">
+          </submission-detail>
+        </div>
       </div>
     </div>
   </div>
@@ -62,6 +68,7 @@ import {
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
+import SubmissionDetail from "@/components/project_view/submission_detail/submission_detail.vue";
 import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
 import { Created, Destroyed } from '@/lifecycle';
 import { deep_copy, safe_assign, sleep, toggle, zip } from '@/utils';
@@ -102,6 +109,7 @@ class Poller {
 
 @Component({
   components: {
+    SubmissionDetail,
     SubmissionPanel
   }
 })
@@ -198,6 +206,11 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
     }
 
     return false;
+  }
+
+  get is_ultimate_submission(): boolean {
+      return this.d_selected_submission !== null && this.d_ultimate_submission !== null &&
+             this.d_selected_submission.pk === this.d_ultimate_submission.pk;
   }
 
   private async get_ultimate_submission() {

@@ -153,7 +153,6 @@ export default class AGSuiteResult extends Vue {
     if (none_correct) {
       return CorrectnessLevel.none_correct;
     }
-
     return CorrectnessLevel.some_correct;
   }
 
