@@ -171,12 +171,9 @@ export default class UIDemos extends Vue {
   margin: 0;
 }
 
-$sidebar-width: 220px;
-$sidebar-header-height: 30px;
-
 @include collapsible-sidebar(
-  $sidebar-width: $sidebar-width,
-  $sidebar-header-height: $sidebar-header-height,
+  $sidebar-width: 220px,
+  $sidebar-header-height: 30px,
   $border-color: lighten($stormy-gray-light, 20%),
   $background-color: $pebble-light,
   $active-color: lighten($stormy-gray-light, 10%),

@@ -160,12 +160,12 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
   margin: 0;
 }
 
-$sidebar-header-height: 35px;
+$border-color: hsl(220, 40%, 94%);
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: $sidebar-header-height,
-  $border-color: hsl(220, 40%, 94%),
+  $sidebar-header-height: 35px,
+  $border-color: $border-color,
   $background-color: white,
   $active-color: $pebble-light
 );
@@ -175,7 +175,6 @@ $sidebar-header-height: 35px;
 }
 
 .sidebar-header {
-  height: $sidebar-header-height;
   padding-top: 8px;
   padding-bottom: 8px;
   font-weight: bold;
@@ -201,7 +200,13 @@ $sidebar-header-height: 35px;
 }
 
 .sidebar-item {
-  border-top: 1px solid hsl(220, 40%, 94%);
+  border-top: 1px solid $border-color;
+}
+
+.sidebar-container {
+  .body {
+    border-top: 1px solid hsl(220, 40%, 94%);
+  }
 }
 
 </style>

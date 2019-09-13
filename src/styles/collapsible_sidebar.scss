@@ -1,10 +1,33 @@
 @mixin collapsible-sidebar(
+    // The width of the sidebar.
     $sidebar-width,
+
+    // The height of the element with class "sidebar-header". This value is
+    // also subtracted from 100vh to determine the max-height of .sidebar-content.
     $sidebar-header-height,
+
+    // Border color around the sidebar menu
     $border-color: none,
+
+    // Background color of the whole sidebar menu
     $background-color: none,
+
+    // Background color for elements in the sidebar content marked with the
+    // class "active"
     $active-color: none,
-    $overlap-breakpoint: 800px
+
+    // The min screen width at which the open sidebar will stop overlapping
+    // the body content.
+    $overlap-breakpoint: 800px,
+
+    // This value is also subtracted from 100vh to determine the max-height of
+    // .sidebar-content. Useful if you have a footer and don't want it to cover
+    // the bottom of the sidebar content.
+    $page-footer-height: 0px,
+
+    // When true, sets the height of .sidebar-content to be equal to its
+    // max-height.
+    $stretch: false,
 ) {
     .sidebar-container {
         display: flex;
@@ -37,11 +60,15 @@
                 min-width: auto;
             }
 
+            $max-height: calc(100vh - #{$sidebar-header-height} - #{$page-footer-height});
             .sidebar-content {
                 position: sticky;
                 top: $sidebar-header-height;
                 overflow: auto;
-                max-height: calc(100vh - #{$sidebar-header-height});
+                max-height: $max-height;
+                @if $stretch {
+                    height: $max-height;
+                }
 
                 @if $active-color != none {
                     .active {
@@ -53,8 +80,10 @@
 
         .body {
             flex-grow: 1;
-            padding-top: $sidebar-header-height;
             margin-left: -$sidebar-width;
+            @if $page-footer-height != 0px {
+                margin-bottom: $page-footer-height;
+            }
         }
 
         .body-closed {

@@ -1,40 +1,39 @@
 <template>
-  <div id="ag-test-suites-component" class="scroll-container">
+  <div id="ag-test-suites-component">
     <template v-if="!d_loading">
-      <div id="columns-container" class="scroll-column-container">
-        <div id="ag-test-suite-sidebar" class="scroll-column">
-          <div class="scroll-container">
-            <div id="sidebar-header">
-              <div id="ag-test-suites-title"> Suites </div>
+      <div class="sidebar-container">
+        <div class="sidebar-menu">
+          <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
+            <span class="collapse-sidebar-button" @click="d_collapsed = !d_collapsed">
+              <i class="fas fa-bars"></i>
+            </span>
+            <template v-if="!d_collapsed">
+              <span id="ag-test-suites-title"> Suites </span>
               <button type="button"
                       id="add-ag-test-suite-button"
                       @click="open_new_ag_test_suite_modal()">
                 <i class="fas fa-plus plus"></i> Add Suite
               </button>
-            </div>
+            </template>
+          </div>
 
-            <div id="sidebar-body" class="scroll-column">
-              <div id="all-ag-test-suites">
-                <div v-for="ag_test_suite of d_ag_test_suites"
-                    class="ag-test-suite-container"
-                    :key="ag_test_suite.pk">
-                  <AGSuitePanel :ag_test_suite="ag_test_suite"
-                                :active_ag_test_suite="d_active_ag_test_suite"
-                                :active_ag_test_command="d_active_ag_test_command"
-                                @update_active_item="update_active_item($event)">
-                  </AGSuitePanel>
-                </div>
-              </div>
+          <div class="sidebar-content" v-if="!d_collapsed">
+            <div v-for="ag_test_suite of d_ag_test_suites"
+                 class="ag-test-suite-container"
+                 :key="ag_test_suite.pk">
+              <AGSuitePanel :ag_test_suite="ag_test_suite"
+                            :active_ag_test_suite="d_active_ag_test_suite"
+                            :active_ag_test_command="d_active_ag_test_command"
+                            @update_active_item="update_active_item($event)">
+              </AGSuitePanel>
             </div>
           </div>
         </div>
 
-        <div class="vertical-divider"></div>
-
-        <div id="viewing-window" class="scroll-column-grow">
+        <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
           <template v-if="d_active_ag_test_suite !== null">
             <AGSuiteSettings :ag_test_suite="d_active_ag_test_suite"
-                            :project="project">
+                             :project="project">
             </AGSuiteSettings>
           </template>
           <template v-else-if="active_level_is_command">
@@ -52,14 +51,14 @@
                   @click="go_to_prev_ag_test_case"
                   id="prev-ag-test-case-button"
                   :disabled="!prev_ag_test_case_is_available">
-            <i class="fas fa-angle-double-left" id="prev"> </i> Previous Case
+            <i class="fas fa-angle-double-left" id="prev"> </i> Prev Test
           </button>
 
           <button type="button"
                   @click="go_to_next_ag_test_case"
                   id="next-ag-test-case-button"
                   :disabled="!next_ag_test_case_is_available">
-            Next Case <i class="fas fa-angle-double-right" id="next"></i>
+            Next Test <i class="fas fa-angle-double-right" id="next"></i>
           </button>
         </span>
       </div>
@@ -155,6 +154,8 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   d_active_ag_test_command: AGTestCommand | null = null;
   d_loading = true;
   d_ag_test_suites: AGTestSuite[] = [];
+
+  d_collapsed = false;
 
   get parent_ag_test_case() {
     if (this.d_active_ag_test_command !== null) {
@@ -509,7 +510,7 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/independent_scrolling.scss';
+@import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/global.scss';
@@ -520,60 +521,71 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
   box-sizing: border-box;
 }
 
-#columns-container {
-  height: calc(100% - 55px);
+$footer-height: 45px;
+$border-color: $gray-blue-1;
+
+@include collapsible-sidebar(
+  $sidebar-width: 300px,
+  $sidebar-header-height: 50px,
+  $background-color: white,
+  $border-color: $border-color,
+  $page-footer-height: $footer-height,
+  $stretch: true,
+);
+
+.sidebar-container {
+  .sidebar-menu {
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
+  }
+
+  .sidebar-header {
+    padding: 5px 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sidebar-content {
+    padding-top: 3px;
+  }
 }
 
-#ag-test-suite-sidebar {
-  min-width: 300px;
-}
-
-#sidebar-header {
-  padding: 15px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-left: none;
-  border-bottom: none;
-  margin-top: 10px;
-}
-
-#sidebar-body {
-  padding-bottom: 10px;
+.collapse-sidebar-button .fa-bars:hover {
+  color: $stormy-gray-dark;
+  cursor: pointer;
 }
 
 #ag-test-suites-title {
   font-size: 1.125rem;
-  display: inline-block;
+  margin: 0 8px;
 }
 
 #add-ag-test-suite-button {
   @extend .white-button;
   box-shadow: none;
+  margin-left: auto;
 }
 
 .plus {
   padding-right: 5px;
 }
 
-.vertical-divider {
-  border: 1px solid $pebble-medium;
-  margin: 10px 8px;
-}
-
-#viewing-window {
-  padding-top: 20px;
-}
-
 #button-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+
+  height: $footer-height;
   background-color: $white-gray;
   border-top: 1px solid hsl(210, 20%, 94%);
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  min-height: 55px;
-  padding: 10px;
+  padding: 5px;
 }
 
 #next-ag-test-case-button, #prev-ag-test-case-button {
