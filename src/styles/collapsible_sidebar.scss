@@ -1,0 +1,74 @@
+@mixin collapsible-sidebar(
+    $sidebar-width,
+    $sidebar-header-height,
+    $border-color: none,
+    $background-color: none,
+    $active-color: none,
+    $overlap-breakpoint: 800px
+) {
+    .sidebar-container {
+        display: flex;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .sidebar-menu {
+            z-index: 1;
+            background-color: $background-color;
+            @if $border-color != none {
+                border: 1px solid $border-color;
+            }
+
+            .sidebar-header, .sidebar-content {
+                // min-width works better with flex-grow
+                min-width: $sidebar-width;
+                max-width: $sidebar-width;
+            }
+
+            .sidebar-header {
+                height: $sidebar-header-height;
+
+                position: sticky;
+                top: 0;
+            }
+
+            .sidebar-header-closed {
+                min-width: auto;
+            }
+
+            .sidebar-content {
+                position: sticky;
+                top: $sidebar-header-height;
+                overflow: auto;
+                max-height: calc(100vh - #{$sidebar-header-height});
+
+                @if $active-color != none {
+                    .active {
+                        background-color: $active-color;
+                    }
+                }
+            }
+        }
+
+        .body {
+            flex-grow: 1;
+            padding-top: $sidebar-header-height;
+            margin-left: -$sidebar-width;
+        }
+
+        .body-closed {
+            margin-left: 0;
+        }
+
+        @media only screen and (min-width: $overlap-breakpoint) {
+            .sidebar-header {
+                border-right: none;
+            }
+
+            .body, .body-closed {
+                margin-left: 0;
+            }
+        }
+    }
+}

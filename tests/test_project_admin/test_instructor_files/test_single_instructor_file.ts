@@ -8,6 +8,8 @@ import APIErrors from '@/components/api_errors.vue';
 import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { set_validated_input_text } from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -18,7 +20,6 @@ describe('SingleInstructorFile tests', () => {
     let wrapper: Wrapper<SingleInstructorFile>;
     let component: SingleInstructorFile;
     let file_1: InstructorFile;
-    let original_match_media: (query: string) => MediaQueryList;
     let validated_input: ValidatedInput;
 
     beforeEach(() => {
@@ -30,13 +31,6 @@ describe('SingleInstructorFile tests', () => {
             last_modified: "2019-02-15T20:44:30.534985Z"
         });
 
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         wrapper = mount(SingleInstructorFile, {
             propsData: {
                 file: file_1
@@ -46,10 +40,6 @@ describe('SingleInstructorFile tests', () => {
     });
 
     afterEach(() => {
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
         sinon.restore();
 
         if (wrapper.exists()) {
@@ -66,14 +56,12 @@ describe('SingleInstructorFile tests', () => {
         expect(component.new_file_name).toEqual(component.file.name);
         expect(component.editing).toBe(true);
 
-        let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
-        (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
-        file_name_input.trigger('input');
+        set_validated_input_text(wrapper.find({ref: 'file_name'}), 'Jane.cpp');
         await component.$nextTick();
 
         expect(component.new_file_name).toEqual("Jane.cpp");
 
-        wrapper.find('.update-file-name-button').trigger('click');
+        wrapper.find({ref: 'rename_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(rename_stub.calledOnce).toBe(true);
@@ -81,9 +69,7 @@ describe('SingleInstructorFile tests', () => {
         expect(component.editing).toBe(false);
     });
 
-    test('Users can choose to cancel the action of renaming a file after entering a ' +
-         'different name but before pressing "update"',
-         async () => {
+    test('Cancel renaming file', async () => {
         let rename_stub = sinon.stub(file_1, 'rename');
 
         wrapper.find('.edit-file-name').trigger('click');
@@ -162,20 +148,11 @@ describe('SingleInstructorFile tests', () => {
         expect(FileSaver.saveAs).toBeCalled();
     });
 
-    test('Users have the ability to view a file', async () => {
-        wrapper.find('#single-instructor-file-component').trigger('click');
-        await component.$nextTick();
-
-        expect(wrapper.emitted().open_file.length).toEqual(1);
-    });
-
     test('File names must be unique - violates condition', async () => {
         wrapper.find('.edit-file-name').trigger('click');
         await component.$nextTick();
 
-        let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
-        (<HTMLInputElement> file_name_input.element).value = "AlreadyExists.cpp";
-        file_name_input.trigger('input');
+        set_validated_input_text(wrapper.find({ref: 'file_name'}), "AlreadyExists.cpp");
         await component.$nextTick();
 
         expect(component.new_file_name).toEqual("AlreadyExists.cpp");
@@ -183,7 +160,7 @@ describe('SingleInstructorFile tests', () => {
         sinon.stub(file_1, 'rename').returns(Promise.reject(
             new HttpError(400, {__all__: "File with this name already exists in project"})
         ));
-        wrapper.find('.update-file-name-button').trigger('click');
+        wrapper.find({ref: 'rename_form'}).trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;

@@ -55,8 +55,12 @@ export default class ViewFile extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  box-sizing: border-box;
+}
+
 #view-file-component {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #viewing-container {

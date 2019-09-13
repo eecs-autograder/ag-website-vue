@@ -1,79 +1,80 @@
 <template>
   <div id="ui-demos">
     <h2>UI Component Demos</h2>
-    <div id="sidebar-toggle" @click="d_show_sidebar = !d_show_sidebar">
-      Menu
-      <i class="fas fa-bars"></i>
-    </div>
-    <div class="wrapper">
-      <sticky-sidebar class="sidebar" v-if="d_show_sidebar">
-        <div :class="['sidebar-item', {active: d_current_tab === 'buttons'}]"
-            @click="d_current_tab ='buttons'">
-          Buttons
+    <div class="sidebar-container">
+      <div class="sidebar-menu">
+        <div class="sidebar-header" :class="{'sidebar-header-closed': !d_show_sidebar}">
+          <i class="fas fa-bars" @click="d_show_sidebar = !d_show_sidebar"></i>
+          <template v-if="d_show_sidebar">Menu</template>
         </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'colors'}]"
-            @click="d_current_tab ='colors'">
-          Color Palette
+        <div class="sidebar-content" v-if="d_show_sidebar">
+          <div :class="['sidebar-item', {active: d_current_tab === 'buttons'}]"
+              @click="d_current_tab ='buttons'">
+            Buttons
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'colors'}]"
+              @click="d_current_tab ='colors'">
+            Color Palette
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'context_menu'}]"
+              @click="d_current_tab ='context_menu'">
+            Context Menu
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'datetime'}]"
+              @click="d_current_tab ='datetime'">
+            Datetime Picker
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'diff'}]"
+              @click="d_current_tab ='diff'">
+            Diff
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'dropdown'}]"
+              @click="d_current_tab ='dropdown'">
+            Dropdown
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'typeahead'}]"
+              @click="d_current_tab ='typeahead'">
+            Dropdown Typeahead
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'upload'}]"
+              @click="d_current_tab ='upload'">
+            File Upload
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'modal'}]"
+              @click="d_current_tab ='modal'">
+            Modal
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'multi_file'}]"
+              @click="d_current_tab ='multi_file'">
+            Multi-file Viewer
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'tabs'}]"
+              @click="d_current_tab ='tabs'">
+            Tabs
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'tooltip'}]"
+              @click="d_current_tab ='tooltip'">
+            Tooltip
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'toggle'}]"
+              @click="d_current_tab ='toggle'">
+            Toggle
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'view_file'}]"
+              @click="d_current_tab ='view_file'">
+            View File
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'validated_input'}]"
+              @click="d_current_tab ='validated_input'">
+            Validated Input
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'validated_form'}]"
+              @click="d_current_tab ='validated_form'">
+            Validated Form
+          </div>
         </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'context_menu'}]"
-            @click="d_current_tab ='context_menu'">
-          Context Menu
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'datetime'}]"
-            @click="d_current_tab ='datetime'">
-          Datetime Picker
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'diff'}]"
-            @click="d_current_tab ='diff'">
-          Diff
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'dropdown'}]"
-            @click="d_current_tab ='dropdown'">
-          Dropdown
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'typeahead'}]"
-            @click="d_current_tab ='typeahead'">
-          Dropdown Typeahead
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'upload'}]"
-            @click="d_current_tab ='upload'">
-          File Upload
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'modal'}]"
-            @click="d_current_tab ='modal'">
-          Modal
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'multi_file'}]"
-            @click="d_current_tab ='multi_file'">
-          Multi-file Viewer
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'tabs'}]"
-            @click="d_current_tab ='tabs'">
-          Tabs
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'tooltip'}]"
-            @click="d_current_tab ='tooltip'">
-          Tooltip
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'toggle'}]"
-            @click="d_current_tab ='toggle'">
-          Toggle
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'view_file'}]"
-            @click="d_current_tab ='view_file'">
-          View File
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'validated_input'}]"
-            @click="d_current_tab ='validated_input'">
-          Validated Input
-        </div>
-        <div :class="['sidebar-item', {active: d_current_tab === 'validated_form'}]"
-            @click="d_current_tab ='validated_form'">
-          Validated Form
-        </div>
-      </sticky-sidebar>
-
-      <div class="body">
+      </div>
+      <div class="body" :class="{'body-closed': !d_show_sidebar}">
         <ButtonDemo v-show="d_current_tab === 'buttons'"></ButtonDemo>
         <ColorPaletteDemo v-show="d_current_tab === 'colors'"></ColorPaletteDemo>
         <ContextMenuDemo v-show="d_current_tab === 'context_menu'"></ContextMenuDemo>
@@ -99,7 +100,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
-import StickySidebar from '@/components/sticky_sidebar.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from "@/components/tabs/tab_header.vue";
 import Tabs from '@/components/tabs/tabs.vue';
@@ -136,7 +136,6 @@ import ViewFileDemo from './view_file_demo.vue';
     FileUploadDemo,
     ModalDemo,
     MultiFileViewerDemo,
-    StickySidebar,
     Tab,
     Tabs,
     TabHeader,
@@ -164,7 +163,7 @@ export default class UIDemos extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import '@/styles/independent_scrolling.scss';
+@import '@/styles/collapsible_sidebar.scss';
 
 * {
   box-sizing: border-box;
@@ -172,15 +171,37 @@ export default class UIDemos extends Vue {
   margin: 0;
 }
 
-.wrapper {
-  display: flex;
+$sidebar-width: 220px;
+$sidebar-header-height: 30px;
+
+@include collapsible-sidebar(
+  $sidebar-width: $sidebar-width,
+  $sidebar-header-height: $sidebar-header-height,
+  $border-color: lighten($stormy-gray-light, 20%),
+  $background-color: $pebble-light,
+  $active-color: lighten($stormy-gray-light, 10%),
+  $overlap-breakpoint: 750px,
+);
+
+.sidebar-header {
+  border-bottom: 1px solid lighten($stormy-gray-light, 20%);
+
+  font-size: 20px;
+  padding: 3px 0;
+
+  .fa-bars {
+    padding: 0 5px;
+  }
+
+  .fa-bars:hover {
+    cursor: pointer;
+    color: $stormy-gray-dark;
+  }
 }
 
-$sidebar-width: 220px;
-$sidebar-toggle-height: 30px;
-
-@mixin sidebar-item() {
-  background-color: $pebble-light;
+.sidebar-item {
+  padding: 3px 20px 3px 8px;
+  font-size: 1.2em;
 
   &:not(.active):hover {
     background-color: lighten($stormy-gray-light, 20%);
@@ -188,51 +209,4 @@ $sidebar-toggle-height: 30px;
   }
 }
 
-#sidebar-toggle {
-  @include sidebar-item();
-  width: $sidebar-width;
-  height: $sidebar-toggle-height;
-
-  border: 1px solid lighten($stormy-gray-light, 20%);
-  border-left: none;
-
-  text-align: center;
-  font-size: 20px;
-  padding: 3px 0;
-
-  position: sticky;
-  top: 0;
-}
-
-.sidebar {
-  z-index: 1;
-  margin-right: -$sidebar-width;
-
-  min-width: $sidebar-width;
-  top: $sidebar-toggle-height;
-
-  border-right: 1px solid lighten($stormy-gray-light, 20%);
-
-  background-color: $pebble-light;
-
-  .sidebar-item {
-    @include sidebar-item();
-    padding: 3px 20px 3px 8px;
-    font-size: 1.2em;
-  }
-
-  .active {
-    background-color: lighten($stormy-gray-light, 10%);
-  }
-}
-
-.body {
-  flex-grow: 1;
-}
-
-@media only screen and (min-width: 800px) {
-  .sidebar {
-    margin-right: 0;
-  }
-}
 </style>
