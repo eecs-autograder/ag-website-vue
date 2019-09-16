@@ -547,6 +547,10 @@ $border-color: $gray-blue-1;
     align-items: center;
   }
 
+  .sidebar-header-closed {
+    border-bottom: 1px solid $border-color;
+  }
+
   .sidebar-content {
     padding-top: 3px;
   }
