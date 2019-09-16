@@ -26,12 +26,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import {
-    MutationTestSuiteResultFeedback,
-    Submission
-} from 'ag-client-typescript';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+import { MutationTestSuiteResultFeedback, Submission } from 'ag-client-typescript';
 
 import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
@@ -58,6 +56,11 @@ export default class MutationSuiteResults extends Vue {
     if (suite_result.invalid_tests === null) {
       return CorrectnessLevel.not_available;
     }
+
+    if (suite_result.total_points === 0 && suite_result.total_points_possible !== 0) {
+      return CorrectnessLevel.none_correct;
+    }
+
     if (suite_result.has_setup_command && suite_result.setup_return_code !== 0) {
       return CorrectnessLevel.none_correct;
     }
@@ -81,7 +84,7 @@ export default class MutationSuiteResults extends Vue {
 @import '@/styles/components/submission_detail.scss';
 
 #mutation-test-suite-results {
-  border: 2px solid #ebeef4;
+  border: 10px solid #ebeef4;
   border-radius: 5px;
   padding: 20px;
   margin: 10px 0;

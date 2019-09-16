@@ -40,7 +40,7 @@ describe('SubmissionDetailPanel tests', () => {
         ).exists()).toBe(true);
     });
 
-    test('some correct full points panel', async () => {
+    test('some correct', async () => {
         wrapper = mount(SubmissionDetailPanel, {
             propsData: {
                 name: "Case Name",
@@ -49,27 +49,11 @@ describe('SubmissionDetailPanel tests', () => {
                 points_possible: 1
             }
         });
-        expect(wrapper.find('.some-correct-full-points-panel-header').exists()).toBe(true);
+        expect(wrapper.find('.some-correct-panel-header').exists()).toBe(true);
         expect(wrapper.find('.correctness').find(
             '.some-correct'
         ).exists()).toBe(true);
         expect(wrapper.vm.points_awarded).toEqual(wrapper.vm.points_possible);
-    });
-
-    test('some correct partial points panel', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
-            propsData: {
-                name: "Case Name",
-                correctness_level: CorrectnessLevel.some_correct,
-                points_awarded: 2,
-                points_possible: 3
-            }
-        });
-        expect(wrapper.find('.some-correct-partial-points-panel-header').exists()).toBe(true);
-        expect(wrapper.find('.correctness').find(
-            '.some-correct'
-        ).exists()).toBe(true);
-        expect(wrapper.vm.points_awarded).not.toEqual(wrapper.vm.points_possible);
     });
 
     test('not available panel', async () => {

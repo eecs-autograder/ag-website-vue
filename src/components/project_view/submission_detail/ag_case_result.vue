@@ -1,8 +1,9 @@
 <template>
-  <div class="ag-case-result" v-if="ag_test_case_result.ag_test_command_results.length">
+  <div v-if="ag_test_case_result.ag_test_command_results.length"
+       class="ag-case-result">
     <template v-if="ag_test_case_result.ag_test_command_results.length > 1">
       <div id="multi-command-body">
-        <div v-for="(ag_test_command_result, index) of ag_test_case_result.ag_test_command_results">
+        <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
           <submission-detail-panel
             ref="ag_test_command_panel"
             :name="ag_test_command_result.ag_test_command_name"
@@ -27,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
     AGTestCaseResultFeedback,
@@ -133,9 +134,4 @@ export default class AGCaseResult extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
-
-#multi-command-body {
-  padding: 15px 10px 10px 10px;
-}
-
 </style>

@@ -51,31 +51,32 @@ describe('AGCommandResult tests', () => {
     });
 
     afterEach(() => {
-       sinon.restore();
+        sinon.restore();
     });
 
     test('return_code_correctness - timed_out === null && return_code_correct === null',
          async () => {
-        ag_test_command_result.timed_out = null;
-        ag_test_command_result.return_code_correct = null;
+            ag_test_command_result.timed_out = null;
+            ag_test_command_result.return_code_correct = null;
 
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+            wrapper = mount(AGCommandResult, {
+                propsData: {
+                    submission: submission,
+                    ag_test_command_result: ag_test_command_result,
+                    fdbk_category: ag_cli.FeedbackCategory.max
+                }
+            });
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.ag_test_command_result.timed_out).toBeNull();
-        expect(wrapper.vm.ag_test_command_result.return_code_correct).toBeNull();
-        expect(wrapper.vm.return_code_correctness).toEqual("Not Available");
-        expect(wrapper.find('#return-code-correctness').exists()).toBe(false);
-    });
+            expect(wrapper.vm.ag_test_command_result.timed_out).toBeNull();
+            expect(wrapper.vm.ag_test_command_result.return_code_correct).toBeNull();
+            expect(wrapper.vm.return_code_correctness).toEqual("Not Available");
+            expect(wrapper.find('#return-code-correctness').exists()).toBe(false);
+        }
+    );
 
     test('return_code_correctness - timed_out === true', async () => {
         ag_test_command_result.timed_out = true;
@@ -88,10 +89,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.timed_out).toBe(true);
         expect(wrapper.vm.ag_test_command_result.return_code_correct).toBeNull();
@@ -111,10 +111,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.timed_out).toBe(false);
         expect(wrapper.vm.ag_test_command_result.return_code_correct).toBeNull();
@@ -134,10 +133,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.timed_out).toBeNull();
         expect(wrapper.vm.ag_test_command_result.return_code_correct).toBe(true);
@@ -157,10 +155,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.timed_out).toBeNull();
         expect(wrapper.vm.ag_test_command_result.return_code_correct).toBe(false);
@@ -169,7 +166,7 @@ describe('AGCommandResult tests', () => {
     });
 
     test('Exit status - expected_and_actual_return_code tooltip is present - ' +
-         'return_code_fdbk_level = expected_and_actual',
+        'return_code_fdbk_level = expected_and_actual',
          async () => {
         ag_test_command_result.return_code_correct = true;
         ag_test_command_result.fdbk_settings.return_code_fdbk_level
@@ -182,37 +179,37 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.find({ref: 'expected_and_actual_return_code'}).exists()).toBe(true);
     });
 
-    test('Exit status - expected_and_actual_return_code tooltip is present - ' +
-         'actual_return_code is not null',
-         async () => {
-        ag_test_command_result.return_code_correct = true;
-        ag_test_command_result.actual_return_code = 0;
+    test(
+        'Exit status - expected_and_actual_return_code tooltip is present - ' +
+        'actual_return_code is not null',
+        async () => {
+            ag_test_command_result.return_code_correct = true;
+            ag_test_command_result.actual_return_code = 0;
 
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
+            wrapper = mount(AGCommandResult, {
+                propsData: {
+                    submission: submission,
+                    ag_test_command_result: ag_test_command_result,
+                    fdbk_category: ag_cli.FeedbackCategory.max
+                }
+            });
+            for (let i = 0; i < 4; ++i) {
+                await wrapper.vm.$nextTick();
             }
-        });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'expected_and_actual_return_code'}).exists()).toBe(true);
-    });
+            expect(wrapper.find({ref: 'expected_and_actual_return_code'}).exists()).toBe(true);
+        }
+    );
 
     test('Exit status - expected_and_actual_return_code tooltip is present - ' +
-         'timed_out is true',
+        'timed_out is true',
          async () => {
         ag_test_command_result.return_code_correct = true;
         ag_test_command_result.timed_out = true;
@@ -224,16 +221,14 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.find({ref: 'expected_and_actual_return_code'}).exists()).toBe(true);
     });
 
-    test('stdout_section - stdout_correct is null',
-         async () => {
+    test('stdout_section - stdout_correct is null', async () => {
         wrapper = mount(AGCommandResult, {
             propsData: {
                 submission: submission,
@@ -241,18 +236,16 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stdout_correct).toBeNull();
         expect(wrapper.find('#stdout-correctness-section').exists()).toBe(false);
         expect(wrapper.find('#stdout-diff-section').exists()).toBe(false);
     });
 
-    test('stdout_section - stdout_correct is true',
-         async () => {
+    test('stdout_section - stdout_correct is true', async () => {
         ag_test_command_result.stdout_correct = true;
 
         wrapper = mount(AGCommandResult, {
@@ -262,10 +255,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stdout_correct).not.toBeNull();
         expect(wrapper.find('#stdout-correctness-section').exists()).toBe(true);
@@ -274,7 +266,7 @@ describe('AGCommandResult tests', () => {
     });
 
     test('stdout_section - stdout_correct is false and stdout_fdbk_level ' +
-         '!== ValueFeedbackLevel.expected_and_actual',
+        '!== ValueFeedbackLevel.expected_and_actual',
          async () => {
         ag_test_command_result.stdout_correct = false;
 
@@ -289,10 +281,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stdout_correct).not.toBeNull();
         expect(wrapper.find('#stdout-correctness-section').exists()).toBe(true);
@@ -301,7 +292,7 @@ describe('AGCommandResult tests', () => {
     });
 
     test('stdout_section - stdout_correct is false and stdout_fdbk_level ' +
-         '!== ValueFeedbackLevel.expected_and_actual',
+        '!== ValueFeedbackLevel.expected_and_actual',
          async () => {
         ag_test_command_result.stdout_correct = false;
         ag_test_command_result.fdbk_settings.stdout_fdbk_level
@@ -331,10 +322,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stdout_correct).not.toBeNull();
         expect(wrapper.find('#stdout-correctness-section').exists()).toBe(true);
@@ -343,8 +333,7 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.find({ref: 'stdout_diff'}).exists()).toBe(true);
     });
 
-    test('stdout_section - show_actual_stdout is true and stdout_content is null',
-         async () => {
+    test('stdout_section - show_actual_stdout is true and stdout_content is null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = true;
 
         get_ag_test_cmd_result_stdout_stub.returns(
@@ -358,17 +347,15 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(true);
         expect(wrapper.find('#stdout-actual-section').text()).toContain("No Output");
     });
 
-    test('stdout_section - show_actual_stdout is true and stdout_content is null',
-         async () => {
+    test('stdout_section - show_actual_stdout is true and stdout_content is null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = true;
 
         get_ag_test_cmd_result_stdout_stub.returns(
@@ -382,17 +369,15 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(true);
         expect(wrapper.find('#stdout-actual-section').text()).toContain("actual stdout");
     });
 
-    test('stdout_section - show_actual_stdout is false',
-         async () => {
+    test('stdout_section - show_actual_stdout is false', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = false;
 
         wrapper = mount(AGCommandResult, {
@@ -402,10 +387,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(false);
         expect(wrapper.find('#stdout-actual-section').exists()).toBe(false);
@@ -419,18 +403,16 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stdout_correct).toBeNull();
         expect(wrapper.find('#stderr-correctness-section').exists()).toBe(false);
         expect(wrapper.find('#stderr-diff-section').exists()).toBe(false);
     });
 
-    test('stderr_section - stderr_correct is true',
-         async () => {
+    test('stderr_section - stderr_correct is true', async () => {
         ag_test_command_result.stderr_correct = true;
 
         wrapper = mount(AGCommandResult, {
@@ -440,10 +422,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stderr_correct).toBe(true);
         expect(wrapper.find('#stderr-correctness-section').exists()).toBe(true);
@@ -452,7 +433,7 @@ describe('AGCommandResult tests', () => {
     });
 
     test('stderr_section - stderr_correct is false and stderr_fdbk_level ' +
-         '!== ValueFeedbackLevel.expected_and_actual',
+        '!== ValueFeedbackLevel.expected_and_actual',
          async () => {
         ag_test_command_result.stderr_correct = false;
 
@@ -467,10 +448,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stderr_correct).not.toBeNull();
         expect(wrapper.find('#stderr-correctness-section').exists()).toBe(true);
@@ -479,7 +459,7 @@ describe('AGCommandResult tests', () => {
     });
 
     test('stderr_section - stderr_correct is false and stderr_fdbk_level ' +
-         '!== ValueFeedbackLevel.expected_and_actual',
+        '!== ValueFeedbackLevel.expected_and_actual',
          async () => {
         ag_test_command_result.stderr_correct = false;
         ag_test_command_result.fdbk_settings.stderr_fdbk_level
@@ -509,10 +489,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.stderr_correct).not.toBeNull();
         expect(wrapper.find('#stderr-correctness-section').exists()).toBe(true);
@@ -521,8 +500,7 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.find({ref: 'stderr_diff'}).exists()).toBe(true);
     });
 
-    test('stderr_section - show_actual_stderr is true and stderr_content is null',
-         async () => {
+    test('stderr_section - show_actual_stderr is true and stderr_content is null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stderr = true;
 
         get_ag_test_cmd_result_stderr_stub.returns(
@@ -536,10 +514,9 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stderr).toBe(true);
         expect(wrapper.find('#stderr-actual-section').text()).toContain("No Output");
@@ -559,12 +536,140 @@ describe('AGCommandResult tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
 
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stderr).toBe(true);
         expect(wrapper.find('#stderr-actual-section').text()).toContain("actual stderr");
+    });
+});
+
+describe('AGCommandResults Watchers', () => {
+    let wrapper: Wrapper<AGCommandResult>;
+    let group: ag_cli.Group;
+    let submission: ag_cli.Submission;
+    let user: ag_cli.User;
+    let ag_test_command_result: ag_cli.AGTestCommandResultFeedback;
+
+    let get_ag_test_cmd_result_stdout_stub: sinon.SinonStub;
+    let get_ag_test_cmd_result_stderr_stub: sinon.SinonStub;
+    let get_ag_test_cmd_result_stdout_diff_stub: sinon.SinonStub;
+    let get_ag_test_cmd_result_stderr_diff_stub: sinon.SinonStub;
+
+    beforeEach(() => {
+        user = data_ut.make_user();
+        group = data_ut.make_group(1, 1, {member_names: [user.username]});
+        submission = data_ut.make_submission(group);
+        ag_test_command_result = data_ut.make_ag_test_command_result_feedback(1);
+
+        get_ag_test_cmd_result_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput,
+            'get_ag_test_cmd_result_stdout'
+        );
+
+        get_ag_test_cmd_result_stdout_diff_stub = sinon.stub(
+            ag_cli.ResultOutput,
+            'get_ag_test_cmd_result_stdout_diff'
+        );
+
+        get_ag_test_cmd_result_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput,
+            'get_ag_test_cmd_result_stderr'
+        );
+
+        get_ag_test_cmd_result_stderr_diff_stub = sinon.stub(
+            ag_cli.ResultOutput,
+            'get_ag_test_cmd_result_stderr_diff'
+        );
+
+        wrapper = mount(AGCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    test('submission Watcher', async () => {
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_submission).toEqual(submission);
+        expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledOnce).toBe(true);
+
+        let updated_submission = data_ut.make_submission(group);
+        wrapper.setProps({submission: updated_submission});
+
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(submission).not.toEqual(updated_submission);
+        expect(wrapper.vm.d_submission).toEqual(updated_submission);
+
+        expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledTwice).toBe(true);
+    });
+
+    test('ag_test_command_result Watcher', async () => {
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_ag_test_command_result).toEqual(ag_test_command_result);
+        expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledOnce).toBe(true);
+
+        let updated_ag_test_command_result = data_ut.make_ag_test_command_result_feedback(1);
+        wrapper.setProps({ag_test_command_result: updated_ag_test_command_result});
+
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(ag_test_command_result).not.toEqual(updated_ag_test_command_result);
+        expect(wrapper.vm.d_ag_test_command_result).toEqual(updated_ag_test_command_result);
+        expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledTwice).toBe(true);
+    });
+
+    test('fdbk_category Watcher', async () => {
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledOnce).toBe(true);
+
+        wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.ultimate_submission});
+
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
+        expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledTwice).toBe(true);
     });
 });

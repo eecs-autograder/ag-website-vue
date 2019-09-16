@@ -1,11 +1,11 @@
 <template>
-  <div id="submission-detail" v-if="!d_loading">
-
-    <div id="view-submission">
-      <div v-if="d_loading">
-        <i class="fa fa-spinner fa-pulse fa-fw"></i>
-      </div>
-      <div id="top" v-if="!d_loading">
+  <div id="submission-detail">
+    <div v-if="d_loading">
+      <i class="fa fa-spinner fa-pulse fa-fw"></i>
+    </div>
+    <div v-else
+         id="view-submission">
+      <div id="top">
 
         <div id="submitted-by"> Submitted by:
           <span id="submitter">{{d_submission.submitter}}</span>
@@ -125,23 +125,24 @@
           </select>
         </div>
       </div>
-    </div>
 
-    <mutation-suite-results
-      ref="mutation_suite_results"
-      v-if="d_submission_result.student_test_suite_results.length"
-      :submission="d_submission"
-      :mutation_test_suite_results="d_submission_result.student_test_suite_results"
-      :fdbk_category="d_feedback_category">
-    </mutation-suite-results>
+      <mutation-suite-results
+        ref="mutation_suite_results"
+        v-if="d_submission_result.student_test_suite_results.length"
+        :submission="d_submission"
+        :mutation_test_suite_results="d_submission_result.student_test_suite_results"
+        :fdbk_category="d_feedback_category">
+      </mutation-suite-results>
 
-    <div v-for="(ag_test_suite_result, index) of d_submission_result.ag_test_suite_results"
-         ref="ag_test_suite_results">
-      <AGTestSuiteResult :submission="d_submission"
-                         :ag_test_suite_result="ag_test_suite_result"
-                         :fdbk_category="d_feedback_category"
-                         :is_first_suite="index === 0">
-      </AGTestSuiteResult>
+      <div v-for="(ag_test_suite_result, index) of d_submission_result.ag_test_suite_results"
+           ref="ag_test_suite_results">
+        <AGTestSuiteResult :submission="d_submission"
+                           :ag_test_suite_result="ag_test_suite_result"
+                           :fdbk_category="d_feedback_category"
+                           :is_first_suite="index === 0">
+        </AGTestSuiteResult>
+      </div>
+
     </div>
 
     <modal v-if="d_show_remove_submission_from_queue_modal"
@@ -234,10 +235,10 @@ export default class SubmissionDetail extends Vue {
   is_ultimate_submission!: boolean;
 
   @Watch('selected_submission_with_results')
-  on_selected_submission_change(new_value: SubmissionWithResults,
-                                old_value: SubmissionWithResults) {
+  async on_selected_submission_change(new_value: SubmissionWithResults,
+                                      old_value: SubmissionWithResults) {
     this.d_submission = new Submission(new_value);
-    this.d_submission_result = new_value.results;
+    await this.load_results();
   }
 
   d_feedback_category: FeedbackCategory | null = null;
@@ -333,7 +334,7 @@ export default class SubmissionDetail extends Vue {
 }
 
 #submission-detail {
-  padding: 10px;
+  padding: 30px;
 }
 
 #top {

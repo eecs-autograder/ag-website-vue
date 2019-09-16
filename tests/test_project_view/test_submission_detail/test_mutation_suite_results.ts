@@ -26,7 +26,7 @@ describe('MutationSuiteResults tests', () => {
         group = data_ut.make_group(1, 1, {member_names: [user.username]});
         submission = data_ut.make_submission(group);
         mutation_suite_1_result = data_ut.make_mutation_test_suite_result_feedback(1);
-        mutation_suite_2_result = data_ut.make_mutation_test_suite_result_feedback(1);
+        mutation_suite_2_result = data_ut.make_mutation_test_suite_result_feedback(2);
 
         mutation_test_suite_results = [
             mutation_suite_1_result,
@@ -85,8 +85,44 @@ describe('MutationSuiteResults tests', () => {
         ).toEqual(CorrectnessLevel.none_correct);
     });
 
+    test('get_mutation_test_validity_correctness_level - total_points === 0 AND ' +
+         'total_points_possible !== 0',
+         async () => {
+        let mutation_test_suite_result_feedback = data_ut.make_mutation_test_suite_result_feedback(
+            1,
+            {
+                invalid_tests: [],
+                total_points: 0,
+                total_points_possible: 50
+            }
+        );
+
+        expect(wrapper.vm.get_mutation_test_validity_correctness_level(
+            mutation_test_suite_result_feedback)
+        ).toEqual(CorrectnessLevel.none_correct);
+    });
+
+    test('get_mutation_test_validity_correctness_level - has_setup_command === true AND' +
+         'setup_return_code !== 0',
+         async () => {
+        let mutation_test_suite_result_feedback = data_ut.make_mutation_test_suite_result_feedback(
+            1,
+            {
+                invalid_tests: [],
+                has_setup_command: true,
+                setup_return_code: 1,
+                total_points: 48,
+                total_points_possible: 50
+            }
+        );
+
+        expect(wrapper.vm.get_mutation_test_validity_correctness_level(
+            mutation_test_suite_result_feedback)
+        ).toEqual(CorrectnessLevel.none_correct);
+    });
+
     test('get_mutation_test_validity_correctness_level - total_points === ' +
-         'total_points_possible && invalid_tests.length === 0',
+         'total_points_possible AND invalid_tests.length === 0',
          async () => {
         let mutation_test_suite_result_feedback = data_ut.make_mutation_test_suite_result_feedback(
                 1,
@@ -153,5 +189,20 @@ describe('MutationSuiteResults tests', () => {
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(
             mutation_test_suite_result_feedback)
         ).toEqual(CorrectnessLevel.some_correct);
+    });
+
+    test('mutation_test_suite_results prop receives a different value', async () => {
+        let updated_mutation_test_suite_results = [
+            data_ut.make_mutation_test_suite_result_feedback(1),
+            data_ut.make_mutation_test_suite_result_feedback(2),
+            data_ut.make_mutation_test_suite_result_feedback(3)
+        ];
+
+        expect(wrapper.findAll({ref: 'mutation_test_suite_detail_panel'}).length).toEqual(2);
+
+        wrapper.setProps({mutation_test_suite_results: updated_mutation_test_suite_results});
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findAll({ref: 'mutation_test_suite_detail_panel'}).length).toEqual(3);
     });
 });

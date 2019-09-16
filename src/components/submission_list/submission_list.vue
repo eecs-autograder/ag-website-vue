@@ -37,7 +37,8 @@
 
       <div class="divider"></div>
       <div class="scroll-column-grow">
-        <div v-if="d_selected_submission !== null">
+        <div v-if="d_selected_submission !== null"
+             id="submission-detail-container">
           <submission-detail ref="submission_detail"
                              :selected_submission_with_results="d_selected_submission"
                              :is_ultimate_submission="is_ultimate_submission"
@@ -288,6 +289,13 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
 
 .divider {
   border: 1px solid $pebble-medium;
+}
+
+#submission-detail-container {
+  min-width: 500px;
+  width: 90%;
+  margin-right: 10%;
+
 }
 
 </style>

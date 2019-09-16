@@ -30,14 +30,14 @@
            id="setup-stdout-section">
         <p class="feedback-label"> Setup Output: </p>
 
-        <template v-if="!setup_stdout_loaded">
+        <template v-if="!d_setup_stdout_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!setup_stdout_content"
+          <div v-if="!d_setup_stdout_content"
                class="feedback-output-content-single-line"> No Output </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{setup_stdout_content}}</pre>
+               class="feedback-output-content-lengthy">{{d_setup_stdout_content}}</pre>
         </template>
 
       </div>
@@ -47,15 +47,15 @@
            id="setup-stderr-section">
         <p class="feedback-label"> Setup Error Output: </p>
 
-        <template v-if="!setup_stderr_loaded">
+        <template v-if="!d_setup_stderr_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!setup_stderr_content"
+          <div v-if="!d_setup_stderr_content"
                class="feedback-output-content-short"> No Output
           </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{setup_stderr_content}}</pre>
+               class="feedback-output-content-lengthy">{{d_setup_stderr_content}}</pre>
         </template>
 
       </div>
@@ -88,15 +88,15 @@
            class="feedback-row"
            id="buggy-stdout-section">
         <div class="feedback-label"> Buggy Stdout: </div>
-        <template v-if="!grade_buggy_stdout_loaded">
+        <template v-if="!d_grade_buggy_stdout_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!grade_buggy_stdout_content"
+          <div v-if="!d_grade_buggy_stdout_content"
                class="feedback-output-content-short"> No Output
           </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{grade_buggy_stdout_content}}</pre>
+               class="feedback-output-content-lengthy">{{d_grade_buggy_stdout_content}}</pre>
         </template>
       </div>
 
@@ -105,15 +105,15 @@
            id="buggy-stderr-section">
         <div class="feedback-label"> Buggy Stderr: </div>
 
-        <template v-if="!grade_buggy_stderr_loaded">
+        <template v-if="!d_grade_buggy_stderr_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!grade_buggy_stderr_content"
+          <div v-if="!d_grade_buggy_stderr_content"
                class="feedback-output-content-short"> No Output
           </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{grade_buggy_stderr_content}}</pre>
+               class="feedback-output-content-lengthy">{{d_grade_buggy_stderr_content}}</pre>
         </template>
 
       </div>
@@ -127,15 +127,16 @@
              id="validity-check-stdout-section">
           <div class="feedback-label"> Validity Check Stdout: </div>
 
-          <template v-if="!validity_checkout_stdout_loaded">
+          <template v-if="!d_validity_checkout_stdout_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
           </template>
           <template v-else>
-            <div v-if="!validity_checkout_stdout_content"
+            <div v-if="!d_validity_checkout_stdout_content"
                class="feedback-output-content-short"> No Output
             </div>
             <pre v-else
-                 class="feedback-output-content-lengthy">{{validity_checkout_stdout_content}}</pre>
+                 class="feedback-output-content-lengthy">{{d_validity_checkout_stdout_content}}
+            </pre>
           </template>
 
         </div>
@@ -145,15 +146,16 @@
              id="validity-check-stderr-section">
           <div class="feedback-label"> Validity Check Stderr: </div>
 
-          <template v-if="!validity_checkout_stderr_loaded">
+          <template v-if="!d_validity_checkout_stderr_loaded">
             <i class="fa fa-spinner fa-pulse fa-fw"></i>
           </template>
           <template v-else>
-            <p v-if="!validity_checkout_stderr_content"
+            <p v-if="!d_validity_checkout_stderr_content"
                class="feedback-output-content-short"> No Output
             </p>
             <pre v-else
-                 class="feedback-output-content-lengthy">{{validity_checkout_stderr_content}}</pre>
+                 class="feedback-output-content-lengthy">{{d_validity_checkout_stderr_content}}
+            </pre>
           </template>
 
         </div>
@@ -164,15 +166,15 @@
            id="test-names-stdout-section">
         <div class="feedback-label"> Get test names stdout: </div>
 
-        <template v-if="!test_names_stdout_loaded">
+        <template v-if="!d_test_names_stdout_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!test_names_stdout_content"
+          <div v-if="!d_test_names_stdout_content"
                class="feedback-output-content-short"> No Output
           </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{test_names_stdout_content}}</pre>
+               class="feedback-output-content-lengthy">{{d_test_names_stdout_content}}</pre>
         </template>
 
       </div>
@@ -182,15 +184,15 @@
            id="test-names-stderr-section">
         <div class="feedback-label"> Get test names stderr: </div>
 
-        <template v-if="!test_names_stderr_loaded">
+        <template v-if="!d_test_names_stderr_loaded">
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!test_names_stderr_content"
+          <div v-if="!d_test_names_stderr_content"
              class="feedback-output-content-short"> No Output
           </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{test_names_stderr_content}}</pre>
+               class="feedback-output-content-lengthy">{{d_test_names_stderr_content}}</pre>
         </template>
       </div>
 
@@ -258,8 +260,7 @@
 </template>
 
 <script lang="ts">
-
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
     BugsExposedFeedbackLevel,
@@ -270,6 +271,7 @@ import {
 } from 'ag-client-typescript';
 
 import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { deep_copy } from "@/utils";
 
 @Component({
   components: {
@@ -286,30 +288,54 @@ export default class MutationSuiteResult extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
+  @Watch('submission')
+  async on_submission_change(new_value: Submission, old_value: Submission) {
+      this.d_submission = deep_copy(new_value, Submission);
+      await this.get_results();
+  }
+
+  @Watch('mutation_test_suite_result')
+  async on_mutation_test_suite_results_change(new_value: MutationTestSuiteResultFeedback,
+                                              old_value: MutationTestSuiteResultFeedback) {
+    this.d_mutation_test_suite_result = JSON.parse(JSON.stringify(new_value));
+    await this.get_results();
+  }
+
+  @Watch('fdbk_category')
+  async on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+      this.d_fdbk_category = new_value;
+      await this.get_results();
+  }
+
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
 
-  setup_stdout_content: string | null = null;
-  setup_stderr_content: string | null = null;
-  test_names_stdout_content: string | null = null;
-  test_names_stderr_content: string | null = null;
-  validity_checkout_stdout_content: string | null = null;
-  validity_checkout_stderr_content: string | null = null;
-  grade_buggy_stdout_content: string | null = null;
-  grade_buggy_stderr_content: string | null = null;
-  d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
+  d_setup_stdout_content: string | null = null;
+  d_setup_stderr_content: string | null = null;
+  d_test_names_stdout_content: string | null = null;
+  d_test_names_stderr_content: string | null = null;
+  d_validity_checkout_stdout_content: string | null = null;
+  d_validity_checkout_stderr_content: string | null = null;
+  d_grade_buggy_stdout_content: string | null = null;
+  d_grade_buggy_stderr_content: string | null = null;
 
-  setup_stdout_loaded = false;
-  setup_stderr_loaded = false;
-  test_names_stdout_loaded = false;
-  test_names_stderr_loaded = false;
-  validity_checkout_stdout_loaded = false;
-  validity_checkout_stderr_loaded = false;
-  grade_buggy_stdout_loaded = false;
-  grade_buggy_stderr_loaded = false;
+  d_submission: Submission | null = null;
+  d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
+  d_mutation_test_suite_result: MutationTestSuiteResultFeedback | null = null;
+
+  d_setup_stdout_loaded = false;
+  d_setup_stderr_loaded = false;
+  d_test_names_stdout_loaded = false;
+  d_test_names_stderr_loaded = false;
+  d_validity_checkout_stdout_loaded = false;
+  d_validity_checkout_stderr_loaded = false;
+  d_grade_buggy_stdout_loaded = false;
+  d_grade_buggy_stderr_loaded = false;
 
   async created() {
     this.d_fdbk_category = this.fdbk_category;
+    this.d_submission = this.submission;
+    this.d_mutation_test_suite_result = this.mutation_test_suite_result;
     await this.get_results();
   }
 
@@ -325,81 +351,87 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_setup_stdout_content() {
-    this.setup_stdout_content = await ResultOutput.get_mutation_test_suite_result_setup_stdout(
+    this.d_setup_stdout_loaded = false;
+    this.d_setup_stdout_content = await ResultOutput.get_mutation_test_suite_result_setup_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.setup_stdout_loaded = true;
+    this.d_setup_stdout_loaded = true;
   }
 
   async load_setup_stderr_content() {
-    this.setup_stderr_content = await ResultOutput.get_mutation_test_suite_result_setup_stderr(
+    this.d_setup_stderr_loaded = false;
+    this.d_setup_stderr_content = await ResultOutput.get_mutation_test_suite_result_setup_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.setup_stderr_loaded = true;
+    this.d_setup_stderr_loaded = true;
   }
 
   async load_test_names_stdout_content() {
-    this.test_names_stdout_content
+    this.d_test_names_stdout_content
         = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.test_names_stdout_loaded = true;
+    this.d_test_names_stdout_loaded = true;
   }
 
   async load_test_names_stderr_content() {
-    this.test_names_stderr_content
+    this.d_test_names_stderr_content
         = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.test_names_stderr_loaded = true;
+    this.d_test_names_stderr_loaded = true;
   }
 
   async load_validity_check_stdout_content() {
-    this.validity_checkout_stdout_content
+    this.d_validity_checkout_stdout_loaded = false;
+    this.d_validity_checkout_stdout_content
         = await ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.validity_checkout_stdout_loaded = true;
+    this.d_validity_checkout_stdout_loaded = true;
   }
 
   async load_validity_check_stderr_content() {
-    this.validity_checkout_stderr_content
+    this.d_validity_checkout_stderr_loaded = false;
+    this.d_validity_checkout_stderr_content
         = await ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.validity_checkout_stderr_loaded = true;
+    this.d_validity_checkout_stderr_loaded = true;
   }
 
   async load_grade_buggy_stdout_content() {
-    this.grade_buggy_stdout_content
+    this.d_grade_buggy_stdout_loaded = false;
+    this.d_grade_buggy_stdout_content
         = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.grade_buggy_stdout_loaded = true;
+    this.d_grade_buggy_stdout_loaded = true;
   }
 
   async load_grade_buggy_stderr_content() {
-    this.grade_buggy_stderr_content
+    this.d_grade_buggy_stderr_loaded = false;
+    this.d_grade_buggy_stderr_content
         = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
       this.submission.pk,
       this.mutation_test_suite_result.pk,
       this.d_fdbk_category
     );
-    this.grade_buggy_stderr_loaded = true;
+    this.d_grade_buggy_stderr_loaded = true;
   }
 
   test_timed_out(test: string): boolean {

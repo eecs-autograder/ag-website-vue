@@ -1046,25 +1046,6 @@ describe('MutationSuiteResult tests', () => {
         ).exists()).toBe(false);
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     test('get_valid_tests.length === 0', async () => {
         mutation_test_suite_result.student_tests = [
             "test_one",
@@ -1241,5 +1222,199 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
         expect(wrapper.vm.test_timed_out("test_three")).toBe(true);
         expect(wrapper.vm.test_timed_out("test_four")).toBe(true);
+    });
+});
+
+
+describe('MutationSuiteResult Watcher tests', () => {
+    let wrapper: Wrapper<MutationSuiteResult>;
+    let group: ag_cli.Group;
+    let mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
+    let submission: ag_cli.Submission;
+    let user: ag_cli.User;
+
+    let get_mutation_test_suite_result_setup_stdout_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_setup_stderr_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_get_student_test_names_stdout_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_get_student_test_names_stderr_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_validity_check_stdout_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_validity_check_stderr_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_grade_buggy_impls_stdout_stub: sinon.SinonStub;
+    let get_mutation_test_suite_result_grade_buggy_impls_stderr_stub: sinon.SinonStub;
+
+    beforeEach(() => {
+        user = data_ut.make_user();
+        group = data_ut.make_group(1, 1, {member_names: [user.username]});
+        submission = data_ut.make_submission(group);
+
+        mutation_test_suite_result = data_ut.make_mutation_test_suite_result_feedback(1);
+
+        get_mutation_test_suite_result_setup_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_setup_stdout'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_setup_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_setup_stderr'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_get_student_test_names_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_get_student_test_names_stdout'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_get_student_test_names_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_get_student_test_names_stderr'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_validity_check_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_validity_check_stdout'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_validity_check_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_validity_check_stderr'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_grade_buggy_impls_stdout_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_grade_buggy_impls_stdout'
+        ).returns(Promise.resolve(""));
+
+        get_mutation_test_suite_result_grade_buggy_impls_stderr_stub = sinon.stub(
+            ag_cli.ResultOutput, 'get_mutation_test_suite_result_grade_buggy_impls_stderr'
+        ).returns(Promise.resolve(""));
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    test('submission Watcher', async () => {
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_submission).toEqual(submission);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledOnce).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
+
+        let updated_submission = data_ut.make_submission(group);
+        wrapper.setProps({submission: updated_submission});
+
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_submission).toEqual(updated_submission);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledTwice).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledTwice).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledTwice).toBe(true);
+    });
+
+    test('mutation_test_suite_result Watcher', async () => {
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_mutation_test_suite_result).toEqual(mutation_test_suite_result);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledOnce).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
+
+        let updated_mutation_test_suite_result = data_ut.make_mutation_test_suite_result_feedback(
+            1
+        );
+        wrapper.setProps({mutation_test_suite_result: updated_mutation_test_suite_result});
+
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_mutation_test_suite_result).toEqual(updated_mutation_test_suite_result);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledTwice).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledTwice).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledTwice).toBe(true);
+    });
+
+    test('fdbk_category Watcher', async () => {
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledOnce).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
+
+        wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.past_limit_submission});
+
+        for (let i = 0; i < 8; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledTwice).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledTwice).toBe(
+            true
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledTwice).toBe(true);
     });
 });

@@ -9,7 +9,7 @@
         </div>
       </div>
 
-      <div v-if="ag_test_suite_result.fdbk_settings.show_setup_stdout"
+      <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stdout"
            class="feedback-row"
            id="stdout-section">
         <div class="feedback-label"> Output: </div>
@@ -17,14 +17,14 @@
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!setup_stdout"
+          <div v-if="!d_setup_stdout"
                class="feedback-output-content-short"> No Output </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{setup_stdout}}</pre>
+               class="feedback-output-content-lengthy">{{d_setup_stdout}}</pre>
         </template>
       </div>
 
-      <div v-if="ag_test_suite_result.fdbk_settings.show_setup_stderr"
+      <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stderr"
            class="feedback-row"
            id="stderr-section">
         <div class="feedback-label"> Error Output: </div>
@@ -32,17 +32,17 @@
           <i class="fa fa-spinner fa-pulse fa-fw"></i>
         </template>
         <template v-else>
-          <div v-if="!setup_stderr"
+          <div v-if="!d_setup_stderr"
                class="feedback-output-content-short"> No Output </div>
           <pre v-else
-               class="feedback-output-content-lengthy">{{setup_stderr}}</pre>
+               class="feedback-output-content-lengthy">{{d_setup_stderr}}</pre>
         </template>
       </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   AGTestSuiteResultFeedback,
@@ -62,41 +62,72 @@ export default class AGCaseSetupResult extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
-  setup_stdout: string = "";
-  setup_stderr: string = "";
+  d_setup_stdout: string = "";
+  d_setup_stderr: string = "";
   d_setup_stdout_loaded = false;
   d_setup_stderr_loaded = false;
 
+  d_ag_test_suite_result: AGTestSuiteResultFeedback | null = null;
+  d_submission: Submission | null = null;
+  d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
+
+  @Watch('submission')
+  async on_submission_change(new_value: Submission, old_value: Submission) {
+    this.d_submission = new_value;
+    await this.get_results();
+  }
+
+  @Watch('ag_test_suite_result')
+  async on_ag_test_suite_result_change(new_value: object, old_value: object) {
+    this.d_ag_test_suite_result = JSON.parse(JSON.stringify(new_value));
+    await this.get_results();
+  }
+
+  @Watch('fdbk_category')
+  async on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+    this.d_fdbk_category = new_value;
+    await this.get_results();
+  }
+
   async created() {
+    this.d_submission = this.submission;
+    this.d_ag_test_suite_result = this.ag_test_suite_result;
+    this.d_fdbk_category = this.fdbk_category;
+    await this.get_results();
+  }
+
+  async get_results() {
     await this.load_setup_stdout();
     await this.load_setup_stderr();
   }
 
   async load_setup_stdout() {
-    this.setup_stdout = await ResultOutput.get_ag_test_suite_result_setup_stdout(
-      this.submission.pk,
-      this.ag_test_suite_result.pk,
-      this.fdbk_category
+    this.d_setup_stdout_loaded = false;
+    this.d_setup_stdout = await ResultOutput.get_ag_test_suite_result_setup_stdout(
+      this.d_submission!.pk,
+      this.d_ag_test_suite_result!.pk,
+      this.d_fdbk_category
     );
     this.d_setup_stdout_loaded = true;
   }
 
   async load_setup_stderr() {
-    this.setup_stderr = await ResultOutput.get_ag_test_suite_result_setup_stderr(
-      this.submission.pk,
-      this.ag_test_suite_result.pk,
-      this.fdbk_category
+    this.d_setup_stderr_loaded = false;
+    this.d_setup_stderr = await ResultOutput.get_ag_test_suite_result_setup_stderr(
+      this.d_submission!.pk,
+      this.d_ag_test_suite_result!.pk,
+      this.d_fdbk_category
     );
     this.d_setup_stderr_loaded = true;
   }
 
   get setup_exit_status() {
-    if (this.ag_test_suite_result.setup_timed_out !== null
-        && this.ag_test_suite_result.setup_timed_out) {
+    if (this.d_ag_test_suite_result!.setup_timed_out !== null
+        && this.d_ag_test_suite_result!.setup_timed_out === true) {
         return "Timed Out";
     }
-    if (this.ag_test_suite_result.setup_return_code !== null) {
-        return this.ag_test_suite_result.setup_return_code;
+    if (this.d_ag_test_suite_result!.setup_return_code !== null) {
+        return this.d_ag_test_suite_result!.setup_return_code;
     }
     return "Not Available";
   }

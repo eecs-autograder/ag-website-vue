@@ -1,150 +1,22 @@
 @import '@/styles/colors.scss';
 
-.panel {
-    margin-bottom: 5px;
+.column-1 {
+    box-sizing: border-box;
+    width: 60%;
+    padding: 7px 10px;
+    word-wrap: break-word;
 }
 
-.panel-header-open {
-    border-radius: 3px 3px 0 0;
+.column-2 {
+    box-sizing: border-box;
+    width: 20%;
+    padding: 7px 10px;
 }
 
-.panel-header-closed {
-    border-radius: 3px;
-}
-
-%panel-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-content: center;
-    border: 1px solid;
-    font-weight: bold;
-}
-
-.name, .column-1 {
-    width: calc(100% / 2);
-    padding: 7px;
-}
-
-.correctness, .column-2 {
-    width: calc(100% / 4);
-    padding: 7px;
-}
-
-.points, .column-3 {
-    width: calc(100% / 4);
-    padding: 7px;
-}
-
-.command-name {
-    padding: 7px;
-}
-
-.command-correctness {
-    padding: 7px;
-}
-
-%panel-body {
-    padding: 6px 10px;
-    background-color: white;
-    border-radius: 0 0 3px 3px;
-}
-
-@mixin panel-body-border($border-color: $white-gray) {
-    border: 2px solid $border-color;
-    border-top: none;
-    border-radius: 0 0 3px 3px;
-}
-
-$base-gray: darken($white-gray, 5);
-
-.not-available-panel-header {
-    @extend %panel-header;
-    background-color: $base-gray;
-    cursor: default;
-    color: $stormy-gray-dark;
-    border-color: darken($base-gray, 5);
-}
-
-$base-red: lighten($warning-red, 25);
-
-.none-correct-panel-header {
-    @extend %panel-header;
-    cursor: pointer;
-    background-color: $base-red;
-    border-color: darken($base-red, 5);
-}
-
-.none-correct-panel-header:hover {
-    background-color: darken($base-red, 5);
-    border-color: darken($base-red, 10);
-}
-
-.none-correct-panel-body {
-    @extend %panel-body;
-    @include panel-body-border($base-red);
-}
-
-$base-orange: hotpink;
-
-.some-correct-full-points-panel-header {
-    @extend %panel-header;
-    cursor: pointer;
-    background-color: $base-orange;
-    border-color: darken($base-orange, 10);
-}
-
-.some-correct-full-points-panel-header:hover {
-    background-color: darken($base-orange, 10);
-    border-color: darken($base-orange, 15);
-}
-
-.some-correct-full-points-panel-body {
-    @extend %panel-body;
-    @include panel-body-border($base-orange);
-}
-
-$base-pink: $orange;
-
-.some-correct-partial-points-panel-header {
-    @extend %panel-header;
-    cursor: pointer;
-    background-color: $base-pink;
-    border-color: darken($base-pink, 10);
-}
-
-.some-correct-partial-points-panel:hover {
-    background-color: darken($base-pink, 10);
-    border-color: darken($base-pink, 15);
-}
-
-.some-correct-partial-points-panel-body {
-    @extend %panel-body;
-    @include panel-body-border($base-pink);
-}
-
-$base-blue: darken($light-blue, 2);
-
-.all-correct-panel-header {
-    @extend %panel-header;
-    cursor: pointer;
-    background-color: $base-blue;
-    border-color: darken($base-blue, 5);
-}
-
-.all-correct-panel-header:hover {
-    background-color: darken($base-blue, 5);
-    border-color: darken($base-blue, 10);
-}
-
-.all-correct-panel-body {
-    @extend %panel-body;
-    @include panel-body-border($base-blue);
-}
-
-.multi-command-header {
-    border-color: black;
-    background-color: white;
+.column-3 {
+    box-sizing: border-box;
+    width: 20%;
+    padding: 7px 10px;
 }
 
 .feedback-label {
