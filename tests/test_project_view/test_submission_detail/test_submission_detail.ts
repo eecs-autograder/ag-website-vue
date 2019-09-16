@@ -332,7 +332,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find('#submission-score').text()).toContain("10.25 / 15");
+        expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
     });
 
     test('submitted files are listed', async () => {

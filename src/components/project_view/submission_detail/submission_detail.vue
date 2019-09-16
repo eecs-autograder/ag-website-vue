@@ -5,11 +5,11 @@
     </div>
     <div v-else
          id="view-submission">
-      <div id="top">
+      <div id="submission-detail-overview">
 
         <div id="submitted-by"> Submitted by:
           <span id="submitter">{{d_submission.submitter}}</span>
-          on <span id="timestamp">{{format_datetime(d_submission.timestamp)}}</span>
+          on <span id="submission-timestamp">{{format_datetime(d_submission.timestamp)}}</span>
         </div>
 
         <div v-if="being_processed">
@@ -18,31 +18,33 @@
 
         <div id="grading-status-section">
           <div id="grading-status-label"> Grading status: </div>
-          <div v-if="d_submission.status === GradingStatus.received">
-            We got your submission! It should be queued soon.
-          </div>
-          <div v-else-if="d_submission.status === GradingStatus.queued">
-            Your submission is at position {{d_submission.position_in_queue}} in the queue.
-          </div>
-          <div v-else-if="d_submission.status === GradingStatus.being_graded">
-            Your submission is being graded!
-          </div>
-          <div v-else-if="d_submission.status === GradingStatus.waiting_for_deferred">
-            All the public test cases are finished grading. You can submit again now!
-          </div>
-          <div v-else-if="d_submission.status === GradingStatus.finished_grading">
-            Everything is finished grading!
-          </div>
-          <div v-else-if="d_submission.status === GradingStatus.removed_from_queue">
-            You removed this submission from the queue. That means it won't be graded,
-            and it won't count towards your daily submission limit.
-          </div>
-          <div v-else-if="d_submission.status === GradingStatus.error">
-            Uh oh...Something very bad happened while we were grading your selected_submission.
-            Don't worry, it's probably our fault, not yours!
-            Sometimes these things only happen once, so you might as well submit again.
-            We won't count this one towards your daily limit.
-            If this keeps happening, send us an email and we'll look into it!
+          <div id="grading-status">
+            <div v-if="d_submission.status === GradingStatus.received">
+              We got your submission! It should be queued soon.
+            </div>
+            <div v-else-if="d_submission.status === GradingStatus.queued">
+              Your submission is at position {{d_submission.position_in_queue}} in the queue.
+            </div>
+            <div v-else-if="d_submission.status === GradingStatus.being_graded">
+              Your submission is being graded!
+            </div>
+            <div v-else-if="d_submission.status === GradingStatus.waiting_for_deferred">
+              All the public test cases are finished grading. You can submit again now!
+            </div>
+            <div v-else-if="d_submission.status === GradingStatus.finished_grading">
+              Everything is finished grading!
+            </div>
+            <div v-else-if="d_submission.status === GradingStatus.removed_from_queue">
+              You removed this submission from the queue. That means it won't be graded,
+              and it won't count towards your daily submission limit.
+            </div>
+            <div v-else-if="d_submission.status === GradingStatus.error">
+              Uh oh...Something very bad happened while we were grading your selected_submission.
+              Don't worry, it's probably our fault, not yours!
+              Sometimes these things only happen once, so you might as well submit again.
+              We won't count this one towards your daily limit.
+              If this keeps happening, send us an email and we'll look into it!
+            </div>
           </div>
         </div>
 
@@ -64,7 +66,7 @@
         </div>
 
         <div id="submission-score"> Score:
-          {{d_submission_result.total_points}} / {{d_submission_result.total_points_possible}}
+          {{d_submission_result.total_points}}/{{d_submission_result.total_points_possible}}
         </div>
 
 
@@ -337,67 +339,39 @@ export default class SubmissionDetail extends Vue {
   padding: 30px;
 }
 
-#top {
-  padding: 6px 12px;
-}
-
-#submissions {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-content: center;
-  margin-right: 10px;
-}
-
-.single-submission {
-  background-color: $white-gray;
-  border: 1px solid darken($white-gray, 10);
-  padding: 5px;
+#submission-detail-overview {
+  padding: 6px 12px 0 12px;
 }
 
 #submitted-by {
-  font-size: 20px;
-  padding: 2px 0;
+  font-size: 22px;
+  padding: 0 0 5px 0;
 }
 
 #submitter {
   color: $ocean-blue;
 }
 
-#timestamp {
+#submission-timestamp {
   color: $green;
+}
+
+#grading-status-section {
+  padding: 5px 0 5px 0;
 }
 
 #grading-status-label {
   font-size: 18px;
-  padding: 2px 0 8px 0;
-}
-
-#grading-status-section {
-  padding: 0 0 2px 0;
+  padding: 0 0 5px 0;
 }
 
 #submission-score {
-  font-size: 18px;
-  padding: 2px 0;
-}
-
-.download-file-icon {
-  padding: 0 10px;
-  color: $navy-blue;
-  cursor: pointer;
-}
-
-#multi-file-viewer-container {
-  margin-bottom: 10px;
-}
-
-#adjust-feedback-label {
-  padding: 0 5px 0 0;
+  font-size: 20px;
+  padding: 5px 0 5px 0;
 }
 
 .submitted-files {
-  padding: 6px 0;
+  padding: 5px 0;
 }
 
 .submitted-file {
@@ -407,6 +381,24 @@ export default class SubmissionDetail extends Vue {
 .open-file {
   color: $ocean-blue;
   cursor: pointer;
+}
+
+.download-file-icon {
+  padding: 0 10px;
+  color: $navy-blue;
+  cursor: pointer;
+}
+
+#multi-file-viewer-container {
+  margin-bottom: 2px;
+}
+
+#adjust-feedback-section {
+  padding: 5px 0 5px 0;
+}
+
+#adjust-feedback-label {
+  padding: 0 2px 0 0;
 }
 
 #remove-from-queue-button {
