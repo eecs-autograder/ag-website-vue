@@ -274,7 +274,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
 }
 
 #submissions-sidebar {
-  min-width: 430px;
+  min-width: 230px;
 }
 
 .sidebar-header {

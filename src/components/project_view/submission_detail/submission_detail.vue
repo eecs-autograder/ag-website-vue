@@ -1,6 +1,7 @@
 <template>
   <div id="submission-detail">
-    <div v-if="d_loading">
+    <div v-if="d_loading"
+         id="submission-detail-loading-spinner">
       <i class="fa fa-spinner fa-pulse fa-fw"></i>
     </div>
     <div v-else
@@ -66,7 +67,8 @@
           </div>
         </div>
 
-        <div id="submission-score"> Score:
+        <div v-if="d_submission.status !== GradingStatus.removed_from_queue"
+             id="submission-score"> Score:
           {{d_submission_result.total_points}}/{{d_submission_result.total_points_possible}}
         </div>
 
@@ -94,10 +96,11 @@
           </multi-file-viewer>
         </div>
 
-        <div v-if="d_user_roles.is_staff"
+        <div v-if="d_user_roles.is_staff
+                   && d_submission.status !== GradingStatus.removed_from_queue"
              id="adjust-feedback-section">
           <span id="adjust-feedback-label"> Adjust Feedback </span>
-          <select v-model="d_feedback_category"
+          <select v-model="d_fdbk_category"
                   id="adjust-feedback-select"
                   class="select"
                   @change="load_results()">
@@ -134,14 +137,14 @@
         v-if="d_submission_result.student_test_suite_results.length"
         :submission="d_submission"
         :mutation_test_suite_results="d_submission_result.student_test_suite_results"
-        :fdbk_category="d_feedback_category">
+        :fdbk_category="d_fdbk_category">
       </mutation-suite-results>
 
       <div v-for="(ag_test_suite_result, index) of d_submission_result.ag_test_suite_results"
            ref="ag_test_suite_results">
         <AGTestSuiteResult :submission="d_submission"
                            :ag_test_suite_result="ag_test_suite_result"
-                           :fdbk_category="d_feedback_category"
+                           :fdbk_category="d_fdbk_category"
                            :is_first_suite="index === 0">
         </AGTestSuiteResult>
       </div>
@@ -240,12 +243,14 @@ export default class SubmissionDetail extends Vue {
   @Watch('selected_submission_with_results')
   async on_selected_submission_change(new_value: SubmissionWithResults,
                                       old_value: SubmissionWithResults) {
-    console.log("The submission changed");
+    this.d_loading = true;
     this.d_submission = new Submission(new_value);
+    this.d_fdbk_category = this.determine_feedback_type();
     await this.load_results();
+    this.d_loading = false;
   }
 
-  d_feedback_category: FeedbackCategory | null = null;
+  d_fdbk_category: FeedbackCategory | null = null;
   d_submission: null | Submission = null;
   d_submission_result: null | SubmissionResultFeedback = null;
   d_loading = true;
@@ -260,12 +265,10 @@ export default class SubmissionDetail extends Vue {
   readonly format_datetime = format_datetime;
 
   async created() {
-    console.log("original pk: " + this.selected_submission_with_results.pk);
     this.d_submission = new Submission(this.selected_submission_with_results);
-    console.log("d_submission pk: " + this.d_submission.pk);
     this.d_user = this.d_globals.current_user;
     this.d_user_roles = this.d_globals.user_roles;
-    this.d_feedback_category = this.determine_feedback_type();
+    this.d_fdbk_category = this.determine_feedback_type();
     await this.load_results();
     this.d_loading = false;
   }
@@ -294,7 +297,7 @@ export default class SubmissionDetail extends Vue {
 
   async load_results() {
     this.d_submission_result = await get_submission_result(
-      this.d_submission!.pk, this.d_feedback_category!
+      this.d_submission!.pk, this.d_fdbk_category!
     );
   }
 
@@ -341,6 +344,15 @@ export default class SubmissionDetail extends Vue {
 
 #submission-detail {
   padding: 9px 30px 30px 30px;
+}
+
+#submission-detail-loading-spinner {
+  color: $ocean-blue;
+  font-size: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
 }
 
 #submission-detail-overview {

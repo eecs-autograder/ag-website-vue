@@ -79,9 +79,12 @@ describe('SubmissionDetail tests', () => {
 
     test('selected_submission_with_results Watcher', async () => {
         submission_with_results = data_ut.make_submission_with_results(group);
-        get_submission_result_stub.onFirstCall().returns(
+        get_submission_result_stub.returns(
             Promise.resolve(submission_with_results.results
         ));
+
+        user_roles.is_staff = true;
+        globals.user_roles = user_roles;
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
@@ -99,22 +102,34 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.vm.d_submission).toEqual(new ag_cli.Submission(submission_with_results));
         expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(get_submission_result_stub.calledOnce).toBe(true);
+
+        let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
+        adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.past_limit_submission);
+
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
+        expect(get_submission_result_stub.calledTwice).toBe(true);
+
 
         let another_submission_with_results = data_ut.make_submission_with_results(group);
-
-        get_submission_result_stub.onSecondCall().returns(
-            Promise.resolve(another_submission_with_results.results
-        ));
-
-        wrapper.setProps(
-            {selected_submission_with_results: another_submission_with_results}
+        get_submission_result_stub.onThirdCall().returns(
+            Promise.resolve(
+                another_submission_with_results.results
+            )
         );
+
+        wrapper.setProps({selected_submission_with_results: another_submission_with_results});
+        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.vm.d_loading).toBe(false);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(submission_with_results).not.toEqual(another_submission_with_results);
         expect(wrapper.vm.d_submission).toEqual(
             new ag_cli.Submission(another_submission_with_results)
         );
+        expect(get_submission_result_stub.calledThrice).toBe(true);
         expect(wrapper.vm.d_submission_result).toEqual(another_submission_with_results.results);
     });
 
@@ -454,7 +469,7 @@ describe('SubmissionDetail tests', () => {
         expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
     });
 
-    test('adjust_feedback - is_staff is false', async () => {
+    test('adjust_feedback - is_staff === false', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group
         );
@@ -473,6 +488,38 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.find('#adjust-feedback-section').exists()).toBe(false);
+    });
+
+    test('adjust_feedback - is_staff === true && status === removed_from_queue', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.removed_from_queue
+            }
+        );
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        user.username = "Moira";
+        user_roles.is_staff = true;
+
+        globals.user_roles = user_roles;
+        globals.current_user = user;
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                selected_submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
         expect(wrapper.find('#adjust-feedback-section').exists()).toBe(false);
     });
 
@@ -582,9 +629,7 @@ describe('SubmissionDetail tests', () => {
     });
 
     test('adjust_feedback - select different feedback category', async () => {
-        submission_with_results = data_ut.make_submission_with_results(
-            group
-        );
+        submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.resolves(submission_with_results.results);
 
         user_roles.is_staff = true;
@@ -608,7 +653,7 @@ describe('SubmissionDetail tests', () => {
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.staff_viewer);
 
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
         expect(get_submission_result_stub.callCount).toEqual(2);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.staff_viewer)
@@ -616,7 +661,7 @@ describe('SubmissionDetail tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.ultimate_submission);
 
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
         expect(get_submission_result_stub.callCount).toEqual(3);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.ultimate_submission)
@@ -624,7 +669,7 @@ describe('SubmissionDetail tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.normal);
 
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.normal);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
         expect(get_submission_result_stub.callCount).toEqual(4);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.normal)
@@ -632,7 +677,7 @@ describe('SubmissionDetail tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.past_limit_submission);
 
-        expect(wrapper.vm.d_feedback_category).toEqual(
+        expect(wrapper.vm.d_fdbk_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
         expect(get_submission_result_stub.callCount).toEqual(5);
@@ -642,7 +687,7 @@ describe('SubmissionDetail tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.max);
 
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_submission_result_stub.callCount).toEqual(6);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.max)
@@ -899,7 +944,7 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_group_member).toBe(true);
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
     });
 
     test('determine_feedback_type -- is_ultimate_submission && is_admin', async () => {
@@ -929,7 +974,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.is_ultimate_submission).toBe(true);
         expect(wrapper.vm.d_user_roles!.is_admin).toBe(true);
         expect(wrapper.vm.is_group_member).toBe(false);
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
     });
 
     test('determine_feedback_type -- !is_ultimate_submission && !is_admin && !is_group_member',
@@ -959,7 +1004,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
         expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
         expect(wrapper.vm.is_group_member).toBe(false);
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
     });
 
     test('determine_feedback_type -- !is_staff && is_ultimate_submission', async () => {
@@ -981,7 +1026,7 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(true);
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
     });
 
     test('determine_feedback_type -- !is_staff && !is_ultimate_submission ' +
@@ -1012,7 +1057,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
         expect(wrapper.vm.d_submission!.is_past_daily_limit).toBe(true);
-        expect(wrapper.vm.d_feedback_category).toEqual(
+        expect(wrapper.vm.d_fdbk_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
     });
@@ -1039,7 +1084,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
         expect(wrapper.vm.d_submission!.is_past_daily_limit).toBe(false);
-        expect(wrapper.vm.d_feedback_category).toEqual(ag_cli.FeedbackCategory.normal);
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
     });
 
     test('being_processed - submission.status === GradingStatus.error', async () => {
