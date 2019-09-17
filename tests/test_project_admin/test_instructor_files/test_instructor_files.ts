@@ -5,9 +5,7 @@ import * as sinon from "sinon";
 
 import FileUpload from '@/components/file_upload.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
-import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
 import ViewFile from '@/components/view_file.vue';
-import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 
@@ -18,7 +16,6 @@ beforeAll(() => {
 describe('InstructorFiles.vue', () => {
     let project: Project;
     let wrapper: Wrapper<InstructorFiles>;
-    let component: InstructorFiles;
     let instructor_file_1: InstructorFile;
     let instructor_file_2: InstructorFile;
     let instructor_file_3: InstructorFile;
@@ -75,16 +72,13 @@ describe('InstructorFiles.vue', () => {
         });
         existing_instructor_files = [instructor_file_1, instructor_file_2, instructor_file_3];
 
-        let get_all_from_project_stub = sinon.stub(InstructorFile, 'get_all_from_project');
-        get_all_from_project_stub.resolves(existing_instructor_files);
-
+        project.instructor_files = existing_instructor_files;
         wrapper = mount(InstructorFiles, {
             propsData: {
                 project: project
             }
         });
         await wrapper.vm.$nextTick();
-        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -95,11 +89,11 @@ describe('InstructorFiles.vue', () => {
         }
     });
 
-    test('InstructorFiles loaded on create', async () => {
-        expect(component.instructor_files.length).toEqual(3);
-        expect(component.instructor_files[0]).toEqual(instructor_file_1);
-        expect(component.instructor_files[1]).toEqual(instructor_file_2);
-        expect(component.instructor_files[2]).toEqual(instructor_file_3);
+    test('InstructorFiles used from project', async () => {
+        expect(wrapper.vm.instructor_files.length).toEqual(3);
+        expect(wrapper.vm.instructor_files[0]).toEqual(instructor_file_1);
+        expect(wrapper.vm.instructor_files[1]).toEqual(instructor_file_2);
+        expect(wrapper.vm.instructor_files[2]).toEqual(instructor_file_3);
     });
 
     test('Uploading file with same name as an existing instructor file', async () => {
@@ -110,11 +104,11 @@ describe('InstructorFiles.vue', () => {
         file_upload_component.d_files.insert(file_same_name_as_1);
 
         final_upload_button.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(set_content_stub.calledOnce).toBe(true);
         expect(set_content_stub.calledWith(file_same_name_as_1)).toBe(true);
-        expect(component.instructor_files.length).toEqual(3);
+        expect(wrapper.vm.instructor_files.length).toEqual(3);
     });
 
     test('Re-upload file being viewed, contents updated', async () => {
@@ -122,11 +116,11 @@ describe('InstructorFiles.vue', () => {
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         expect(await view_file.vm.file_contents).toEqual('Old Content');
 
         InstructorFile.notify_instructor_file_content_changed(instructor_file_1, "New Content");
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         expect(await view_file.vm.file_contents).toEqual('New Content');
     });
 
@@ -139,7 +133,7 @@ describe('InstructorFiles.vue', () => {
         create_stub.resolves(new_uniquely_named_instructor_file);
 
         final_upload_button.trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(create_stub.calledOnce).toBe(true);
         expect(create_stub.calledWith(
@@ -148,11 +142,7 @@ describe('InstructorFiles.vue', () => {
             uniquely_named_file
         )).toBe(true);
 
-        expect(component.instructor_files.length).toEqual(4);
-        expect(component.instructor_files[0]).toEqual(instructor_file_1);
-        expect(component.instructor_files[1]).toEqual(new_uniquely_named_instructor_file);
-        expect(component.instructor_files[2]).toEqual(instructor_file_2);
-        expect(component.instructor_files[3]).toEqual(instructor_file_3);
+        // project_admin.vue listens for created instructor files
     });
 
     test('Viewing a file', async () => {
@@ -189,16 +179,13 @@ describe('InstructorFiles.vue', () => {
 
         expect(delete_stub.callCount).toEqual(0);
         wrapper.findAll('.delete-file').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.find('.file-to-delete').text()).toContain(instructor_file_1.name);
 
         wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        let uploaded_files = wrapper.findAll('.file-name');
-        expect(uploaded_files.at(0).text()).toEqual(instructor_file_2.name);
-        expect(uploaded_files.at(1).text()).toEqual(instructor_file_3.name);
         expect(delete_stub.calledOnce).toBe(true);
     });
 
@@ -206,7 +193,7 @@ describe('InstructorFiles.vue', () => {
         sinon.stub(instructor_file_1, 'get_content').resolves("File 1 Content");
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_current_filename).toBe(instructor_file_1.name);
 
         sinon.stub(instructor_file_1, 'delete').callsFake(
@@ -215,33 +202,13 @@ describe('InstructorFiles.vue', () => {
 
         let file_to_delete = wrapper.findAll({name: 'SingleInstructorFile'}).at(0);
         file_to_delete.find('.delete-file').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
-
-        let existing_files = <WrapperArray<SingleInstructorFile>> wrapper.findAll(
-            {name: 'SingleInstructorFile'});
-        expect(existing_files.length).toEqual(2);
-        expect(existing_files.at(0).vm.file.name).toEqual(instructor_file_2.name);
-        expect(existing_files.at(1).vm.file.name).toEqual(instructor_file_3.name);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_current_filename).toBeNull();
         expect(wrapper.vm.d_open_files.has(instructor_file_1.name)).toBe(false);
-    });
-
-    test('Renaming a file updates the name of the file', async () => {
-        let renamed_file = deep_copy(instructor_file_2, InstructorFile);
-        let new_file_name = "amber.cpp";
-        renamed_file.name = new_file_name;
-        InstructorFile.notify_instructor_file_renamed(renamed_file);
-
-        let instructor_files = <WrapperArray<SingleInstructorFile>> wrapper.findAll(
-            {name: 'SingleInstructorFile'});
-        expect(instructor_files.length).toEqual(3);
-        expect(instructor_files.at(0).vm.file.name).toEqual(new_file_name);
-        expect(instructor_files.at(1).vm.file.name).toEqual(instructor_file_1.name);
-        expect(instructor_files.at(2).vm.file.name).toEqual(instructor_file_3.name);
     });
 
     test('Open/close the sidebar', async () => {

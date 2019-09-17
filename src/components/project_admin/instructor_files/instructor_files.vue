@@ -58,10 +58,15 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
   project!: Project;
 
   d_collapsed = false;
-  instructor_files: InstructorFile[] = [];
+
+  // Do NOT modify the contents of this array!!
+  get instructor_files(): ReadonlyArray<Readonly<InstructorFile>> {
+    // Since this component is only used in project admin, we know that
+    // this.project.instructor files will never be undefined.
+    return this.project.instructor_files!;
+  }
 
   d_open_files: SafeMap<string, Promise<string>> = new SafeMap();
-
   d_current_filename: string | null  = null;
 
   get current_file_contents() {
@@ -72,19 +77,12 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
     return this.d_open_files.get(this.d_current_filename);
   }
 
-  async created() {
+  created() {
     InstructorFile.subscribe(this);
-    this.instructor_files = await InstructorFile.get_all_from_project(this.project.pk);
   }
 
   destroyed() {
     InstructorFile.unsubscribe(this);
-  }
-
-  sort_files() {
-    this.instructor_files.sort(
-      (file_a: InstructorFile, file_b: InstructorFile) =>
-        file_a.name.localeCompare(file_b.name));
   }
 
   view_file(file: InstructorFile) {
@@ -111,12 +109,10 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
         await file_to_update.set_content(file);
       }
       else {
-          let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
-          this.instructor_files.push(file_to_add);
+        let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
       }
     }
     (<FileUpload> this.$refs.instructor_files_upload).clear_files();
-    this.sort_files();
   }
 
   update_instructor_file_content_changed(instructor_file: InstructorFile,
@@ -126,25 +122,18 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
     this.d_open_files = new_open_files;
   }
 
-  update_instructor_file_created(instructor_file: InstructorFile) { }
-
   update_instructor_file_deleted(instructor_file: InstructorFile) {
     if (this.d_current_filename === instructor_file.name) {
       this.d_current_filename = null;
     }
-    array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
 
     let new_open_files = new SafeMap(this.d_open_files);
     new_open_files.delete(instructor_file.name);
     this.d_open_files = new_open_files;
   }
 
-  update_instructor_file_renamed(instructor_file: InstructorFile) {
-    let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
-    Vue.set(this.instructor_files, index, instructor_file);
-
-    this.sort_files();
-  }
+  update_instructor_file_renamed(instructor_file: InstructorFile) {}
+  update_instructor_file_created(instructor_file: InstructorFile) {}
 }
 
 </script>
@@ -158,6 +147,10 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+#instructor-files-component {
+  margin-top: 10px;
 }
 
 $border-color: hsl(220, 40%, 94%);

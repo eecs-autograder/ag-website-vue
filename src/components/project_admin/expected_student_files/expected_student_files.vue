@@ -32,7 +32,7 @@ import { ExpectedStudentFile, ExpectedStudentFileObserver, Project } from 'ag-cl
 import CreateExpectedStudentFile from '@/components/project_admin/expected_student_files/create_expected_student_file.vue';
 import SingleExpectedStudentFile from '@/components/project_admin/expected_student_files/single_expected_student_file.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { array_remove_unique } from '@/utils';
+import { array_remove_unique, deep_copy } from '@/utils';
 
 @Component({
   components: {
@@ -41,50 +41,14 @@ import { array_remove_unique } from '@/utils';
     Tooltip
   }
 })
-export default class ExpectedStudentFiles extends Vue implements ExpectedStudentFileObserver {
+export default class ExpectedStudentFiles extends Vue {
 
   @Prop({required: true, type: Project})
   project!: Project;
 
-  expected_student_files: ExpectedStudentFile[] = [];
-
-  async created() {
-    ExpectedStudentFile.subscribe(this);
-    this.expected_student_files = await ExpectedStudentFile.get_all_from_project(
-      this.project.pk
-    );
-    this.sort_files();
-  }
-
-  destroyed() {
-    ExpectedStudentFile.unsubscribe(this);
-  }
-
-  update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
-    this.expected_student_files.push(expected_student_file);
-    this.sort_files();
-  }
-
-  update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
-    let index = this.expected_student_files.findIndex(
-      (file) => file.pk === expected_student_file.pk);
-    Vue.set(this.expected_student_files, index, expected_student_file);
-    this.sort_files();
-  }
-
-  update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
-    array_remove_unique(this.expected_student_files,
-                        expected_student_file.pk,
-                        (file, pk) => file.pk === pk
-    );
-  }
-
-  sort_files() {
-    this.expected_student_files.sort(
-      (file_a: ExpectedStudentFile, file_b: ExpectedStudentFile) => {
-        return file_a.pattern.localeCompare(file_b.pattern, undefined, {numeric: true});
-      }
-    );
+  // Do NOT modify the contents of this array!!
+  get expected_student_files(): ReadonlyArray<Readonly<ExpectedStudentFile>> {
+    return this.project.expected_student_files;
   }
 }
 </script>

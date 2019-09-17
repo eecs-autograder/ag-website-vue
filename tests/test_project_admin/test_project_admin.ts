@@ -1,6 +1,4 @@
-import VueRouter from 'vue-router';
-
-import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
+import { config, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestSuite,
@@ -10,35 +8,29 @@ import {
     InstructorFile,
     MutationTestSuite,
     Project,
-    Semester,
-    UltimateSubmissionPolicy,
     User
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
+import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-let course = new Course({
-    pk: 4,
-    name: 'A Course',
-    semester: Semester.fall,
-    year: 2018,
-    subtitle: '',
-    num_late_days: 0,
-    allowed_guest_domain: '@llama.edu',
-    last_modified: ''
-});
+let course = data_ut.make_course();
 
 beforeEach(() => {
     sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
     sinon.stub(User, 'get_current_user_roles').returns(
         Promise.resolve(data_ut.make_user_roles()));
+    sinon.stub(Group, 'get_all_from_project').resolves([]);
+    sinon.stub(AGTestSuite, 'get_all_from_project').resolves([]);
+    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([]);
 });
 
 afterEach(() => {
@@ -49,443 +41,275 @@ afterEach(() => {
 // in created() will need to be stubbed in these tests.
 describe('Changing tabs in project admin', () => {
     let wrapper: Wrapper<ProjectAdmin>;
-    let component: ProjectAdmin;
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
-    // tslint:disable-next-line naming-convention
-    const localVue = createLocalVue();
-    localVue.use(VueRouter);
 
-    const routes = [
-        { path: '/web/project_admin/:project_id', name: "project_admin", component: ProjectAdmin}
-    ];
+    let router_replace: sinon.SinonStub;
 
-    const router = new VueRouter({
-        routes: routes,
-        mode: "history"
-    });
-
-    beforeEach(() => {
-
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return { matches: true };
-            })
-        });
-
+    beforeEach(async () => {
         project = data_ut.make_project(course.pk);
 
-        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
-        sinon.stub(Group, 'get_all_from_project').returns(Promise.resolve([]));
+        sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
+        router_replace = sinon.stub();
 
-        wrapper = mount(ProjectAdmin, {
-            localVue,
-            router
+        wrapper = managed_mount(ProjectAdmin, {
+            mocks: {
+                $route: {
+                    params: {
+                        project_id: project.pk.toString()
+                    },
+                    query: {}
+                },
+                $router: {
+                    replace: router_replace
+                }
+            }
         });
-        component = wrapper.vm;
+        await wrapper.vm.$nextTick();
     });
 
     afterEach(() => {
         sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
 
         if (wrapper.exists()) {
             wrapper.destroy();
         }
     });
 
+    test('Requested tab on load', async () => {
+        wrapper = managed_mount(ProjectAdmin, {
+            mocks: {
+                $route: {
+                    params: {
+                        project_id: project.pk.toString()
+                    },
+                    query: {
+                        current_tab: 'handgrading'
+                    }
+                },
+                $router: {
+                    replace: router_replace
+                }
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_current_tab).toEqual('handgrading');
+    });
+
     test('Clicking on Settings', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(1);
+        expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
         expect(router_replace.calledOnce);
 
         tabs.at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(0);
+        expect(wrapper.vm.d_current_tab).toEqual('settings');
         expect(router_replace.secondCall.calledWith(
-            { query: { current_tab: 'settings'}})
+            {query: { current_tab: 'settings'}})
         ).toBe(true);
     });
 
     test('Clicking on Instructor Files tab', async () => {
-        sinon.stub(InstructorFile, 'get_all_from_project').returns(Promise.resolve([]));
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(1);
+        expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'instructor_files'}})
+            {query: { current_tab: 'instructor_files'}})
         ).toBe(true);
     });
 
     test('Clicking on Expected Student Files tab', async () => {
-        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(Promise.resolve([]));
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(2).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
+        expect(wrapper.vm.d_current_tab).toEqual('expected_student_files');
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'expected_student_files'}})
+            {query: { current_tab: 'expected_student_files'}})
         ).toBe(true);
     });
 
     test('Clicking on Test Cases tab', async () => {
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(3).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(3);
+        expect(wrapper.vm.d_current_tab).toEqual('test_cases');
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'test_cases'}})
+            {query: { current_tab: 'test_cases'}})
         ).toBe(true);
     });
 
     test('Clicking on Mutation Testing tab', async () => {
-        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(4).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(4);
+        expect(wrapper.vm.d_current_tab).toEqual('mutation_testing');
         expect(router_replace.firstCall.calledWith(
-        { query: { current_tab: 'mutation_testing'}})
+        {query: { current_tab: 'mutation_testing'}})
         ).toBe(true);
     });
 
     test('Clicking on Edit Groups tab', async () => {
-        // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
-        //     Promise.resolve([])
-        // );
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(5).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(5);
+        expect(wrapper.vm.d_current_tab).toEqual('edit_groups');
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'edit_groups'}})
+            {query: { current_tab: 'edit_groups'}})
         ).toBe(true);
-        // expect(get_all_groups_stub.calledOnce).toBe(true);
     });
 
     test('Clicking on Download Grades tab', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(6).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(6);
+        expect(wrapper.vm.d_current_tab).toEqual('download_grades');
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'download_grades'}})
+            {query: { current_tab: 'download_grades'}})
         ).toBe(true);
     });
 
     test('Clicking on Rerun Tests tab', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(7).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(7);
+        expect(wrapper.vm.d_current_tab).toEqual('rerun_tests');
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'rerun_tests'}})
+            {query: { current_tab: 'rerun_tests'}})
         ).toBe(true);
     });
 
     test('Clicking on Configure Handgrading tab', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(8).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab_index).toEqual(8);
+        expect(wrapper.vm.d_current_tab).toEqual('configure_handgrading');
         expect(router_replace.firstCall.calledWith(
-        { query: { current_tab: 'configure_handgrading'}})
+        {query: { current_tab: 'configure_handgrading'}})
         ).toBe(true);
     });
 });
 
-describe('select_tab function called with different values associated with "current_tab" ' +
-    'key on create',
-         () => {
-    let wrapper: Wrapper<ProjectAdmin>;
-    let component: ProjectAdmin;
+describe('InstructorFileObserver tests', () => {
     let project: Project;
-    let original_match_media: (query: string) => MediaQueryList;
+    let instructor_files: InstructorFile[];
+    let wrapper: Wrapper<ProjectAdmin>;
 
-    const $route = {
-        path: '/web/project_admin/:project_id',
-        params: {
-            project_id: '3'
-        },
-        query: { }
-    };
+    beforeEach(async () => {
+        project = data_ut.make_project(course.pk);
+        instructor_files = [
+            data_ut.make_instructor_file(project.pk, 'file1'),
+            data_ut.make_instructor_file(project.pk, 'file2'),
+            data_ut.make_instructor_file(project.pk, 'file3'),
+        ];
+        project.instructor_files = instructor_files.map(
+            file => deep_copy(file, InstructorFile));
 
-    beforeEach(() => {
-        project = new Project({
-            pk: 3,
-            name: "Project 200",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false
-        });
-
-        sinon.stub(Project, 'get_by_pk').returns(Promise.resolve(project));
-        sinon.stub(Group, 'get_all_from_project').returns(Promise.resolve([]));
-
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return { matches: true };
-            })
-        });
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-    test('current tab parameter value = settings', async () => {
-        $route.query = { current_tab: 'settings' };
-        wrapper = mount(ProjectAdmin, {
+        sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+        wrapper = managed_mount(ProjectAdmin, {
             mocks: {
-             $route
+                $route: {
+                    params: {
+                        project_id: project.pk.toString()
+                    },
+                    query: {}
+                },
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
-        await component.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.d_loading).toBe(false);
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
     });
 
-    test('current tab parameter value = instructor_files', async () => {
-        sinon.stub(InstructorFile, 'get_all_from_project').returns(Promise.resolve([]));
-        $route.query = { current_tab: 'instructor_files' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-             $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
+    test('Instructor file created', () => {
+        let new_file = data_ut.make_instructor_file(project.pk, 'file0');
+        InstructorFile.notify_instructor_file_created(new_file);
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(1);
+        instructor_files.unshift(new_file);
+        expect(wrapper.vm.project!.instructor_files).toEqual(instructor_files);
     });
 
-    test('current tab parameter value = expected_student_files', async () => {
-        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(Promise.resolve([]));
-        $route.query = { current_tab: 'expected_student_files' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(2);
+    test('Instructor file deleted', () => {
+        InstructorFile.notify_instructor_file_deleted(instructor_files[1]);
+        instructor_files.splice(1, 1);
+        expect(wrapper.vm.project!.instructor_files).toEqual(instructor_files);
     });
 
+    test('Instructor file renamed', () => {
+        instructor_files[0].name = 'file4';
+        InstructorFile.notify_instructor_file_renamed(instructor_files[0]);
+        expect(wrapper.vm.project!.instructor_files).toEqual([
+            instructor_files[1],
+            instructor_files[2],
+            instructor_files[0],
+        ]);
+    });
+});
 
-    test('current tab parameter value = test_cases', async () => {
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([])
-        );
-        $route.query = { current_tab: 'test_cases' };
-        wrapper = mount(ProjectAdmin, {
+describe('ExpectedStudentFileObserver tests', () => {
+    let project: Project;
+    let expected_student_files: ExpectedStudentFile[];
+    let wrapper: Wrapper<ProjectAdmin>;
+
+    beforeEach(async () => {
+        project = data_ut.make_project(course.pk);
+        expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, 'file1'),
+            data_ut.make_expected_student_file(project.pk, 'file2'),
+            data_ut.make_expected_student_file(project.pk, 'file3'),
+        ];
+        project.expected_student_files = expected_student_files.map(
+            file => deep_copy(file, ExpectedStudentFile));
+
+        sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+        wrapper = managed_mount(ProjectAdmin, {
             mocks: {
-                $route
+                $route: {
+                    params: {
+                        project_id: project.pk.toString()
+                    },
+                    query: {}
+                },
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(3);
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
     });
 
-    test('current tab parameter value = mutation_testing', async () => {
-        sinon.stub(MutationTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
-        $route.query = { current_tab: 'mutation_testing' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
+    test('Expected file created', () => {
+        let new_file = data_ut.make_expected_student_file(project.pk, 'file0');
+        ExpectedStudentFile.notify_expected_student_file_created(new_file);
 
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(4);
+        expected_student_files.unshift(new_file);
+        expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
     });
 
-    test('current tab parameter value = edit_groups', async () => {
-        // let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project').returns(
-        //     Promise.resolve([])
-        // );
-        $route.query = { current_tab: 'edit_groups' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(5);
-        // expect(get_all_groups_stub.calledOnce).toBe(true);
+    test('Expected file changed', () => {
+        expected_student_files[0].pattern = 'file4';
+        ExpectedStudentFile.notify_expected_student_file_changed(expected_student_files[0]);
+        expect(wrapper.vm.project!.expected_student_files).toEqual([
+            expected_student_files[1],
+            expected_student_files[2],
+            expected_student_files[0],
+        ]);
     });
 
-    test('current tab parameter value = download_grades', async () => {
-        $route.query = { current_tab: 'download_grades' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(6);
-    });
-
-    test('current tab parameter value = rerun_tests', async () => {
-        $route.query = { current_tab: 'rerun_tests' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(7);
-    });
-
-    test('current tab parameter value = configure_handgrading', async () => {
-        $route.query = { current_tab: 'configure_handgrading' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(8);
-    });
-
-    test('current tab parameter value = empty string', async () => {
-        $route.query = { current_tab: '' };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(0);
-    });
-
-    test('current tab parameter value = empty string', async () => {
-        $route.query = { current_tab: ['edit_groups', 'dont_edit_groups'] };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(5);
-    });
-
-    test('current_tab query not provided', async () => {
-        $route.query = { };
-        wrapper = mount(ProjectAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.project).toEqual(project);
-        expect(component.current_tab_index).toEqual(0);
+    test('Expected file deleted', () => {
+        ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_files[1]);
+        expected_student_files.splice(1, 1);
+        expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
     });
 });

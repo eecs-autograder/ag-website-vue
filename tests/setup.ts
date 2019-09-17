@@ -1,6 +1,6 @@
 import { Vue } from 'vue-property-decorator';
 
-import { mount, Wrapper } from '@vue/test-utils';
+import { mount, VueClass, Wrapper } from '@vue/test-utils';
 
 import { HttpClient } from "ag-client-typescript";
 import * as sinon from 'sinon';
@@ -17,7 +17,7 @@ let wrappers: Wrapper<Vue>[] = [];
 
 // Creates a vue-test-utils wrapper and ensures that the wrapper is destroyed
 // at the end of the test case.
-export function managed_mount<T, U>(component: T, options?: U) {
+export function managed_mount<V extends Vue, U>(component: VueClass<V>, options?: U) {
     let wrapper = mount(component, options);
     wrappers.push(wrapper);
     return wrapper;

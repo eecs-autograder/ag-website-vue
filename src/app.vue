@@ -144,7 +144,6 @@ export default class App extends Vue {
 
 #navbar {
   width: 100%;
-  background-color: $pebble-light;
   height: 44px;
   font-size: 24px;
 }
