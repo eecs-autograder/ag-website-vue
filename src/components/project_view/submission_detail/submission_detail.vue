@@ -12,8 +12,9 @@
           on <span id="submission-timestamp">{{format_datetime(d_submission.timestamp)}}</span>
         </div>
 
-        <div v-if="being_processed">
-          This page will update automatically
+        <div v-if="being_processed"
+             id="being-processed-message">
+          This page will update automatically.
         </div>
 
         <div id="grading-status-section">
@@ -239,6 +240,7 @@ export default class SubmissionDetail extends Vue {
   @Watch('selected_submission_with_results')
   async on_selected_submission_change(new_value: SubmissionWithResults,
                                       old_value: SubmissionWithResults) {
+    console.log("The submission changed");
     this.d_submission = new Submission(new_value);
     await this.load_results();
   }
@@ -258,7 +260,9 @@ export default class SubmissionDetail extends Vue {
   readonly format_datetime = format_datetime;
 
   async created() {
+    console.log("original pk: " + this.selected_submission_with_results.pk);
     this.d_submission = new Submission(this.selected_submission_with_results);
+    console.log("d_submission pk: " + this.d_submission.pk);
     this.d_user = this.d_globals.current_user;
     this.d_user_roles = this.d_globals.user_roles;
     this.d_feedback_category = this.determine_feedback_type();
@@ -336,7 +340,7 @@ export default class SubmissionDetail extends Vue {
 }
 
 #submission-detail {
-  padding: 30px;
+  padding: 9px 30px 30px 30px;
 }
 
 #submission-detail-overview {
@@ -354,6 +358,10 @@ export default class SubmissionDetail extends Vue {
 
 #submission-timestamp {
   color: $green;
+}
+
+#being-processed-message {
+  padding: 5px 0 10px 0;
 }
 
 #grading-status-section {
@@ -401,7 +409,7 @@ export default class SubmissionDetail extends Vue {
   padding: 0 2px 0 0;
 }
 
-#remove-from-queue-button {
+#remove-submission-from-queue-button {
   @extend .red-button;
   margin: 5px 0 10px 0;
 }
