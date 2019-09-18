@@ -1,10 +1,6 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import CorrectnessIcon, { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('CorrectnessIcon tests', () => {
     let wrapper: Wrapper<CorrectnessIcon>;
@@ -15,9 +11,9 @@ describe('CorrectnessIcon tests', () => {
                 correctness_level: CorrectnessLevel.all_correct
             }
         });
-        expect(wrapper.find(
-            '.correctness-level'
-        ).classes()).toContain('all-correct');
+        expect(wrapper.find('.correctness-level').classes()).toContain(
+            'all-correct'
+        );
     });
 
     test('Correctness_level = some_correct', async () => {
@@ -27,9 +23,9 @@ describe('CorrectnessIcon tests', () => {
             }
         });
 
-        expect(wrapper.find(
-            '.correctness-level'
-        ).classes()).toContain('some-correct');
+        expect(wrapper.find('.correctness-level').classes()).toContain(
+            'some-correct'
+        );
     });
 
     test('Correctness_level = none_correct', async () => {
@@ -39,9 +35,9 @@ describe('CorrectnessIcon tests', () => {
             }
         });
 
-        expect(wrapper.find(
-            '.correctness-level'
-        ).classes()).toContain('none-correct');
+        expect(wrapper.find('.correctness-level').classes()).toContain(
+            'none-correct'
+        );
     });
 
     test('Correctness_level = not_available', async () => {
@@ -51,9 +47,9 @@ describe('CorrectnessIcon tests', () => {
             }
         });
 
-        expect(wrapper.find(
-            '.correctness-level'
-        ).classes()).toContain('not-available');
+        expect(wrapper.find('.correctness-level').classes()).toContain(
+            'not-available'
+        );
     });
 
     test('Change value assigned to correctness_level prop', async () => {
@@ -70,8 +66,8 @@ describe('CorrectnessIcon tests', () => {
         wrapper.setProps({correctness_level: CorrectnessLevel.some_correct});
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find(
-            '.correctness-level'
-        ).classes()).toContain('some-correct');
+        expect(wrapper.find('.correctness-level').classes()).toContain(
+            'some-correct'
+        );
     });
 });

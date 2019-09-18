@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
@@ -7,41 +7,40 @@ import { CorrectnessLevel } from '@/components/project_view/submission_detail/co
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
+let group: ag_cli.Group;
+let submission: ag_cli.Submission;
+let user: ag_cli.User;
+let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
+let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
+let ag_test_command_1_result: ag_cli.AGTestCommandResultFeedback;
+let ag_test_command_2_result: ag_cli.AGTestCommandResultFeedback;
+let ag_test_command_3_result: ag_cli.AGTestCommandResultFeedback;
+
+beforeEach(() => {
+    user = data_ut.make_user();
+    group = data_ut.make_group(1, 1, {member_names: [user.username]});
+    submission = data_ut.make_submission(group);
+    ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
+    ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
+    ag_test_command_1_result = data_ut.make_ag_test_command_result_feedback(1);
+    ag_test_command_2_result = data_ut.make_ag_test_command_result_feedback(2);
+    ag_test_command_3_result = data_ut.make_ag_test_command_result_feedback(3);
+
+    ag_test_case_result.ag_test_command_results = [
+        ag_test_command_1_result,
+        ag_test_command_2_result,
+        ag_test_command_3_result
+    ];
+
+    ag_test_suite_result.ag_test_case_results = [
+        ag_test_case_result
+    ];
 });
 
 describe('case_result_correctness tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
-    let group: ag_cli.Group;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
-    let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
-    let ag_test_command_1_result: ag_cli.AGTestCommandResultFeedback;
-    let ag_test_command_2_result: ag_cli.AGTestCommandResultFeedback;
-    let ag_test_command_3_result: ag_cli.AGTestCommandResultFeedback;
 
     beforeEach(() => {
-        user = data_ut.make_user();
-        group = data_ut.make_group(1, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
-        ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
-        ag_test_command_1_result = data_ut.make_ag_test_command_result_feedback(1);
-        ag_test_command_2_result = data_ut.make_ag_test_command_result_feedback(2);
-        ag_test_command_3_result = data_ut.make_ag_test_command_result_feedback(3);
-
-        ag_test_case_result.ag_test_command_results = [
-            ag_test_command_1_result,
-            ag_test_command_2_result,
-            ag_test_command_3_result
-        ];
-
-        ag_test_suite_result.ag_test_case_results = [
-            ag_test_case_result
-        ];
-
         wrapper = mount(AGSuiteResult, {
             propsData: {
                 submission: submission,
@@ -543,17 +542,8 @@ describe('case_result_correctness tests', () => {
 
 describe('setup_correctness_level tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
-    let group: ag_cli.Group;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
 
     beforeEach(() => {
-        user = data_ut.make_user();
-        group = data_ut.make_group(1, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
-
         wrapper = mount(AGSuiteResult, {
             propsData: {
                 submission: submission,
@@ -596,17 +586,6 @@ describe('setup_correctness_level tests', () => {
 
 describe('panel_is_active - setup_case tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
-    let group: ag_cli.Group;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
-
-    beforeEach(() => {
-        user = data_ut.make_user();
-        group = data_ut.make_group(1, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
-    });
 
     test('decide_whether_to_open_setup - setup_correctness_level === none_correct',
          async () => {
@@ -763,10 +742,6 @@ describe('panel_is_active - setup_case tests', () => {
 
 describe('panel_is_active - case tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
-    let group: ag_cli.Group;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
 
     let ag_test_case_red_result: ag_cli.AGTestCaseResultFeedback;
     let ag_test_command_red_1_result: ag_cli.AGTestCommandResultFeedback;
@@ -779,10 +754,6 @@ describe('panel_is_active - case tests', () => {
     let ag_test_command_green_3_result: ag_cli.AGTestCommandResultFeedback;
 
     beforeEach(() => {
-        user = data_ut.make_user();
-        group = data_ut.make_group(1, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
         ag_test_case_red_result = data_ut.make_ag_test_case_result_feedback(1);
         ag_test_command_red_1_result = data_ut.make_ag_test_command_result_feedback(1);
         ag_test_command_red_2_result = data_ut.make_ag_test_command_result_feedback(2);
@@ -985,10 +956,6 @@ describe('panel_is_active - case tests', () => {
 
 describe('panel_is_active - case tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
-    let group: ag_cli.Group;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
 
     let ag_test_case_red_result: ag_cli.AGTestCaseResultFeedback;
     let ag_test_command_red_1_result: ag_cli.AGTestCommandResultFeedback;
@@ -1001,10 +968,6 @@ describe('panel_is_active - case tests', () => {
     let ag_test_command_green_3_result: ag_cli.AGTestCommandResultFeedback;
 
     beforeEach(() => {
-        user = data_ut.make_user();
-        group = data_ut.make_group(1, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-        ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
         ag_test_case_red_result = data_ut.make_ag_test_case_result_feedback(1);
         ag_test_command_red_1_result = data_ut.make_ag_test_command_result_feedback(1);
         ag_test_command_red_2_result = data_ut.make_ag_test_command_result_feedback(2);

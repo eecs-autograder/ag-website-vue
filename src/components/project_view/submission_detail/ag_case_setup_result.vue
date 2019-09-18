@@ -50,6 +50,8 @@ import {
   ResultOutput,
   Submission
 } from "ag-client-typescript";
+import AGTestSuiteResultOutputSize = ResultOutput.AGTestSuiteResultOutputSize;
+import get_ag_test_suite_result_output_size = ResultOutput.get_ag_test_suite_result_output_size;
 
 @Component
 export default class AGCaseSetupResult extends Vue {
@@ -62,11 +64,11 @@ export default class AGCaseSetupResult extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
-  d_setup_stdout: string = "";
-  d_setup_stderr: string = "";
+  d_setup_stdout: string | null = null;
+  d_setup_stderr: string | null = null;
   d_setup_stdout_loaded = false;
   d_setup_stderr_loaded = false;
-
+  d_ag_test_suite_result_output_size: AGTestSuiteResultOutputSize | null = null;
   d_ag_test_suite_result: AGTestSuiteResultFeedback | null = null;
   d_submission: Submission | null = null;
   d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
@@ -97,27 +99,43 @@ export default class AGCaseSetupResult extends Vue {
   }
 
   async get_results() {
+    this.d_ag_test_suite_result_output_size
+        = await ResultOutput.get_ag_test_suite_result_output_size(
+      this.d_submission!.pk,
+      this.d_ag_test_suite_result!.pk,
+      this.d_fdbk_category
+    );
     await this.load_setup_stdout();
     await this.load_setup_stderr();
   }
 
   async load_setup_stdout() {
     this.d_setup_stdout_loaded = false;
-    this.d_setup_stdout = await ResultOutput.get_ag_test_suite_result_setup_stdout(
-      this.d_submission!.pk,
-      this.d_ag_test_suite_result!.pk,
-      this.d_fdbk_category
-    );
+    if (this.d_ag_test_suite_result_output_size!.setup_stdout_size === null) {
+      this.d_setup_stdout = null;
+    }
+    else {
+      this.d_setup_stdout = await ResultOutput.get_ag_test_suite_result_setup_stdout(
+        this.d_submission!.pk,
+        this.d_ag_test_suite_result!.pk,
+        this.d_fdbk_category
+      );
+    }
     this.d_setup_stdout_loaded = true;
   }
 
   async load_setup_stderr() {
     this.d_setup_stderr_loaded = false;
-    this.d_setup_stderr = await ResultOutput.get_ag_test_suite_result_setup_stderr(
-      this.d_submission!.pk,
-      this.d_ag_test_suite_result!.pk,
-      this.d_fdbk_category
-    );
+    if (this.d_ag_test_suite_result_output_size!.setup_stderr_size === null) {
+        this.d_setup_stderr = null;
+    }
+    else {
+      this.d_setup_stderr = await ResultOutput.get_ag_test_suite_result_setup_stderr(
+        this.d_submission!.pk,
+        this.d_ag_test_suite_result!.pk,
+        this.d_fdbk_category
+      );
+    }
     this.d_setup_stderr_loaded = true;
   }
 

@@ -145,6 +145,7 @@ import {
 
 import Diff from '@/components/diff.vue';
 import Tooltip from '@/components/tooltip.vue';
+import AGTestCommandResultOutputSize = ResultOutput.AGTestCommandResultOutputSize;
 
 @Component({
   components: {
@@ -166,15 +167,14 @@ export default class AGCommandResult extends Vue {
   d_stderr_content: string | null = null;
   d_stdout_diff: string[] | null = null;
   d_stderr_diff: string[] | null = null;
-
-  d_submission: Submission | null = null;
-  d_ag_test_command_result: AGTestCommandResultFeedback | null = null;
-  d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
-
   d_stdout_content_loaded = false;
   d_stderr_content_loaded = false;
   d_stdout_diff_loaded = false;
   d_stderr_diff_loaded = false;
+  d_ag_test_command_result_output_size: AGTestCommandResultOutputSize | null = null;
+  d_submission: Submission | null = null;
+  d_ag_test_command_result: AGTestCommandResultFeedback | null = null;
+  d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
 
   @Watch('submission')
   async on_submission_change(new_value: Submission, old_value: Submission) {
@@ -205,6 +205,12 @@ export default class AGCommandResult extends Vue {
   }
 
   async get_results() {
+    this.d_ag_test_command_result_output_size
+        = await ResultOutput.get_ag_test_cmd_result_output_size(
+      this.d_submission!.pk,
+      this.d_ag_test_command_result!.pk,
+      this.d_fdbk_category
+    );
     await this.load_stdout_content();
     await this.load_stderr_content();
     await this.load_stdout_diff();
@@ -224,41 +230,61 @@ export default class AGCommandResult extends Vue {
 
   async load_stdout_content() {
     this.d_stdout_content_loaded = false;
-    this.d_stdout_content = await ResultOutput.get_ag_test_cmd_result_stdout(
-      this.d_submission!.pk,
-      this.ag_test_command_result.pk,
-      this.d_fdbk_category
-    );
+    if (this.d_ag_test_command_result_output_size!.stdout_size === null) {
+      this.d_stdout_content = null;
+    }
+    else {
+      this.d_stdout_content = await ResultOutput.get_ag_test_cmd_result_stdout(
+        this.d_submission!.pk,
+        this.ag_test_command_result.pk,
+        this.d_fdbk_category
+      );
+    }
     this.d_stdout_content_loaded = true;
   }
 
   async load_stderr_content() {
     this.d_stderr_content_loaded = false;
-    this.d_stderr_content = await ResultOutput.get_ag_test_cmd_result_stderr(
-      this.d_submission!.pk,
-      this.d_ag_test_command_result!.pk,
-      this.d_fdbk_category
-    );
+    if (this.d_ag_test_command_result_output_size!.stderr_size === null) {
+      this.d_stderr_content = null;
+    }
+    else {
+      this.d_stderr_content = await ResultOutput.get_ag_test_cmd_result_stderr(
+        this.d_submission!.pk,
+        this.d_ag_test_command_result!.pk,
+        this.d_fdbk_category
+      );
+    }
     this.d_stderr_content_loaded = true;
   }
 
   async load_stdout_diff() {
     this.d_stdout_diff_loaded = false;
-    this.d_stdout_diff = await ResultOutput.get_ag_test_cmd_result_stdout_diff(
-      this.d_submission!.pk,
-      this.d_ag_test_command_result!.pk,
-      this.d_fdbk_category
-    );
+    if (this.d_ag_test_command_result_output_size!.stdout_diff_size === null) {
+      this.d_stdout_diff = null;
+    }
+    else {
+      this.d_stdout_diff = await ResultOutput.get_ag_test_cmd_result_stdout_diff(
+        this.d_submission!.pk,
+        this.d_ag_test_command_result!.pk,
+        this.d_fdbk_category
+      );
+    }
     this.d_stdout_diff_loaded = true;
   }
 
   async load_stderr_diff() {
     this.d_stderr_diff_loaded = false;
-    this.d_stderr_diff = await ResultOutput.get_ag_test_cmd_result_stderr_diff(
-      this.d_submission!.pk,
-      this.d_ag_test_command_result!.pk,
-      this.d_fdbk_category
-    );
+    if (this.d_ag_test_command_result_output_size!.stderr_diff_size === null) {
+      this.d_stderr_diff = null;
+    }
+    else {
+      this.d_stderr_diff = await ResultOutput.get_ag_test_cmd_result_stderr_diff(
+        this.d_submission!.pk,
+        this.d_ag_test_command_result!.pk,
+        this.d_fdbk_category
+      );
+    }
     this.d_stderr_diff_loaded = true;
   }
 }

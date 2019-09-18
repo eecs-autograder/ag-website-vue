@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
@@ -9,10 +9,6 @@ import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import SubmissionDetail from '@/components/project_view/submission_detail/submission_detail.vue';
 
 import * as data_ut from '@/tests/data_utils.ts';
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 jest.mock('file-saver');
 
@@ -31,7 +27,6 @@ describe('SubmissionDetail tests', () => {
     let remove_submission_from_queue_stub: sinon.SinonStub;
 
     let original_match_media: (query: string) => MediaQueryList;
-
 
     beforeEach(() => {
         user = new ag_cli.User({

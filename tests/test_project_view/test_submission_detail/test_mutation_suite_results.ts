@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
@@ -7,17 +7,12 @@ import MutationSuiteResults from '@/components/project_view/submission_detail/mu
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
-
 describe('MutationSuiteResults tests', () => {
     let wrapper: Wrapper<MutationSuiteResults>;
     let group: ag_cli.Group;
     let mutation_test_suite_results: ag_cli.MutationTestSuiteResultFeedback[];
     let submission: ag_cli.Submission;
     let user: ag_cli.User;
-
     let mutation_suite_1_result: ag_cli.MutationTestSuiteResultFeedback;
     let mutation_suite_2_result: ag_cli.MutationTestSuiteResultFeedback;
 
@@ -177,13 +172,13 @@ describe('MutationSuiteResults tests', () => {
          ' !== student_tests.length',
          async () => {
         let mutation_test_suite_result_feedback = data_ut.make_mutation_test_suite_result_feedback(
-          1,
-          {
-              student_tests: ["an_invalid_test", "a_valid_test"],
-              invalid_tests: ["an_invalid_test"],
-              total_points: 45,
-              total_points_possible: 50
-          }
+            1,
+            {
+                student_tests: ["an_invalid_test", "a_valid_test"],
+                invalid_tests: ["an_invalid_test"],
+                total_points: 45,
+                total_points_possible: 50
+            }
         );
 
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(

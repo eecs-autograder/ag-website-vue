@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
@@ -7,26 +7,24 @@ import { CorrectnessLevel } from '@/components/project_view/submission_detail/co
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
+let group: ag_cli.Group;
+let project: ag_cli.Project;
+let submission: ag_cli.Submission;
+let user: ag_cli.User;
+let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
+
+beforeEach(() => {
+    user = data_ut.make_user();
+    project = data_ut.make_project(1);
+    group = data_ut.make_group(project.pk, 1, {member_names: [user.username]});
+    submission = data_ut.make_submission(group);
+    ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
 });
 
 describe('command_result_correctness tests', () => {
     let wrapper: Wrapper<AGCaseResult>;
-    let group: ag_cli.Group;
-    let project: ag_cli.Project;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
 
     beforeEach(() => {
-        user = data_ut.make_user();
-        project = data_ut.make_project(1);
-        group = data_ut.make_group(project.pk, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-
-        ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
-
         wrapper = mount(AGCaseResult, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
@@ -312,20 +310,8 @@ describe('command_result_correctness tests', () => {
 
 describe('AGTestCaseResult tests concerning props', () => {
     let wrapper: Wrapper<AGCaseResult>;
-    let group: ag_cli.Group;
-    let project: ag_cli.Project;
-    let submission: ag_cli.Submission;
-    let user: ag_cli.User;
-    let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
 
     beforeEach(() => {
-        user = data_ut.make_user();
-        project = data_ut.make_project(1);
-        group = data_ut.make_group(project.pk, 1, {member_names: [user.username]});
-        submission = data_ut.make_submission(group);
-
-        ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
-
         wrapper = mount(AGCaseResult, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
