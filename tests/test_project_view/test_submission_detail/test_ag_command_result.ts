@@ -18,31 +18,55 @@ let get_ag_test_cmd_result_stdout_diff_stub: sinon.SinonStub;
 let get_ag_test_cmd_result_stderr_diff_stub: sinon.SinonStub;
 let get_ag_test_cmd_result_output_size_stub: sinon.SinonStub;
 
+let diff_contents: string[];
+let stdout_content: string;
+let stderr_content: string;
+let stdout_diff_content: string[];
+let stderr_diff_content: string[];
+
 beforeEach(() => {
     user = data_ut.make_user();
     group = data_ut.make_group(1, 1, {member_names: [user.username]});
     submission = data_ut.make_submission(group);
     ag_test_command_result = data_ut.make_ag_test_command_result_feedback(1);
 
+    diff_contents = [
+        '  one\r\n',
+        '  two\n',
+        '- left one\n',
+        '- left two\n',
+        '- left three\n',
+        '  three\n',
+        '+ right one\n',
+        '+ right two\n',
+        '  four\n',
+        '  five\n'
+    ];
+
+    stdout_content = "stdout content";
+    stderr_content = "stderr_content";
+    stdout_diff_content = diff_contents;
+    stderr_diff_content = diff_contents;
+
     get_ag_test_cmd_result_stdout_stub = sinon.stub(
         ag_cli.ResultOutput,
         'get_ag_test_cmd_result_stdout'
-    );
+    ).returns(Promise.resolve(stdout_content));
 
     get_ag_test_cmd_result_stdout_diff_stub = sinon.stub(
         ag_cli.ResultOutput,
         'get_ag_test_cmd_result_stdout_diff'
-    );
+    ).returns(Promise.resolve(stdout_diff_content));
 
     get_ag_test_cmd_result_stderr_stub = sinon.stub(
         ag_cli.ResultOutput,
         'get_ag_test_cmd_result_stderr'
-    );
+    ).returns(Promise.resolve(stderr_content));
 
     get_ag_test_cmd_result_stderr_diff_stub = sinon.stub(
         ag_cli.ResultOutput,
         'get_ag_test_cmd_result_stderr_diff'
-    );
+    ).returns(Promise.resolve(stderr_diff_content));
 
     get_ag_test_cmd_result_output_size_stub = sinon.stub(
         ag_cli.ResultOutput,
@@ -263,7 +287,6 @@ describe('AGCommandResult tests', () => {
             }
         ));
 
-
         wrapper = mount(AGCommandResult, {
             propsData: {
                 submission: submission,
@@ -291,10 +314,6 @@ describe('AGCommandResult tests', () => {
          async () => {
         ag_test_command_result.stdout_correct = false;
 
-        get_ag_test_cmd_result_stdout_diff_stub.returns(
-            Promise.resolve(["stdout diff contents"])
-        );
-
         wrapper = mount(AGCommandResult, {
             propsData: {
                 submission: submission,
@@ -320,23 +339,6 @@ describe('AGCommandResult tests', () => {
         ag_test_command_result.stdout_correct = false;
         ag_test_command_result.fdbk_settings.stdout_fdbk_level
             = ag_cli.ValueFeedbackLevel.expected_and_actual;
-
-        let diff_contents = [
-            '  one\r\n',
-            '  two\n',
-            '- left one\n',
-            '- left two\n',
-            '- left three\n',
-            '  three\n',
-            '+ right one\n',
-            '+ right two\n',
-            '  four\n',
-            '  five\n'
-        ];
-
-        get_ag_test_cmd_result_stdout_diff_stub.returns(
-            Promise.resolve(diff_contents)
-        );
 
         wrapper = mount(AGCommandResult, {
             propsData: {
@@ -393,10 +395,6 @@ describe('AGCommandResult tests', () => {
     test('stdout_section - show_actual_stdout === true and stdout_content !== null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = true;
 
-        get_ag_test_cmd_result_stdout_stub.returns(
-            Promise.resolve("actual stdout")
-        );
-
         wrapper = mount(AGCommandResult, {
             propsData: {
                 submission: submission,
@@ -411,8 +409,8 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stdout).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_stdout_content).toEqual("actual stdout");
-        expect(wrapper.find('#stdout-actual-section').text()).toContain("actual stdout");
+        expect(wrapper.vm.d_stdout_content).toEqual(stdout_content);
+        expect(wrapper.find('#stdout-actual-section').text()).toContain(stdout_content);
     });
 
     test('stdout_section - show_actual_stdout === false', async () => {
@@ -489,10 +487,6 @@ describe('AGCommandResult tests', () => {
          async () => {
         ag_test_command_result.stderr_correct = false;
 
-        get_ag_test_cmd_result_stderr_diff_stub.returns(
-            Promise.resolve(["stderr diff contents"])
-        );
-
         wrapper = mount(AGCommandResult, {
             propsData: {
                 submission: submission,
@@ -520,23 +514,6 @@ describe('AGCommandResult tests', () => {
         ag_test_command_result.stderr_correct = false;
         ag_test_command_result.fdbk_settings.stderr_fdbk_level
             = ag_cli.ValueFeedbackLevel.expected_and_actual;
-
-        let diff_contents = [
-            '  one\r\n',
-            '  two\n',
-            '- left one\n',
-            '- left two\n',
-            '- left three\n',
-            '  three\n',
-            '+ right one\n',
-            '+ right two\n',
-            '  four\n',
-            '  five\n'
-        ];
-
-        get_ag_test_cmd_result_stderr_diff_stub.returns(
-            Promise.resolve(diff_contents)
-        );
 
         wrapper = mount(AGCommandResult, {
             propsData: {
@@ -593,10 +570,6 @@ describe('AGCommandResult tests', () => {
     test('stderr_section - show_actual_stderr === true and stderr_content !== null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stderr = true;
 
-        get_ag_test_cmd_result_stderr_stub.returns(
-            Promise.resolve("actual stderr")
-        );
-
         wrapper = mount(AGCommandResult, {
             propsData: {
                 submission: submission,
@@ -611,8 +584,8 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stderr).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_stderr_content).toEqual("actual stderr");
-        expect(wrapper.find('#stderr-actual-section').text()).toContain("actual stderr");
+        expect(wrapper.vm.d_stderr_content).toEqual(stderr_content);
+        expect(wrapper.find('#stderr-actual-section').text()).toContain(stderr_content);
     });
 });
 

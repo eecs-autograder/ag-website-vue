@@ -22,44 +22,61 @@ let get_mutation_test_suite_result_grade_buggy_impls_stdout_stub: sinon.SinonStu
 let get_mutation_test_suite_result_grade_buggy_impls_stderr_stub: sinon.SinonStub;
 let get_mutation_test_suite_result_output_size_stub: sinon.SinonStub;
 
+let setup_stdout_content: string;
+let setup_stderr_content: string;
+let student_test_names_stdout_content: string;
+let student_test_names_stderr_content: string;
+let validity_check_stdout_content: string;
+let validity_check_stderr_content: string;
+let grade_buggy_impls_stdout_content: string;
+let grade_buggy_impls_stderr_content: string;
+
 beforeEach(() => {
     user = data_ut.make_user();
     group = data_ut.make_group(1, 1, {member_names: [user.username]});
     submission = data_ut.make_submission(group);
-
     mutation_test_suite_result = data_ut.make_mutation_test_suite_result_feedback(1);
+
+    setup_stdout_content = "setup stdout content";
+    setup_stderr_content = "setup stderr content";
+    student_test_names_stdout_content = "student test names stdout content";
+    student_test_names_stderr_content = "student test names stderr content";
+    validity_check_stdout_content = "validity check stdout content";
+    validity_check_stderr_content = "validity check stderr content";
+    grade_buggy_impls_stdout_content = "grade buggy impls stdout content";
+    grade_buggy_impls_stderr_content = "grade buggy impls stderr content";
 
     get_mutation_test_suite_result_setup_stdout_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_setup_stdout'
-    ).returns(Promise.resolve("setup stdout content"));
+    ).returns(Promise.resolve(setup_stdout_content));
 
     get_mutation_test_suite_result_setup_stderr_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_setup_stderr'
-    ).returns(Promise.resolve("setup stderr content"));
+    ).returns(Promise.resolve(setup_stderr_content));
 
     get_mutation_test_suite_result_get_student_test_names_stdout_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_get_student_test_names_stdout'
-    ).returns(Promise.resolve("student test names stdout content"));
+    ).returns(Promise.resolve(student_test_names_stdout_content));
 
     get_mutation_test_suite_result_get_student_test_names_stderr_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_get_student_test_names_stderr'
-    ).returns(Promise.resolve("student test names stderr content"));
+    ).returns(Promise.resolve(student_test_names_stderr_content));
 
     get_mutation_test_suite_result_validity_check_stdout_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_validity_check_stdout'
-    ).returns(Promise.resolve("validity check stdout content"));
+    ).returns(Promise.resolve(validity_check_stdout_content));
 
     get_mutation_test_suite_result_validity_check_stderr_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_validity_check_stderr'
-    ).returns(Promise.resolve("validity check stderr content"));
+    ).returns(Promise.resolve(validity_check_stderr_content));
 
     get_mutation_test_suite_result_grade_buggy_impls_stdout_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_grade_buggy_impls_stdout'
-    ).returns(Promise.resolve("grade buggy impls stdout content"));
+    ).returns(Promise.resolve(grade_buggy_impls_stdout_content));
 
     get_mutation_test_suite_result_grade_buggy_impls_stderr_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_grade_buggy_impls_stderr'
-    ).returns(Promise.resolve("grade buggy impls stderr content"));
+    ).returns(Promise.resolve(grade_buggy_impls_stderr_content));
 
     get_mutation_test_suite_result_output_size_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_mutation_test_suite_result_output_size'
@@ -83,33 +100,6 @@ afterEach(() => {
 
 describe('MutationSuiteResult tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
-
-    test('stubbing', async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(get_mutation_test_suite_result_output_size_stub.callCount).toEqual(1);
-        expect(get_mutation_test_suite_result_setup_stdout_stub.callCount).toEqual(1);
-        expect(get_mutation_test_suite_result_setup_stderr_stub.callCount).toEqual(1);
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
-            1
-        );
-        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.callCount).toEqual(
-            1
-        );
-        expect(get_mutation_test_suite_result_validity_check_stdout_stub.callCount).toEqual(1);
-        expect(get_mutation_test_suite_result_validity_check_stderr_stub.callCount).toEqual(1);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.callCount).toEqual(1);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.callCount).toEqual(1);
-    });
 
     test('setup-section is not visible when setup_return_code === null and ' +
          'setup_timed_out === false',
@@ -314,9 +304,9 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.vm.d_mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout_content).toEqual("setup stdout content");
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
         expect(wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
-        expect(wrapper.find('#setup-stdout-section').text()).toContain("setup stdout content");
+        expect(wrapper.find('#setup-stdout-section').text()).toContain(setup_stdout_content);
     });
 
     test('setup-stdout-section is not visible when show_setup_stdout === false', async () => {
@@ -412,9 +402,9 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stderr_content).toEqual("setup stderr content");
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
         expect(wrapper.find('#setup-stderr-section').text()).toContain(
-            "setup stderr content"
+            setup_stderr_content
         );
     });
 
@@ -573,9 +563,9 @@ describe('MutationSuiteResult tests', () => {
         ).toBe(true);
         expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual("grade buggy impls stdout content");
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(grade_buggy_impls_stdout_content);
         expect(wrapper.find('#buggy-stdout-section').text()).toContain(
-        'grade buggy impls stdout content'
+            grade_buggy_impls_stdout_content
         );
     });
 
@@ -636,12 +626,6 @@ describe('MutationSuiteResult tests', () => {
          async () => {
         mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr = true;
 
-        get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.returns(
-            Promise.resolve(
-                "grade buggy impls stdout content"
-            )
-        );
-
         wrapper = mount(MutationSuiteResult, {
             propsData: {
                 mutation_test_suite_result: mutation_test_suite_result,
@@ -657,9 +641,9 @@ describe('MutationSuiteResult tests', () => {
         ).toBe(true);
         expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual("grade buggy impls stderr content");
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(grade_buggy_impls_stderr_content);
         expect(wrapper.find('#buggy-stderr-section').text()).toContain(
-            'grade buggy impls stderr content'
+            grade_buggy_impls_stderr_content
         );
     });
 
@@ -784,10 +768,10 @@ describe('MutationSuiteResult tests', () => {
         expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_validity_checkout_stdout_content).toEqual(
-            "validity check stdout content"
+            validity_check_stdout_content
         );
         expect(wrapper.find('#validity-check-stdout-section').text()).toContain(
-            "validity check stdout content"
+            validity_check_stdout_content
         );
     });
 
@@ -851,10 +835,10 @@ describe('MutationSuiteResult tests', () => {
         expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_validity_checkout_stderr_content).toEqual(
-            "validity check stderr content"
+            validity_check_stderr_content
         );
         expect(wrapper.find('#validity-check-stderr-section').text()).toContain(
-            "validity check stderr content"
+            validity_check_stderr_content
         );
     });
 
@@ -955,10 +939,10 @@ describe('MutationSuiteResult tests', () => {
             true
         );
         expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            "student test names stdout content"
+            student_test_names_stdout_content
         );
         expect(wrapper.find('#test-names-stdout-section').text()).toContain(
-            "student test names stdout content"
+            student_test_names_stdout_content
         );
     });
 
@@ -1037,10 +1021,10 @@ describe('MutationSuiteResult tests', () => {
             true
         );
         expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            "student test names stderr content"
+            student_test_names_stderr_content
         );
         expect(wrapper.find('#test-names-stderr-section').text()).toContain(
-            "student test names stderr content"
+            student_test_names_stderr_content
         );
     });
 
@@ -1374,6 +1358,32 @@ describe('MutationSuiteResult Watcher tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     beforeEach(() => {
+        get_mutation_test_suite_result_output_size_stub.onFirstCall().returns(Promise.resolve(
+            {
+                setup_stdout_size: null,
+                setup_stderr_size: null,
+                get_student_test_names_stdout_size: null,
+                get_student_test_names_stderr_size: null,
+                validity_check_stdout_size: null,
+                validity_check_stderr_size: null,
+                grade_buggy_impls_stdout_size: null,
+                grade_buggy_impls_stderr_size: null
+            }
+        ));
+
+        get_mutation_test_suite_result_output_size_stub.onSecondCall().returns(Promise.resolve(
+            {
+                setup_stdout_size: 20,
+                setup_stderr_size: 20,
+                get_student_test_names_stdout_size: 20,
+                get_student_test_names_stderr_size: 20,
+                validity_check_stdout_size: 20,
+                validity_check_stderr_size: 20,
+                grade_buggy_impls_stdout_size: 20,
+                grade_buggy_impls_stderr_size: 20
+            }
+        ));
+
         wrapper = mount(MutationSuiteResult, {
             propsData: {
                 mutation_test_suite_result: mutation_test_suite_result,
@@ -1389,18 +1399,28 @@ describe('MutationSuiteResult Watcher tests', () => {
         }
 
         expect(wrapper.vm.d_submission).toEqual(submission);
-        expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
-            true
+        expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            0
         );
-        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledOnce).toBe(
-            true
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.callCount).toEqual(
+            0
         );
-        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledOnce).toBe(true);
-        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.callCount).toEqual(0);
+
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
+        expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
+        expect(wrapper.vm.d_student_test_names_stderr_content).toBeNull();
+        expect(wrapper.vm.d_validity_checkout_stdout_content).toBeNull();
+        expect(wrapper.vm.d_validity_checkout_stderr_content).toBeNull();
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toBeNull();
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toBeNull();
 
         let updated_submission = data_ut.make_submission(group);
         wrapper.setProps({submission: updated_submission});
@@ -1410,26 +1430,7 @@ describe('MutationSuiteResult Watcher tests', () => {
         }
 
         expect(wrapper.vm.d_submission).toEqual(updated_submission);
-        expect(get_mutation_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledTwice).toBe(
-            true
-        );
-        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledTwice).toBe(
-            true
-        );
-        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledTwice).toBe(true);
-    });
-
-    test('mutation_test_suite_result Watcher', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_mutation_test_suite_result).toEqual(mutation_test_suite_result);
+        expect(get_mutation_test_suite_result_output_size_stub.calledTwice).toBe(true);
         expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
@@ -1442,6 +1443,53 @@ describe('MutationSuiteResult Watcher tests', () => {
         expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
+
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
+        expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
+            student_test_names_stdout_content
+        );
+        expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
+            student_test_names_stderr_content
+        );
+        expect(wrapper.vm.d_validity_checkout_stdout_content).toEqual(
+            validity_check_stdout_content
+        );
+        expect(wrapper.vm.d_validity_checkout_stderr_content).toEqual(
+            validity_check_stderr_content
+        );
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(grade_buggy_impls_stdout_content);
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(grade_buggy_impls_stderr_content);
+    });
+
+    test('mutation_test_suite_result Watcher', async () => {
+        for (let i = 0; i < 9; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_mutation_test_suite_result).toEqual(mutation_test_suite_result);
+        expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            0
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.callCount).toEqual(
+            0
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.callCount).toEqual(0);
+
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
+        expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
+        expect(wrapper.vm.d_student_test_names_stderr_content).toBeNull();
+        expect(wrapper.vm.d_validity_checkout_stdout_content).toBeNull();
+        expect(wrapper.vm.d_validity_checkout_stderr_content).toBeNull();
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toBeNull();
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toBeNull();
 
         let updated_mutation_test_suite_result = data_ut.make_mutation_test_suite_result_feedback(
             1
@@ -1453,26 +1501,7 @@ describe('MutationSuiteResult Watcher tests', () => {
         }
 
         expect(wrapper.vm.d_mutation_test_suite_result).toEqual(updated_mutation_test_suite_result);
-        expect(get_mutation_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledTwice).toBe(
-            true
-        );
-        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledTwice).toBe(
-            true
-        );
-        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledTwice).toBe(true);
-    });
-
-    test('fdbk_category Watcher', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(get_mutation_test_suite_result_output_size_stub.calledTwice).toBe(true);
         expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
@@ -1486,6 +1515,53 @@ describe('MutationSuiteResult Watcher tests', () => {
         expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
 
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
+        expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
+            student_test_names_stdout_content
+        );
+        expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
+            student_test_names_stderr_content
+        );
+        expect(wrapper.vm.d_validity_checkout_stdout_content).toEqual(
+            validity_check_stdout_content
+        );
+        expect(wrapper.vm.d_validity_checkout_stderr_content).toEqual(
+            validity_check_stderr_content
+        );
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(grade_buggy_impls_stdout_content);
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(grade_buggy_impls_stderr_content);
+    });
+
+    test('fdbk_category Watcher', async () => {
+        for (let i = 0; i < 9; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(get_mutation_test_suite_result_output_size_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.callCount).toEqual(
+            0
+        );
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.callCount).toEqual(
+            0
+        );
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.callCount).toEqual(0);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.callCount).toEqual(0);
+
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
+        expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
+        expect(wrapper.vm.d_student_test_names_stderr_content).toBeNull();
+        expect(wrapper.vm.d_validity_checkout_stdout_content).toBeNull();
+        expect(wrapper.vm.d_validity_checkout_stderr_content).toBeNull();
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toBeNull();
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toBeNull();
+
         wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.past_limit_submission});
 
         for (let i = 0; i < 9; ++i) {
@@ -1493,17 +1569,35 @@ describe('MutationSuiteResult Watcher tests', () => {
         }
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
-        expect(get_mutation_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledTwice).toBe(
+        expect(get_mutation_test_suite_result_output_size_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_get_student_test_names_stdout_stub.calledOnce).toBe(
             true
         );
-        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledTwice).toBe(
+        expect(get_mutation_test_suite_result_get_student_test_names_stderr_stub.calledOnce).toBe(
             true
         );
-        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledTwice).toBe(true);
-        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledTwice).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_validity_check_stderr_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
+        expect(get_mutation_test_suite_result_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
+
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
+        expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
+            student_test_names_stdout_content
+        );
+        expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
+            student_test_names_stderr_content
+        );
+        expect(wrapper.vm.d_validity_checkout_stdout_content).toEqual(
+            validity_check_stdout_content
+        );
+        expect(wrapper.vm.d_validity_checkout_stderr_content).toEqual(
+            validity_check_stderr_content
+        );
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(grade_buggy_impls_stdout_content);
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(grade_buggy_impls_stderr_content);
     });
 });

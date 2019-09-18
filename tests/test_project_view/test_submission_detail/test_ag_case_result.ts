@@ -306,8 +306,6 @@ describe('command_result_correctness tests', () => {
     });
 });
 
-
-
 describe('AGTestCaseResult tests concerning props', () => {
     let wrapper: Wrapper<AGCaseResult>;
 
