@@ -321,13 +321,13 @@ describe('AGTestCommandSettings tests', () => {
             {ref: 'deduction_for_wrong_return_code'}
         );
 
-        set_validated_input_text(deduction_for_wrong_return_code_input, '2');
+        set_validated_input_text(deduction_for_wrong_return_code_input, '-2');
 
-        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_return_code).toEqual(2);
+        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_return_code).toEqual(-2);
         expect(validated_input_is_valid(deduction_for_wrong_return_code_input)).toEqual(true);
 
-        wrapper.vm.d_ag_test_command!.deduction_for_wrong_return_code = 3;
-        expect(get_validated_input_text(deduction_for_wrong_return_code_input)).toEqual('3');
+        wrapper.vm.d_ag_test_command!.deduction_for_wrong_return_code = -3;
+        expect(get_validated_input_text(deduction_for_wrong_return_code_input)).toEqual('-3');
     });
 
     test('error - deduction_for_wrong_return_code is blank or not an integer', async () => {
@@ -338,12 +338,12 @@ describe('AGTestCommandSettings tests', () => {
             wrapper, {ref: 'deduction_for_wrong_return_code'}, '.save-button');
     });
 
-    test('error - deduction_for_wrong_return_code must be >= 0', async () => {
+    test('error - deduction_for_wrong_return_code must be <= 0', async () => {
         wrapper.vm.d_ag_test_command!.expected_return_code = ExpectedReturnCode.zero;
         await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'deduction_for_wrong_return_code'}, '-1', '.save-button');
+            wrapper, {ref: 'deduction_for_wrong_return_code'}, '1', '.save-button');
     });
 
     test('expected_stdout_source binding', async () => {
@@ -496,13 +496,13 @@ describe('AGTestCommandSettings tests', () => {
 
         let deduction_for_wrong_stdout_input = wrapper.find({ref: 'deduction_for_wrong_stdout'});
 
-        set_validated_input_text(deduction_for_wrong_stdout_input, '9');
+        set_validated_input_text(deduction_for_wrong_stdout_input, '-9');
 
-        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_stdout).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_stdout).toEqual(-9);
         expect(validated_input_is_valid(deduction_for_wrong_stdout_input)).toEqual(true);
 
-        wrapper.vm.d_ag_test_command!.deduction_for_wrong_stdout = 4;
-        expect(get_validated_input_text(deduction_for_wrong_stdout_input)).toEqual('4');
+        wrapper.vm.d_ag_test_command!.deduction_for_wrong_stdout = -4;
+        expect(get_validated_input_text(deduction_for_wrong_stdout_input)).toEqual('-4');
     });
 
     test('error - deduction_for_wrong_stdout is blank or not an integer', async () => {
@@ -513,12 +513,12 @@ describe('AGTestCommandSettings tests', () => {
             wrapper, {ref: 'deduction_for_wrong_stdout'}, '.save-button');
     });
 
-    test('error - deduction_for_wrong_stdout must be >= 0', async () => {
+    test('error - deduction_for_wrong_stdout must be <= 0', async () => {
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         wrapper.vm.d_ag_test_command!.expected_stdout_text = "Hi there";
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'deduction_for_wrong_stdout'}, '-1', '.save-button');
+            wrapper, {ref: 'deduction_for_wrong_stdout'}, '1', '.save-button');
     });
 
     test('expected_stderr_source binding', async () => {
@@ -672,13 +672,13 @@ describe('AGTestCommandSettings tests', () => {
 
         let deduction_for_wrong_stderr_input = wrapper.find({ref: 'deduction_for_wrong_stderr'});
 
-        set_validated_input_text(deduction_for_wrong_stderr_input, '9');
+        set_validated_input_text(deduction_for_wrong_stderr_input, '-9');
 
-        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_stderr).toEqual(9);
+        expect(wrapper.vm.d_ag_test_command!.deduction_for_wrong_stderr).toEqual(-9);
         expect(validated_input_is_valid(deduction_for_wrong_stderr_input)).toEqual(true);
 
-        wrapper.vm.d_ag_test_command!.deduction_for_wrong_stderr = 4;
-        expect(get_validated_input_text(deduction_for_wrong_stderr_input)).toEqual('4');
+        wrapper.vm.d_ag_test_command!.deduction_for_wrong_stderr = -4;
+        expect(get_validated_input_text(deduction_for_wrong_stderr_input)).toEqual('-4');
     });
 
     test('error - deduction_for_wrong_stderr is blank or not an integer', async () => {
@@ -690,13 +690,13 @@ describe('AGTestCommandSettings tests', () => {
             wrapper, {ref: 'deduction_for_wrong_stderr'}, '.save-button');
     });
 
-    test('error - deduction_for_wrong_stderr must be >= 0', async () => {
+    test('error - deduction_for_wrong_stderr must be <= 0', async () => {
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
         wrapper.vm.d_ag_test_command!.expected_stderr_text = "Hi there";
         await wrapper.vm.$nextTick();
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'deduction_for_wrong_stderr'}, '-1', '.save-button');
+            wrapper, {ref: 'deduction_for_wrong_stderr'}, '1', '.save-button');
     });
 
     test('Diff options appear when expected_stdout_source !== none ' +

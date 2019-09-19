@@ -136,9 +136,6 @@
                                ]"
                                input_style="width: 80px;"
                                :from_string_fn="string_to_num">
-                <div slot="prefix" class="plus-sign">
-                  <i class="fas fa-plus"></i>
-                </div>
                 <div slot="suffix" class="unit-of-measurement"> points </div>
               </validated-input>
             </div>
@@ -153,13 +150,10 @@
                                :validators="[
                                  is_not_empty,
                                  is_integer,
-                                 is_greater_than_or_equal_to_zero
+                                 is_less_than_or_equal_to_zero
                                ]"
                                input_style="width: 80px;"
                                :from_string_fn="string_to_num">
-                <div slot="prefix" class="minus-sign">
-                  <i class="fas fa-minus"></i>
-                </div>
                 <div slot="suffix" class="unit-of-measurement"> points </div>
               </validated-input>
             </div>
@@ -244,9 +238,6 @@
                                ]"
                                input_style="width: 80px;"
                                :from_string_fn="string_to_num">
-                <div slot="prefix" class="plus-sign">
-                  <i class="fas fa-plus"></i>
-                </div>
                 <div slot="suffix" class="unit-of-measurement"> points </div>
               </validated-input>
             </div>
@@ -261,13 +252,10 @@
                                :validators="[
                                  is_not_empty,
                                  is_integer,
-                                 is_greater_than_or_equal_to_zero
+                                 is_less_than_or_equal_to_zero
                                ]"
                                input_style="width: 80px;"
                                :from_string_fn="string_to_num">
-                <div slot="prefix" class="minus-sign">
-                  <i class="fas fa-minus"></i>
-                </div>
                 <div slot="suffix" class="unit-of-measurement"> points </div>
               </validated-input>
             </div>
@@ -352,9 +340,6 @@
                                ]"
                                input_style="width: 80px;"
                                :from_string_fn="string_to_num">
-                <div slot="prefix" class="plus-sign">
-                  <i class="fas fa-plus"></i>
-                </div>
                 <div slot="suffix" class="unit-of-measurement"> points </div>
               </validated-input>
             </div>
@@ -368,13 +353,10 @@
                                :validators="[
                                  is_not_empty,
                                  is_integer,
-                                 is_greater_than_or_equal_to_zero
+                                 is_less_than_or_equal_to_zero
                                ]"
                                input_style="width: 80px;"
                                :from_string_fn="string_to_num">
-                <div slot="prefix" class="minus-sign">
-                  <i class="fas fa-minus"></i>
-                </div>
                 <div slot="suffix" class="unit-of-measurement"> points </div>
               </validated-input>
             </div>
@@ -745,8 +727,9 @@ import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/u
 import {
   is_integer,
   is_not_empty,
+  make_max_value_validator,
   make_min_value_validator,
-  string_to_num
+  string_to_num,
 } from '@/validators';
 
 @Component({
@@ -787,6 +770,7 @@ export default class AGTestCommandSettings extends Vue {
   readonly is_integer = is_integer;
   readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
   readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
+  readonly is_less_than_or_equal_to_zero = make_max_value_validator(0);
   readonly string_to_num = string_to_num;
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
