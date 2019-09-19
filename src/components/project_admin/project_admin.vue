@@ -2,8 +2,7 @@
   <div v-if="d_loading" class="loading-spinner">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
-  <div v-else
-       id="project-admin">
+  <div v-else id="project-admin">
     <div class="navbar">
       <div class="nav-link"
             :class="{'active': d_current_tab === 'settings'}"
@@ -217,6 +216,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/navbar.scss';
 
 * {
   margin: 0;
@@ -238,30 +238,17 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   height: 100vh;
 }
 
+@include navbar(
+  $background-color: $pebble-light,
+  $hover-color: lighten($pebble-dark, 5%),
+  $active-color: $pebble-dark,
+  $border-color: lighten($pebble-dark, 5%)
+);
+
 .navbar {
-  display: flex;
-  flex-wrap: wrap;
-
-  white-space: nowrap;
-
-  background-color: $pebble-medium;
-  border: 1px solid $pebble-dark;
-  border-left: none;
-  border-right: none;
-
   .nav-link {
-    cursor: pointer;
-
     font-size: 14px;
-
-    display: flex;
-    align-items: center;
     padding: 10px 10px;
-  }
-
-  .active {
-    cursor: default;
-    font-weight: bold;
   }
 }
 

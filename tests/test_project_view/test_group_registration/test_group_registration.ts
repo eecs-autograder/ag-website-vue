@@ -12,7 +12,12 @@ import APIErrors from '@/components/api_errors.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
-import { make_course, make_project, set_global_current_user } from '@/tests/data_utils';
+import {
+    make_course,
+    make_group,
+    make_project,
+    set_global_current_user
+} from '@/tests/data_utils';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -45,6 +50,44 @@ describe('GroupRegistration tests', () => {
 
     afterEach(() => {
         sinon.restore();
+    });
+
+    test('Max group size 1, automatically work alone', async () => {
+        let work_alone_stub = sinon.stub(Group, 'create_solo_group').resolves(
+            make_group(project.pk, 1, {member_names: [user.username]})
+        );
+        project.max_group_size = 1;
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(work_alone_stub.calledOnce).toBe(true);
+        expect(wrapper.vm.d_loading).toBe(false);
+    });
+
+    test('Min group size 2, work alone button hidden', async () => {
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        project.min_group_size = 2;
+        wrapper = mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_loading).toBe(false);
+
+        expect(wrapper.find('#registration-buttons #work-alone-button').exists()).toBe(false);
+        expect(
+            wrapper.find('#registration-buttons #send-group-invitation-button').exists()
+        ).toBe(true);
     });
 
     test('created - Project.disallow_group_registration is true', async () => {

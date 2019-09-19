@@ -102,7 +102,7 @@ describe('Changing tabs in project admin', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
-        expect(router_replace.calledOnce);
+        expect(router_replace.calledOnce).toBe(true);
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();

@@ -3,68 +3,48 @@
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
 
-  <div v-else
-       id="project-submission">
-    <tabs ref="course_admin_tabs"
-          tab_active_class="gray-white-theme-active"
-          tab_inactive_class="gray-white-theme-inactive"
-          v-model="current_tab_index"
-          @input="on_tab_changed">
-      <tab>
-        <tab-header ref="project_settings_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Submit </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <div v-if="group === null">
-              <group-registration ref="group_registration"
-                                  :project="project"
-                                  :course="course">
-              </group-registration>
-            </div>
-            <div v-else>
-              <submit :course="course" :project="project" :group="group"></submit>
-            </div>
+  <div v-else id="project-view">
+    <div class="navbar">
+      <div class="nav-link"
+           :class="{'active': d_current_tab === 'submit'}"
+           @click="set_current_tab('submit')">
+        Submit
+      </div>
+      <div class="nav-link"
+           :class="{
+             'active': d_current_tab === 'my_submissions',
+             'disabled': group === null
+           }"
+           @click="set_current_tab('my_submissions')">
+        My Submissions
+      </div>
+      <div class="nav-link"
+           :class="{'active': d_current_tab === 'student_lookup'}"
+           @click="set_current_tab('student_lookup')">
+        Student Lookup
+      </div>
+    </div>
 
-            <!--TODO Submit component-->
+    <div>
+      <div v-show="d_current_tab === 'submit'">
+        <group-registration v-if="group === null"
+                            ref="group_registration"
+                            :project="project"
+                            :course="course">
+        </group-registration>
+        <submit v-else
+                @submitted="set_current_tab('my_submissions')"
+                :course="course" :project="project" :group="group"></submit>
+      </div>
 
-          </div>
-        </template>
-      </tab>
+      <submission-list v-if="d_load_my_submissions && group !== null"
+                       v-show="d_current_tab === 'my_submissions'"
+                       :course="course" :project="project" :group="group"></submission-list>
 
-      <tab>
-        <tab-header ref="instructor_files_tab">
-          <div class="tab-label">
-            <p class="tab-header"> My Submissions </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <submission-list :course="course"
-                  :project="project"
-                  :group="group"></submission-list>
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="expected_student_files_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Student Lookup </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <!--TODO Student Lookup-->
-          </div>
-        </template>
-      </tab>
-    </tabs>
+      <div v-show="d_current_tab === 'student_lookup'">TODO</div>
+    </div>
   </div>
 </template>
-
 
 <script lang="ts">
 import { Component, Inject, Vue } from 'vue-property-decorator';
@@ -95,26 +75,33 @@ export default class ProjectView extends Vue implements GroupObserver {
   globals!: GlobalData;
   d_globals = this.globals;
 
-  current_tab_index = 0;
+  d_current_tab: string = 'submit';
   d_loading = true;
+
+  d_load_my_submissions = false;
+
   project: Project | null = null;
   course: Course | null = null;
   group: Group | null = null;
   readonly format_datetime = format_datetime;
 
-  async created() {
+  async mounted() {
     Group.subscribe(this);
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
     this.course = await Course.get_by_pk(this.project.course);
+
     let groups_is_member_of = await this.d_globals.current_user.groups_is_member_of();
-    if (groups_is_member_of.length > 0) {
-      let result = groups_is_member_of.find(group => group.project === this.project!.pk);
-      if (result !== undefined) {
-        this.group = result;
-      }
+    let result = groups_is_member_of.find(group => group.project === this.project!.pk);
+    if (result !== undefined) {
+      this.group = result;
     }
 
     await this.d_globals.set_current_project(this.project, this.course);
+
+    let requested_tab = get_query_param(this.$route.query, "current_tab");
+    if (requested_tab !== null) {
+      this.set_current_tab(requested_tab);
+    }
     this.d_loading = false;
   }
 
@@ -122,41 +109,25 @@ export default class ProjectView extends Vue implements GroupObserver {
     Group.unsubscribe(this);
   }
 
-  mounted() {
-    this.select_tab(get_query_param(this.$route.query, "current_tab"));
-  }
-
-  on_tab_changed(index: number) {
-    switch (index) {
-      case 0:
-        this.$router.replace({query: {current_tab: "submit"}});
-        break;
-      case 1:
-        this.$router.replace({query: {current_tab: "my_submissions"}});
-        break;
-      case 2:
-        this.$router.replace({query: {current_tab: "student_lookup"}});
+  set_current_tab(tab_id: string) {
+    if (tab_id === 'my_submissions') {
+      if (this.group === null) {
+        return;
+      }
+      this.d_load_my_submissions = true;
     }
-  }
-  select_tab(tab_name: string | null) {
-    switch (tab_name) {
-      case "submit":
-        break;
-      case "my_submissions":
-        this.current_tab_index = 1;
-        break;
-      case "student_lookup":
-        this.current_tab_index = 2;
-        break;
-      default:
-        this.current_tab_index = 0;
-    }
+    this.d_current_tab = tab_id;
+    this.$router.replace({query: {current_tab: tab_id}});
   }
 
   update_group_changed(group: Group): void {}
 
   update_group_created(group: Group): void {
-    this.group = group;
+    let has_current_user = group.member_names.find(
+      member => member === this.d_globals.current_user.username) !== undefined;
+    if (this.project !== null && group.project === this.project.pk && has_current_user) {
+      this.group = group;
+    }
   }
 
   update_group_merged(new_group: Group, group1_pk: number, group2_pk: number): void {}
@@ -165,6 +136,7 @@ export default class ProjectView extends Vue implements GroupObserver {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/navbar.scss';
 
 .loading-spinner {
   color: $ocean-blue;
@@ -175,20 +147,17 @@ export default class ProjectView extends Vue implements GroupObserver {
   height: 100vh;
 }
 
-.tab-header {
-  margin: 0;
-  font-size: 14px;
-  overflow: hidden;
-}
+@include navbar(
+  $background-color: $pebble-light,
+  $hover-color: lighten($pebble-dark, 5%),
+  $active-color: $pebble-dark,
+  $border-color: lighten($pebble-dark, 5%)
+);
 
-.tab-label {
-  outline: none;
-  cursor: pointer;
-}
-
-@media only screen and (min-width: 481px) {
-  .tab-body {
-    border-top: 2px solid $pebble-medium;
+.navbar {
+  .nav-link {
+    font-size: 14px;
+    padding: 10px 10px;
   }
 }
 

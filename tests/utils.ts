@@ -6,6 +6,35 @@ import ValidatedInput from "@/components/validated_input.vue";
 
 export { sleep } from '@/utils';
 
+type DonePredicateFunc<T extends Vue> = (wrapper: Wrapper<T>) => boolean;
+
+// Awaits wrapper.vm.$nextTick() until done_predicate returns true or
+// max_awaits is reached.
+// Returns the final value of done_predicate.
+export async function wait_until<T extends Vue>(
+    wrapper: Wrapper<T>, done_predicate: DonePredicateFunc<T>, max_awaits = 10
+): Promise<boolean> {
+    for (let i = 0; i < max_awaits && !done_predicate(wrapper); ++i) {
+        await wrapper.vm.$nextTick();
+    }
+
+    return done_predicate(wrapper);
+}
+
+// Like wait_until(), but always awaits wrapper.vm.$nextTick() num_waits times.
+export async function wait_fixed<T extends Vue>(wrapper: Wrapper<T>, num_waits: number) {
+    for (let i = 0; i < num_waits; ++i) {
+        await wrapper.vm.$nextTick();
+    }
+}
+
+// A specialized version of wait_until() that waits until wrapper.vm.d_loading is false.
+export async function wait_for_load<T extends (Wrapper<Vue> & {vm: {d_loading: boolean}})>(
+    wrapper: T, max_awaits = 10
+) {
+    return wait_until(wrapper, wrap => !wrap.vm.d_loading, max_awaits);
+}
+
 // Sets the text for the given validaded input wrapper and triggers an update.
 // Prefer calling this function rather than inlining its definition so that our tests
 // are more robust against changes to the ValidatedInput implementation.
