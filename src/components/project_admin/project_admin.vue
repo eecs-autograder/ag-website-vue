@@ -2,139 +2,85 @@
   <div v-if="d_loading" class="loading-spinner">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
-  <div v-else
-       id="project-admin">
-    <tabs ref="course_admin_tabs"
-          tab_active_class="gray-white-theme-active"
-          tab_inactive_class="gray-white-theme-inactive"
-          v-model="current_tab_index"
-          @input="on_tab_changed"
-          :scroll_body="true">
-      <tab>
-        <tab-header ref="project_settings_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Project Settings </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <project-settings :project="project"> </project-settings>
-          </div>
-        </template>
-      </tab>
+  <div v-else id="project-admin">
+    <div class="navbar">
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'settings'}"
+            @click="set_current_tab('settings')">
+        Settings
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'instructor_files'}"
+            @click="set_current_tab('instructor_files')">
+        Instructor Files
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'expected_student_files'}"
+            @click="set_current_tab('expected_student_files')">
+        Student Files
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'test_cases'}"
+            @click="set_current_tab('test_cases')">
+        Test Cases
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'mutation_testing'}"
+            @click="set_current_tab('mutation_testing')">
+        Mutation Testing
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'edit_groups'}"
+            @click="set_current_tab('edit_groups')">
+        Groups & Extensions
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'download_grades'}"
+            @click="set_current_tab('download_grades')">
+        Grades
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'rerun_tests'}"
+            @click="set_current_tab('rerun_tests')">
+        Rerun
+      </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'configure_handgrading'}"
+            @click="set_current_tab('configure_handgrading')">
+        Handgrading
+      </div>
+    </div>
 
-      <tab>
-        <tab-header ref="instructor_files_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Instructor Files </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <instructor-files :project="project"></instructor-files>
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="expected_student_files_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Files Students Should Submit </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <expected-student-files :project="project"></expected-student-files>
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="ag_test_cases_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Test Cases </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <AGTestSuites :project="project"></AGTestSuites>
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="mutation_testing_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Mutation Testing </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <mutation-suites :project="project"></mutation-suites>
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="edit_groups_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Groups & Extensions </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            <edit-groups :project="project"></edit-groups>
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="download_grades_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Download Grades </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            DOWNLOAD GRADES - TODO
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="rerun_tests_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Rerun Tests </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            RERUN TESTS - TODO
-          </div>
-        </template>
-      </tab>
-
-      <tab>
-        <tab-header ref="configure_handgrading_tab">
-          <div class="tab-label">
-            <p class="tab-header"> Configure Handgrading </p>
-          </div>
-        </tab-header>
-        <template slot="body">
-          <div class="tab-body">
-            CONFIGURE HANDGRADING - TODO
-          </div>
-        </template>
-      </tab>
-
-    </tabs>
+    <div>
+      <project-settings v-show="d_current_tab === 'settings'"
+                        :project="project"> </project-settings>
+      <instructor-files v-show="d_current_tab === 'instructor_files'"
+                        :project="project"></instructor-files>
+      <expected-student-files v-show="d_current_tab === 'expected_student_files'"
+                              :project="project"></expected-student-files>
+      <ag-test-suites v-show="d_current_tab === 'test_cases'"
+                    :project="project"></ag-test-suites>
+      <mutation-suites v-show="d_current_tab === 'mutation_testing'"
+                        :project="project"></mutation-suites>
+      <edit-groups v-show="d_current_tab === 'edit_groups'"
+                    :project="project"></edit-groups>
+      <div v-show="d_current_tab === 'download_grades'">DOWNLOAD GRADES - TODO</div>
+      <div v-show="d_current_tab === 'rerun_tests'">RERUN TESTS - TODO</div>
+      <div v-show="d_current_tab === 'configure_handgrading'">CONFIGURE HANDGRADING - TODO</div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Inject, Vue } from 'vue-property-decorator';
 
-import { Project } from 'ag-client-typescript';
+import {
+  ExpectedStudentFile,
+  ExpectedStudentFileObserver,
+  InstructorFile,
+  InstructorFileObserver,
+  Project,
+} from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
 import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
@@ -146,11 +92,12 @@ import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
-import { get_query_param } from "@/utils";
+import { Created, Destroyed, Mounted } from '@/lifecycle';
+import { array_remove_unique, get_query_param } from "@/utils";
 
 @Component({
   components: {
-    AGTestSuites,
+    'ag-test-suites': AGTestSuites,
     EditGroups,
     ExpectedStudentFiles,
     InstructorFiles,
@@ -161,92 +108,115 @@ import { get_query_param } from "@/utils";
     Tabs
   }
 })
-export default class ProjectAdmin extends Vue {
+export default class ProjectAdmin extends Vue implements InstructorFileObserver,
+                                                         ExpectedStudentFileObserver,
+                                                         Created,
+                                                         Mounted,
+                                                         Destroyed {
   @Inject({from: 'globals'})
   globals!: GlobalData;
 
-  current_tab_index = 0;
   d_loading = true;
   project: Project | null = null;
+  d_current_tab: string = 'settings';
 
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
+
     await this.globals.set_current_project(this.project);
+    InstructorFile.subscribe(this);
+    ExpectedStudentFile.subscribe(this);
     this.d_loading = false;
   }
 
   mounted() {
-    this.select_tab(get_query_param(this.$route.query, "current_tab"));
-  }
-
-  on_tab_changed(index: number) {
-    switch (index) {
-      case 0:
-        this.$router.replace({query: {current_tab: "settings"}});
-        break;
-      case 1:
-        this.$router.replace({query: {current_tab: "instructor_files"}});
-        break;
-      case 2:
-        this.$router.replace({query: {current_tab: "expected_student_files"}});
-        break;
-      case 3:
-        this.$router.replace({query: {current_tab: "test_cases"}});
-        break;
-      case 4:
-        this.$router.replace({query: {current_tab: "mutation_testing"}});
-        break;
-      case 5:
-        this.$router.replace({query: {current_tab: "edit_groups"}});
-        break;
-      case 6:
-        this.$router.replace({query: {current_tab: "download_grades"}});
-        break;
-      case 7:
-        this.$router.replace({query: {current_tab: "rerun_tests"}});
-        break;
-      case 8:
-        this.$router.replace({query: {current_tab: "configure_handgrading"}});
+    let requested_tab = get_query_param(this.$route.query, "current_tab");
+    if (requested_tab !== null) {
+      this.d_current_tab = requested_tab;
     }
   }
 
-  select_tab(tab_name: string | null) {
-    switch (tab_name) {
-      case "settings":
-        break;
-      case "instructor_files":
-        this.current_tab_index = 1;
-        break;
-      case "expected_student_files":
-        this.current_tab_index = 2;
-        break;
-      case "test_cases":
-        this.current_tab_index = 3;
-        break;
-      case "mutation_testing":
-        this.current_tab_index = 4;
-        break;
-      case "edit_groups":
-        this.current_tab_index = 5;
-        break;
-      case "download_grades":
-        this.current_tab_index = 6;
-        break;
-      case "rerun_tests":
-        this.current_tab_index = 7;
-        break;
-      case "configure_handgrading":
-        this.current_tab_index = 8;
-        break;
-      default:
-        this.current_tab_index = 0;
+  destroyed() {
+    InstructorFile.unsubscribe(this);
+    ExpectedStudentFile.unsubscribe(this);
+  }
+
+  set_current_tab(tab_id: string) {
+    this.d_current_tab = tab_id;
+    this.$router.replace({query: {current_tab: tab_id}});
+  }
+
+  update_instructor_file_created(instructor_file: InstructorFile) {
+    if (this.project !==  null) {
+      this.project.instructor_files!.push(instructor_file);
+      this.project.instructor_files!.sort(
+        (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
+      );
     }
   }
+
+  update_instructor_file_deleted(instructor_file: InstructorFile) {
+    if (this.project !==  null) {
+      array_remove_unique(
+        this.project.instructor_files!, instructor_file.pk, (file, pk) => file.pk === pk);
+    }
+  }
+
+  update_instructor_file_renamed(instructor_file: InstructorFile) {
+    if (this.project !== null) {
+      let index = this.project.instructor_files!.findIndex(
+        (file) => file.pk === instructor_file.pk
+      );
+      Vue.set(this.project.instructor_files!, index, instructor_file);
+
+      this.project.instructor_files!.sort(
+        (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
+      );
+    }
+  }
+
+  update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
+    if (this.project !== null) {
+      this.project.expected_student_files.push(expected_student_file);
+      this.project.expected_student_files.sort(
+        (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
+          return first.pattern.localeCompare(second.pattern);
+        }
+      );
+    }
+  }
+
+  update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
+    if (this.project !== null) {
+      let index = this.project.expected_student_files.findIndex(
+        (file) => file.pk === expected_student_file.pk);
+      Vue.set(this.project.expected_student_files, index, expected_student_file);
+
+      this.project.expected_student_files.sort(
+        (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
+          return first.pattern.localeCompare(second.pattern);
+        }
+      );
+    }
+  }
+
+  update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
+    if (this.project !== null) {
+      array_remove_unique(
+        this.project.expected_student_files, expected_student_file.pk,
+        (file, pk) => file.pk === pk
+      );
+    }
+  }
+
+  update_instructor_file_content_changed(
+    instructor_file: InstructorFile, new_content: string): void {}
 }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/navbar.scss';
 
 * {
   margin: 0;
@@ -268,27 +238,17 @@ export default class ProjectAdmin extends Vue {
   height: 100vh;
 }
 
-.tab-header {
-  margin: 0;
-  font-size: 14px;
-  overflow: hidden;
-}
+@include navbar(
+  $background-color: $pebble-light,
+  $hover-color: lighten($pebble-dark, 5%),
+  $active-color: $pebble-dark,
+  $border-color: lighten($pebble-dark, 5%)
+);
 
-.tab-body {
-  text-align: left;
-  width: 100%;
-  height: 100%;
-  padding-top: 0;
-}
-
-.tab-label {
-  outline: none;
-  cursor: pointer;
-}
-
-@media only screen and (min-width: 481px) {
-  .tab-body {
-    border-top: 2px solid $pebble-medium;
+.navbar {
+  .nav-link {
+    font-size: 14px;
+    padding: 10px 10px;
   }
 }
 

@@ -4,39 +4,31 @@
                 @upload_files="add_instructor_files($event)">
     </FileUpload>
 
-    <div id="instructor-files-label"> Uploaded Instructor Files
-      <div class="collapse-show-area" @click="d_collapsed = !d_collapsed">
-        <div :class="['fas',
-                       d_collapsed ? 'fa-plus-square' : 'fa-minus-square',
-                      'collapse-show-icon']">
+    <div class="sidebar-container">
+      <div class="sidebar-menu">
+        <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
+          <span class="collapse-show-button" @click="d_collapsed = !d_collapsed">
+            <i class="fas fa-bars"></i>
+          </span>
+          <span class="header-text"
+                v-if="!d_collapsed || d_current_filename === null">Uploaded Files</span>
         </div>
-        <button class="collapse-show-button"
-                type="button">
-          ( {{d_collapsed? 'Show' : 'Collapse'}} )
-        </button>
-      </div>
-    </div>
 
-    <div id="viewing-area">
-      <div id="column-of-files" :style="{display: d_collapsed? 'none' : 'block'}">
-        <div v-for="instructor_file of instructor_files" :key="instructor_file.pk">
-          <single-instructor-file :file="instructor_file"
-                                  @open_file="view_file($event)">
+        <div class="sidebar-content" v-if="!d_collapsed">
+          <single-instructor-file v-for="instructor_file of instructor_files"
+                                  :key="instructor_file.pk"
+                                  :file="instructor_file"
+                                  @click="view_file(instructor_file)"
+                                  class="sidebar-item"
+                                  :class="{'active': d_current_filename === instructor_file.name}">
           </single-instructor-file>
         </div>
       </div>
-      <div id="instructor-file-viewer-wrapper"
-           :style="{left: d_collapsed ? '0' : '390px'}">
-        <MultiFileViewer ref="instructor_files_viewer"
-                         height_of_view_file="600px"
-                         @num_files_viewing_changed="num_files_currently_viewing = $event">
-          <div v-if="!d_collapsed" slot="view_files_message" style="min-width: 280px;">
-            Click on a file to view its contents.
-          </div>
-        </MultiFileViewer>
+      <div :class="['body', {'body-closed': d_collapsed}]" v-if="d_current_filename !== null">
+        <view-file :filename="d_current_filename"
+                   :file_contents="current_file_contents"></view-file>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -47,7 +39,9 @@ import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-types
 
 import FileUpload from '@/components/file_upload.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
-import { array_get_unique, array_has_unique, array_remove_unique } from '@/utils';
+import ViewFile from '@/components/view_file.vue';
+import { SafeMap } from '@/safe_map';
+import { array_get_unique, array_has_unique, array_remove_unique, toggle } from '@/utils';
 
 import SingleInstructorFile from './single_instructor_file.vue';
 
@@ -55,38 +49,47 @@ import SingleInstructorFile from './single_instructor_file.vue';
   components: {
     FileUpload,
     MultiFileViewer,
-    SingleInstructorFile
+    SingleInstructorFile,
+    ViewFile,
   }
 })
 export default class InstructorFiles extends Vue implements InstructorFileObserver {
-
-  d_collapsed = false;
-  instructor_files: InstructorFile[] = [];
-  num_files_currently_viewing = 0;
-
   @Prop({required: true, type: Project})
   project!: Project;
 
-  async created() {
+  d_collapsed = false;
+
+  // Do NOT modify the contents of this array!!
+  get instructor_files(): ReadonlyArray<Readonly<InstructorFile>> {
+    // Since this component is only used in project admin, we know that
+    // this.project.instructor files will never be undefined.
+    return this.project.instructor_files!;
+  }
+
+  d_open_files: SafeMap<string, Promise<string>> = new SafeMap();
+  d_current_filename: string | null  = null;
+
+  get current_file_contents() {
+    if (this.d_current_filename === null) {
+      // istanbul ignore next
+      throw new Error('current_file_contents requested when d_current_filename is null');
+    }
+    return this.d_open_files.get(this.d_current_filename);
+  }
+
+  created() {
     InstructorFile.subscribe(this);
-    this.instructor_files = await InstructorFile.get_all_from_project(this.project.pk);
-    this.sort_files();
   }
 
   destroyed() {
     InstructorFile.unsubscribe(this);
   }
 
-  sort_files() {
-    this.instructor_files.sort(
-      (file_a: InstructorFile, file_b: InstructorFile) =>
-        file_a.name.localeCompare(file_b.name));
-  }
-
-  async view_file(file: InstructorFile) {
-    (<MultiFileViewer> this.$refs.instructor_files_viewer).add_to_viewing(
-      file.name, file.get_content(), file.pk
-    );
+  view_file(file: InstructorFile) {
+    if (!this.d_open_files.has(file.name)) {
+      this.d_open_files.set(file.name, file.get_content());
+    }
+    this.d_current_filename = file.name;
   }
 
   async add_instructor_files(files: File[]) {
@@ -106,36 +109,31 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
         await file_to_update.set_content(file);
       }
       else {
-          let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
-          this.instructor_files.push(file_to_add);
+        let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
       }
     }
     (<FileUpload> this.$refs.instructor_files_upload).clear_files();
-    this.sort_files();
   }
 
   update_instructor_file_content_changed(instructor_file: InstructorFile,
                                          file_content: string) {
-    (<MultiFileViewer> this.$refs.instructor_files_viewer).update_contents_by_name(
-      instructor_file.name, Promise.resolve(file_content)
-    );
+    let new_open_files = new SafeMap(this.d_open_files);
+    new_open_files.set(instructor_file.name, Promise.resolve(file_content));
+    this.d_open_files = new_open_files;
   }
-
-  update_instructor_file_created(instructor_file: InstructorFile) { }
 
   update_instructor_file_deleted(instructor_file: InstructorFile) {
-    array_remove_unique(this.instructor_files, instructor_file.pk, (file, pk) => file.pk === pk);
-    (<MultiFileViewer> this.$refs.instructor_files_viewer).remove_by_name(instructor_file.name);
+    if (this.d_current_filename === instructor_file.name) {
+      this.d_current_filename = null;
+    }
+
+    let new_open_files = new SafeMap(this.d_open_files);
+    new_open_files.delete(instructor_file.name);
+    this.d_open_files = new_open_files;
   }
 
-  update_instructor_file_renamed(instructor_file: InstructorFile) {
-    let index = this.instructor_files.findIndex((file) => file.pk === instructor_file.pk);
-    Vue.set(this.instructor_files, index, instructor_file);
-    (<MultiFileViewer> this.$refs.instructor_files_viewer).rename_file(
-      instructor_file.pk, instructor_file.name
-    );
-    this.sort_files();
-  }
+  update_instructor_file_renamed(instructor_file: InstructorFile) {}
+  update_instructor_file_created(instructor_file: InstructorFile) {}
 }
 
 </script>
@@ -143,89 +141,64 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
 <style scoped lang="scss">
 @import "@/styles/colors.scss";
 @import '@/styles/button_styles.scss';
+@import '@/styles/collapsible_sidebar.scss';
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
 
 #instructor-files-component {
-  box-sizing: border-box;
-  width: 95%;
-  margin-left: 2.5%;
-  margin-right: 2.5%;
-  margin-top: 25px;
+  margin-top: 10px;
 }
 
-#column-of-files {
-  display: inline-block;
-  vertical-align: top;
-  max-height: 665px;
-  overflow: scroll;
-  border-radius: .25rem;
-  box-sizing: border-box;
+$border-color: hsl(220, 40%, 94%);
+
+@include collapsible-sidebar(
+  $sidebar-width: 300px,
+  $sidebar-header-height: 35px,
+  $border-color: $border-color,
+  $background-color: white,
+  $active-color: $pebble-light
+);
+
+.sidebar-container {
+  margin-top: 15px;
 }
 
-#instructor-file-viewer-wrapper {
-  position: absolute;
-  right: 0;
-  left: 360px;
-  top: -7px;
-  margin-bottom: 100px;
-  min-width: 50px;
-  box-sizing: border-box;
-}
-
-::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
-}
-
-#viewing-area {
-  position: relative;
-}
-
-#instructor-files-label {
-  padding: 40px 10px 15px 10px;
-  font-weight: 600;
+.sidebar-header {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-weight: bold;
   font-size: 17px;
 }
 
-.collapse-show-area {
-  display: inline-block;
+.collapse-show-button {
   cursor: pointer;
-  padding-left: 5px;
-}
-
-.collapse-show-icon {
+  background: white;
+  border: none;
   color: $ocean-blue;
-  font-size: 20px;
-  padding: 0 5px;
-  display: inline-block;
-  position: relative;
-  top: 2px;
+  outline: none;
+  padding: 0 8px;
+  font-size: 16px;
 }
 
-.collapse-show-icon:hover {
+.collapse-show-button:hover {
   color: darken($ocean-blue, 10);
 }
 
-.collapse-show-button {
-  display: none;
+.header-text {
+  padding-right: 8px;
 }
 
-@media only screen and (min-width: 481px) {
-  .collapse-show-button {
-    background: white;
-    border: none;
-    color: $ocean-blue;
-    outline: none;
-    display: inline;
-    padding: 0 5px;
-    font-size: 16px;
-  }
+.sidebar-item {
+  border-top: 1px solid $border-color;
+}
 
-  .collapse-show-button:hover {
-    color: darken($ocean-blue, 10);
-  }
-
-  .collapse-show-icon {
-    display: none;
+.sidebar-container {
+  .body {
+    border-top: 1px solid hsl(220, 40%, 94%);
   }
 }
 

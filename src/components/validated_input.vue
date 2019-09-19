@@ -214,6 +214,10 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  box-sizing: border-box;
+}
+
 #validated-input-wrapper {
   display: flex;
   flex-direction: row;
@@ -240,7 +244,6 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 }
 
 .error-ul .error-li {
-  box-sizing: border-box;
   word-wrap: break-word;
   position: relative;
   padding: 10px 15px;
@@ -262,7 +265,6 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 }
 
 .input {
-  box-sizing: border-box;
   display: inline-block;
   position: relative;
   width: 100%;

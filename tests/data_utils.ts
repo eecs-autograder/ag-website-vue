@@ -15,6 +15,7 @@ import {
     ExpectedStudentFile,
     GradingStatus,
     Group,
+    InstructorFile,
     MutationTestSuite,
     MutationTestSuiteFeedbackConfig,
     Project,
@@ -124,7 +125,7 @@ export function make_project(course_pk: number, args: Partial<Project> = {}): Pr
     return new Project(defaults);
 }
 
-const EXPECTED_STUDENT_FILE_PKS  = counter();
+const EXPECTED_STUDENT_FILE_PKS = counter();
 
 export function make_expected_student_file(
     project_pk: number, pattern: string, args: Partial<ExpectedStudentFile> = {}
@@ -142,7 +143,24 @@ export function make_expected_student_file(
     return new ExpectedStudentFile(defaults);
 }
 
-const GROUP_PKS  = counter();
+const INSTRUCTOR_FILE_PKS = counter();
+
+export function make_instructor_file(
+    project_pk: number, name: string, args: Partial<InstructorFile> = {}
+): InstructorFile {
+    let defaults = {
+        pk: INSTRUCTOR_FILE_PKS.next().value,
+        project: project_pk,
+        name: name,
+        size: rand_int(1000),
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.project = project_pk;
+    return new InstructorFile(defaults);
+}
+
+const GROUP_PKS = counter();
 
 export function make_group(project_pk: number,
                            num_members: number = 1,
@@ -209,7 +227,7 @@ export function make_submission_with_results(
     };
 }
 
-const AG_TEST_SUITE_PKS  = counter();
+const AG_TEST_SUITE_PKS = counter();
 
 export function make_ag_test_suite(project_pk: number,
                                    args: Partial<AGTestSuite> = {}): AGTestSuite {

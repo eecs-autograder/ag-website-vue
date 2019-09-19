@@ -338,6 +338,7 @@ export default class Submit extends Vue {
 
       (<FileUpload> this.$refs.submit_file_upload).clear_files();
       this.d_show_confirm_submit_modal = false;
+      this.$emit('submitted');
     });
   }
 }

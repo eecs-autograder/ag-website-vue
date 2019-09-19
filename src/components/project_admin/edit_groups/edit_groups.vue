@@ -2,7 +2,7 @@
   <div id="edit-groups-component" v-if="!d_loading">
     <div class="edit-group-container">
       <div class="edit-limits">
-        <div class="edit-title"> Edit Existing Group </div>
+        <div class="edit-title"> Edit Group </div>
         <group-lookup ref="group_lookup"
                       :groups="groups_by_members.data"
                       @update_group_selected="selected_group = $event"> </group-lookup>
@@ -251,6 +251,7 @@ export default class EditGroups extends Vue implements GroupObserver {
 }
 
 .extensions-table {
+  text-align: left;
   border-collapse: collapse;
   font-size: 16px;
   width: 100%;

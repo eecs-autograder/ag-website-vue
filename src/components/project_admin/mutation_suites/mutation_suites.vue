@@ -1,38 +1,39 @@
 <template>
   <div id="mutation-test-suites-component" class="scroll-container">
     <template v-if="!d_loading">
-      <div id="columns-container" class="scroll-column-container">
-        <div id="mutation-test-suite-sidebar" class="scroll-column">
-          <div class="scroll-container">
-
-            <div id="sidebar-header">
+      <div class="sidebar-container">
+        <div id="mutation-test-suite-sidebar" class="sidebar-menu">
+          <div id="sidebar-header"
+               class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
+            <span class="collapse-sidebar-button" @click="d_collapsed = !d_collapsed">
+              <i class="fas fa-bars"></i>
+            </span>
+            <template v-if="!d_collapsed">
               <div id="sidebar-title"> Suites </div>
               <button type="button"
                       id="add-mutation-test-suite-button"
                       @click="open_new_mutation_test_suite_modal">
                 <i class="fas fa-plus plus"></i> Add Suite
               </button>
-            </div>
+            </template>
+          </div>
 
-            <div id="sidebar-body" class="scroll-column">
-              <div id="all-mutation-test-suites">
-                <div v-for="mutation_test_suite of d_mutation_test_suites"
-                     :class="['mutation-test-suite-panel',
-                       {'active-mutation-test-suite-panel': d_active_mutation_test_suite !== null
-                         && d_active_mutation_test_suite.pk === mutation_test_suite.pk}]"
-                     :key="mutation_test_suite.pk"
-                     @click="d_active_mutation_test_suite = mutation_test_suite">
-                  {{mutation_test_suite.name}}
-                </div>
-              </div>
+          <div class="sidebar-content" v-if="!d_collapsed">
+            <div v-for="mutation_test_suite of d_mutation_test_suites"
+                  class="mutation-test-suite-panel"
+                  :class="{
+                    'active':
+                      d_active_mutation_test_suite !== null
+                      && d_active_mutation_test_suite.pk === mutation_test_suite.pk
+                  }"
+                  :key="mutation_test_suite.pk"
+                  @click="d_active_mutation_test_suite = mutation_test_suite">
+              {{mutation_test_suite.name}}
             </div>
-
           </div>
         </div>
 
-        <div class="vertical-divider"></div>
-
-        <div id="viewing-window" class="scroll-column-grow">
+        <div class="body" :class="{'body-closed': d_collapsed}">
           <div v-if="d_active_mutation_test_suite !== null">
             <validated-form id="mutation-test-suite-form"
                             autocomplete="off"
@@ -328,6 +329,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   d_show_new_mutation_test_suite_modal = false;
   d_show_delete_mutation_test_suite_modal = false;
 
+  d_collapsed = false;
+
   async created() {
     MutationTestSuite.subscribe(this);
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
@@ -554,53 +557,63 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
+@import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/independent_scrolling.scss';
 
 * {
   box-sizing: border-box;
 }
 
-.tab-heading {
-  background-color: inherit;
-  margin: 0;
-  overflow: hidden;
-  height: 20px;
+$border-color: $gray-blue-1;
+
+@include collapsible-sidebar(
+  $sidebar-width: 300px,
+  $sidebar-header-height: 50px,
+  $background-color: white,
+  $active-color: $light-blue,
+  $border-color: $border-color,
+  $stretch: true,
+);
+
+.sidebar-container {
+  .sidebar-menu {
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
+  }
+
+  .sidebar-header {
+    padding: 5px 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sidebar-header-closed {
+    border-bottom: 1px solid $border-color;
+  }
+
+  .body {
+    padding-top: 15px;
+    padding-right: 10px;
+  }
 }
 
-.tab-body {
-  padding: 15px 0 0 0;
-}
-
-#columns-container {
-  height: 100%;
-}
-
-#mutation-test-suite-sidebar {
-  min-width: 300px;
-  width: 200px;
-}
-
-#sidebar-header {
-  padding: 15px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-left: none;
-  border-bottom: none;
-  margin-top: 10px;
+.collapse-sidebar-button .fa-bars:hover {
+  color: $stormy-gray-dark;
+  cursor: pointer;
 }
 
 #sidebar-title {
-  display: inline-block;
   font-size: 1.125rem;
+  margin: 0 8px;
 }
 
 #add-mutation-test-suite-button {
   @extend .white-button;
   box-shadow: none;
+  margin-left: auto;
 }
 
 .plus {
@@ -608,36 +621,11 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   margin-right: 3px;
 }
 
-#sidebar-body {
-  padding-bottom: 10px;
-}
-
-#all-mutation-test-suites {
-  border-color: $white-gray;
-  border-style: solid;
-  border-width: 1px 0;
-}
-
 .mutation-test-suite-panel {
-  border-bottom: 1px solid $white-gray;
+  border-top: 1px solid $border-color;
   cursor: pointer;
   font-size: 14px;
   padding: 8px;
-  width: 100%;
-}
-
-.active-mutation-test-suite-panel {
-  background-color: $light-blue;
-}
-
-.vertical-divider {
-  border: 1px solid $pebble-medium;
-  margin: 10px 8px 10px 0;
-}
-
-#viewing-window {
-  padding-top: 20px;
-  padding-right: 20px;
 }
 
 #config-panels-container {
@@ -673,6 +661,7 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   @extend .red-button;
   margin: 8px 0 0 2px
 }
+
 // MODAL stuff ----------------------------------------------------
 .modal-header {
   font-size: 20px;

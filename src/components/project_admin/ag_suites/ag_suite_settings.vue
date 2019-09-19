@@ -561,7 +561,7 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 }
 
 #ag-test-suite-name-container {
-  padding: 0 12px 22px 12px;
+  padding: 10px 12px 22px 12px;
 }
 
 </style>

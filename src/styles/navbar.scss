@@ -1,0 +1,39 @@
+@mixin navbar($background-color, $hover-color: none, $active-color: none, $border-color: none) {
+    .navbar {
+        display: flex;
+        flex-wrap: wrap;
+        white-space: nowrap;
+
+        background-color: $background-color;
+
+        @if $border-color != none {
+            border: 1px solid $border-color;
+            border-left: none;
+            border-right: none;
+        }
+
+        .nav-link {
+
+            display: flex;
+            align-items: center;
+
+            &:not(.active):not(.disabled):hover {
+                cursor: pointer;
+                @if $hover-color != none {
+                    background-color: $hover-color;
+                }
+            }
+        }
+
+        .active {
+            cursor: default;
+            @if $active-color != none {
+                background-color: $active-color;
+            }
+        }
+
+        .disabled {
+            cursor: not-allowed;
+        }
+    }
+}

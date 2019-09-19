@@ -582,6 +582,8 @@ describe('Submit tests', () => {
         expect(wrapper.vm.d_submit_progress).toEqual(100);
 
         expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(false);
+
+        expect(wrapper.emitted().submitted.length).toEqual(1);
     });
 
     test('Submit API error', async () => {

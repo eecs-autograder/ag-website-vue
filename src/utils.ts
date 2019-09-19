@@ -103,7 +103,7 @@ export function array_add_unique<ItemType>(
 // Returns true if the given value is in array using the given equality
 // comparison function.
 export function array_has_unique<ItemType, SentinelType>(
-        array: ItemType[], value: SentinelType,
+        array: ReadonlyArray<Readonly<ItemType>>, value: SentinelType,
         eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
     return array.find((item: ItemType) => eq_func(item, value)) !== undefined;
 }
@@ -111,7 +111,7 @@ export function array_has_unique<ItemType, SentinelType>(
 // Finds and returns the item with the given value from array.
 // Throws Error if item does not exist.
 export function array_get_unique<ItemType, SentinelType>(
-        array: ItemType[], value: SentinelType,
+        array: ReadonlyArray<Readonly<ItemType>>, value: SentinelType,
         eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
     let item = array.find((elt: ItemType) => eq_func(elt, value));
     if (item === undefined) {

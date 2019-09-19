@@ -1,81 +1,72 @@
 <template>
-  <div>
-    <div id="single-instructor-file-component" @click="$emit('open_file', file)">
-      <div>
-        <div v-if="editing">
-          <div @click.stop>
-            <validated-form autocomplete="off"
-                            spellcheck="false"
-                            @submit>
-              <validated-input ref='file_name'
-                               v-model="new_file_name"
-                               :validators="[is_not_empty]"
-                               input_style="border-radius: 2px;
-                                            border: 0px solid hsl(220, 30%, 72%);
-                                            padding: 3px 5px;
-                                            width: 360px;
-                                            margin-right: 10px;
-                                            box-sizing: border-box;"
-                               @input_validity_changed="new_name_is_valid = $event">
-                <div slot="suffix" class="edit-name-buttons">
-                  <button class="update-file-name-button"
-                          :disabled="!new_name_is_valid"
-                          @click.stop="rename_file"> Update
-                  </button>
-                  <button class="update-file-name-cancel-button"
-                          @click.stop="cancel_renaming_file"> Cancel
-                  </button>
-                </div>
-              </validated-input>
-            </validated-form>
-            <APIErrors ref="api_errors"></APIErrors>
-          </div>
+  <div class="single-instructor-file-component" v-on="$listeners">
+    <div v-if="editing">
+      <validated-form autocomplete="off"
+                      spellcheck="false"
+                      ref="rename_form"
+                      @submit=rename_file>
+        <validated-input ref='file_name'
+                          v-model="new_file_name"
+                          :validators="[is_not_empty]"
+                          input_style="width: 200px;
+                                      padding: 3px 5px;
+                                      margin-right: 10px;"
+                          @input_validity_changed="new_name_is_valid = $event">
+        </validated-input>
+        <div class="edit-name-buttons">
+          <button class="update-file-name-button"
+                  type="submit"
+                  :disabled="!new_name_is_valid"
+                  @click.stop>
+            Save
+          </button>
+          <button class="update-file-name-cancel-button"
+                  @click.stop="cancel_renaming_file"> Cancel
+          </button>
         </div>
-        <div v-else class="not-editing">
-          <div class="file-name"> <span>{{file.name}}</span>
-            <div class="icon-holder">
-              <i class="fas fa-file-download download-file"
-                 @click.stop="download_file"></i>
-              <i class="fas fa-pencil-alt edit-file-name"
-                 @click.stop="new_file_name = file.name; editing = true;"></i>
-            </div>
-          </div>
-          <i class="far fa-trash-alt delete-file"
-             @click.stop="d_show_delete_instructor_file_modal = true"></i>
-        </div>
-      </div>
-      <div class="display-timestamp">
-        {{format_datetime(file.last_modified)}}
-      </div>
+      </validated-form>
+      <APIErrors ref="api_errors"></APIErrors>
     </div>
+    <div v-else class="not-editing">
+      <div class="file-name">{{file.name}}</div>
+      <i class="fas fa-pencil-alt edit-file-name"
+          @click.stop="new_file_name = file.name; editing = true;"></i>
+      <i class="fas fa-file-download download-file"
+          @click.stop="download_file"></i>
+      <i class="far fa-trash-alt delete-file"
+          @click.stop="d_show_delete_instructor_file_modal = true"></i>
+    </div>
+    <div class="display-timestamp">
+      {{format_datetime(file.last_modified)}}
+    </div>
+    <div @click.stop>
+      <modal v-if="d_show_delete_instructor_file_modal"
+            @close="d_show_delete_instructor_file_modal = false"
+            ref="delete_instructor_file_modal"
+            size="large"
+            click_outside_to_close>
+        <div id="modal-header">Confirm Delete</div>
+        <hr>
+        <div id="modal-body"> Are you sure you want to delete the file
+          <span class="file-to-delete">{{file.name}}</span>?
+          This action cannot be undone, and any test cases that rely on this file may have
+          to be updated before they'll run correctly again.
+        </div>
 
-    <modal v-if="d_show_delete_instructor_file_modal"
-           @close="d_show_delete_instructor_file_modal = false"
-           ref="delete_instructor_file_modal"
-           size="large"
-           :include_closing_x="false">
-      <div id="modal-header">Confirm Deletion</div>
-      <hr>
-      <div id="modal-body"> Are you sure you want to delete the file
-        <span class="file-to-delete">{{file.name}}</span>?
-        This action cannot be undone, and any test cases that rely on this file may have
-        to be updated before they run correctly again.
-      </div>
-
-      <div id="modal-button-container">
-        <button class="modal-delete-button"
-                :disabled="d_delete_pending"
-                @click="delete_file_permanently"> Delete </button>
-        <button class="modal-cancel-button"
-                @click="d_show_delete_instructor_file_modal = false"> Cancel </button>
-      </div>
-    </modal>
-
+        <div id="modal-button-container">
+          <button class="modal-delete-button"
+                  :disabled="d_delete_pending"
+                  @click="delete_file_permanently"> Delete </button>
+          <button class="modal-cancel-button"
+                  @click="d_show_delete_instructor_file_modal = false"> Cancel </button>
+        </div>
+      </modal>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { InstructorFile } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
@@ -146,97 +137,80 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/global.scss';
 
-.icon-holder {
-  display: inline-block;
-  padding-top: 2px;
-}
-
-.not-editing {
-  max-width: 250px;
-}
-
-.edit-name-buttons {
-  display: block;
-  padding: 9px 0 7px 0;
-}
-
-.update-file-name-button, .update-file-name-cancel-button {
-  background-color: hsl(220, 30%, 60%);
-  border-radius: 2px;
-  border: 0;
-  padding: 4px 6px 5px 6px;
-  color: white;
-  display: inline-block;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.update-file-name-button:disabled, .update-file-name-button:disabled:hover {
-  background-color: hsl(220, 30%, 85%);
-  color: gray;
-  cursor: default;
-}
-
-.update-file-name-cancel-button {
-  margin-left: 10px;
-}
-
-.update-file-name-button:hover, .update-file-name-cancel-button:hover {
-  background-color: hsl(220, 30%, 45%);
-}
-
-.delete-file {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  color: hsl(220, 20%, 75%);
-}
-
-.delete-file:hover {
-  color: hsl(220, 20%, 55%);
-}
-
-.download-file {
-  color: hsl(220, 30%, 60%);
-  padding-left: 1px;
-}
-
-.download-file:hover {
-  color: hsl(220, 30%, 35%);
-}
-
-.edit-file-name {
-  color: hsl(220, 30%, 60%);
-  padding-left: 10px;
-}
-
-.edit-file-name:hover {
-  color: hsl(220, 30%, 35%);
-}
-
-#single-instructor-file-component {
-  margin-bottom: 5px;
-  cursor: pointer;
-  background-color: hsl(220, 40%, 94%);
-  width: 380px;
-  padding: 9px 11px 7px 11px;
-  border-radius: .25rem;
-  position: relative;
+* {
   box-sizing: border-box;
+}
+
+.single-instructor-file-component {
+  cursor: pointer;
+
+  padding: 9px 11px 7px 11px;
   word-wrap: break-word;
   word-break: break-word;
 }
 
-.file-name {
-  display: inline-block;
-  font-size: 16px;
-  padding-bottom: 2px;
-  box-sizing: border-box;
+.icon-holder {
+  // display: inline-block;
+  padding-top: 2px;
 }
 
-.file-name span {
-  padding-right: 8px;
+.not-editing {
+  display: flex;
+
+  .file-name {
+    // max-width: 200px;
+    font-size: 16px;
+    padding-bottom: 2px;
+  }
+
+  .edit-file-name, .download-file, .delete-file {
+    margin: 0 5px;
+  }
+
+  .edit-file-name {
+    color: hsl(220, 30%, 60%);
+    margin-left: auto;
+  }
+
+  .edit-file-name:hover {
+    color: hsl(220, 30%, 35%);
+  }
+
+  .download-file {
+    color: hsl(220, 30%, 60%);
+  }
+
+  .download-file:hover {
+    color: hsl(220, 30%, 35%);
+  }
+
+  .delete-file {
+    color: hsl(220, 20%, 75%);
+  }
+
+  .delete-file:hover {
+    color: hsl(220, 20%, 55%);
+  }
+}
+
+.edit-name-buttons {
+  display: flex;
+  padding: 9px 0 7px 0;
+}
+
+.update-file-name-button {
+  @extend .green-button;
+}
+
+.update-file-name-cancel-button {
+  @extend .flat-white-button;
+  margin-left: 10px;
+}
+
+.update-file-name-button, .update-file-name-cancel-button {
+  padding: 4px 6px 5px 6px;
 }
 
 .display-timestamp {

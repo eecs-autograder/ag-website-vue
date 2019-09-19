@@ -239,17 +239,17 @@ interface ExtractedTabData {
   }
 
   // Added to outermost element when scroll_body is true
-  .scroll-tabs-container {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
+  // .scroll-tabs-container {
+  //   overflow: hidden;
+  //   display: flex;
+  //   flex-direction: column;
+  // }
 
-  .scroll-tab-body-container {
-    height: 100%;
-    overflow: auto;
-    flex-grow: 1;
-  }
+  // .scroll-tab-body-container {
+  //   height: 100%;
+  //   overflow: auto;
+  //   flex-grow: 1;
+  // }
 
   // Added to the outermost element when displaying tabs as sidebar.
   .container-sidebar {

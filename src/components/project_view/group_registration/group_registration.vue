@@ -5,10 +5,12 @@
           v-if="!project.disallow_group_registration
                 && invitation_sent === null
                 && invitations_received.length === 0">
-      <button id="work-alone-button"
-              class="teal-button"
-              @click="d_show_confirm_working_alone_modal = true"> I am working alone </button>
-      <div>- or -</div>
+      <template v-if="project.min_group_size === 1">
+        <button id="work-alone-button"
+                class="teal-button"
+                @click="d_show_confirm_working_alone_modal = true"> I am working alone </button>
+        <div>- or -</div>
+      </template>
       <button id="send-group-invitation-button"
               class="purple-button"
               @click="d_show_send_group_invitation_modal = true"> Send group invitation </button>
@@ -234,25 +236,30 @@ export default class GroupRegistration extends Vue {
   d_show_delete_invitation_modal = false;
 
   async created() {
-    if (!this.project.disallow_group_registration) {
-      if (this.project.max_group_size === 1) {
-        await this.work_alone();
-      }
-
-      this.invitations_received = await this.d_globals.current_user.group_invitations_received();
-      this.invitations_received = this.invitations_received.filter(
-        (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
-      );
-
-      let invitations_sent = await this.d_globals.current_user.group_invitations_sent();
-      invitations_sent = invitations_sent.filter(
-        (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
-      );
-
-      if (invitations_sent.length > 0) {
-        this.invitation_sent = invitations_sent[0];
-      }
+    if (this.project.disallow_group_registration) {
+      this.d_loading = false;
+      return;
     }
+    if (this.project.max_group_size === 1) {
+      await this.work_alone();
+      this.d_loading = false;
+      return;
+    }
+
+    this.invitations_received = await this.d_globals.current_user.group_invitations_received();
+    this.invitations_received = this.invitations_received.filter(
+      (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
+    );
+
+    let invitations_sent = await this.d_globals.current_user.group_invitations_sent();
+    invitations_sent = invitations_sent.filter(
+      (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
+    );
+
+    if (invitations_sent.length > 0) {
+      this.invitation_sent = invitations_sent[0];
+    }
+
     this.d_loading = false;
   }
 

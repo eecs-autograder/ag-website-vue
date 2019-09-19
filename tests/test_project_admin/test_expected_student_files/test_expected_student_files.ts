@@ -9,6 +9,8 @@ import * as sinon from "sinon";
 
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 
+import * as data_ut from '@/tests/data_utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -16,7 +18,7 @@ beforeAll(() => {
 describe('ExpectedStudentFiles tests', () => {
     let wrapper: Wrapper<ExpectedStudentFiles>;
     let component: ExpectedStudentFiles;
-    let project_1: Project;
+    let project: Project;
     let file_1_has_wildcard: ExpectedStudentFile;
     let file_2_no_wildcard: ExpectedStudentFile;
     let file_3_no_wildcard: ExpectedStudentFile;
@@ -24,33 +26,7 @@ describe('ExpectedStudentFiles tests', () => {
     let existing_files: ExpectedStudentFile[];
 
     beforeEach(() => {
-        project_1 = new Project({
-            pk: 10,
-            name: "Detroit Zoo",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false,
-        });
+        project = data_ut.make_project(data_ut.make_course().pk);
 
         file_1_has_wildcard = new ExpectedStudentFile({
             pk: 1,
@@ -81,8 +57,8 @@ describe('ExpectedStudentFiles tests', () => {
 
         existing_files = [
             file_1_has_wildcard,
+            file_2_no_wildcard,
             file_3_no_wildcard,
-            file_2_no_wildcard
         ];
 
         new_file = new ExpectedStudentFile({
@@ -94,13 +70,11 @@ describe('ExpectedStudentFiles tests', () => {
             last_modified: "now"
         });
 
-        sinon.stub(ExpectedStudentFile, "get_all_from_project").returns(
-            Promise.resolve(existing_files)
-        );
+        project.expected_student_files = existing_files;
 
         wrapper = mount(ExpectedStudentFiles, {
            propsData: {
-               project: project_1
+               project: project
            }
         });
         component = wrapper.vm;
@@ -114,71 +88,13 @@ describe('ExpectedStudentFiles tests', () => {
         }
     });
 
-    test('Existing files get fetched and sorted', () => {
+    test('Existing files used from project', () => {
         expect(component.expected_student_files.length).toEqual(3);
         expect(component.expected_student_files[0]).toEqual(file_1_has_wildcard);
         expect(component.expected_student_files[1]).toEqual(file_2_no_wildcard);
         expect(component.expected_student_files[2]).toEqual(file_3_no_wildcard);
     });
 
-    test('Create a file', async () => {
-        expect(component.expected_student_files.length).toEqual(3);
-
-        ExpectedStudentFile.notify_expected_student_file_created(new_file);
-
-        expect(component.expected_student_files.length).toEqual(4);
-        expect(component.expected_student_files[0]).toEqual(file_1_has_wildcard);
-        expect(component.expected_student_files[1]).toEqual(file_2_no_wildcard);
-        expect(component.expected_student_files[2]).toEqual(file_3_no_wildcard);
-        expect(component.expected_student_files[3]).toEqual(new_file);
-    });
-
-    test('Delete a file', async () => {
-        expect(component.expected_student_files.length).toEqual(3);
-
-        ExpectedStudentFile.notify_expected_student_file_deleted(file_2_no_wildcard);
-        await component.$nextTick();
-
-        expect(component.expected_student_files.length).toEqual(2);
-        expect(component.expected_student_files[0]).toEqual(file_1_has_wildcard);
-        expect(component.expected_student_files[1]).toEqual(file_3_no_wildcard);
-    });
-
-    test('Edit a file - no pattern to pattern', async () => {
-        let updated_file = new ExpectedStudentFile({
-            pk: 3,
-            project: 10,
-            pattern: "aardvarks?.cpp",
-            min_num_matches: 1,
-            max_num_matches: 6,
-            last_modified: "now"
-        });
-
-        ExpectedStudentFile.notify_expected_student_file_changed(updated_file);
-        await component.$nextTick();
-
-        expect(component.expected_student_files.length).toEqual(3);
-        expect(component.expected_student_files[0]).toEqual(updated_file);
-        expect(component.expected_student_files[1]).toEqual(file_1_has_wildcard);
-        expect(component.expected_student_files[2]).toEqual(file_2_no_wildcard);
-    });
-
-    test('Edit a file - pattern to no pattern', async () => {
-        let updated_file = new ExpectedStudentFile({
-            pk: 2,
-            project: 10,
-            pattern: "aardvarks.cpp",
-            min_num_matches: 1,
-            max_num_matches: 1,
-            last_modified: "now"
-        });
-
-        ExpectedStudentFile.notify_expected_student_file_changed(updated_file);
-        await component.$nextTick();
-
-        expect(component.expected_student_files.length).toEqual(3);
-        expect(component.expected_student_files[0]).toEqual(updated_file);
-        expect(component.expected_student_files[1]).toEqual(file_1_has_wildcard);
-        expect(component.expected_student_files[2]).toEqual(file_3_no_wildcard);
-    });
+    // Note that create/delete/edit actions are handled in child components,
+    // and the parent project_admin.vue handles observer events.
 });

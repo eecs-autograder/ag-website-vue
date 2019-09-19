@@ -1,0 +1,103 @@
+@mixin collapsible-sidebar(
+    // The width of the sidebar.
+    $sidebar-width,
+
+    // The height of the element with class "sidebar-header". This value is
+    // also subtracted from 100vh to determine the max-height of .sidebar-content.
+    $sidebar-header-height,
+
+    // Border color around the sidebar menu
+    $border-color: none,
+
+    // Background color of the whole sidebar menu
+    $background-color: none,
+
+    // Background color for elements in the sidebar content marked with the
+    // class "active"
+    $active-color: none,
+
+    // The min screen width at which the open sidebar will stop overlapping
+    // the body content.
+    $overlap-breakpoint: 800px,
+
+    // This value is also subtracted from 100vh to determine the max-height of
+    // .sidebar-content. Useful if you have a footer and don't want it to cover
+    // the bottom of the sidebar content.
+    $page-footer-height: 0px,
+
+    // When true, sets the height of .sidebar-content to be equal to its
+    // max-height.
+    $stretch: false,
+) {
+    .sidebar-container {
+        display: flex;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .sidebar-menu {
+            z-index: 1;
+            background-color: $background-color;
+            @if $border-color != none {
+                border: 1px solid $border-color;
+            }
+
+            .sidebar-header, .sidebar-content {
+                // min-width works better with flex-grow
+                min-width: $sidebar-width;
+                max-width: $sidebar-width;
+            }
+
+            .sidebar-header {
+                height: $sidebar-header-height;
+
+                position: sticky;
+                top: 0;
+            }
+
+            .sidebar-header-closed {
+                min-width: auto;
+            }
+
+            $max-height: calc(100vh - #{$sidebar-header-height} - #{$page-footer-height});
+            .sidebar-content {
+                position: sticky;
+                top: $sidebar-header-height;
+                overflow: auto;
+                max-height: $max-height;
+                @if $stretch {
+                    height: $max-height;
+                }
+
+                @if $active-color != none {
+                    .active {
+                        background-color: $active-color;
+                    }
+                }
+            }
+        }
+
+        .body {
+            flex-grow: 1;
+            margin-left: -$sidebar-width;
+            @if $page-footer-height != 0px {
+                margin-bottom: $page-footer-height;
+            }
+        }
+
+        .body-closed {
+            margin-left: 0;
+        }
+
+        @media only screen and (min-width: $overlap-breakpoint) {
+            .sidebar-header {
+                border-right: none;
+            }
+
+            .body, .body-closed {
+                margin-left: 0;
+            }
+        }
+    }
+}

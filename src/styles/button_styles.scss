@@ -332,3 +332,18 @@ $white-button-text: hsl(220, 12%, 20%);
     text-shadow: 0 -0.5px 0.5px $white-shadow;
 }
 
+.flat-white-button {
+    @extend .button;
+
+    box-shadow: none;
+    color: black;
+    background: white;
+}
+
+.flat-white-button:hover:enabled {
+    @include hover_state($pebble-medium, $pebble-medium);
+}
+
+.flat-white-button:disabled {
+    color: $stormy-gray-light;
+}
