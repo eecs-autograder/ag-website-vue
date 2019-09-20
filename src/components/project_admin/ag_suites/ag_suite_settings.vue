@@ -41,7 +41,7 @@
                         @update_item_selected="
                           d_ag_test_suite.sandbox_docker_image = $event">
                 <template slot="header">
-                  <div tabindex="1" class="dropdown-header-wrapper">
+                  <div tabindex="0" class="dropdown-header-wrapper">
                     <div class="dropdown-header sandbox-docker-image-dropdown">
                       {{d_ag_test_suite.sandbox_docker_image === null ? ' '
                       : d_ag_test_suite.sandbox_docker_image.display_name}}

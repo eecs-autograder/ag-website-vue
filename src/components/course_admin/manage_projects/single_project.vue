@@ -59,7 +59,7 @@
                         dropdown_height="150px"
                         @update_item_selected="course_to_clone_to = $event">
                 <template slot="header">
-                <div tabindex="1" class="dropdown-header-wrapper">
+                <div tabindex="0" class="dropdown-header-wrapper">
                   <div id="input-course-to-copy-to" class="dropdown-header">
                     {{format_course_name(course_to_clone_to)}}
                     <i class="fas fa-caret-down dropdown-caret"></i>

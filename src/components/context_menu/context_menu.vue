@@ -1,5 +1,5 @@
 <template>
-  <div tabindex="1"
+  <div tabindex="-1"
        id="context-menu-container"
        @blur="hide_context_menu"
        @keyup.esc="hide_context_menu">

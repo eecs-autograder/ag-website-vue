@@ -12,7 +12,7 @@
                 dropdown_height="200px"
                 @update_item_selected="add_item_1($event)">
         <template slot="header">
-          <p tabindex="1" class="header-para">
+          <p tabindex="0" class="header-para">
             {{selected_menu_item.option}}
           </p>
         </template>
@@ -67,7 +67,7 @@
       <dropdown ref="dropdown_menu_ex_4"
           :items="food_menu_items">
         <template slot="header">
-          <div tabindex="1" class="menu-option navy-tile">
+          <div tabindex="0" class="menu-option navy-tile">
             <p> Products </p>
           </div>
         </template>
@@ -75,7 +75,7 @@
       <dropdown ref="dropdown_menu_ex_5"
                 :items="contact_methods">
         <template slot="header">
-          <div tabindex="1" class="menu-option">
+          <div tabindex="0" class="menu-option">
             <p> Contact </p>
           </div>
         </template>
