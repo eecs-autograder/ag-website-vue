@@ -34,7 +34,7 @@
                   @update_item_selected="d_mutation_test_suite.sandbox_docker_image = $event;
                                            $emit('input', d_mutation_test_suite)">
           <template slot="header">
-            <div tabindex="1" class="dropdown-header-wrapper">
+            <div tabindex="0" class="dropdown-header-wrapper">
               <div class="dropdown-header sandbox-docker-image-dropdown">
                 {{d_mutation_test_suite.sandbox_docker_image === null ? ' '
                 : d_mutation_test_suite.sandbox_docker_image.display_name}}

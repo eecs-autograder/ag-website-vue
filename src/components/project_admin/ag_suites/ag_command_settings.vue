@@ -83,7 +83,7 @@
                       @update_item_selected="d_ag_test_command.stdin_instructor_file
                                               = $event">
               <template slot="header">
-                <div tabindex="1" class="dropdown-header-wrapper">
+                <div tabindex="0" class="dropdown-header-wrapper">
                   <div class="dropdown-header instructor-file-dropdown">
                     {{d_ag_test_command.stdin_instructor_file === null ? ' '
                       : d_ag_test_command.stdin_instructor_file.name}}
@@ -206,7 +206,7 @@
                       @update_item_selected="
                           d_ag_test_command.expected_stdout_instructor_file = $event">
               <template slot="header">
-                <div tabindex="1" class="dropdown-header-wrapper">
+                <div tabindex="0" class="dropdown-header-wrapper">
                   <div class="dropdown-header instructor-file-dropdown">
                     {{d_ag_test_command.expected_stdout_instructor_file === null ? ' '
                     : d_ag_test_command.expected_stdout_instructor_file.name}}
@@ -308,7 +308,7 @@
                       @update_item_selected="
                           d_ag_test_command.expected_stderr_instructor_file = $event">
               <template slot="header">
-                <div tabindex="1" class="dropdown-header-wrapper">
+                <div tabindex="0" class="dropdown-header-wrapper">
                   <div class="dropdown-header instructor-file-dropdown">
                     {{d_ag_test_command.expected_stderr_instructor_file === null ? ' '
                     : d_ag_test_command.expected_stderr_instructor_file.name}}

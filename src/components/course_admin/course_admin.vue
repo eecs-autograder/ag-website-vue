@@ -34,7 +34,7 @@
                                              current_tab_index = 1;
                                              on_tab_changed(1);">
               <template slot="header">
-                <div class="tab-label" tabindex="1">
+                <div class="tab-label" tabindex="0">
                   <p class="roster-tab-header tab-header"
                      ref="roster_tab_header"
                      @click="show_roster_tab_dropdown_menu">

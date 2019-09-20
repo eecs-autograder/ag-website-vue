@@ -37,7 +37,7 @@
                         :items="countries"
                         @update_item_selected="country_selected = $event">
                 <template slot="header">
-                  <div class="tab-label" tabindex="1">
+                  <div class="tab-label" tabindex="0">
                     <p class="tab-heading-dropdown-tabs"
                        ref="edit_roster_tab"
                        @click.stop="show_countries_dropdown">
