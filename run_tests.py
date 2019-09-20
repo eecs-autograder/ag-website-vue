@@ -26,12 +26,12 @@ def main():
     server_thread = threading.Thread(target=start_server)
     server_thread.start()
 
-    while server_ready.wait(.1):
-        with HTTPConnection('localhost', port=PORT, timeout=1) as http:
-            http.request('READY', '/')
-            http.getresponse()
-
-    result = subprocess.run(['./node_modules/.bin/vue-cli-service', 'test:unit'] + args.test_args)
+    while not server_ready.wait(.1):
+        http = HTTPConnection('localhost', port=PORT, timeout=1)
+        http.request('READY', '/')
+        http.getresponse()
+     
+    result = subprocess.run(['./node_modules/.bin/vue-cli-service', 'test:unit'] + args.test_args) 
 
     tcp_server.shutdown()
     server_thread.join()
@@ -43,7 +43,7 @@ def main():
           'sent to the following urls (<url>, <count>):')
     for url, count in request_urls.items():
         print(f'{url}, {count}')
-
+        
     exit(1)
 
 
@@ -85,12 +85,15 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.record_request()
 
     def record_request(self):
+        print(self.headers)
         with request_urls_lock:
             request_urls[self.path] += 1
         self.send_error(501, 'Unmocked HTTP request detected')
 
     def do_READY(self):
+        server_ready.set()
         self.send_response(200)
+        self.end_headers()
 
 
 if __name__ == '__main__':
