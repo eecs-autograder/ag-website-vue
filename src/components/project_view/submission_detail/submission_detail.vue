@@ -104,29 +104,28 @@
                   id="adjust-feedback-select"
                   class="select"
                   @change="load_results()">
-            <option ref="staff_viewer_feedback_option"
-                    :value="FeedbackCategory.staff_viewer">
-              {{FeedbackCategory.staff_viewer}}
-            </option>
-            <option ref="ultimate_submission_feedback_option"
-                    :value="FeedbackCategory.ultimate_submission">
-              {{FeedbackCategory.ultimate_submission}}
-            </option>
-
             <option v-if="d_user_roles.is_admin || is_group_member"
                     ref="normal_feedback_option"
                     :value="FeedbackCategory.normal">
-              {{FeedbackCategory.normal}}
+              Normal
             </option>
             <option v-if="d_user_roles.is_admin || is_group_member"
                     ref="past_limit_feedback_option"
                     :value="FeedbackCategory.past_limit_submission">
-              {{FeedbackCategory.past_limit_submission}}
+              Past Limit
+            </option>
+            <option ref="ultimate_submission_feedback_option"
+                    :value="FeedbackCategory.ultimate_submission">
+              Final Graded
+            </option>
+            <option ref="staff_viewer_feedback_option"
+                    :value="FeedbackCategory.staff_viewer">
+              Student Lookup
             </option>
             <option v-if="d_user_roles.is_admin || is_group_member"
                     ref="max_feedback_option"
                     :value="FeedbackCategory.max">
-              {{FeedbackCategory.max}}
+              Max
             </option>
           </select>
         </div>
