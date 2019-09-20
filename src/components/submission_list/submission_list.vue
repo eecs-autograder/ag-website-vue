@@ -210,8 +210,8 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
   }
 
   get is_ultimate_submission(): boolean {
-      return this.d_selected_submission !== null && this.d_ultimate_submission !== null &&
-             this.d_selected_submission.pk === this.d_ultimate_submission.pk;
+      return this.d_selected_submission !== null && this.d_ultimate_submission !== null
+             && this.d_selected_submission.pk === this.d_ultimate_submission.pk;
   }
 
   private async get_ultimate_submission() {
