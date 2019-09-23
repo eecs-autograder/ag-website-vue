@@ -45,8 +45,67 @@ describe('DownloadGrades tests', () => {
         sinon.restore();
     });
 
-    test('props', () => {
+    test('d_downloads fetched, sorted, and displayed', () => {
         expect(wrapper.vm.project).toEqual(project);
+    });
+
+    test('d_download_grades binding', async () => {
+        let download_grades_toggle = wrapper.find({ref: 'download_grades'});
+
+        wrapper.vm.d_download_grades = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_download_grades).toEqual(true);
+
+        download_grades_toggle.find('.off-border').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_download_grades).toEqual(false);
+
+        download_grades_toggle.find('.on-border').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_download_grades).toEqual(true);
+    });
+
+    test('d_include_staff binding', async () => {
+        let include_staff_toggle = wrapper.find({ref: 'include_staff'});
+
+        wrapper.vm.d_include_staff = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_include_staff).toEqual(true);
+
+        include_staff_toggle.find('.off-border').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_include_staff).toEqual(false);
+
+        include_staff_toggle.find('.on-border').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_include_staff).toEqual(true);
+    });
+
+    test('d_final_graded_submissions_only binding', async () => {
+        let final_graded_submissions_only_toggle = wrapper.find(
+            {ref: 'final_graded_submissions_only'}
+        );
+
+        wrapper.vm.d_final_graded_submissions_only = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_final_graded_submissions_only).toEqual(true);
+
+        final_graded_submissions_only_toggle.find('.off-border').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_final_graded_submissions_only).toEqual(false);
+
+        final_graded_submissions_only_toggle.find('.on-border').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_final_graded_submissions_only).toEqual(true);
     });
 
     test('get_filename - download_type === all_scores', () => {
@@ -126,4 +185,28 @@ describe('DownloadGrades tests', () => {
 
         expect(wrapper.vm.get_download_url(base_url)).toEqual(expected_download_url);
     });
+
+    test.skip('Download task result', async () => {
+        // sinon for getting file content? csv and zip?
+    });
+});
+
+describe.skip('Polling tests', () => {
+
+    test('Download submission files', async () => {
+
+    });
+
+    test('Download submission scores', async () => {
+
+    });
+
+    test('Downloads unchanged when refreshed', async () => {
+
+    });
+
+    test('Downloads changed when refreshed', async () => {
+
+    });
+
 });

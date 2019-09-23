@@ -6,7 +6,8 @@
 
         <div class="toggle-container">
           <Toggle v-model="d_download_grades"
-                  :active_background_color="d_active_toggle_color">
+                  :active_background_color="d_active_toggle_color"
+                  ref="download_grades">
             <div slot="on">
               <p class="toggle-option"> Download Scores </p>
             </div>
@@ -18,7 +19,8 @@
 
         <div class="toggle-container">
           <Toggle v-model="d_include_staff"
-                  :active_background_color="d_active_toggle_color">
+                  :active_background_color="d_active_toggle_color"
+                  ref="include_staff">
             <div slot="on">
               <p class="toggle-option"> Include Staff </p>
             </div>
@@ -30,7 +32,8 @@
 
         <div class="toggle-container">
           <Toggle v-model="d_final_graded_submissions_only"
-                  :active_background_color="d_active_toggle_color">
+                  :active_background_color="d_active_toggle_color"
+                  ref="final_graded_submissions_only">
             <div slot="on">
               <p class="toggle-option"> Final Graded Submissions Only </p>
             </div>
@@ -84,23 +87,57 @@ import * as FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
 import Toggle from "@/components/toggle.vue";
-import { format_datetime } from '@/utils';
+import { format_datetime, sleep, zip } from '@/utils';
 
 export enum DownloadType {
-    all_scores = 'all_scores',
-    final_graded_submission_scores = 'final_graded_submission_scores',
-    all_submission_files = 'all_submission_files',
-    final_graded_submission_files = 'final_graded_submission_files'
+  all_scores = 'all_scores',
+  final_graded_submission_scores = 'final_graded_submission_scores',
+  all_submission_files = 'all_submission_files',
+  final_graded_submission_files = 'final_graded_submission_files'
 }
 
 export interface DownloadTask {
-    pk: number;
-    project: number;
-    download_type: DownloadType;
-    result_filename: string;
-    progress: number;
-    error_msg: string;
-    created_at: string;
+  pk: number;
+  project: number;
+  download_type: DownloadType;
+  result_filename: string;
+  progress: number;
+  error_msg: string;
+  created_at: string;
+}
+
+export class Poller {
+  private poll_fn: () => Promise<void>;
+  private delay_seconds: number;
+
+  get continue() {
+    return this._continue;
+  }
+  private _continue: boolean = false;
+
+  constructor(poll_fn: () => Promise<void>,
+              delay_seconds: number) {
+    this.poll_fn = poll_fn;
+    this.delay_seconds = delay_seconds;
+  }
+
+  async start_after_delay() {
+    if (this._continue) {
+      // istanbul ignore next
+      throw new Error('This poller has already been started');
+    }
+
+    this._continue = true;
+    await sleep(this.delay_seconds);
+    while (this._continue) {
+      await this.poll_fn();
+      await sleep(this.delay_seconds);
+    }
+  }
+
+  stop() {
+    this._continue = false;
+  }
 }
 
 @Component({
@@ -123,6 +160,8 @@ export default class DownloadGrades extends Vue {
   d_include_staff = false;
   d_final_graded_submissions_only = false;
   d_downloading = false;
+
+  downloads_poller: Poller | null = null;
 
   readonly format_datetime = format_datetime;
 
@@ -156,11 +195,23 @@ export default class DownloadGrades extends Vue {
       let base_url = `/api/projects/${this.project.pk}/`;
       base_url += this.d_final_graded_submissions_only
                   ? 'ultimate_submission_files/' : 'all_submission_files/';
-      let download_url = this.get_download_url(base_url);
-      // let new_task = await this.http.post<DownloadTask>(download_url, {}).toPromise();
-      // this.downloads.unshift(new_task);
-      // this.subscribe_to(this.poll_for_task_updates(new_task));
 
+      let download_url = this.get_download_url(base_url);
+      // download url is used in the api call?
+      let new_task = {
+        pk: 3,
+        project: this.project.pk,
+        download_type: DownloadType.final_graded_submission_files,
+        result_filename: "filename_3",
+        progress: 0,
+        error_msg: "",
+        created_at: "2019-02-15T20:41:30.534985Z"
+      };
+
+      this.d_downloads.unshift(new_task);
+      this.downloads_poller = new Poller(
+          () => this.refresh_downloads(), 8
+      );
       this.d_downloading = false;
   }
 
@@ -171,17 +222,54 @@ export default class DownloadGrades extends Vue {
       let base_url = `/api/projects/${this.project.pk}/`;
       base_url += this.d_final_graded_submissions_only
                   ? 'ultimate_submission_scores/' : 'all_submission_scores/';
+
       let download_url = this.get_download_url(base_url);
-      // let new_task = await this.http.post<DownloadTask>(download_url, {}).toPromise();
-      // this.downloads.unshift(new_task);
-      // this.subscribe_to(this.poll_for_task_updates(new_task));
+      // download url is used in the api call?
+      let new_task = {
+        pk: 3,
+        project: this.project.pk,
+        download_type: DownloadType.final_graded_submission_files,
+        result_filename: "filename_3",
+        progress: 0,
+        error_msg: "",
+        created_at: "2019-02-15T20:41:30.534985Z"
+      };
+
+      this.d_downloads.unshift(new_task);
+      this.downloads_poller = new Poller(
+        () => this.refresh_downloads(), 8
+      );
 
       this.d_downloading = false;
   }
 
-  poll_for_task_updates(download_task: DownloadTask) {}
+  async refresh_downloads() {
+    let downloads: DownloadTask[] = [];
 
-  make_task_poller() {}
+    if (this.downloads_differ(downloads)) {
+      this.d_downloads = downloads;
+    }
+
+    // Is this correct? - what if one has an error? Stop then too?
+    if (this.d_downloads.every(
+      (download_task: DownloadTask) => download_task.progress === 100
+                                       && download_task.error_msg === ""
+    )) {
+      this.downloads_poller!.stop();
+    }
+  }
+
+  downloads_differ(new_downloads: DownloadTask[]) {
+    let current_progresses = this.d_downloads.map(task => task.progress);
+    let new_progresses = new_downloads.map(task => task.progress);
+
+    for (let [current_progress, new_progress] of zip(current_progresses, new_progresses)) {
+      if (current_progress !== new_progress) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   get_filename(download_task: DownloadTask) {
     let file_suffix = null;
@@ -209,10 +297,11 @@ export default class DownloadGrades extends Vue {
 
   async download_task_result(download_task: DownloadTask) {
     console.log("Download file");
-    let url = `/api/download_tasks/${download_task.pk}/result/`;
+    let content = "hello";
+    // let url = `/api/download_tasks/${download_task.pk}/result/`;
     // await download_file(this.http, url, this.get_filename(download_task));
+    FileSaver.saveAs(new File([content], this.get_filename(download_task)));
   }
-
 }
 
 </script>
@@ -252,7 +341,7 @@ export default class DownloadGrades extends Vue {
 
 .download-button {
   @extend .light-gray-button;
-  margin: 15px 0 10px 0;
+  margin: 10px 0 10px 0;
 }
 
 .toggle-container {
@@ -276,25 +365,31 @@ export default class DownloadGrades extends Vue {
 
 .started-at {
   padding: 10px 10px 10px 0;
+  text-align: left;
 }
 
 .progress {
   padding: 10px;
+  text-align: left;
 }
 
 .started-at-header {
   padding: 10px 10px 5px 0;
   border-bottom: 2px solid $white-gray;
+  text-align: left;
 }
 
 .file-header, .progress-header {
   padding: 10px 10px 5px 10px;
   border-bottom: 2px solid $white-gray;
+  text-align: left;
 }
 
 .file-name {
   color: $ocean-blue;
   padding: 10px;
+  text-align: left;
+
 }
 
 .file-name:hover {

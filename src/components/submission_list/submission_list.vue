@@ -79,7 +79,7 @@ import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
 import { Created, Destroyed } from '@/lifecycle';
 import { deep_copy, safe_assign, sleep, toggle, zip } from '@/utils';
 
-class Poller {
+export class Poller {
   private poll_fn: () => Promise<void>;
   private delay_seconds: number;
 
