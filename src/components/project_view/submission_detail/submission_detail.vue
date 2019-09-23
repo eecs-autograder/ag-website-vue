@@ -19,7 +19,23 @@
         </div>
 
         <div id="grading-status-section">
-          <div id="grading-status-label"> Grading status: </div>
+          <div id="grading-status-label">
+            Grading status:
+            <span>
+              <i v-if="d_submission.status === GradingStatus.queued"
+                 class="queued-symbol">Q</i>
+              <i v-else-if="d_submission.status === GradingStatus.being_graded"
+                 class="fas fa-list being-graded-symbol"></i>
+              <i v-else-if="d_submission.status === GradingStatus.waiting_for_deferred
+                            || d_submission.status === GradingStatus.finished_grading"
+                 class="far fa-check-circle finished-grading-symbol"></i>
+              <i v-else-if="d_submission.status === GradingStatus.removed_from_queue"
+                 class="fas fa-eject removed-symbol"></i>
+              <i v-else-if="d_submission.status === GradingStatus.error"
+                 class="fas fa-skull error-symbol"></i>
+            </span>
+          </div>
+
           <div id="grading-status">
             <div v-if="d_submission.status === GradingStatus.received">
               We got your submission! It should be queued soon.
@@ -41,7 +57,7 @@
               and it won't count towards your daily submission limit.
             </div>
             <div v-else-if="d_submission.status === GradingStatus.error">
-              Uh oh...Something very bad happened while we were grading your selected_submission.
+              Uh oh...Something very bad happened while we were grading your submission.
               Don't worry, it's probably our fault, not yours!
               Sometimes these things only happen once, so you might as well submit again.
               We won't count this one towards your daily limit.
@@ -67,7 +83,10 @@
           </div>
         </div>
 
-        <div v-if="d_submission.status !== GradingStatus.removed_from_queue"
+        <div v-if="(d_submission.status === GradingStatus.waiting_for_deferred
+                   || d_submission.status === GradingStatus.finished_grading) &&
+                   d_submission_result !== null
+                   && d_submission_result.total_points_possible !== 0"
              id="submission-score"> Score:
           {{d_submission_result.total_points}}/{{d_submission_result.total_points_possible}}
         </div>
@@ -131,21 +150,23 @@
         </div>
       </div>
 
-      <mutation-suite-results
-        ref="mutation_suite_results"
-        v-if="d_submission_result.student_test_suite_results.length"
-        :submission="d_submission"
-        :mutation_test_suite_results="d_submission_result.student_test_suite_results"
-        :fdbk_category="d_fdbk_category">
-      </mutation-suite-results>
+      <div v-if="d_submission_result !== null">
+        <mutation-suite-results
+          ref="mutation_suite_results"
+          v-if="d_submission_result.student_test_suite_results.length"
+          :submission="d_submission"
+          :mutation_test_suite_results="d_submission_result.student_test_suite_results"
+          :fdbk_category="d_fdbk_category">
+        </mutation-suite-results>
 
-      <div v-for="(ag_test_suite_result, index) of d_submission_result.ag_test_suite_results"
-           ref="ag_test_suite_results">
-        <AGTestSuiteResult :submission="d_submission"
-                           :ag_test_suite_result="ag_test_suite_result"
-                           :fdbk_category="d_fdbk_category"
-                           :is_first_suite="index === 0">
-        </AGTestSuiteResult>
+        <div v-for="(ag_test_suite_result, index) of d_submission_result.ag_test_suite_results"
+             ref="ag_test_suite_results">
+          <AGTestSuiteResult :submission="d_submission"
+                             :ag_test_suite_result="ag_test_suite_result"
+                             :fdbk_category="d_fdbk_category"
+                             :is_first_suite="index === 0">
+          </AGTestSuiteResult>
+        </div>
       </div>
 
     </div>
@@ -268,7 +289,7 @@ export default class SubmissionDetail extends Vue {
     this.d_user = this.d_globals.current_user;
     this.d_user_roles = this.d_globals.user_roles;
     this.d_fdbk_category = this.determine_feedback_type();
-    await this.load_results();
+    this.d_submission_result = this.selected_submission_with_results.results;
     this.d_loading = false;
   }
 
@@ -382,6 +403,27 @@ export default class SubmissionDetail extends Vue {
 #grading-status-label {
   font-size: 18px;
   padding: 0 0 5px 0;
+}
+
+.queued-symbol {
+  font-weight: bold;
+  color: darken($sky-blue, 10%);
+}
+
+.being-graded-symbol {
+  color: $ocean-blue;
+}
+
+.finished-grading-symbol {
+  color: green;
+}
+
+.removed-symbol {
+  color: $orange;
+}
+
+.error-symbol {
+  color: crimson;
 }
 
 #submission-score {

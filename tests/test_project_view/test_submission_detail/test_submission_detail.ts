@@ -98,17 +98,16 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_submission).toEqual(new ag_cli.Submission(submission_with_results));
         expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_submission_result_stub.calledOnce).toBe(true);
+        expect(get_submission_result_stub.callCount).toEqual(0);
 
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.past_limit_submission);
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
-        expect(get_submission_result_stub.calledTwice).toBe(true);
-
+        expect(get_submission_result_stub.calledOnce).toBe(true);
 
         let another_submission_with_results = data_ut.make_submission_with_results(group);
-        get_submission_result_stub.onThirdCall().returns(
+        get_submission_result_stub.onSecondCall().returns(
             Promise.resolve(
                 another_submission_with_results.results
             )
@@ -124,7 +123,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_submission).toEqual(
             new ag_cli.Submission(another_submission_with_results)
         );
-        expect(get_submission_result_stub.calledThrice).toBe(true);
+        expect(get_submission_result_stub.calledTwice).toBe(true);
         expect(wrapper.vm.d_submission_result).toEqual(another_submission_with_results.results);
     });
 
@@ -318,10 +317,14 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.find('#does-not-count-for-user-message').exists()).toBe(false);
     });
 
-    test('submission score', async () => {
+    test('submission score is only visible when (GradingStatus === Finished Grading ' +
+         '|| GradingStatus === Waiting for deferred) && total_points_possible is > 0',
+         async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
-            {},
+            {
+                status: ag_cli.GradingStatus.received
+            },
             {
                 total_points: 10.25,
                 total_points_possible: 15
@@ -342,7 +345,25 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
+
+        wrapper.vm.d_submission.status = ag_cli.GradingStatus.removed_from_queue;
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
+
+        wrapper.vm.d_submission.status = ag_cli.GradingStatus.being_graded;
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
+
+        wrapper.vm.d_submission.status = ag_cli.GradingStatus.waiting_for_deferred;
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
+
+        wrapper.vm.d_submission.status = ag_cli.GradingStatus.error;
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
+
+        wrapper.vm.d_submission.status = ag_cli.GradingStatus.finished_grading;
+        expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
+
+        wrapper.vm.d_submission_result.total_points_possible = 0;
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
     });
 
     test('submitted files are listed', async () => {
@@ -643,13 +664,13 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(get_submission_result_stub.callCount).toEqual(1);
+        expect(get_submission_result_stub.callCount).toEqual(0);
 
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.staff_viewer);
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
-        expect(get_submission_result_stub.callCount).toEqual(2);
+        expect(get_submission_result_stub.callCount).toEqual(1);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.staff_viewer)
         ).toBe(true);
@@ -657,7 +678,7 @@ describe('SubmissionDetail tests', () => {
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.ultimate_submission);
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
-        expect(get_submission_result_stub.callCount).toEqual(3);
+        expect(get_submission_result_stub.callCount).toEqual(2);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.ultimate_submission)
         ).toBe(true);
@@ -665,7 +686,7 @@ describe('SubmissionDetail tests', () => {
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.normal);
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
-        expect(get_submission_result_stub.callCount).toEqual(4);
+        expect(get_submission_result_stub.callCount).toEqual(3);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.normal)
         ).toBe(true);
@@ -675,7 +696,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_fdbk_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
-        expect(get_submission_result_stub.callCount).toEqual(5);
+        expect(get_submission_result_stub.callCount).toEqual(4);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.past_limit_submission)
         ).toBe(true);
@@ -683,7 +704,7 @@ describe('SubmissionDetail tests', () => {
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.max);
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_submission_result_stub.callCount).toEqual(6);
+        expect(get_submission_result_stub.callCount).toEqual(5);
         expect(get_submission_result_stub.calledWith(
             submission_with_results.pk, ag_cli.FeedbackCategory.max)
         ).toBe(true);
