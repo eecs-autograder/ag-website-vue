@@ -298,14 +298,8 @@ import {
 } from 'ag-client-typescript';
 
 import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 import { deep_copy } from "@/utils";
-
-export enum ReturnCodeCorrectness {
-  correct = 'Correct',
-  incorrect = 'Incorrect',
-  not_available = 'Not Available',
-  timed_out = 'Timed Out'
-}
 
 @Component({
   components: {

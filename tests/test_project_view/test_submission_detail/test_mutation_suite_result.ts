@@ -3,7 +3,8 @@ import { mount, Wrapper } from '@vue/test-utils';
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import MutationSuiteResult, { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/mutation_suite_result.vue';
+import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
+import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 
 import * as data_ut from '@/tests/data_utils';
 

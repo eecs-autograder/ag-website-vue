@@ -169,7 +169,7 @@ import {
 } from "ag-client-typescript";
 
 import Diff from '@/components/diff.vue';
-import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/mutation_suite_result.vue';
+import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 import Tooltip from '@/components/tooltip.vue';
 
 @Component({

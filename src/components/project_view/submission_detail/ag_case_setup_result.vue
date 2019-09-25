@@ -4,7 +4,16 @@
         <div class="feedback-row">
           <div class="feedback-label"> Exit status: </div>
           <div class="feedback-output-content-short">
-            {{setup_exit_status}}
+            <span v-if="setup_exit_status === ReturnCodeCorrectness.timed_out">
+              <span>{{setup_exit_status}}</span>
+              <i class="fas fa-clock timed-out-icon"></i>
+            </span>
+            <span v-else-if="setup_exit_status === ReturnCodeCorrectness.not_available">
+              <i class="fas fa-ban not-available-icon"></i>
+            </span>
+            <span v-else>
+              {{setup_exit_status}}
+            </span>
           </div>
         </div>
       </div>
@@ -45,11 +54,13 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
-  AGTestSuiteResultFeedback,
-  FeedbackCategory,
-  ResultOutput,
-  Submission
+    AGTestSuiteResultFeedback,
+    FeedbackCategory,
+    ResultOutput,
+    Submission
 } from "ag-client-typescript";
+
+import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 
 @Component
 export default class AGCaseSetupResult extends Vue {
@@ -70,6 +81,8 @@ export default class AGCaseSetupResult extends Vue {
   d_ag_test_suite_result: AGTestSuiteResultFeedback | null = null;
   d_submission: Submission | null = null;
   d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
+
+  readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
   @Watch('submission')
   async on_submission_change(new_value: Submission, old_value: Submission) {
@@ -140,16 +153,27 @@ export default class AGCaseSetupResult extends Vue {
   get setup_exit_status() {
     if (this.d_ag_test_suite_result!.setup_timed_out !== null
         && this.d_ag_test_suite_result!.setup_timed_out === true) {
-        return "Timed Out";
+        return ReturnCodeCorrectness.timed_out;
     }
     if (this.d_ag_test_suite_result!.setup_return_code !== null) {
         return this.d_ag_test_suite_result!.setup_return_code;
     }
-    return "Not Available";
+    return ReturnCodeCorrectness.not_available;
   }
 }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
+
+.not-available-icon {
+  color: darken($pebble-dark, 5);
+  padding: 0 2px 0 0;
+}
+
+.timed-out-icon {
+  color: $navy-blue;
+  padding: 0 2px 0 5px;
+}
+
 </style>
