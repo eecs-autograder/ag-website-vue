@@ -321,10 +321,6 @@ export default class AGCommandResult extends Vue {
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
 
-#return-code-correctness-icon {
-  padding: 0 4px 0 6px;
-}
-
 .not-available-icon {
   color: darken($pebble-dark, 5);
   padding: 0 2px 0 0;
@@ -342,14 +338,6 @@ export default class AGCommandResult extends Vue {
 
 .timed-out-icon {
   color: $navy-blue;
-  padding: 0 2px;
-}
-
-#correctness-label {
-  padding: 0 0 0 0;
-}
-
-#just-for-now {
   padding: 0 2px;
 }
 
