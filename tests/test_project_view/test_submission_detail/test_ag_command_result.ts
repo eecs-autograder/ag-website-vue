@@ -4,6 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import AGCommandResult from '@/components/project_view/submission_detail/ag_command_result.vue';
+import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/mutation_suite_result.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
@@ -171,8 +172,8 @@ describe('AGCommandResult tests', () => {
 
         expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
         expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBe(true);
-        expect(wrapper.vm.return_code_correctness).toEqual("Correct");
-        expect(wrapper.find('#return-code-correctness').text()).toEqual("Correct");
+        expect(wrapper.vm.return_code_correctness).toEqual(ReturnCodeCorrectness.correct);
+        // expect(wrapper.find('#return-code-correctness').text()).toEqual("Correct");
     });
 
     test('return_code_correctness - timed_out === null && return_code_correct === false',
@@ -193,8 +194,8 @@ describe('AGCommandResult tests', () => {
 
         expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
         expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBe(false);
-        expect(wrapper.vm.return_code_correctness).toEqual("Incorrect");
-        expect(wrapper.find('#return-code-correctness').text()).toEqual("Incorrect");
+        expect(wrapper.vm.return_code_correctness).toEqual(ReturnCodeCorrectness.incorrect);
+        // expect(wrapper.find('#return-code-correctness').text()).toEqual("Incorrect");
     });
 
     test('Exit status - expected_and_actual_return_code tooltip is present - ' +
@@ -305,7 +306,9 @@ describe('AGCommandResult tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stdout_diff).toBeNull();
-        expect(wrapper.find('#stdout-correctness-section').text()).toContain("Correct");
+        expect(wrapper.find('#stdout-correctness-section').find(
+            '.correct-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#stdout-diff-section').exists()).toBe(false);
     });
 
@@ -329,7 +332,9 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level).toEqual(
             ag_cli.ValueFeedbackLevel.no_feedback
         );
-        expect(wrapper.find('#stdout-correctness-section').text()).toContain("Incorrect");
+        expect(wrapper.find('#stdout-correctness-section').find(
+            '.incorrect-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#stdout-diff-section').exists()).toBe(false);
     });
 
@@ -357,7 +362,9 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level).toEqual(
             ag_cli.ValueFeedbackLevel.expected_and_actual
         );
-        expect(wrapper.find('#stdout-correctness-section').text()).toContain("Incorrect");
+        expect(wrapper.find('#stdout-correctness-section').find(
+            '.incorrect-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#stdout-diff-section').exists()).toBe(true);
         expect(wrapper.find({ref: 'stdout_diff'}).exists()).toBe(true);
     });
@@ -478,7 +485,9 @@ describe('AGCommandResult tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_diff_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stderr_diff).toBeNull();
-        expect(wrapper.find('#stderr-correctness-section').text()).toContain("Correct");
+        expect(wrapper.find('#stderr-correctness-section').find(
+            '.correct-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#stderr-diff-section').exists()).toBe(false);
     });
 
@@ -504,7 +513,9 @@ describe('AGCommandResult tests', () => {
         );
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
-        expect(wrapper.find('#stderr-correctness-section').text()).toContain("Incorrect");
+        expect(wrapper.find('#stderr-correctness-section').find(
+            '.incorrect-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#stderr-diff-section').exists()).toBe(false);
     });
 
@@ -532,7 +543,9 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level).toEqual(
             ag_cli.ValueFeedbackLevel.expected_and_actual
         );
-        expect(wrapper.find('#stderr-correctness-section').text()).toContain("Incorrect");
+        expect(wrapper.find('#stderr-correctness-section').find(
+            '.incorrect-icon').exists()
+        ).toBe(true);
         expect(wrapper.find('#stderr-diff-section').exists()).toBe(true);
         expect(wrapper.find({ref: 'stderr_diff'}).exists()).toBe(true);
     });

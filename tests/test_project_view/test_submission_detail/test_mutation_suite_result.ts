@@ -3,7 +3,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
+import MutationSuiteResult, { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/mutation_suite_result.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
@@ -207,8 +207,10 @@ describe('MutationSuiteResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.get_setup_return_code_correctness()).toEqual("Timed Out");
-        expect(wrapper.find('#setup-return-code-correctness').text()).toContain("Timed Out");
+        expect(wrapper.vm.setup_return_code_correctness).toEqual(ReturnCodeCorrectness.timed_out);
+        expect(wrapper.find('#setup-return-code-correctness-icon').find(
+            '.timed-out-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#setup-return-code').exists()).toBe(false);
     });
 
@@ -225,8 +227,10 @@ describe('MutationSuiteResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.get_setup_return_code_correctness()).toEqual("Correct");
-        expect(wrapper.find('#setup-return-code-correctness').text()).toContain("Correct");
+        expect(wrapper.vm.setup_return_code_correctness).toEqual("Correct");
+        expect(wrapper.find('#setup-return-code-correctness-icon').find(
+            '.correct-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#setup-return-code').text()).toContain("0");
     });
 
@@ -243,8 +247,10 @@ describe('MutationSuiteResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.get_setup_return_code_correctness()).toEqual("Incorrect");
-        expect(wrapper.find('#setup-return-code-correctness').text()).toContain("Incorrect");
+        expect(wrapper.vm.setup_return_code_correctness).toEqual("Incorrect");
+        expect(wrapper.find('#setup-return-code-correctness-icon').find(
+            '.incorrect-icon'
+        ).exists()).toBe(true);
         expect(wrapper.find('#setup-return-code').text()).toContain("1");
     });
 
@@ -444,6 +450,7 @@ describe('MutationSuiteResult tests', () => {
     test('bugs_exposed_fdbk_level === exposed_bug_names', async () => {
         mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
             = ag_cli.BugsExposedFeedbackLevel.exposed_bug_names;
+        mutation_test_suite_result.num_bugs_exposed = 2;
         mutation_test_suite_result.bugs_exposed = ["bug_1", "bug_2"];
 
         wrapper = mount(MutationSuiteResult, {
@@ -466,6 +473,7 @@ describe('MutationSuiteResult tests', () => {
     test('bugs_exposed_fdbk_level !== exposed_bug_names', async () => {
         mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
             = ag_cli.BugsExposedFeedbackLevel.num_bugs_exposed;
+        mutation_test_suite_result.num_bugs_exposed = 2;
 
         wrapper = mount(MutationSuiteResult, {
             propsData: {
@@ -479,9 +487,7 @@ describe('MutationSuiteResult tests', () => {
         }
         expect(
             wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.bugs_exposed_fdbk_level
-        ).toEqual(
-            ag_cli.BugsExposedFeedbackLevel.num_bugs_exposed
-        );
+        ).toEqual(ag_cli.BugsExposedFeedbackLevel.num_bugs_exposed);
         expect(wrapper.find('#list-of-bug-names-exposed').exists()).toBe(false);
     });
 

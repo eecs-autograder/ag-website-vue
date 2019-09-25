@@ -120,8 +120,33 @@ export default class SubmissionDetailPanel extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+@mixin panel_header($background-color: $white-gray, $border-color: $white-gray,
+                    $cursor-option: pointer) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+  background-color: $background-color;
+  border: 1px solid $border-color;
+  font-weight: bold;
+  cursor: $cursor-option;
+}
+
+@mixin panel_header_hover($background-color: $white-gray, $border-color: $white-gray) {
+  background-color: $background-color;
+  border-color: $border-color;
+}
+
+@mixin panel_body($border-color: $white-gray) {
+  background-color: white;
+  border: 1px solid $border-color;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  padding: 7px 10px;
+}
+
 .panel {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 .panel-header-open {
@@ -132,122 +157,101 @@ export default class SubmissionDetailPanel extends Vue {
   border-radius: 3px;
 }
 
-%panel-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-content: center;
-  border: 1px solid;
-  font-weight: bold;
+%panel-column-padding {
+  padding: 7px 10px;
 }
 
 .name {
+  @extend %panel-column-padding;
   box-sizing: border-box;
   width: 60%;
-  padding: 7px 10px;
   word-wrap: break-word;
 }
 
 .correctness {
+  @extend %panel-column-padding;
   box-sizing: border-box;
   width: 20%;
-  padding: 7px 10px;
 }
 
 .points {
+  @extend %panel-column-padding;
   box-sizing: border-box;
   width: 20%;
-  padding: 7px 10px;
+}
+
+.display-points {
+  padding: 0 5px;
 }
 
 .command-name {
-  padding: 7px 10px;
+  @extend %panel-column-padding;
 }
 
 .command-correctness {
-  padding: 7px 10px;
+  @extend %panel-column-padding;
 }
 
-%panel-body {
-  padding: 7px 10px;
-  background-color: $white-gray;
-  border-radius: 0 0 3px 3px;
-  border: 1px solid darken(white, 5);
+.multiple-command-panel-body {
+  padding: 20px 20px 15px 20px !important;
+  background-color: #f5f5f5 !important;
 }
+
+/* ---------------- Not Available Panel ---------------- */
 
 $base-gray: darken($white-gray, 5);
 
 .not-available-panel-header {
-  @extend %panel-header;
-  background-color: $base-gray;
-  cursor: default;
+  @include panel_header($base-gray, darken($base-gray, 5), default);
   color: $stormy-gray-dark;
-  border-color: darken($base-gray, 5);
 }
 
-$base-red: lighten($warning-red, 25);
+/* ---------------- None Correct Panel ---------------- */
+
+$base-red: lighten($warning-red, 20);
 
 .none-correct-panel-header {
-  @extend %panel-header;
-  cursor: pointer;
-  background-color: $base-red;
-  border-color: darken($base-red, 5);
+  @include panel_header($base-red, darken($base-red, 5), pointer);
 }
 
 .none-correct-panel-header:hover {
-  background-color: darken($base-red, 5);
-  border-color: darken($base-red, 10);
+  @include panel_header_hover(darken($base-red, 5), darken($base-red, 10));
 }
 
 .none-correct-panel-body {
-  @extend %panel-body;
+  @include panel_body($base-red);
 }
 
-$base-orange: $orange;
+/* ---------------- Some Correct Panel ---------------- */
+
+$base-orange: lighten($orange, 5);
 
 .some-correct-panel-header {
-  @extend %panel-header;
-  cursor: pointer;
-  background-color: $base-orange;
-  border-color: darken($base-orange, 10);
+  @include panel_header($base-orange, darken($base-orange, 5), pointer);
 }
 
 .some-correct-panel-header:hover {
-  background-color: darken($base-orange, 10);
-  border-color: darken($base-orange, 15);
+  @include panel_header_hover(darken($base-orange, 5), darken($base-orange, 10));
 }
 
 .some-correct-panel-body {
-  @extend %panel-body;
+  @include panel_body($base-orange);
 }
+
+/* ---------------- All Correct Panel ---------------- */
 
 $base-blue: darken($light-blue, 2);
 
 .all-correct-panel-header {
-  @extend %panel-header;
-  cursor: pointer;
-  background-color: $base-blue;
-  border-color: darken($base-blue, 5);
+  @include panel_header($base-blue, darken($base-blue, 5), pointer);
 }
 
 .all-correct-panel-header:hover {
-  background-color: darken($base-blue, 5);
-  border-color: darken($base-blue, 10);
+  @include panel_header_hover(darken($base-blue, 5), darken($base-blue, 10));
 }
 
 .all-correct-panel-body {
-  @extend %panel-body;
+  @include panel_body($base-blue);
 }
 
-@mixin panel-body-border($border-color: $white-gray) {
-  border-radius: 0 0 3px 3px;
-}
-
-.multiple-command-panel-body {
-  padding: 20px 20px 15px 20px;
-}
-
-.command-panel-body {
-  background-color: white;
-}
 </style>

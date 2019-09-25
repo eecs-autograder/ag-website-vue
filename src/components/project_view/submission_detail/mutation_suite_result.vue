@@ -11,8 +11,17 @@
           ? d_mutation_test_suite_result.setup_command_name : 'Setup'}}:
         </div>
 
-        <span id="setup-return-code-correctness">
-          {{get_setup_return_code_correctness()}}
+        <span id="setup-return-code-correctness-icon">
+          <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
+            <i class="fas fa-check-circle correct-icon"></i>
+          </span>
+          <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
+            <i class="fas fa-times-circle incorrect-icon"></i>
+          </span>
+          <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
+            <span> Timed Out </span>
+            <i class="fas fa-clock timed-out-icon"></i>
+          </span>
         </span>
       </div>
 
@@ -39,7 +48,6 @@
           <pre v-else
                class="feedback-output-content-lengthy">{{d_setup_stdout_content}}</pre>
         </template>
-
       </div>
 
       <div v-if="d_mutation_test_suite_result.fdbk_settings.show_setup_stderr"
@@ -57,31 +65,39 @@
           <pre v-else
                class="feedback-output-content-lengthy">{{d_setup_stderr_content}}</pre>
         </template>
-
       </div>
+    </div>
+
+    <div v-if="d_mutation_test_suite_result.setup_return_code !== null
+               || d_mutation_test_suite_result.setup_timed_out"
+         class="section-divider">
     </div>
 
     <div id="bug-section">
 
       <div v-if="d_mutation_test_suite_result.num_bugs_exposed !== null"
-           class="feedback-row"
            id="num-bugs-exposed-section">
-        <div class="feedback-label"> Bugs exposed: </div>
-        <div class="feedback-output-content-short">
-          {{d_mutation_test_suite_result.num_bugs_exposed}}
-        </div>
-      </div>
 
-      <div v-if="d_mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
-                 === BugsExposedFeedbackLevel.exposed_bug_names">
-        <ul id="list-of-bug-names-exposed"
-            class="fa-ul">
-          <li class="list-item"
-              v-for="bug_name of d_mutation_test_suite_result.bugs_exposed">
-            <span class="fa-li"><i class="fas fa-bug bug-icon"></i></span>
-            {{bug_name}}
-          </li>
-        </ul>
+        <div class="list-header">
+          <div class="feedback-label"> Bugs exposed: </div>
+          <div class="feedback-output-content-short">
+            {{d_mutation_test_suite_result.num_bugs_exposed}}
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
+                   === BugsExposedFeedbackLevel.exposed_bug_names
+                   && d_mutation_test_suite_result.num_bugs_exposed > 1">
+          <ul id="list-of-bug-names-exposed"
+              class="fa-ul">
+            <li class="list-item"
+                v-for="bug_name of d_mutation_test_suite_result.bugs_exposed">
+              <span class="fa-li"><i class="fas fa-bug bug-icon"></i></span>
+              {{bug_name}}
+            </li>
+          </ul>
+        </div>
+
       </div>
 
       <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout"
@@ -115,8 +131,11 @@
           <pre v-else
                class="feedback-output-content-lengthy">{{d_grade_buggy_stderr_content}}</pre>
         </template>
-
       </div>
+    </div>
+
+    <div v-if="mutation_test_suite_result.student_tests.length"
+         class="section-divider">
     </div>
 
     <div v-if="d_mutation_test_suite_result.student_tests.length"
@@ -138,7 +157,6 @@
                  class="feedback-output-content-lengthy">{{d_validity_checkout_stdout_content}}
             </pre>
           </template>
-
         </div>
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
@@ -157,8 +175,11 @@
                  class="feedback-output-content-lengthy">{{d_validity_checkout_stderr_content}}
             </pre>
           </template>
-
         </div>
+      </div>
+
+      <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout"
+           class="section-divider">
       </div>
 
       <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout"
@@ -176,7 +197,6 @@
           <pre v-else
                class="feedback-output-content-lengthy">{{d_student_test_names_stdout_content}}</pre>
         </template>
-
       </div>
 
       <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
@@ -198,22 +218,22 @@
 
       <div v-if="d_mutation_test_suite_result.discarded_tests.length"
            id="discarded-tests-section">
-        <div id="discarded-explanation">
+        <div id="discarded-explanation"
+             class="list-header">
           This suite accepts up to
           <span id="num-tests-accepted">
-            {{d_mutation_test_suite_result.student_tests.length}}
-          </span>
+            {{d_mutation_test_suite_result.student_tests.length}}</span>
           tests, but you submitted
           <span id="total-tests-submitted">
             {{d_mutation_test_suite_result.student_tests.length
-              + d_mutation_test_suite_result.discarded_tests.length}}
-          </span>.
+              + d_mutation_test_suite_result.discarded_tests.length}}</span>.
+          These tests were discarded:
         </div>
-        <div class="feedback-label list-label"> These tests were discarded: </div>
+
         <ul id="list-of-discarded-tests" class="fa-ul">
           <li class="list-item"
               v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests">
-            <span class="fa-li"><i class="fas fa-square discarded-test-icon"></i></span>
+            <span class="fa-li"><i class="far fa-trash-alt discarded-test-icon"></i></span>
             {{discarded_test_name}}
           </li>
         </ul>
@@ -221,8 +241,9 @@
 
       <div v-if="d_mutation_test_suite_result.invalid_tests !== null &&
                  d_mutation_test_suite_result.invalid_tests.length"
-           id="invalid-tests-section">
-        <div class="list-label feedback-label">
+           id="invalid-tests-section"
+           class="feedback-row">
+        <div class="list-header">
           These tests incorrectly reported a bug when run against a correct implementation:
         </div>
         <ul id="list-of-incorrectly-reported-bug-tests"
@@ -233,8 +254,11 @@
               <i class="fas fa-exclamation-triangle incorrectly-reported-bug-icon"></i>
             </span>
             {{invalid_test}}
-            <i v-if="test_timed_out(invalid_test)"
-               class="test-timed-out"> (Timed Out) </i>
+            <span v-if="test_timed_out(invalid_test)"
+                  class="test-timed-out">
+              (Timed Out)
+              <i class="far fa-clock timed-out-icon"></i>
+            </span>
           </li>
         </ul>
       </div>
@@ -242,16 +266,19 @@
       <div v-if="get_valid_tests().length"
            class="feedback-row"
            id="valid-tests-section">
-        <div class="feedback-label"> Valid test cases you submitted: </div>
-        <ul id="list-of-valid-tests"
-            class="fa-ul">
-          <li class="list-item"
-              v-for="valid_test of get_valid_tests()">
-            <span class="fa-li">
-              <i class="fas fa-check-circle valid-test-icon"></i>
-            </span>{{valid_test}}
-          </li>
-        </ul>
+
+        <div class="list-header"> Valid test cases you submitted: </div>
+
+        <div>
+          <ul id="list-of-valid-tests"
+              class="fa-ul">
+            <li class="list-item" v-for="valid_test of get_valid_tests()">
+              <span class="fa-li">
+                <i class="far fa-check-circle valid-test-icon"></i>
+              </span>{{valid_test}}
+            </li>
+          </ul>
+        </div>
       </div>
 
     </div>
@@ -272,7 +299,13 @@ import {
 
 import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 import { deep_copy } from "@/utils";
-import MutationTestSuiteResultOutputSize = ResultOutput.MutationTestSuiteResultOutputSize;
+
+export enum ReturnCodeCorrectness {
+  correct = 'Correct',
+  incorrect = 'Incorrect',
+  not_available = 'Not Available',
+  timed_out = 'Timed Out'
+}
 
 @Component({
   components: {
@@ -310,6 +343,7 @@ export default class MutationSuiteResult extends Vue {
 
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
+  readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
   d_setup_stdout_content: string | null = null;
   d_setup_stderr_content: string | null = null;
@@ -332,7 +366,8 @@ export default class MutationSuiteResult extends Vue {
   d_validity_checkout_stderr_loaded = false;
   d_grade_buggy_stdout_loaded = false;
   d_grade_buggy_stderr_loaded = false;
-  d_mutation_test_suite_result_output_size: MutationTestSuiteResultOutputSize | null = null;
+  d_mutation_test_suite_result_output_size: ResultOutput.MutationTestSuiteResultOutputSize
+                                            | null = null;
 
   async created() {
     this.d_fdbk_category = this.fdbk_category;
@@ -506,15 +541,15 @@ export default class MutationSuiteResult extends Vue {
     return valid_tests;
   }
 
-  get_setup_return_code_correctness(): string {
+  get setup_return_code_correctness(): string {
     if (this.mutation_test_suite_result.setup_timed_out !== null
         && this.mutation_test_suite_result.setup_timed_out) {
-        return "Timed Out";
+        return ReturnCodeCorrectness.timed_out;
     }
     else if (this.mutation_test_suite_result.setup_return_code === 0) {
-        return "Correct";
+        return ReturnCodeCorrectness.correct;
     }
-    return "Incorrect";
+    return ReturnCodeCorrectness.incorrect;
   }
 }
 </script>
@@ -523,26 +558,43 @@ export default class MutationSuiteResult extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/components/submission_detail.scss';
 
+.section-divider {
+  height: 2px;
+  background-color: darken($white-gray, 5);
+  margin: 5px 0;
+}
+
+#valid-tests-section, #invalid-tests-section, #discarded-tests-section {
+  padding: 5px 0;
+}
+
+#num-bugs-exposed-section {
+  padding: 5px 0;
+}
+
 #list-of-bug-names-exposed,
 #list-of-incorrectly-reported-bug-tests,
 #list-of-valid-tests,
 #list-of-discarded-tests {
   margin-top: 0;
   margin-bottom: 0;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   font-size: 14px;
 }
 
-#list-of-bug-names-exposed li,
-#list-of-incorrectly-reported-bug-tests li,
-#list-of-valid-tests li,
-#list-of-discarded-tests li {
-  margin-bottom: 2px;
+.list-header {
+  font-weight: bold;
+  padding: 3px 0 0 0;
+}
+
+.list-item {
+  padding: 1px 0;
+  font-weight: normal;
 }
 
 .bug-icon {
-  color: $stormy-gray-light;
+  color: $navy-blue;
   font-size: 13px;
 }
 
@@ -552,7 +604,7 @@ export default class MutationSuiteResult extends Vue {
 }
 
 .discarded-test-icon {
-  color: $orange;
+  color: #7a8fb8;
   font-size: 13px;
 }
 
@@ -565,4 +617,37 @@ export default class MutationSuiteResult extends Vue {
   display: inline-block;
   color: $green;
 }
+
+#setup-return-code-correctness-icon {
+  padding: 0 0 0 2px;
+}
+
+.correct-icon {
+  color: $ocean-blue;
+  padding: 0 2px 0 0;
+}
+
+.incorrect-icon {
+  color: $burnt-red;
+  padding: 0 2px 0 0;
+}
+
+.timed-out-icon {
+  color: $navy-blue;
+  padding: 0 2px;
+}
+
+#num-tests-accepted {
+  text-decoration: underline;
+}
+
+#total-tests-submitted {
+  text-decoration: underline;
+}
+
+.test-timed-out {
+  color: $navy-blue;
+  padding-left: 2px;
+}
+
 </style>

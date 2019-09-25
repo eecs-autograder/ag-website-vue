@@ -50,8 +50,6 @@ import {
   ResultOutput,
   Submission
 } from "ag-client-typescript";
-import AGTestSuiteResultOutputSize = ResultOutput.AGTestSuiteResultOutputSize;
-import get_ag_test_suite_result_output_size = ResultOutput.get_ag_test_suite_result_output_size;
 
 @Component
 export default class AGCaseSetupResult extends Vue {
@@ -68,7 +66,7 @@ export default class AGCaseSetupResult extends Vue {
   d_setup_stderr: string | null = null;
   d_setup_stdout_loaded = false;
   d_setup_stderr_loaded = false;
-  d_ag_test_suite_result_output_size: AGTestSuiteResultOutputSize | null = null;
+  d_ag_test_suite_result_output_size: ResultOutput.AGTestSuiteResultOutputSize | null = null;
   d_ag_test_suite_result: AGTestSuiteResultFeedback | null = null;
   d_submission: Submission | null = null;
   d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;

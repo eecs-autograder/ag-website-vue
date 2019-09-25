@@ -347,22 +347,22 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.find('#submission-score').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.removed_from_queue;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.removed_from_queue;
         expect(wrapper.find('#submission-score').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.being_graded;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.being_graded;
         expect(wrapper.find('#submission-score').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.waiting_for_deferred;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.waiting_for_deferred;
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.error;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.error;
         expect(wrapper.find('#submission-score').exists()).toBe(false);
 
-        wrapper.vm.d_submission.status = ag_cli.GradingStatus.finished_grading;
+        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
 
-        wrapper.vm.d_submission_result.total_points_possible = 0;
+        wrapper.vm.d_submission_result!.total_points_possible = 0;
         expect(wrapper.find('#submission-score').exists()).toBe(false);
     });
 

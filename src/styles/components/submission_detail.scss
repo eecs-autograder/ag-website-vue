@@ -1,22 +1,26 @@
 @import '@/styles/colors.scss';
 
+%column-padding {
+    padding: 7px 10px;
+}
+
 .column-1 {
+    @extend %column-padding;
     box-sizing: border-box;
     width: 60%;
-    padding: 7px 10px;
     word-wrap: break-word;
 }
 
 .column-2 {
+    @extend %column-padding;
     box-sizing: border-box;
     width: 20%;
-    padding: 7px 10px;
 }
 
 .column-3 {
+    @extend %column-padding;
     box-sizing: border-box;
     width: 20%;
-    padding: 7px 10px;
 }
 
 .feedback-label {
@@ -25,7 +29,7 @@
 }
 
 .feedback-row {
-    padding: 3px 0;
+    padding: 6px 0;
 }
 
 .feedback-output-content-short {
@@ -33,11 +37,18 @@
 }
 
 .feedback-output-content-lengthy {
-    border: 2px solid $pebble-dark;
-    background-color: white;
+    border: 2px solid $pebble-medium;
+    background-color: $pebble-light;
     border-radius: 3px;
     padding: 5px 10px;
     margin: 4px 0 2px 0;
     overflow: auto;
     max-height: 400px;
+}
+
+.diff-container {
+    border: 2px solid $pebble-medium;
+    background-color: white;
+    margin: 5px 0;
+    border-radius: 3px;
 }
