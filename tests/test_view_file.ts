@@ -76,3 +76,55 @@ describe('ViewFile.vue', () => {
         expect(component.d_filename).toEqual(new_filename);
     });
 });
+
+describe.skip('ViewFile handgrading tests', () => {
+    // Add some non-location comments to the handgrading results
+
+    test('Single-line annotation', () => {
+        fail();
+    });
+
+    test('Multi-line annotations', () => {
+        fail();
+    });
+
+    test('Overlapping multi-line annotations', () => {
+        fail();
+    });
+
+    test('Hovered annotation highlighted differently', () => {
+        fail();
+    });
+
+    test('Add new single-line annotation', () => {
+        fail();
+    });
+
+    test('Add new multi-line-annotation', () => {
+        fail();
+    });
+
+    test('Highlighted region can expand up and down', () => {
+        fail();
+    });
+
+    test('Readonly mode', () => {
+        fail();
+    });
+
+    test('Handgraders can leave comments', () => {
+        fail();
+    });
+
+    test('Handgraders cannot leave comments', () => {
+        fail();
+    });
+
+    test('Delete comment or annotation', () => {
+        fail();
+    });
+
+    test('File changed, handgrading data updated', () => {
+        fail();
+    });
+});

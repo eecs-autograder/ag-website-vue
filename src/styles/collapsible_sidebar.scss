@@ -10,7 +10,11 @@
     $border-color: none,
 
     // Background color of the whole sidebar menu
-    $background-color: none,
+    $background-color: transparent,
+
+    // Background color while hovering over elements with the class
+    // .sidebar-item
+    $hover-color: none,
 
     // Background color for elements in the sidebar content marked with the
     // class "active"
@@ -21,9 +25,14 @@
     $overlap-breakpoint: 800px,
 
     // This value is also subtracted from 100vh to determine the max-height of
-    // .sidebar-content. Useful if you have a footer and don't want it to cover
-    // the bottom of the sidebar content.
+    // .sidebar-content. It's also added as a margin to the bottom of
+    // .body. Useful if you have a full-page footer and don't want
+    // it to cover the bottom of the sidebar and body content.
     $page-footer-height: 0px,
+
+    // Like $page-footer-height, but is NOT added as a bottom margin to .body.
+    // (Instead, it's added as margin-bottom to .sidebar-content).
+    $sidebar-footer-height: 0px,
 
     // When true, sets the height of .sidebar-content to be equal to its
     // max-height.
@@ -60,7 +69,12 @@
                 min-width: auto;
             }
 
-            $max-height: calc(100vh - #{$sidebar-header-height} - #{$page-footer-height});
+            $max-height: calc(
+                100vh
+                - #{$sidebar-header-height}
+                - #{$page-footer-height}
+                - #{$sidebar-footer-height}
+            );
             .sidebar-content {
                 position: sticky;
                 top: $sidebar-header-height;
@@ -70,10 +84,23 @@
                     height: $max-height;
                 }
 
+                margin-bottom: $sidebar-footer-height;
+
+                @if $hover-color != none {
+                    .sidebar-item:not(.active):not(.disabled):hover {
+                        cursor: pointer;
+                        background-color: $hover-color;
+                    }
+                }
+
                 @if $active-color != none {
                     .active {
                         background-color: $active-color;
                     }
+                }
+
+                .disabled {
+                    cursor: not-allowed;
                 }
             }
         }

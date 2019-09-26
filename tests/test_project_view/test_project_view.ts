@@ -5,6 +5,8 @@ import { config, Wrapper } from '@vue/test-utils';
 import {
     Course,
     Group,
+    HandgradingResult,
+    HandgradingRubric,
     HttpError,
     Project,
     Submission,
@@ -28,6 +30,8 @@ beforeEach(() => {
         Promise.resolve(data_ut.make_user_roles()));
     sinon.stub(Submission, 'get_final_graded_submission_from_group').rejects(
         new HttpError(403, ''));
+    sinon.stub(HandgradingRubric, 'get_from_project').rejects(new HttpError(403, ''));
+    sinon.stub(HandgradingResult, 'get_by_group_pk').rejects(new HttpError(403, ''));
 });
 
 afterEach(() => {
@@ -222,5 +226,41 @@ describe('Changing Tabs', ()  => {
 
         expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(true);
         expect(wrapper.find({name: 'SubmissionList'}).isVisible()).toBe(true);
+    });
+
+    test('No handgrading rubric, handgrading tab not shown', async () => {
+        fail();
+    });
+
+    test('Handgrading rubric exists, handgrading tab shown to staff', async () => {
+        fail();
+    });
+
+    test('Handgrading rubric exists, handgrading tab shown to handgrader', async () => {
+        fail();
+    });
+
+    test('Handgrading rubric exists, handgrading hidden from student', async () => {
+        fail();
+    });
+
+    test('Clicking on handgrading tab', async () => {
+        fail();
+    });
+
+    test('No handgrading result, handgrading result tab not shown', async () => {
+        fail();
+    });
+
+    test('No group, handgrading result tab not shown to student', async () => {
+        fail();
+    });
+
+    test('Handgrading result exists, handgrading result tab shown', async () => {
+        fail();
+    });
+
+    test('Clicking on handgrading results tab', async () => {
+        fail();
     });
 });

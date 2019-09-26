@@ -2,8 +2,8 @@ import { Vue } from "vue-property-decorator";
 
 import { RefSelector, Wrapper } from "@vue/test-utils";
 
+import SelectObject from '@/components/select_object.vue';
 import ValidatedInput from "@/components/validated_input.vue";
-
 export { sleep } from '@/utils';
 
 type DonePredicateFunc<T extends Vue> = (wrapper: Wrapper<T>) => boolean;
@@ -101,6 +101,23 @@ function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelec
            || wrapper.name() === 'option';
 }
 
+// Sets the selected item of a select-object tag.
+// Note that select_value should be the value used to identify the object, not
+// the object itself.
+export function set_select_object_value(select_object_wrapper: Wrapper<Vue>,
+                                        select_value: unknown) {
+    if (!is<SelectObject>(select_object_wrapper.vm,
+                          select_object_wrapper.name() === 'SelectObject')) {
+        throw new TypeError(
+            `Expected a select-option element, but got "${select_object_wrapper.name()}"`);
+    }
+
+    select_object_wrapper.find('.select').setValue(select_value);
+}
+
+function is<T>(obj: unknown, condition: boolean): obj is T {
+    return condition;
+}
 
 export function compress_whitespace(str: string): string {
     return str.trim().replace(/\s+/g, ' ');

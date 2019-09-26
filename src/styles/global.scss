@@ -16,6 +16,7 @@
 }
 
 .loading-large {
+    @extend .loading;
     font-size: 55px;
     @include fully-center();
 }

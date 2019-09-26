@@ -23,6 +23,17 @@
            @click="set_current_tab('student_lookup')">
         Student Lookup
       </div>
+      <div class="nav-link"
+           :class="{'active': d_current_tab === 'handgrading'}"
+           @click.self="set_current_tab('handgrading')"
+           v-if="handgrading_rubric !== null">
+        Handgrading
+        <template v-if="d_globals.user_roles.is_admin">
+          <router-link :to="`/web/project_admin/${project.pk}?current_tab=configure_handgrading`">
+            <i id="edit-handgrading-link" class="fas fa-cog cog"></i>
+          </router-link>
+        </template>
+      </div>
     </div>
 
     <div>
@@ -42,6 +53,13 @@
                        :course="course" :project="project" :group="group"></submission-list>
 
       <div v-show="d_current_tab === 'student_lookup'">TODO</div>
+
+      <div v-show="d_current_tab === 'handgrading'">
+        <template v-if="handgrading_rubric !== null">
+          <handgrading-container :project="project"
+                                 :handgrading_rubric="handgrading_rubric"></handgrading-container>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -49,20 +67,22 @@
 <script lang="ts">
 import { Component, Inject, Vue } from 'vue-property-decorator';
 
-import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
+import { Course, Group, GroupObserver, Project, HandgradingRubric, HttpError, HandgradingResult } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
+import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
-import { format_datetime, get_query_param } from '@/utils';
+import { format_datetime, get_query_param, assert_not_null } from '@/utils';
 
 @Component({
   components: {
     GroupRegistration,
+    HandgradingContainer,
     SubmissionList,
     Submit,
     Tab,
@@ -85,6 +105,9 @@ export default class ProjectView extends Vue implements GroupObserver {
   group: Group | null = null;
   readonly format_datetime = format_datetime;
 
+  handgrading_rubric: HandgradingRubric | null = null;
+  handgrading_result: HandgradingResult | null = null;
+
   async mounted() {
     Group.subscribe(this);
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
@@ -98,11 +121,40 @@ export default class ProjectView extends Vue implements GroupObserver {
 
     await this.d_globals.set_current_project(this.project, this.course);
 
+    await Promise.all([this.load_handgrading(), this.load_handgrading_result]);
+
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab !== null) {
       this.set_current_tab(requested_tab);
     }
+
     this.d_loading = false;
+  }
+
+  private async load_handgrading() {
+    assert_not_null(this.project);
+    if (!this.project!.has_handgrading_rubric) {
+      return;
+    }
+
+    if (this.d_globals.user_roles.is_staff || this.d_globals.user_roles.is_handgrader) {
+      this.handgrading_rubric = await HandgradingRubric.get_from_project(this.project!.pk);
+    }
+  }
+
+  private async load_handgrading_result() {
+    if (this.group === null) {
+      return;
+    }
+
+    try {
+      this.handgrading_result = await HandgradingResult.get_by_group_pk(this.group.pk);
+    }
+    catch (e) {
+      if (!(e instanceof HttpError) || (e.status !== 403 && e.status !== 404)) {
+        throw e;
+      }
+    }
   }
 
   beforeDestroy() {
@@ -116,6 +168,10 @@ export default class ProjectView extends Vue implements GroupObserver {
       }
       this.d_load_my_submissions = true;
     }
+    else if (tab_id === 'handgrading' && this.handgrading_rubric === null) {
+      return;
+    }
+
     this.d_current_tab = tab_id;
     this.$router.replace({query: {current_tab: tab_id}});
   }
@@ -159,6 +215,16 @@ export default class ProjectView extends Vue implements GroupObserver {
     font-size: 14px;
     padding: 10px 10px;
   }
+}
+
+#edit-handgrading-link {
+  margin-left: 6px;
+  color: $ocean-blue;
+  font-size: 1.1em;
+}
+
+#edit-handgrading-link:hover {
+  color: lighten($ocean-blue, 5%);
 }
 
 </style>

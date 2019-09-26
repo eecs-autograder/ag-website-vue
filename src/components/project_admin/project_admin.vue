@@ -66,7 +66,9 @@
                     :project="project"></edit-groups>
       <div v-show="d_current_tab === 'download_grades'">DOWNLOAD GRADES - TODO</div>
       <div v-show="d_current_tab === 'rerun_tests'">RERUN TESTS - TODO</div>
-      <div v-show="d_current_tab === 'configure_handgrading'">CONFIGURE HANDGRADING - TODO</div>
+      <div v-show="d_current_tab === 'configure_handgrading'">
+        <handgrading-settings :project="project"></handgrading-settings>
+      </div>
     </div>
   </div>
 </template>
@@ -86,6 +88,7 @@ import { GlobalData } from '@/app.vue';
 import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
+import HandgradingSettings from '@/components/project_admin/handgrading_settings/handgrading_settings.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
@@ -100,6 +103,7 @@ import { array_remove_unique, get_query_param } from "@/utils";
     'ag-test-suites': AGTestSuites,
     EditGroups,
     ExpectedStudentFiles,
+    HandgradingSettings,
     InstructorFiles,
     MutationSuites,
     ProjectSettings,

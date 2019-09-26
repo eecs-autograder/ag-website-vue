@@ -1,0 +1,31 @@
+@mixin section-header(
+    // The margin width on either side of the header text.
+    $line-spacing: 3px,
+    $line-color: black,
+    // When false, leaves out the divider on the left side.
+    $with-left-divider: true,
+) {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    @if $with-left-divider {
+        &:before {
+            height: 1px;
+            background-color: $line-color;
+            content: '\a0';
+
+            margin-right: $line-spacing;
+        }
+    }
+
+    &:after {
+        // border: 1px solid $line-color;
+        height: 1px;
+        background-color: $line-color;
+        content: '\a0';
+
+        margin-left: $line-spacing;
+        flex-grow: 1;
+    }
+}

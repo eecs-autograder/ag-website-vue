@@ -9,9 +9,12 @@ import {
     AGTestCommandFeedbackConfig,
     AGTestCommandResultFeedback,
     AGTestSuite,
-    AGTestSuiteFeedbackConfig, AGTestSuiteResultFeedback,
+    AGTestSuiteFeedbackConfig,
+    AGTestSuiteResultFeedback,
+    Annotation,
     BugsExposedFeedbackLevel,
     Course,
+    Criterion,
     ExpectedOutputSource,
     ExpectedReturnCode,
     ExpectedStudentFile,
@@ -537,6 +540,41 @@ export function make_mutation_test_suite_result_feedback(
     };
     safe_assign(defaults, args);
     return defaults;
+}
+
+const CRITERION_PKS = counter();
+
+export function make_criterion(rubric_pk: number,
+                               args: Partial<Criterion> = {}): Criterion {
+    let defaults = {
+        pk: CRITERION_PKS.next().value,
+        handgrading_rubric: rubric_pk,
+        short_description: 'An criteria',
+        long_description: '',
+        points: 0,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.handgrading_rubric = rubric_pk;
+    return new Criterion(defaults);
+}
+
+const ANNOTATION_PKS = counter();
+
+export function make_annotation(rubric_pk: number,
+                                args: Partial<Annotation> = {}): Annotation {
+    let defaults = {
+        pk: ANNOTATION_PKS.next().value,
+        handgrading_rubric: rubric_pk,
+        short_description: 'An criteria',
+        long_description: '',
+        deduction: 0,
+        max_deduction: null,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.handgrading_rubric = rubric_pk;
+    return new Annotation(defaults);
 }
 
 function random_id() {

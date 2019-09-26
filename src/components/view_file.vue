@@ -6,19 +6,82 @@
     </div>
     <table v-else
            id="viewing-container">
-      <tr v-for="(line, index) of d_file_contents.split('\n')">
-        <td class="line-number">{{index + 1}}</td>
-        <td class="line-of-file-content">{{line === "" ? "\n" : line}}</td>
-      </tr>
+      <template v-for="(line, index) of d_file_contents.split('\n')">
+        <tr :class="{'commented-line': line_in_comment(index),
+                     'hovered-comment-line': d_hovered_comment !== null
+                                             && index >= d_hovered_comment.location.first_line
+                                             && index <= d_hovered_comment.location.last_line,
+                     'highlighted-region-line': d_first_highlighted_line !== null
+                                                && index >= d_first_highlighted_line
+                                                && index <= d_last_highlighted_line}"
+            @mousedown="start_highlighting(index)"
+            @mouseenter="grow_highlighted_region(index)"
+            @mouseup="stop_highlighting($event, index)">
+          <td class="line-number">{{index + 1}}</td>
+          <td class="line-of-file-content"
+              :style="{'user-select': (handgrading_enabled
+                                       && !readonly_handgrading_results) ? 'none' : 'auto'}"
+          >{{line === "" ? "\n" : line}}</td>
+        </tr>
+        <tr v-for="comment of d_handgrading_comments.get(index, [])">
+          <td></td>
+          <td>
+            <div class="comment"
+                 @mouseenter="d_hovered_comment = comment"
+                 @mouseleave="d_hovered_comment = null">
+              <div class="comment-line-range">
+                {{comment.first_line !== comment.last_line
+                    ? `Lines ${comment.first_line + 1} - ${comment.last_line + 1}`
+                    :`Line ${comment.first_line + 1}`}}
+              </div>
+              <div class="comment-message">{{comment.message}}</div>
+            </div>
+          </td>
+        </tr>
+      </template>
     </table>
+
+    <context-menu ref="handgrading_context_menu"
+                  v-if="handgrading_enabled"
+                  @context_menu_closed="d_first_highlighted_line = null;
+                                        d_last_highlighted_line = null">
+      <template v-slot:context_menu_items>
+        <context-menu-item v-for="annotation of handgrading_rubric.annotations">
+          <template slot="label">
+            {{annotation.short_description}} ({{annotation.deduction}})
+          </template>
+        </context-menu-item>
+        <div class="context-menu-divider"> </div>
+        <context-menu-item>
+          <template slot="label">
+            Leave a comment
+          </template>
+        </context-menu-item>
+      </template>
+    </context-menu>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
-@Component
-export default class ViewFile extends Vue {
+import {
+  AppliedAnnotation,
+  Comment,
+  HandgradingResult,
+  HandgradingRubric,
+  UserRoles,
+} from "ag-client-typescript";
+
+import { ArrayMap } from '@/array_map';
+import ContextMenu from '@/components/context_menu/context_menu.vue';
+import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
+import { Created } from '@/lifecycle';
+
+@Component({
+  components: {ContextMenu, ContextMenuItem}
+})
+export default class ViewFile extends Vue implements Created {
 
   @Prop({default: "", type: String})
   filename!: string;
@@ -32,6 +95,41 @@ export default class ViewFile extends Vue {
   @Prop({default: "", type: String})
   view_file_max_height!: string;
 
+  d_filename: string = "";
+  d_file_contents: string = "";
+  d_loading = true;
+
+  // If null, the component will behave normally (no handgrading).
+  // When this field is non-null, handgrading functionality will be made available.
+  @Prop({default: null, type: HandgradingRubric})
+  handgrading_rubric!: HandgradingRubric | null;
+
+  // When handgrading_rubric is non-null, this field is required.
+  @Prop({default: null, type: HandgradingResult})
+  handgrading_result!: HandgradingResult | null;
+
+  // When true, editing handgrading results will be disabled.
+  @Prop({default: true, type: Boolean})
+  readonly_handgrading_results!: boolean;
+
+  d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
+  d_hovered_comment: HandgradingComment | null = null;
+
+  async created() {
+    this.d_file_contents = await this.file_contents;
+    this.d_filename = this.filename;
+
+    this.populate_d_handgrading_comments();
+
+    this.d_loading = false;
+  }
+
+  @Watch('handgrading_result', {deep: true})
+  on_handgrading_result_change(new_comments: HandgradingComment[] | null,
+                               old_comments: HandgradingComment[] | null) {
+    this.populate_d_handgrading_comments();
+  }
+
   @Watch('file_contents')
   async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {
     this.d_loading = true;
@@ -42,25 +140,148 @@ export default class ViewFile extends Vue {
   @Watch('filename')
   on_filename_change(new_file_name: string, old_file_name: string) {
     this.d_filename = new_file_name;
+    // If the filename changed, then we know for sure that the file is different.
+    // If just the contents changed, it's possible for two different files to have the
+    // same contents.
+    this.populate_d_handgrading_comments();
   }
 
-  d_filename: string = "";
-  d_file_contents: string = "";
-  d_loading = true;
+  // Organize the comments provided as input into a map of (last line, comments).
+  populate_d_handgrading_comments() {
+    if (this.handgrading_result === null) {
+      return;
+    }
 
-  async created() {
-    this.d_file_contents = await this.file_contents;
-    this.d_filename = this.filename;
-    this.d_loading = false;
+    this.d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
+
+    let annotations = this.handgrading_result.applied_annotations.filter(
+      (item) => item.location.filename === this.filename);
+    for (let annotation of annotations) {
+      this.d_handgrading_comments.get(
+        annotation.location.last_line, [], true
+      ).push(new HandgradingComment(annotation));
+    }
+
+    let comments = this.handgrading_result.comments.filter(
+      (item) => item.location !== null && item.location.filename === this.filename);
+    for (let comment of comments) {
+      let handgrading_comment = new HandgradingComment(comment);
+      this.d_handgrading_comments.get(
+        handgrading_comment.last_line, [], true
+      ).push(handgrading_comment);
+    }
+
+    // Sort lists of comments ending on the same line by first line
+    for (let [last_line, comment_list] of this.d_handgrading_comments) {
+      comment_list.sort(
+        (first, second) => first.first_line - second.first_line);
+    }
+  }
+
+  // Returns true if line_num is contained in any provided handgrading comments.
+  line_in_comment(line_num: number) {
+    for (let [last_line, comment_list] of this.d_handgrading_comments) {
+      let first_line = comment_list[0].first_line;
+      if (line_num >= first_line && line_num <= last_line) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  get handgrading_enabled() {
+    return this.handgrading_rubric !== null;
+  }
+
+  d_first_highlighted_line: number | null = null;
+  d_last_highlighted_line: number | null = null;
+
+  start_highlighting(line_index: number) {
+    if (this.readonly_handgrading_results || !this.handgrading_enabled) {
+      return;
+    }
+    this.d_first_highlighted_line = line_index;
+    this.d_last_highlighted_line = line_index;
+  }
+
+  grow_highlighted_region(line_index: number) {
+    if (this.readonly_handgrading_results
+        || !this.handgrading_enabled
+        || this.d_first_highlighted_line === null
+        || this.d_last_highlighted_line === null) {
+      return;
+    }
+
+    if (line_index < this.d_first_highlighted_line) {
+      this.d_first_highlighted_line = line_index;
+    }
+    if (line_index > this.d_last_highlighted_line) {
+      this.d_last_highlighted_line = line_index;
+    }
+  }
+
+  stop_highlighting(event: MouseEvent, line_index: number) {
+    if (this.readonly_handgrading_results || !this.handgrading_enabled) {
+      return;
+    }
+
+    (<ContextMenu> this.$refs.handgrading_context_menu).show_context_menu(
+      event.pageX, event.pageY);
   }
 }
+
+class HandgradingComment {
+  private handgrading_data: AppliedAnnotation | Comment;
+
+  constructor(handgrading_data: AppliedAnnotation | Comment) {
+    this.handgrading_data = handgrading_data;
+  }
+
+  get first_line() {
+    return this.location.first_line;
+  }
+
+  get last_line() {
+    return this.location.last_line;
+  }
+
+  get filename() {
+    return this.location.filename;
+  }
+
+  get message() {
+    if (this.handgrading_data instanceof AppliedAnnotation) {
+      let annotation = this.handgrading_data.annotation;
+      return `${annotation.short_description} (${annotation.deduction})`;
+    }
+    return this.handgrading_data.text;
+  }
+
+  get location() {
+    if (this.handgrading_data.location === null) {
+      throw new Error('Location unexpectedly null');
+    }
+    return this.handgrading_data.location;
+  }
+
+  delete() {
+    return this.handgrading_data.delete();
+  }
+}
+
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
 * {
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
+}
+
+table {
+  border-spacing: 0;
 }
 
 #view-file-component {
@@ -87,7 +308,7 @@ export default class ViewFile extends Vue {
   color: black;
   font-size: 14px;
   margin: 0;
-  padding: 1px 0;
+  padding: 1px 2px;
   white-space: pre-wrap;
   word-break: break-word;
   word-wrap: break-word;
@@ -100,6 +321,52 @@ export default class ViewFile extends Vue {
   align-items: center;
   justify-content: center;
   height: 90%;
+}
+
+.comment {
+  border: 1px solid $gray-blue-2;
+  margin: 5px 0;
+  margin-right: 1%;
+  border-radius: 2px;
+  max-width: 600px;
+
+  font-family: "Helvetica Neue", Helvetica;
+  font-size: 14px;
+
+  .comment-line-range {
+    font-style: italic;
+    border-bottom: 1px solid $pebble-dark;
+    padding-top: 5px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    background-color: $pebble-light;
+  }
+
+  .comment-message {
+    padding: 10px;
+  }
+}
+
+$light-green: hsl(97, 42%, 79%);
+
+.comment:hover {
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+
+  .comment-line-range {
+    background-color: lighten($light-green, 4%);
+  }
+}
+
+.commented-line {
+  background-color: $gray-blue-1;
+}
+
+.hovered-comment-line {
+  background-color: $light-green;
+}
+
+.highlighted-region-line {
+  background-color: $bubble-gum;
 }
 
 </style>

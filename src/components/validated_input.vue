@@ -158,6 +158,10 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
     }
   }
 
+  rerun_validators() {
+    this.change_input(this.d_input_value);
+  }
+
   private change_input(new_value: string) {
     // If the input is invalid, don't turn off warnings.
     if (this.is_valid) {
@@ -173,29 +177,29 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
     }
   }
 
-  private run_validators(new_value: string) {
+  private update_and_validate(new_value: string) {
+    this.d_input_value = new_value;
+    let original_is_valid = this.is_valid;
+    this.run_validators();
+    if (original_is_valid !== this.is_valid) {
+        this.$emit('input_validity_changed', this.is_valid);
+    }
+  }
+
+  private run_validators() {
     let original_is_valid = this.is_valid;
     this.d_is_valid = true;
     this.d_error_msg = "";
 
     // Display error message of first validator that fails
     for (const validator of this.validators) {
-      let response: ValidatorResponse = validator(new_value);
+      let response: ValidatorResponse = validator(this.d_input_value);
 
       if (!response.is_valid) {
         this.d_is_valid = false;
         this.d_error_msg = response.error_msg;
         return;
       }
-    }
-  }
-
-  private update_and_validate(new_value: string) {
-    this.d_input_value = new_value;
-    let original_is_valid = this.is_valid;
-    this.run_validators(new_value);
-    if (original_is_valid !== this.is_valid) {
-        this.$emit('input_validity_changed', this.is_valid);
     }
   }
 
@@ -213,6 +217,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 
 * {
   box-sizing: border-box;
@@ -233,14 +238,14 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
 .error-li:first-child {
   margin-top: -10px;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 
 .error-li:last-child {
   margin-bottom: 0;
-  border-bottom-right-radius: .25rem;
-  border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
 }
 
 .error-ul .error-li {
@@ -261,20 +266,14 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   outline: none;
   box-shadow: 0 0 10px $warning-red;
   border: 1px solid $warning-red;
-  border-radius: .25rem;
+  border-radius: 2px;
 }
 
 .input {
   display: inline-block;
   position: relative;
   width: 100%;
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
+
   transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
