@@ -243,6 +243,7 @@ $active-color: $light-blue;
 
     border-top: none;
     border-left: none;
+    border-bottom: none;
 
     .sidebar-footer {
       position: fixed;
@@ -269,22 +270,5 @@ $active-color: $light-blue;
 .divider {
   border-top: 1px solid $border-color;
 }
-
-// .footer {
-//   position: fixed;
-//   bottom: 0;
-//   left: 0;
-//   right: calc(100vw - #{$sidebar-width});
-//   z-index: 1;
-
-//   height: $footer-height;
-//   background-color: $white-gray;
-//   border-top: 1px solid hsl(210, 20%, 94%);
-
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   padding: 5px;
-// }
 
 </style>

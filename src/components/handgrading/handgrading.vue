@@ -14,7 +14,8 @@
     <div class="grading-sidebar">
       <div class="grading-sidebar-header">
         Score: <span class="score">
-          {{d_handgrading_result.total_points}}/{{d_handgrading_result.total_points_possible}}
+          {{Math.max(
+            0, d_handgrading_result.total_points)}}/{{d_handgrading_result.total_points_possible}}
         </span>
       </div>
 
@@ -44,7 +45,7 @@
                   {{result.criterion.points}}
                 </div>
               </div>
-              <div class="long-description">
+              <div class="long-description" v-if="result.criterion.long_description !== ''">
                 {{result.criterion.long_description}}
               </div>
             </div>
@@ -70,9 +71,12 @@
                 </div>
                 <div class="points">
                   {{annotation.deduction}}
+                  <template v-if="annotation.max_deduction !== null">
+                    (max {{annotation.max_deduction}})
+                  </template>
                 </div>
               </div>
-              <div class="long-description">
+              <div class="long-description" v-if="annotation.long_description !== ''">
                 {{annotation.long_description}}
               </div>
             </div>
@@ -81,7 +85,36 @@
       </div>
 
       <div class="grading-sidebar-footer">
-
+        <button type="button"
+                id="prev-button"
+                @click="$emit('next_group')"
+                class="footer-button footer-item"
+                :disabled="d_saving">
+          <i class="fas fa-chevron-left"></i>
+          Prev
+        </button>
+        <div
+          class="checkbox-input-container footer-item"
+          @click="d_handgrading_result.finished_grading = !d_handgrading_result.finished_grading;
+                  save_adjust_points()"
+        >
+          <input type="checkbox"
+                 class="checkbox"
+                 id="finished-grading"
+                 :disabled="d_saving"
+                 @change="save_adjust_points"
+                 v-model="d_handgrading_result.finished_grading"/>
+          <label for="finished-grading">Done</label>
+        </div>
+        <button type="button"
+                id="next-button"
+                @click="$emit('prev_group')"
+                class="footer-button footer-item"
+                :class="{'green': d_handgrading_result.finished_grading}"
+                :disabled="d_saving">
+          {{d_handgrading_result.finished_grading ? 'Next' : 'Skip'}}
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -126,14 +159,20 @@ export default class Handgrading extends Vue {
     return toggle(this, 'd_saving', async () => {
       result.selected = !result.selected;
 
-      if (result.selected) {
+      await result.save();
+
+      // If this is marked as finished grading, we want observers to be
+      // notified if the score changed (so we refresh).
+      // Otherwise, we can just update the score in place.
+      if (this.d_handgrading_result!.finished_grading) {
+        await this.d_handgrading_result!.refresh();
+      }
+      else if (result.selected) {
         this.d_handgrading_result!.total_points += result.criterion.points;
       }
       else {
         this.d_handgrading_result!.total_points -= result.criterion.points;
       }
-
-      return result.save();
     });
   }
 
@@ -147,6 +186,7 @@ export default class Handgrading extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 @import '@/styles/global.scss';
 @import '@/styles/section_header.scss';
 
@@ -164,9 +204,13 @@ export default class Handgrading extends Vue {
   flex-grow: 1;
 }
 
+
 .grading-sidebar {
-  width: 275px;
+  $sidebar-width: 275px;
   $header-height: 30px;
+  $footer-height: 28px;
+
+  width: $sidebar-width;
   background-color: lighten($pebble-dark, 10%);
 
   // Don't pad the top, or it will mess up the sticky caclulations.
@@ -190,8 +234,9 @@ export default class Handgrading extends Vue {
   .grading-sidebar-content {
     position: sticky;
     top: $header-height;
-    max-height: calc(100vh - #{$header-height});
+    max-height: calc(100vh - #{$header-height} - #{$footer-height});
     overflow: auto;
+    margin-bottom: $footer-height;
 
     font-size: 14px;
 
@@ -214,6 +259,56 @@ export default class Handgrading extends Vue {
       border: 1px solid $pebble-dark;
     }
   }
+
+  .grading-sidebar-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: $sidebar-width;
+    height: $footer-height;
+    border: 1px solid lighten($pebble-dark, 10%);
+    border-bottom: none;
+    border-right: none;
+
+    display: flex;
+
+    .footer-item {
+      &:hover {
+        background-color: $pebble-light;
+      }
+    }
+
+    .checkbox-input-container {
+      padding: 5px 15px;
+      display: flex;
+      justify-content: center;
+
+      background-color: white;
+
+      border: 1px solid lighten($pebble-dark, 10%);
+      border-top: none;
+      border-bottom: none;
+    }
+
+    .footer-button {
+      flex-grow: 1;
+      padding: 3px 6px;
+      background-color: white;
+
+      border: none;
+
+      height: $footer-height;
+      font-size: 16px;
+    }
+
+    .green {
+      background-color: lighten($green, 10%);
+      &:hover {
+        background-color: lighten($green, 5%);
+      }
+      // color: white;
+    }
+  }
 }
 
 .criterion-hover:not(.loading-cursor):hover {
@@ -232,6 +327,8 @@ export default class Handgrading extends Vue {
   min-height: 15px;
   background-color: $pebble-light;
   border: 1px solid $gray-blue-2;
+
+  margin-right: 8px;
 }
 
 .rubric-item {
@@ -243,7 +340,8 @@ export default class Handgrading extends Vue {
   }
 
   .short-description {
-    padding: 0 8px;
+    padding-right: 8px;
+    // padding: 0 8px;
   }
 
   .points {
