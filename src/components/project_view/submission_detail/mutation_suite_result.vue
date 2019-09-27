@@ -1,225 +1,289 @@
 <template>
   <div id="mutation-suite-result">
-    <div v-if="d_mutation_test_suite_result.setup_return_code !== null
-               || d_mutation_test_suite_result.setup_timed_out"
-         id="setup-section">
+    <fieldset v-if="show_setup_fieldset"
+              class="fieldset">
+      <legend class="legend"> Setup Command </legend>
 
-      <div class="feedback-row">
-        <div class="feedback-label"
-             id="setup-command-name">
-          {{d_mutation_test_suite_result.setup_command_name !== null
-          ? d_mutation_test_suite_result.setup_command_name : 'Setup'}}:
-        </div>
-
-        <span id="setup-return-code-correctness-icon">
-          <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
-            <i class="fas fa-check-circle correct-icon"></i>
-          </span>
-          <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
-            <i class="fas fa-times-circle incorrect-icon"></i>
-          </span>
-          <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
-            <span> Timed Out </span>
-            <i class="fas fa-clock timed-out-icon"></i>
-          </span>
-        </span>
-      </div>
-
-      <div v-if="d_mutation_test_suite_result.setup_return_code !== null"
-           class="feedback-row"
-           id="setup-return-code">
-        <div class="feedback-label"> Setup Return Code: </div>
-        <div class="feedback-output-content-short">
-          {{d_mutation_test_suite_result.setup_return_code}}
-        </div>
-      </div>
-
-      <div v-if="d_mutation_test_suite_result.fdbk_settings.show_setup_stdout"
-           class="feedback-row"
-           id="setup-stdout-section">
-        <p class="feedback-label"> Setup Output: </p>
-
-        <template v-if="!d_setup_stdout_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_setup_stdout_content"
-               class="feedback-output-content-single-line"> No Output </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_setup_stdout_content}}</pre>
-        </template>
-      </div>
-
-      <div v-if="d_mutation_test_suite_result.fdbk_settings.show_setup_stderr"
-           class="feedback-row"
-           id="setup-stderr-section">
-        <p class="feedback-label"> Setup Error Output: </p>
-
-        <template v-if="!d_setup_stderr_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_setup_stderr_content"
-               class="feedback-output-content-short"> No Output
+      <div v-if="d_mutation_test_suite_result.setup_return_code !== null
+                 || d_mutation_test_suite_result.setup_timed_out"
+           id="setup-section">
+        <div class="feedback-row">
+          <div class="feedback-label"
+               id="setup-command-name">
+            {{d_mutation_test_suite_result.setup_command_name !== null
+            ? d_mutation_test_suite_result.setup_command_name : 'Setup'}}:
           </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_setup_stderr_content}}</pre>
-        </template>
-      </div>
-    </div>
+          <span id="setup-return-code-correctness-icon">
+            <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
+              <i class="fas fa-check-circle correct-icon"></i>
+            </span>
+            <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
+              <i class="fas fa-times-circle incorrect-icon"></i>
+            </span>
+            <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
+              <span> Timed Out </span>
+              <i class="fas fa-clock timed-out-icon"></i>
+            </span>
+          </span>
+        </div>
 
-    <div v-if="d_mutation_test_suite_result.setup_return_code !== null
-               || d_mutation_test_suite_result.setup_timed_out"
-         class="section-divider">
-    </div>
+        <div v-if="d_mutation_test_suite_result.setup_return_code !== null"
+             id="setup-return-code"
+             class="feedback-row">
+          <div class="feedback-label"> Return code: </div>
+          <div class="feedback">
+            <div class="short-output">
+              {{d_mutation_test_suite_result.setup_return_code}}
+            </div>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_setup_stdout"
+             id="setup-stdout-section"
+             class="feedback-row">
+          <div class="feedback-label"> Stdout: </div>
+
+          <div class="feedback">
+            <template v-if="!d_setup_stdout_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_setup_stdout_content"
+                   class="short-output"> No Output </div>
+              <pre v-else
+                   class="lengthy-output">{{d_setup_stdout_content}}</pre>
+            </template>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_setup_stderr"
+             id="setup-stderr-section"
+             class="feedback-row">
+
+          <div class="feedback-label"> Stderr: </div>
+
+          <div class="feedback">
+            <template v-if="!d_setup_stderr_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_setup_stderr_content"
+                   class="short-output"> No Output
+              </div>
+              <pre v-else
+                   class="lengthy-output">{{d_setup_stderr_content}}</pre>
+            </template>
+          </div>
+        </div>
+      </div>
+    </fieldset>
 
     <div id="bug-section">
+      <fieldset v-if="show_buggy_implementations_fieldset"
+                class="fieldset">
+        <legend class="legend"> Buggy Implementations </legend>
 
-      <div v-if="d_mutation_test_suite_result.num_bugs_exposed !== null"
-           id="num-bugs-exposed-section">
+        <div v-if="d_mutation_test_suite_result.num_bugs_exposed !== null"
+             id="num-bugs-exposed-section"
+             class="feedback-row">
 
-        <div class="list-header">
-          <div class="feedback-label"> Bugs exposed: </div>
-          <div class="feedback-output-content-short">
-            {{d_mutation_test_suite_result.num_bugs_exposed}}
+          <div class="feedback-label buggy-impl-feedback-label"> # of exposed bugs: </div>
+          <div class="feedback buggy-impl-feedback">
+            <div class="short-output">
+              {{d_mutation_test_suite_result.num_bugs_exposed}}
+            </div>
           </div>
         </div>
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
-                   === BugsExposedFeedbackLevel.exposed_bug_names
-                   && d_mutation_test_suite_result.num_bugs_exposed > 1">
-          <ul id="list-of-bug-names-exposed"
-              class="fa-ul">
-            <li class="list-item"
-                v-for="bug_name of d_mutation_test_suite_result.bugs_exposed">
-              <span class="fa-li"><i class="fas fa-bug bug-icon"></i></span>
-              {{bug_name}}
-            </li>
-          </ul>
+                     === BugsExposedFeedbackLevel.exposed_bug_names
+                     && d_mutation_test_suite_result.num_bugs_exposed > 1"
+             class="feedback-row">
+
+          <div class="feedback-label buggy-impl-feedback-label"> Bugs exposed: </div>
+          <div class="feedback buggy-impl-feedback">
+            <div id="list-of-bugs">
+              <div v-for="bug_name of d_mutation_test_suite_result.bugs_exposed"
+                   class="single-bug">
+                    <span>
+                      <i class="fas fa-bug bug-icon"></i>
+                      {{bug_name}}
+                    </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-      </div>
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout"
+             id="buggy-stdout-section"
+             class="feedback-row">
+          <div class="feedback-label buggy-impl-feedback-label"> Stdout: </div>
 
-      <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout"
-           class="feedback-row"
-           id="buggy-stdout-section">
-        <div class="feedback-label"> Buggy Stdout: </div>
-        <template v-if="!d_grade_buggy_stdout_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_grade_buggy_stdout_content"
-               class="feedback-output-content-short"> No Output
+          <div class="feedback buggy-impl-feedback">
+            <template v-if="!d_grade_buggy_stdout_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_grade_buggy_stdout_content"
+                   class="short-output"> No Output
+              </div>
+              <pre v-else
+                   class="lengthy-output">{{d_grade_buggy_stdout_content}}</pre>
+            </template>
           </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_grade_buggy_stdout_content}}</pre>
-        </template>
-      </div>
 
-      <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
-           class="feedback-row"
-           id="buggy-stderr-section">
-        <div class="feedback-label"> Buggy Stderr: </div>
+        </div>
 
-        <template v-if="!d_grade_buggy_stderr_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_grade_buggy_stderr_content"
-               class="feedback-output-content-short"> No Output
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
+             class="feedback-row"
+             id="buggy-stderr-section">
+          <div class="feedback-label buggy-impl-feedback-label"> Stderr: </div>
+
+          <div class="feedback buggy-impl-feedback">
+            <template v-if="!d_grade_buggy_stderr_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_grade_buggy_stderr_content"
+                   class="short-output"> No Output
+              </div>
+              <pre v-else
+                   class="lengthy-output">{{d_grade_buggy_stderr_content}}</pre>
+            </template>
           </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_grade_buggy_stderr_content}}</pre>
-        </template>
-      </div>
+        </div>
+      </fieldset>
+
     </div>
 
-    <div v-if="mutation_test_suite_result.student_tests.length"
-         class="section-divider">
-    </div>
-
-    <div v-if="d_mutation_test_suite_result.student_tests.length"
-         id="student-tests-section">
-      <div>
+    <fieldset v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
+                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
+              class="fieldset">
+      <legend class="legend"> Validity Check </legend>
+      <div id="student-tests-section">
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout"
              class="feedback-row"
              id="validity-check-stdout-section">
-          <div class="feedback-label"> Validity Check Stdout: </div>
+          <div class="feedback-label"> Stdout: </div>
 
-          <template v-if="!d_validity_checkout_stdout_loaded">
-            <i class="fa fa-spinner fa-pulse fa-fw"></i>
-          </template>
-          <template v-else>
-            <div v-if="!d_validity_checkout_stdout_content"
-               class="feedback-output-content-short"> No Output
-            </div>
-            <pre v-else
-                 class="feedback-output-content-lengthy">{{d_validity_checkout_stdout_content}}
-            </pre>
-          </template>
+          <div class="feedback">
+            <template v-if="!d_validity_checkout_stdout_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_validity_checkout_stdout_content"
+                 class="short-output"> No Output
+              </div>
+              <pre v-else
+                   class="lengthy-output">{{d_validity_checkout_stdout_content}}
+              </pre>
+            </template>
+          </div>
         </div>
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
              class="feedback-row"
              id="validity-check-stderr-section">
-          <div class="feedback-label"> Validity Check Stderr: </div>
+          <div class="feedback-label"> Stderr: </div>
 
-          <template v-if="!d_validity_checkout_stderr_loaded">
-            <i class="fa fa-spinner fa-pulse fa-fw"></i>
-          </template>
-          <template v-else>
-            <p v-if="!d_validity_checkout_stderr_content"
-               class="feedback-output-content-short"> No Output
-            </p>
-            <pre v-else
-                 class="feedback-output-content-lengthy">{{d_validity_checkout_stderr_content}}
-            </pre>
-          </template>
+          <div class="feedback">
+            <template v-if="!d_validity_checkout_stderr_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <p v-if="!d_validity_checkout_stderr_content"
+                 class="short-output"> No Output
+              </p>
+              <pre v-else
+                   class="lengthy-output">{{d_validity_checkout_stderr_content}}
+              </pre>
+            </template>
+          </div>
         </div>
       </div>
+    </fieldset>
 
-      <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout"
-           class="section-divider">
-      </div>
-
+    <fieldset v-if="show_test_names_fieldset"
+              class="fieldset">
+      <legend class="legend"> Get Test Names </legend>
       <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout"
            class="feedback-row"
            id="test-names-stdout-section">
-        <div class="feedback-label"> Get test names stdout: </div>
+        <div class="feedback-label test-names-feedback-label"> Stdout: </div>
 
-        <template v-if="!d_student_test_names_stdout_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_student_test_names_stdout_content"
-               class="feedback-output-content-short"> No Output
-          </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_student_test_names_stdout_content}}</pre>
-        </template>
+        <div class="feedback test-names-feedback">
+          <template v-if="!d_student_test_names_stdout_loaded">
+            <div class="loading-output">
+              <i class="fa fa-spinner fa-pulse fa-fw"></i>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="!d_student_test_names_stdout_content"
+                 class="short-output"> No Output
+            </div>
+            <pre v-else
+                 class="lengthy-output">{{d_student_test_names_stdout_content}}</pre>
+          </template>
+        </div>
       </div>
 
       <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
            class="feedback-row"
            id="test-names-stderr-section">
-        <div class="feedback-label"> Get test names stderr: </div>
+        <div class="feedback-label test-names-feedback-label"> Stderr: </div>
 
-        <template v-if="!d_student_test_names_stderr_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_student_test_names_stderr_content"
-             class="feedback-output-content-short"> No Output
+        <div class="feedback test-names-feedback">
+          <template v-if="!d_student_test_names_stderr_loaded">
+            <div class="loading-output">
+              <i class="fa fa-spinner fa-pulse fa-fw"></i>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="!d_student_test_names_stderr_content"
+               class="short-output"> No Output
+            </div>
+            <pre v-else
+                 class="lengthy-output">{{d_student_test_names_stderr_content}}</pre>
+          </template>
+        </div>
+      </div>
+
+      <div v-if="get_valid_tests().length"
+           class="feedback-row"
+           id="valid-tests-section">
+
+        <div class="feedback-label test-names-feedback-label"> Valid test cases: </div>
+
+        <div class="feedback test-names-feedback">
+          <div id="list-of-valid-tests">
+            <div v-for="valid_test of get_valid_tests()"
+                 class="single-valid-test">
+              <span>
+                <i class="far fa-check-circle valid-test-icon"></i>
+                {{valid_test}}
+              </span>
+            </div>
           </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_student_test_names_stderr_content}}</pre>
-        </template>
+        </div>
       </div>
 
       <div v-if="d_mutation_test_suite_result.discarded_tests.length"
-           id="discarded-tests-section">
-        <div id="discarded-explanation"
-             class="list-header">
+           id="discarded-tests-section"
+           class="feedback-row">
+
+        <div class="feedback-explanation">
           This suite accepts up to
           <span id="num-tests-accepted">
             {{d_mutation_test_suite_result.student_tests.length}}</span>
@@ -227,62 +291,57 @@
           <span id="total-tests-submitted">
             {{d_mutation_test_suite_result.student_tests.length
               + d_mutation_test_suite_result.discarded_tests.length}}</span>.
-          These tests were discarded:
         </div>
 
-        <ul id="list-of-discarded-tests" class="fa-ul">
-          <li class="list-item"
-              v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests">
-            <span class="fa-li"><i class="far fa-trash-alt discarded-test-icon"></i></span>
-            {{discarded_test_name}}
-          </li>
-        </ul>
+        <div class="feedback-label test-names-feedback-label">
+          Discarded test cases:
+        </div>
+
+        <div class="feedback test-names-feedback">
+          <div id="list-of-discarded-tests">
+            <div v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests"
+                 class="single-valid-test">
+              <span>
+                <i class="far fa-trash-alt discarded-test-icon"></i>
+                {{discarded_test_name}}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-if="d_mutation_test_suite_result.invalid_tests !== null &&
                  d_mutation_test_suite_result.invalid_tests.length"
            id="invalid-tests-section"
            class="feedback-row">
-        <div class="list-header">
-          These tests incorrectly reported a bug when run against a correct implementation:
+
+        <div class="feedback-explanation">
+          Invalid tests time out or incorrectly report a bug when run against a correct implementation.
         </div>
-        <ul id="list-of-incorrectly-reported-bug-tests"
-            class="fa-ul">
-          <li class="list-item invalid-test"
-              v-for="invalid_test of d_mutation_test_suite_result.invalid_tests">
-            <span class="fa-li">
-              <i class="fas fa-exclamation-triangle incorrectly-reported-bug-icon"></i>
-            </span>
-            {{invalid_test}}
-            <span v-if="test_timed_out(invalid_test)"
-                  class="test-timed-out">
-              (Timed Out)
-              <i class="far fa-clock timed-out-icon"></i>
-            </span>
-          </li>
-        </ul>
-      </div>
 
-      <div v-if="get_valid_tests().length"
-           class="feedback-row"
-           id="valid-tests-section">
+        <div class="feedback-label test-names-feedback-label">
+          Invalid test cases:
+        </div>
+        <div class="feedback test-names-feedback">
+          <div id="list-of-invalid-tests">
+            <div v-for="invalid_test of d_mutation_test_suite_result.invalid_tests"
+                 class="single-invalid-test">
+              <span>
+                <i class="fas fa-exclamation-triangle invalid-test-icon"></i>
+                {{invalid_test}}
+              </span>
 
-        <div class="list-header"> Valid test cases you submitted: </div>
-
-        <div>
-          <ul id="list-of-valid-tests"
-              class="fa-ul">
-            <li class="list-item" v-for="valid_test of get_valid_tests()">
-              <span class="fa-li">
-                <i class="far fa-check-circle valid-test-icon"></i>
-              </span>{{valid_test}}
-            </li>
-          </ul>
+              <span v-if="test_timed_out(invalid_test)"
+                    class="test-timed-out">
+                (Timed Out)
+                <i class="far fa-clock timed-out-icon"></i>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-    </div>
-
+    </fieldset>
   </div>
 </template>
 
@@ -370,6 +429,29 @@ export default class MutationSuiteResult extends Vue {
     await this.get_results();
   }
 
+  get show_setup_fieldset() {
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
+           || this.d_mutation_test_suite_result!.setup_return_code !== null
+           || this.d_mutation_test_suite_result!.setup_timed_out;
+  }
+
+  get show_test_names_fieldset() {
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
+           || this.d_mutation_test_suite_result!.discarded_tests.length
+           || (this.d_mutation_test_suite_result!.invalid_tests !== null
+               && this.d_mutation_test_suite_result!.invalid_tests!.length)
+           || this.get_valid_tests().length;
+  }
+
+  get show_buggy_implementations_fieldset() {
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
+           || this.d_mutation_test_suite_result!.num_bugs_exposed !== null;
+  }
+
+
   async get_results() {
     this.d_mutation_test_suite_result_output_size
         = await ResultOutput.get_mutation_test_suite_result_output_size(
@@ -385,6 +467,9 @@ export default class MutationSuiteResult extends Vue {
     await this.load_validity_check_stderr_content();
     await this.load_grade_buggy_stdout_content();
     await this.load_grade_buggy_stderr_content();
+    this.d_mutation_test_suite_result!.invalid_tests = [
+      'one', 'two'
+    ];
   }
 
   async load_setup_stdout_content() {
@@ -552,34 +637,12 @@ export default class MutationSuiteResult extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/components/submission_detail.scss';
 
+$left-side-width-adjusted: 175px;
+
 .section-divider {
-  height: 2px;
-  background-color: darken($white-gray, 5);
+  height: 1px;
+  background-color: hsl(220, 30%, 60%);
   margin: 5px 0;
-}
-
-#valid-tests-section, #invalid-tests-section, #discarded-tests-section {
-  padding: 5px 0;
-}
-
-#num-bugs-exposed-section {
-  padding: 5px 0;
-}
-
-#list-of-bug-names-exposed,
-#list-of-incorrectly-reported-bug-tests,
-#list-of-valid-tests,
-#list-of-discarded-tests {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  font-size: 14px;
-}
-
-.list-header {
-  font-weight: bold;
-  padding: 3px 0 0 0;
 }
 
 .list-item {
@@ -589,46 +652,22 @@ export default class MutationSuiteResult extends Vue {
 
 .bug-icon {
   color: $navy-blue;
-  font-size: 13px;
 }
 
-.incorrectly-reported-bug-icon{
+.invalid-test-icon {
   color: $warning-red;
-  font-size: 13px;
 }
 
 .discarded-test-icon {
   color: #7a8fb8;
-  font-size: 13px;
 }
 
 .valid-test-icon {
   color: $ocean-blue;
-  font-size: 13px;
-}
-
-#setup-return-code-icon {
-  display: inline-block;
-  color: $green;
 }
 
 #setup-return-code-correctness-icon {
-  padding: 0 0 0 2px;
-}
-
-.correct-icon {
-  color: $ocean-blue;
-  padding: 0 2px 0 0;
-}
-
-.incorrect-icon {
-  color: $burnt-red;
-  padding: 0 2px 0 0;
-}
-
-.timed-out-icon {
-  color: $navy-blue;
-  padding: 0 2px;
+  padding: 0 0 0 5px;
 }
 
 #num-tests-accepted {
@@ -642,6 +681,66 @@ export default class MutationSuiteResult extends Vue {
 .test-timed-out {
   color: $navy-blue;
   padding-left: 2px;
+}
+
+
+$width-of-feedback-label: 170px;
+
+.feedback-label {
+  width: $width-of-feedback-label;
+}
+
+.feedback {
+  width: calc(100% - #{$width-of-feedback-label});
+}
+
+//$buggy-impl-feedback-label-width: 150px;
+
+//.buggy-impl-feedback-label {
+  //width: $buggy-impl-feedback-label-width;
+//}
+
+//.buggy-impl-feedback {
+  //width: calc(100% - #{$buggy-impl-feedback-label-width});
+//}
+
+//$test-names-feedback-label-width: 200px;
+
+//.test-names-feedback-label {
+  //width: $test-names-feedback-label-width;
+//}
+
+//.test-names-feedback {
+  //width: calc(100% - #{$test-names-feedback-label-width});
+//}
+
+
+
+
+
+.discarded-test-icon,
+.valid-test-icon,
+.invalid-test-icon,
+.bug-icon {
+  padding-right: 5px;
+}
+
+.single-bug,
+.single-valid-test,
+.single-invalid-test {
+  padding: 0 0 5px 0;
+}
+
+#list-of-bugs,
+#list-of-valid-tests,
+#list-of-invalid-tests,
+#list-of-discarded-tests {
+  padding: 5px;
+}
+
+.feedback-explanation {
+  font-weight: bold;
+  padding: 5px 0;
 }
 
 </style>

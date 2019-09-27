@@ -240,14 +240,12 @@ export default class AGSuiteResult extends Vue {
 @import '@/styles/components/submission_detail.scss';
 
 #ag-suite-result {
-  border: 10px solid #ebeef4;
-  border-radius: 5px;
-  padding: 20px;
+  padding: 20px 0;
   margin: 10px 0;
 }
 
 #ag-test-suite-name {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
   padding: 0 0 10px 0;
 }

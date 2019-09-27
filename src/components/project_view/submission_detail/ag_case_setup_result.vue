@@ -1,53 +1,73 @@
 <template>
   <div id="ag-case-setup-result">
+    <fieldset class="fieldset">
+      <legend class="legend"> Correctness </legend>
+
       <div id="exit-status-section">
         <div class="feedback-row">
           <div class="feedback-label"> Exit status: </div>
-          <div class="feedback-output-content-short">
-            <span v-if="setup_exit_status === ReturnCodeCorrectness.timed_out">
-              <span>{{setup_exit_status}}</span>
-              <i class="fas fa-clock timed-out-icon"></i>
-            </span>
-            <span v-else-if="setup_exit_status === ReturnCodeCorrectness.not_available">
-              <i class="fas fa-ban not-available-icon"></i>
-            </span>
-            <span v-else>
-              {{setup_exit_status}}
-            </span>
+          <div class="feedback">
+            <div class="correctness-output">
+              <span v-if="setup_exit_status === ReturnCodeCorrectness.timed_out">
+                <span>{{ReturnCodeCorrectness.timed_out}}</span>
+                <i class="fas fa-clock timed-out-icon"></i>
+              </span>
+              <span v-else-if="setup_exit_status === ReturnCodeCorrectness.not_available">
+                <i class="fas fa-ban not-available-icon"></i>
+              </span>
+              <span v-else>
+                {{setup_exit_status}}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
+    </fieldset>
+
+    <fieldset v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stdout
+                    || d_ag_test_suite_result.fdbk_settings.show_setup_stderr"
+              class="fieldset">
+      <legend class="legend"> Output </legend>
       <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stdout"
-           class="feedback-row"
-           id="stdout-section">
-        <div class="feedback-label"> Output: </div>
-        <template v-if="!d_setup_stdout_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_setup_stdout"
-               class="feedback-output-content-short"> No Output </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_setup_stdout}}</pre>
-        </template>
+           id="setup-stdout-section"
+           class="feedback-row">
+        <div class="feedback-label"> Stdout: </div>
+        <div class="feedback">
+          <template v-if="!d_setup_stdout_loaded">
+            <div class="loading-output">
+              <i class="fa fa-spinner fa-pulse fa-fw"></i>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="!d_setup_stdout"
+                 class="short-output"> No Output </div>
+            <pre v-else
+                 class="lengthy-output">{{d_setup_stdout}}</pre>
+          </template>
+        </div>
       </div>
 
       <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stderr"
-           class="feedback-row"
-           id="stderr-section">
-        <div class="feedback-label"> Error Output: </div>
-        <template v-if="!d_setup_stderr_loaded">
-          <i class="fa fa-spinner fa-pulse fa-fw"></i>
-        </template>
-        <template v-else>
-          <div v-if="!d_setup_stderr"
-               class="feedback-output-content-short"> No Output </div>
-          <pre v-else
-               class="feedback-output-content-lengthy">{{d_setup_stderr}}</pre>
-        </template>
+           id="setup-stderr-section"
+           class="feedback-row">
+        <div class="feedback-label"> Stderr: </div>
+        <div class="feedback">
+          <template v-if="!d_setup_stderr_loaded">
+            <div class="loading-output">
+              <i class="fa fa-spinner fa-pulse fa-fw"></i>
+            </div>
+          </template>
+          <template v-else>
+            <div v-if="!d_setup_stderr"
+                 class="short-output"> No Output </div>
+            <pre v-else
+                 class="lengthy-output">{{d_setup_stderr}}</pre>
+          </template>
+        </div>
       </div>
-    </div>
+    </fieldset>
+  </div>
 </template>
 
 <script lang="ts">
@@ -166,13 +186,7 @@ export default class AGCaseSetupResult extends Vue {
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
 
-.not-available-icon {
-  color: darken($pebble-dark, 5);
-  padding: 0 2px 0 0;
-}
-
 .timed-out-icon {
-  color: $navy-blue;
   padding: 0 2px 0 5px;
 }
 

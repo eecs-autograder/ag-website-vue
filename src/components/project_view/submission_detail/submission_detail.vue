@@ -183,8 +183,7 @@
           <ul>
             <li>This action cannot be undone</li>
             <li>Once removed, the submission will NOT be graded</li>
-            <li>The next time you submit, that submission will be placed at the back of the grading
-              queue
+            <li>The next time you submit, that submission will be placed at the back of the grading queue
             </li>
           </ul>
         </div>
@@ -376,7 +375,7 @@ export default class SubmissionDetail extends Vue {
 }
 
 #submission-detail-overview {
-  padding: 6px 12px 0 12px;
+  padding: 6px 0 0 1px;
 }
 
 #submitted-by {
@@ -468,7 +467,7 @@ export default class SubmissionDetail extends Vue {
 }
 
 .modal-cancel-button {
- margin-right: 10px;
+  margin-right: 10px;
 }
 
 .modal-header {
