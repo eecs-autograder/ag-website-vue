@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { config, mount } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
@@ -15,10 +15,6 @@ beforeAll(() => {
 afterEach(() => {
     sinon.restore();
 });
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Make sure that you call wrapper.vm.$destroy() at the end of each test case. Otherwise,
-// the lingering wheel event listeners attached to window could cause other tests to fail.
 
 @Component({
     template: `<div class="outermost">
@@ -136,8 +132,6 @@ describe('ContextMenu tests', () => {
          expect(context_menu_item_1.$el.classList).toContain('hoverable-item');
          expect(context_menu_item_2.$el.classList).toContain('disabled-item');
          expect(context_menu_item_3.$el.classList).toContain('hoverable-item');
-         expect(context_menu_item_1.$el.classList).toContain('first-child');
-         expect(context_menu_item_3.$el.classList).toContain('last-child');
 
          wrapper.destroy();
     });
@@ -145,23 +139,25 @@ describe('ContextMenu tests', () => {
     test("Clicking on a context menu item closes the context menu",
          async () => {
         let wrapper = mount(WrapperComponent);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
 
         let context_menu_area = wrapper.find('.context-menu-area');
 
         context_menu_area.trigger('click');
-        await context_menu.$nextTick();
+        await context_menu.vm.$nextTick();
 
-        expect((<HTMLElement> context_menu.$el).style.visibility).toBe('visible');
-        expect(context_menu.menu_is_open).toBe(true);
+        expect(context_menu.isVisible()).toBe(true);
+        expect(context_menu.vm.menu_is_open).toBe(true);
+        expect(context_menu.emitted().is_open_changed[0][0]).toBe(true);
 
         let context_menu_item_1 = wrapper.find({ref: 'item_1'});
 
         context_menu_item_1.trigger('click');
-        await context_menu.$nextTick();
+        await context_menu.vm.$nextTick();
 
-        expect((<HTMLElement> context_menu.$el).style.visibility).toBe('hidden');
-        expect(context_menu.menu_is_open).toBe(false);
+        expect(context_menu.isVisible()).toBe(false);
+        expect(context_menu.vm.menu_is_open).toBe(false);
+        expect(context_menu.emitted().is_open_changed[1][0]).toBe(false);
 
         wrapper.destroy();
     });
@@ -213,19 +209,19 @@ describe('ContextMenu tests', () => {
          "outside the context menu area hides it",
          async () => {
         let wrapper = mount(WrapperComponent);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
         let context_menu_area = wrapper.find('.context-menu-area');
         context_menu_area.trigger('click');
-        await context_menu.$nextTick();
+        await context_menu.vm.$nextTick();
 
-        expect((<HTMLElement> context_menu.$el).style.visibility).toBe("visible");
+        expect(context_menu.isVisible()).toBe(true);
 
         let outside_input = wrapper.find('#outside');
         outside_input.trigger('click');
         outside_input.element.focus();
-        await context_menu.$nextTick();
+        await context_menu.vm.$nextTick();
 
-        expect((<HTMLElement> context_menu.$el).style.visibility).toBe("hidden");
+        expect(context_menu.isVisible()).toBe(false);
 
         wrapper.destroy();
     });
@@ -378,9 +374,10 @@ describe('ContextMenu tests', () => {
 
         sinon.stub(document.body, 'clientWidth').value(800);
         sinon.stub(document.body, 'clientHeight').value(500);
-        sinon.stub(context_menu, 'd_width_of_menu').value(10);
+        sinon.stub(context_menu.$el, 'clientWidth').value(10);
 
         context_menu.show_context_menu(798, 2);
+        await context_menu.$nextTick();
         let new_left = (<HTMLElement> context_menu.$el).style.left;
         expect(new_left).not.toBeNull();
         // Chop off 'px'
@@ -437,9 +434,10 @@ describe('ContextMenu tests', () => {
 
         sinon.stub(document.body, 'clientWidth').value(800);
         sinon.stub(document.body, 'clientHeight').value(500);
-        sinon.stub(context_menu, 'd_height_of_menu').value(15);
+        sinon.stub(context_menu.$el, 'clientHeight').value(15);
 
         context_menu.show_context_menu(2, 498);
+        await context_menu.$nextTick();
         let new_top = (<HTMLElement> context_menu.$el).style.top;
         expect(new_top).not.toBeNull();
         new_top = new_top!.substring(0, new_top!.length - 2);
@@ -475,25 +473,6 @@ describe('ContextMenu tests', () => {
         expect(
             () => mount(component)
         ).toThrow("Context Menus must contain at least one Context Menu Item");
-    });
-
-    test("Scrolling via wheel event is disallowed while the context menu is open",
-         () => {
-        let wrapper = mount(WrapperComponent, {attachToDocument: true});
-        let context_menu_area = wrapper.find('.context-menu-area');
-
-        let handle_wheel_event = sinon.fake();
-        context_menu_area.element.addEventListener('wheel', handle_wheel_event);
-
-        context_menu_area.trigger('wheel');
-        expect(handle_wheel_event.calledOnce).toBe(true);
-
-        context_menu_area.trigger('click');
-
-        context_menu_area.trigger('wheel');
-        expect(handle_wheel_event.calledOnce).toBe(true);
-
-        wrapper.destroy();
     });
 
     test("Pressing esc closes the context menu", async () => {

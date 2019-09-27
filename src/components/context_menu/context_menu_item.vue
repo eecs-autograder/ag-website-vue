@@ -13,7 +13,6 @@
 
   @Component
   export default class ContextMenuItem extends Vue {
-
     @Watch('disabled')
     on_disabled_change(new_value: boolean, old_value: boolean) {
       this.d_disabled = new_value;
@@ -46,16 +45,6 @@
 .context-menu-option {
   color: black;
   padding: 6px 15px;
-}
-
-.first-child {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
-.last-child {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
 }
 
 .hoverable-item:hover {

@@ -48,7 +48,9 @@
                   v-if="handgrading_enabled"
                   @is_open_changed="on_menu_is_open_changed">
       <template v-slot:context_menu_items>
-        <context-menu-item v-for="annotation of handgrading_rubric.annotations">
+        <context-menu-item v-for="annotation of handgrading_rubric.annotations"
+                           :key="annotation.pk"
+                           >
           <template slot="label">
             {{annotation.short_description}} ({{annotation.deduction}})
           </template>

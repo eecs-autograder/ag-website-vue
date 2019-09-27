@@ -1,10 +1,10 @@
 <template>
   <div tabindex="-1"
-      ref="context_menu"
-      id="context-menu-container"
-      @blur="hide_context_menu"
-      @keyup.esc="hide_context_menu"
-      v-show="d_is_open">
+       ref="context_menu"
+       id="context-menu-container"
+       @blur="hide_context_menu"
+       @keyup.esc="hide_context_menu"
+       v-show="d_is_open">
     <slot name="context_menu_items">
       <context-menu-item :disabled="true">
         <template slot="label">
@@ -27,6 +27,13 @@ import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 })
 export default class ContextMenu extends Vue {
   private d_is_open = false;
+
+  mounted() {
+    let children = this.$el.getElementsByClassName('context-menu-option');
+    if (children.length === 0) {
+      throw new Error('Context Menus must contain at least one Context Menu Item');
+    }
+  }
 
   get menu_is_open() {
     return this.d_is_open;
