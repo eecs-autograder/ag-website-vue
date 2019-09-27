@@ -46,8 +46,7 @@
 
     <context-menu ref="handgrading_context_menu"
                   v-if="handgrading_enabled"
-                  @context_menu_closed="d_first_highlighted_line = null;
-                                        d_last_highlighted_line = null">
+                  @is_open_changed="on_menu_is_open_changed">
       <template v-slot:context_menu_items>
         <context-menu-item v-for="annotation of handgrading_rubric.annotations">
           <template slot="label">
@@ -117,6 +116,8 @@ export default class ViewFile extends Vue implements Created {
 
   d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
   d_hovered_comment: HandgradingComment | null = null;
+
+  d_menu_is_open = false;
 
   readonly max_display_size = 5000000;  // 5MB
 
@@ -202,7 +203,9 @@ export default class ViewFile extends Vue implements Created {
   d_last_highlighted_line: number | null = null;
 
   start_highlighting(line_index: number) {
-    if (this.readonly_handgrading_results || !this.handgrading_enabled) {
+    if (this.readonly_handgrading_results
+        || !this.handgrading_enabled
+        || this.d_menu_is_open) {
       return;
     }
     this.d_first_highlighted_line = line_index;
@@ -213,7 +216,8 @@ export default class ViewFile extends Vue implements Created {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
         || this.d_first_highlighted_line === null
-        || this.d_last_highlighted_line === null) {
+        || this.d_last_highlighted_line === null
+        || this.d_menu_is_open) {
       return;
     }
 
@@ -226,12 +230,24 @@ export default class ViewFile extends Vue implements Created {
   }
 
   stop_highlighting(event: MouseEvent, line_index: number) {
-    if (this.readonly_handgrading_results || !this.handgrading_enabled) {
+    if (this.readonly_handgrading_results
+        || !this.handgrading_enabled
+        || this.d_first_highlighted_line === null
+        || this.d_last_highlighted_line === null
+        || this.d_menu_is_open) {
       return;
     }
 
     (<ContextMenu> this.$refs.handgrading_context_menu).show_context_menu(
       event.pageX, event.pageY);
+  }
+
+  on_menu_is_open_changed(is_open: boolean) {
+    this.d_menu_is_open = is_open;
+    if (!this.d_menu_is_open) {
+      this.d_first_highlighted_line = null;
+      this.d_last_highlighted_line = null;
+    }
   }
 }
 

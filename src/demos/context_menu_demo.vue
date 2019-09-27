@@ -1,7 +1,7 @@
 <template>
   <div class="context-menu-demo-outer">
     <div class="context-menu-demo-1">
-      <div class="area-of-focus-1"
+      <div class="area-of-focus-1 menu-parent"
            @click="$refs.context_menu_1.show_context_menu($event.pageX, $event.pageY)">
         As Harry and a severely weakened Dumbledore flee the cave where Dumbledore drank the
         potion of despair to obtain what he thought was one of Voldemort’s Horcruxes, Harry
@@ -56,7 +56,7 @@
     </context-menu>
 
     <div class="context-menu-demo-2">
-      <div class="area-of-focus-2"
+      <div class="area-of-focus-2 menu-parent"
            @click="$refs.context_menu_2.show_context_menu($event.pageX, $event.pageY)">
         Today is Toby Flenderson's last day.
         I couldn't sleep last night.
@@ -103,7 +103,8 @@
     </context-menu>
 
     <br>
-    <div @click="$refs.empty_context_menu.show_context_menu($event.pageX, $event.pageY)">
+    <div @click="$refs.empty_context_menu.show_context_menu($event.pageX, $event.pageY)"
+         class="menu-parent">
       This context menu is empty <br> <br>
 
       EmptymenuEmptymenuEmptymenuEmptymenuEmptymenuEm
@@ -150,15 +151,18 @@ export default class ContextMenuDemo extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/context_menu_styles.scss';
 
-.context-menu-demo-1{
-  overflow: scroll;
+.context-menu-demo-1 {
+  overflow: auto;
   height: 1000px;
+}
+
+.menu-parent {
+  position: relative;
 }
 
 .area-of-focus-1 {
   height: 2500px;
   padding: 20px;
-  position: relative;
 }
 
 .context-menu-demo-2{
@@ -168,7 +172,6 @@ export default class ContextMenuDemo extends Vue {
 .area-of-focus-2 {
   background-color: mediumpurple;
   padding: 20px;
-  position: relative;
 }
 
 .fish {

@@ -74,7 +74,7 @@ export default class FilePanel extends Vue {
     top: 0;
 
     display: flex;
-    padding: 10px;
+    padding: 8px;
     cursor: pointer;
 
     background-color: $white-gray;
