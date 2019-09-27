@@ -4,6 +4,9 @@
     <div v-if="d_loading" class="loading-spinner">
       <div><i class="fa fa-spinner fa-pulse"></i></div>
     </div>
+    <div v-else-if="d_file_contents.length > max_display_size">
+      FIXME: file too big
+    </div>
     <table v-else
            id="viewing-container">
       <template v-for="(line, index) of d_file_contents.split('\n')">
@@ -114,6 +117,8 @@ export default class ViewFile extends Vue implements Created {
 
   d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
   d_hovered_comment: HandgradingComment | null = null;
+
+  readonly max_display_size = 5000000;  // 5MB
 
   async created() {
     this.d_file_contents = await this.file_contents;

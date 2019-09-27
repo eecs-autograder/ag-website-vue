@@ -62,9 +62,8 @@
 
           <i v-if="d_loading_result_summaries" class="loading fa fa-spinner fa-pulse"></i>
         </div>
-        <div class="sidebar-footer">
+        <div class="sidebar-footer" v-if="!d_group_sidebar_collapsed">
           <input type="text"
-                 v-if="!d_group_sidebar_collapsed"
                  v-model="d_search_text"
                  class="input" placeholder="Search by username"/>
         </div>
@@ -72,6 +71,7 @@
 
       <div class="body" :class="{'body-closed': d_group_sidebar_collapsed}">
         <handgrading v-if="d_currently_grading !== null"
+                     :readonly_handgrading_results="false"
                      :group="d_currently_grading"></handgrading>
       </div>
     </div>
