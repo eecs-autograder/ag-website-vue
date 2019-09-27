@@ -151,6 +151,8 @@ export default class SubmissionDetailPanel extends Vue {
 
 .panel-header-open {
   border-radius: 3px 3px 0 0;
+  position: sticky;
+  top: 0;
 }
 
 .panel-header-closed {

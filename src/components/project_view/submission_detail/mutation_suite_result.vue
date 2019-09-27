@@ -316,7 +316,8 @@
            class="feedback-row">
 
         <div class="feedback-explanation">
-          Invalid tests time out or incorrectly report a bug when run against a correct implementation.
+          Invalid tests time out or incorrectly report a bug when run against a
+          correct implementation.
         </div>
 
         <div class="feedback-label test-names-feedback-label">
@@ -683,7 +684,6 @@ $left-side-width-adjusted: 175px;
   padding-left: 2px;
 }
 
-
 $width-of-feedback-label: 170px;
 
 .feedback-label {
@@ -693,30 +693,6 @@ $width-of-feedback-label: 170px;
 .feedback {
   width: calc(100% - #{$width-of-feedback-label});
 }
-
-//$buggy-impl-feedback-label-width: 150px;
-
-//.buggy-impl-feedback-label {
-  //width: $buggy-impl-feedback-label-width;
-//}
-
-//.buggy-impl-feedback {
-  //width: calc(100% - #{$buggy-impl-feedback-label-width});
-//}
-
-//$test-names-feedback-label-width: 200px;
-
-//.test-names-feedback-label {
-  //width: $test-names-feedback-label-width;
-//}
-
-//.test-names-feedback {
-  //width: calc(100% - #{$test-names-feedback-label-width});
-//}
-
-
-
-
 
 .discarded-test-icon,
 .valid-test-icon,

@@ -36,7 +36,8 @@
                         The command timed out.
                       </div>
                       <div v-if="d_ag_test_command_result.expected_return_code !== null
-                         && d_ag_test_command_result.expected_return_code !== ExpectedReturnCode.none">
+                                 && d_ag_test_command_result.expected_return_code
+                                 !== ExpectedReturnCode.none">
                         Expected exit status:
                         {{d_ag_test_command_result.expected_return_code
                           === ExpectedReturnCode.zero ? 0 : 'nonzero'}}
@@ -91,49 +92,39 @@
       <div v-if="show_stdout_diff"
            id="stdout-diff-section"
            class="feedback-row">
-
-        <div class="feedback-label"> Stdout: </div>
-
-        <div class="feedback">
-          <template v-if="!d_stdout_diff_loaded">
-            <div class="loading-output">
-              <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            </div>
-          </template>
-          <template v-else class="feedback-output-content-lengthy">
-            <div class="diff-container">
-              <diff ref="stdout_diff"
-                    :diff_contents="wide_diff"
-                    left_header="Expected Output"
-                    right_header="Student Output">
-              </diff>
-            </div>
-          </template>
-        </div>
+        <template v-if="!d_stdout_diff_loaded">
+          <div class="loading-output">
+            <i class="fa fa-spinner fa-pulse fa-fw"></i>
+          </div>
+        </template>
+        <template v-else class="feedback-output-content-lengthy">
+          <div class="diff-container">
+            <diff ref="stdout_diff"
+                  :diff_contents="d_stdout_diff"
+                  left_header="Expected Stdout"
+                  right_header="Student Stdout">
+            </diff>
+          </div>
+        </template>
       </div>
 
       <div v-if="show_stderr_diff"
            id="stderr-diff-section"
            class="feedback-row">
-
-        <div class="feedback-label"> Stderr: </div>
-
-        <div class="feedback">
-          <template v-if="!d_stderr_diff_loaded">
-            <div class="loading-output">
-              <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            </div>
-          </template>
-          <template v-else>
-            <div class="diff-container">
-              <diff ref="stderr_diff"
-                    :diff_contents="wide_diff"
-                    left_header="Expected Output"
-                    right_header="Student Output">
-              </diff>
-            </div>
-          </template>
-        </div>
+        <template v-if="!d_stderr_diff_loaded">
+          <div class="loading-output">
+            <i class="fa fa-spinner fa-pulse fa-fw"></i>
+          </div>
+        </template>
+        <template v-else>
+          <div class="diff-container">
+            <diff ref="stderr_diff"
+                  :diff_contents="d_stderr_diff"
+                  left_header="Expected Stderr"
+                  right_header="Student Stderr">
+            </diff>
+          </div>
+        </template>
       </div>
     </fieldset>
 
@@ -191,9 +182,8 @@
 </template>
 
 <script lang="ts">
-import Diff from '@/components/diff.vue';
-import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
-import Tooltip from '@/components/tooltip.vue';
+
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
     AGTestCommandResultFeedback,
@@ -203,7 +193,10 @@ import {
     Submission,
     ValueFeedbackLevel
 } from "ag-client-typescript";
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+
+import Diff from '@/components/diff.vue';
+import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
+import Tooltip from '@/components/tooltip.vue';
 
 @Component({
   components: {
@@ -234,19 +227,19 @@ export default class AGCommandResult extends Vue {
   d_ag_test_command_result: AGTestCommandResultFeedback | null = null;
   d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
 
-  wide_diff = [
-      "  ./euchre.exe pack.in noshuffle 1 Alice Simple Bob Simple Cathy Simple Drew Simple\n",
-      "- Hand 0\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "- Jack of Diamonds turned up\n",
-      "+ Hand 0\n",
-  ];
+  // wide_diff = [
+  //     "  ./euchre.exe pack.in noshuffle 1 Alice Simple Bob Simple Cathy Simple Drew Simple\n",
+  //     "- Hand 0\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "- Jack of Diamonds turned up\n",
+  //     "+ Hand 0\n",
+  // ];
 
   readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 

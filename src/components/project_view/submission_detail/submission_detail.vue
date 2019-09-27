@@ -183,7 +183,8 @@
           <ul>
             <li>This action cannot be undone</li>
             <li>Once removed, the submission will NOT be graded</li>
-            <li>The next time you submit, that submission will be placed at the back of the grading queue
+            <li>The next time you submit, that submission will be placed at the
+              back of the grading queue
             </li>
           </ul>
         </div>
