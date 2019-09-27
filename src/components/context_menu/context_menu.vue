@@ -81,10 +81,9 @@ export default class ContextMenu extends Vue {
 
 #context-menu-container {
   background-color: white;
-  border: 2px solid lighten($baking-pan, 50%);
-  border-radius: 5px;
+  border: 1px solid lighten($baking-pan, 50%);
+  border-radius: 2px;
   box-shadow: 0 0 15px opacify(lighten($baking-pan, 50%), .2);
-  margin-top: 0.5px;
   position: absolute;
   z-index: 1;
 }

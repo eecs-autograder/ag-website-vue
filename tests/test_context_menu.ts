@@ -27,19 +27,19 @@ afterEach(() => {
                     <context-menu ref="context_menu">
                       <template slot="context_menu_items">
                           <context-menu-item ref="item_1"
-                            @context_menu_item_clicked="change_greeting_color('orange')">
+                            @click="change_greeting_color('orange')">
                             <template slot="label">
                               One
                             </template>
                           </context-menu-item>
                           <context-menu-item ref="item_2"
-                            @context_menu_item_clicked="make_greeting_cursive()">
+                            @click="make_greeting_cursive()">
                             <template slot="label">
                               Two
                             </template>
                           </context-menu-item>
                           <context-menu-item ref="item_3"
-                            @context_menu_item_clicked="change_greeting_text('Boo!')">
+                            @click="change_greeting_text('Boo!')">
                             <template slot="label">
                               Three
                             </template>
@@ -89,7 +89,7 @@ describe('ContextMenu tests', () => {
                 <context-menu ref="context_menu">
                   <template slot="context_menu_items">
                       <context-menu-item ref="item_1"
-                        @context_menu_item_clicked="fun('one')">
+                        @click="fun('one')">
                         <template slot="label">
                           One
                         </template>
@@ -101,7 +101,7 @@ describe('ContextMenu tests', () => {
                         </template>
                       </context-menu-item>
                       <context-menu-item ref="item_3"
-                        @context_menu_item_clicked="fun('three')">
+                        @click="fun('three')">
                         <template slot="label">
                           Three
                         </template>
@@ -237,7 +237,7 @@ describe('ContextMenu tests', () => {
               <template slot="context_menu_items">
                   <context-menu-item ref="item_1"
                     :disabled="is_disabled"
-                    @context_menu_item_clicked="print_label('One')">
+                    @click="print_label('One')">
                     <template slot="label">
                       One
                     </template>
@@ -265,17 +265,17 @@ describe('ContextMenu tests', () => {
         let context_menu_item_1 = wrapper.find({ref: 'item_1'});
         context_menu_item_1.trigger('click');
 
-        expect(context_menu_item_1.emitted('context_menu_item_clicked')).not.toBeTruthy();
+        expect(context_menu_item_1.emitted().click).toBeUndefined();
 
         wrapper.vm.is_disabled = false;
         context_menu_item_1.trigger('click');
 
-        expect(context_menu_item_1.emitted().context_menu_item_clicked.length).toBe(1);
+        expect(context_menu_item_1.emitted().click.length).toBe(1);
 
         wrapper.destroy();
     });
 
-    test("parent component is not notified when disabled context menu items are clicked",
+    test("Menu is not closed when disabled context menu items are clicked",
          async () => {
         @Component({
             template: `<div>
@@ -287,7 +287,7 @@ describe('ContextMenu tests', () => {
           <template slot="context_menu_items">
               <context-menu-item ref="item_1"
                 :disabled="true"
-                @context_menu_item_clicked="change_greeting_color('red')">
+                @click="change_greeting_color('red')">
                 <template slot="label">
                   One
                 </template>
@@ -309,22 +309,23 @@ describe('ContextMenu tests', () => {
             }
         }
         let wrapper = mount(WrapperComponent2);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
         let context_menu_area = wrapper.find('.context-menu-area');
         let greeting = wrapper.find('.greeting');
 
         expect(greeting.element.style.color).toBe("black");
 
         context_menu_area.trigger('click');
-        await context_menu.$nextTick();
+        await context_menu.vm.$nextTick();
 
         let context_menu_item_1 = <ContextMenuItem> wrapper.find({ref: 'item_1'}).vm;
-        expect(context_menu_item_1.d_disabled).toBe(true);
+        expect(context_menu_item_1.disabled).toBe(true);
 
         wrapper.find({ref: 'item_1'}).trigger('click');
-        await context_menu.$nextTick();
+        await context_menu.vm.$nextTick();
 
         expect(greeting.element.style.color).toBe("black");
+        expect(context_menu.isVisible()).toBe(true);
 
         wrapper.destroy();
     });
@@ -340,13 +341,13 @@ describe('ContextMenu tests', () => {
                         <context-menu ref="context_menu">
                           <template slot="context_menu_items">
                               <context-menu-item ref="item_1"
-                                @context_menu_item_clicked="change_greeting_color('red')">
+                                @click="change_greeting_color('red')">
                                 <template slot="label">
                                  One
                                 </template>
                               </context-menu-item>
                               <context-menu-item ref="item_2"
-                                @context_menu_item_clicked="change_greeting_color('blue')">
+                                @click="change_greeting_color('blue')">
                                 <template slot="label">
                                   Two
                                 </template>
@@ -400,13 +401,13 @@ describe('ContextMenu tests', () => {
                     <context-menu ref="context_menu">
                       <template slot="context_menu_items">
                           <context-menu-item ref="item_1"
-                            @context_menu_item_clicked="change_greeting_color('red')">
+                            @click="change_greeting_color('red')">
                             <template slot="label">
                               One
                             </template>
                           </context-menu-item>
                           <context-menu-item ref="item_2"
-                            @context_menu_item_clicked="change_greeting_color('blue')">
+                            @click="change_greeting_color('blue')">
                             <template slot="label">
                               Two
                             </template>

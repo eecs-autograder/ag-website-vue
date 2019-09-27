@@ -29,13 +29,13 @@
     </div>
     <context-menu ref="context_menu_1">
       <template slot="context_menu_items">
-        <context-menu-item @context_menu_item_clicked="choice_alert('A Fish!')">
+        <context-menu-item @click="choice_alert('A Fish!')">
           <template slot="label">
             One Fish <i class="fas fa-fish fish"></i>
           </template>
         </context-menu-item>
         <div class="context-menu-divider"> </div>
-        <context-menu-item @context_menu_item_clicked="choice_alert('Two Fish!')">
+        <context-menu-item @click="choice_alert('Two Fish!')">
           <template slot="label"> Two Fish
             <i class="fas fa-fish fish"></i>
             <i class="fas fa-fish fish"></i>
@@ -43,13 +43,13 @@
         </context-menu-item>
         <div class="context-menu-divider"> </div>
         <context-menu-item
-          @context_menu_item_clicked="change_color('red')">
+          @click="change_color('red')">
           <template slot="label">
             Red Fish <i class="fas fa-fish red-fish"></i>
           </template>
         </context-menu-item>
         <div class="context-menu-divider"> </div>
-        <context-menu-item @context_menu_item_clicked="change_color('blue')">
+        <context-menu-item @click="change_color('blue')">
           <template slot="label"> Blue Fish <i class="fas fa-fish blue-fish"></i> </template>
         </context-menu-item>
       </template>
@@ -94,7 +94,7 @@
       <template slot="context_menu_items">
         <context-menu-item v-for="item of items"
                            :disabled="item.disabled"
-                           @context_menu_item_clicked="choice_alert(item.name)">
+                           @click="choice_alert(item.name)">
           <template slot="label">
             {{item.name}}
           </template>

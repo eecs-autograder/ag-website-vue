@@ -26,7 +26,7 @@
       <context-menu ref="ag_test_case_context_menu">
         <template slot="context_menu_items">
           <context-menu-item ref="add_ag_test_command_menu_item"
-                             @context_menu_item_clicked="open_new_ag_test_command_modal">
+                             @click="open_new_ag_test_command_modal">
             <template slot="label">
               <i class="fas fa-plus"></i>
               <span class="context-menu-item-text">Add command</span>
@@ -34,7 +34,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="edit_ag_test_case_menu_item"
-                             @context_menu_item_clicked="d_show_ag_test_case_settings_modal = true">
+                             @click="d_show_ag_test_case_settings_modal = true">
             <template slot="label">
               <i class="fas fa-pencil-alt"></i>
               <span class="context-menu-item-text">Edit test case settings</span>
@@ -42,7 +42,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="clone_ag_test_case_menu_item"
-                             @context_menu_item_clicked="open_clone_ag_test_case_modal">
+                             @click="open_clone_ag_test_case_modal">
             <template slot="label">
               <i class="far fa-copy"></i>
               <span class="context-menu-item-text"> Clone test case </span>
@@ -50,7 +50,7 @@
           </context-menu-item>
           <div class="context-menu-divider"> </div>
           <context-menu-item ref="delete_ag_test_case_menu_item"
-                             @context_menu_item_clicked="d_show_delete_ag_test_case_modal = true">
+                             @click="d_show_delete_ag_test_case_modal = true">
             <template slot="label">
               <i class="fas fa-trash-alt"></i>
               <span id="delete-case-label" class="context-menu-item-text"> Delete test case </span>
