@@ -266,13 +266,13 @@ export default class SubmissionDetail extends Vue {
     this.d_loading = true;
     this.d_submission = new Submission(new_value);
     this.d_fdbk_category = this.determine_feedback_type();
-    this.d_submission_result = null;
+    this.d_submission_fdbk_override = null;
     this.d_loading = false;
   }
 
   d_fdbk_category: FeedbackCategory | null = null;
   d_submission: null | Submission = null;
-  d_submission_result: null | SubmissionResultFeedback = null;
+  d_submission_fdbk_override: null | SubmissionResultFeedback = null;
   d_loading = true;
   d_height_of_view_file = "500px";
   d_show_remove_submission_from_queue_modal = false;
@@ -289,13 +289,13 @@ export default class SubmissionDetail extends Vue {
     this.d_user = this.d_globals.current_user;
     this.d_user_roles = this.d_globals.user_roles;
     this.d_fdbk_category = this.determine_feedback_type();
-    this.d_submission_result = this.selected_submission_with_results.results;
+    this.d_submission_fdbk_override = this.selected_submission_with_results.results;
     this.d_loading = false;
   }
 
   get submission_result() {
-      return this.d_submission_result === null
-          ? this.selected_submission_with_results.results : this.d_submission_result;
+      return this.d_submission_fdbk_override === null
+          ? this.selected_submission_with_results.results : this.d_submission_fdbk_override;
   }
 
   determine_feedback_type(): FeedbackCategory {
@@ -321,7 +321,7 @@ export default class SubmissionDetail extends Vue {
   }
 
   async load_results() {
-    this.d_submission_result = await get_submission_result(
+    this.d_submission_fdbk_override = await get_submission_result(
       this.d_submission!.pk, this.d_fdbk_category!
     );
   }

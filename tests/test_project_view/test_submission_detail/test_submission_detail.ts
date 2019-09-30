@@ -105,7 +105,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.vm.d_submission).toEqual(new ag_cli.Submission(submission_with_results));
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
+        expect(wrapper.vm.d_submission_fdbk_override).toEqual(submission_with_results.results);
         expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
         expect(get_submission_result_stub.callCount).toEqual(0);
 
@@ -118,7 +118,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_submission).toEqual(
             new ag_cli.Submission(submission_with_results)
         );
-        expect(wrapper.vm.d_submission_result).toEqual(past_limit_submission_results);
+        expect(wrapper.vm.d_submission_fdbk_override).toEqual(past_limit_submission_results);
         expect(wrapper.vm.submission_result).toEqual(past_limit_submission_results);
 
         wrapper.setProps({selected_submission_with_results: another_submission_with_results});
@@ -131,7 +131,7 @@ describe('SubmissionDetail tests', () => {
             new ag_cli.Submission(another_submission_with_results)
         );
         expect(get_submission_result_stub.callCount).toEqual(1);
-        expect(wrapper.vm.d_submission_result).toBeNull();
+        expect(wrapper.vm.d_submission_fdbk_override).toBeNull();
         expect(wrapper.vm.submission_result).toEqual(another_submission_with_results.results);
     });
 
@@ -172,14 +172,14 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.d_loading).toBe(false);
         expect(get_submission_result_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_submission_result).not.toBeNull();
+        expect(wrapper.vm.d_submission_fdbk_override).not.toBeNull();
         expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
 
         wrapper.setProps({selected_submission_with_results: another_submission_with_results});
 
         expect(wrapper.vm.d_loading).toBe(false);
         expect(get_submission_result_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_submission_result).toBeNull();
+        expect(wrapper.vm.d_submission_fdbk_override).toBeNull();
         expect(wrapper.vm.submission_result).toEqual(another_submission_with_results.results);
 
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
@@ -187,7 +187,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(get_submission_result_stub.calledOnce);
-        expect(wrapper.vm.d_submission_result).not.toBeNull();
+        expect(wrapper.vm.d_submission_fdbk_override).not.toBeNull();
         expect(wrapper.vm.submission_result).toEqual(staff_viewer_results);
     });
 
@@ -426,7 +426,7 @@ describe('SubmissionDetail tests', () => {
         wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
 
-        wrapper.vm.d_submission_result!.total_points_possible = 0;
+        wrapper.vm.d_submission_fdbk_override!.total_points_possible = 0;
         expect(wrapper.find('#submission-score').exists()).toBe(false);
     });
 
@@ -792,7 +792,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission_result!.student_test_suite_results.length).toEqual(0);
+        expect(wrapper.vm.d_submission_fdbk_override!.student_test_suite_results.length).toEqual(0);
         expect(wrapper.find({ref: 'mutation_suite_results'}).exists()).toBe(false);
     });
 
@@ -822,7 +822,7 @@ describe('SubmissionDetail tests', () => {
             }
         });
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_submission_result!.student_test_suite_results.length).toEqual(2);
+        expect(wrapper.vm.d_submission_fdbk_override!.student_test_suite_results.length).toEqual(2);
         expect(wrapper.find({ref: 'mutation_suite_results'}).exists()).toBe(true);
     });
 
@@ -845,7 +845,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission_result!.ag_test_suite_results.length).toEqual(0);
+        expect(wrapper.vm.d_submission_fdbk_override!.ag_test_suite_results.length).toEqual(0);
         expect(wrapper.find({ref: 'ag_test_suite_results'}).exists()).toBe(false);
     });
 
@@ -876,7 +876,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission_result!.ag_test_suite_results.length).toEqual(2);
+        expect(wrapper.vm.d_submission_fdbk_override!.ag_test_suite_results.length).toEqual(2);
         expect(wrapper.find({ref: 'ag_test_suite_results'}).exists()).toBe(true);
     });
 
