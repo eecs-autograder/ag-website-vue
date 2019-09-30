@@ -6,8 +6,6 @@
     </div>
     <div v-else
          id="view-submission">
-
-      <div id="d-submission-result-pk"> {{d_submission_result.pk}} </div>
       <div id="submission-detail-overview">
 
         <div id="submitted-by"> Submitted by:
