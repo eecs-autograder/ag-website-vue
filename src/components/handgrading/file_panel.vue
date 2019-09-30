@@ -45,10 +45,20 @@ export default class FilePanel extends Vue {
   d_loading_file = false;
 
   toggle_open() {
+    let top = this.$el.getBoundingClientRect().top;
+
     this.d_is_open = !this.d_is_open;
     if (this.d_content === null) {
       this.d_content = HandgradingResult.get_file_from_handgrading_result(
         this.handgrading_result.group, this.filename);
+    }
+
+    // This prevents any open files below this one from being pushed
+    // into the top of the viewport due to the size change of the parent.
+    if (!this.d_is_open && top < 0) {
+      this.$nextTick(() => {
+        this.$el.scrollIntoView();
+      });
     }
   }
 }
