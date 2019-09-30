@@ -304,6 +304,7 @@ $border-color: $pebble-medium;
 
 .sidebar-container {
   .sidebar-menu {
+    z-index: 3;
     border-left: none;
     border-top: none;
     border-bottom: none;
