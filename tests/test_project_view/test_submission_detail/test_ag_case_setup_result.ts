@@ -69,7 +69,7 @@ describe('AGCaseSetupResult tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(false);
-        expect(wrapper.find('#stdout-section').exists()).toBe(false);
+        expect(wrapper.find('#setup-stdout-section').exists()).toBe(false);
     });
 
     test('setup_stdout === null && show_setup_stdout === true', async () => {
@@ -98,7 +98,7 @@ describe('AGCaseSetupResult tests', () => {
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stdout_size).toBeNull();
         expect(wrapper.vm.d_setup_stdout).toEqual(null);
-        expect(wrapper.find('#stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#setup-stdout-section').text()).toContain("No Output");
     });
 
     test('setup_stderr === null && show_setup_stderr === true', async () => {
@@ -127,7 +127,7 @@ describe('AGCaseSetupResult tests', () => {
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stderr_size).toBeNull();
         expect(wrapper.vm.d_setup_stderr).toEqual(null);
-        expect(wrapper.find('#stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#setup-stderr-section').text()).toContain("No Output");
     });
 
     test('setup_stdout !== null and show_setup_stdout === true', async () => {
@@ -148,7 +148,7 @@ describe('AGCaseSetupResult tests', () => {
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toEqual(setup_stdout_content);
-        expect(wrapper.find('#stdout-section').text()).toContain(setup_stdout_content);
+        expect(wrapper.find('#setup-stdout-section').text()).toContain(setup_stdout_content);
     });
 
     test('show_setup_stderr === false', async () => {
@@ -164,7 +164,7 @@ describe('AGCaseSetupResult tests', () => {
         }
 
         expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(false);
-        expect(wrapper.find('#stderr-section').exists()).toBe(false);
+        expect(wrapper.find('#setup-stderr-section').exists()).toBe(false);
     });
 
     test('setup_stderr !== null and show_setup_stderr === true', async () => {
@@ -185,7 +185,7 @@ describe('AGCaseSetupResult tests', () => {
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stderr).toEqual(setup_stderr_content);
-        expect(wrapper.find('#stderr-section').text()).toContain(setup_stderr_content);
+        expect(wrapper.find('#setup-stderr-section').text()).toContain(setup_stderr_content);
     });
 
     test('show_setup_stdout === true', async () => {
@@ -203,7 +203,7 @@ describe('AGCaseSetupResult tests', () => {
         }
 
         expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
-        expect(wrapper.find('#stdout-section').exists()).toBe(true);
+        expect(wrapper.find('#setup-stdout-section').exists()).toBe(true);
     });
 
     test('Exit status is displayed', async () => {

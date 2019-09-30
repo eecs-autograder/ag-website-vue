@@ -6,6 +6,8 @@
     </div>
     <div v-else
          id="view-submission">
+
+      <div id="d-submission-result-pk"> {{d_submission_result.pk}} </div>
       <div id="submission-detail-overview">
 
         <div id="submitted-by"> Submitted by:
@@ -261,12 +263,12 @@ export default class SubmissionDetail extends Vue {
   is_ultimate_submission!: boolean;
 
   @Watch('selected_submission_with_results')
-  async on_selected_submission_change(new_value: SubmissionWithResults,
-                                      old_value: SubmissionWithResults) {
+  on_selected_submission_change(new_value: SubmissionWithResults,
+                                old_value: SubmissionWithResults) {
     this.d_loading = true;
     this.d_submission = new Submission(new_value);
     this.d_fdbk_category = this.determine_feedback_type();
-    await this.load_results();
+    this.d_submission_result = new_value.results;
     this.d_loading = false;
   }
 
@@ -284,7 +286,7 @@ export default class SubmissionDetail extends Vue {
   readonly GradingStatus = GradingStatus;
   readonly format_datetime = format_datetime;
 
-  async created() {
+  created() {
     this.d_submission = new Submission(this.selected_submission_with_results);
     this.d_user = this.d_globals.current_user;
     this.d_user_roles = this.d_globals.user_roles;

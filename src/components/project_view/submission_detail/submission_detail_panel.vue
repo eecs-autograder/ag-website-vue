@@ -1,14 +1,17 @@
 <template>
   <div class="panel">
     <div :class="[`${panel_correctness}-panel-header`,
-                  d_is_open ? 'panel-header-open' : 'panel-header-closed']"
+                  {'command-panel-header-open': d_is_open && is_command },
+                  {'panel-header-open': d_is_open && !is_command },
+                  {'panel-header-closed': !d_is_open }]"
          @click="toggle_d_is_open">
+
       <template v-if="is_command">
-        <div class="command-name">{{name}}</div>
-        <div class="command-correctness">
-          <correctness-icon :correctness_level="correctness_level">
-          </correctness-icon>
-        </div>
+          <div class="command-name">{{name}}</div>
+          <div class="command-correctness">
+            <correctness-icon :correctness_level="correctness_level">
+            </correctness-icon>
+          </div>
       </template>
 
       <template v-else>
@@ -24,7 +27,6 @@
           </span>
         </div>
       </template>
-
     </div>
 
     <div v-if="d_is_open"
@@ -150,9 +152,17 @@ export default class SubmissionDetailPanel extends Vue {
 }
 
 .panel-header-open {
+  z-index: 3;
   border-radius: 3px 3px 0 0;
   position: sticky;
   top: 0;
+}
+
+.command-panel-header-open {
+  z-index: 2;
+  border-radius: 3px 3px 0 0;
+  /*position: sticky;*/
+  /*top: 34px;*/
 }
 
 .panel-header-closed {

@@ -396,7 +396,7 @@ describe('AGCommandResult tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stdout_content).toBeNull();
-        expect(wrapper.find('#stdout-actual-section').text()).toContain("No Output");
+        expect(wrapper.find('#actual-stdout-section').text()).toContain("No Output");
     });
 
     test('stdout_section - show_actual_stdout === true and stdout_content !== null', async () => {
@@ -417,7 +417,7 @@ describe('AGCommandResult tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_stdout_content).toEqual(stdout_content);
-        expect(wrapper.find('#stdout-actual-section').text()).toContain(stdout_content);
+        expect(wrapper.find('#actual-stdout-section').text()).toContain(stdout_content);
     });
 
     test('stdout_section - show_actual_stdout === false', async () => {
@@ -435,7 +435,7 @@ describe('AGCommandResult tests', () => {
         }
 
         expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stdout).toBe(false);
-        expect(wrapper.find('#stdout-actual-section').exists()).toBe(false);
+        expect(wrapper.find('#actual-stdout-section').exists()).toBe(false);
     });
 
     test('stderr_section - stderr_correct === null', async () => {
@@ -577,7 +577,7 @@ describe('AGCommandResult tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stderr_content).toBeNull();
-        expect(wrapper.find('#stderr-actual-section').text()).toContain("No Output");
+        expect(wrapper.find('#actual-stderr-section').text()).toContain("No Output");
     });
 
     test('stderr_section - show_actual_stderr === true and stderr_content !== null', async () => {
@@ -598,7 +598,191 @@ describe('AGCommandResult tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_stderr_content).toEqual(stderr_content);
-        expect(wrapper.find('#stderr-actual-section').text()).toContain(stderr_content);
+        expect(wrapper.find('#actual-stderr-section').text()).toContain(stderr_content);
+    });
+
+    test('show_correctness_fieldset getter', async () => {
+        wrapper = mount(AGCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBeNull();
+        expect(wrapper.vm.show_correctness_fieldset).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.return_code_correct = true;
+
+        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).not.toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBeNull();
+        expect(wrapper.vm.show_correctness_fieldset).toBe(true);
+
+        wrapper.vm.d_ag_test_command_result!.return_code_correct = null;
+        wrapper.vm.d_ag_test_command_result!.stdout_correct = true;
+
+        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).not.toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBeNull();
+        expect(wrapper.vm.show_correctness_fieldset).toBe(true);
+
+        wrapper.vm.d_ag_test_command_result!.stdout_correct = null;
+        wrapper.vm.d_ag_test_command_result!.stderr_correct = false;
+
+        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).not.toBeNull();
+        expect(wrapper.vm.show_correctness_fieldset).toBe(true);
+    });
+
+    test('show_exit_status_tooltip getter', async () => {
+        ag_test_command_result!.timed_out = null;
+
+        wrapper = mount(AGCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.d_ag_test_command_result!.actual_return_code).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
+        expect(wrapper.vm.show_exit_status_tooltip).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
+            = ag_cli.ValueFeedbackLevel.expected_and_actual;
+
+        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level).toEqual(
+            ag_cli.ValueFeedbackLevel.expected_and_actual
+        );
+        expect(wrapper.vm.d_ag_test_command_result!.actual_return_code).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
+        expect(wrapper.vm.show_exit_status_tooltip).toBe(true);
+
+        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
+            = ag_cli.ValueFeedbackLevel.correct_or_incorrect;
+        wrapper.vm.d_ag_test_command_result!.actual_return_code = 0;
+
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.d_ag_test_command_result!.actual_return_code).toEqual(0);
+        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
+        expect(wrapper.vm.show_exit_status_tooltip).toBe(true);
+
+        wrapper.vm.d_ag_test_command_result!.actual_return_code = null;
+        wrapper.vm.d_ag_test_command_result!.timed_out = true;
+
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.d_ag_test_command_result!.actual_return_code).toBeNull();
+        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBe(true);
+        expect(wrapper.vm.show_exit_status_tooltip).toBe(true);
+    });
+
+    test('show_stdout_diff getter', async () => {
+        wrapper = mount(AGCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stdout_diff).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.stdout_correct = false;
+
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBe(false);
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stdout_diff).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.stdout_correct = null;
+        wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level
+            = ag_cli.ValueFeedbackLevel.expected_and_actual;
+
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level
+        ).toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stdout_diff).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.stdout_correct = false;
+
+        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBe(false);
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level
+        ).toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stdout_diff).toBe(true);
+    });
+
+    test('show_stderr_diff getter', async () => {
+        wrapper = mount(AGCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBeNull();
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stderr_diff).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.stderr_correct = false;
+
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBe(false);
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level
+        ).not.toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stderr_diff).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.stderr_correct = null;
+        wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level
+            = ag_cli.ValueFeedbackLevel.expected_and_actual;
+
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBeNull();
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level
+        ).toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stderr_diff).toBe(false);
+
+        wrapper.vm.d_ag_test_command_result!.stderr_correct = false;
+
+        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBe(false);
+        expect(
+            wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level
+        ).toEqual(ag_cli.ValueFeedbackLevel.expected_and_actual);
+        expect(wrapper.vm.show_stderr_diff).toBe(true);
     });
 });
 

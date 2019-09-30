@@ -72,7 +72,7 @@ describe('SubmissionDetail tests', () => {
         });
     });
 
-    test('selected_submission_with_results Watcher', async () => {
+    test.only('selected_submission_with_results Watcher', async () => {
         submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.returns(
             Promise.resolve(submission_with_results.results
@@ -102,19 +102,17 @@ describe('SubmissionDetail tests', () => {
 
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.past_limit_submission);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
         expect(get_submission_result_stub.calledOnce).toBe(true);
+        expect(wrapper.vm.d_submission).toEqual(
+            new ag_cli.Submission(submission_with_results)
+        );
+        expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
 
         let another_submission_with_results = data_ut.make_submission_with_results(group);
-        get_submission_result_stub.onSecondCall().returns(
-            Promise.resolve(
-                another_submission_with_results.results
-            )
-        );
-
         wrapper.setProps({selected_submission_with_results: another_submission_with_results});
-        await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_loading).toBe(false);
@@ -123,7 +121,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_submission).toEqual(
             new ag_cli.Submission(another_submission_with_results)
         );
-        expect(get_submission_result_stub.calledTwice).toBe(true);
+        expect(get_submission_result_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_submission_result).toEqual(another_submission_with_results.results);
     });
 

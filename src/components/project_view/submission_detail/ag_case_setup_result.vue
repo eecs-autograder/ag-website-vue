@@ -1,15 +1,15 @@
 <template>
   <div id="ag-case-setup-result">
+
     <fieldset class="fieldset">
       <legend class="legend"> Correctness </legend>
-
       <div id="exit-status-section">
         <div class="feedback-row">
           <div class="feedback-label"> Exit status: </div>
           <div class="feedback">
             <div class="correctness-output">
               <span v-if="setup_exit_status === ReturnCodeCorrectness.timed_out">
-                <span>{{ReturnCodeCorrectness.timed_out}}</span>
+                <span>{{setup_exit_status}}</span>
                 <i class="fas fa-clock timed-out-icon"></i>
               </span>
               <span v-else-if="setup_exit_status === ReturnCodeCorrectness.not_available">
@@ -22,17 +22,16 @@
           </div>
         </div>
       </div>
-
     </fieldset>
 
     <fieldset v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stdout
                     || d_ag_test_suite_result.fdbk_settings.show_setup_stderr"
               class="fieldset">
-      <legend class="legend"> Output </legend>
+      <legend class="legend"> Actual Output </legend>
       <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stdout"
            id="setup-stdout-section"
            class="feedback-row">
-        <div class="feedback-label"> Stdout: </div>
+        <div class="feedback-label"> Output: </div>
         <div class="feedback">
           <template v-if="!d_setup_stdout_loaded">
             <div class="loading-output">
@@ -51,7 +50,7 @@
       <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stderr"
            id="setup-stderr-section"
            class="feedback-row">
-        <div class="feedback-label"> Stderr: </div>
+        <div class="feedback-label"> Error Output: </div>
         <div class="feedback">
           <template v-if="!d_setup_stderr_loaded">
             <div class="loading-output">

@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="body">
+    <div :class="['body', {'body-closed': d_collapsed}]">
       <div v-if="d_selected_submission !== null"
            id="submission-detail-container">
         <submission-detail ref="submission_detail"
