@@ -85,10 +85,10 @@
 
         <div v-if="(d_submission.status === GradingStatus.waiting_for_deferred
                    || d_submission.status === GradingStatus.finished_grading) &&
-                   d_submission_result !== null
-                   && d_submission_result.total_points_possible !== 0"
+                   submission_result !== null
+                   && submission_result.total_points_possible !== 0"
              id="submission-score"> Score:
-          {{d_submission_result.total_points}}/{{d_submission_result.total_points_possible}}
+          {{submission_result.total_points}}/{{submission_result.total_points_possible}}
         </div>
 
 
@@ -150,16 +150,16 @@
         </div>
       </div>
 
-      <div v-if="d_submission_result !== null">
+      <div v-if="submission_result !== null">
         <mutation-suite-results
           ref="mutation_suite_results"
-          v-if="d_submission_result.student_test_suite_results.length"
+          v-if="submission_result.student_test_suite_results.length"
           :submission="d_submission"
-          :mutation_test_suite_results="d_submission_result.student_test_suite_results"
+          :mutation_test_suite_results="submission_result.student_test_suite_results"
           :fdbk_category="d_fdbk_category">
         </mutation-suite-results>
 
-        <div v-for="(ag_test_suite_result, index) of d_submission_result.ag_test_suite_results"
+        <div v-for="(ag_test_suite_result, index) of submission_result.ag_test_suite_results"
              ref="ag_test_suite_results">
           <AGTestSuiteResult :submission="d_submission"
                              :ag_test_suite_result="ag_test_suite_result"
@@ -266,7 +266,7 @@ export default class SubmissionDetail extends Vue {
     this.d_loading = true;
     this.d_submission = new Submission(new_value);
     this.d_fdbk_category = this.determine_feedback_type();
-    this.d_submission_result = new_value.results;
+    this.d_submission_result = null;
     this.d_loading = false;
   }
 
@@ -291,6 +291,11 @@ export default class SubmissionDetail extends Vue {
     this.d_fdbk_category = this.determine_feedback_type();
     this.d_submission_result = this.selected_submission_with_results.results;
     this.d_loading = false;
+  }
+
+  get submission_result() {
+      return this.d_submission_result === null
+          ? this.selected_submission_with_results.results : this.d_submission_result;
   }
 
   determine_feedback_type(): FeedbackCategory {

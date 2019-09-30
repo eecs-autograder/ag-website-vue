@@ -72,11 +72,19 @@ describe('SubmissionDetail tests', () => {
         });
     });
 
-    test.only('selected_submission_with_results Watcher', async () => {
-        submission_with_results = data_ut.make_submission_with_results(group);
-        get_submission_result_stub.returns(
-            Promise.resolve(submission_with_results.results
-        ));
+    test('selected_submission_with_results Watcher', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            }
+        );
+        let past_limit_submission_results = data_ut.make_submission_with_results(group).results;
+        let another_submission_with_results = data_ut.make_submission_with_results(group);
+
+        get_submission_result_stub.onFirstCall().returns(
+            Promise.resolve(past_limit_submission_results)
+        );
 
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
@@ -96,8 +104,9 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.vm.d_submission).toEqual(new ag_cli.Submission(submission_with_results));
-        expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
+        expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
         expect(get_submission_result_stub.callCount).toEqual(0);
 
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
@@ -109,9 +118,9 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_submission).toEqual(
             new ag_cli.Submission(submission_with_results)
         );
-        expect(wrapper.vm.d_submission_result).toEqual(submission_with_results.results);
+        expect(wrapper.vm.d_submission_result).toEqual(past_limit_submission_results);
+        expect(wrapper.vm.submission_result).toEqual(past_limit_submission_results);
 
-        let another_submission_with_results = data_ut.make_submission_with_results(group);
         wrapper.setProps({selected_submission_with_results: another_submission_with_results});
         await wrapper.vm.$nextTick();
 
@@ -122,7 +131,64 @@ describe('SubmissionDetail tests', () => {
             new ag_cli.Submission(another_submission_with_results)
         );
         expect(get_submission_result_stub.callCount).toEqual(1);
-        expect(wrapper.vm.d_submission_result).toEqual(another_submission_with_results.results);
+        expect(wrapper.vm.d_submission_result).toBeNull();
+        expect(wrapper.vm.submission_result).toEqual(another_submission_with_results.results);
+    });
+
+    test('submission_result getter', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            }
+        );
+        let another_submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            }
+        );
+        let staff_viewer_results = data_ut.make_submission_with_results(group).results;
+
+        get_submission_result_stub.onFirstCall().returns(
+            Promise.resolve(staff_viewer_results)
+        );
+
+        user_roles.is_staff = true;
+        globals.user_roles = user_roles;
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                selected_submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_loading).toBe(false);
+        expect(get_submission_result_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_submission_result).not.toBeNull();
+        expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
+
+        wrapper.setProps({selected_submission_with_results: another_submission_with_results});
+
+        expect(wrapper.vm.d_loading).toBe(false);
+        expect(get_submission_result_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_submission_result).toBeNull();
+        expect(wrapper.vm.submission_result).toEqual(another_submission_with_results.results);
+
+        let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
+        adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.staff_viewer);
+        await wrapper.vm.$nextTick();
+
+        expect(get_submission_result_stub.calledOnce);
+        expect(wrapper.vm.d_submission_result).not.toBeNull();
+        expect(wrapper.vm.submission_result).toEqual(staff_viewer_results);
     });
 
     test('submitted by', async () => {
@@ -546,10 +612,9 @@ describe('SubmissionDetail tests', () => {
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
         user.username = "Moira";
-        user_roles.is_staff = true;
-
-        globals.user_roles = user_roles;
         globals.current_user = user;
+        user_roles.is_staff = true;
+        globals.user_roles = user_roles;
 
         wrapper = mount(SubmissionDetail, {
             propsData: {

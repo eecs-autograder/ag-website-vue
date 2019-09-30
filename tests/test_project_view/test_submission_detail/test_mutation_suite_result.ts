@@ -1132,12 +1132,12 @@ describe('MutationSuiteResult tests', () => {
         expect(wrapper.find('#list-of-invalid-tests').text()).toContain(
             "test_four"
         );
-        expect(wrapper.find('.test-timed-out').exists()).toBe(true);
+        expect(wrapper.find('.invalid-test-timed-out').exists()).toBe(true);
         expect(wrapper.findAll('.single-invalid-test').at(0).find(
-            '.test-timed-out'
+            '.invalid-test-timed-out'
         ).exists()).toBe(true);
         expect(wrapper.findAll('.single-invalid-test').at(1).find(
-            '.test-timed-out'
+            '.invalid-test-timed-out'
         ).exists()).toBe(false);
     });
 

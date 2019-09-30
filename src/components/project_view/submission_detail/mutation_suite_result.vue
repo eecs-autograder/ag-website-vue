@@ -345,8 +345,8 @@ export default class MutationSuiteResult extends Vue {
 
   @Watch('submission')
   async on_submission_change(new_value: Submission, old_value: Submission) {
-      this.d_submission = deep_copy(new_value, Submission);
-      await this.get_results();
+    this.d_submission = deep_copy(new_value, Submission);
+    await this.get_results();
   }
 
   @Watch('mutation_test_suite_result')
@@ -358,8 +358,8 @@ export default class MutationSuiteResult extends Vue {
 
   @Watch('fdbk_category')
   async on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
-      this.d_fdbk_category = new_value;
-      await this.get_results();
+    this.d_fdbk_category = new_value;
+    await this.get_results();
   }
 
   readonly CorrectnessLevel = CorrectnessLevel;
