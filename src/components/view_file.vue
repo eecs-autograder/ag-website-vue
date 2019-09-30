@@ -31,10 +31,13 @@
             <div class="comment"
                  @mouseenter="d_hovered_comment = comment"
                  @mouseleave="d_hovered_comment = null">
-              <div class="comment-line-range">
-                {{comment.first_line !== comment.last_line
-                    ? `Lines ${comment.first_line + 1} - ${comment.last_line + 1}`
-                    :`Line ${comment.first_line + 1}`}}
+              <div class="comment-header">
+                <div class="comment-line-range">
+                  {{comment.first_line !== comment.last_line
+                      ? `Lines ${comment.first_line + 1} - ${comment.last_line + 1}`
+                      :`Line ${comment.first_line + 1}`}}
+                </div>
+                <i @click="delete_comment(comment)" class="close fas fa-times"></i>
               </div>
               <div class="comment-message">{{comment.message}}</div>
             </div>
@@ -316,6 +319,11 @@ export default class ViewFile extends Vue implements Created {
     });
   }
 
+  async delete_comment(comment: HandgradingComment) {
+    await comment.delete();
+    this.d_hovered_comment = null;
+  }
+
   on_menu_is_open_changed(is_open: boolean) {
     this.d_menu_is_open = is_open;
     if (!this.d_menu_is_open) {
@@ -425,6 +433,8 @@ table {
   height: 90%;
 }
 
+$light-green: hsl(97, 42%, 79%);
+
 .comment {
   border: 1px solid $gray-blue-2;
   margin: 5px 0;
@@ -435,27 +445,40 @@ table {
   font-family: "Helvetica Neue", Helvetica;
   font-size: 14px;
 
-  .comment-line-range {
-    font-style: italic;
+  .comment-header {
+    display: flex;
+
     border-bottom: 1px solid $pebble-dark;
+    padding: 5px 5px 2px;
     padding-top: 5px;
     padding-bottom: 2px;
     padding-left: 5px;
     background-color: $pebble-light;
+
+    .comment-line-range {
+      font-style: italic;
+    }
+
+    .close {
+      margin-left: auto;
+      // padding: 1px;
+
+      &:hover {
+        color: $stormy-gray-dark;
+      }
+    }
   }
 
   .comment-message {
     padding: 10px;
   }
-}
 
-$light-green: hsl(97, 42%, 79%);
+  &:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 
-.comment:hover {
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
-
-  .comment-line-range {
-    background-color: lighten($light-green, 4%);
+    .comment-header {
+      background-color: lighten($light-green, 4%);
+    }
   }
 }
 
