@@ -6,7 +6,7 @@
     </div>
     <div class="body" v-show="d_is_open">
       <view-file v-if="d_content !== null"
-                 filename="filename"
+                 :filename="filename"
                  :file_contents="d_content"
                  :handgrading_rubric="handgrading_result.handgrading_rubric"
                  :handgrading_result="handgrading_result"

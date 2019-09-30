@@ -7,8 +7,7 @@
     <div v-else-if="d_file_contents.length > max_display_size">
       FIXME: file too big
     </div>
-    <table v-else
-           id="viewing-container">
+    <table v-else id="viewing-container" :class="{'saving': d_saving}">
       <template v-for="(line, index) of d_file_contents.split('\n')">
         <tr :class="{'commented-line': line_in_comment(index),
                      'hovered-comment-line': d_hovered_comment !== null
@@ -50,19 +49,39 @@
       <template v-slot:context_menu_items>
         <context-menu-item v-for="annotation of handgrading_rubric.annotations"
                            :key="annotation.pk"
-                           >
+                           @click="apply_annotation(annotation)">
           <template slot="label">
             {{annotation.short_description}} ({{annotation.deduction}})
           </template>
         </context-menu-item>
         <div class="context-menu-divider"> </div>
-        <context-menu-item>
+        <context-menu-item @click="open_comment_modal">
           <template slot="label">
             Leave a comment
           </template>
         </context-menu-item>
       </template>
     </context-menu>
+
+    <modal v-if="d_show_comment_modal"
+           @close="d_show_comment_modal = false"
+           ref="show_comment_modal"
+           click_outside_to_close
+           size="medium">
+      <div class="modal">
+        <div class="header">Comment</div>
+        <textarea class="input" v-model="d_comment_text" rows="4" ref="comment_text"></textarea>
+        <div class="button-footer">
+          <button class="green-button" :disabled="d_saving" @click="create_comment">
+            Comment
+          </button>
+
+          <button class="white-button" :disabled="d_saving" @click="d_show_comment_modal = false">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </modal>
   </div>
 </template>
 
@@ -70,20 +89,28 @@
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
+  Annotation,
   AppliedAnnotation,
   Comment,
   HandgradingResult,
   HandgradingRubric,
+  Location,
   UserRoles,
 } from "ag-client-typescript";
 
 import { ArrayMap } from '@/array_map';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
+import Modal from '@/components/modal.vue';
 import { Created } from '@/lifecycle';
+import { toggle } from '@/utils';
 
 @Component({
-  components: {ContextMenu, ContextMenuItem}
+  components: {
+    ContextMenu,
+    ContextMenuItem,
+    Modal,
+  }
 })
 export default class ViewFile extends Vue implements Created {
 
@@ -102,6 +129,7 @@ export default class ViewFile extends Vue implements Created {
   d_filename: string = "";
   d_file_contents: string = "";
   d_loading = true;
+  d_saving = false;
 
   // If null, the component will behave normally (no handgrading).
   // When this field is non-null, handgrading functionality will be made available.
@@ -116,10 +144,19 @@ export default class ViewFile extends Vue implements Created {
   @Prop({default: true, type: Boolean})
   readonly_handgrading_results!: boolean;
 
+  // FIXME: Have parent pass in array of HandgradingComments, then we build
+  // the arraymap? We need to make sure that when the parents delete something
+  // we get updated without having to subscribe to anything.
   d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
   d_hovered_comment: HandgradingComment | null = null;
 
   d_menu_is_open = false;
+  d_show_comment_modal = false;
+  // Since the context menu closes before the comment modal opens,
+  // the first and last lines are set to null before we can use them
+  // (can we fix that???). For now, we'll store the location here temporarily
+  d_pending_comment_location: Location | null = null;
+  d_comment_text = '';
 
   readonly max_display_size = 5000000;  // 5MB
 
@@ -207,7 +244,8 @@ export default class ViewFile extends Vue implements Created {
   start_highlighting(line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
-        || this.d_menu_is_open) {
+        || this.d_menu_is_open
+        || this.d_saving) {
       return;
     }
     this.d_first_highlighted_line = line_index;
@@ -244,6 +282,40 @@ export default class ViewFile extends Vue implements Created {
       event.pageX, event.pageY);
   }
 
+  open_comment_modal() {
+    this.d_pending_comment_location = {
+      filename: this.filename,
+      first_line: this.d_first_highlighted_line!,
+      last_line: this.d_last_highlighted_line!,
+    };
+    this.d_show_comment_modal = true;
+    this.$nextTick(() => (<HTMLElement> this.$refs.comment_text).focus());
+  }
+
+  apply_annotation(annotation: Annotation) {
+    return toggle(this, 'd_saving', () => {
+      return AppliedAnnotation.create(this.handgrading_result!.pk, {
+        annotation: annotation.pk,
+        location: {
+          first_line: this.d_first_highlighted_line!,
+          last_line: this.d_last_highlighted_line!,
+          filename: this.filename,
+        }
+      });
+    });
+  }
+
+  create_comment() {
+    return toggle(this, 'd_saving', async () => {
+      await Comment.create(this.handgrading_result!.pk, {
+        text: this.d_comment_text,
+        location: this.d_pending_comment_location!
+      });
+      this.d_show_comment_modal = false;
+      this.d_comment_text = '';
+    });
+  }
+
   on_menu_is_open_changed(is_open: boolean) {
     this.d_menu_is_open = is_open;
     if (!this.d_menu_is_open) {
@@ -253,6 +325,7 @@ export default class ViewFile extends Vue implements Created {
   }
 }
 
+// FIXME: use the hierarchy in handgrading.vue?
 class HandgradingComment {
   private handgrading_data: AppliedAnnotation | Comment;
 
@@ -295,7 +368,9 @@ class HandgradingComment {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 
 * {
   padding: 0;
@@ -315,6 +390,10 @@ table {
   font-family: monospace;
   padding: 5px 0 0 0;
   width: 100%;
+}
+
+.saving:hover {
+  cursor: wait;
 }
 
 .line-number {
@@ -390,6 +469,23 @@ $light-green: hsl(97, 42%, 79%);
 
 .highlighted-region-line {
   background-color: $bubble-gum;
+}
+
+.modal {
+  .header {
+    font-weight: bold;
+  }
+
+  .input {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .button-footer {
+    .button {
+      margin-right: 10px;
+    }
+  }
 }
 
 </style>

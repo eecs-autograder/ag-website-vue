@@ -199,7 +199,6 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 @import '@/styles/colors.scss';
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
 
 * {
   box-sizing: border-box;
@@ -208,8 +207,9 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 }
 
 .loading {
-  @include fully-center();
   padding: 10px;
+  width: 100%;
+  text-align: center;
 }
 
 $sidebar-width: 275px;
