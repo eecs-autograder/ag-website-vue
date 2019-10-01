@@ -44,7 +44,6 @@
 </template>
 
 <script lang="ts">
-
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
@@ -197,9 +196,21 @@ export default class AGSuiteResult extends Vue {
 
   case_result_output_correctness(case_result: AGTestCaseResultFeedback) {
     let not_available = case_result.ag_test_command_results.every(
-        (cmd_result) => cmd_result.stdout_correct === null &&
-                        cmd_result.stderr_correct === null);
+        (cmd_result) => cmd_result.stdout_correct === null
+                        && cmd_result.stderr_correct === null
+    );
+
+    let no_points_but_show_output = case_result.ag_test_command_results.some(
+        (cmd_result) => (cmd_result.stdout_points_possible === 0
+                        && cmd_result.stderr_points_possible === 0)
+                        && (cmd_result.fdbk_settings.show_actual_stdout
+                        || cmd_result.fdbk_settings.show_actual_stderr)
+    );
+
     if (not_available) {
+        if (no_points_but_show_output) {
+            return CorrectnessLevel.all_correct;
+        }
         return CorrectnessLevel.not_available;
     }
 

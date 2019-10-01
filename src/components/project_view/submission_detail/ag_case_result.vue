@@ -1,3 +1,4 @@
+import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div v-if="ag_test_case_result.ag_test_command_results.length"
        class="ag-case-result">
@@ -28,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
     AGTestCaseResultFeedback,
@@ -107,7 +108,16 @@ export default class AGCaseResult extends Vue {
     let output_not_available = command_result.stdout_correct === null &&
                                command_result.stderr_correct === null;
 
+    let no_points_but_show_output = (
+        (command_result.stdout_points_possible === 0 && command_result.stderr_points_possible === 0)
+        && (command_result.fdbk_settings.show_actual_stdout
+            || command_result.fdbk_settings.show_actual_stderr)
+    );
+
     if (output_not_available) {
+      if (no_points_but_show_output) {
+          return CorrectnessLevel.all_correct;
+      }
       return CorrectnessLevel.not_available;
     }
 

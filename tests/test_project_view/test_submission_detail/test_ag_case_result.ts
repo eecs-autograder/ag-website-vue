@@ -39,19 +39,27 @@ describe('command_result_correctness tests', () => {
             1,
             {
                 return_code_correct: null,
-                stdout_correct: true,
-                stderr_correct: false
+                stdout_points_possible: 0,
+                stderr_points_possible: 0,
+                stdout_correct: null,
+                stderr_correct: null
             }
+        );
+
+        ag_test_command_result.fdbk_settings.show_actual_stdout = true;
+
+        expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.all_correct
         );
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.not_available
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.some_correct
+            CorrectnessLevel.all_correct
         );
         expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.some_correct
+            CorrectnessLevel.all_correct
         );
     });
 
@@ -239,6 +247,24 @@ describe('command_result_correctness tests', () => {
 
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.not_available
+        );
+    });
+
+    test('command_result_output_correctness - no_points_but_show_output', async () => {
+        let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
+            1,
+            {
+                stdout_points_possible: 0,
+                stderr_points_possible: 0,
+                stdout_correct: null,
+                stderr_correct: null
+            }
+        );
+
+        ag_test_command_result.fdbk_settings.show_actual_stdout = true;
+
+        expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.all_correct
         );
     });
 

@@ -113,7 +113,7 @@ describe('AGCommandResult tests', () => {
 
     test('return_code_correctness - timed_out === true', async () => {
         ag_test_command_result.timed_out = true;
-        ag_test_command_result.return_code_correct = null;
+        ag_test_command_result.stdout_correct = true;
 
         wrapper = mount(AGCommandResult, {
             propsData: {
@@ -129,13 +129,16 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBe(true);
         expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
         expect(wrapper.vm.return_code_correctness).toEqual("Timed Out");
-        expect(wrapper.find('#return-code-correctness').exists()).toBe(false);
+        expect(wrapper.find('.correctness-output').find(
+            '.timed-out-icon'
+        ).exists()).toBe(true);
     });
 
     test('return_code_correctness - timed_out === false && return_code_correct === null',
          async () => {
         ag_test_command_result.timed_out = false;
         ag_test_command_result.return_code_correct = null;
+        ag_test_command_result.stdout_correct = true;
 
         wrapper = mount(AGCommandResult, {
             propsData: {
@@ -151,7 +154,9 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBe(false);
         expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
         expect(wrapper.vm.return_code_correctness).toEqual("Not Available");
-        expect(wrapper.find('#return-code-correctness').exists()).toBe(false);
+        expect(wrapper.find('.correctness-output').find(
+            '.not-available-icon'
+        ).exists()).toBe(true);
     });
 
     test('return_code_correctness - timed_out === null && return_code_correct === true',
@@ -173,7 +178,9 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
         expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBe(true);
         expect(wrapper.vm.return_code_correctness).toEqual(ReturnCodeCorrectness.correct);
-        // expect(wrapper.find('#return-code-correctness').text()).toEqual("Correct");
+        expect(wrapper.find('.correctness-output').find(
+            '.correct-icon'
+        ).exists()).toBe(true);
     });
 
     test('return_code_correctness - timed_out === null && return_code_correct === false',
@@ -195,7 +202,9 @@ describe('AGCommandResult tests', () => {
         expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
         expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBe(false);
         expect(wrapper.vm.return_code_correctness).toEqual(ReturnCodeCorrectness.incorrect);
-        // expect(wrapper.find('#return-code-correctness').text()).toEqual("Incorrect");
+        expect(wrapper.find('.correctness-output').find(
+            '.incorrect-icon'
+        ).exists()).toBe(true);
     });
 
     test('Exit status - expected_and_actual_return_code tooltip is present - ' +
