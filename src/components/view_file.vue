@@ -4,9 +4,6 @@
     <div v-if="d_loading" class="loading-spinner">
       <div><i class="fa fa-spinner fa-pulse"></i></div>
     </div>
-    <div v-else-if="d_file_contents.length > max_display_size">
-      FIXME: file too big
-    </div>
     <table v-else id="viewing-container" :class="{'saving': d_saving}">
       <template v-for="(line, index) of d_file_contents.split('\n')">
         <tr :class="{'commented-line': line_in_comment(index),
@@ -33,13 +30,13 @@
                  @mouseleave="d_hovered_comment = null">
               <div class="comment-header">
                 <div class="comment-line-range">
-                  {{comment.first_line !== comment.last_line
-                      ? `Lines ${comment.first_line + 1} - ${comment.last_line + 1}`
-                      :`Line ${comment.first_line + 1}`}}
+                  {{comment.location.first_line !== comment.location.last_line
+                    ? `Lines ${comment.location.first_line + 1} - ${comment.location.last_line + 1}`
+                    :`Line ${comment.location.first_line + 1}`}}
                 </div>
-                <i @click="delete_comment(comment)" class="close fas fa-times"></i>
+                <i @click="delete_handgrading_comment(comment)" class="close fas fa-times"></i>
               </div>
-              <div class="comment-message">{{comment.message}}</div>
+              <div class="comment-message">{{comment.short_description}}</div>
             </div>
           </td>
         </tr>
@@ -107,7 +104,12 @@ import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
 import { Created } from '@/lifecycle';
 import { SafeMap } from '@/safe_map';
-import { toggle } from '@/utils';
+import { chain, toggle } from '@/utils';
+
+import {
+  HandgradingComment,
+  handgrading_comment_factory
+} from './handgrading/handgrading_comment';
 
 @Component({
   components: {
@@ -148,13 +150,9 @@ export default class ViewFile extends Vue implements Created {
   @Prop({default: true, type: Boolean})
   readonly_handgrading_results!: boolean;
 
-  // FIXME: Have parent pass in array of HandgradingComments, then we build
-  // the arraymap? We need to make sure that when the parents delete something
-  // we get updated without having to subscribe to anything.
-  // d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
   d_hovered_comment: HandgradingComment | null = null;
 
-  d_menu_is_open = false;
+  d_context_menu_is_open = false;
   d_show_comment_modal = false;
   // Since the context menu closes before the comment modal opens,
   // the first and last lines are set to null before we can use them
@@ -162,21 +160,11 @@ export default class ViewFile extends Vue implements Created {
   d_pending_comment_location: Location | null = null;
   d_comment_text = '';
 
-  readonly max_display_size = 5000000;  // 5MB
-
   async created() {
     this.d_file_contents = await this.file_contents;
     this.d_filename = this.filename;
 
-    // this.populate_d_handgrading_comments();
-
     this.d_loading = false;
-  }
-
-  @Watch('handgrading_result', {deep: true})
-  on_handgrading_result_change(new_comments: HandgradingComment[] | null,
-                               old_comments: HandgradingComment[] | null) {
-    // this.populate_d_handgrading_comments();
   }
 
   @Watch('file_contents')
@@ -189,10 +177,6 @@ export default class ViewFile extends Vue implements Created {
   @Watch('filename')
   on_filename_change(new_file_name: string, old_file_name: string) {
     this.d_filename = new_file_name;
-    // If the filename changed, then we know for sure that the file is different.
-    // If just the contents changed, it's possible for two different files to have the
-    // same contents.
-    // this.populate_d_handgrading_comments();
   }
 
   get handgrading_comments(): SafeMap<number, HandgradingComment[]> {
@@ -201,70 +185,33 @@ export default class ViewFile extends Vue implements Created {
     }
 
     let result =  new SafeMap<number, HandgradingComment[]>();
-    // this.d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
 
     let annotations = this.handgrading_result.applied_annotations.filter(
       (item) => item.location.filename === this.filename);
-    for (let annotation of annotations) {
-      result.get(
-        annotation.location.last_line, [], true
-      ).push(new HandgradingComment(annotation));
-    }
 
     let comments = this.handgrading_result.comments.filter(
       (item) => item.location !== null && item.location.filename === this.filename);
-    for (let comment of comments) {
-      let handgrading_comment = new HandgradingComment(comment);
+
+    for (let item of chain<AppliedAnnotation | Comment>(annotations, comments)) {
+      let handgrading_comment = handgrading_comment_factory(item);
       result.get(
-        handgrading_comment.last_line, [], true
+        handgrading_comment.location.last_line, [], true
       ).push(handgrading_comment);
     }
 
     // Sort lists of comments ending on the same line by first line
     for (let [last_line, comment_list] of result) {
       comment_list.sort(
-        (first, second) => first.first_line - second.first_line);
+        (first, second) => first.location.first_line - second.location.first_line);
     }
 
     return result;
   }
 
-  // Organize the comments provided as input into a map of (last line, comments).
-  // populate_d_handgrading_comments() {
-  //   if (this.handgrading_result === null) {
-  //     return;
-  //   }
-
-  //   this.d_handgrading_comments = new ArrayMap<number, HandgradingComment[]>();
-
-  //   let annotations = this.handgrading_result.applied_annotations.filter(
-  //     (item) => item.location.filename === this.filename);
-  //   for (let annotation of annotations) {
-  //     this.d_handgrading_comments.get(
-  //       annotation.location.last_line, [], true
-  //     ).push(new HandgradingComment(annotation));
-  //   }
-
-  //   let comments = this.handgrading_result.comments.filter(
-  //     (item) => item.location !== null && item.location.filename === this.filename);
-  //   for (let comment of comments) {
-  //     let handgrading_comment = new HandgradingComment(comment);
-  //     this.d_handgrading_comments.get(
-  //       handgrading_comment.last_line, [], true
-  //     ).push(handgrading_comment);
-  //   }
-
-  //   // Sort lists of comments ending on the same line by first line
-  //   for (let [last_line, comment_list] of this.d_handgrading_comments) {
-  //     comment_list.sort(
-  //       (first, second) => first.first_line - second.first_line);
-  //   }
-  // }
-
   // Returns true if line_num is contained in any provided handgrading comments.
   line_in_comment(line_num: number) {
     for (let [last_line, comment_list] of this.handgrading_comments) {
-      let first_line = comment_list[0].first_line;
+      let first_line = comment_list[0].location.first_line;
       if (line_num >= first_line && line_num <= last_line) {
         return true;
       }
@@ -282,7 +229,7 @@ export default class ViewFile extends Vue implements Created {
   start_highlighting(line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
-        || this.d_menu_is_open
+        || this.d_context_menu_is_open
         || this.d_saving) {
       return;
     }
@@ -295,7 +242,7 @@ export default class ViewFile extends Vue implements Created {
         || !this.handgrading_enabled
         || this.d_first_highlighted_line === null
         || this.d_last_highlighted_line === null
-        || this.d_menu_is_open) {
+        || this.d_context_menu_is_open) {
       return;
     }
 
@@ -312,7 +259,7 @@ export default class ViewFile extends Vue implements Created {
         || !this.handgrading_enabled
         || this.d_first_highlighted_line === null
         || this.d_last_highlighted_line === null
-        || this.d_menu_is_open) {
+        || this.d_context_menu_is_open) {
       return;
     }
 
@@ -354,57 +301,17 @@ export default class ViewFile extends Vue implements Created {
     });
   }
 
-  async delete_comment(comment: HandgradingComment) {
-    await comment.delete();
+  async delete_handgrading_comment(handgrading_comment: HandgradingComment) {
+    await handgrading_comment.delete();
     this.d_hovered_comment = null;
   }
 
   on_menu_is_open_changed(is_open: boolean) {
-    this.d_menu_is_open = is_open;
-    if (!this.d_menu_is_open) {
+    this.d_context_menu_is_open = is_open;
+    if (!this.d_context_menu_is_open) {
       this.d_first_highlighted_line = null;
       this.d_last_highlighted_line = null;
     }
-  }
-}
-
-// FIXME: use the hierarchy in handgrading.vue?
-class HandgradingComment {
-  private handgrading_data: AppliedAnnotation | Comment;
-
-  constructor(handgrading_data: AppliedAnnotation | Comment) {
-    this.handgrading_data = handgrading_data;
-  }
-
-  get first_line() {
-    return this.location.first_line;
-  }
-
-  get last_line() {
-    return this.location.last_line;
-  }
-
-  get filename() {
-    return this.location.filename;
-  }
-
-  get message() {
-    if (this.handgrading_data instanceof AppliedAnnotation) {
-      let annotation = this.handgrading_data.annotation;
-      return `${annotation.short_description} (${annotation.deduction})`;
-    }
-    return this.handgrading_data.text;
-  }
-
-  get location() {
-    if (this.handgrading_data.location === null) {
-      throw new Error('Location unexpectedly null');
-    }
-    return this.handgrading_data.location;
-  }
-
-  delete() {
-    return this.handgrading_data.delete();
   }
 }
 
