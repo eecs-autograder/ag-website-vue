@@ -24,7 +24,9 @@ export enum CorrectnessLevel {
   not_available = "not available",
   none_correct = 'none correct',
   some_correct = 'some correct',
-  all_correct = 'all correct'
+  all_correct = 'all correct',
+  output_only = 'output only',
+  return_code_only = 'return code only'
 }
 
 @Component
@@ -42,18 +44,6 @@ export default class CorrectnessIcon extends Vue {
 #correctness-icon {
   padding: 0 5px;
   display: inline-block;
-}
-
-.all-correct {
-  //color: darken($ocean-blue, 20);
-}
-
-.some-correct {
-  //color: darken(darkorange, 30);
-}
-
-.none-correct {
-  //color: darkred;
 }
 
 .correctness-level {

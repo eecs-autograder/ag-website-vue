@@ -1,4 +1,3 @@
-import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div v-if="ag_test_case_result.ag_test_command_results.length"
        class="ag-case-result">
@@ -7,7 +6,7 @@ import {CorrectnessLevel} from "@/components/project_view/submission_detail/corr
         <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
           <submission-detail-panel
             ref="ag_test_command_panel"
-            :name="ag_test_command_result.ag_test_command_name"
+            :name="`ag_test_command_result ${ag_test_command_result.pk}`"
             :correctness_level="command_result_correctness(ag_test_command_result)"
             :is_command="true">
             <AGCommandResult :submission="submission"
@@ -65,21 +64,38 @@ export default class AGCaseResult extends Vue {
     let return_code_correctness = this.command_result_return_code_correctness(command_result);
     let output_correctness = this.command_result_output_correctness(command_result);
 
-    if (return_code_correctness === CorrectnessLevel.not_available) {
+    // if (command_result.pk === 2934) {
+    //     console.log("Return code correctness: " + return_code_correctness);
+    //     console.log("Output correctness: " + output_correctness);
+    // }
+
+    if (return_code_correctness === CorrectnessLevel.output_only
+        && output_correctness === CorrectnessLevel.not_available) {
+      return CorrectnessLevel.output_only;
+    }
+
+    if (output_correctness === CorrectnessLevel.output_only
+        && return_code_correctness === CorrectnessLevel.not_available) {
+      return CorrectnessLevel.output_only;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.not_available
+        || return_code_correctness === CorrectnessLevel.output_only) {
       return output_correctness;
     }
 
-    if (output_correctness === CorrectnessLevel.not_available) {
+    if (output_correctness === CorrectnessLevel.not_available
+        || output_correctness === CorrectnessLevel.output_only) {
       return return_code_correctness;
     }
 
-    if (return_code_correctness === CorrectnessLevel.all_correct &&
-        output_correctness === CorrectnessLevel.all_correct) {
+    if (return_code_correctness === CorrectnessLevel.all_correct
+        && output_correctness === CorrectnessLevel.all_correct) {
       return CorrectnessLevel.all_correct;
     }
 
-    if (return_code_correctness === CorrectnessLevel.none_correct &&
-        output_correctness === CorrectnessLevel.none_correct) {
+    if (return_code_correctness === CorrectnessLevel.none_correct
+        && output_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.none_correct;
     }
 
@@ -87,8 +103,8 @@ export default class AGCaseResult extends Vue {
       return CorrectnessLevel.some_correct;
     }
 
-    if (return_code_correctness === CorrectnessLevel.all_correct &&
-        output_correctness === CorrectnessLevel.none_correct) {
+    if (return_code_correctness === CorrectnessLevel.all_correct
+        && output_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.some_correct;
     }
     return CorrectnessLevel.some_correct;
@@ -96,6 +112,9 @@ export default class AGCaseResult extends Vue {
 
   command_result_return_code_correctness(command_result: AGTestCommandResultFeedback) {
     if (command_result.return_code_correct === null) {
+      if (command_result.fdbk_settings.show_actual_return_code) {
+        return CorrectnessLevel.output_only;
+      }
       return CorrectnessLevel.not_available;
     }
     else if (command_result.return_code_correct) {
@@ -108,15 +127,16 @@ export default class AGCaseResult extends Vue {
     let output_not_available = command_result.stdout_correct === null &&
                                command_result.stderr_correct === null;
 
-    let no_points_but_show_output = (
-        (command_result.stdout_points_possible === 0 && command_result.stderr_points_possible === 0)
+    let show_output_only = (
+        (command_result.stdout_points_possible === 0
+        && command_result.stderr_points_possible === 0)
         && (command_result.fdbk_settings.show_actual_stdout
             || command_result.fdbk_settings.show_actual_stderr)
     );
 
     if (output_not_available) {
-      if (no_points_but_show_output) {
-          return CorrectnessLevel.all_correct;
+      if (show_output_only) {
+        return CorrectnessLevel.output_only;
       }
       return CorrectnessLevel.not_available;
     }
@@ -125,6 +145,7 @@ export default class AGCaseResult extends Vue {
       (command_result.stdout_correct === null || command_result.stdout_correct)
       && (command_result.stderr_correct === null || command_result.stderr_correct)
     );
+
     if (output_correct) {
       return CorrectnessLevel.all_correct;
     }

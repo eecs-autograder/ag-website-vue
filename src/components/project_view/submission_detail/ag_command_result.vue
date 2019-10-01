@@ -265,6 +265,8 @@ export default class AGCommandResult extends Vue {
 
   get show_correctness_fieldset() {
     return this.d_ag_test_command_result!.return_code_correct !== null
+           || this.d_ag_test_command_result!.timed_out !== null
+           || this.d_ag_test_command_result!.fdbk_settings.show_actual_return_code
            || this.d_ag_test_command_result!.stdout_correct !== null
            || this.d_ag_test_command_result!.stderr_correct !== null;
   }

@@ -144,29 +144,36 @@ export default class AGSuiteResult extends Vue {
     if (return_code_correctness === CorrectnessLevel.not_available) {
       return output_correctness;
     }
+
     if (output_correctness === CorrectnessLevel.not_available) {
       return return_code_correctness;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.output_only
+        && output_correctness === CorrectnessLevel.output_only) {
+      return CorrectnessLevel.output_only;
     }
 
     if (case_result.total_points === 0 && case_result.total_points_possible !== 0) {
       return CorrectnessLevel.none_correct;
     }
 
-    if (return_code_correctness === CorrectnessLevel.all_correct &&
-        output_correctness === CorrectnessLevel.all_correct) {
+    if (return_code_correctness === CorrectnessLevel.all_correct
+        && (output_correctness === CorrectnessLevel.all_correct
+         || output_correctness === CorrectnessLevel.output_only)) {
       return CorrectnessLevel.all_correct;
     }
-    if (return_code_correctness === CorrectnessLevel.none_correct &&
-        output_correctness === CorrectnessLevel.none_correct) {
+    if (return_code_correctness === CorrectnessLevel.none_correct
+        && output_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.none_correct;
     }
-    if (return_code_correctness === CorrectnessLevel.some_correct ||
-        output_correctness === CorrectnessLevel.some_correct) {
+    if (return_code_correctness === CorrectnessLevel.some_correct
+        || output_correctness === CorrectnessLevel.some_correct) {
       return CorrectnessLevel.some_correct;
     }
 
-    if (return_code_correctness === CorrectnessLevel.all_correct &&
-        output_correctness === CorrectnessLevel.none_correct) {
+    if (return_code_correctness === CorrectnessLevel.all_correct
+        && output_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.some_correct;
     }
     return CorrectnessLevel.some_correct;
@@ -176,7 +183,13 @@ export default class AGSuiteResult extends Vue {
     let not_available = case_result.ag_test_command_results.every(
       (cmd_result) => cmd_result.return_code_correct === null);
 
+    let some_show_return_code_only = case_result.ag_test_command_results.some(
+        (cmd_result) => cmd_result.fdbk_settings.show_actual_return_code);
+
     if (not_available) {
+      if (some_show_return_code_only) {
+          return CorrectnessLevel.output_only;
+      }
       return CorrectnessLevel.not_available;
     }
 
@@ -200,32 +213,33 @@ export default class AGSuiteResult extends Vue {
                         && cmd_result.stderr_correct === null
     );
 
-    let no_points_but_show_output = case_result.ag_test_command_results.some(
+    let some_show_output_only = case_result.ag_test_command_results.some(
         (cmd_result) => (cmd_result.stdout_points_possible === 0
                         && cmd_result.stderr_points_possible === 0)
                         && (cmd_result.fdbk_settings.show_actual_stdout
                         || cmd_result.fdbk_settings.show_actual_stderr)
     );
 
+    if (not_available && some_show_output_only) {
+      return CorrectnessLevel.output_only;
+    }
+
     if (not_available) {
-        if (no_points_but_show_output) {
-            return CorrectnessLevel.all_correct;
-        }
-        return CorrectnessLevel.not_available;
+      return CorrectnessLevel.not_available;
     }
 
     let all_correct = case_result.ag_test_command_results.every(
         (cmd_result) => (cmd_result.stdout_correct === null || cmd_result.stdout_correct) &&
                         (cmd_result.stderr_correct === null || cmd_result.stderr_correct));
     if (all_correct) {
-        return CorrectnessLevel.all_correct;
+      return CorrectnessLevel.all_correct;
     }
 
     let none_correct = !case_result.ag_test_command_results.some(
         (cmd_result) => cmd_result.stdout_correct !== null && cmd_result.stdout_correct
                         || cmd_result.stderr_correct !== null && cmd_result.stderr_correct);
     if (none_correct) {
-        return CorrectnessLevel.none_correct;
+      return CorrectnessLevel.none_correct;
     }
     return CorrectnessLevel.some_correct;
   }

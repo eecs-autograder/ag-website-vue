@@ -47,7 +47,9 @@ export enum PanelCorrectnessLevel {
     not_available = "not-available",
     none_correct = 'none-correct',
     some_correct = 'some-correct',
-    all_correct = 'all-correct'
+    all_correct = 'all-correct',
+    output_only = 'output-only',
+    dont_check = 'dont-check'
 }
 
 @Component({
@@ -107,6 +109,9 @@ export default class SubmissionDetailPanel extends Vue {
     }
     else if (this.correctness_level === CorrectnessLevel.none_correct) {
       return PanelCorrectnessLevel.none_correct;
+    }
+    else if (this.correctness_level === CorrectnessLevel.output_only) {
+      return PanelCorrectnessLevel.output_only;
     }
     return PanelCorrectnessLevel.some_correct;
   }
@@ -261,6 +266,22 @@ $base-blue: darken($light-blue, 2);
 
 .all-correct-panel-body {
   @include panel_body($base-blue);
+}
+
+/* ---------------- Output Only Panel ---------------- */
+
+$base-purple: hsl(255, 88%, 89%);
+
+.output-only-panel-header {
+  @include panel_header($base-purple, darken($base-purple, 5), pointer);
+}
+
+.output-only-panel-header:hover {
+  @include panel_header_hover(darken($base-purple, 5), darken($base-purple, 10));
+}
+
+.output-only-panel-body {
+  @include panel_body($base-purple);
 }
 
 </style>
