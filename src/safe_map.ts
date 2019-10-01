@@ -1,4 +1,13 @@
-export class SafeMapError extends Error {}
+export class SafeMapError extends Error {
+    // See https://github.com/Microsoft/TypeScript/issues/13965
+    __proto__: Error; // tslint:disable-line
+
+    constructor(msg?: string) {
+        const actual_proto = new.target.prototype;
+        super(msg);
+        this.__proto__ = actual_proto;
+    }
+}
 
 export class SafeMap<K, V>  {
     // The type declarations for map we've seen don't actually accept
@@ -31,11 +40,30 @@ export class SafeMap<K, V>  {
         return this._map.forEach(callbackfn);
     }
 
-    get(key: K): V {
+    // Returns the value in the SafeMap identified by key.
+    // If the key is not found, SafeMapError is thrown if
+    // no default is provided. If a default is provided and insert is true,
+    // inserts the key with the provided default.
+    get(key: K, default_val?: V, insert: boolean = false): V {
         if (!this._map.has(key)) {
+            if (default_val !== undefined) {
+                if (insert) {
+                    this._map.set(key, default_val);
+                }
+                return default_val;
+            }
             throw new SafeMapError(`Key Error: "${key}" not found in map`);
         }
         return this._map.get(key)!;
+
+        //         let index = this._index_of(key, default_val === undefined);
+        // if (index === -1) {
+        //     if (insert) {
+        //         this.insert(key, default_val!);
+        //     }
+        //     return default_val!;
+        // }
+        // return this.data[index][1];
     }
 
     has(key: K): boolean {

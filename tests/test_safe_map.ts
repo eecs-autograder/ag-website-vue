@@ -1,4 +1,4 @@
-import { SafeMap } from '@/safe_map';
+import { SafeMap, SafeMapError } from '@/safe_map';
 
 describe('SafeMap', () => {
 
@@ -17,16 +17,25 @@ describe('SafeMap', () => {
 
     });
 
-    test('SafeMap get undefined', () => {
-        let map = new SafeMap<string, number>();
-        map.set('spam', 44);
+    test('get() key not found no default', () => {
+        let map = new SafeMap<string, number>([['spam', 42]]);
+        return expect(() => {
+            map.get('egg');
+        }).toThrow(SafeMapError);
+    });
 
-        try {
-            map.get('tofu');
-        }
-        catch (error_in) {
-            expect(error_in.message).toBe('Key Error: "tofu" not found in map');
-        }
+    test('get() key not found return default', () => {
+        let map = new SafeMap<string, number>([['spam', 42]]);
+        expect(map.get('egg', 25)).toEqual(25);
+
+        expect(map.has('egg')).toBe(false);
+    });
+
+    test('get() key not found insert true default inserted', () => {
+        let map = new SafeMap<string, number>([['spam', 42]]);
+        expect(map.get('egg', 25, true)).toEqual(25);
+
+        expect(map.has('egg')).toBe(true);
     });
 
     test('SafeMap clear', () => {
