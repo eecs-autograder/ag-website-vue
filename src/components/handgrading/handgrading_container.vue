@@ -103,7 +103,11 @@
       <div class="body" :class="{'body-closed': d_group_sidebar_collapsed}">
         <handgrading v-if="d_currently_grading !== null && !d_loading_result"
                      :readonly_handgrading_results="false"
-                     :handgrading_result="d_currently_grading"></handgrading>
+                     :is_first="previous === null"
+                     :is_last="next === null"
+                     :handgrading_result="d_currently_grading"
+                     @prev_group="select_for_grading(previous)"
+                     @next_group="select_for_grading(next)"></handgrading>
         <div v-else-if="d_loading_result" class="loading-large">
           <i class="fa fa-spinner fa-pulse"></i>
         </div>
@@ -237,9 +241,37 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   async select_for_grading(group: ag_cli.GroupWithHandgradingResultSummary) {
     if (group.num_submissions !== 0) {
       await toggle(this, 'd_loading_result', async () => {
-        this.d_currently_grading = await ag_cli.HandgradingResult.get_by_group_pk(group.pk);
+        this.d_currently_grading = await ag_cli.HandgradingResult.get_or_create(group.pk);
       });
     }
+  }
+
+  get previous() {
+    let index = this.index_of_currently_grading - 1;
+    while (index >= 0) {
+      if (this.staff_filtered_groups[index].num_submissions !== 0) {
+        return this.staff_filtered_groups[index];
+      }
+      index -= 1;
+    }
+    return null;
+  }
+
+  get next() {
+    let index = this.index_of_currently_grading + 1;
+    while (index < this.staff_filtered_groups.length) {
+      if (this.staff_filtered_groups[index].num_submissions !== 0) {
+        return this.staff_filtered_groups[index];
+      }
+      index += 1;
+    }
+    return null;
+  }
+
+  private get index_of_currently_grading() {
+    assert_not_null(this.d_currently_grading);
+    return this.staff_filtered_groups.findIndex(
+      group => group.pk === this.d_currently_grading!.group);
   }
 
   update_handgrading_result_created(handgrading_result: ag_cli.HandgradingResult): void {

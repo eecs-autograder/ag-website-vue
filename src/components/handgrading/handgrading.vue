@@ -179,9 +179,9 @@
       <div class="grading-sidebar-footer" v-if="!readonly_handgrading_results">
         <button type="button"
                 id="prev-button"
-                @click="$emit('next_group')"
+                @click="$emit('prev_group')"
                 class="footer-button footer-item"
-                :disabled="d_saving">
+                :disabled="d_saving || is_first">
           <i class="fas fa-chevron-left"></i>
           Prev
         </button>
@@ -200,10 +200,10 @@
         </div>
         <button type="button"
                 id="next-button"
-                @click="$emit('prev_group')"
+                @click="$emit('next_group')"
                 class="footer-button footer-item"
                 :class="{'green': d_handgrading_result.finished_grading}"
-                :disabled="d_saving">
+                :disabled="d_saving || is_last">
           {{d_handgrading_result.finished_grading ? 'Next' : 'Skip'}}
           <i class="fas fa-chevron-right"></i>
         </button>
@@ -259,6 +259,14 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   // When true, editing handgrading results will be disabled.
   @Prop({required: true, type: Boolean})
   readonly_handgrading_results!: boolean;
+
+  // When true, the "prev" buttion will be disabled.
+  @Prop({default: false, type: Boolean})
+  is_first!: boolean;
+
+  // When true, the "skip/next" buttion will be disabled.
+  @Prop({default: false, type: Boolean})
+  is_last!: boolean;
 
   d_handgrading_result: HandgradingResult | null = null;
 
@@ -527,7 +535,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     display: flex;
 
     .footer-item {
-      &:hover {
+      &:hover:not([disabled]) {
         background-color: $pebble-light;
       }
     }
