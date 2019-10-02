@@ -1,7 +1,4 @@
 <template>
-  <!-- <div v-if="d_loading" class="loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
-  </div> -->
   <div id="handgrading-container">
     <div class="sidebar-container">
       <div class="sidebar-menu">
@@ -13,7 +10,7 @@
           <template v-if="!d_group_sidebar_collapsed">
             <span class="header-text">{{project.max_group_size === 1 ? 'Students' : 'Groups'}}
               <!-- <template v-if="!d_loading_result_summaries">
-                ({{d_group_summaries.length}})
+                ({{d_result_summaries.length}})
               </template> -->
             </span>
           </template>
@@ -46,7 +43,7 @@
           </select> -->
         </div>
         <div class="sidebar-content" v-if="!d_group_sidebar_collapsed">
-          <template v-for="(group_summary, index) of d_group_summaries">
+          <template v-for="(group_summary, index) of filtered_groups">
             <div class="divider" v-if="index !== 0"></div>
             <group-summary-panel :key="group_summary.pk"
                                  :group_summary="group_summary"
@@ -78,16 +75,6 @@
         </div>
       </div>
     </div>
-
-    <!-- <div class="footer">
-      <input type="text" v-model="d_search_text" class="input" placeholder="Search by username"/>
-      <div id="adjust-points">
-        Adjust Points
-      </div>
-      <div id="next-prev-buttons">
-        Prev Skip Finish
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -118,7 +105,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   d_currently_grading: ag_cli.HandgradingResult | null = null;
 
-  d_group_summaries: ag_cli.GroupWithHandgradingResultSummary[] = [];
+  d_result_summaries: ag_cli.GroupWithHandgradingResultSummary[] = [];
   d_loading_result_summaries = true;
 
   d_group_sidebar_collapsed = false;
@@ -156,14 +143,21 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     do {
       page = await ag_cli.HandgradingResult.get_all_summaries_from_project(
         this.project.pk, {page_size: page_size, page_num: page_num});
-      this.d_group_summaries.push(...page.results);
+      this.d_result_summaries.push(...page.results);
       page_num += 1;
     } while (page.next !== null);
 
     this.d_loading_result_summaries = false;
   }
 
-  // ---------------------------------------------------
+  get filtered_groups() {
+    let search = this.d_search_text.trim();
+    if (search === '') {
+      return this.d_result_summaries;
+    }
+    return this.d_result_summaries.filter(
+      group => !!group.member_names.find(username => username.includes(search)));
+  }
 
   async select_for_grading(group: ag_cli.GroupWithHandgradingResultSummary) {
     if (group.num_submissions !== 0) {
@@ -182,7 +176,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   }
 
   update_summary(handgrading_result: ag_cli.HandgradingResult) {
-    let to_update = this.d_group_summaries.find(
+    let to_update = this.d_result_summaries.find(
       summary => summary.pk === handgrading_result.group);
 
     if (assert_not_null(to_update)) {
