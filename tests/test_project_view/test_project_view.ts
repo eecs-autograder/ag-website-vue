@@ -1,5 +1,3 @@
-import { Vue } from 'vue-property-decorator';
-
 import { config, Wrapper } from '@vue/test-utils';
 
 import {
@@ -261,6 +259,10 @@ describe('Changing Tabs', ()  => {
     });
 
     test('Clicking on handgrading results tab', async () => {
+        fail();
+    });
+
+    test('Submit and my submissions unavailable to non-student handgrader', async () => {
         fail();
     });
 });

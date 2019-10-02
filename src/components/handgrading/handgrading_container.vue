@@ -54,7 +54,7 @@
                                  class="sidebar-item"
                                  :class="{
                                    'active': d_currently_grading !== null
-                                             && d_currently_grading.pk === group_summary.pk,
+                                             && d_currently_grading.group === group_summary.pk,
                                    'disabled': group_summary.num_submissions === 0
                                  }">
             </group-summary-panel>
@@ -70,9 +70,12 @@
       </div>
 
       <div class="body" :class="{'body-closed': d_group_sidebar_collapsed}">
-        <handgrading v-if="d_currently_grading !== null"
+        <handgrading v-if="d_currently_grading !== null && !d_loading_result"
                      :readonly_handgrading_results="false"
-                     :group="d_currently_grading"></handgrading>
+                     :handgrading_result="d_currently_grading"></handgrading>
+        <div v-else-if="d_loading_result" class="loading-large">
+          <i class="fa fa-spinner fa-pulse"></i>
+        </div>
       </div>
     </div>
 
@@ -94,7 +97,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import * as ag_cli from 'ag-client-typescript';
 
 import { SafeMap } from '@/safe_map';
-import { assert_not_null } from '@/utils';
+import { assert_not_null, toggle } from '@/utils';
 
 import GroupSummaryPanel from './group_summary_panel.vue';
 import { HandgradingStatus } from './handgrading_status';
@@ -113,7 +116,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   @Prop({required: true, type: ag_cli.HandgradingRubric})
   handgrading_rubric!: ag_cli.HandgradingRubric;
 
-  d_currently_grading: ag_cli.Group | null = null;
+  d_currently_grading: ag_cli.HandgradingResult | null = null;
 
   d_group_summaries: ag_cli.GroupWithHandgradingResultSummary[] = [];
   d_loading_result_summaries = true;
@@ -133,7 +136,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   readonly HandgradingStatus = HandgradingStatus;
 
-  // d_loading = true;
+  d_loading_result = false;
 
   async created() {
     await this.load_result_summaries();
@@ -164,7 +167,9 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   async select_for_grading(group: ag_cli.GroupWithHandgradingResultSummary) {
     if (group.num_submissions !== 0) {
-      this.d_currently_grading = new ag_cli.Group(group);
+      await toggle(this, 'd_loading_result', async () => {
+        this.d_currently_grading = await ag_cli.HandgradingResult.get_by_group_pk(group.pk);
+      });
     }
   }
 
@@ -199,6 +204,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 @import '@/styles/colors.scss';
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/global.scss';
 
 * {
   box-sizing: border-box;

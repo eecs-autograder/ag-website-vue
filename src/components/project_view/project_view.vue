@@ -34,6 +34,12 @@
           </router-link>
         </template>
       </div>
+      <div class="nav-link"
+           :class="{'active': d_current_tab === 'handgrading_result'}"
+           @click.self="set_current_tab('handgrading_result')"
+           v-if="handgrading_result !== null">
+        Handgrading Score
+      </div>
     </div>
 
     <div>
@@ -60,6 +66,13 @@
                                  :handgrading_rubric="handgrading_rubric"></handgrading-container>
         </template>
       </div>
+
+      <div v-show="d_current_tab === 'handgrading_result'">
+        <template v-if="handgrading_result !== null">
+          <handgrading :handgrading_result="handgrading_result"
+                       :readonly_handgrading_results="true"></handgrading>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -72,6 +85,7 @@ import { Course, Group, GroupObserver, Project, HandgradingRubric, HttpError, Ha
 import { GlobalData } from '@/app.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
+import Handgrading from '@/components/handgrading/handgrading.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -82,6 +96,7 @@ import { format_datetime, get_query_param, assert_not_null } from '@/utils';
 @Component({
   components: {
     GroupRegistration,
+    Handgrading,
     HandgradingContainer,
     SubmissionList,
     Submit,
@@ -121,7 +136,7 @@ export default class ProjectView extends Vue implements GroupObserver {
 
     await this.d_globals.set_current_project(this.project, this.course);
 
-    await Promise.all([this.load_handgrading(), this.load_handgrading_result]);
+    await Promise.all([this.load_handgrading(), this.load_handgrading_result()]);
 
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab !== null) {

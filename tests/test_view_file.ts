@@ -77,7 +77,7 @@ describe('ViewFile.vue', () => {
     });
 });
 
-describe.skip('ViewFile handgrading tests', () => {
+describe('ViewFile handgrading tests', () => {
     // Add some non-location comments to the handgrading results
 
     test('Single-line annotation', () => {

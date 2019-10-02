@@ -1,13 +1,13 @@
 <template>
-  <div v-if="d_loading" class="loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
-  </div>
-  <div v-else id="handgrading">
+  <div id="handgrading">
     <div class="files">
       <file-panel v-for="filename of d_handgrading_result.submitted_filenames"
                   :key="filename"
                   :handgrading_result="d_handgrading_result"
                   :filename="filename"
+                  :enable_custom_comments="
+                    d_globals.user_roles.is_staff
+                    || d_handgrading_result.handgrading_rubric.handgraders_can_leave_comments"
                   :readonly_handgrading_results="readonly_handgrading_results">
       </file-panel>
     </div>
@@ -19,8 +19,9 @@
         </span>
       </div>
 
-      <div class="grading-sidebar-content">
-        <div id="adjust-points-container">
+      <div class="grading-sidebar-content"
+           :class="{'readonly-mode': readonly_handgrading_results}">
+        <div id="adjust-points-container" v-if="can_adjust_points">
           <label class="text-label" for="adjust-points">Adjust Points</label>
           <validated-input @input_validity_changed="d_adjust_points_is_valid = $event"
                            :validators="[is_not_empty, is_integer]"
@@ -47,8 +48,11 @@
           <template v-for="(result, index) of d_handgrading_result.criterion_results">
             <div class="divider" v-if="index !== 0"></div>
 
-            <div class="criterion-hover criterion"
-                 :class="{'loading-cursor': d_saving}"
+            <div class="criterion"
+                 :class="{
+                   'loading-cursor': d_saving,
+                   'criterion-hover': !readonly_handgrading_results
+                 }"
                  :key="result.pk"
                  @click="toggle_criterion(result)">
               <div class="row">
@@ -76,7 +80,7 @@
           Comments
         </div>
         <div v-show="!d_comments_collapsed">
-          <div class="new-comment">
+          <div class="new-comment" v-if="can_leave_comments">
             <textarea class="input" v-model="d_new_comment_text"></textarea>
             <button type="button" class="blue-button" @click="add_comment">Comment</button>
           </div>
@@ -93,7 +97,9 @@
                     :key="comment.pk">
                 <div class="row">
                   <div class="short-description">{{comment.text}}</div>
-                  <i @click="delete_comment(comment)" class="close fas fa-times"></i>
+                  <i v-if="!readonly_handgrading_results"
+                     @click="delete_comment(comment)"
+                     class="close fas fa-times"></i>
                 </div>
               </div>
             </template>
@@ -104,8 +110,7 @@
 
               <div class="comment"
                     :class="{'loading-cursor': d_saving}"
-                    :key="handgrading_comment.pk"
-                    @click="toggle_criterion(result)">
+                    :key="handgrading_comment.pk">
                 <div class="row">
                   <div class="short-description">
                     {{handgrading_comment.short_description}}
@@ -113,7 +118,9 @@
                       v-if="handgrading_comment.deduction !== 0"
                     >({{handgrading_comment.deduction}})</span>
                   </div>
-                  <i @click="delete_comment(handgrading_comment)" class="close fas fa-times"></i>
+                  <i v-if="!readonly_handgrading_results"
+                     @click="delete_comment(handgrading_comment)"
+                     class="close fas fa-times"></i>
                 </div>
 
                 <div class="long-description" v-if="handgrading_comment.long_description !== ''">
@@ -136,38 +143,40 @@
         </div>
 
         <!-- Annotations -->
-        <div class="collapsible-section-header"
-             @click="d_annotations_collapsed = !d_annotations_collapsed">
-          <i class="fas" :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
-          Annotations
-        </div>
-        <div class="sidebar-section" v-if="!d_annotations_collapsed">
-          <template
-            v-for="(annotation, index) of d_handgrading_result.handgrading_rubric.annotations"
-          >
-            <div class="divider" v-if="index !== 0"></div>
+        <template v-if="!readonly_handgrading_results">
+          <div class="collapsible-section-header"
+              @click="d_annotations_collapsed = !d_annotations_collapsed">
+            <i class="fas" :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
+            Annotations
+          </div>
+          <div class="sidebar-section" v-if="!d_annotations_collapsed">
+            <template
+              v-for="(annotation, index) of d_handgrading_result.handgrading_rubric.annotations"
+            >
+              <div class="divider" v-if="index !== 0"></div>
 
-            <div class="criterion" :key="annotation.pk">
-              <div class="row">
-                <div class="short-description">
-                  {{annotation.short_description}}
+              <div class="criterion" :key="annotation.pk">
+                <div class="row">
+                  <div class="short-description">
+                    {{annotation.short_description}}
+                  </div>
+                  <div class="points">
+                    {{annotation.deduction}}
+                    <template v-if="annotation.max_deduction !== null">
+                      (max {{annotation.max_deduction}})
+                    </template>
+                  </div>
                 </div>
-                <div class="points">
-                  {{annotation.deduction}}
-                  <template v-if="annotation.max_deduction !== null">
-                    (max {{annotation.max_deduction}})
-                  </template>
+                <div class="long-description" v-if="annotation.long_description !== ''">
+                  {{annotation.long_description}}
                 </div>
               </div>
-              <div class="long-description" v-if="annotation.long_description !== ''">
-                {{annotation.long_description}}
-              </div>
-            </div>
-          </template>
-        </div>
+            </template>
+          </div>
+        </template>
       </div>
 
-      <div class="grading-sidebar-footer">
+      <div class="grading-sidebar-footer" v-if="!readonly_handgrading_results">
         <button type="button"
                 id="prev-button"
                 @click="$emit('next_group')"
@@ -204,7 +213,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   Annotation,
@@ -215,13 +224,13 @@ import {
   CommentObserver,
   CriterionResult,
   CriterionResultObserver,
-  Group,
   HandgradingResult,
   Location,
 } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { assert_not_null, toggle } from '@/utils';
+import { assert_not_null, toggle, deep_copy } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -240,8 +249,12 @@ import { HandgradingComment, handgrading_comment_factory } from './handgrading_c
 export default class Handgrading extends Vue implements AppliedAnnotationObserver,
                                                         CommentObserver,
                                                         CriterionResultObserver {
-  @Prop({required: true, type: Group})
-  group!: Group;
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
+  @Prop({required: true, type: HandgradingResult})
+  handgrading_result!: HandgradingResult;
 
   // When true, editing handgrading results will be disabled.
   @Prop({required: true, type: Boolean})
@@ -249,7 +262,6 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
   d_handgrading_result: HandgradingResult | null = null;
 
-  d_loading = true;
   d_saving = false;
 
   d_criteria_collapsed = false;
@@ -264,9 +276,8 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   readonly is_integer = is_integer;
   readonly is_not_empty = is_not_empty;
 
-  async created() {
-    this.d_handgrading_result = await HandgradingResult.get_or_create(this.group.pk);
-    this.d_loading = false;
+  created() {
+    this.d_handgrading_result = deep_copy(this.handgrading_result, HandgradingResult);
     AppliedAnnotation.subscribe(this);
     CriterionResult.subscribe(this);
     Comment.subscribe(this);
@@ -278,13 +289,14 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     Comment.unsubscribe(this);
   }
 
-  @Watch('group')
-  async on_group_changed(new_group: Group, old_group: Group) {
-    this.d_handgrading_result = await HandgradingResult.get_or_create(this.group.pk);
+  @Watch('handgrading_result')
+  on_handgrading_result_changed(
+      new_result: HandgradingResult, old_result: HandgradingResult) {
+    this.d_handgrading_result = deep_copy(this.handgrading_result, HandgradingResult);
   }
 
   toggle_criterion(criterion_result: CriterionResult) {
-    if (this.d_saving) {
+    if (this.d_saving || this.readonly_handgrading_results) {
       return;
     }
     return toggle(this, 'd_saving', () => {
@@ -320,10 +332,22 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     return this.d_handgrading_result!.comments.filter(comment => comment.location === null);
   }
 
+  get can_leave_comments() {
+    return !this.readonly_handgrading_results
+           && (this.d_globals.user_roles.is_staff
+               || this.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments);
+  }
+
   save_handgrading_result() {
     return toggle(this, 'd_saving', () => {
       return this.d_handgrading_result!.save();
     });
+  }
+
+  get can_adjust_points() {
+    return !this.readonly_handgrading_results
+           && (this.d_globals.user_roles.is_staff
+               || this.d_handgrading_result!.handgrading_rubric.handgraders_can_adjust_points);
   }
 
   delete_comment(comment: Comment | HandgradingComment) {
@@ -456,9 +480,17 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   .grading-sidebar-content {
     position: sticky;
     top: $header-height;
-    height: calc(100vh - #{$header-height} - #{$footer-height});
     overflow: auto;
-    margin-bottom: $footer-height;
+
+    &:not(.readonly-mode) {
+      height: calc(100vh - #{$header-height} - #{$footer-height});
+      margin-bottom: $footer-height;
+    }
+
+    &.readonly-mode {
+      height: calc(100vh - #{$header-height});
+      margin-bottom: 5px;
+    }
 
     font-size: 14px;
 

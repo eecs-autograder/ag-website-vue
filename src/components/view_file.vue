@@ -34,7 +34,9 @@
                     ? `Lines ${comment.location.first_line + 1} - ${comment.location.last_line + 1}`
                     :`Line ${comment.location.first_line + 1}`}}
                 </div>
-                <i @click="delete_handgrading_comment(comment)" class="close fas fa-times"></i>
+                <i v-if="!readonly_handgrading_results"
+                   @click="delete_handgrading_comment(comment)"
+                   class="close fas fa-times"></i>
               </div>
               <div class="comment-message">{{comment.short_description}}</div>
             </div>
@@ -47,7 +49,7 @@
                   v-if="handgrading_enabled"
                   @is_open_changed="on_menu_is_open_changed">
       <template v-slot:context_menu_items>
-        <context-menu-item v-for="annotation of handgrading_rubric.annotations"
+        <context-menu-item v-for="annotation of handgrading_result.handgrading_rubric.annotations"
                            :key="annotation.pk"
                            @click="apply_annotation(annotation)">
           <template slot="label">
@@ -55,7 +57,7 @@
           </template>
         </context-menu-item>
         <div class="context-menu-divider"> </div>
-        <context-menu-item @click="open_comment_modal">
+        <context-menu-item @click="open_comment_modal" v-if="enable_custom_comments">
           <template slot="label">
             Leave a comment
           </template>
@@ -139,12 +141,11 @@ export default class ViewFile extends Vue implements Created {
 
   // If null, the component will behave normally (no handgrading).
   // When this field is non-null, handgrading functionality will be made available.
-  @Prop({default: null, type: HandgradingRubric})
-  handgrading_rubric!: HandgradingRubric | null;
-
-  // When handgrading_rubric is non-null, this field is required.
   @Prop({default: null, type: HandgradingResult})
   handgrading_result!: HandgradingResult | null;
+
+  @Prop({default: false, type: Boolean})
+  enable_custom_comments!: boolean;
 
   // When true, editing handgrading results will be disabled.
   @Prop({default: true, type: Boolean})
@@ -159,6 +160,9 @@ export default class ViewFile extends Vue implements Created {
   // (can we fix that???). For now, we'll store the location here temporarily
   d_pending_comment_location: Location | null = null;
   d_comment_text = '';
+
+  d_first_highlighted_line: number | null = null;
+  d_last_highlighted_line: number | null = null;
 
   async created() {
     this.d_file_contents = await this.file_contents;
@@ -177,6 +181,10 @@ export default class ViewFile extends Vue implements Created {
   @Watch('filename')
   on_filename_change(new_file_name: string, old_file_name: string) {
     this.d_filename = new_file_name;
+  }
+
+  get handgrading_enabled() {
+    return this.handgrading_result !== null;
   }
 
   get handgrading_comments(): SafeMap<number, HandgradingComment[]> {
@@ -218,13 +226,6 @@ export default class ViewFile extends Vue implements Created {
     }
     return false;
   }
-
-  get handgrading_enabled() {
-    return this.handgrading_rubric !== null;
-  }
-
-  d_first_highlighted_line: number | null = null;
-  d_last_highlighted_line: number | null = null;
 
   start_highlighting(line_index: number) {
     if (this.readonly_handgrading_results

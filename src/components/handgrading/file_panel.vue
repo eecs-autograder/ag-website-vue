@@ -8,8 +8,8 @@
       <view-file v-if="d_content !== null"
                  :filename="filename"
                  :file_contents="d_content"
-                 :handgrading_rubric="handgrading_result.handgrading_rubric"
                  :handgrading_result="handgrading_result"
+                 :enable_custom_comments="enable_custom_comments"
                  :readonly_handgrading_results="readonly_handgrading_results"></view-file>
     </div>
   </div>
@@ -34,6 +34,9 @@ export default class FilePanel extends Vue {
 
   @Prop({required: true, type: String})
   filename!: string;
+
+  @Prop({required: true, type: Boolean})
+  enable_custom_comments!: boolean;
 
   // When true, editing handgrading results will be disabled.
   @Prop({required: true, type: Boolean})
