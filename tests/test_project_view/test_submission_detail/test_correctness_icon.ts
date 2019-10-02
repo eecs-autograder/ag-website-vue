@@ -60,7 +60,7 @@ describe('CorrectnessIcon tests', () => {
         });
 
         expect(wrapper.find('.correctness-level').classes()).toContain(
-            'not-available'
+            'info-only'
         );
     });
 

@@ -82,7 +82,7 @@ describe('SubmissionDetailPanel tests', () => {
         });
         expect(wrapper.find('.info-only-panel-header').exists()).toBe(true);
         expect(wrapper.find('.correctness').find(
-            '.not-available'
+            '.info-only'
         ).exists()).toBe(true);
     });
 
