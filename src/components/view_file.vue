@@ -38,7 +38,12 @@
                    @click="delete_handgrading_comment(comment)"
                    class="close fas fa-times"></i>
               </div>
-              <div class="comment-message">{{comment.short_description}}</div>
+              <div class="comment-message">
+                {{comment.short_description}}
+                ({{comment.deduction}}<template
+                  v-if="comment.max_deduction !== null"
+                >, {{comment.max_deduction}} max</template>)
+              </div>
             </div>
           </td>
         </tr>

@@ -12,6 +12,7 @@ export interface HandgradingComment {
     readonly long_description: string;
 
     readonly deduction: number;
+    readonly max_deduction: number | null;
     readonly vue_key: string;
 
     delete(): Promise<void>;
@@ -42,6 +43,10 @@ class AppliedAnnotationWrapper extends AppliedAnnotation implements HandgradingC
         return this.annotation.deduction;
     }
 
+    get max_deduction() {
+        return this.annotation.max_deduction;
+    }
+
     get vue_key(): string {
         return `ann${this.pk}`;
     }
@@ -63,13 +68,9 @@ class CommentWrapper implements HandgradingComment {
         return this.comment.text;
     }
 
-    get long_description() {
-        return '';
-    }
-
-    get deduction() {
-        return 0;
-    }
+    long_description = '';
+    deduction = 0;
+    max_deduction = null;
 
     get location() {
         return this.comment.location!;

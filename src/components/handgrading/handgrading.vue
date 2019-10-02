@@ -155,20 +155,18 @@
             >
               <div class="divider" v-if="index !== 0"></div>
 
-              <div class="criterion" :key="annotation.pk">
+              <div class="annotation" :key="annotation.pk">
                 <div class="row">
                   <div class="short-description">
                     {{annotation.short_description}}
                   </div>
-                  <div class="points">
-                    {{annotation.deduction}}
-                    <template v-if="annotation.max_deduction !== null">
-                      (max {{annotation.max_deduction}})
-                    </template>
-                  </div>
+                  <div class="points">{{annotation.deduction}}</div>
                 </div>
                 <div class="long-description" v-if="annotation.long_description !== ''">
                   {{annotation.long_description}}
+                </div>
+                <div class="max-deduction" v-if="annotation.max_deduction !== null">
+                  {{annotation.max_deduction}} max total deduction
                 </div>
               </div>
             </template>
@@ -464,7 +462,8 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   $header-height: 30px;
   $footer-height: 28px;
 
-  width: $sidebar-width;
+  min-width: $sidebar-width;
+  max-width: $sidebar-width;
   background-color: lighten($pebble-dark, 10%);
 
   // Don't pad the top, or it will mess up the sticky caclulations.
@@ -602,7 +601,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   margin-right: 8px;
 }
 
-.criterion, .comment {
+.criterion, .annotation, .comment {
   background-color: white;
   padding: 8px;
 
@@ -620,13 +619,22 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 }
 
-.criterion {
+.criterion, .annotation {
   .points {
     margin-left: auto;
+    color: $navy-blue;
   }
 
   .long-description {
     padding: 3px 5px 0;
+  }
+}
+
+.annotation {
+  .max-deduction {
+    padding-top: 3px;
+    font-size: 13px;
+    font-weight: bold;
   }
 }
 
