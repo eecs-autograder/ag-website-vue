@@ -58,7 +58,7 @@ describe('command_result_correctness tests', () => {
     });
 
     test('command_result_correctness - return_code_correctness === not_available AND' +
-         ' output_correctness === output_only',
+         ' output_correctness === info_only',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
             1,
@@ -74,10 +74,10 @@ describe('command_result_correctness tests', () => {
             CorrectnessLevel.not_available
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 
@@ -150,7 +150,7 @@ describe('command_result_correctness tests', () => {
         );
     });
 
-    test('command_result_correctness - return_code_correctness === output_only AND' +
+    test('command_result_correctness - return_code_correctness === info_only AND' +
          ' output_correctness === not_available',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
@@ -164,18 +164,18 @@ describe('command_result_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_return_code = true;
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.not_available
         );
         expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 
-    test('command_result_correctness - return_code_correctness === output_only AND' +
-         ' output_correctness === output_only',
+    test('command_result_correctness - return_code_correctness === info_only AND' +
+         ' output_correctness === info_only',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
             1,
@@ -189,17 +189,17 @@ describe('command_result_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = true;
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 
-    test('command_result_correctness - return_code_correctness === output_only AND' +
+    test('command_result_correctness - return_code_correctness === info_only AND' +
          ' output_correctness === none_correct',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
@@ -213,7 +213,7 @@ describe('command_result_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_return_code = true;
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.none_correct
@@ -223,7 +223,7 @@ describe('command_result_correctness tests', () => {
         );
     });
 
-    test('command_result_correctness - return_code_correctness === output_only AND' +
+    test('command_result_correctness - return_code_correctness === info_only AND' +
          ' output_correctness === some_correct',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
@@ -237,7 +237,7 @@ describe('command_result_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_return_code = true;
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.some_correct
@@ -247,7 +247,7 @@ describe('command_result_correctness tests', () => {
         );
     });
 
-    test('command_result_correctness - return_code_correctness === output_only AND' +
+    test('command_result_correctness - return_code_correctness === info_only AND' +
          ' output_correctness === all_correct',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
@@ -261,7 +261,7 @@ describe('command_result_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_return_code = true;
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.all_correct
@@ -295,7 +295,7 @@ describe('command_result_correctness tests', () => {
     });
 
     test('command_result_correctness - return_code_correctness === none_correct AND' +
-         ' output_correctness === output_only',
+         ' output_correctness === info_only',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
             1,
@@ -311,7 +311,7 @@ describe('command_result_correctness tests', () => {
             CorrectnessLevel.none_correct
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.none_correct
@@ -411,7 +411,7 @@ describe('command_result_correctness tests', () => {
     });
 
     test('command_result_correctness - return_code_correctness === all_correct AND' +
-         ' output_correctness === output_only',
+         ' output_correctness === info_only',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
             1,
@@ -427,7 +427,7 @@ describe('command_result_correctness tests', () => {
             CorrectnessLevel.all_correct
         );
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
         expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
             CorrectnessLevel.all_correct
@@ -542,7 +542,7 @@ describe('command_result_return_code_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_return_code = true;
 
         expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 
@@ -600,7 +600,7 @@ describe('command_result_output_correctness tests', () => {
         );
     });
 
-    test('command_result_output_correctness - output_not_available && show_output_only -' +
+    test('command_result_output_correctness - output_not_available && show_info_only -' +
          ' show_actual_stdout === true',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
@@ -615,11 +615,11 @@ describe('command_result_output_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = true;
 
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 
-    test('command_result_output_correctness - output_not_available && show_output_only -' +
+    test('command_result_output_correctness - output_not_available && show_info_only -' +
          ' show_actual_stderr === true',
          async () => {
         let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
@@ -634,7 +634,7 @@ describe('command_result_output_correctness tests', () => {
         ag_test_command_result.fdbk_settings.show_actual_stderr = true;
 
         expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 

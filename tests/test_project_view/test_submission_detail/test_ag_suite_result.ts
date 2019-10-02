@@ -55,6 +55,24 @@ beforeEach(() => {
     ];
 });
 
+function set_command_result_correctness(command: ag_cli.AGTestCommandResultFeedback,
+                                        return_code_correctness: boolean | null,
+                                        stdout_correctness: boolean | null,
+                                        stderr_correctness: boolean | null) {
+    command.return_code_correct = return_code_correctness;
+    command.stdout_correct = stdout_correctness;
+    command.stderr_correct = stderr_correctness;
+}
+
+function check_command_result_correctness(command: ag_cli.AGTestCommandResultFeedback,
+                                          return_code_correctness: boolean | null,
+                                          stdout_correctness: boolean | null,
+                                          stderr_correctness: boolean | null) {
+    expect(command.return_code_correct).toEqual(return_code_correctness);
+    expect(command.stdout_correct).toEqual(stdout_correctness);
+    expect(command.stderr_correct).toEqual(stderr_correctness);
+}
+
 describe('case_result_correctness tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
@@ -68,56 +86,811 @@ describe('case_result_correctness tests', () => {
         });
     });
 
-    test('case_result_correctness - return_code_correctness === CorrectnessLevel.not_available',
+    test('case_result_correctness - return_code_correctness === not_available ' +
+         'AND output_correctness === not_available',
          async () => {
-        ag_test_command_1_result.fdbk_settings.show_actual_stdout = true;
-        ag_test_command_1_result.stdout_points_possible = 0;
-        ag_test_command_1_result.stderr_points_possible = 0;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBeNull();
 
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
 
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
+
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
 
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.not_available
         );
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.not_available
         );
         expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.not_available
         );
     });
 
-    test('case_result_correctness - output_correctness === CorrectnessLevel.not_available',
+    test('case_result_correctness - return_code_correctness === not_available ' +
+         'AND output_correctness === info_only',
          async () => {
-        ag_test_command_1_result.return_code_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
 
-        ag_test_command_2_result.return_code_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
 
-        ag_test_command_3_result.return_code_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBeNull();
+        ag_test_case_result.ag_test_command_results[2].stdout_points_possible = 0;
+        ag_test_case_result.ag_test_command_results[2].stderr_points_possible = 0;
+        ag_test_case_result.ag_test_command_results[2].fdbk_settings.show_actual_stdout = true;
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === not_available ' +
+         'AND output_correctness === none_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         false,
+                                         false);
+
+
+        set_command_result_correctness(ag_test_command_2_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === not_available ' +
+         'AND output_correctness === some_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_2_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === not_available ' +
+         'AND output_correctness === all_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_2_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         true,
+                                         true);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === info_only ' +
+         'AND output_correctness === not_available',
+         async () => {
+        ag_test_command_1_result.fdbk_settings.show_actual_return_code = true;
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
+
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
+
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === info_only ' +
+         'AND output_correctness === info_only',
+         async () => {
+        ag_test_command_1_result.fdbk_settings.show_actual_return_code = true;
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
+
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
+
+        ag_test_command_3_result.stdout_points_possible = 0;
+        ag_test_command_3_result.stderr_points_possible = 0;
+        ag_test_command_3_result.fdbk_settings.show_actual_stderr = true;
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === info_only ' +
+         'AND output_correctness === none_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         false,
+                                         false);
+
+        ag_test_command_2_result.fdbk_settings.show_actual_return_code = true;
+        set_command_result_correctness(ag_test_command_2_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === info_only ' +
+         'AND output_correctness === some_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, false, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         false,
+                                         true);
+
+        ag_test_command_2_result.fdbk_settings.show_actual_return_code = true;
+        set_command_result_correctness(ag_test_command_2_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, null, null, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === info_only ' +
+         'AND output_correctness === all_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_2_result, null, null, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         true);
+
+        ag_test_command_3_result.fdbk_settings.show_actual_return_code = true;
+        set_command_result_correctness(ag_test_command_3_result, null, true, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         true,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === none_correct ' +
+         'AND output_correctness === not_available',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         false,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         false,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === none_correct ' +
+         'AND output_correctness === info_only',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         null,
+                                         null);
+
+        ag_test_command_2_result.stdout_points_possible = 0;
+        ag_test_command_2_result.stderr_points_possible = 0;
+        ag_test_command_2_result.fdbk_settings.show_actual_stderr = true;
+        set_command_result_correctness(ag_test_command_2_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         false,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         false,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === none_correct ' +
+         'AND output_correctness === none_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, false, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         false,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, false, null, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         false,
+                                         null,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, false, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         false,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === none_correct ' +
+         'AND output_correctness === some_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, false, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         false,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, false, null, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         false,
+                                         null,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, false, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         false,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === none_correct ' +
+         'AND output_correctness === all_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_2_result, false, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         false,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, false, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         false,
+                                         true,
+                                         true);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === some_correct ' +
+         'AND output_correctness === not_available',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         null,
+                                         null);
+
+
+        set_command_result_correctness(ag_test_command_2_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === some_correct ' +
+         'AND output_correctness === info_only',
+         async () => {
+        ag_test_command_1_result.stdout_points_possible = 0;
+        ag_test_command_1_result.stderr_points_possible = 0;
+        ag_test_command_1_result.fdbk_settings.show_actual_stderr = true;
+        set_command_result_correctness(ag_test_command_1_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === some_correct ' +
+         'AND output_correctness === none_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_2_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, true, null, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === some_correct ' +
+         'AND output_correctness === some_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, true, true, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         true,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, true, null, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === some_correct ' +
+         'AND output_correctness === all_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, false, true, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         true,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, true, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, true, null, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         true);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === all_correct ' +
+         'AND output_correctness === not_available',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         true,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_3_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         null);
 
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.all_correct
         );
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.not_available
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === all_correct ' +
+         'AND output_correctness === info_only',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         true,
+                                         null,
+                                         null);
+
+        set_command_result_correctness(ag_test_command_2_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         null,
+                                         null);
+
+        ag_test_command_3_result.stdout_points_possible = 0;
+        ag_test_command_3_result.stderr_points_possible = 0;
+        ag_test_command_3_result.fdbk_settings.show_actual_stdout = true;
+        set_command_result_correctness(ag_test_command_3_result, true, null, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === all_correct ' +
+         'AND output_correctness === none_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, true, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         true,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_2_result, true, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, true, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === all_correct ' +
+         'AND output_correctness === some_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, true, true, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         true,
+                                         true,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_2_result, true, false, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         false,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, true, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         true,
+                                         true);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_correctness - return_code_correctness === all_correct ' +
+         'AND output_correctness === all_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, true, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         true,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_2_result, true, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         true,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, true, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         true,
+                                         true);
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.all_correct
         );
         expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.all_correct
@@ -129,170 +902,23 @@ describe('case_result_correctness tests', () => {
         ag_test_case_result.total_points = 0;
         ag_test_case_result.total_points_possible = 10;
 
-        ag_test_command_1_result.return_code_correct = false;
-        ag_test_command_1_result.stdout_correct = true;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
+        set_command_result_correctness(ag_test_command_1_result, false, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         false,
+                                         true,
+                                         true);
 
-        ag_test_command_2_result.return_code_correct = false;
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
+        set_command_result_correctness(ag_test_command_2_result, false, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         false,
+                                         true,
+                                         true);
 
-        ag_test_command_3_result.return_code_correct = false;
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.none_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.none_correct
-        );
-    });
-
-
-    test('case_result_correctness - return_code_correctness === all_correct && ' +
-         'output_correctness === all_correct',
-         async () => {
-        ag_test_command_1_result.return_code_correct = true;
-        ag_test_command_1_result.stdout_correct = true;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
-
-        ag_test_command_2_result.return_code_correct = true;
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
-
-        ag_test_command_3_result.return_code_correct = true;
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-    });
-
-    test('case_result_correctness - return_code_correctness === all_correct && ' +
-         'output_correctness === output_only',
-         async () => {
-        ag_test_command_1_result.return_code_correct = true;
-        ag_test_command_1_result.fdbk_settings.show_actual_stderr = true;
-        ag_test_command_1_result.stdout_points_possible = 0;
-        ag_test_command_1_result.stderr_points_possible = 0;
-
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_points_possible).toEqual(0);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_points_possible).toEqual(0);
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBeNull();
-
-        ag_test_command_2_result.return_code_correct = true;
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
-
-        ag_test_command_3_result.return_code_correct = true;
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.output_only
-        );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-    });
-
-    test('case_result_correctness - return_code_correctness === none_correct && ' +
-         'output_correctness === none_correct',
-         async () => {
-        ag_test_command_1_result.return_code_correct = false;
-        ag_test_command_1_result.stdout_correct = false;
-        ag_test_command_1_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(false);
-
-        ag_test_command_2_result.return_code_correct = false;
-        ag_test_command_2_result.stdout_correct = false;
-        ag_test_command_2_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(false);
-
-        ag_test_command_3_result.return_code_correct = false;
-        ag_test_command_3_result.stdout_correct = false;
-        ag_test_command_3_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(false);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.none_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.none_correct
-        );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.none_correct
-        );
-    });
-
-    test('case_result_correctness - return_code_correctness === some_correct', async () => {
-
-        ag_test_command_1_result.return_code_correct = false;
-        ag_test_command_1_result.stdout_correct = true;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
-
-        ag_test_command_2_result.return_code_correct = true;
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
-
-        ag_test_command_3_result.return_code_correct = true;
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
+        set_command_result_correctness(ag_test_command_3_result, true, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         true,
+                                         true,
+                                         true);
 
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.some_correct
@@ -301,111 +927,22 @@ describe('case_result_correctness tests', () => {
             CorrectnessLevel.all_correct
         );
         expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
-        );
-    });
-
-    test('case_result_correctness - output_correctness === some_correct', async () => {
-        ag_test_command_1_result.return_code_correct = true;
-        ag_test_command_1_result.stdout_correct = true;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
-
-        ag_test_command_2_result.return_code_correct = true;
-        ag_test_command_2_result.stdout_correct = false;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
-
-        ag_test_command_3_result.return_code_correct = true;
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(false);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
-        );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
-        );
-    });
-
-    test('case_result_correctness - return_code_correctness === all_correct && ' +
-         'output_correctness === none_correct',
-         async () => {
-        ag_test_command_1_result.return_code_correct = true;
-        ag_test_command_1_result.stdout_correct = false;
-        ag_test_command_1_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(false);
-
-        ag_test_command_2_result.return_code_correct = true;
-        ag_test_command_2_result.stdout_correct = false;
-        ag_test_command_2_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(false);
-
-        ag_test_command_3_result.return_code_correct = true;
-        ag_test_command_3_result.stdout_correct = false;
-        ag_test_command_3_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(false);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.none_correct
         );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
-        );
     });
+});
 
-    test('case_result_correctness - return_code_correctness === none_correct && ' +
-         'output_correctness === all_correct',
-         async () => {
-        ag_test_command_1_result.return_code_correct = false;
-        ag_test_command_1_result.stdout_correct = true;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
+describe('case_result_return_code_correctness tests', () => {
+    let wrapper: Wrapper<AGSuiteResult>;
 
-        ag_test_command_2_result.return_code_correct = false;
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
-
-        ag_test_command_3_result.return_code_correct = false;
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
-
-        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.none_correct
-        );
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.all_correct
-        );
-        expect(wrapper.vm.case_result_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
-        );
+    beforeEach(() => {
+        wrapper = mount(AGSuiteResult, {
+            propsData: {
+                submission: submission,
+                ag_test_suite_result: ag_test_suite_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
     });
 
     test('case_result_return_code_correctness - all commands have return_code_correct === null',
@@ -416,6 +953,20 @@ describe('case_result_correctness tests', () => {
 
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.not_available
+        );
+    });
+
+    test('case_result_return_code_correctness - all commands have return_code_correct === null -' +
+         ' at least one command has show_actual_return_code === true',
+         async () => {
+        ag_test_case_result.ag_test_command_results[1].fdbk_settings.show_actual_return_code = true;
+
+        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBeNull();
+        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBeNull();
+        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBeNull();
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
         );
     });
 
@@ -435,8 +986,8 @@ describe('case_result_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - all commands have ' +
-         'return_code_correct === true || null',
+    test('case_result_return_code_correctness - at least one command has return_code_correct ' +
+         '=== true, the rest have return_code_correct === null',
          async () => {
         ag_test_command_1_result.return_code_correct = true;
         expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
@@ -451,7 +1002,25 @@ describe('case_result_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - all commands have return_code_correct === false',
+    test('case_result_return_code_correctness - at least one command has ' +
+         'return_code_correct === true and at least one command has return_code_correct ' +
+         '=== false',
+         async () => {
+        ag_test_command_1_result.return_code_correct = true;
+        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
+
+        ag_test_command_2_result.return_code_correct = false;
+        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(false);
+
+        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBeNull();
+
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_return_code_correctness - all commands have return_code_correct ' +
+         '=== false',
          async () => {
         ag_test_command_1_result.return_code_correct = false;
         expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(false);
@@ -467,166 +1036,263 @@ describe('case_result_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - some commands have return_code_correct ' +
-         '=== false but not all',
+    test('case_result_return_code_correctness - at least one command has ' +
+         'return_code_correct === false and no command has return_code_correct === true',
          async () => {
-        ag_test_command_1_result.return_code_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
+        ag_test_command_1_result.return_code_correct = false;
+        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(false);
 
-        ag_test_command_2_result.return_code_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBe(false);
+        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBeNull();
 
-        ag_test_command_3_result.return_code_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(true);
+        ag_test_command_3_result.return_code_correct = false;
+        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBe(false);
 
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
+            CorrectnessLevel.none_correct
         );
     });
+});
 
-    test('case_result_output_correctness - every command has stdout_correct === null ' +
-         'AND stderr_correct === null',
+describe('case_result_output_correctness tests', () => {
+    let wrapper: Wrapper<AGSuiteResult>;
+
+    beforeEach(() => {
+        wrapper = mount(AGSuiteResult, {
+            propsData: {
+                submission: submission,
+                ag_test_suite_result: ag_test_suite_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+    });
+
+    test('case_result_output_correctness - not_available - every command has ' +
+         'stdout_correct === null AND stderr_correct === null',
          async () => {
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBeNull();
-
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBeNull();
-
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
 
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.not_available
         );
     });
 
-    test('case_result_output_correctness - every command has stdout_correct === null ' +
-              'AND stderr_correct === null, and at least one command has ' +
-              'stdout_points_possible === 0 AND stderr_points_possible === 0 ' +
-              'AND show_actual_stdout === true or show_actual_stderr === true',
+    test('case_result_output_correctness - info_only - every command has ' +
+         'stdout_correct === null AND stderr_correct === null and at least one command has ' +
+         'show_actual_stdout === true',
          async () => {
-        ag_test_command_1_result.fdbk_settings.show_actual_stdout = true;
-        ag_test_command_1_result.stdout_points_possible = 0;
-        ag_test_command_1_result.stderr_points_possible = 0;
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_points_possible).toEqual(0);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_points_possible).toEqual(0);
-        expect(
-            ag_test_case_result.ag_test_command_results[0].fdbk_settings.show_actual_stdout
-        ).toBe(true);
-        expect(
-            ag_test_case_result.ag_test_command_results[0].fdbk_settings.show_actual_stderr
-        ).toBe(false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
 
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBeNull();
+        ag_test_case_result.ag_test_command_results[1].fdbk_settings.show_actual_stdout = true;
+        ag_test_case_result.ag_test_command_results[1].stdout_points_possible = 0;
+        ag_test_case_result.ag_test_command_results[1].stderr_points_possible = 0;
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
 
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
 
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.output_only
-        );
-
-        ag_test_command_1_result.fdbk_settings.show_actual_stdout = false;
-        ag_test_command_1_result.fdbk_settings.show_actual_stderr = true;
-
-        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.output_only
+            CorrectnessLevel.info_only
         );
     });
 
-    test('case_result_output_correctness - every command has stdout_correct === true ' +
-         'AND stderr_correct === true',
+    test('case_result_output_correctness - info_only - every command has ' +
+         'stdout_correct === null AND stderr_correct === null and at least one command has ' +
+         'show_actual_stderr === true',
          async () => {
-        ag_test_command_1_result.stdout_correct = true;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         null,
+                                         null);
 
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
 
-        ag_test_command_3_result.stdout_correct = true;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
+        ag_test_case_result.ag_test_command_results[2].fdbk_settings.show_actual_stderr = true;
+        ag_test_case_result.ag_test_command_results[2].stdout_points_possible = 0;
+        ag_test_case_result.ag_test_command_results[2].stderr_points_possible = 0;
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
+
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+    });
+
+    test('case_result_output_correctness - all_correct - every command has ' +
+         'stdout_correct === true AND stderr_correct === true',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_2_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         true,
+                                         true);
+
+        set_command_result_correctness(ag_test_command_3_result, null, true, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         true,
+                                         true);
 
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.all_correct
         );
     });
 
-    test('case_result_output_correctness - every command has stdout_correct === true || null ' +
-         'AND stderr_correct === true || null',
+    test('case_result_output_correctness - all_correct - every command has ' +
+         '(stdout_correct === true || stdout_correct === null) AND ' +
+         '(stderr_correct === true || stderr_correct === null)',
          async () => {
-        ag_test_command_1_result.stdout_correct = null;
-        ag_test_command_1_result.stderr_correct = null;
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBeNull();
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         null);
 
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = null;
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBeNull();
+        set_command_result_correctness(ag_test_command_2_result, null, true, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         true,
+                                         null);
 
-        ag_test_command_3_result.stdout_correct = null;
-        ag_test_command_3_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(true);
+        set_command_result_correctness(ag_test_command_3_result, null, null, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         true);
 
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.all_correct
         );
     });
 
-    test('case_result_output_correctness - every command has stdout_correct = false ' +
-         'AND stderr_correct = false',
+    test('case_result_output_correctness - some_correct - at least one command has ' +
+         'stdout_correct',
          async () => {
-        ag_test_command_1_result.stdout_correct = false;
-        ag_test_command_1_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(false);
+        set_command_result_correctness(ag_test_command_1_result, null, true, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         true,
+                                         false);
 
-        ag_test_command_2_result.stdout_correct = false;
-        ag_test_command_2_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(false);
+        set_command_result_correctness(ag_test_command_2_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         false,
+                                         false);
 
-        ag_test_command_3_result.stdout_correct = false;
-        ag_test_command_3_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(false);
+        set_command_result_correctness(ag_test_command_3_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         false,
+                                         false);
+
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_output_correctness - some_correct - at least one command has ' +
+         'stderr_correct',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_2_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, null, false, true);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         false,
+                                         true);
+
+        expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.some_correct
+        );
+    });
+
+    test('case_result_output_correctness - every command has stdout_correct === false ' +
+         'AND stderr_correct === false',
+         async () => {
+        set_command_result_correctness(ag_test_command_1_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_2_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         false,
+                                         false);
+
+        set_command_result_correctness(ag_test_command_3_result, null, false, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         false,
+                                         false);
 
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.none_correct
         );
     });
 
-    test('case_result_output_correctness - some commands have stdout_correct = false ' +
-         'AND stderr_correct = false but not all',
+    test('case_result_output_correctness - no command has stdout_correct === true ' +
+         'or stderr_correct === true',
          async () => {
-        ag_test_command_1_result.stdout_correct = false;
-        ag_test_command_1_result.stderr_correct = true;
-        expect(ag_test_case_result.ag_test_command_results[0].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[0].stderr_correct).toBe(true);
+        set_command_result_correctness(ag_test_command_1_result, null, false, null);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[0],
+                                         null,
+                                         false,
+                                         null);
 
-        ag_test_command_2_result.stdout_correct = true;
-        ag_test_command_2_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[1].stdout_correct).toBe(true);
-        expect(ag_test_case_result.ag_test_command_results[1].stderr_correct).toBe(false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[1],
+                                         null,
+                                         null,
+                                         null);
 
-        ag_test_command_3_result.stdout_correct = false;
-        ag_test_command_3_result.stderr_correct = false;
-        expect(ag_test_case_result.ag_test_command_results[2].stdout_correct).toBe(false);
-        expect(ag_test_case_result.ag_test_command_results[2].stderr_correct).toBe(false);
+        set_command_result_correctness(ag_test_command_3_result, null, null, false);
+        check_command_result_correctness(ag_test_case_result.ag_test_command_results[2],
+                                         null,
+                                         null,
+                                         false);
 
         expect(wrapper.vm.case_result_output_correctness(ag_test_case_result)).toEqual(
-            CorrectnessLevel.some_correct
+            CorrectnessLevel.none_correct
         );
     });
 });
@@ -1045,7 +1711,7 @@ describe('panel_is_active - case tests', () => {
     });
 });
 
-describe('panel_is_active - case tests', () => {
+describe('AGSuiteResult Watchers tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
     let ag_test_case_red_result: ag_cli.AGTestCaseResultFeedback;

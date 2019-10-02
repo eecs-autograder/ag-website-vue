@@ -141,17 +141,24 @@ export default class AGSuiteResult extends Vue {
     let return_code_correctness = this.case_result_return_code_correctness(case_result);
     let output_correctness = this.case_result_output_correctness(case_result);
 
-    if (return_code_correctness === CorrectnessLevel.not_available) {
+    if (return_code_correctness === CorrectnessLevel.info_only
+        && output_correctness === CorrectnessLevel.not_available) {
+      return CorrectnessLevel.info_only;
+    }
+
+    if (output_correctness === CorrectnessLevel.info_only
+        && return_code_correctness === CorrectnessLevel.not_available) {
+      return CorrectnessLevel.info_only;
+    }
+
+    if (return_code_correctness === CorrectnessLevel.not_available
+        || return_code_correctness === CorrectnessLevel.info_only) {
       return output_correctness;
     }
 
-    if (output_correctness === CorrectnessLevel.not_available) {
+    if (output_correctness === CorrectnessLevel.not_available
+        || output_correctness === CorrectnessLevel.info_only) {
       return return_code_correctness;
-    }
-
-    if (return_code_correctness === CorrectnessLevel.output_only
-        && output_correctness === CorrectnessLevel.output_only) {
-      return CorrectnessLevel.output_only;
     }
 
     if (case_result.total_points === 0 && case_result.total_points_possible !== 0) {
@@ -159,8 +166,7 @@ export default class AGSuiteResult extends Vue {
     }
 
     if (return_code_correctness === CorrectnessLevel.all_correct
-        && (output_correctness === CorrectnessLevel.all_correct
-         || output_correctness === CorrectnessLevel.output_only)) {
+        && output_correctness === CorrectnessLevel.all_correct) {
       return CorrectnessLevel.all_correct;
     }
     if (return_code_correctness === CorrectnessLevel.none_correct
@@ -188,7 +194,7 @@ export default class AGSuiteResult extends Vue {
 
     if (not_available) {
       if (some_show_return_code_only) {
-          return CorrectnessLevel.output_only;
+          return CorrectnessLevel.info_only;
       }
       return CorrectnessLevel.not_available;
     }
@@ -213,18 +219,17 @@ export default class AGSuiteResult extends Vue {
                         && cmd_result.stderr_correct === null
     );
 
-    let some_show_output_only = case_result.ag_test_command_results.some(
+    let some_show_info_only = case_result.ag_test_command_results.some(
         (cmd_result) => (cmd_result.stdout_points_possible === 0
                         && cmd_result.stderr_points_possible === 0)
                         && (cmd_result.fdbk_settings.show_actual_stdout
                         || cmd_result.fdbk_settings.show_actual_stderr)
     );
 
-    if (not_available && some_show_output_only) {
-      return CorrectnessLevel.output_only;
-    }
-
     if (not_available) {
+      if (some_show_info_only) {
+          return CorrectnessLevel.info_only;
+      }
       return CorrectnessLevel.not_available;
     }
 

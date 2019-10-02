@@ -93,8 +93,8 @@ describe('MutationSuiteResults tests', () => {
         );
 
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(
-            mutation_test_suite_result_feedback)
-        ).toEqual(CorrectnessLevel.none_correct);
+            mutation_test_suite_result_feedback
+        )).toEqual(CorrectnessLevel.none_correct);
     });
 
     test('get_mutation_test_validity_correctness_level - has_setup_command === true AND' +
@@ -112,8 +112,8 @@ describe('MutationSuiteResults tests', () => {
         );
 
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(
-            mutation_test_suite_result_feedback)
-        ).toEqual(CorrectnessLevel.none_correct);
+            mutation_test_suite_result_feedback
+        )).toEqual(CorrectnessLevel.none_correct);
     });
 
     test('get_mutation_test_validity_correctness_level - total_points === ' +
@@ -129,8 +129,8 @@ describe('MutationSuiteResults tests', () => {
         );
 
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(
-            mutation_test_suite_result_feedback)
-        ).toEqual(CorrectnessLevel.all_correct);
+            mutation_test_suite_result_feedback
+        )).toEqual(CorrectnessLevel.all_correct);
     });
 
     test('get_mutation_test_validity_correctness_level - total_points === ' +
@@ -146,8 +146,8 @@ describe('MutationSuiteResults tests', () => {
         );
 
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(
-            mutation_test_suite_result_feedback)
-        ).toEqual(CorrectnessLevel.some_correct);
+            mutation_test_suite_result_feedback
+        )).toEqual(CorrectnessLevel.some_correct);
     });
 
     test('get_mutation_test_validity_correctness_level - invalid_tests.length ' +
@@ -182,8 +182,8 @@ describe('MutationSuiteResults tests', () => {
         );
 
         expect(wrapper.vm.get_mutation_test_validity_correctness_level(
-            mutation_test_suite_result_feedback)
-        ).toEqual(CorrectnessLevel.some_correct);
+            mutation_test_suite_result_feedback
+        )).toEqual(CorrectnessLevel.some_correct);
     });
 
     test('mutation_test_suite_results prop receives a different value', async () => {

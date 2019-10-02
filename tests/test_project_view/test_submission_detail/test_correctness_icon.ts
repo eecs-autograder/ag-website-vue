@@ -52,6 +52,18 @@ describe('CorrectnessIcon tests', () => {
         );
     });
 
+    test('Correctness_level = info_only', async () => {
+        wrapper = mount(CorrectnessIcon, {
+            propsData: {
+                correctness_level: CorrectnessLevel.info_only
+            }
+        });
+
+        expect(wrapper.find('.correctness-level').classes()).toContain(
+            'not-available'
+        );
+    });
+
     test('Change value assigned to correctness_level prop', async () => {
         wrapper = mount(CorrectnessIcon, {
             propsData: {

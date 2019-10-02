@@ -71,6 +71,21 @@ describe('SubmissionDetailPanel tests', () => {
         ).exists()).toBe(true);
     });
 
+    test('info only panel', async () => {
+        wrapper = mount(SubmissionDetailPanel, {
+            propsData: {
+                name: "Case Name",
+                correctness_level: CorrectnessLevel.info_only,
+                points_awarded: 1,
+                points_possible: 1
+            }
+        });
+        expect(wrapper.find('.info-only-panel-header').exists()).toBe(true);
+        expect(wrapper.find('.correctness').find(
+            '.not-available'
+        ).exists()).toBe(true);
+    });
+
     test('points possible === 0 - score is not displayed', async () => {
         wrapper = mount(SubmissionDetailPanel, {
             propsData: {
@@ -172,7 +187,6 @@ describe('SubmissionDetailPanel tests', () => {
         });
         expect(wrapper.find('.command-name').exists()).toBe(false);
         expect(wrapper.find('.command-correctness').exists()).toBe(false);
-
         expect(wrapper.find('.name').exists()).toBe(true);
         expect(wrapper.find('.correctness').exists()).toBe(true);
         expect(wrapper.find('.points').exists()).toBe(true);

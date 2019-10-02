@@ -25,8 +25,7 @@ export enum CorrectnessLevel {
   none_correct = 'none correct',
   some_correct = 'some correct',
   all_correct = 'all correct',
-  output_only = 'output only',
-  return_code_only = 'return code only'
+  info_only = 'info only'
 }
 
 @Component

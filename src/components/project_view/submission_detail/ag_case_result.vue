@@ -64,28 +64,23 @@ export default class AGCaseResult extends Vue {
     let return_code_correctness = this.command_result_return_code_correctness(command_result);
     let output_correctness = this.command_result_output_correctness(command_result);
 
-    // if (command_result.pk === 2934) {
-    //     console.log("Return code correctness: " + return_code_correctness);
-    //     console.log("Output correctness: " + output_correctness);
-    // }
-
-    if (return_code_correctness === CorrectnessLevel.output_only
+    if (return_code_correctness === CorrectnessLevel.info_only
         && output_correctness === CorrectnessLevel.not_available) {
-      return CorrectnessLevel.output_only;
+      return CorrectnessLevel.info_only;
     }
 
-    if (output_correctness === CorrectnessLevel.output_only
+    if (output_correctness === CorrectnessLevel.info_only
         && return_code_correctness === CorrectnessLevel.not_available) {
-      return CorrectnessLevel.output_only;
+      return CorrectnessLevel.info_only;
     }
 
     if (return_code_correctness === CorrectnessLevel.not_available
-        || return_code_correctness === CorrectnessLevel.output_only) {
+        || return_code_correctness === CorrectnessLevel.info_only) {
       return output_correctness;
     }
 
     if (output_correctness === CorrectnessLevel.not_available
-        || output_correctness === CorrectnessLevel.output_only) {
+        || output_correctness === CorrectnessLevel.info_only) {
       return return_code_correctness;
     }
 
@@ -113,7 +108,7 @@ export default class AGCaseResult extends Vue {
   command_result_return_code_correctness(command_result: AGTestCommandResultFeedback) {
     if (command_result.return_code_correct === null) {
       if (command_result.fdbk_settings.show_actual_return_code) {
-        return CorrectnessLevel.output_only;
+        return CorrectnessLevel.info_only;
       }
       return CorrectnessLevel.not_available;
     }
@@ -127,7 +122,7 @@ export default class AGCaseResult extends Vue {
     let output_not_available = command_result.stdout_correct === null &&
                                command_result.stderr_correct === null;
 
-    let show_output_only = (
+    let show_info_only = (
         (command_result.stdout_points_possible === 0
         && command_result.stderr_points_possible === 0)
         && (command_result.fdbk_settings.show_actual_stdout
@@ -135,8 +130,8 @@ export default class AGCaseResult extends Vue {
     );
 
     if (output_not_available) {
-      if (show_output_only) {
-        return CorrectnessLevel.output_only;
+      if (show_info_only) {
+        return CorrectnessLevel.info_only;
       }
       return CorrectnessLevel.not_available;
     }
