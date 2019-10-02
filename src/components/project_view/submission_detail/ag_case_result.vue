@@ -6,7 +6,7 @@
         <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
           <submission-detail-panel
             ref="ag_test_command_panel"
-            :name="`ag_test_command_result ${ag_test_command_result.pk}`"
+            :name="ag_test_command_result.ag_test_command_name"
             :correctness_level="command_result_correctness(ag_test_command_result)"
             :is_command="true">
             <AGCommandResult :submission="submission"
