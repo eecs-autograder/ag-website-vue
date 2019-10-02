@@ -22,6 +22,13 @@ $input-text-color: #495057;
     padding: 6px 4px;
 }
 
+.radio-container {
+    padding: 2px 4px;
+    .label {
+        padding-left: 3px;
+    }
+}
+
 // Organization -----------------------------------
 
 .legend {

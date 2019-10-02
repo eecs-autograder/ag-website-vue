@@ -3,47 +3,81 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_group_sidebar_collapsed}">
-          <span class="collapse-sidebar-button"
+          <div class="collapse-sidebar-button"
                 @click="d_group_sidebar_collapsed = !d_group_sidebar_collapsed">
             <i class="fas fa-bars"></i>
-          </span>
-          <template v-if="!d_group_sidebar_collapsed">
-            <span class="header-text">{{project.max_group_size === 1 ? 'Students' : 'Groups'}}
-              <!-- <template v-if="!d_loading_result_summaries">
-                ({{d_result_summaries.length}})
-              </template> -->
-            </span>
-          </template>
-
-          <!-- <div class="checkbox-input-container">
-            <input id="include-staff"
-                   type="checkbox"
-                   class="checkbox">
-            <label for="include-staff">Include Staff</label>
           </div>
-          <label class="text-label" for="select-status">Status</label>
-          <br>
+          <template v-if="!d_group_sidebar_collapsed">
+            <div class="header-text">
+              {{project.max_group_size === 1 ? 'Students' : 'Groups'}}
+            </div>
+            <div class="progress dropdown" v-if="!d_loading_result_summaries">
+                {{num_finished}}/{{total_num_to_grade}}
+                ({{staff_filtered_groups.length}} total)
+                <i class="fas fa-caret-down"></i>
 
-          <select id="select-status" class="select">
-            <option value="All">
-              All
-            </option>
-            <option :value="HandgradingStatus.graded">
-              {{HandgradingStatus.graded}}
-            </option>
-            <option :value="HandgradingStatus.in_progress">
-              {{HandgradingStatus.in_progress}}
-            </option>
-            <option :value="HandgradingStatus.ungraded">
-              {{HandgradingStatus.ungraded}}
-            </option>
-            <option :value="HandgradingStatus.no_submission">
-              {{HandgradingStatus.no_submission}}
-            </option>
-          </select> -->
+                <div id="filter-menu" class="menu">
+                  <div class="checkbox-input-container">
+                    <input v-model="d_include_staff"
+                           id="include-staff"
+                           type="checkbox"
+                           class="checkbox">
+                    <label for="include-staff">Include Staff</label>
+                  </div>
+
+                  <div id="select-status">
+                    <div class="header">Status</div>
+                    <div class="radio-container">
+                      <input type="radio" name="status"
+                             id="all"
+                             class="radio"
+                             v-model="d_status_filter"
+                             :value="null">
+                      <label class="label" for="all">All</label>
+                    </div>
+                    <div class="radio-container">
+                      <input type="radio" name="status"
+                             id="graded"
+                             class="radio"
+                             v-model="d_status_filter"
+                             :value="HandgradingStatus.graded">
+                      <label class="label"
+                             for="graded">{{HandgradingStatus.graded}}</label>
+                    </div>
+                    <div class="radio-container">
+                      <input type="radio" name="status"
+                             id="in-progress"
+                             class="radio"
+                             v-model="d_status_filter"
+                             :value="HandgradingStatus.in_progress">
+                      <label class="label"
+                             for="in-progress">{{HandgradingStatus.in_progress}}</label>
+                    </div>
+                    <div class="radio-container">
+                      <input type="radio" name="status"
+                             id="ungraded"
+                             class="radio"
+                             v-model="d_status_filter"
+                             :value="HandgradingStatus.ungraded">
+                      <label class="label"
+                             for="ungraded">{{HandgradingStatus.ungraded}}</label>
+                    </div>
+                    <div class="radio-container">
+                      <input type="radio" name="status"
+                             id="no-submission"
+                             class="radio"
+                             v-model="d_status_filter"
+                             :value="HandgradingStatus.no_submission">
+                      <label class="label"
+                             for="no-submission">{{HandgradingStatus.no_submission}}</label>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </template>
         </div>
         <div class="sidebar-content" v-if="!d_group_sidebar_collapsed">
-          <template v-for="(group_summary, index) of filtered_groups">
+          <template v-for="(group_summary, index) of username_filtered_groups">
             <div class="divider" v-if="index !== 0"></div>
             <group-summary-panel :key="group_summary.pk"
                                  :group_summary="group_summary"
@@ -79,15 +113,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Inject } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import { SafeMap } from '@/safe_map';
 import { assert_not_null, toggle } from '@/utils';
 
 import GroupSummaryPanel from './group_summary_panel.vue';
-import { HandgradingStatus } from './handgrading_status';
+import { HandgradingStatus, get_handgrading_status } from './handgrading_status';
 import Handgrading from './handgrading.vue';
 
 @Component({
@@ -97,6 +132,10 @@ import Handgrading from './handgrading.vue';
   }
 })
 export default class HandgradingContainer extends Vue implements ag_cli.HandgradingResultObserver {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   @Prop({required: true, type: ag_cli.Project})
   project!: ag_cli.Project;
 
@@ -120,12 +159,19 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   }
 
   d_search_text = '';
+  d_status_filter: HandgradingStatus | null = null;
+  d_include_staff = false;
+
+  d_staff: Set<string> = new Set<string>();
 
   readonly HandgradingStatus = HandgradingStatus;
 
   d_loading_result = false;
 
   async created() {
+    this.d_staff =  new Set(
+      (await this.d_globals.current_course!.get_staff()).map(user => user.username)
+    );
     await this.load_result_summaries();
     ag_cli.HandgradingResult.subscribe(this);
   }
@@ -150,13 +196,42 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     this.d_loading_result_summaries = false;
   }
 
-  get filtered_groups() {
-    let search = this.d_search_text.trim();
-    if (search === '') {
+  get staff_filtered_groups() {
+    if (this.d_include_staff) {
       return this.d_result_summaries;
     }
-    return this.d_result_summaries.filter(
-      group => !!group.member_names.find(username => username.includes(search)));
+
+    return this.d_result_summaries.filter(group => !this.d_staff.has(group.member_names[0]));
+  }
+
+  get status_filtered_groups() {
+    if (this.d_status_filter ===  null) {
+      return this.staff_filtered_groups;
+    }
+
+    return this.staff_filtered_groups.filter(
+      group => get_handgrading_status(group) === this.d_status_filter);
+  }
+
+  get username_filtered_groups() {
+    let search = this.d_search_text.trim();
+    if (search === '') {
+      return this.status_filtered_groups;
+    }
+    return this.status_filtered_groups.filter(
+      group => group.member_names.some(username => username.includes(search)));
+  }
+
+  get num_finished(): number {
+    return this.staff_filtered_groups.filter(
+      group => get_handgrading_status(group) === HandgradingStatus.graded
+    ).length;
+  }
+
+  get total_num_to_grade() {
+    return this.staff_filtered_groups.filter(
+      group => get_handgrading_status(group) !== HandgradingStatus.no_submission
+    ).length;
   }
 
   async select_for_grading(group: ag_cli.GroupWithHandgradingResultSummary) {
@@ -235,6 +310,25 @@ $active-color: $light-blue;
       padding: 5px 8px;
       display: flex;
       align-items: center;
+
+      // Create a new stacking context
+      z-index: inherit;
+
+      .collapse-sidebar-button:hover {
+        color: $stormy-gray-dark;
+        cursor: pointer;
+      }
+
+      .header-text {
+        font-size: 18px;
+        margin: 0 8px;
+      }
+
+      .progress {
+        margin-left: auto;
+        font-size: 14px;
+        color: $navy-blue;
+      }
     }
 
     .sidebar-header-closed {
@@ -257,18 +351,45 @@ $active-color: $light-blue;
   }
 }
 
-.collapse-sidebar-button:hover {
-  color: $stormy-gray-dark;
-  cursor: pointer;
+#filter-menu {
+  color: black;
 }
 
-.header-text {
-  font-size: 18px;
-  margin: 0 8px;
+#select-status {
+  padding-left: 3px;
+
+  .header {
+    font-size: 15px;
+    font-weight: bold;
+  }
 }
 
 .divider {
   border-top: 1px solid $border-color;
+}
+
+.dropdown {
+  position: relative;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .menu {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background-color: white;
+
+    border: 1px solid $pebble-light;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+
+    min-width: 150px;
+  }
+
+  &:hover .menu {
+    display: block;
+  }
 }
 
 </style>

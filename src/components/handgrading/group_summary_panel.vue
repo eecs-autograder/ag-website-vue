@@ -23,7 +23,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import { HandgradingStatus } from './handgrading_status';
+import { get_handgrading_status, HandgradingStatus } from './handgrading_status';
 
 @Component({})
 export default class  extends Vue {
@@ -33,19 +33,12 @@ export default class  extends Vue {
   readonly HandgradingStatus = HandgradingStatus;
 
   get status() {
-    if (this.group_summary.num_submissions === 0) {
-      return HandgradingStatus.no_submission;
+    let status = get_handgrading_status(this.group_summary);
+    if (status === HandgradingStatus.graded) {
+      let result = this.group_summary.handgrading_result!;
+      return `${result.total_points}/${result.total_points_possible}`;
     }
-
-    let result = this.group_summary.handgrading_result;
-    if (result === null) {
-      return HandgradingStatus.ungraded;
-    }
-    if (!result.finished_grading) {
-      return HandgradingStatus.in_progress;
-    }
-
-    return `${result.total_points}/${result.total_points_possible}`;
+    return status;
   }
 }
 </script>
