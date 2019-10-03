@@ -182,10 +182,14 @@
               <i class="fas fa-plus"></i> New Annotation
             </button>
           </div>
-          <template v-for="(annotation, index) of d_handgrading_rubric.annotations">
-            <div v-if="index !== 0" class="divider"></div>
-            <single-annotation :annotation="annotation"></single-annotation>
-          </template>
+          <draggable v-model="d_handgrading_rubric.annotations"
+                     @change="set_annotations_order"
+                     handle=".handle" ghost-class="ghost">
+            <single-annotation v-for="(annotation, index) of d_handgrading_rubric.annotations"
+                               :key="annotation.pk"
+                               :class="{'criterion-border': index !== 0}"
+                               :annotation="annotation"></single-annotation>
+          </draggable>
         </div>
       </div>
     </template>
@@ -509,6 +513,13 @@ export default class HandgradingSettings extends Vue implements Created,
     finally {
       this.d_creating_annotation = false;
     }
+  }
+
+  set_annotations_order() {
+    return Annotation.update_order(
+      this.d_handgrading_rubric!.pk,
+      this.d_handgrading_rubric!.annotations.map(annotation => annotation.pk)
+    );
   }
 
   update_annotations_order_changed(annotation_list: number[],

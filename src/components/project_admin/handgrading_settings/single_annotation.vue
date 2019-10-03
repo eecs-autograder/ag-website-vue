@@ -4,6 +4,7 @@
       <div class="header row">
         <span class="short-description">{{d_annotation.short_description}}</span>
         <span class="header-icons">
+          <i class="fas fa-arrows-alt handle"></i>
           <i class="edit-icon fas fa-pencil-alt"
              @click="d_edit_mode = true"></i>
           <i class="delete-icon fas fa-trash-alt"
@@ -164,7 +165,6 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
   display: flex;
 
   .edit-icon {
-    margin-right: 15px;
     color: darken($gray-blue-2, 15%);
   }
 
@@ -172,7 +172,7 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
     color: lighten($cherry, 10%);
   }
 
-  .edit-icon, .delete-icon {
+  .handle, .edit-icon, .delete-icon {
     padding: 0 4px;
   }
 
@@ -189,6 +189,10 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 
 .deduction, .long-description {
   font-size: 14px;
+}
+
+.deduction {
+  color: $navy-blue;
 }
 
 .long-description {

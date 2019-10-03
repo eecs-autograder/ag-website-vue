@@ -1,5 +1,5 @@
 <template>
-  <div class="single-criterion">
+  <div class="rubric-item">
     <template v-if="!d_edit_mode">
       <div class="header row">
         <span class="short-description">{{d_criterion.short_description}}</span>
@@ -149,7 +149,7 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
   box-sizing: border-box;
 }
 
-.single-criterion {
+.rubric-item {
   padding: 10px 15px;
 }
 
@@ -171,7 +171,6 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
   }
 
   .edit-icon {
-    // margin-right: 5px;
     color: darken($gray-blue-2, 15%);
   }
 
@@ -196,6 +195,10 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
 
 .points, .long-description {
   font-size: 14px;
+}
+
+.points {
+  color: $navy-blue;
 }
 
 .long-description {
