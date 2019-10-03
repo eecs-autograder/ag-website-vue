@@ -55,25 +55,26 @@
 
     <div id="download-results">
       <div id="download-results-label"> Downloads </div>
-      <table id="downloads-table">
-        <tr>
-          <th class="started-at-header"> Started at </th>
-          <th class="file-header"> File </th>
-          <th class="progress-header"> Progress </th>
-        </tr>
+      <div id="downloads-table">
 
-        <tr v-for="download of d_downloads"
-            class="download-row">
-          <td class="started-at">{{format_datetime(download.created_at)}}</td>
-          <td class="file">
+        <div id="download-table-labels">
+          <div id="started-at-header"> Started at </div>
+          <div id="file-header"> File </div>
+          <div id="progress-header"> Progress </div>
+        </div>
+
+        <div v-for="(download, index) of d_downloads"
+            :class="['download-row', {'even-row': index % 2 == 0}]">
+          <div class="started-at">{{format_datetime(download.created_at)}}</div>
+          <div class="file">
             <a v-if="download.progress === 100 && !download.error_msg"
                @click="download_task_result(download)"
                class="file-name">{{get_filename(download)}}
             </a>
-          </td>
-          <td class="progress"> Carousel of Progress </td>
-        </tr>
-      </table>
+          </div>
+          <div class="progress">{{download.progress}}%</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -185,7 +186,37 @@ export default class DownloadGrades extends Vue {
       error_msg: "",
       created_at: "2019-02-15T20:41:30.534985Z"
     };
-    this.d_downloads = [first_download, second_download];
+
+    let third_download: DownloadTask = {
+        pk: 3,
+        project: this.project.pk,
+        download_type: DownloadType.final_graded_submission_files,
+        result_filename: "filename_3",
+        progress: 80,
+        error_msg: "",
+        created_at: "2019-02-15T20:41:30.534985Z"
+    };
+
+    let fourth_download: DownloadTask = {
+        pk: 4,
+        project: this.project.pk,
+        download_type: DownloadType.final_graded_submission_files,
+        result_filename: "filename_4",
+        progress: 100,
+        error_msg: "",
+        created_at: "2019-02-15T20:41:30.534985Z"
+    };
+
+    let fifth_download: DownloadTask = {
+        pk: 5,
+        project: this.project.pk,
+        download_type: DownloadType.final_graded_submission_files,
+        result_filename: "filename_5",
+        progress: 100,
+        error_msg: "",
+        created_at: "2019-02-15T20:41:30.534985Z"
+    };
+    this.d_downloads = [first_download, second_download, third_download, fourth_download, fifth_download];
   }
 
   async download_submission_files() {
@@ -310,6 +341,10 @@ export default class DownloadGrades extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
+* {
+  font-size: 14px;
+}
+
 #download-grades-component {
   padding: 15px 25px;
 }
@@ -318,18 +353,13 @@ export default class DownloadGrades extends Vue {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding: 0 10px 10px 10px;
   width: 100%;
 }
 
 #download-grades-section {
+  min-width: 500px;
   padding: 10px 0 30px 0;
-  min-width: 500px;
-  width: 50%;
-}
-
-#download-files-section {
-  padding: 10px 0 10px 0;
-  min-width: 500px;
   width: 50%;
 }
 
@@ -341,7 +371,8 @@ export default class DownloadGrades extends Vue {
 
 .download-button {
   @extend .light-gray-button;
-  margin: 10px 0 10px 0;
+  margin: 10px 0;
+  font-size: 14px;
 }
 
 .toggle-container {
@@ -349,52 +380,76 @@ export default class DownloadGrades extends Vue {
 }
 
 #download-results {
-  margin: 40px 0 20px 0;
+  margin: 0 0 20px 0;
 }
 
 #download-results-label {
   font-weight: bold;
   font-size: 20px;
-  padding: 10px 10px 10px 0;
+  padding: 10px 10px 10px 10px;
 }
 
-#downloads-table {
+#download-table-labels, .download-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
   width: 100%;
-  border-collapse: collapse;
+}
+
+.download-row:hover {
+  background-color: darken($white-gray, 5);
+}
+
+$started-at-column-width: 30%;
+$file-column-width: 50%;
+$progress-column-width: 20%;
+
+#started-at-header {
+  padding: 10px;
+  width: $started-at-column-width;
+  font-weight: bold;
+}
+
+#file-header {
+  padding: 10px;
+  width: $file-column-width;
+  font-weight: bold;
+}
+
+#progress-header {
+  padding: 10px;
+  width: $progress-column-width;
+  font-weight: bold;
 }
 
 .started-at {
-  padding: 10px 10px 10px 0;
-  text-align: left;
+  padding: 10px;
+  width: $started-at-column-width;
+}
+
+.file {
+  padding: 10px;
+  width: $file-column-width;
 }
 
 .progress {
   padding: 10px;
-  text-align: left;
-}
-
-.started-at-header {
-  padding: 10px 10px 5px 0;
-  border-bottom: 2px solid $white-gray;
-  text-align: left;
-}
-
-.file-header, .progress-header {
-  padding: 10px 10px 5px 10px;
-  border-bottom: 2px solid $white-gray;
-  text-align: left;
+  width: $progress-column-width;
 }
 
 .file-name {
   color: $ocean-blue;
-  padding: 10px;
-  text-align: left;
-
+  word-break: break-word;
 }
 
 .file-name:hover {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.even-row {
+  background-color: $white-gray;
 }
 
 </style>
