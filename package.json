@@ -18,7 +18,8 @@
     "vue": "^2.6.10",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
-    "vue-router": "^3.0.2"
+    "vue-router": "^3.0.2",
+    "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.0",

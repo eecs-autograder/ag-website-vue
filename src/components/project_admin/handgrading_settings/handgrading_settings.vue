@@ -164,10 +164,14 @@
               <i class="fas fa-plus"></i> New Checkbox
             </button>
           </div>
-          <template v-for="(criterion, index) of d_handgrading_rubric.criteria">
-            <div v-if="index !== 0" class="divider"></div>
-            <single-criterion :criterion="criterion"></single-criterion>
-          </template>
+          <draggable v-model="d_handgrading_rubric.criteria"
+                     @change="set_criteria_order"
+                     handle=".handle" ghost-class="ghost">
+            <single-criterion v-for="(criterion, index) of d_handgrading_rubric.criteria"
+                              :key="criterion.pk"
+                              :class="{'criterion-border': index !== 0}"
+                              :criterion="criterion"></single-criterion>
+          </draggable>
         </div>
 
         <div id="annotations-column" class="edit-rubric-column">
@@ -229,6 +233,7 @@
 
 <script lang="ts">
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+import Draggable from 'vuedraggable';
 
 import {
   Annotation,
@@ -271,6 +276,7 @@ import CriterionForm from './criterion_form.vue';
     AnnotationForm,
     APIErrors,
     CriterionForm,
+    Draggable,
     Modal,
     SelectObject,
     SingleAnnotation,
@@ -453,6 +459,13 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
+  set_criteria_order() {
+    return Criterion.update_order(
+      this.d_handgrading_rubric!.pk,
+      this.d_handgrading_rubric!.criteria.map(criterion => criterion.pk)
+    );
+  }
+
   update_criteria_order_changed(criterion_list: number[], handgrading_rubric_pk: number): void {
   }
 
@@ -622,8 +635,8 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
   margin: 15px 0;
 }
 
-.divider {
-  border: 1px solid $pebble-medium;
+.divider, .criterion-border {
+  border-top: 1px solid $pebble-medium;
 }
 
 @media only screen and (min-width: 900px) {
@@ -648,6 +661,11 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
 
 .multi-button-form-footer button {
   display: inline-block;
+}
+
+.ghost {
+  opacity: 0.5;
+  background-color: #c8ebfb;
 }
 
 </style>

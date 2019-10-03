@@ -4,6 +4,7 @@
       <div class="header row">
         <span class="short-description">{{d_criterion.short_description}}</span>
         <span class="header-icons">
+          <i class="fas fa-arrows-alt handle"></i>
           <i class="edit-icon fas fa-pencil-alt"
              @click="d_edit_mode = true"></i>
           <i class="delete-icon fas fa-trash-alt"
@@ -165,8 +166,12 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
 .header-icons {
   display: flex;
 
+  .handle {
+    cursor: grabbing;
+  }
+
   .edit-icon {
-    margin-right: 15px;
+    // margin-right: 5px;
     color: darken($gray-blue-2, 15%);
   }
 
@@ -174,7 +179,7 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
     color: lighten($cherry, 10%);
   }
 
-  .edit-icon, .delete-icon {
+  .handle, .edit-icon, .delete-icon {
     padding: 0 4px;
   }
 

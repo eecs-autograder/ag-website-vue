@@ -114,8 +114,8 @@ import { SafeMap } from '@/safe_map';
 import { chain, toggle } from '@/utils';
 
 import {
+  handgrading_comment_factory,
   HandgradingComment,
-  handgrading_comment_factory
 } from './handgrading/handgrading_comment';
 
 @Component({

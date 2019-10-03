@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
@@ -126,8 +126,8 @@ import { SafeMap } from '@/safe_map';
 import { assert_not_null, toggle } from '@/utils';
 
 import GroupSummaryPanel from './group_summary_panel.vue';
-import { HandgradingStatus, get_handgrading_status } from './handgrading_status';
 import Handgrading from './handgrading.vue';
+import { get_handgrading_status, HandgradingStatus } from './handgrading_status';
 
 @Component({
   components: {

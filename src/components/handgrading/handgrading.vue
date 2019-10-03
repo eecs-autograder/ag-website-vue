@@ -146,7 +146,8 @@
         <template v-if="!readonly_handgrading_results">
           <div class="collapsible-section-header"
               @click="d_annotations_collapsed = !d_annotations_collapsed">
-            <i class="fas" :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
+            <i class="fas"
+               :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
             Annotations
           </div>
           <div class="sidebar-section" v-if="!d_annotations_collapsed">
@@ -228,7 +229,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { assert_not_null, toggle, deep_copy } from '@/utils';
+import { assert_not_null, deep_copy, toggle } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -236,7 +237,7 @@ import {
 } from '@/validators';
 
 import FilePanel from './file_panel.vue';
-import { HandgradingComment, handgrading_comment_factory } from './handgrading_comment';
+import { handgrading_comment_factory, HandgradingComment } from './handgrading_comment';
 
 @Component({
   components: {
@@ -325,10 +326,10 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   get handgrading_comments() {
     let comments = this.d_handgrading_result!.comments.filter(
       comment => comment.location !== null
-    ).map(comment => handgrading_comment_factory(comment));
+    ).map(handgrading_comment_factory);
 
     let applied_annotations = this.d_handgrading_result!.applied_annotations.map(
-      applied_annotation => handgrading_comment_factory(applied_annotation)
+      handgrading_comment_factory
     );
 
     return comments.concat(applied_annotations).sort((first, second) => first.compare(second));

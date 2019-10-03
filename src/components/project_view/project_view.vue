@@ -80,18 +80,26 @@
 <script lang="ts">
 import { Component, Inject, Vue } from 'vue-property-decorator';
 
-import { Course, Group, GroupObserver, Project, HandgradingRubric, HttpError, HandgradingResult } from 'ag-client-typescript';
+import {
+  Course,
+  Group,
+  GroupObserver,
+  HandgradingResult,
+  HandgradingRubric,
+  HttpError,
+  Project
+} from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
-import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
-import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
 import Handgrading from '@/components/handgrading/handgrading.vue';
+import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
+import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
-import { format_datetime, get_query_param, assert_not_null } from '@/utils';
+import { assert_not_null, format_datetime, get_query_param } from '@/utils';
 
 @Component({
   components: {
