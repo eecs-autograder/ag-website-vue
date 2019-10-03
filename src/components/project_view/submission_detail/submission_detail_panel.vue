@@ -149,9 +149,11 @@ export default class SubmissionDetailPanel extends Vue {
   background-color: white;
   border: 1px solid $border-color;
   border-top: none;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 $border-radius-value $border-radius-value;
   padding: 7px 10px;
 }
+
+$border-radius-value: 3px;
 
 .panel {
   margin-bottom: 8px;
@@ -159,17 +161,17 @@ export default class SubmissionDetailPanel extends Vue {
 
 .panel-header-open {
   z-index: 2;
-  border-radius: 3px 3px 0 0;
+  border-radius: $border-radius-value $border-radius-value 0 0;
   position: sticky;
   top: 0;
 }
 
 .command-panel-header-open {
-  border-radius: 3px 3px 0 0;
+  border-radius: $border-radius-value $border-radius-value 0 0;
 }
 
 .panel-header-closed {
-  border-radius: 3px;
+  border-radius: $border-radius-value;
 }
 
 %panel-column-padding {
@@ -214,75 +216,75 @@ export default class SubmissionDetailPanel extends Vue {
 
 /* ---------------- Not Available Panel ---------------- */
 
-$base-gray: darken($white-gray, 5);
+$not-available-color: darken($white-gray, 5);
 
 .not-available-panel-header {
-  @include panel_header($base-gray, darken($base-gray, 5), default);
+  @include panel_header($not-available-color, darken($not-available-color, 5), default);
   color: $stormy-gray-dark;
 }
 
 /* ---------------- None Correct Panel ---------------- */
 
-$base-red: lighten($warning-red, 20);
+$none-correct-color: lighten($warning-red, 20);
 
 .none-correct-panel-header {
-  @include panel_header($base-red, darken($base-red, 5), pointer);
+  @include panel_header($none-correct-color, darken($none-correct-color, 5), pointer);
 }
 
 .none-correct-panel-header:hover {
-  @include panel_header_hover(darken($base-red, 5), darken($base-red, 10));
+  @include panel_header_hover(darken($none-correct-color, 5), darken($none-correct-color, 10));
 }
 
 .none-correct-panel-body {
-  @include panel_body($base-red);
+  @include panel_body($none-correct-color);
 }
 
 /* ---------------- Some Correct Panel ---------------- */
 
-$base-orange: lighten($orange, 5);
+$some-correct-color: lighten($orange, 5);
 
 .some-correct-panel-header {
-  @include panel_header($base-orange, darken($base-orange, 5), pointer);
+  @include panel_header($some-correct-color, darken($some-correct-color, 5), pointer);
 }
 
 .some-correct-panel-header:hover {
-  @include panel_header_hover(darken($base-orange, 5), darken($base-orange, 10));
+  @include panel_header_hover(darken($some-correct-color, 5), darken($some-correct-color, 10));
 }
 
 .some-correct-panel-body {
-  @include panel_body($base-orange);
+  @include panel_body($some-correct-color);
 }
 
 /* ---------------- All Correct Panel ---------------- */
 
-$base-blue: darken($light-blue, 2);
+$all-correct-color: darken($light-blue, 2);
 
 .all-correct-panel-header {
-  @include panel_header($base-blue, darken($base-blue, 5), pointer);
+  @include panel_header($all-correct-color, darken($all-correct-color, 5), pointer);
 }
 
 .all-correct-panel-header:hover {
-  @include panel_header_hover(darken($base-blue, 5), darken($base-blue, 10));
+  @include panel_header_hover(darken($all-correct-color, 5), darken($all-correct-color, 10));
 }
 
 .all-correct-panel-body {
-  @include panel_body($base-blue);
+  @include panel_body($all-correct-color);
 }
 
 /* ---------------- Info Only Panel ---------------- */
 
-$base-purple: hsl(255, 88%, 89%);
+$info-only-color: desaturate($all-correct-color, 50%);
 
 .info-only-panel-header {
-  @include panel_header($base-purple, darken($base-purple, 5), pointer);
+  @include panel_header($info-only-color, darken($info-only-color, 5), pointer);
 }
 
 .info-only-panel-header:hover {
-  @include panel_header_hover(darken($base-purple, 5), darken($base-purple, 10));
+  @include panel_header_hover(darken($info-only-color, 5), darken($info-only-color, 10));
 }
 
 .info-only-panel-body {
-  @include panel_body($base-purple);
+  @include panel_body($info-only-color);
 }
 
 </style>

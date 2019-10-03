@@ -12,12 +12,11 @@
          class="correctness-level none-correct">
       <i class="fas fa-times"></i>
     </div>
-    <div v-else-if="correctness_level === CorrectnessLevel.not_available"
-         class="correctness-level not-available">
-      <i class="fas fa-ban"></i>
+    <div v-else-if="correctness_level === CorrectnessLevel.info_only"
+         class="correctness-level info-only">
     </div>
     <div v-else
-         class="correctness-level info-only">
+         class="correctness-level not-available">
     </div>
   </div>
 </template>

@@ -1,6 +1,7 @@
 <template>
   <div v-if="!d_loading"
-       id="ag-suite-result">
+       id="ag-suite-result"
+       class="suite-result">
 
     <div id="ag-test-suite-name">{{d_ag_test_suite_result.ag_test_suite_name}}</div>
     <div class="ag-test-case-results-header">
@@ -268,11 +269,6 @@ export default class AGSuiteResult extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
-
-#ag-suite-result {
-  padding: 20px 0;
-  margin: 10px 0;
-}
 
 #ag-test-suite-name {
   font-size: 22px;

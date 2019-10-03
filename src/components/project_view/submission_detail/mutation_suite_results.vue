@@ -1,5 +1,6 @@
 <template>
-  <div id="mutation-test-suite-results">
+  <div id="mutation-test-suite-results"
+       class="suite-result">
     <div id="mutation-test-suites-title">Mutation Testing Suites</div>
     <div id="mutation-test-suites-header">
       <div class="column-1"> Suite Name </div>
@@ -82,11 +83,6 @@ export default class MutationSuiteResults extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
-
-#mutation-test-suite-results {
-  padding: 20px 0;
-  margin: 10px 0;
-}
 
 #mutation-test-suites-header {
   display: flex;
