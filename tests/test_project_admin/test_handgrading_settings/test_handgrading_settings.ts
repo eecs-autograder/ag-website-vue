@@ -72,6 +72,7 @@ describe('Initialize handgrading tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
+                course: course,
                 project: project
             },
         });
@@ -116,6 +117,7 @@ describe('Initialize handgrading tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
+                course: course,
                 project: current_project
             },
         });
@@ -182,6 +184,7 @@ describe('Initialize handgrading tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
+                course: course,
                 project: current_project
             },
         });
@@ -232,6 +235,7 @@ describe('Initialize handgrading tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
+                course: course,
                 project: current_course_project
             }
         });
@@ -289,6 +293,7 @@ describe('Handgrading settings tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
+                course: course,
                 project: current_project
             }
         });
@@ -439,6 +444,7 @@ describe('Criteria and annotation tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
+                course: course,
                 project: current_project
             }
         });

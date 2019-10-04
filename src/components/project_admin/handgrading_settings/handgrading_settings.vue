@@ -369,7 +369,7 @@ export default class HandgradingSettings extends Vue implements Created,
     else {
       this.d_courses_is_admin_for = await this.globals.current_user.courses_is_admin_for();
       let current_course = this.d_courses_is_admin_for.find(
-        course => course.project === this.project.pk);
+        course => course.pk === this.project.course);
       assert_not_null(current_course);
       this.d_course_to_import_from = current_course!;
       await this.load_projects_to_import_from(this.d_course_to_import_from);
