@@ -2,41 +2,47 @@ import { Wrapper } from "@vue/test-utils";
 
 import {
     Annotation,
+    Course,
     Criterion,
-    HandgradingRubric, HttpError,
+    HandgradingRubric,
+    HttpError,
     PointsStyle,
     Project,
-    User
+    User,
 } from "ag-client-typescript";
 import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
-import Modal from "@/components/modal.vue";
 import AnnotationForm from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import HandgradingSettings from "@/components/project_admin/handgrading_settings/handgrading_settings.vue";
 import SelectObject from "@/components/select_object.vue";
 
-import { make_annotation, make_course, make_criterion, make_project } from "@/tests/data_utils";
+import * as data_ut from "@/tests/data_utils";
 import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked, expect_html_element_has_value,
     get_validated_input_text,
-    set_select_object_value, set_validated_input_text, validated_input_is_valid
+    set_select_object_value,
+    set_validated_input_text,
+    validated_input_is_valid
 } from "@/tests/utils";
 
-describe('Initialize handgrading tests', () => {
-    let course = make_course();
-    let wrapper: Wrapper<HandgradingSettings>;
+let user: User;
+let course: Course;
+let current_project: Project;
 
-    let user = new User({
-        pk: 1,
-        username: 'waluigi',
-        first_name: 'Wa',
-        last_name: 'Luigi',
-        email: 'waluigi@spam.net',
-        is_superuser: false
-    });
+beforeEach(() => {
+    user = data_ut.make_user();
+    data_ut.set_global_current_user(user);
+    course = data_ut.make_course();
+    data_ut.set_global_current_course(course);
+    current_project = data_ut.make_project(course.pk);
+    data_ut.set_global_current_project(current_project);
+});
+
+describe('Initialize handgrading tests', () => {
+    let wrapper: Wrapper<HandgradingSettings>;
 
     afterEach(() => {
         sinon.restore();
@@ -46,7 +52,7 @@ describe('Initialize handgrading tests', () => {
         sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve([course]));
         sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
 
-        let project = make_project(course.pk);
+        let project = data_ut.make_project(course.pk);
 
         let rubric =  new HandgradingRubric({
             pk: 3,
@@ -68,11 +74,6 @@ describe('Initialize handgrading tests', () => {
             propsData: {
                 project: project
             },
-            provide: {
-                globals: {
-                    current_user: user
-                }
-            }
         });
 
         await wrapper.vm.$nextTick();
@@ -89,13 +90,13 @@ describe('Initialize handgrading tests', () => {
 
     test('Import rubric from same course', async () => {
         sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve([course]));
-        let project_to_import_from = make_project(course.pk, {has_handgrading_rubric: true});
-        let current_project = make_project(course.pk);
-        let other_project = make_project(course.pk, {has_handgrading_rubric: true});
+        let project_to_import_from = data_ut.make_project(
+            course.pk, {has_handgrading_rubric: true});
+        let other_project = data_ut.make_project(course.pk, {has_handgrading_rubric: true});
 
         let get_projects_stub = sinon.stub(
             Project, 'get_all_from_course'
-        ).returns(Promise.resolve([current_project, other_project, project_to_import_from]));
+        ).resolves([current_project, other_project, project_to_import_from]);
 
         let rubric =  new HandgradingRubric({
             pk: 3,
@@ -117,11 +118,6 @@ describe('Initialize handgrading tests', () => {
             propsData: {
                 project: current_project
             },
-            provide: {
-                globals: {
-                    current_user: user
-                }
-            }
         });
 
         await wrapper.vm.$nextTick();
@@ -151,21 +147,22 @@ describe('Initialize handgrading tests', () => {
     });
 
     test('Import rubric from different course', async () => {
-        let course_to_import_from = make_course();
+        let course_to_import_from = data_ut.make_course();
 
         sinon.stub(user, 'courses_is_admin_for').returns(
             Promise.resolve([course, course_to_import_from]));
-        let project_to_import_from = make_project(
+        let project_to_import_from = data_ut.make_project(
             course_to_import_from.pk, {has_handgrading_rubric: true});
-        let current_project = make_project(course.pk);
-        let other_project = make_project(course_to_import_from.pk, {has_handgrading_rubric: true});
-        let other_project_no_rubric = make_project(course_to_import_from.pk);
+        let other_project = data_ut.make_project(
+            course_to_import_from.pk, {has_handgrading_rubric: true});
+        let other_project_no_rubric = data_ut.make_project(course_to_import_from.pk);
 
         let get_projects_stub = sinon.stub(Project, 'get_all_from_course');
 
         get_projects_stub.withArgs(course.pk).returns(Promise.resolve([current_project]));
-        get_projects_stub.withArgs(course_to_import_from.pk).returns(
-            Promise.resolve([other_project, other_project_no_rubric, project_to_import_from]));
+        get_projects_stub.withArgs(course_to_import_from.pk).resolves([
+            other_project, other_project_no_rubric, project_to_import_from
+        ]);
 
         let rubric = new HandgradingRubric({
             pk: 3,
@@ -187,11 +184,6 @@ describe('Initialize handgrading tests', () => {
             propsData: {
                 project: current_project
             },
-            provide: {
-                globals: {
-                    current_user: user
-                }
-            }
         });
 
         await wrapper.vm.$nextTick();
@@ -225,26 +217,22 @@ describe('Initialize handgrading tests', () => {
     });
 
     test('Selecting course with no projects resets d_project_pk_to_import_from', async () => {
-        let no_projects_course = make_course();
-        let current_course_project = make_project(course.pk);
-        let project_with_rubric = make_project(course.pk, {has_handgrading_rubric: true});
+        let no_projects_course = data_ut.make_course();
+        let current_course_project = data_ut.make_project(course.pk);
+        let project_with_rubric = data_ut.make_project(course.pk, {has_handgrading_rubric: true});
 
         sinon.stub(user, 'courses_is_admin_for').returns(
             Promise.resolve([course, no_projects_course]));
 
         let get_projects_stub = sinon.stub(Project, 'get_all_from_course');
         get_projects_stub.withArgs(no_projects_course.pk).returns(Promise.resolve([]));
-        get_projects_stub.withArgs(course.pk).returns(
-            Promise.resolve([current_course_project, project_with_rubric]));
+        get_projects_stub.withArgs(course.pk).resolves([
+            current_course_project, project_with_rubric
+        ]);
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
                 project: current_course_project
-            },
-            provide: {
-                globals: {
-                    current_user: user
-                }
             }
         });
 
@@ -283,10 +271,10 @@ describe('Handgrading settings tests', () => {
     let wrapper: Wrapper<HandgradingSettings>;
 
     beforeEach(async () => {
-        let project = make_project(42, {has_handgrading_rubric: true});
+        current_project.has_handgrading_rubric = true;
         rubric = new HandgradingRubric({
             pk: 3,
-            project: project.pk,
+            project: current_project.pk,
             last_modified: '',
             points_style: PointsStyle.start_at_zero_and_add,
             max_points: null,
@@ -301,7 +289,7 @@ describe('Handgrading settings tests', () => {
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
-                project: project
+                project: current_project
             }
         });
 
@@ -429,10 +417,10 @@ describe('Criteria and annotation tests', () => {
     let wrapper: Wrapper<HandgradingSettings>;
 
     beforeEach(async () => {
-        let project = make_project(42, {has_handgrading_rubric: true});
+        current_project.has_handgrading_rubric = true;
         rubric = new HandgradingRubric({
             pk: 3,
-            project: project.pk,
+            project: current_project.pk,
             last_modified: '',
             points_style: PointsStyle.start_at_zero_and_add,
             max_points: null,
@@ -442,14 +430,16 @@ describe('Criteria and annotation tests', () => {
             criteria: [],
             annotations: []
         });
-        rubric.criteria = [make_criterion(rubric.pk), make_criterion(rubric.pk)];
-        rubric.annotations = [make_annotation(rubric.pk), make_annotation(rubric.pk)];
+        rubric.criteria = [data_ut.make_criterion(rubric.pk), data_ut.make_criterion(rubric.pk)];
+        rubric.annotations = [
+            data_ut.make_annotation(rubric.pk), data_ut.make_annotation(rubric.pk)
+        ];
 
         sinon.stub(HandgradingRubric, 'get_from_project').returns(Promise.resolve(rubric));
 
         wrapper = managed_mount(HandgradingSettings, {
             propsData: {
-                project: project
+                project: current_project
             }
         });
 
@@ -465,7 +455,7 @@ describe('Criteria and annotation tests', () => {
     });
 
     test('Create criterion', async () => {
-        let new_criterion = make_criterion(rubric.pk);
+        let new_criterion = data_ut.make_criterion(rubric.pk);
         sinon.stub(Criterion, 'create').callsFake(() => {
             Criterion.notify_criterion_created(new_criterion);
             return Promise.resolve(new_criterion);
@@ -532,7 +522,7 @@ describe('Criteria and annotation tests', () => {
     });
 
     test('Create annotation', async () => {
-        let new_annotation = make_annotation(rubric.pk);
+        let new_annotation = data_ut.make_annotation(rubric.pk);
         sinon.stub(Annotation, 'create').callsFake(() => {
             Annotation.notify_annotation_created(new_annotation);
             return Promise.resolve(new_annotation);

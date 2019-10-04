@@ -47,9 +47,26 @@ function* counter() {
 }
 
 export function set_global_current_user(user: User) {
-    let globals = new GlobalData();
-    globals.current_user = user;
-    vue_test_utils.config.provide!['globals'] = globals;
+   provided_global_data().current_user = user;
+}
+
+export function set_global_current_course(course: Course) {
+   provided_global_data().current_course = course;
+}
+
+export function set_global_current_project(project: Project) {
+   provided_global_data().current_project = project;
+}
+
+export function reset_provided_global_data() {
+    vue_test_utils.config.provide!['globals'] = undefined;
+}
+
+function provided_global_data(): GlobalData {
+    if (vue_test_utils.config.provide!['globals'] === undefined) {
+        vue_test_utils.config.provide!['globals'] = new GlobalData();
+    }
+    return vue_test_utils.config.provide!['globals'];
 }
 
 const USER_PKS = counter();

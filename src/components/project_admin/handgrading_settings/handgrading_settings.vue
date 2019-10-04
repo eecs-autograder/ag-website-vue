@@ -363,22 +363,18 @@ export default class HandgradingSettings extends Vue implements Created,
     Criterion.subscribe(this);
     Annotation.subscribe(this);
 
-    try {
-      if (this.project.has_handgrading_rubric) {
-        this.d_handgrading_rubric = await HandgradingRubric.get_from_project(this.project.pk);
-      }
-      else {
-        this.d_courses_is_admin_for = await this.globals.current_user.courses_is_admin_for();
-        let current_course = this.d_courses_is_admin_for.find(
-          (course) => course.pk === this.project.course);
-        assert_not_null(current_course, "Couldn't find current course");
-        this.d_course_to_import_from = current_course!;
-        await this.load_projects_to_import_from(this.d_course_to_import_from);
-      }
+    if (this.project.has_handgrading_rubric) {
+      this.d_handgrading_rubric = await HandgradingRubric.get_from_project(this.project.pk);
     }
-    finally {
-      this.d_loading = false;
+    else {
+      this.d_courses_is_admin_for = await this.globals.current_user.courses_is_admin_for();
+      let current_course = await this.globals.current_course;
+      assert_not_null(current_course);
+      this.d_course_to_import_from = current_course!;
+      await this.load_projects_to_import_from(this.d_course_to_import_from);
     }
+
+    this.d_loading = false;
   }
 
   destroyed() {
