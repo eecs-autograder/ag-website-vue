@@ -45,30 +45,36 @@
         Rerun
       </div>
       <div class="nav-link"
-            :class="{'active': d_current_tab === 'configure_handgrading'}"
-            @click="set_current_tab('configure_handgrading')">
+            :class="{'active': d_current_tab === 'handgrading'}"
+            @click="set_current_tab('handgrading')">
         Handgrading
       </div>
     </div>
 
     <div>
       <project-settings v-show="d_current_tab === 'settings'"
+                        v-if="d_loaded_tabs.has('settings')"
                         :project="project"> </project-settings>
       <instructor-files v-show="d_current_tab === 'instructor_files'"
+                        v-if="d_loaded_tabs.has('instructor_files')"
                         :project="project"></instructor-files>
       <expected-student-files v-show="d_current_tab === 'expected_student_files'"
+                              v-if="d_loaded_tabs.has('expected_student_files')"
                               :project="project"></expected-student-files>
-      <ag-test-suites v-show="d_current_tab === 'test_cases'"
-                    :project="project"></ag-test-suites>
+      <ag-suites ref="suitey" v-show="d_current_tab === 'test_cases'"
+                      v-if="d_loaded_tabs.has('test_cases')"
+                      :project="project"></ag-suites>
       <mutation-suites v-show="d_current_tab === 'mutation_testing'"
-                        :project="project"></mutation-suites>
+                       v-if="d_loaded_tabs.has('mutation_testing')"
+                       :project="project"></mutation-suites>
       <edit-groups v-show="d_current_tab === 'edit_groups'"
-                    :project="project"></edit-groups>
+                   v-if="d_loaded_tabs.has('edit_groups')"
+                   :project="project"></edit-groups>
       <div v-show="d_current_tab === 'download_grades'">DOWNLOAD GRADES - TODO</div>
       <div v-show="d_current_tab === 'rerun_tests'">RERUN TESTS - TODO</div>
-      <div v-show="d_current_tab === 'configure_handgrading'">
-        <handgrading-settings :project="project"></handgrading-settings>
-      </div>
+      <handgrading-settings v-show="d_current_tab === 'handgrading'"
+                            v-if="d_loaded_tabs.has('handgrading')"
+                            :project="project"></handgrading-settings>
     </div>
   </div>
 </template>
@@ -85,7 +91,8 @@ import {
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
-import AGTestSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import { ArraySet } from '@/array_set';
+import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import HandgradingSettings from '@/components/project_admin/handgrading_settings/handgrading_settings.vue';
@@ -100,7 +107,7 @@ import { array_remove_unique, get_query_param } from "@/utils";
 
 @Component({
   components: {
-    'ag-test-suites': AGTestSuites,
+    'ag-suites': AGSuites,
     EditGroups,
     ExpectedStudentFiles,
     HandgradingSettings,
@@ -124,6 +131,10 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   project: Project | null = null;
   d_current_tab: string = 'settings';
 
+  // The identifiers for tabs that have been clicked on and therefore
+  // have had there content loaded.
+  d_loaded_tabs: Set<string> = new Set();
+
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
 
@@ -136,7 +147,10 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   mounted() {
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab !== null) {
-      this.d_current_tab = requested_tab;
+      this.set_current_tab(requested_tab);
+    }
+    else {
+      this.mark_tab_as_loaded('settings');
     }
   }
 
@@ -148,6 +162,15 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   set_current_tab(tab_id: string) {
     this.d_current_tab = tab_id;
     this.$router.replace({query: {current_tab: tab_id}});
+    this.mark_tab_as_loaded(tab_id);
+  }
+
+  private mark_tab_as_loaded(tab_id: string) {
+    if (!this.d_loaded_tabs.has(tab_id)) {
+      let new_loaded_tabs = new Set(this.d_loaded_tabs);
+      new_loaded_tabs.add(tab_id);
+      this.d_loaded_tabs = new_loaded_tabs;
+    }
   }
 
   update_instructor_file_created(instructor_file: InstructorFile) {

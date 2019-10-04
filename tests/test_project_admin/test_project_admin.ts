@@ -1,12 +1,9 @@
 import { config, Wrapper } from '@vue/test-utils';
 
 import {
-    AGTestSuite,
     Course,
     ExpectedStudentFile,
-    Group,
     InstructorFile,
-    MutationTestSuite,
     Project,
     User
 } from 'ag-client-typescript';
@@ -16,21 +13,23 @@ import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { managed_mount } from '@/tests/setup';
+import { managed_mount, managed_shallow_mount } from '@/tests/setup';
+import { wait_until } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 let course = data_ut.make_course();
+let current_user = data_ut.make_user();
 
 beforeEach(() => {
     sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
     sinon.stub(User, 'get_current_user_roles').returns(
         Promise.resolve(data_ut.make_user_roles()));
-    sinon.stub(Group, 'get_all_from_project').resolves([]);
-    sinon.stub(AGTestSuite, 'get_all_from_project').resolves([]);
-    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([]);
+
+    data_ut.set_global_current_user(current_user);
+    data_ut.set_global_current_course(course);
 });
 
 afterEach(() => {
@@ -51,7 +50,7 @@ describe('Changing tabs in project admin', () => {
         sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
         router_replace = sinon.stub();
 
-        wrapper = managed_mount(ProjectAdmin, {
+        wrapper = managed_shallow_mount(ProjectAdmin, {
             mocks: {
                 $route: {
                     params: {
@@ -62,9 +61,17 @@ describe('Changing tabs in project admin', () => {
                 $router: {
                     replace: router_replace
                 }
-            }
+            },
         });
         await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({name: 'ProjectSettings'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'InstructorFiles'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'ExpectedStudentFiles'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'AGSuites'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'MutationSuites'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'EditGroups'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'HandgradingSettings'}).exists()).toBe(false);
     });
 
     afterEach(() => {
@@ -76,7 +83,7 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Requested tab on load', async () => {
-        wrapper = managed_mount(ProjectAdmin, {
+        wrapper = managed_shallow_mount(ProjectAdmin, {
             mocks: {
                 $route: {
                     params: {
@@ -92,80 +99,115 @@ describe('Changing tabs in project admin', () => {
             }
         });
 
-        await wrapper.vm.$nextTick();
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'HandgradingSettings'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'HandgradingSettings'}).isVisible()).toBe(true);
         expect(wrapper.vm.d_current_tab).toEqual('handgrading');
+        expect(wrapper.find({name: 'HandgradingSettings'}).vm.$props.project).toEqual(project);
     });
 
-    test('Clicking on Settings', async () => {
+    test('Settings loaded initially, select another tab and then settings again', async () => {
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'ProjectSettings'}).vm.$props.project).toEqual(project);
+
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
-        await wrapper.vm.$nextTick();
 
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'InstructorFiles'}).exists())
+        ).toBe(true);
         expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
+        expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(true);
+        expect(wrapper.find({name: 'ProjectSettings'}).isVisible()).toBe(false);
         expect(router_replace.calledOnce).toBe(true);
 
         tabs.at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).isVisible())
+        ).toBe(true);
         expect(wrapper.vm.d_current_tab).toEqual('settings');
         expect(router_replace.secondCall.calledWith(
-            {query: { current_tab: 'settings'}})
+            {query: {current_tab: 'settings'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(false);
     });
 
     test('Clicking on Instructor Files tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'InstructorFiles'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
         expect(router_replace.firstCall.calledWith(
-            {query: { current_tab: 'instructor_files'}})
+            {query: {current_tab: 'instructor_files'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'InstructorFiles'}).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Expected Student Files tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(2).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'ExpectedStudentFiles'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'ExpectedStudentFiles'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_current_tab).toEqual('expected_student_files');
         expect(router_replace.firstCall.calledWith(
-            {query: { current_tab: 'expected_student_files'}})
+            {query: {current_tab: 'expected_student_files'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'ExpectedStudentFiles'}).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Test Cases tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(3).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'AGSuites'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'AGSuites'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_current_tab).toEqual('test_cases');
         expect(router_replace.firstCall.calledWith(
-            {query: { current_tab: 'test_cases'}})
+            {query: {current_tab: 'test_cases'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'AGSuites'}).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Mutation Testing tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(4).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'MutationSuites'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'MutationSuites'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_current_tab).toEqual('mutation_testing');
         expect(router_replace.firstCall.calledWith(
-        {query: { current_tab: 'mutation_testing'}})
+        {query: {current_tab: 'mutation_testing'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'MutationSuites'}).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Edit Groups tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(5).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'EditGroups'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'EditGroups'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_current_tab).toEqual('edit_groups');
         expect(router_replace.firstCall.calledWith(
-            {query: { current_tab: 'edit_groups'}})
+            {query: {current_tab: 'edit_groups'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'EditGroups'}).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Download Grades tab', async () => {
@@ -175,7 +217,7 @@ describe('Changing tabs in project admin', () => {
 
         expect(wrapper.vm.d_current_tab).toEqual('download_grades');
         expect(router_replace.firstCall.calledWith(
-            {query: { current_tab: 'download_grades'}})
+            {query: {current_tab: 'download_grades'}})
         ).toBe(true);
     });
 
@@ -186,19 +228,23 @@ describe('Changing tabs in project admin', () => {
 
         expect(wrapper.vm.d_current_tab).toEqual('rerun_tests');
         expect(router_replace.firstCall.calledWith(
-            {query: { current_tab: 'rerun_tests'}})
+            {query: {current_tab: 'rerun_tests'}})
         ).toBe(true);
     });
 
-    test('Clicking on Configure Handgrading tab', async () => {
+    test('Clicking on Handgrading tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(8).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_current_tab).toEqual('configure_handgrading');
-        expect(router_replace.firstCall.calledWith(
-        {query: { current_tab: 'configure_handgrading'}})
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'HandgradingSettings'}).exists())
         ).toBe(true);
+        expect(wrapper.find({name: 'HandgradingSettings'}).isVisible()).toBe(true);
+
+        expect(wrapper.vm.d_current_tab).toEqual('handgrading');
+        expect(router_replace.firstCall.calledWith(
+        {query: {current_tab: 'handgrading'}})
+        ).toBe(true);
+        expect(wrapper.find({name: 'HandgradingSettings'}).vm.$props.project).toEqual(project);
     });
 });
 
