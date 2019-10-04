@@ -62,7 +62,8 @@
 
       <div v-show="d_current_tab === 'handgrading'">
         <template v-if="handgrading_rubric !== null">
-          <handgrading-container :project="project"
+          <handgrading-container :course="course"
+                                 :project="project"
                                  :handgrading_rubric="handgrading_rubric"></handgrading-container>
         </template>
       </div>

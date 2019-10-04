@@ -140,6 +140,9 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   globals!: GlobalData;
   d_globals = this.globals;
 
+  @Prop({required: true, type: ag_cli.Course})
+  course!: ag_cli.Course;
+
   @Prop({required: true, type: ag_cli.Project})
   project!: ag_cli.Project;
 
@@ -173,9 +176,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   d_loading_result = false;
 
   async created() {
-    this.d_staff =  new Set(
-      (await this.d_globals.current_course!.get_staff()).map(user => user.username)
-    );
+    this.d_staff =  new Set((await this.course.get_staff()).map(user => user.username));
     await this.load_result_summaries();
     ag_cli.HandgradingResult.subscribe(this);
   }
