@@ -119,7 +119,6 @@
               {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
             </button>
           </div>
-
         </div>
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
