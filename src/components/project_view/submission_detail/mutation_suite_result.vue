@@ -220,7 +220,7 @@
              class="feedback-row">
 
           <div class="feedback-explanation">
-            Invalid tests are tests that either time out or flag a correct implementation
+            A test is considered invalid if it times out or flags a correct implementation
             as incorrect.
           </div>
 
@@ -525,6 +525,8 @@ export default class MutationSuiteResult extends Vue {
       this.d_mutation_test_suite_result!.pk,
       this.d_fdbk_category
     );
+
+    this.d_mutation_test_suite_result!.invalid_tests = ["one_test", "two_test"];
 
     this.d_setup_stdout_loaded = false;
     this.d_setup_stderr_loaded = false;
