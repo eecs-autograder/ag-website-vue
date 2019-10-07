@@ -75,17 +75,6 @@
       </div>
     </fieldset>
 
-
-
-
-
-
-
-
-
-
-
-
     <div id="bug-section">
       <fieldset v-if="show_buggy_implementations_fieldset"
                 class="fieldset">
@@ -118,17 +107,13 @@
           </div>
         </div>
 
-
-
-
-
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
                    || d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
              class="feedback-row">
-<!--          <div class="feedback-label"> Buggy Output </div>-->
 
+          <div class="feedback-label"> Bug Output: </div>
           <div class="feedback">
-            <button class="show-buggy-output-button"
+            <button class="show-output-button"
                     id="show-buggy-output-button"
                     @click="toggle_d_show_buggy_implementations_output">
               {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
@@ -136,14 +121,6 @@
           </div>
 
         </div>
-
-
-
-
-
-
-
-
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
                    && d_show_buggy_implementations_output"
@@ -182,9 +159,7 @@
           </div>
         </div>
       </fieldset>
-
     </div>
-
 
     <fieldset v-if="show_test_names_fieldset"
               class="fieldset">
@@ -276,12 +251,14 @@
                        || d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
              class="feedback-row">
 
-<!--          <div class="feedback-label"> Test Names Output </div>-->
-          <button class="show-output-button"
-                  id="show-test-names-output-button"
-                  @click="toggle_d_show_student_test_names_output">
-            {{d_show_student_test_names_output ? 'Hide' : 'Show'}} Output
-          </button>
+          <div class="feedback-label"> Test Names Output: </div>
+          <div class="feedback">
+            <button class="show-output-button"
+                    id="show-test-names-output-button"
+                    @click="toggle_d_show_student_test_names_output">
+              {{d_show_student_test_names_output ? 'Hide' : 'Show'}} Output
+            </button>
+          </div>
         </div>
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
@@ -324,11 +301,6 @@
       </div>
     </fieldset>
 
-
-
-
-
-
     <fieldset v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
                     || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
               class="fieldset">
@@ -340,22 +312,15 @@
                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
              class="feedback-row">
 
-<!--          <div class="feedback-label"> Validity Output </div>-->
-          <button class="show-output-button"
-                  id="show-validity-check-output-button"
-                  @click="toggle_d_show_validity_check_output">
-            {{d_show_validity_check_output ? 'Hide' : 'Show'}} Output
-          </button>
+          <div class="feedback-label"> Validity Output: </div>
+          <div class="feedback">
+            <button class="show-output-button"
+                    id="show-validity-check-output-button"
+                    @click="toggle_d_show_validity_check_output">
+              {{d_show_validity_check_output ? 'Hide' : 'Show'}} Output
+            </button>
+          </div>
         </div>
-
-<!--        <div class="feedback-row">-->
-<!--          <div class="checkbox-row checkbox-input-container">-->
-<!--<input type="checkbox" id="checkbox" class="checkbox" v-model="d_show_validity_check_output"-->
-<!--                   @input="toggle_d_show_validity_check_output">-->
-<!--            <label for="checkbox" class="checkbox-label"> Show validity output </label>-->
-<!--          </div>-->
-<!--        </div>-->
-
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
                    && d_show_validity_check_output"
@@ -396,17 +361,6 @@
       </div>
     </fieldset>
 
-
-
-
-
-
-
-
-
-
-
-
   </div>
 </template>
 
@@ -423,7 +377,6 @@ import {
 
 import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
-import { deep_copy } from "@/utils";
 
 @Component({
   components: {
@@ -458,7 +411,7 @@ export default class MutationSuiteResult extends Vue {
   }
 
 
-    readonly CorrectnessLevel = CorrectnessLevel;
+  readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
   readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
@@ -820,21 +773,12 @@ export default class MutationSuiteResult extends Vue {
 .show-output-button {
   @extend .white-button;
   box-shadow: none;
-  margin: 10px 0;
-}
-
-.show-buggy-output-button {
-  @extend .show-output-button;
-  margin: 0;
+  margin: 0 10px;
 }
 
 .show-output-button:focus {
   outline: none;
   box-shadow: none;
-}
-
-.checkbox-row {
-  padding: 5px 0;
 }
 
 @media only screen and (min-width: 700px) {
@@ -846,6 +790,10 @@ export default class MutationSuiteResult extends Vue {
 
   .feedback {
     width: calc(100% - #{$width-of-mutation-feedback-label});
+  }
+
+  .show-output-button {
+    margin: 0;
   }
 }
 
