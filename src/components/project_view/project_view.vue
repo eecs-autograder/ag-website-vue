@@ -6,16 +6,20 @@
   <div v-else id="project-view">
     <div class="navbar">
       <div class="nav-link"
+           ref="submit_tab"
            :class="{'active': d_current_tab === 'submit'}"
-           @click="set_current_tab('submit')">
+           @click="set_current_tab('submit')"
+           v-if="can_submit">
         Submit
       </div>
       <div class="nav-link"
+           ref="my_submissions_tab"
            :class="{
              'active': d_current_tab === 'my_submissions',
              'disabled': group === null
            }"
-           @click="set_current_tab('my_submissions')">
+           @click="set_current_tab('my_submissions')"
+           v-if="can_submit">
         My Submissions
       </div>
       <div class="nav-link"
@@ -24,6 +28,7 @@
         Student Lookup
       </div>
       <div class="nav-link"
+           ref="handgrading_tab"
            :class="{'active': d_current_tab === 'handgrading'}"
            @click.self="set_current_tab('handgrading')"
            v-if="handgrading_rubric !== null">
@@ -35,6 +40,7 @@
         </template>
       </div>
       <div class="nav-link"
+           ref="handgrading_result_tab"
            :class="{'active': d_current_tab === 'handgrading_result'}"
            @click.self="set_current_tab('handgrading_result')"
            v-if="handgrading_result !== null">
@@ -43,7 +49,8 @@
     </div>
 
     <div>
-      <div v-show="d_current_tab === 'submit'">
+      <div v-if="can_submit && d_loaded_tabs.has('submit')"
+           v-show="d_current_tab === 'submit'">
         <group-registration v-if="group === null"
                             ref="group_registration"
                             :project="project"
@@ -54,26 +61,22 @@
                 :course="course" :project="project" :group="group"></submit>
       </div>
 
-      <submission-list v-if="d_load_my_submissions && group !== null"
+      <submission-list v-if="can_submit && d_loaded_tabs.has('my_submissions')"
                        v-show="d_current_tab === 'my_submissions'"
                        :course="course" :project="project" :group="group"></submission-list>
 
       <div v-show="d_current_tab === 'student_lookup'">TODO</div>
 
-      <div v-show="d_current_tab === 'handgrading'">
-        <template v-if="handgrading_rubric !== null">
-          <handgrading-container :course="course"
-                                 :project="project"
-                                 :handgrading_rubric="handgrading_rubric"></handgrading-container>
-        </template>
-      </div>
+      <handgrading-container v-show="d_current_tab === 'handgrading'"
+                             v-if="handgrading_rubric !== null && d_loaded_tabs.has('handgrading')"
+                             :course="course"
+                             :project="project"
+                             :handgrading_rubric="handgrading_rubric"></handgrading-container>
 
-      <div v-show="d_current_tab === 'handgrading_result'">
-        <template v-if="handgrading_result !== null">
-          <handgrading :handgrading_result="handgrading_result"
-                       :readonly_handgrading_results="true"></handgrading>
-        </template>
-      </div>
+      <handgrading v-show="d_current_tab === 'handgrading_result'"
+                   v-if="handgrading_result !== null && d_loaded_tabs.has('handgrading_result')"
+                   :handgrading_result="handgrading_result"
+                   :readonly_handgrading_results="true"></handgrading>
     </div>
   </div>
 </template>
@@ -127,10 +130,14 @@ export default class ProjectView extends Vue implements GroupObserver {
   project: Project | null = null;
   course: Course | null = null;
   group: Group | null = null;
-  readonly format_datetime = format_datetime;
-
   handgrading_rubric: HandgradingRubric | null = null;
   handgrading_result: HandgradingResult | null = null;
+
+  // The identifiers for tabs that have been clicked on and therefore
+  // have had there content loaded.
+  d_loaded_tabs: Set<string> = new Set();
+
+  readonly format_datetime = format_datetime;
 
   async mounted() {
     Group.subscribe(this);
@@ -144,15 +151,47 @@ export default class ProjectView extends Vue implements GroupObserver {
     }
 
     await this.d_globals.set_current_project(this.project, this.course);
-
     await Promise.all([this.load_handgrading(), this.load_handgrading_result()]);
+    this.initialize_current_tab();
 
+    this.d_loading = false;
+  }
+
+  beforeDestroy() {
+    Group.unsubscribe(this);
+  }
+
+  private initialize_current_tab() {
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab !== null) {
       this.set_current_tab(requested_tab);
     }
+    else {
+      if (this.d_globals.user_roles.is_handgrader) {
+        this.d_current_tab = 'handgrading';
+      }
+      this.mark_tab_as_loaded(this.d_current_tab);
+    }
+  }
 
-    this.d_loading = false;
+  private set_current_tab(tab_id: string) {
+    if (tab_id === 'my_submissions' && this.group === null
+        || tab_id === 'handgrading' && this.handgrading_rubric === null
+        || tab_id === 'handgrading_result' && this.handgrading_result === null) {
+      return;
+    }
+
+    this.d_current_tab = tab_id;
+    this.$router.replace({query: {current_tab: tab_id}});
+    this.mark_tab_as_loaded(tab_id);
+  }
+
+  private mark_tab_as_loaded(tab_id: string) {
+    if (!this.d_loaded_tabs.has(tab_id)) {
+      let new_loaded_tabs = new Set(this.d_loaded_tabs);
+      new_loaded_tabs.add(tab_id);
+      this.d_loaded_tabs = new_loaded_tabs;
+    }
   }
 
   private async load_handgrading() {
@@ -176,28 +215,17 @@ export default class ProjectView extends Vue implements GroupObserver {
     }
     catch (e) {
       if (!(e instanceof HttpError) || (e.status !== 403 && e.status !== 404)) {
+        // istanbul ignore next
         throw e;
       }
     }
   }
 
-  beforeDestroy() {
-    Group.unsubscribe(this);
-  }
-
-  set_current_tab(tab_id: string) {
-    if (tab_id === 'my_submissions') {
-      if (this.group === null) {
-        return;
-      }
-      this.d_load_my_submissions = true;
-    }
-    else if (tab_id === 'handgrading' && this.handgrading_rubric === null) {
-      return;
-    }
-
-    this.d_current_tab = tab_id;
-    this.$router.replace({query: {current_tab: tab_id}});
+  // Whether to show the "submit" and "my submissions" tabs
+  get can_submit() {
+    return !this.d_globals.user_roles.is_handgrader
+           || this.d_globals.user_roles.is_student
+           || this.d_globals.user_roles.is_staff;
   }
 
   update_group_changed(group: Group): void {}
@@ -238,6 +266,10 @@ export default class ProjectView extends Vue implements GroupObserver {
   .nav-link {
     font-size: 14px;
     padding: 10px 10px;
+  }
+
+  .disabled {
+    color: $stormy-gray-dark;
   }
 }
 

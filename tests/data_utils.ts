@@ -20,9 +20,13 @@ import {
     ExpectedStudentFile,
     GradingStatus,
     Group,
+    HandgradingResult,
+    HandgradingRubric,
     InstructorFile,
     MutationTestSuite,
-    MutationTestSuiteFeedbackConfig, MutationTestSuiteResultFeedback,
+    MutationTestSuiteFeedbackConfig,
+    MutationTestSuiteResultFeedback,
+    PointsStyle,
     Project,
     Semester,
     StdinSource,
@@ -557,6 +561,52 @@ export function make_mutation_test_suite_result_feedback(
     };
     safe_assign(defaults, args);
     return defaults;
+}
+
+const HANDGRADING_RUBRIC_PKS = counter();
+
+export function make_handgrading_rubric(project_pk: number,
+                                        args: Partial<HandgradingRubric> = {}): HandgradingRubric {
+    let defaults = {
+        pk: HANDGRADING_RUBRIC_PKS.next().value,
+        project: project_pk,
+        last_modified: now_str(),
+        criteria: [],
+        annotations: [],
+        handgraders_can_leave_comments: false,
+        handgraders_can_adjust_points: false,
+        points_style: PointsStyle.start_at_zero_and_add,
+        max_points: null,
+        show_grades_and_rubric_to_students: false,
+    };
+    safe_assign(defaults, args);
+    defaults.project = project_pk;
+    return new HandgradingRubric(defaults);
+}
+
+const HANDGRADING_RESULT_PKS = counter();
+
+export function make_handgrading_result(handgrading_rubric: HandgradingRubric,
+                                        group_pk: number,
+                                        submission_pk: number,
+                                        args: Partial<HandgradingResult> = {}): HandgradingResult {
+    let defaults = {
+        pk: HANDGRADING_RESULT_PKS.next().value,
+        handgrading_rubric: handgrading_rubric,
+        group: group_pk,
+        submission: submission_pk,
+        last_modified: now_str(),
+        finished_grading: false,
+        points_adjustment: 0,
+        submitted_filenames: [],
+        total_points: 0,
+        total_points_possible: 0,
+        applied_annotations: [],
+        comments: [],
+        criterion_results: [],
+    };
+    safe_assign(defaults, args);
+    return new HandgradingResult(defaults);
 }
 
 const CRITERION_PKS = counter();

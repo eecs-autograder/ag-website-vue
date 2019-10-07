@@ -14,7 +14,7 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount, managed_shallow_mount } from '@/tests/setup';
-import { wait_until } from '@/tests/utils';
+import { wait_for_load, wait_until } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -63,9 +63,11 @@ describe('Changing tabs in project admin', () => {
                 }
             },
         });
-        await wrapper.vm.$nextTick();
+        await wait_for_load(wrapper);
 
-        expect(wrapper.find({name: 'ProjectSettings'}).exists()).toBe(false);
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).exists())
+        ).toBe(true);
         expect(wrapper.find({name: 'InstructorFiles'}).exists()).toBe(false);
         expect(wrapper.find({name: 'ExpectedStudentFiles'}).exists()).toBe(false);
         expect(wrapper.find({name: 'AGSuites'}).exists()).toBe(false);

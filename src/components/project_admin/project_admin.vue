@@ -145,6 +145,15 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   }
 
   mounted() {
+    this.initialize_current_tab();
+  }
+
+  destroyed() {
+    InstructorFile.unsubscribe(this);
+    ExpectedStudentFile.unsubscribe(this);
+  }
+
+  private initialize_current_tab() {
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab !== null) {
       this.set_current_tab(requested_tab);
@@ -154,12 +163,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
     }
   }
 
-  destroyed() {
-    InstructorFile.unsubscribe(this);
-    ExpectedStudentFile.unsubscribe(this);
-  }
-
-  set_current_tab(tab_id: string) {
+  private set_current_tab(tab_id: string) {
     this.d_current_tab = tab_id;
     this.$router.replace({query: {current_tab: tab_id}});
     this.mark_tab_as_loaded(tab_id);
