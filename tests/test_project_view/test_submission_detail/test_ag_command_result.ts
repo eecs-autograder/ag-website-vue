@@ -829,6 +829,7 @@ describe('AGCommandResult Watchers tests', () => {
         }
 
         expect(wrapper.vm.d_submission).toEqual(submission);
+        expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
@@ -843,10 +844,11 @@ describe('AGCommandResult Watchers tests', () => {
 
         expect(submission).not.toEqual(updated_submission);
         expect(wrapper.vm.d_submission).toEqual(updated_submission);
-        expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
-        expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
-        expect(get_ag_test_cmd_result_stdout_diff_stub.calledTwice).toBe(true);
-        expect(get_ag_test_cmd_result_stderr_diff_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledOnce).toBe(true);
     });
 
     test('ag_test_command_result Watcher', async () => {
@@ -855,6 +857,7 @@ describe('AGCommandResult Watchers tests', () => {
         }
 
         expect(wrapper.vm.d_ag_test_command_result).toEqual(ag_test_command_result);
+        expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
@@ -869,6 +872,7 @@ describe('AGCommandResult Watchers tests', () => {
 
         expect(ag_test_command_result).not.toEqual(updated_ag_test_command_result);
         expect(wrapper.vm.d_ag_test_command_result).toEqual(updated_ag_test_command_result);
+        expect(get_ag_test_cmd_result_output_size_stub.calledTwice).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.calledTwice).toBe(true);
@@ -881,6 +885,7 @@ describe('AGCommandResult Watchers tests', () => {
         }
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
@@ -893,9 +898,10 @@ describe('AGCommandResult Watchers tests', () => {
         }
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
-        expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
-        expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
-        expect(get_ag_test_cmd_result_stdout_diff_stub.calledTwice).toBe(true);
-        expect(get_ag_test_cmd_result_stderr_diff_stub.calledTwice).toBe(true);
+        expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
+        expect(get_ag_test_cmd_result_stderr_diff_stub.calledOnce).toBe(true);
     });
 });

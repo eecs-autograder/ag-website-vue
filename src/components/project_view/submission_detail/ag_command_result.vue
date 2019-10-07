@@ -27,7 +27,7 @@
               <i class="fas fa-question-circle">
                 <tooltip ref="expected_and_actual_return_code"
                          width="medium"
-                         placement="top">
+                         placement="right">
                   <div class="expected-and-actual-return-code">
                     <div v-if="d_ag_test_command_result.actual_return_code !== null">
                       Exit Status: {{d_ag_test_command_result.actual_return_code}}
@@ -96,7 +96,7 @@
           </div>
         </template>
         <template v-else class="feedback-output-content-lengthy">
-          <div class="diff-container">
+          <div class="diff-container" v-if="d_stdout_diff !== null">
             <diff ref="stdout_diff"
                   :diff_contents="d_stdout_diff"
                   diff_height="50vh"
@@ -116,7 +116,7 @@
           </div>
         </template>
         <template v-else>
-          <div class="diff-container">
+          <div class="diff-container" v-if="d_stderr_diff !== null">
             <diff ref="stderr_diff"
                   :diff_contents="d_stderr_diff"
                   diff_height="50vh"
@@ -131,7 +131,7 @@
     <fieldset v-if="d_ag_test_command_result.fdbk_settings.show_actual_stdout
                     || d_ag_test_command_result.fdbk_settings.show_actual_stderr"
               class="fieldset">
-      <legend class="legend"> Output </legend>
+      <legend class="legend"> Actual Output </legend>
       <div v-if="d_ag_test_command_result.fdbk_settings.show_actual_stdout"
            id="actual-stdout-section"
            class="feedback-row">
@@ -223,20 +223,18 @@ export default class AGCommandResult extends Vue {
   readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
   @Watch('submission')
-  async on_submission_change(new_value: Submission, old_value: Submission) {
+  on_submission_change(new_value: Submission, old_value: Submission) {
     this.d_submission = new_value;
-    await this.get_results();
+  }
+
+  @Watch('fdbk_category')
+  on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+    this.d_fdbk_category = new_value;
   }
 
   @Watch('ag_test_command_result')
   async on_ag_test_command_result_change(new_value: object, old_value: object) {
     this.d_ag_test_command_result = JSON.parse(JSON.stringify(new_value));
-    await this.get_results();
-  }
-
-  @Watch('fdbk_category')
-  async on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
-    this.d_fdbk_category = new_value;
     await this.get_results();
   }
 
@@ -257,6 +255,10 @@ export default class AGCommandResult extends Vue {
       this.d_ag_test_command_result!.pk,
       this.d_fdbk_category
     );
+    this.d_stdout_content_loaded = false;
+    this.d_stderr_content_loaded = false;
+    this.d_stdout_diff_loaded = false;
+    this.d_stderr_content_loaded = false;
     await this.load_stdout_content();
     await this.load_stderr_content();
     await this.load_stdout_diff();
@@ -306,7 +308,6 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stdout_content() {
-    this.d_stdout_content_loaded = false;
     if (this.d_ag_test_command_result_output_size!.stdout_size === null) {
       this.d_stdout_content = null;
     }
@@ -321,7 +322,6 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stderr_content() {
-    this.d_stderr_content_loaded = false;
     if (this.d_ag_test_command_result_output_size!.stderr_size === null) {
       this.d_stderr_content = null;
     }
@@ -336,7 +336,6 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stdout_diff() {
-    this.d_stdout_diff_loaded = false;
     if (this.d_ag_test_command_result_output_size!.stdout_diff_size === null) {
       this.d_stdout_diff = null;
     }
@@ -351,7 +350,6 @@ export default class AGCommandResult extends Vue {
   }
 
   async load_stderr_diff() {
-    this.d_stderr_diff_loaded = false;
     if (this.d_ag_test_command_result_output_size!.stderr_diff_size === null) {
       this.d_stderr_diff = null;
     }

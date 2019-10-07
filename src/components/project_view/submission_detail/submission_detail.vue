@@ -264,6 +264,7 @@ export default class SubmissionDetail extends Vue {
   on_selected_submission_change(new_value: SubmissionWithResults,
                                 old_value: SubmissionWithResults) {
     this.d_loading = true;
+    console.log("on selected submission with results change");
     this.d_submission = new Submission(new_value);
     this.d_fdbk_category = this.determine_feedback_type();
     this.d_submission_fdbk_override = null;
@@ -294,8 +295,8 @@ export default class SubmissionDetail extends Vue {
   }
 
   get submission_result() {
-      return this.d_submission_fdbk_override === null
-          ? this.selected_submission_with_results.results : this.d_submission_fdbk_override;
+    return this.d_submission_fdbk_override === null
+        ? this.selected_submission_with_results.results : this.d_submission_fdbk_override;
   }
 
   determine_feedback_type(): FeedbackCategory {
@@ -324,6 +325,7 @@ export default class SubmissionDetail extends Vue {
     this.d_submission_fdbk_override = await get_submission_result(
       this.d_submission!.pk, this.d_fdbk_category!
     );
+    // console.log("load results in submission_detail");
   }
 
   get does_not_count_for_current_user() {

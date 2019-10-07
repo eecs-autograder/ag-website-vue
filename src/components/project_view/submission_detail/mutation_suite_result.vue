@@ -75,6 +75,17 @@
       </div>
     </fieldset>
 
+
+
+
+
+
+
+
+
+
+
+
     <div id="bug-section">
       <fieldset v-if="show_buggy_implementations_fieldset"
                 class="fieldset">
@@ -107,7 +118,35 @@
           </div>
         </div>
 
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout"
+
+
+
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
+                   || d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
+             class="feedback-row">
+<!--          <div class="feedback-label"> Buggy Output </div>-->
+
+          <div class="feedback">
+            <button class="show-buggy-output-button"
+                    id="show-buggy-output-button"
+                    @click="toggle_d_show_buggy_implementations_output">
+              {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
+            </button>
+          </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
+                   && d_show_buggy_implementations_output"
              id="buggy-stdout-section"
              class="feedback-row">
           <div class="feedback-label buggy-impl-feedback-label"> Output: </div>
@@ -125,7 +164,8 @@
           </div>
         </div>
 
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
+                   && d_show_buggy_implementations_output"
              class="feedback-row"
              id="buggy-stderr-section">
           <div class="feedback-label buggy-impl-feedback-label"> Error Output: </div>
@@ -145,93 +185,16 @@
 
     </div>
 
-    <fieldset v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
-                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
-              class="fieldset">
-      <legend class="legend"> Validity Check </legend>
-      <div id="validity-check-section">
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout"
-             class="feedback-row"
-             id="validity-check-stdout-section">
-          <div class="feedback-label"> Output: </div>
-          <div class="feedback">
-            <template v-if="!d_validity_checkout_stdout_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_validity_checkout_stdout_content" class="short-output">No Output</div>
-              <pre v-else class="lengthy-output">{{d_validity_checkout_stdout_content}}</pre>
-            </template>
-          </div>
-        </div>
-
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
-             class="feedback-row"
-             id="validity-check-stderr-section">
-          <div class="feedback-label"> Error Output: </div>
-          <div class="feedback">
-            <template v-if="!d_validity_checkout_stderr_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
-              </div>
-            </template>
-            <template v-else>
-              <p v-if="!d_validity_checkout_stderr_content" class="short-output">No Output</p>
-              <pre v-else class="lengthy-output">{{d_validity_checkout_stderr_content}}
-              </pre>
-            </template>
-          </div>
-        </div>
-      </div>
-    </fieldset>
 
     <fieldset v-if="show_test_names_fieldset"
               class="fieldset">
       <legend class="legend"> Get Test Names </legend>
       <div id="student-tests-section">
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout"
-             class="feedback-row"
-             id="test-names-stdout-section">
-          <div class="feedback-label test-names-feedback-label"> Output: </div>
-
-          <div class="feedback test-names-feedback">
-            <template v-if="!d_student_test_names_stdout_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_student_test_names_stdout_content" class="short-output">No Output</div>
-              <pre v-else class="lengthy-output">{{d_student_test_names_stdout_content}}</pre>
-            </template>
-          </div>
-        </div>
-
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
-             class="feedback-row"
-             id="test-names-stderr-section">
-          <div class="feedback-label test-names-feedback-label"> Error Output: </div>
-
-          <div class="feedback test-names-feedback">
-            <template v-if="!d_student_test_names_stderr_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_student_test_names_stderr_content" class="short-output">No Output</div>
-              <pre v-else class="lengthy-output">{{d_student_test_names_stderr_content}}</pre>
-            </template>
-          </div>
-        </div>
-
         <div v-if="get_valid_tests().length"
              class="feedback-row"
              id="valid-tests-section">
 
-          <div class="feedback-label test-names-feedback-label"> Valid test cases: </div>
+          <div class="feedback-label test-names-feedback-label"> Your test cases: </div>
 
           <div class="feedback test-names-feedback">
             <div id="list-of-valid-tests">
@@ -283,8 +246,8 @@
              class="feedback-row">
 
           <div class="feedback-explanation">
-            Invalid tests time out or incorrectly report a bug when run against a
-            correct implementation.
+            Invalid tests are tests that either time out or flag a correct implementation
+            as incorrect.
           </div>
 
           <div class="feedback-label test-names-feedback-label">
@@ -308,8 +271,142 @@
             </div>
           </div>
         </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
+                       || d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
+             class="feedback-row">
+
+<!--          <div class="feedback-label"> Test Names Output </div>-->
+          <button class="show-output-button"
+                  id="show-test-names-output-button"
+                  @click="toggle_d_show_student_test_names_output">
+            {{d_show_student_test_names_output ? 'Hide' : 'Show'}} Output
+          </button>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
+                   && d_show_student_test_names_output"
+             class="feedback-row"
+             id="test-names-stdout-section">
+          <div class="feedback-label test-names-feedback-label"> Output: </div>
+
+          <div class="feedback test-names-feedback">
+            <template v-if="!d_student_test_names_stdout_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_student_test_names_stdout_content" class="short-output">No Output</div>
+              <pre v-else class="lengthy-output">{{d_student_test_names_stdout_content}}</pre>
+            </template>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr
+                   && d_show_student_test_names_output"
+             class="feedback-row"
+             id="test-names-stderr-section">
+          <div class="feedback-label test-names-feedback-label"> Error Output: </div>
+
+          <div class="feedback test-names-feedback">
+            <template v-if="!d_student_test_names_stderr_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_student_test_names_stderr_content" class="short-output">No Output</div>
+              <pre v-else class="lengthy-output">{{d_student_test_names_stderr_content}}</pre>
+            </template>
+          </div>
+        </div>
       </div>
     </fieldset>
+
+
+
+
+
+
+    <fieldset v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
+                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
+              class="fieldset">
+      <legend class="legend"> Validity Check </legend>
+      <div id="validity-check-section">
+
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
+                   || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
+             class="feedback-row">
+
+<!--          <div class="feedback-label"> Validity Output </div>-->
+          <button class="show-output-button"
+                  id="show-validity-check-output-button"
+                  @click="toggle_d_show_validity_check_output">
+            {{d_show_validity_check_output ? 'Hide' : 'Show'}} Output
+          </button>
+        </div>
+
+<!--        <div class="feedback-row">-->
+<!--          <div class="checkbox-row checkbox-input-container">-->
+<!--<input type="checkbox" id="checkbox" class="checkbox" v-model="d_show_validity_check_output"-->
+<!--                   @input="toggle_d_show_validity_check_output">-->
+<!--            <label for="checkbox" class="checkbox-label"> Show validity output </label>-->
+<!--          </div>-->
+<!--        </div>-->
+
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
+                   && d_show_validity_check_output"
+             class="feedback-row"
+             id="validity-check-stdout-section">
+          <div class="feedback-label"> Output: </div>
+          <div class="feedback">
+            <template v-if="!d_validity_check_stdout_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_validity_check_stdout_content" class="short-output">No Output</div>
+              <pre v-else class="lengthy-output">{{d_validity_check_stdout_content}}</pre>
+            </template>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr
+                   && d_show_validity_check_output"
+             class="feedback-row"
+             id="validity-check-stderr-section">
+          <div class="feedback-label"> Error Output: </div>
+          <div class="feedback">
+            <template v-if="!d_validity_check_stderr_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <p v-if="!d_validity_check_stderr_content" class="short-output">No Output</p>
+              <pre v-else class="lengthy-output">{{d_validity_check_stderr_content}}
+              </pre>
+            </template>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+
+
+
+
+
+
+
+
+
+
+
   </div>
 </template>
 
@@ -344,9 +441,13 @@ export default class MutationSuiteResult extends Vue {
   fdbk_category!: FeedbackCategory;
 
   @Watch('submission')
-  async on_submission_change(new_value: Submission, old_value: Submission) {
-    this.d_submission = deep_copy(new_value, Submission);
-    await this.get_results();
+  on_submission_change(new_value: Submission, old_value: Submission) {
+    this.d_submission = new_value;
+  }
+
+  @Watch('fdbk_category')
+  on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+    this.d_fdbk_category = new_value;
   }
 
   @Watch('mutation_test_suite_result')
@@ -356,13 +457,8 @@ export default class MutationSuiteResult extends Vue {
     await this.get_results();
   }
 
-  @Watch('fdbk_category')
-  async on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
-    this.d_fdbk_category = new_value;
-    await this.get_results();
-  }
 
-  readonly CorrectnessLevel = CorrectnessLevel;
+    readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
   readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
@@ -370,8 +466,8 @@ export default class MutationSuiteResult extends Vue {
   d_setup_stderr_content: string | null = null;
   d_student_test_names_stdout_content: string | null = null;
   d_student_test_names_stderr_content: string | null = null;
-  d_validity_checkout_stdout_content: string | null = null;
-  d_validity_checkout_stderr_content: string | null = null;
+  d_validity_check_stdout_content: string | null = null;
+  d_validity_check_stderr_content: string | null = null;
   d_grade_buggy_stdout_content: string | null = null;
   d_grade_buggy_stderr_content: string | null = null;
 
@@ -379,16 +475,66 @@ export default class MutationSuiteResult extends Vue {
   d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
   d_mutation_test_suite_result: MutationTestSuiteResultFeedback | null = null;
 
+  d_show_buggy_implementations_output = false;
+  d_show_student_test_names_output = false;
+  d_show_validity_check_output = false;
+
+  d_load_grade_buggy_output = false;
+  d_load_student_test_names_output = false;
+  d_load_validity_check_output = false;
+
   d_setup_stdout_loaded = false;
   d_setup_stderr_loaded = false;
   d_student_test_names_stdout_loaded = false;
   d_student_test_names_stderr_loaded = false;
-  d_validity_checkout_stdout_loaded = false;
-  d_validity_checkout_stderr_loaded = false;
+  d_validity_check_stdout_loaded = false;
+  d_validity_check_stderr_loaded = false;
   d_grade_buggy_stdout_loaded = false;
   d_grade_buggy_stderr_loaded = false;
   d_mutation_test_suite_result_output_size: ResultOutput.MutationTestSuiteResultOutputSize
                                             | null = null;
+
+  async toggle_d_show_buggy_implementations_output() {
+    let old_toggle_val = this.d_show_buggy_implementations_output;
+    this.d_show_buggy_implementations_output = !this.d_show_buggy_implementations_output;
+    if (!old_toggle_val) {
+      if (!this.d_load_grade_buggy_output) {
+        this.d_load_grade_buggy_output = true;
+        this.d_grade_buggy_stdout_loaded = false;
+        this.d_grade_buggy_stderr_loaded = false;
+        await this.load_grade_buggy_stdout_content();
+        await this.load_grade_buggy_stderr_content();
+      }
+    }
+  }
+
+  async toggle_d_show_student_test_names_output() {
+    let old_toggle_val = this.d_show_student_test_names_output;
+    this.d_show_student_test_names_output = !this.d_show_student_test_names_output;
+    if (!old_toggle_val) {
+      if (!this.d_load_student_test_names_output) {
+        this.d_load_student_test_names_output = true;
+        this.d_student_test_names_stdout_loaded = false;
+        this.d_student_test_names_stderr_loaded = false;
+        await this.load_student_test_names_stdout_content();
+        await this.load_student_test_names_stderr_content();
+      }
+    }
+  }
+
+  async toggle_d_show_validity_check_output() {
+    let old_toggle_val = this.d_show_validity_check_output;
+    this.d_show_validity_check_output = !this.d_show_validity_check_output;
+    if (!old_toggle_val) {
+      if (!this.d_load_validity_check_output) {
+        this.d_load_validity_check_output = true;
+        this.d_validity_check_stdout_loaded = false;
+        this.d_validity_check_stderr_loaded = false;
+        await this.load_validity_check_stdout_content();
+        await this.load_validity_check_stderr_content();
+      }
+    }
+  }
 
   async created() {
     this.d_fdbk_category = this.fdbk_category;
@@ -398,7 +544,7 @@ export default class MutationSuiteResult extends Vue {
   }
 
   get show_setup_fieldset(): boolean {
-  return this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout
            || this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stderr
            || this.d_mutation_test_suite_result!.setup_return_code !== null
            || (this.d_mutation_test_suite_result!.setup_timed_out !== null
@@ -427,18 +573,33 @@ export default class MutationSuiteResult extends Vue {
       this.d_mutation_test_suite_result!.pk,
       this.d_fdbk_category
     );
+
+    this.d_setup_stdout_loaded = false;
+    this.d_setup_stderr_loaded = false;
+    this.d_grade_buggy_stdout_loaded = false;
+    this.d_grade_buggy_stderr_loaded = false;
+    this.d_student_test_names_stdout_loaded = false;
+    this.d_student_test_names_stderr_loaded = false;
+    this.d_validity_check_stdout_loaded = false;
+    this.d_validity_check_stderr_loaded = false;
+
     await this.load_setup_stdout_content();
     await this.load_setup_stderr_content();
-    await this.load_student_test_names_stdout_content();
-    await this.load_student_test_names_stderr_content();
-    await this.load_validity_check_stdout_content();
-    await this.load_validity_check_stderr_content();
-    await this.load_grade_buggy_stdout_content();
-    await this.load_grade_buggy_stderr_content();
+    if (this.d_load_student_test_names_output) {
+      await this.load_student_test_names_stdout_content();
+      await this.load_student_test_names_stderr_content();
+    }
+    if (this.d_load_validity_check_output) {
+      await this.load_validity_check_stdout_content();
+      await this.load_validity_check_stderr_content();
+    }
+    if (this.d_load_grade_buggy_output) {
+      await this.load_grade_buggy_stdout_content();
+      await this.load_grade_buggy_stderr_content();
+    }
   }
 
   async load_setup_stdout_content() {
-    this.d_setup_stdout_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.setup_stdout_size === null) {
       this.d_setup_stdout_content = null;
     }
@@ -453,7 +614,6 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_setup_stderr_content() {
-    this.d_setup_stderr_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.setup_stderr_size === null) {
       this.d_setup_stderr_content = null;
     }
@@ -468,7 +628,6 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_student_test_names_stdout_content() {
-    this.d_student_test_names_stdout_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.get_student_test_names_stdout_size
         === null) {
       this.d_student_test_names_stdout_content = null;
@@ -485,7 +644,6 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_student_test_names_stderr_content() {
-    this.d_student_test_names_stderr_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.get_student_test_names_stderr_size
         === null) {
       this.d_student_test_names_stderr_content = null;
@@ -502,39 +660,36 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_validity_check_stdout_content() {
-    this.d_validity_checkout_stdout_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.validity_check_stdout_size === null) {
-      this.d_validity_checkout_stdout_content = null;
+      this.d_validity_check_stdout_content = null;
     }
     else {
-      this.d_validity_checkout_stdout_content
+      this.d_validity_check_stdout_content
           = await ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
         this.submission.pk,
         this.d_mutation_test_suite_result!.pk,
         this.d_fdbk_category
       );
     }
-    this.d_validity_checkout_stdout_loaded = true;
+    this.d_validity_check_stdout_loaded = true;
   }
 
   async load_validity_check_stderr_content() {
-    this.d_validity_checkout_stderr_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.validity_check_stderr_size === null) {
-      this.d_validity_checkout_stderr_content = null;
+      this.d_validity_check_stderr_content = null;
     }
     else {
-      this.d_validity_checkout_stderr_content
+      this.d_validity_check_stderr_content
           = await ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
         this.submission.pk,
         this.d_mutation_test_suite_result!.pk,
         this.d_fdbk_category
       );
     }
-    this.d_validity_checkout_stderr_loaded = true;
+    this.d_validity_check_stderr_loaded = true;
   }
 
   async load_grade_buggy_stdout_content() {
-    this.d_grade_buggy_stdout_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.grade_buggy_impls_stdout_size === null) {
       this.d_grade_buggy_stdout_content = null;
     }
@@ -550,7 +705,6 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async load_grade_buggy_stderr_content() {
-    this.d_grade_buggy_stderr_loaded = false;
     if (this.d_mutation_test_suite_result_output_size!.grade_buggy_impls_stderr_size === null) {
       this.d_grade_buggy_stderr_content = null;
     }
@@ -600,6 +754,8 @@ export default class MutationSuiteResult extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/button_styles.scss';
 @import '@/styles/components/submission_detail.scss';
 
 .bug-icon {
@@ -658,6 +814,26 @@ export default class MutationSuiteResult extends Vue {
 
 .feedback-explanation {
   font-weight: bold;
+  padding: 5px 0;
+}
+
+.show-output-button {
+  @extend .white-button;
+  box-shadow: none;
+  margin: 10px 0;
+}
+
+.show-buggy-output-button {
+  @extend .show-output-button;
+  margin: 0;
+}
+
+.show-output-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.checkbox-row {
   padding: 5px 0;
 }
 

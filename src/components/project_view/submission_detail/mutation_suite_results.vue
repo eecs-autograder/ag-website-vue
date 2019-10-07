@@ -8,7 +8,8 @@
       <div class="column-3"> Score </div>
     </div>
 
-    <template v-for="(mutation_test_suite_result, index) of mutation_test_suite_results">
+    <div v-for="(mutation_test_suite_result, index) of mutation_test_suite_results"
+              :key="mutation_test_suite_result.pk">
       <submission-detail-panel
         ref="mutation_test_suite_detail_panel"
         :name="mutation_test_suite_result.student_test_suite_name"
@@ -22,13 +23,13 @@
                                :fdbk_category="fdbk_category">
         </mutation-suite-result>
       </submission-detail-panel>
-    </template>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { MutationTestSuiteResultFeedback, Submission } from 'ag-client-typescript';
 

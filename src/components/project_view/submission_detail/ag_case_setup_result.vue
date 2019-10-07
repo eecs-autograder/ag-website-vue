@@ -104,20 +104,18 @@ export default class AGCaseSetupResult extends Vue {
   readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
   @Watch('submission')
-  async on_submission_change(new_value: Submission, old_value: Submission) {
+  on_submission_change(new_value: Submission, old_value: Submission) {
     this.d_submission = new_value;
-    await this.get_results();
+  }
+
+  @Watch('fdbk_category')
+  on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+    this.d_fdbk_category = new_value;
   }
 
   @Watch('ag_test_suite_result')
   async on_ag_test_suite_result_change(new_value: object, old_value: object) {
     this.d_ag_test_suite_result = JSON.parse(JSON.stringify(new_value));
-    await this.get_results();
-  }
-
-  @Watch('fdbk_category')
-  async on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
-    this.d_fdbk_category = new_value;
     await this.get_results();
   }
 
@@ -135,12 +133,13 @@ export default class AGCaseSetupResult extends Vue {
       this.d_ag_test_suite_result!.pk,
       this.d_fdbk_category
     );
+    this.d_setup_stdout_loaded = false;
+    this.d_setup_stderr_loaded = false;
     await this.load_setup_stdout();
     await this.load_setup_stderr();
   }
 
   async load_setup_stdout() {
-    this.d_setup_stdout_loaded = false;
     if (this.d_ag_test_suite_result_output_size!.setup_stdout_size === null) {
       this.d_setup_stdout = null;
     }
@@ -155,7 +154,6 @@ export default class AGCaseSetupResult extends Vue {
   }
 
   async load_setup_stderr() {
-    this.d_setup_stderr_loaded = false;
     if (this.d_ag_test_suite_result_output_size!.setup_stderr_size === null) {
         this.d_setup_stderr = null;
     }
