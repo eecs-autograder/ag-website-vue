@@ -525,7 +525,7 @@ export default class MutationSuiteResult extends Vue {
       this.d_mutation_test_suite_result!.pk,
       this.d_fdbk_category
     );
-      
+
     this.d_setup_stdout_loaded = false;
     this.d_setup_stderr_loaded = false;
     this.d_grade_buggy_stdout_loaded = false;
