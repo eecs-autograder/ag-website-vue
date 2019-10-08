@@ -390,6 +390,60 @@ describe('Select next/prev for grading', () => {
     });
 });
 
+test('Handgrading result created', async () => {
+    set_summaries([ungraded_group]);
+    let wrapper = await make_wrapper();
+    expect(wrapper.vm.d_result_summaries[0].handgrading_result).toBeNull();
+
+    let ungraded_result = data_ut.make_handgrading_result(
+        rubric, ungraded_group.pk, 42,
+        {
+            total_points: 3,
+            total_points_possible: 8,
+            finished_grading: false
+        }
+    );
+    ag_cli.HandgradingResult.notify_handgrading_result_created(ungraded_result);
+    expect(wrapper.vm.d_result_summaries[0].handgrading_result).toEqual({
+        total_points: 3,
+        total_points_possible: 8,
+        finished_grading: false
+    });
+});
+
+test('Handgrading result updated', async () => {
+    set_summaries([in_progress_group]);
+    let wrapper = await make_wrapper();
+    expect(wrapper.vm.d_result_summaries[0].handgrading_result).toEqual(
+        in_progress_group.handgrading_result
+    );
+
+    let changed_result = data_ut.make_handgrading_result(
+        rubric, in_progress_group.pk, 42, in_progress_group.handgrading_result!
+    );
+    changed_result.total_points += 1;
+    changed_result.finished_grading = true;
+
+    ag_cli.HandgradingResult.notify_handgrading_result_changed(changed_result);
+    expect(wrapper.vm.d_result_summaries[0].handgrading_result).toEqual({
+        'total_points': changed_result.total_points,
+        'total_points_possible': changed_result.total_points_possible,
+        'finished_grading': changed_result.finished_grading,
+    });
+});
+
+test('Header is "Students" or "Groups based on max group size"', async () => {
+    project.max_group_size = 1;
+    set_summaries([]);
+    let wrapper = await make_wrapper();
+    expect(wrapper.find('.sidebar-header .header-text').text()).toEqual('Students');
+
+    project.max_group_size = 2;
+    wrapper.vm.$forceUpdate();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.sidebar-header .header-text').text()).toEqual('Groups');
+});
+
 function set_summaries(summaries: ag_cli.GroupWithHandgradingResultSummary[]) {
     get_all_summaries_stub.resolves({
         count: summaries.length,
@@ -414,15 +468,3 @@ async function make_wrapper() {
 function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
     return <Wrapper<T>> wrapper.find({name: name});
 }
-
-test('Handgrading result created', async () => {
-    fail();
-});
-
-test('Handgrading result updated', async () => {
-    fail();
-});
-
-test('Header is "Students" or "Groups based on max group size"', async () => {
-    fail();
-});
