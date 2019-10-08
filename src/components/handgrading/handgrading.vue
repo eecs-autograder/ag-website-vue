@@ -299,7 +299,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   @Watch('handgrading_result')
   on_handgrading_result_changed(
       new_result: HandgradingResult, old_result: HandgradingResult) {
-    this.d_handgrading_result = deep_copy(this.handgrading_result, HandgradingResult);
+    this.d_handgrading_result = deep_copy(new_result, HandgradingResult);
   }
 
   toggle_criterion(criterion_result: CriterionResult) {
