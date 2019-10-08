@@ -12,9 +12,11 @@
               {{project.max_group_size === 1 ? 'Students' : 'Groups'}}
             </div>
             <div class="progress dropdown" v-if="!d_loading_result_summaries">
-                {{num_finished}}/{{total_num_to_grade}}
-                ({{staff_filtered_groups.length}} total)
-                <i class="fas fa-caret-down"></i>
+                <div ref="progress_text">
+                  {{num_finished}}/{{total_num_to_grade}}
+                  ({{staff_filtered_groups.length}} total)
+                  <i class="fas fa-caret-down"></i>
+                </div>
 
                 <div id="filter-menu" class="menu">
                   <div class="checkbox-input-container">
@@ -136,10 +138,6 @@ import { get_handgrading_status, HandgradingStatus } from './handgrading_status'
   }
 })
 export default class HandgradingContainer extends Vue implements ag_cli.HandgradingResultObserver {
-  @Inject({from: 'globals'})
-  globals!: GlobalData;
-  d_globals = this.globals;
-
   @Prop({required: true, type: ag_cli.Course})
   course!: ag_cli.Course;
 
@@ -158,12 +156,6 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   d_grading_sidebar_collapsed = false;
 
   d_filters_collapsed = true;
-  readonly filters_collapsed_height = '50px';
-  readonly filters_open_height = '150px';
-
-  get filters_height() {
-    return this.d_filters_collapsed ? this.filters_collapsed_height : this.filters_open_height;
-  }
 
   d_search_text = '';
   d_status_filter: HandgradingStatus | null = null;
@@ -186,7 +178,8 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   }
 
   async load_result_summaries() {
-    // HACK because the urls aren't proxying right in dev stack
+    // Because the page urls aren't correct in the dev stack,
+    // we'll just keep track of the current page number.
     let page_num = 1;
     let page_size = 1;
 

@@ -20,6 +20,7 @@ import {
     ExpectedStudentFile,
     GradingStatus,
     Group,
+    GroupWithHandgradingResultSummary,
     HandgradingResult,
     HandgradingRubric,
     InstructorFile,
@@ -607,6 +608,23 @@ export function make_handgrading_result(handgrading_rubric: HandgradingRubric,
     };
     safe_assign(defaults, args);
     return new HandgradingResult(defaults);
+}
+
+export function make_group_summary(
+    project_pk: number,
+    num_members: number = 1,
+    group_args: Partial<Group> = {},
+    handgrading_result: {
+        finished_grading: boolean;
+        total_points: number;
+        total_points_possible: number;
+    } | null = null
+): GroupWithHandgradingResultSummary {
+    let group = make_group(project_pk, num_members, group_args);
+    return {
+        handgrading_result: handgrading_result,
+        ...group
+    };
 }
 
 const CRITERION_PKS = counter();

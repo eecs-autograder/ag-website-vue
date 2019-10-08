@@ -68,15 +68,16 @@ function is_validated_input(wrapper: Wrapper<Vue>): wrapper is Wrapper<Validated
 }
 
 // Verifies that the given wrapper holds an input tag and returns whether it is checked.
-// Also verifies that the input tag is a checkbox.
+// Also verifies that the input tag is a checkbox or radio button.
 export function checkbox_is_checked(wrapper: Wrapper<Vue>): boolean {
     if (!is_html_input_or_select(wrapper)) {
         throw new TypeError(
             `Expected an input, select, or option element, but got "${wrapper.name()}"`);
     }
 
-    if (wrapper.element.type !== 'checkbox') {
-        throw new TypeError(`Expected a checkbox, but got "${wrapper.element.type }"`);
+    if (wrapper.element.type !== 'checkbox' && wrapper.element.type !== 'radio') {
+        throw new TypeError(
+            `Expected a checkbox or radio button, but got "${wrapper.element.type }"`);
     }
 
     return wrapper.element.checked;

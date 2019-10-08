@@ -26,7 +26,7 @@ import * as ag_cli from 'ag-client-typescript';
 import { get_handgrading_status, HandgradingStatus } from './handgrading_status';
 
 @Component({})
-export default class  extends Vue {
+export default class GroupSummaryPanel extends Vue {
   @Prop({required: true})
   group_summary!: ag_cli.GroupWithHandgradingResultSummary;
 
