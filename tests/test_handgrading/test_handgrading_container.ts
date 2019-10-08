@@ -5,11 +5,11 @@ import * as sinon from 'sinon';
 
 import GroupSummaryPanel from '@/components/handgrading/group_summary_panel.vue';
 import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
+import { HandgradingStatus } from '@/components/handgrading/handgrading_status';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, wait_for_load, wait_until, compress_whitespace } from '@/tests/utils';
-import {HandgradingStatus} from '@/components/handgrading/handgrading_status';
+import { checkbox_is_checked, compress_whitespace, wait_until } from '@/tests/utils';
 
 let course: ag_cli.Course;
 let project: ag_cli.Project;
@@ -186,32 +186,124 @@ describe('Filter group summaries tests', () => {
             compress_whitespace(wrapper.find({ref: 'progress_text'}).text())
         ).toEqual('2/4 (5 total)');
     });
-
-    function summary_pks(wrapper_: Wrapper<HandgradingContainer>): number[] {
-        return (<WrapperArray<GroupSummaryPanel>> wrapper_.findAll(
-            {name: 'GroupSummaryPanel'}
-        )).wrappers.map(w => w.vm.group_summary.pk);
-    }
 });
 
 test('Load and display paginated group summaries', async () => {
-    fail();
+    get_all_summaries_stub.withArgs(project.pk).onFirstCall().resolves({
+        count: 5,
+        next: '/i/am/url',
+        previous: null,
+        results: [no_submissions_group]
+    });
+    get_all_summaries_stub.withArgs(project.pk).onSecondCall().resolves({
+        count: 5,
+        next: '/i/am/url',
+        previous: null,
+        results: [ungraded_group, in_progress_group]
+    });
+    get_all_summaries_stub.withArgs(project.pk).onThirdCall().resolves({
+        count: 5,
+        next: null,
+        previous: null,
+        results: [graded_group, staff_group]
+    });
+
+    let wrapper = managed_mount(HandgradingContainer, {
+        propsData: {
+            course: course,
+            project: project,
+            handgrading_rubric: data_ut.make_handgrading_rubric(project.pk)
+        }
+    });
+    wrapper.vm.d_include_staff = true;
+    await wait_until(wrapper, w => !w.vm.d_loading_result_summaries);
+
+    expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(5);
+    expect(summary_pks(wrapper)).toEqual([
+        no_submissions_group.pk,
+        ungraded_group.pk,
+        in_progress_group.pk,
+        graded_group.pk,
+        staff_group.pk,
+    ]);
+
+    expect(get_all_summaries_stub.firstCall.args[1].page_num).toEqual(1);
+    expect(get_all_summaries_stub.secondCall.args[1].page_num).toEqual(2);
+    expect(get_all_summaries_stub.thirdCall.args[1].page_num).toEqual(3);
+    expect(get_all_summaries_stub.callCount).toEqual(3);
 });
 
-test('Select group for grading', async () => {
-    fail();
+function summary_pks(wrapper_: Wrapper<HandgradingContainer>): number[] {
+    return (<WrapperArray<GroupSummaryPanel>> wrapper_.findAll(
+        {name: 'GroupSummaryPanel'}
+    )).wrappers.map(w => w.vm.group_summary.pk);
+}
+
+describe('Select group tests', () => {
+    let wrapper: Wrapper<HandgradingContainer>;
+
+    beforeEach(async () => {
+        get_all_summaries_stub.resolves({
+            count: 3,
+            next: null,
+            previous: null,
+            results: [
+                no_submissions_group,
+                ungraded_group,
+                graded_group,
+            ],
+        });
+
+        wrapper = managed_mount(HandgradingContainer, {
+            propsData: {
+                course: course,
+                project: project,
+                handgrading_rubric: data_ut.make_handgrading_rubric(project.pk)
+            }
+        });
+        await wait_until(wrapper, w => !w.vm.d_loading_result_summaries);
+    });
+
+    test('Select ungraded group for grading', async () => {
+        let result = data_ut.make_handgrading_result(rubric, ungraded_group.pk, 42);
+        get_or_create_stub.withArgs(ungraded_group.pk).resolves(result);
+        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+
+        wrapper.findAll({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_currently_grading).toEqual(result);
+        expect(wrapper.find({name: 'Handgrading'}).vm.handgrading_result).toEqual(result);
+    });
+
+    test('Select graded group for grading', async () => {
+        let result = data_ut.make_handgrading_result(rubric, graded_group.pk, 42);
+        get_or_create_stub.withArgs(graded_group.pk).resolves(result);
+        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+
+        wrapper.findAll({name: 'GroupSummaryPanel'}).at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_currently_grading).toEqual(result);
+        expect(wrapper.find({name: 'Handgrading'}).vm.handgrading_result).toEqual(result);
+    });
+
+    test('Group selected for grading has no submissions', async () => {
+        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+        wrapper.findAll({name: 'GroupSummaryPanel'}).at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_currently_grading).toBe(null);
+        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+    });
 });
 
-test('Group selected for grading has no submissions', async () => {
-    fail();
-});
+describe('Select next/prev for grading', () => {
+    test('Select next group on event', async () => {
+        fail();
+    });
 
-test('Select next group on event', async () => {
-    fail();
-});
-
-test('Select prev group on event', async () => {
-    fail();
+    test('Select prev group on event', async () => {
+        fail();
+    });
 });
 
 test('Handgrading result created', async () => {
