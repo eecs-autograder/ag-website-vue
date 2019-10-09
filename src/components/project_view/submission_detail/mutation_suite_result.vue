@@ -1,15 +1,16 @@
 <template>
   <div id="mutation-suite-result">
+
     <fieldset v-if="show_setup_fieldset"
               class="fieldset">
       <legend class="legend"> Setup Command </legend>
 
-      <div v-if="d_mutation_test_suite_result.setup_return_code !== null
-                 || (d_mutation_test_suite_result.setup_timed_out !== null
-                 && d_mutation_test_suite_result.setup_timed_out)"
-           id="setup-section">
+      <div id="setup-section">
 
-        <div class="feedback-row">
+        <div class="feedback-row"
+             v-if="d_mutation_test_suite_result.setup_return_code !== null
+                   || (d_mutation_test_suite_result.setup_timed_out !== null
+                       && d_mutation_test_suite_result.setup_timed_out)">
           <div class="feedback-label"
                id="setup-command-name">
             {{d_mutation_test_suite_result.setup_command_name !== null
@@ -75,101 +76,15 @@
       </div>
     </fieldset>
 
-    <div id="bug-section">
-      <fieldset v-if="show_buggy_implementations_fieldset"
-                class="fieldset">
-        <legend class="legend"> Buggy Implementations </legend>
-
-        <div v-if="d_mutation_test_suite_result.num_bugs_exposed !== null"
-             id="num-bugs-exposed-section"
-             class="feedback-row">
-          <div class="feedback-label buggy-impl-feedback-label"> # of exposed bugs: </div>
-          <div class="feedback buggy-impl-feedback">
-            <div class="short-output">{{d_mutation_test_suite_result.num_bugs_exposed}}</div>
-          </div>
-        </div>
-
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
-                     === BugsExposedFeedbackLevel.exposed_bug_names
-                     && d_mutation_test_suite_result.num_bugs_exposed > 1"
-             class="feedback-row">
-          <div class="feedback-label buggy-impl-feedback-label"> Bugs exposed: </div>
-          <div class="feedback buggy-impl-feedback">
-            <div id="list-of-bugs">
-              <div v-for="bug_name of d_mutation_test_suite_result.bugs_exposed"
-                   class="single-bug">
-                <span>
-                  <i class="fas fa-bug bug-icon"></i>
-                  {{bug_name}}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
-                   || d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
-             class="feedback-row">
-
-          <div class="feedback-label"> Bug Output: </div>
-          <div class="feedback">
-            <button class="show-output-button"
-                    id="show-buggy-output-button"
-                    @click="toggle_d_show_buggy_implementations_output">
-              {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
-            </button>
-          </div>
-        </div>
-
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
-                   && d_show_buggy_implementations_output"
-             id="buggy-stdout-section"
-             class="feedback-row">
-          <div class="feedback-label buggy-impl-feedback-label"> Output: </div>
-
-          <div class="feedback buggy-impl-feedback">
-            <template v-if="!d_grade_buggy_stdout_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_grade_buggy_stdout_content" class="short-output">No Output</div>
-              <pre v-else class="lengthy-output">{{d_grade_buggy_stdout_content}}</pre>
-            </template>
-          </div>
-        </div>
-
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
-                   && d_show_buggy_implementations_output"
-             class="feedback-row"
-             id="buggy-stderr-section">
-          <div class="feedback-label buggy-impl-feedback-label"> Error Output: </div>
-          <div class="feedback buggy-impl-feedback">
-            <template v-if="!d_grade_buggy_stderr_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_grade_buggy_stderr_content" class="short-output">No Output</div>
-              <pre v-else class="lengthy-output">{{d_grade_buggy_stderr_content}}</pre>
-            </template>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-
-    <fieldset v-if="show_test_names_fieldset"
+    <fieldset v-if="show_student_tests_fieldset"
               class="fieldset">
-      <legend class="legend"> Get Test Names </legend>
+      <legend class="legend"> Student Tests </legend>
       <div id="student-tests-section">
+
         <div v-if="get_valid_tests().length"
              class="feedback-row"
              id="valid-tests-section">
-
           <div class="feedback-label test-names-feedback-label"> Your test cases: </div>
-
           <div class="feedback test-names-feedback">
             <div id="list-of-valid-tests">
               <div v-for="valid_test of get_valid_tests()"
@@ -186,7 +101,6 @@
         <div v-if="d_mutation_test_suite_result.discarded_tests.length"
              id="discarded-tests-section"
              class="feedback-row">
-
           <div class="feedback-explanation">
             This suite accepts up to
             <span id="num-tests-accepted">
@@ -200,7 +114,6 @@
           <div class="feedback-label test-names-feedback-label">
             Discarded test cases:
           </div>
-
           <div class="feedback test-names-feedback">
             <div id="list-of-discarded-tests">
               <div v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests"
@@ -223,7 +136,6 @@
             A test is considered invalid if it times out or flags a correct implementation
             as incorrect.
           </div>
-
           <div class="feedback-label test-names-feedback-label">
             Invalid test cases:
           </div>
@@ -235,7 +147,6 @@
                   <i class="fas fa-exclamation-triangle invalid-test-icon"></i>
                   {{invalid_test}}
                 </span>
-
                 <span v-if="test_timed_out(invalid_test)"
                       class="invalid-test-timed-out">
                   (Timed Out)
@@ -250,7 +161,7 @@
                        || d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
              class="feedback-row">
 
-          <div class="feedback-label"> Test Names Output: </div>
+          <div class="feedback-label show-output-button-label">Test Names Output:</div>
           <div class="feedback">
             <button class="show-output-button"
                     id="show-test-names-output-button"
@@ -265,7 +176,6 @@
              class="feedback-row"
              id="test-names-stdout-section">
           <div class="feedback-label test-names-feedback-label"> Output: </div>
-
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stdout_loaded">
               <div class="loading-output">
@@ -284,7 +194,6 @@
              class="feedback-row"
              id="test-names-stderr-section">
           <div class="feedback-label test-names-feedback-label"> Error Output: </div>
-
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stderr_loaded">
               <div class="loading-output">
@@ -297,21 +206,12 @@
             </template>
           </div>
         </div>
-      </div>
-    </fieldset>
-
-    <fieldset v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
-                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
-              class="fieldset">
-      <legend class="legend"> Validity Check </legend>
-      <div id="validity-check-section">
-
 
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
              class="feedback-row">
 
-          <div class="feedback-label"> Validity Output: </div>
+          <div class="feedback-label show-output-button-label">Validity Output:</div>
           <div class="feedback">
             <button class="show-output-button"
                     id="show-validity-check-output-button"
@@ -360,6 +260,88 @@
       </div>
     </fieldset>
 
+    <fieldset v-if="show_buggy_implementations_fieldset"
+              class="fieldset">
+      <legend class="legend"> Buggy Implementations </legend>
+      <div id="buggy-implementations-section">
+
+        <div v-if="d_mutation_test_suite_result.num_bugs_exposed !== null"
+             id="num-bugs-exposed-section"
+             class="feedback-row">
+          <div class="feedback-label buggy-impl-feedback-label"> # of exposed bugs: </div>
+          <div class="feedback buggy-impl-feedback">
+            <div class="short-output">{{d_mutation_test_suite_result.num_bugs_exposed}}</div>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
+                     === BugsExposedFeedbackLevel.exposed_bug_names
+                     && d_mutation_test_suite_result.num_bugs_exposed > 1"
+             class="feedback-row">
+          <div class="feedback-label buggy-impl-feedback-label"> Bugs exposed: </div>
+          <div class="feedback buggy-impl-feedback">
+            <div id="list-of-bugs">
+              <div v-for="bug_name of d_mutation_test_suite_result.bugs_exposed"
+                   class="single-bug">
+                <span>
+                  <i class="fas fa-bug bug-icon"></i>
+                  {{bug_name}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
+                   || d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
+             class="feedback-row">
+          <div class="feedback-label show-output-button-label">Bug Output:</div>
+          <div class="feedback">
+            <button class="show-output-button"
+                    id="show-buggy-output-button"
+                    @click="toggle_d_show_buggy_implementations_output">
+              {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
+            </button>
+          </div>
+        </div>
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
+                     && d_show_buggy_implementations_output"
+               id="buggy-stdout-section"
+               class="feedback-row">
+          <div class="feedback-label buggy-impl-feedback-label"> Output: </div>
+          <div class="feedback buggy-impl-feedback">
+            <template v-if="!d_grade_buggy_stdout_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_grade_buggy_stdout_content" class="short-output">No Output</div>
+              <pre v-else class="lengthy-output">{{d_grade_buggy_stdout_content}}</pre>
+            </template>
+          </div>
+        </div>
+
+        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
+                   && d_show_buggy_implementations_output"
+             class="feedback-row"
+             id="buggy-stderr-section">
+          <div class="feedback-label buggy-impl-feedback-label"> Error Output: </div>
+          <div class="feedback buggy-impl-feedback">
+            <template v-if="!d_grade_buggy_stderr_loaded">
+              <div class="loading-output">
+                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="!d_grade_buggy_stderr_content" class="short-output">No Output</div>
+              <pre v-else class="lengthy-output">{{d_grade_buggy_stderr_content}}</pre>
+            </template>
+          </div>
+        </div>
+
+      </div>
+    </fieldset>
   </div>
 </template>
 
@@ -409,7 +391,6 @@ export default class MutationSuiteResult extends Vue {
     await this.get_results();
   }
 
-
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
   readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
@@ -445,6 +426,38 @@ export default class MutationSuiteResult extends Vue {
   d_grade_buggy_stderr_loaded = false;
   d_mutation_test_suite_result_output_size: ResultOutput.MutationTestSuiteResultOutputSize
                                             | null = null;
+
+  async created() {
+    this.d_fdbk_category = this.fdbk_category;
+    this.d_submission = this.submission;
+    this.d_mutation_test_suite_result = this.mutation_test_suite_result;
+    await this.get_results();
+  }
+
+  get show_setup_fieldset(): boolean {
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stderr
+           || this.d_mutation_test_suite_result!.setup_return_code !== null
+           || (this.d_mutation_test_suite_result!.setup_timed_out !== null
+               && this.d_mutation_test_suite_result!.setup_timed_out!);
+  }
+
+  get show_buggy_implementations_fieldset(): boolean {
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
+           || this.d_mutation_test_suite_result!.num_bugs_exposed !== null;
+  }
+
+  get show_student_tests_fieldset(): boolean {
+    return this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
+           || this.d_mutation_test_suite_result!.discarded_tests.length > 0
+           || (this.d_mutation_test_suite_result!.invalid_tests !== null
+               && this.d_mutation_test_suite_result!.invalid_tests!.length > 0)
+           || this.get_valid_tests().length > 0
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout
+           || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr;
+  }
 
   async toggle_d_show_buggy_implementations_output() {
     let old_toggle_val = this.d_show_buggy_implementations_output;
@@ -486,36 +499,6 @@ export default class MutationSuiteResult extends Vue {
         await this.load_validity_check_stderr_content();
       }
     }
-  }
-
-  async created() {
-    this.d_fdbk_category = this.fdbk_category;
-    this.d_submission = this.submission;
-    this.d_mutation_test_suite_result = this.mutation_test_suite_result;
-    await this.get_results();
-  }
-
-  get show_setup_fieldset(): boolean {
-    return this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout
-           || this.d_mutation_test_suite_result!.fdbk_settings.show_setup_stderr
-           || this.d_mutation_test_suite_result!.setup_return_code !== null
-           || (this.d_mutation_test_suite_result!.setup_timed_out !== null
-               && this.d_mutation_test_suite_result!.setup_timed_out!);
-  }
-
-  get show_buggy_implementations_fieldset(): boolean {
-    return this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
-           || this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
-           || this.d_mutation_test_suite_result!.num_bugs_exposed !== null;
-  }
-
-  get show_test_names_fieldset(): boolean {
-    return this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
-           || this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
-           || this.d_mutation_test_suite_result!.discarded_tests.length > 0
-           || (this.d_mutation_test_suite_result!.invalid_tests !== null
-               && this.d_mutation_test_suite_result!.invalid_tests!.length > 0)
-           || this.get_valid_tests().length > 0;
   }
 
   async get_results() {
@@ -767,6 +750,10 @@ export default class MutationSuiteResult extends Vue {
 .feedback-explanation {
   font-weight: bold;
   padding: 5px 0;
+}
+
+.show-output-button-label {
+  font-weight: bold;
 }
 
 .show-output-button {

@@ -1,6 +1,7 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
+import { MutationTestSuiteFeedbackConfig } from 'ag-client-typescript/dist/src/mutation_test_suite';
 import * as sinon from 'sinon';
 
 import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
@@ -98,12 +99,12 @@ afterEach(() => {
     sinon.restore();
 });
 
-describe('MutationSuiteResult setup section tests', () => {
+describe('show_setup_fieldset getter', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
+    let d_mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
+    let fdbk_settings: MutationTestSuiteFeedbackConfig;
 
-    test('show_setup_fieldset getter', async () => {
-        mutation_test_suite_result.fdbk_settings.show_setup_stdout = true;
-
+    beforeEach(async () => {
         wrapper = mount(MutationSuiteResult, {
             propsData: {
                 mutation_test_suite_result: mutation_test_suite_result,
@@ -111,78 +112,86 @@ describe('MutationSuiteResult setup section tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
+
         for (let i = 0; i < 9; ++i) {
             await wrapper.vm.$nextTick();
         }
 
-        let d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
-        let fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
+        d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
+        fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
+    });
+
+    test('show_setup_fieldset - show_setup_stdout === false', () => {
+        expect(fdbk_settings.show_setup_stdout).toBe(false);
+        expect(fdbk_settings.show_setup_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
+        expect(d_mutation_test_suite_result.setup_timed_out).toBeNull();
+        expect(wrapper.vm.show_setup_fieldset).toBe(false);
+        expect(wrapper.find('#setup-section').exists()).toBe(false);
+    });
+
+    test('show_setup_fieldset - show_setup_stdout === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout = true;
 
         expect(fdbk_settings.show_setup_stdout).toBe(true);
         expect(fdbk_settings.show_setup_stderr).toBe(false);
         expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
         expect(d_mutation_test_suite_result.setup_timed_out).toBeNull();
         expect(wrapper.vm.show_setup_fieldset).toBe(true);
+        expect(wrapper.find('#setup-section').exists()).toBe(true);
+    });
 
-        fdbk_settings.show_setup_stdout = false;
-        fdbk_settings.show_setup_stderr = true;
+    test('show_setup_fieldset - show_setup_stderr === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_setup_stderr = true;
 
         expect(fdbk_settings.show_setup_stdout).toBe(false);
         expect(fdbk_settings.show_setup_stderr).toBe(true);
         expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
         expect(d_mutation_test_suite_result.setup_timed_out).toBeNull();
         expect(wrapper.vm.show_setup_fieldset).toBe(true);
+        expect(wrapper.find('#setup-section').exists()).toBe(true);
+    });
 
-        fdbk_settings.show_setup_stderr = false;
-        d_mutation_test_suite_result.setup_return_code = 0;
+    test('show_setup_fieldset - setup_return_code !== null', () => {
+        wrapper.vm.d_mutation_test_suite_result!.setup_return_code = 0;
 
         expect(fdbk_settings.show_setup_stdout).toBe(false);
         expect(fdbk_settings.show_setup_stderr).toBe(false);
         expect(d_mutation_test_suite_result.setup_return_code).not.toBeNull();
         expect(d_mutation_test_suite_result.setup_timed_out).toBeNull();
         expect(wrapper.vm.show_setup_fieldset).toBe(true);
-
-        d_mutation_test_suite_result.setup_return_code = null;
-        d_mutation_test_suite_result.setup_timed_out = false;
-
-        d_mutation_test_suite_result.setup_return_code = null;
-        expect(fdbk_settings.show_setup_stdout).toBe(false);
-        expect(fdbk_settings.show_setup_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
-        expect(d_mutation_test_suite_result.setup_timed_out).not.toBeNull();
-        expect(wrapper.vm.show_setup_fieldset).toBe(false);
-
-        d_mutation_test_suite_result.setup_timed_out = true;
-
-        d_mutation_test_suite_result.setup_return_code = null;
-        expect(fdbk_settings.show_setup_stdout).toBe(false);
-        expect(fdbk_settings.show_setup_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
-        expect(d_mutation_test_suite_result.setup_timed_out).not.toBeNull();
-        expect(wrapper.vm.show_setup_fieldset).toBe(true);
+        expect(wrapper.find('#setup-section').exists()).toBe(true);
     });
 
-    test('setup-section is not visible when setup_return_code === null and ' +
-         'setup_timed_out === false',
-         async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+    test('show_setup_fieldset - setup_timed_out === false', async () => {
+        wrapper.vm.d_mutation_test_suite_result!.setup_timed_out = false;
 
-        expect(wrapper.vm.d_mutation_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.d_mutation_test_suite_result!.setup_timed_out).toBeNull();
+        expect(fdbk_settings.show_setup_stdout).toBe(false);
+        expect(fdbk_settings.show_setup_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
+        expect(d_mutation_test_suite_result.setup_timed_out).toBe(false);
+        expect(wrapper.vm.show_setup_fieldset).toBe(false);
         expect(wrapper.find('#setup-section').exists()).toBe(false);
     });
 
-    test('setup-section visible when setup_return_code !== null', async () => {
-        mutation_test_suite_result.setup_return_code = 1;
+    test('show_setup_fieldset - setup_timed_out === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.setup_timed_out = true;
+
+        expect(fdbk_settings.show_setup_stdout).toBe(false);
+        expect(fdbk_settings.show_setup_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.setup_return_code).toBeNull();
+        expect(d_mutation_test_suite_result.setup_timed_out).toBe(true);
+        expect(wrapper.vm.show_setup_fieldset).toBe(true);
+        expect(wrapper.find('#setup-section').exists()).toBe(true);
+    });
+});
+
+describe('show_buggy_implementations_fieldset getter', () => {
+    let wrapper: Wrapper<MutationSuiteResult>;
+    let d_mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
+    let fdbk_settings: MutationTestSuiteFeedbackConfig;
+
+    beforeEach(async () => {
         wrapper = mount(MutationSuiteResult, {
             propsData: {
                 mutation_test_suite_result: mutation_test_suite_result,
@@ -190,17 +199,60 @@ describe('MutationSuiteResult setup section tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
+
         for (let i = 0; i < 9; ++i) {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_mutation_test_suite_result!.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.d_mutation_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.find('#setup-section').exists()).toBe(true);
+        d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
+        fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
     });
 
-    test('setup-section visible when setup_timed_out === true', async () => {
-        mutation_test_suite_result.setup_timed_out = true;
+    test('show_buggy_implementations_fieldset - false', () => {
+        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(false);
+        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.num_bugs_exposed).toBeNull();
+        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(false);
+        expect(wrapper.find('#buggy-implementations-section').exists()).toBe(false);
+    });
+
+    test('show_buggy_implementations_fieldset - show_grade_buggy_impls_stdout === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout = true;
+
+        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(true);
+        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.num_bugs_exposed).toBeNull();
+        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(true);
+        expect(wrapper.find('#buggy-implementations-section').exists()).toBe(true);
+    });
+
+    test('show_buggy_implementations_fieldset - show_grade_buggy_impls_stdout === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr = true;
+
+        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(false);
+        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(true);
+        expect(d_mutation_test_suite_result.num_bugs_exposed).toBeNull();
+        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(true);
+        expect(wrapper.find('#buggy-implementations-section').exists()).toBe(true);
+    });
+
+    test('show_buggy_implementations_fieldset - num_bugs_exposed !== null', () => {
+        wrapper.vm.d_mutation_test_suite_result!.num_bugs_exposed = 1;
+
+        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(false);
+        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.num_bugs_exposed).toEqual(1);
+        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(true);
+        expect(wrapper.find('#buggy-implementations-section').exists()).toBe(true);
+    });
+});
+
+describe('show_student_tests_fieldset getter', () => {
+    let wrapper: Wrapper<MutationSuiteResult>;
+    let d_mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
+    let fdbk_settings: MutationTestSuiteFeedbackConfig;
+
+    beforeEach(async () => {
         wrapper = mount(MutationSuiteResult, {
             propsData: {
                 mutation_test_suite_result: mutation_test_suite_result,
@@ -208,14 +260,128 @@ describe('MutationSuiteResult setup section tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
+
         for (let i = 0; i < 9; ++i) {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.mutation_test_suite_result.setup_return_code).toBeNull();
-        expect(wrapper.vm.mutation_test_suite_result.setup_timed_out).toBe(true);
-        expect(wrapper.find('#setup-section').exists()).toBe(true);
+        d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
+        fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
     });
+
+    test('show_student_tests_fieldset - false', () => {
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(false);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(false);
+    });
+
+    test('show_student_tests_fieldset - show_get_test_names_stdout === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout = true;
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(true);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+
+    test('show_student_tests_fieldset - show_get_test_names_stderr === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr = true;
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(true);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+
+    test('show_student_tests_fieldset - discarded_tests.length > 0', () => {
+        wrapper.vm.d_mutation_test_suite_result!.discarded_tests = ['one_test'];
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(1);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+
+    test('show_student_tests_fieldset - invalid_tests.length > 0', () => {
+        wrapper.vm.d_mutation_test_suite_result!.invalid_tests = ['one_test'];
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests!.length).toEqual(1);
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+
+    test('show_student_tests_fieldset - get_valid_tests().length > 0', () => {
+        wrapper.vm.d_mutation_test_suite_result!.student_tests = ['one_test'];
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(1);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+
+    test('show_student_tests_fieldset - show_validity_check_stdout === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout = true;
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(true);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+
+    test('show_student_tests_fieldset - show_validity_check_stderr === true', () => {
+        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr = true;
+
+        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+        expect(fdbk_settings.show_validity_check_stderr).toBe(true);
+        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+    });
+});
+
+describe('MutationSuiteResult setup section tests', () => {
+    let wrapper: Wrapper<MutationSuiteResult>;
 
     test('Setup command name === null', async () => {
         mutation_test_suite_result.setup_return_code = 0;
@@ -359,11 +525,11 @@ describe('MutationSuiteResult setup section tests', () => {
         mutation_test_suite_result.fdbk_settings.show_setup_stdout = true;
 
         wrapper = mount(MutationSuiteResult, {
-        propsData: {
-            mutation_test_suite_result: mutation_test_suite_result,
-            submission: submission,
-            fdbk_category: ag_cli.FeedbackCategory.max
-        }
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
         });
         for (let i = 0; i < 9; ++i) {
             await wrapper.vm.$nextTick();
@@ -478,50 +644,6 @@ describe('MutationSuiteResult setup section tests', () => {
 
 describe('MutationSuiteResult buggy implementations section tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
-
-    test('show_buggy_implementations_fieldset getter', async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        let d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
-        let fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
-
-        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(false);
-        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.num_bugs_exposed).toBeNull();
-        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(false);
-
-        fdbk_settings.show_grade_buggy_impls_stdout = true;
-
-        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(true);
-        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.num_bugs_exposed).toBeNull();
-        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(true);
-
-        fdbk_settings.show_grade_buggy_impls_stdout = false;
-        fdbk_settings.show_grade_buggy_impls_stderr = true;
-
-        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(false);
-        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(true);
-        expect(d_mutation_test_suite_result.num_bugs_exposed).toBeNull();
-        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(true);
-
-        fdbk_settings.show_grade_buggy_impls_stderr = false;
-        d_mutation_test_suite_result.num_bugs_exposed = 3;
-
-        expect(fdbk_settings.show_grade_buggy_impls_stdout).toBe(false);
-        expect(fdbk_settings.show_grade_buggy_impls_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.num_bugs_exposed).toEqual(3);
-        expect(wrapper.vm.show_buggy_implementations_fieldset).toBe(true);
-    });
 
     test('num_bugs_exposed === null', async () => {
         wrapper = mount(MutationSuiteResult, {
@@ -898,80 +1020,8 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
     });
 });
 
-describe('MutationSuiteResult get test names section tests', () => {
+describe('MutationSuiteResult student tests section tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
-
-    test('show_test_names_fieldset getter', async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        let d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
-        let fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(wrapper.vm.show_test_names_fieldset).toBe(false);
-
-        fdbk_settings.show_get_test_names_stdout = true;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(true);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(wrapper.vm.show_test_names_fieldset).toBe(true);
-
-        fdbk_settings.show_get_test_names_stdout = false;
-        fdbk_settings.show_get_test_names_stderr = true;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(true);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(wrapper.vm.show_test_names_fieldset).toBe(true);
-
-        fdbk_settings.show_get_test_names_stderr = false;
-        d_mutation_test_suite_result.discarded_tests = ['one_test'];
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(1);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(wrapper.vm.show_test_names_fieldset).toBe(true);
-
-        d_mutation_test_suite_result.discarded_tests = [];
-        d_mutation_test_suite_result.invalid_tests = ['one_test'];
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests!.length).toEqual(1);
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(wrapper.vm.show_test_names_fieldset).toBe(true);
-
-        d_mutation_test_suite_result.invalid_tests = null;
-        d_mutation_test_suite_result.student_tests = ['one_test'];
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(1);
-        expect(wrapper.vm.show_test_names_fieldset).toBe(true);
-    });
 
     test('show_get_test_names_stdout === false && show_get_test_names_stderr === false',
          async () => {
@@ -1363,9 +1413,7 @@ describe('MutationSuiteResult get test names section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(get_student_test_names_stdout_stub.callCount).toEqual(
-            0
-        );
+        expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#invalid-tests-section').exists()).toBe(false);
     });
 
@@ -1445,9 +1493,7 @@ describe('MutationSuiteResult get test names section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(get_student_test_names_stdout_stub.callCount).toEqual(
-            0
-        );
+        expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#valid-tests-section').exists()).toBe(false);
     });
 
@@ -1474,9 +1520,7 @@ describe('MutationSuiteResult get test names section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(get_student_test_names_stdout_stub.callCount).toEqual(
-            0
-        );
+        expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#valid-tests-section').exists()).toBe(true);
         expect(wrapper.find('#list-of-valid-tests').text()).toContain('test_two');
         expect(wrapper.find('#list-of-valid-tests').text()).toContain('test_three');
@@ -1600,7 +1644,7 @@ describe('MutationSuiteResult get test names section tests', () => {
 });
 
 
-describe('MutationSuiteResult validity check section tests', () => {
+describe('MutationSuiteResult validity check related tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     test('show_validity_check_stdout === false && show_validity_check_stderr === false',
@@ -1914,7 +1958,7 @@ describe('MutationSuiteResult validity check section tests', () => {
 describe('MutationSuiteResult Watcher tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         get_output_size_stub.onFirstCall().returns(Promise.resolve(
             {
                 setup_stdout_size: null,
@@ -1948,13 +1992,13 @@ describe('MutationSuiteResult Watcher tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-    });
 
-    test('mutation_test_suite_result Watcher', async () => {
         for (let i = 0; i < 9; ++i) {
             await wrapper.vm.$nextTick();
         }
+    });
 
+    test('mutation_test_suite_result Watcher', async () => {
         expect(wrapper.vm.d_mutation_test_suite_result).toEqual(mutation_test_suite_result);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
@@ -2005,10 +2049,6 @@ describe('MutationSuiteResult Watcher tests', () => {
     });
 
     test('submission Watcher', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(wrapper.vm.fdbk_category).not.toEqual(ag_cli.FeedbackCategory.normal);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stdout_stub.callCount).toEqual(0);
@@ -2056,10 +2096,6 @@ describe('MutationSuiteResult Watcher tests', () => {
     });
 
     test('fdbk_category Watcher', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(wrapper.vm.fdbk_category).not.toEqual(ag_cli.FeedbackCategory.normal);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stdout_stub.callCount).toEqual(0);
@@ -2107,11 +2143,10 @@ describe('MutationSuiteResult Watcher tests', () => {
     });
 });
 
-
 describe('MutationSuiteResult get_results tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         wrapper = mount(MutationSuiteResult, {
             propsData: {
                 mutation_test_suite_result: mutation_test_suite_result,
@@ -2119,16 +2154,15 @@ describe('MutationSuiteResult get_results tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
+
+        for (let i = 0; i < 9; ++i) {
+            await wrapper.vm.$nextTick();
+        }
     });
 
     test('get_results - d_load_student_test_names_output === false ' +
          '&& d_load_validity_check_output === false && d_load_grade_buggy_output === false ',
          async () => {
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(get_output_size_stub.callCount).toEqual(1);
         expect(get_setup_stdout_stub.callCount).toEqual(1);
         expect(get_setup_stderr_stub.callCount).toEqual(1);
@@ -2141,10 +2175,6 @@ describe('MutationSuiteResult get_results tests', () => {
     });
 
     test('get_results - d_load_grade_buggy_output === true ', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(get_output_size_stub.callCount).toEqual(1);
         expect(get_setup_stdout_stub.callCount).toEqual(1);
         expect(get_setup_stderr_stub.callCount).toEqual(1);
@@ -2176,10 +2206,6 @@ describe('MutationSuiteResult get_results tests', () => {
     });
 
     test('get_results - d_load_student_test_names_output === true', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(get_output_size_stub.callCount).toEqual(1);
         expect(get_setup_stdout_stub.callCount).toEqual(1);
         expect(get_setup_stderr_stub.callCount).toEqual(1);
@@ -2211,10 +2237,6 @@ describe('MutationSuiteResult get_results tests', () => {
     });
 
     test('get_results - d_load_validity_check_output === true', async () => {
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(get_output_size_stub.callCount).toEqual(1);
         expect(get_setup_stdout_stub.callCount).toEqual(1);
         expect(get_setup_stderr_stub.callCount).toEqual(1);
