@@ -100,7 +100,7 @@
               <div v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests"
                    class="single-discarded-test">
                 <span>
-                  <i class="fas fa-trash-alt discarded-test-icon"></i>
+                  <i class="far fa-trash-alt discarded-test-icon"></i>
                   {{discarded_test_name}}
                 </span>
               </div>
@@ -120,18 +120,18 @@
           <div class="feedback-label test-names-feedback-label">Tests with false positives:</div>
           <div class="feedback test-names-feedback">
             <div id="list-of-false-positive-tests">
-              <div v-for="invalid_test of d_mutation_test_suite_result.invalid_tests"
-                   class="single-invalid-test">
+              <div v-for="false_positive_test of d_mutation_test_suite_result.invalid_tests"
+                   class="single-false-positive-test">
                 <span>
-                  <span v-if="test_timed_out(invalid_test)">
-                    <i class="fas fa-clock timed-out-icon"></i>
+                  <span v-if="test_timed_out(false_positive_test)">
+                    <i class="far fa-clock timed-out-icon"></i>
                   </span>
                   <span v-else>
-                    <i class="fas fa-exclamation-circle false-positive-test-icon"></i>
+                    <i class="fas fa-exclamation-triangle false-positive-test-icon"></i>
                   </span>
-                  {{invalid_test}}
+                  {{false_positive_test}}
                 </span>
-                <span v-if="test_timed_out(invalid_test)"
+                <span v-if="test_timed_out(false_positive_test)"
                       class="test-timed-out">
                   (Timed Out)
                 </span>
@@ -149,7 +149,7 @@
               <div v-for="valid_test of get_valid_tests()"
                    class="single-valid-test">
                 <span>
-                  <i class="fas fa-check-circle valid-test-icon"></i>
+                  <i class="far fa-check-circle valid-test-icon"></i>
                   {{valid_test}}
                 </span>
               </div>
@@ -746,7 +746,7 @@ $bug-color: $navy-blue;
 
 .single-bug,
 .single-valid-test,
-.single-invalid-test,
+.single-false-positive-test,
 .single-discarded-test {
   padding: 0 0 5px 0;
   word-break: break-word;

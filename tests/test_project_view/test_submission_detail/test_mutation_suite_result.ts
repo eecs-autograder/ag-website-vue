@@ -1460,10 +1460,10 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_three");
         expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_four");
         expect(wrapper.find('.test-timed-out').exists()).toBe(true);
-        expect(wrapper.findAll('.single-invalid-test').at(0).find(
+        expect(wrapper.findAll('.single-false-positive-test').at(0).find(
             '.test-timed-out'
         ).exists()).toBe(true);
-        expect(wrapper.findAll('.single-invalid-test').at(1).find(
+        expect(wrapper.findAll('.single-false-positive-test').at(1).find(
             '.test-timed-out'
         ).exists()).toBe(false);
     });
