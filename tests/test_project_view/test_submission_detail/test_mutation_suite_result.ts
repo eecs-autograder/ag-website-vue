@@ -1395,7 +1395,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(get_student_test_names_stdout_stub.callCount).toEqual(
             0
         );
-        expect(wrapper.find('#invalid-tests-section').exists()).toBe(false);
+        expect(wrapper.find('#false-positive-tests-section').exists()).toBe(false);
     });
 
     test('invalid_tests.length === 0', async () => {
@@ -1414,7 +1414,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         }
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
-        expect(wrapper.find('#invalid-tests-section').exists()).toBe(false);
+        expect(wrapper.find('#false-positive-tests-section').exists()).toBe(false);
     });
 
     test('invalid_tests.length !== 0 AND no tests timed out', async () => {
@@ -1433,9 +1433,9 @@ describe('MutationSuiteResult student tests section tests', () => {
         }
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
-        expect(wrapper.find('#invalid-tests-section').exists()).toBe(true);
-        expect(wrapper.find('#list-of-invalid-tests').text()).toContain("test_three");
-        expect(wrapper.find('#list-of-invalid-tests').text()).toContain("test_four");
+        expect(wrapper.find('#false-positive-tests-section').exists()).toBe(true);
+        expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_three");
+        expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_four");
         expect(wrapper.find('.test-timed-out').exists()).toBe(false);
     });
 
@@ -1456,15 +1456,15 @@ describe('MutationSuiteResult student tests section tests', () => {
         }
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
-        expect(wrapper.find('#invalid-tests-section').exists()).toBe(true);
-        expect(wrapper.find('#list-of-invalid-tests').text()).toContain("test_three");
-        expect(wrapper.find('#list-of-invalid-tests').text()).toContain("test_four");
-        expect(wrapper.find('.invalid-test-timed-out').exists()).toBe(true);
+        expect(wrapper.find('#false-positive-tests-section').exists()).toBe(true);
+        expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_three");
+        expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_four");
+        expect(wrapper.find('.test-timed-out').exists()).toBe(true);
         expect(wrapper.findAll('.single-invalid-test').at(0).find(
-            '.invalid-test-timed-out'
+            '.test-timed-out'
         ).exists()).toBe(true);
         expect(wrapper.findAll('.single-invalid-test').at(1).find(
-            '.invalid-test-timed-out'
+            '.test-timed-out'
         ).exists()).toBe(false);
     });
 

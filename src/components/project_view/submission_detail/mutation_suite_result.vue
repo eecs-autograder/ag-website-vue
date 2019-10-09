@@ -81,23 +81,6 @@
       <legend class="legend"> Student Tests </legend>
       <div id="student-tests-section">
 
-        <div v-if="get_valid_tests().length"
-             class="feedback-row"
-             id="valid-tests-section">
-          <div class="feedback-label test-names-feedback-label"> Your test cases: </div>
-          <div class="feedback test-names-feedback">
-            <div id="list-of-valid-tests">
-              <div v-for="valid_test of get_valid_tests()"
-                   class="single-valid-test">
-                <span>
-                  <i class="far fa-check-circle valid-test-icon"></i>
-                  {{valid_test}}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div v-if="d_mutation_test_suite_result.discarded_tests.length"
              id="discarded-tests-section"
              class="feedback-row">
@@ -111,15 +94,13 @@
                 + d_mutation_test_suite_result.discarded_tests.length}}</span>.
           </div>
 
-          <div class="feedback-label test-names-feedback-label">
-            Discarded test cases:
-          </div>
+          <div class="feedback-label test-names-feedback-label"> Discarded test cases: </div>
           <div class="feedback test-names-feedback">
             <div id="list-of-discarded-tests">
               <div v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests"
                    class="single-discarded-test">
                 <span>
-                  <i class="far fa-times-circle discarded-test-icon"></i>
+                  <i class="fas fa-trash-alt discarded-test-icon"></i>
                   {{discarded_test_name}}
                 </span>
               </div>
@@ -129,28 +110,47 @@
 
         <div v-if="d_mutation_test_suite_result.invalid_tests !== null &&
                    d_mutation_test_suite_result.invalid_tests.length"
-             id="invalid-tests-section"
+             id="false-positive-tests-section"
              class="feedback-row">
 
           <div class="feedback-explanation">
-            A test is considered invalid if it times out or flags a correct implementation
-            as incorrect.
+            Tests with false positives incorrectly reported a bug when run against a correct
+            implementation.
           </div>
-          <div class="feedback-label test-names-feedback-label">
-            Invalid test cases:
-          </div>
+          <div class="feedback-label test-names-feedback-label">Tests with false positives:</div>
           <div class="feedback test-names-feedback">
-            <div id="list-of-invalid-tests">
+            <div id="list-of-false-positive-tests">
               <div v-for="invalid_test of d_mutation_test_suite_result.invalid_tests"
                    class="single-invalid-test">
                 <span>
-                  <i class="fas fa-exclamation-triangle invalid-test-icon"></i>
+                  <span v-if="test_timed_out(invalid_test)">
+                    <i class="fas fa-clock timed-out-icon"></i>
+                  </span>
+                  <span v-else>
+                    <i class="fas fa-exclamation-circle false-positive-test-icon"></i>
+                  </span>
                   {{invalid_test}}
                 </span>
                 <span v-if="test_timed_out(invalid_test)"
-                      class="invalid-test-timed-out">
+                      class="test-timed-out">
                   (Timed Out)
-                  <i class="far fa-clock timed-out-icon"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="get_valid_tests().length"
+             class="feedback-row"
+             id="valid-tests-section">
+          <div class="feedback-label test-names-feedback-label"> Your test cases: </div>
+          <div class="feedback test-names-feedback">
+            <div id="list-of-valid-tests">
+              <div v-for="valid_test of get_valid_tests()"
+                   class="single-valid-test">
+                <span>
+                  <i class="fas fa-check-circle valid-test-icon"></i>
+                  {{valid_test}}
                 </span>
               </div>
             </div>
@@ -693,20 +693,29 @@ export default class MutationSuiteResult extends Vue {
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/submission_detail.scss';
 
-.bug-icon {
-  color: $navy-blue;
-}
+$discarded-test-color: #b53389;
+$false-positive-test-color: $coral-pink;
+$valid-test-color: $ocean-blue;
+$bug-color: $navy-blue;
 
-.invalid-test-icon {
-  color: $warning-red;
+.bug-icon {
+  color: $bug-color;
 }
 
 .discarded-test-icon {
-  color: $coral-pink;
+  color: $discarded-test-color;
+}
+
+.false-positive-test-icon {
+  color: $false-positive-test-color;
+}
+
+.timed-out-icon {
+  color: $false-positive-test-color;
 }
 
 .valid-test-icon {
-  color: $ocean-blue;
+  color: $valid-test-color;
 }
 
 #setup-return-code-correctness-icon {
@@ -715,21 +724,23 @@ export default class MutationSuiteResult extends Vue {
 
 #num-tests-accepted, #total-tests-submitted {
   text-decoration: underline;
+  color: $discarded-test-color;
 }
 
-.invalid-test-timed-out {
-  color: $navy-blue;
+.test-timed-out {
+  color: $false-positive-test-color;
   padding-left: 2px;
 }
 
 .discarded-test-icon,
 .valid-test-icon,
-.invalid-test-icon,
+.false-positive-test-icon,
+.timed-out-icon,
 .bug-icon {
   padding-right: 5px;
 }
 
-.bug-icon, .invalid-test-icon {
+.bug-icon {
   font-size: 14px;
 }
 
@@ -738,18 +749,19 @@ export default class MutationSuiteResult extends Vue {
 .single-invalid-test,
 .single-discarded-test {
   padding: 0 0 5px 0;
+  word-break: break-word;
 }
 
 #list-of-bugs,
 #list-of-valid-tests,
-#list-of-invalid-tests,
+#list-of-false-positive-tests,
 #list-of-discarded-tests {
   padding: 5px;
 }
 
 .feedback-explanation {
   font-weight: bold;
-  padding: 5px 0;
+  padding: 5px 2px;
 }
 
 .show-output-button-label {
@@ -768,7 +780,7 @@ export default class MutationSuiteResult extends Vue {
 }
 
 @media only screen and (min-width: 700px) {
-  $width-of-mutation-feedback-label: 180px;
+  $width-of-mutation-feedback-label: 200px;
 
   .feedback-label {
     width: $width-of-mutation-feedback-label;
