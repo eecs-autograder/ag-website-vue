@@ -13,7 +13,7 @@
             <div class="correctness-output">
               <span v-if="return_code_correctness === ReturnCodeCorrectness.timed_out">
                 <i class="far fa-clock timed-out-icon"></i>
-                <span class="timed-out-msg"> (Timed Out) </span>
+                <span class="timed-out-msg"> (Timed out) </span>
               </span>
               <span v-else-if="return_code_correctness === ReturnCodeCorrectness.correct">
                 <i class="fas fa-check correct-icon"></i>
@@ -144,7 +144,7 @@
           </template>
           <template v-else>
             <div v-if="!d_stdout_content"
-                 class="short-output"> No Output
+                 class="short-output"> No output
             </div>
             <pre v-else class="lengthy-output">{{d_stdout_content}}</pre>
           </template>
@@ -163,7 +163,7 @@
           </template>
           <template v-else>
             <div v-if="!d_stderr_content"
-                 class="short-output"> No Output
+                 class="short-output"> No output
             </div>
             <pre v-else class="lengthy-output">{{d_stderr_content}}</pre>
           </template>
@@ -368,10 +368,6 @@ export default class AGCommandResult extends Vue {
 
 .not-available-icon, .correct-icon, .incorrect-icon, .timed-out-icon {
   padding: 0 5px 0 0;
-}
-
-.timed-out-msg {
-  //color: $coral-pink;
 }
 
 </style>

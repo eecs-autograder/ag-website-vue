@@ -38,7 +38,7 @@
           </template>
           <template v-else>
             <div v-if="!d_setup_stdout"
-                 class="short-output"> No Output </div>
+                 class="short-output"> No output </div>
             <pre v-else
                  class="lengthy-output">{{d_setup_stdout}}</pre>
           </template>
@@ -57,7 +57,7 @@
           </template>
           <template v-else>
             <div v-if="!d_setup_stderr"
-                 class="short-output"> No Output </div>
+                 class="short-output"> No output </div>
             <pre v-else
                  class="lengthy-output">{{d_setup_stderr}}</pre>
           </template>

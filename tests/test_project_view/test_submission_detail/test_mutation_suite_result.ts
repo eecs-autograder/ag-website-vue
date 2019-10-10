@@ -515,7 +515,7 @@ describe('MutationSuiteResult setup section tests', () => {
         expect(get_setup_stdout_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_setup_stdout_content).toBeNull();
         expect(wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
-        expect(wrapper.find('#setup-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#setup-stdout-section').text()).toContain("No output");
     });
 
     test('setup-stdout-section is visible when show_setup_stdout === true' +
@@ -614,7 +614,7 @@ describe('MutationSuiteResult setup section tests', () => {
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stderr_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_setup_stderr_content).toBeNull();
-        expect(wrapper.find('#setup-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#setup-stderr-section').text()).toContain("No output");
     });
 
     test('show_setup_stderr === true, and setup_stderr_content !== null', async () => {
@@ -791,7 +791,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
         expect(wrapper.vm.d_grade_buggy_stdout_content).toBeNull();
-        expect(wrapper.find('#buggy-stdout-section').text()).toContain('No Output');
+        expect(wrapper.find('#buggy-stdout-section').text()).toContain('No output');
 
         // hide
         wrapper.find('#show-buggy-output-button').trigger('click');
@@ -813,7 +813,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
-        expect(wrapper.find('#buggy-stdout-section').text()).toContain('No Output');
+        expect(wrapper.find('#buggy-stdout-section').text()).toContain('No output');
     });
 
     test('show_grade_buggy_impls_stdout === true AND grade_buggy_stdout_content !== null ' +
@@ -929,7 +929,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
         expect(wrapper.vm.d_grade_buggy_stderr_content).toBeNull();
-        expect(wrapper.find('#buggy-stderr-section').text()).toContain('No Output');
+        expect(wrapper.find('#buggy-stderr-section').text()).toContain('No output');
 
         // hide
         wrapper.find('#show-buggy-output-button').trigger('click');
@@ -951,7 +951,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
-        expect(wrapper.find('#buggy-stderr-section').text()).toContain('No Output');
+        expect(wrapper.find('#buggy-stderr-section').text()).toContain('No output');
     });
 
     test('show_grade_buggy_impls_stderr === true AND grade_buggy_stderr_content !== null ' +
@@ -1092,7 +1092,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
-        expect(wrapper.find('#test-names-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#test-names-stdout-section').text()).toContain("No output");
 
         // hide
         wrapper.find('#show-test-names-output-button').trigger('click');
@@ -1116,7 +1116,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
-        expect(wrapper.find('#test-names-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#test-names-stdout-section').text()).toContain("No output");
     });
 
     test('show_get_test_names_stdout === true AND test_names_stdout_content !== null',
@@ -1239,7 +1239,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stderr_content).toBeNull();
-        expect(wrapper.find('#test-names-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#test-names-stderr-section').text()).toContain("No output");
 
         // hide
         wrapper.find('#show-test-names-output-button').trigger('click');
@@ -1263,7 +1263,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stderr_content).toBeNull();
-        expect(wrapper.find('#test-names-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#test-names-stderr-section').text()).toContain("No output");
     });
 
     test('show_get_test_names_stderr === true AND test_names_stderr_content !== null',
@@ -1721,7 +1721,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
         expect(wrapper.vm.d_validity_check_stdout_content).toBeNull();
-        expect(wrapper.find('#validity-check-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#validity-check-stdout-section').text()).toContain("No output");
 
         // hide
         wrapper.find('#show-validity-check-output-button').trigger('click');
@@ -1745,7 +1745,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
         expect(wrapper.vm.d_validity_check_stdout_content).toBeNull();
-        expect(wrapper.find('#validity-check-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#validity-check-stdout-section').text()).toContain("No output");
     });
 
     test('show_validity_check_stdout === true AND validity_check_stdout_content !== null',
@@ -1862,7 +1862,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
         expect(wrapper.vm.d_validity_check_stderr_content).toBeNull();
-        expect(wrapper.find('#validity-check-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#validity-check-stderr-section').text()).toContain("No output");
 
         // hide
         wrapper.find('#show-validity-check-output-button').trigger('click');
@@ -1886,7 +1886,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
         expect(wrapper.vm.d_validity_check_stderr_content).toBeNull();
-        expect(wrapper.find('#validity-check-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#validity-check-stderr-section').text()).toContain("No output");
     });
 
     test('show_validity_check_stderr === true AND validity_check_stderr_content !== null',

@@ -98,7 +98,7 @@ describe('AGCaseSetupResult tests', () => {
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stdout_size).toBeNull();
         expect(wrapper.vm.d_setup_stdout).toEqual(null);
-        expect(wrapper.find('#setup-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#setup-stdout-section').text()).toContain("No output");
     });
 
     test('setup_stdout !== null and show_setup_stdout === true', async () => {
@@ -164,7 +164,7 @@ describe('AGCaseSetupResult tests', () => {
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stderr_size).toBeNull();
         expect(wrapper.vm.d_setup_stderr).toEqual(null);
-        expect(wrapper.find('#setup-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#setup-stderr-section').text()).toContain("No output");
     });
 
     test('setup_stderr !== null and show_setup_stderr === true', async () => {

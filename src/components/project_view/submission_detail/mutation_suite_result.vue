@@ -15,18 +15,21 @@
             {{d_mutation_test_suite_result.setup_command_name !== null
             ? d_mutation_test_suite_result.setup_command_name : 'Setup'}}:
           </div>
-          <span id="setup-return-code-correctness-icon">
-            <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
-              <i class="fas fa-check correct-icon"></i>
-            </span>
-            <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
-              <i class="fas fa-times incorrect-icon"></i>
-            </span>
-            <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
-              <i class="far fa-clock timed-out-icon"></i>
-              <span> (Timed Out) </span>
-            </span>
-          </span>
+          <div class="feedback">
+            <div class="correctness-output"
+               id="setup-return-code-correctness-icon">
+              <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
+                <i class="fas fa-check correct-icon"></i>
+              </span>
+              <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
+                <i class="fas fa-times incorrect-icon"></i>
+              </span>
+              <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
+                <i class="far fa-clock timed-out-icon setup-timed-out-icon"></i>
+                <span> (Timed Out) </span>
+              </span>
+            </div>
+          </div>
         </div>
 
         <div v-if="d_mutation_test_suite_result.setup_return_code !== null"
@@ -49,7 +52,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_setup_stdout_content" class="short-output"> No Output </div>
+              <div v-if="!d_setup_stdout_content" class="short-output"> No output </div>
               <pre v-else class="lengthy-output">{{d_setup_stdout_content}}</pre>
             </template>
           </div>
@@ -66,7 +69,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_setup_stderr_content" class="short-output">No Output</div>
+              <div v-if="!d_setup_stderr_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_setup_stderr_content}}</pre>
             </template>
           </div>
@@ -98,10 +101,8 @@
             <div id="list-of-discarded-tests">
               <div v-for="discarded_test_name of d_mutation_test_suite_result.discarded_tests"
                    class="single-discarded-test">
-                <span>
-                  <i class="far fa-trash-alt discarded-test-icon"></i>
-                  {{discarded_test_name}}
-                </span>
+                <span class="list-icon"><i class="far fa-trash-alt discarded-test-icon"></i></span>
+                <span class="test-name">{{discarded_test_name}}</span>
               </div>
             </div>
           </div>
@@ -121,18 +122,19 @@
             <div id="list-of-false-positive-tests">
               <div v-for="false_positive_test of d_mutation_test_suite_result.invalid_tests"
                    class="single-false-positive-test">
-                <span>
-                  <span v-if="test_timed_out(false_positive_test)">
-                    <i class="far fa-clock timed-out-icon"></i>
-                  </span>
-                  <span v-else>
-                    <i class="fas fa-exclamation-triangle false-positive-test-icon"></i>
-                  </span>
-                  {{false_positive_test}}
-                </span>
                 <span v-if="test_timed_out(false_positive_test)"
-                      class="test-timed-out">
-                  (Timed Out)
+                      class="list-icon">
+                  <i class="far fa-clock timed-out-icon"></i>
+                </span>
+                <span v-else
+                     class="list-icon">
+                  <i class="fas fa-exclamation-triangle false-positive-test-icon"></i>
+                </span>
+                <span class="test-name">{{false_positive_test}}
+                  <span v-if="test_timed_out(false_positive_test)"
+                        class="test-timed-out">
+                    (Timed out)
+                  </span>
                 </span>
               </div>
             </div>
@@ -147,10 +149,8 @@
             <div id="list-of-valid-tests">
               <div v-for="valid_test of get_valid_tests()"
                    class="single-valid-test">
-                <span>
-                  <i class="far fa-check-circle valid-test-icon"></i>
-                  {{valid_test}}
-                </span>
+                <span class="list-icon"><i class="far fa-check-circle valid-test-icon"></i></span>
+                <span class="test-name">{{valid_test}}</span>
               </div>
             </div>
           </div>
@@ -182,7 +182,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_student_test_names_stdout_content" class="short-output">No Output</div>
+              <div v-if="!d_student_test_names_stdout_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_student_test_names_stdout_content}}</pre>
             </template>
           </div>
@@ -200,7 +200,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_student_test_names_stderr_content" class="short-output">No Output</div>
+              <div v-if="!d_student_test_names_stderr_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_student_test_names_stderr_content}}</pre>
             </template>
           </div>
@@ -232,7 +232,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_validity_check_stdout_content" class="short-output">No Output</div>
+              <div v-if="!d_validity_check_stdout_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_validity_check_stdout_content}}</pre>
             </template>
           </div>
@@ -250,7 +250,7 @@
               </div>
             </template>
             <template v-else>
-              <p v-if="!d_validity_check_stderr_content" class="short-output">No Output</p>
+              <p v-if="!d_validity_check_stderr_content" class="short-output">No output</p>
               <pre v-else class="lengthy-output">{{d_validity_check_stderr_content}}
               </pre>
             </template>
@@ -282,10 +282,8 @@
             <div id="list-of-bugs">
               <div v-for="bug_name of d_mutation_test_suite_result.bugs_exposed"
                    class="single-bug">
-                <span>
-                  <i class="fas fa-bug bug-icon"></i>
-                  {{bug_name}}
-                </span>
+                  <span class="list-icon"><i class="fas fa-bug bug-icon"></i></span>
+                  <span>{{bug_name}}</span>
               </div>
             </div>
           </div>
@@ -315,7 +313,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_grade_buggy_stdout_content" class="short-output">No Output</div>
+              <div v-if="!d_grade_buggy_stdout_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_grade_buggy_stdout_content}}</pre>
             </template>
           </div>
@@ -333,7 +331,7 @@
               </div>
             </template>
             <template v-else>
-              <div v-if="!d_grade_buggy_stderr_content" class="short-output">No Output</div>
+              <div v-if="!d_grade_buggy_stderr_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_grade_buggy_stderr_content}}</pre>
             </template>
           </div>
@@ -697,28 +695,16 @@ $false-positive-test-color: lighten($warning-red, 10);
 $valid-test-color: $ocean-blue;
 $bug-color: $navy-blue;
 
-.bug-icon {
-  color: $bug-color;
+.setup-timed-out-icon {
+  padding-right: 3px;
+}
+
+.list-icon {
+  padding-right: 10px;
 }
 
 .discarded-test-icon {
   color: $discarded-test-color;
-}
-
-.false-positive-test-icon {
-  color: $false-positive-test-color;
-}
-
-.timed-out-icon {
-  color: $false-positive-test-color;
-}
-
-.valid-test-icon {
-  color: $valid-test-color;
-}
-
-#setup-return-code-correctness-icon {
-  padding: 0 0 0 5px;
 }
 
 #num-tests-accepted, #total-tests-submitted {
@@ -726,20 +712,26 @@ $bug-color: $navy-blue;
   color: $discarded-test-color;
 }
 
+.false-positive-test-icon {
+  color: $false-positive-test-color;
+  font-size: 15px;
+}
+
+.timed-out-icon  {
+  color: $false-positive-test-color;
+}
+
 .test-timed-out {
   color: $false-positive-test-color;
   padding-left: 2px;
 }
 
-.discarded-test-icon,
-.valid-test-icon,
-.false-positive-test-icon,
-.timed-out-icon,
-.bug-icon {
-  padding-right: 5px;
+.valid-test-icon {
+  color: $valid-test-color;
 }
 
 .bug-icon {
+  color: $bug-color;
   font-size: 14px;
 }
 
@@ -749,6 +741,14 @@ $bug-color: $navy-blue;
 .single-discarded-test {
   padding: 0 0 5px 0;
   word-break: break-word;
+}
+
+.single-discarded-test,
+.single-false-positive-test,
+.single-valid-test,
+.single-bug {
+  display: flex;
+  flex-direction: row;
 }
 
 #list-of-bugs,

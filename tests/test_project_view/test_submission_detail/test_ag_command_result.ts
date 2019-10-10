@@ -585,7 +585,7 @@ describe('AGCommandResult section exists tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stdout_content).toBeNull();
-        expect(wrapper.find('#actual-stdout-section').text()).toContain("No Output");
+        expect(wrapper.find('#actual-stdout-section').text()).toContain("No output");
     });
 
     test('stdout_section - show_actual_stdout === true and stdout_content !== null', async () => {
@@ -765,7 +765,7 @@ describe('AGCommandResult section exists tests', () => {
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stderr_content).toBeNull();
-        expect(wrapper.find('#actual-stderr-section').text()).toContain("No Output");
+        expect(wrapper.find('#actual-stderr-section').text()).toContain("No output");
     });
 
     test('stderr_section - show_actual_stderr === true and stderr_content !== null', async () => {
