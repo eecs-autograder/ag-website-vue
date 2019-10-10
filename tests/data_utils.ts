@@ -55,6 +55,10 @@ export function set_global_current_user(user: User) {
    provided_global_data().current_user = user;
 }
 
+export function set_global_user_roles(user_roles: UserRoles) {
+    provided_global_data().user_roles = user_roles;
+}
+
 export function set_global_current_course(course: Course) {
    provided_global_data().current_course = course;
 }

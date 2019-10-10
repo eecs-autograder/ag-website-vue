@@ -24,8 +24,9 @@
         <div id="adjust-points-container" v-if="can_adjust_points">
           <label class="text-label" for="adjust-points">Adjust Points</label>
           <validated-input @input_validity_changed="d_adjust_points_is_valid = $event"
+                           ref="adjust_points"
                            :validators="[is_not_empty, is_integer]"
-                           :from_string_func="string_to_num"
+                           :from_string_fn="string_to_num"
                            v-model="d_handgrading_result.points_adjustment">
             <template v-slot:suffix>
               <button type="button"
@@ -564,11 +565,10 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     }
 
     .green {
-      background-color: lighten($green, 10%);
-      &:hover {
-        background-color: lighten($green, 5%);
+      background-color: lighten($green, 20%);
+      &:hover:not([disabled]) {
+        background-color: lighten($green, 15%);
       }
-      // color: white;
     }
   }
 }
@@ -658,10 +658,6 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     margin-top: 3px;
     font-weight: bold;
     font-size: 13px;
-  }
-
-  .short-description {
-    // margin-bottom: 3px;
   }
 
   .deduction {

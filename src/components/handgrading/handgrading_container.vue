@@ -181,7 +181,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     // Because the page urls aren't correct in the dev stack,
     // we'll just keep track of the current page number.
     let page_num = 1;
-    let page_size = 1;
+    let page_size = 500;
 
     let page: ag_cli.HandgradingResultPage;
     do {
