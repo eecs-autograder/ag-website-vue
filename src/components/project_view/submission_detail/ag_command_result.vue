@@ -1,51 +1,51 @@
 <template>
   <div id="ag-command-result">
-
     <fieldset v-if="show_correctness_fieldset" class="fieldset">
       <legend class="legend"> Correctness </legend>
+
       <div id="exit-status-section">
-        <div class="feedback-row">
-          <div class="feedback-label" id="return-code-correctness-section"> Exit status: </div>
+        <div class="feedback-row"
+             id="return-code-correctness-section"
+             v-if="return_code_correctness !== ReturnCodeCorrectness.not_available">
+          <div class="feedback-label"> Exit status:
+          </div>
           <div class="feedback">
             <div class="correctness-output">
               <span v-if="return_code_correctness === ReturnCodeCorrectness.timed_out">
-                <span> Timed Out </span>
-                <i class="fas fa-clock timed-out-icon"></i>
-              </span>
-              <span v-else-if="return_code_correctness === ReturnCodeCorrectness.not_available">
-                <i class="fas fa-ban not-available-icon"></i>
+                <i class="far fa-clock timed-out-icon"></i>
+                <span class="timed-out-msg"> (Timed Out) </span>
               </span>
               <span v-else-if="return_code_correctness === ReturnCodeCorrectness.correct">
-                <i class="fas fa-check-circle correct-icon"></i>
+                <i class="fas fa-check correct-icon"></i>
               </span>
               <span v-else-if="return_code_correctness === ReturnCodeCorrectness.incorrect">
-                <i class="fas fa-times-circle incorrect-icon"></i>
+                <i class="fas fa-times incorrect-icon"></i>
               </span>
             </div>
+          </div>
+        </div>
 
-            <span v-if="show_exit_status_tooltip">
-              <i class="fas fa-question-circle">
-                <tooltip ref="expected_and_actual_return_code"
-                         width="medium"
-                         placement="right">
-                  <div class="expected-and-actual-return-code">
-                    <div v-if="d_ag_test_command_result.actual_return_code !== null">
-                      Exit Status: {{d_ag_test_command_result.actual_return_code}}
-                    </div>
-                    <div v-if="d_ag_test_command_result.timed_out">
-                      The command timed out.
-                    </div>
-                    <div v-if="d_ag_test_command_result.expected_return_code !== null
-                               && d_ag_test_command_result.expected_return_code
-                               !== ExpectedReturnCode.none">
-                      Expected exit status:
-                      {{d_ag_test_command_result.expected_return_code
-                        === ExpectedReturnCode.zero ? 0 : 'nonzero'}}
-                    </div>
-                  </div>
-                </tooltip>
-              </i>
-            </span>
+        <div v-if="show_actual_and_expected_return_code"
+             id="actual-and-expected-return-code-section">
+          <div v-if="d_ag_test_command_result.actual_return_code !== null"
+               class="feedback-row"
+               id="actual-return-code">
+            <div class="feedback-label"> Actual exit status: </div>
+            <div class="feedback">
+              <div class="short-output">{{d_ag_test_command_result.actual_return_code}}</div>
+            </div>
+          </div>
+
+          <div v-if="d_ag_test_command_result.expected_return_code !== null
+                     && d_ag_test_command_result.expected_return_code
+                     !== ExpectedReturnCode.none"
+               class="feedback-row"
+               id="expected-return-code">
+            <div class="feedback-label"> Expected exit status: </div>
+            <div class="feedback">
+              <div class="short-output">{{d_ag_test_command_result.expected_return_code
+                === ExpectedReturnCode.zero ? 0 : 'nonzero'}}</div>
+            </div>
           </div>
         </div>
 
@@ -56,10 +56,10 @@
           <div class="feedback">
             <div class="correctness-output">
               <span v-if="d_ag_test_command_result.stdout_correct">
-                <i class="fas fa-check-circle correct-icon"></i>
+                <i class="fas fa-check correct-icon"></i>
               </span>
               <span v-else>
-                <i class="fas fa-times-circle incorrect-icon"></i>
+                <i class="fas fa-times incorrect-icon"></i>
               </span>
             </div>
           </div>
@@ -68,14 +68,14 @@
         <div v-if="d_ag_test_command_result.stderr_correct !== null"
              id="stderr-correctness-section"
              class="feedback-row">
-          <div class="feedback-label"> Error Output: </div>
+          <div class="feedback-label"> Error output: </div>
           <div class="feedback">
             <div class="correctness-output">
               <span v-if="d_ag_test_command_result.stderr_correct">
-                <i class="fas fa-check-circle correct-icon"></i>
+                <i class="fas fa-check correct-icon"></i>
               </span>
               <span v-else>
-                <i class="fas fa-times-circle incorrect-icon"></i>
+                <i class="fas fa-times incorrect-icon"></i>
               </span>
             </div>
           </div>
@@ -154,7 +154,7 @@
       <div v-if="d_ag_test_command_result.fdbk_settings.show_actual_stderr"
            id="actual-stderr-section"
            class="feedback-row">
-        <div class="feedback-label"> Error Output: </div>
+        <div class="feedback-label"> Error output: </div>
         <div class="feedback">
           <template v-if="!d_stderr_content_loaded">
             <div class="loading-output">
@@ -189,12 +189,10 @@ import {
 
 import Diff from '@/components/diff.vue';
 import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
-import Tooltip from '@/components/tooltip.vue';
 
 @Component({
   components: {
-    Diff,
-    Tooltip
+    Diff
   }
 })
 export default class AGCommandResult extends Vue {
@@ -267,18 +265,18 @@ export default class AGCommandResult extends Vue {
 
   get show_correctness_fieldset() {
     return this.d_ag_test_command_result!.return_code_correct !== null
-           || this.d_ag_test_command_result!.timed_out !== null
-           || this.d_ag_test_command_result!.fdbk_settings.show_actual_return_code
+           || (this.d_ag_test_command_result!.timed_out !== null
+               && this.d_ag_test_command_result!.timed_out!)
+           || this.show_actual_and_expected_return_code
            || this.d_ag_test_command_result!.stdout_correct !== null
            || this.d_ag_test_command_result!.stderr_correct !== null;
   }
 
-  get show_exit_status_tooltip() {
+  get show_actual_and_expected_return_code() {
     return this.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
            === ValueFeedbackLevel.expected_and_actual
-           || this.d_ag_test_command_result!.actual_return_code !== null
-           || (this.d_ag_test_command_result!.timed_out !== null
-               && this.d_ag_test_command_result!.timed_out!);
+           && (this.d_ag_test_command_result!.actual_return_code !== null
+               || this.d_ag_test_command_result!.expected_return_code !== null);
   }
 
   get show_stdout_diff() {
@@ -298,7 +296,7 @@ export default class AGCommandResult extends Vue {
   get return_code_correctness() {
     if (this.d_ag_test_command_result!.timed_out !== null
         && this.d_ag_test_command_result!.timed_out!) {
-        return ReturnCodeCorrectness.timed_out;
+      return ReturnCodeCorrectness.timed_out;
     }
     if (this.d_ag_test_command_result!.return_code_correct !== null) {
       return this.d_ag_test_command_result!.return_code_correct!
@@ -370,6 +368,10 @@ export default class AGCommandResult extends Vue {
 
 .not-available-icon, .correct-icon, .incorrect-icon, .timed-out-icon {
   padding: 0 5px 0 0;
+}
+
+.timed-out-msg {
+  //color: $coral-pink;
 }
 
 </style>

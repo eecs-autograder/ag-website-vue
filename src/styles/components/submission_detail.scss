@@ -115,15 +115,15 @@
 }
 
 .incorrect-icon {
-    color: $burnt-red;
+    color: lighten($warning-red, 10);
 }
 
 .timed-out-icon {
-    color: $navy-blue;
+    color: lighten($warning-red, 10);
 }
 
 @media only screen and (min-width: 700px) {
-    $feedback-label-width: 115px;
+    $feedback-label-width: 200px;
 
     .feedback-label {
         width: $feedback-label-width;

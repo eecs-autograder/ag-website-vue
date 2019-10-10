@@ -4,7 +4,6 @@
     <fieldset v-if="show_setup_fieldset"
               class="fieldset">
       <legend class="legend"> Setup Command </legend>
-
       <div id="setup-section">
 
         <div class="feedback-row"
@@ -18,14 +17,14 @@
           </div>
           <span id="setup-return-code-correctness-icon">
             <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
-              <i class="fas fa-check-circle correct-icon"></i>
+              <i class="fas fa-check correct-icon"></i>
             </span>
             <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
-              <i class="fas fa-times-circle incorrect-icon"></i>
+              <i class="fas fa-times incorrect-icon"></i>
             </span>
             <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
-              <span> Timed Out </span>
-              <i class="fas fa-clock timed-out-icon"></i>
+              <i class="far fa-clock timed-out-icon"></i>
+              <span> (Timed Out) </span>
             </span>
           </span>
         </div>
@@ -33,7 +32,7 @@
         <div v-if="d_mutation_test_suite_result.setup_return_code !== null"
              id="setup-return-code"
              class="feedback-row">
-          <div class="feedback-label"> Return code: </div>
+          <div class="feedback-label"> Exit status: </div>
           <div class="feedback">
             <div class="short-output">{{d_mutation_test_suite_result.setup_return_code}}</div>
           </div>
@@ -59,7 +58,7 @@
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_setup_stderr"
              id="setup-stderr-section"
              class="feedback-row">
-          <div class="feedback-label"> Error Output: </div>
+          <div class="feedback-label"> Error output: </div>
           <div class="feedback">
             <template v-if="!d_setup_stderr_loaded">
               <div class="loading-output">
@@ -161,7 +160,7 @@
                        || d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
              class="feedback-row">
 
-          <div class="feedback-label show-output-button-label">Test Names Output:</div>
+          <div class="feedback-label show-output-button-label">Test names output:</div>
           <div class="feedback">
             <button class="show-output-button"
                     id="show-test-names-output-button"
@@ -193,7 +192,7 @@
                    && d_show_student_test_names_output"
              class="feedback-row"
              id="test-names-stderr-section">
-          <div class="feedback-label test-names-feedback-label"> Error Output: </div>
+          <div class="feedback-label test-names-feedback-label"> Error output: </div>
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stderr_loaded">
               <div class="loading-output">
@@ -211,7 +210,7 @@
                    || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
              class="feedback-row">
 
-          <div class="feedback-label show-output-button-label">Validity Output:</div>
+          <div class="feedback-label show-output-button-label">Validity output:</div>
           <div class="feedback">
             <button class="show-output-button"
                     id="show-validity-check-output-button"
@@ -243,7 +242,7 @@
                    && d_show_validity_check_output"
              class="feedback-row"
              id="validity-check-stderr-section">
-          <div class="feedback-label"> Error Output: </div>
+          <div class="feedback-label"> Error output: </div>
           <div class="feedback">
             <template v-if="!d_validity_check_stderr_loaded">
               <div class="loading-output">
@@ -295,7 +294,7 @@
         <div v-if="d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
                    || d_mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr"
              class="feedback-row">
-          <div class="feedback-label show-output-button-label">Bug Output:</div>
+          <div class="feedback-label show-output-button-label">Bug output:</div>
           <div class="feedback">
             <button class="show-output-button"
                     id="show-buggy-output-button"
@@ -326,7 +325,7 @@
                    && d_show_buggy_implementations_output"
              class="feedback-row"
              id="buggy-stderr-section">
-          <div class="feedback-label buggy-impl-feedback-label"> Error Output: </div>
+          <div class="feedback-label buggy-impl-feedback-label"> Error output: </div>
           <div class="feedback buggy-impl-feedback">
             <template v-if="!d_grade_buggy_stderr_loaded">
               <div class="loading-output">
@@ -694,7 +693,7 @@ export default class MutationSuiteResult extends Vue {
 @import '@/styles/components/submission_detail.scss';
 
 $discarded-test-color: #b53389;
-$false-positive-test-color: $coral-pink;
+$false-positive-test-color: lighten($warning-red, 10);
 $valid-test-color: $ocean-blue;
 $bug-color: $navy-blue;
 

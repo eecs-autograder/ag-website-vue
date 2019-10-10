@@ -101,35 +101,6 @@ describe('AGCaseSetupResult tests', () => {
         expect(wrapper.find('#setup-stdout-section').text()).toContain("No Output");
     });
 
-    test('setup_stderr === null && show_setup_stderr === true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
-
-        get_ag_test_suite_result_output_size_stub.onFirstCall().returns(Promise.resolve(
-            {
-                setup_stdout_size: 3,
-                setup_stderr_size: null
-            }
-        ));
-
-        wrapper = mount(AGCaseSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stderr_size).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toEqual(null);
-        expect(wrapper.find('#setup-stderr-section').text()).toContain("No Output");
-    });
-
     test('setup_stdout !== null and show_setup_stdout === true', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
 
@@ -167,6 +138,35 @@ describe('AGCaseSetupResult tests', () => {
         expect(wrapper.find('#setup-stderr-section').exists()).toBe(false);
     });
 
+    test('setup_stderr === null && show_setup_stderr === true', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
+
+        get_ag_test_suite_result_output_size_stub.onFirstCall().returns(Promise.resolve(
+            {
+                setup_stdout_size: 3,
+                setup_stderr_size: null
+            }
+        ));
+
+        wrapper = mount(AGCaseSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
+        expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stderr_size).toBeNull();
+        expect(wrapper.vm.d_setup_stderr).toEqual(null);
+        expect(wrapper.find('#setup-stderr-section').text()).toContain("No Output");
+    });
+
     test('setup_stderr !== null and show_setup_stderr === true', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
 
@@ -187,42 +187,6 @@ describe('AGCaseSetupResult tests', () => {
         expect(wrapper.vm.d_setup_stderr).toEqual(setup_stderr_content);
         expect(wrapper.find('#setup-stderr-section').text()).toContain(setup_stderr_content);
     });
-
-    test('show_setup_stdout === true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
-
-        wrapper = mount(AGCaseSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
-        expect(wrapper.find('#setup-stdout-section').exists()).toBe(true);
-    });
-
-    test('Exit status is displayed', async () => {
-        ag_test_suite_result.setup_timed_out = false;
-        ag_test_suite_result.setup_return_code = 0;
-
-        wrapper = mount(AGCaseSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.find('#exit-status-section').text()).toContain("0");
-    });
 });
 
 describe('AGCaseSetupResult setup_exit_status tests', () => {
@@ -242,22 +206,7 @@ describe('AGCaseSetupResult setup_exit_status tests', () => {
         expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
         expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.vm.setup_exit_status).toEqual("Not Available");
-    });
-
-    test('setup_exit_status - setup_timed_out === false && setup_return_code === null', () => {
-        wrapper.vm.d_ag_test_suite_result!.setup_timed_out = false;
-
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(false);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.setup_exit_status).toEqual("Not Available");
-    });
-
-    test('setup_exit_status - setup_timed_out === true && setup_return_code === null',  () => {
-        wrapper.vm.d_ag_test_suite_result!.setup_timed_out = true;
-
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(true);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.setup_exit_status).toEqual("Timed Out");
+        expect(wrapper.find('#exit-status-section').exists()).toBe(false);
     });
 
     test('setup_exit_status - setup_timed_out === null && setup_return_code !== null',  () => {
@@ -266,9 +215,27 @@ describe('AGCaseSetupResult setup_exit_status tests', () => {
         expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
         expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(1);
         expect(wrapper.vm.setup_exit_status).toEqual(1);
+        expect(wrapper.find('#exit-status-section').text()).toContain("1");
+    });
+
+    test('setup_exit_status - setup_timed_out === false && setup_return_code === null', () => {
+        wrapper.vm.d_ag_test_suite_result!.setup_timed_out = false;
+
+        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(false);
+        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
+        expect(wrapper.vm.setup_exit_status).toEqual("Not Available");
+        expect(wrapper.find('#exit-status-section').exists()).toBe(false);
+    });
+
+    test('setup_exit_status - setup_timed_out === true && setup_return_code === null',  () => {
+        wrapper.vm.d_ag_test_suite_result!.setup_timed_out = true;
+
+        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(true);
+        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
+        expect(wrapper.vm.setup_exit_status).toEqual("Timed Out");
+        expect(wrapper.find('#exit-status-section').text()).toContain('(Timed out)');
     });
 });
-
 
 describe('AGCaseSetupResult tests concerning Watchers', () => {
     let wrapper: Wrapper<AGCaseSetupResult>;

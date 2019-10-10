@@ -1,7 +1,8 @@
 <template>
   <div id="ag-case-setup-result">
 
-    <fieldset class="fieldset">
+    <fieldset class="fieldset"
+              v-if="setup_exit_status !== ReturnCodeCorrectness.not_available">
       <legend class="legend"> Correctness </legend>
       <div id="exit-status-section">
         <div class="feedback-row">
@@ -9,11 +10,8 @@
           <div class="feedback">
             <div class="correctness-output">
               <span v-if="setup_exit_status === ReturnCodeCorrectness.timed_out">
-                <span>{{setup_exit_status}}</span>
                 <i class="fas fa-clock timed-out-icon"></i>
-              </span>
-              <span v-else-if="setup_exit_status === ReturnCodeCorrectness.not_available">
-                <i class="fas fa-ban not-available-icon"></i>
+                <span class="timed-out-msg"> (Timed out) </span>
               </span>
               <span v-else>
                 {{setup_exit_status}}
@@ -50,7 +48,7 @@
       <div v-if="d_ag_test_suite_result.fdbk_settings.show_setup_stderr"
            id="setup-stderr-section"
            class="feedback-row">
-        <div class="feedback-label"> Error Output: </div>
+        <div class="feedback-label"> Error output: </div>
         <div class="feedback">
           <template v-if="!d_setup_stderr_loaded">
             <div class="loading-output">
