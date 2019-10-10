@@ -32,7 +32,7 @@
               <button type="button"
                       id="save-adjust-points"
                       class="green-button"
-                      :disabled="d_saving || !d_adjust_points_is_valid"
+                      :disabled="saving || !d_adjust_points_is_valid"
                       @click="save_handgrading_result">Save</button>
               </template>
           </validated-input>
@@ -40,7 +40,7 @@
 
         <!-- Checkboxes -->
         <div class="collapsible-section-header"
-              @click="d_criteria_collapsed = !d_criteria_collapsed">
+             @click="d_criteria_collapsed = !d_criteria_collapsed">
           <i class="fas" :class="d_criteria_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
           Checkboxes
         </div>
@@ -51,7 +51,7 @@
 
             <div class="criterion"
                  :class="{
-                   'loading-cursor': d_saving,
+                   'loading-cursor': saving,
                    'criterion-hover': !readonly_handgrading_results
                  }"
                  :key="result.pk"
@@ -94,7 +94,7 @@
               <div class="divider" v-if="index !== 0"></div>
 
               <div class="comment"
-                    :class="{'loading-cursor': d_saving}"
+                    :class="{'loading-cursor': saving}"
                     :key="comment.pk">
                 <div class="row">
                   <div class="short-description">{{comment.text}}</div>
@@ -110,7 +110,7 @@
               <div class="divider" v-if="index !== 0 || general_comments.length !== 0"></div>
 
               <div class="comment"
-                    :class="{'loading-cursor': d_saving}"
+                    :class="{'loading-cursor': saving}"
                     :key="handgrading_comment.pk">
                 <div class="row">
                   <div class="short-description">
@@ -181,7 +181,7 @@
                 id="prev-button"
                 @click="$emit('prev_group')"
                 class="footer-button footer-item"
-                :disabled="d_saving || is_first">
+                :disabled="saving || is_first">
           <i class="fas fa-chevron-left"></i>
           Prev
         </button>
@@ -193,7 +193,7 @@
           <input type="checkbox"
                  class="checkbox"
                  id="finished-grading"
-                 :disabled="d_saving"
+                 :disabled="saving"
                  @change="save_handgrading_result"
                  v-model="d_handgrading_result.finished_grading"/>
           <label for="finished-grading">Done</label>
@@ -203,7 +203,7 @@
                 @click="$emit('next_group')"
                 class="footer-button footer-item"
                 :class="{'green': d_handgrading_result.finished_grading}"
-                :disabled="d_saving || is_last">
+                :disabled="saving || is_last">
           {{d_handgrading_result.finished_grading ? 'Next' : 'Skip'}}
           <i class="fas fa-chevron-right"></i>
         </button>
@@ -240,6 +240,24 @@ import {
 import FilePanel from './file_panel.vue';
 import { handgrading_comment_factory, HandgradingComment } from './handgrading_comment';
 
+class ProcessingSemaphore {
+  private count = 0;
+
+  get processing() {
+    return this.count !== 0;
+  }
+
+  async process<T>(body: () => Promise<T>) {
+    try {
+      this.count += 1;
+      return await body();
+    }
+    finally {
+      this.count -= 1;
+    }
+  }
+}
+
 @Component({
   components: {
     FilePanel,
@@ -247,8 +265,7 @@ import { handgrading_comment_factory, HandgradingComment } from './handgrading_c
   }
 })
 export default class Handgrading extends Vue implements AppliedAnnotationObserver,
-                                                        CommentObserver,
-                                                        CriterionResultObserver {
+                                                        CommentObserver {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
@@ -270,7 +287,10 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
   d_handgrading_result: HandgradingResult | null = null;
 
-  d_saving = false;
+  get saving() {
+    return this.d_saving.processing;
+  }
+  d_saving = new ProcessingSemaphore();
 
   d_criteria_collapsed = false;
   d_comments_collapsed = false;
@@ -287,13 +307,11 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   created() {
     this.d_handgrading_result = deep_copy(this.handgrading_result, HandgradingResult);
     AppliedAnnotation.subscribe(this);
-    CriterionResult.subscribe(this);
     Comment.subscribe(this);
   }
 
   destroy() {
     AppliedAnnotation.unsubscribe(this);
-    CriterionResult.unsubscribe(this);
     Comment.unsubscribe(this);
   }
 
@@ -304,17 +322,22 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 
   toggle_criterion(criterion_result: CriterionResult) {
-    if (this.d_saving || this.readonly_handgrading_results) {
+    if (this.saving || this.readonly_handgrading_results) {
       return;
     }
-    return toggle(this, 'd_saving', () => {
+    return this.d_saving.process(async () => {
       criterion_result.selected = !criterion_result.selected;
-      return criterion_result.save();
+      await criterion_result.save();
+      let adjustment = criterion_result.criterion.points;
+      if (!criterion_result.selected) {
+        adjustment *= -1;
+      }
+      return this.update_score(adjustment);
     });
   }
 
   add_comment() {
-    return toggle(this, 'd_saving', async () => {
+    return this.d_saving.process(async () => {
       let comment = await Comment.create(
         this.d_handgrading_result!.pk, {text: this.d_new_comment_text});
       this.d_handgrading_result!.comments.push(comment);
@@ -347,7 +370,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 
   save_handgrading_result() {
-    return toggle(this, 'd_saving', () => {
+    return this.d_saving.process(() => {
       return this.d_handgrading_result!.save();
     });
   }
@@ -359,28 +382,18 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 
   delete_comment(comment: Comment | HandgradingComment) {
-    if (this.d_saving) {
+    if (this.saving) {
       return;
     }
-    return toggle(this, 'd_saving', () => {
+    return this.d_saving.process(() => {
       return comment.delete();
     });
-  }
-
-  update_criterion_result_changed(criterion_result: CriterionResult): void {
-    let adjustment = criterion_result.criterion.points;
-    if (criterion_result.selected) {
-      adjustment *= -1;
-    }
-    this.update_score(adjustment);
-  }
-
-  update_criterion_result_deleted(criterion_result: CriterionResult): void {
   }
 
   update_applied_annotation_created(applied_annotation: AppliedAnnotation): void {
     if (applied_annotation.handgrading_result === this.d_handgrading_result!.pk) {
       this.d_handgrading_result!.applied_annotations.push(applied_annotation);
+      // tslint:disable-next-line no-floating-promises
       this.update_score(applied_annotation.annotation.deduction);
     }
   }
@@ -393,7 +406,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
         ),
         1
       );
-
+      // tslint:disable-next-line no-floating-promises
       this.update_score(-applied_annotation.annotation.deduction);
     }
   }
@@ -423,15 +436,16 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   // adds adjustment points to d_handgrading_result.total_points.
   // Otherwise, also d_handgrading_result
   update_score(adjustment: number) {
-    // If this is marked as finished grading, we want observers to be
-    // notified if the score changed (so we refresh).
-    if (this.d_handgrading_result!.finished_grading) {
-      // tslint:disable-next-line no-floating-promises
-      this.d_handgrading_result!.refresh();
-    }
-    else {
-      this.d_handgrading_result!.total_points += adjustment;
-    }
+    return this.d_saving.process(async () => {
+      // If this is marked as finished grading, we want observers to be
+      // notified if the score changed (so we refresh).
+      if (this.d_handgrading_result!.finished_grading) {
+        await this.d_handgrading_result!.refresh();
+      }
+      else {
+        this.d_handgrading_result!.total_points += adjustment;
+      }
+    });
   }
 }
 

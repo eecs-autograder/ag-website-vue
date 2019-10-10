@@ -15,6 +15,7 @@ import {
     BugsExposedFeedbackLevel,
     Course,
     Criterion,
+    CriterionResult,
     ExpectedOutputSource,
     ExpectedReturnCode,
     ExpectedStudentFile,
@@ -646,6 +647,22 @@ export function make_criterion(rubric_pk: number,
     safe_assign(defaults, args);
     defaults.handgrading_rubric = rubric_pk;
     return new Criterion(defaults);
+}
+
+const CRITERION_RESULT_PKS = counter();
+
+export function make_criterion_result(
+    handgrading_result: HandgradingResult, criterion: Criterion, checked: boolean
+): CriterionResult {
+    let result = new CriterionResult({
+        pk: CRITERION_RESULT_PKS.next().value,
+        criterion: criterion,
+        handgrading_result: handgrading_result.pk,
+        selected: checked,
+        last_modified: now_str(),
+    });
+    handgrading_result.criterion_results.push(result);
+    return result;
 }
 
 const ANNOTATION_PKS = counter();

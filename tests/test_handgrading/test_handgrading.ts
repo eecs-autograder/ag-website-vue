@@ -1,4 +1,6 @@
-import { WrapperArray } from '@vue/test-utils';
+import { Vue } from 'vue-property-decorator';
+
+import { Wrapper, WrapperArray } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -74,7 +76,7 @@ describe('Adjust points test', () => {
         set_validated_input_text(wrapper.find({ref: 'adjust_points'}), '-1');
         expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(false);
         wrapper.find('#save-adjust-points').trigger('click');
-        expect(await wait_until(wrapper, w => w.vm.d_saving === false)).toBe(true);
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
         expect(wrapper.vm.d_handgrading_result.points_adjustment).toEqual(-1);
         expect(save_stub.calledOnce).toBe(true);
@@ -114,7 +116,7 @@ test('One file panel per submitted file', async () => {
             readonly_handgrading_results: false,
         }
     });
-    let panels = <WrapperArray<FilePanel>> wrapper.findAll({name: 'FilePanel'});
+    let panels = <WrapperArray<FilePanel>>wrapper.findAll({name: 'FilePanel'});
     expect(panels.length).toEqual(3);
     expect(panels.at(0).vm.filename).toEqual('file1.txt');
     expect(panels.at(1).vm.filename).toEqual('file2.cpp');
@@ -127,34 +129,184 @@ test('One file panel per submitted file', async () => {
 
 describe('Score tests', () => {
     test('Score displayed', async () => {
-        fail();
+        result.total_points = 48;
+        result.total_points_possible = 70;
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('48/70');
     });
 
     test('Negative total points shows as zero', async () => {
-        fail();
+        result.total_points = -10;
+        result.total_points_possible = 70;
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('0/70');
     });
 });
 
 describe('Checkbox tests', () => {
+    let checkbox_with_long_description: ag_cli.Criterion;
+    let checkbox_empty_long_description: ag_cli.Criterion;
+
+    beforeEach(() => {
+        checkbox_with_long_description = data_ut.make_criterion(
+            result.handgrading_rubric.pk,
+            {
+                short_description: "I am an criterion",
+                long_description: "I am such long description of very length",
+                points: 4
+            }
+        );
+        checkbox_empty_long_description = data_ut.make_criterion(
+            result.handgrading_rubric.pk,
+            {
+                short_description: "I am another criterion",
+                long_description: "",
+                points: -2
+            }
+        );
+
+        result.handgrading_rubric.criteria = [
+            checkbox_with_long_description, checkbox_empty_long_description
+        ];
+        data_ut.make_criterion_result(result, checkbox_with_long_description, true);
+        data_ut.make_criterion_result(result, checkbox_empty_long_description, false);
+        result.total_points = 4;
+        result.total_points_possible = 4;
+    });
+
     test('Expand/collapse checkbox list', async () => {
-        fail();
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+        expect(wrapper.findAll('.criterion').length).toEqual(2);
+        expect(wrapper.findAll('.criterion').isVisible()).toBe(true);
+
+        wrapper.findAll('.collapsible-section-header').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.criterion').length).toEqual(2);
+        expect(wrapper.findAll('.criterion').isVisible()).toBe(false);
+
+        wrapper.findAll('.collapsible-section-header').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.criterion').length).toEqual(2);
+        expect(wrapper.findAll('.criterion').isVisible()).toBe(true);
     });
 
     test('Checkboxes displayed', async () => {
-        fail();
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+        let criteria = wrapper.findAll('.criterion');
+
+        expect(
+            criteria.at(0).find('.short-description').text()
+        ).toEqual(checkbox_with_long_description.short_description);
+        expect(
+            criteria.at(0).find('.long-description').text()
+        ).toEqual(checkbox_with_long_description.long_description);
+        expect(
+            criteria.at(0).find('.points').text()
+        ).toEqual(checkbox_with_long_description.points.toString());
+        expect(criteria.at(0).find('.criterion-checkbox .fa-check').exists()).toBe(true);
+
+        expect(
+            criteria.at(1).find('.short-description').text()
+        ).toEqual(checkbox_empty_long_description.short_description);
+        expect(criteria.at(1).find('.long-description').exists()).toBe(false);
+        expect(
+            criteria.at(1).find('.points').text()
+        ).toEqual(checkbox_empty_long_description.points.toString());
+        expect(criteria.at(1).find('.criterion-checkbox .fa-check').exists()).toBe(false);
     });
 
-    test('Toggle checkbox, grading not marked as done, score updated locally', async () => {
-        fail();
-    });
+    describe('Toggle checkbox tests', () => {
+        let wrapper: Wrapper<Handgrading>;
+        let criteria: WrapperArray<Vue>;
+        let save_stub: sinon.SinonStub;
 
-    test('Toggle checkbox, grading marked as done, result refreshes', async () => {
-        fail();
+        beforeEach(async () => {
+            wrapper = managed_mount(Handgrading, {
+                propsData: {
+                    handgrading_result: result,
+                    readonly_handgrading_results: false,
+                }
+            });
+            expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/4');
+            criteria = wrapper.findAll('.criterion');
+            save_stub = sinon.stub(
+                wrapper.vm.d_handgrading_result.criterion_results[0], 'save'
+            ).callsFake(() => {
+                ag_cli.CriterionResult.notify_criterion_result_changed(
+                    wrapper.vm.d_handgrading_result.criterion_results[0]
+                );
+            });
+        });
+
+        test('Toggle checkbox, grading not marked as done, score updated locally', async () => {
+            criteria.at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+
+            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(false);
+            expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('0/4');
+            expect(save_stub.calledOnce).toBe(true);
+
+            criteria.at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+
+            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(true);
+            expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/4');
+            expect(save_stub.calledTwice).toBe(true);
+        });
+
+        test('Toggle checkbox, grading marked as done, result refreshes', async () => {
+            wrapper.vm.d_handgrading_result.finished_grading = true;
+            let refresh_result_stub = sinon.stub(
+                wrapper.vm.d_handgrading_result, 'refresh'
+            ).onFirstCall().callsFake(() => {
+                wrapper.vm.d_handgrading_result.total_points = 3;
+                return Promise.resolve({});
+            }).onSecondCall().callsFake(() => {
+                wrapper.vm.d_handgrading_result.total_points = 2;
+                return Promise.resolve({});
+            });
+
+            criteria.at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+
+            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(false);
+            expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('3/4');
+            expect(save_stub.calledOnce).toBe(true);
+
+            criteria.at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+
+            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(true);
+            expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/4');
+            expect(save_stub.calledTwice).toBe(true);
+
+            expect(refresh_result_stub.callCount).toEqual(2);
+        });
     });
 });
 
 describe('Comment tests', () => {
-    // Check valu passed to file panels
+    // Check value passed to file panels
     test('Expand/collapse comment list', async () => {
         fail();
     });

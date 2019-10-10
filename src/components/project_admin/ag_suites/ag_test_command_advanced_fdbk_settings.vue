@@ -3,7 +3,7 @@
 
     <div id="edit-feedback-toggle-zone" v-if="d_feedback_config !== null">
       <div class="checkbox-input-container" v-if="ag_test_case.ag_test_commands.length > 1
-                                                  || d_feedback_config.visible === false">
+                                                  || !d_feedback_config.visible">
         <input :id="`${hyphenate(config_name)}-visible`"
                type="checkbox"
                @change="$emit('input', d_feedback_config)"
