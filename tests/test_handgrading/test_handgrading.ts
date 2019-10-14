@@ -14,7 +14,8 @@ import {
     compress_whitespace,
     get_validated_input_text,
     set_validated_input_text,
-    wait_until
+    wait_until,
+    checkbox_is_checked
 } from '@/tests/utils';
 
 let result: ag_cli.HandgradingResult;
@@ -584,23 +585,98 @@ describe('Annotations reference list', () => {
 
 describe('Footer tests', () => {
     test('Toggle finished grading', async () => {
-        fail();
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+
+        let save_result_stub = sinon.stub(wrapper.vm.d_handgrading_result, 'save');
+        expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
+
+        wrapper.find('#finished-grading').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(true);
+        expect(save_result_stub.calledOnce).toBe(true);
+
+        wrapper.find('#finished-grading').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
+        expect(save_result_stub.calledTwice).toBe(true);
     });
 
-    test('Prev disabled', async () => {
-        fail();
+    test('Prev disabled', () => {
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+                is_first: true,
+            }
+        });
+
+        expect(wrapper.find('#prev-button').is('[disabled]')).toBe(true);
     });
 
-    test('Next disabled', async () => {
-        fail();
+    test('Next disabled', () => {
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+                is_last: true,
+            }
+        });
+
+        expect(wrapper.find('#next-button').is('[disabled]')).toBe(true);
     });
 
-    test('Next labeled as "Skip" when unfinished', async () => {
-        fail();
+    test('Prev not disabled, emit events when clicked', () => {
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+
+        wrapper.find('#prev-button').trigger('click');
+        expect(wrapper.emitted().prev_group.length).toBe(1);
+    });
+
+    test('Next not disabled, emit events when clicked', () => {
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+
+        wrapper.find('#next-button').trigger('click');
+        expect(wrapper.emitted().next_group.length).toBe(1);
+    });
+
+    test('Next labeled as "Skip" when unfinished', () => {
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+
+        expect(wrapper.vm.d_handgrading_result.finished_grading).toBe(false);
+        expect(wrapper.find('#next-button').text()).toEqual('Skip');
     });
 
     test('Next labeled as "Next" when finished', async () => {
-        fail();
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+
+        wrapper.vm.d_handgrading_result.finished_grading = true;
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#next-button').text()).toEqual('Next');
     });
 });
 
