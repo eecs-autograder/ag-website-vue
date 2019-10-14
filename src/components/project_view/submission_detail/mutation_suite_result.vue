@@ -83,6 +83,12 @@
       <legend class="legend"> Student Tests </legend>
       <div id="student-tests-section">
 
+        <div v-if="d_mutation_test_suite_result.student_tests.length === 0"
+             class="feedback-row"
+             id="no-tests-submitted-message">
+          <div> No test cases were submitted. </div>
+        </div>
+
         <div v-if="d_mutation_test_suite_result.discarded_tests.length"
              id="discarded-tests-section"
              class="feedback-row">
@@ -114,7 +120,7 @@
              class="feedback-row">
 
           <div class="feedback-explanation">
-            Tests with false positives incorrectly reported a bug when run against a correct
+            Tests with false positives incorrectly report a bug when run against a correct
             implementation.
           </div>
           <div class="feedback-label test-names-feedback-label">Tests with false positives:</div>
@@ -144,7 +150,7 @@
         <div v-if="get_valid_tests().length"
              class="feedback-row"
              id="valid-tests-section">
-          <div class="feedback-label test-names-feedback-label"> Your test cases: </div>
+          <div class="feedback-label test-names-feedback-label"> Valid test cases: </div>
           <div class="feedback test-names-feedback">
             <div id="list-of-valid-tests">
               <div v-for="valid_test of get_valid_tests()"
@@ -156,8 +162,9 @@
           </div>
         </div>
 
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
-                       || d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr"
+        <div v-if="(d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
+                       || d_mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr)
+                    && d_mutation_test_suite_result.student_tests.length"
              class="feedback-row">
 
           <div class="feedback-label show-output-button-label">Test names output:</div>
@@ -206,8 +213,9 @@
           </div>
         </div>
 
-        <div v-if="d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
-                   || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr"
+        <div v-if="(d_mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
+                   || d_mutation_test_suite_result.fdbk_settings.show_validity_check_stderr)
+                   && d_mutation_test_suite_result.student_tests.length"
              class="feedback-row">
 
           <div class="feedback-label show-output-button-label">Validity output:</div>
@@ -250,7 +258,7 @@
               </div>
             </template>
             <template v-else>
-              <p v-if="!d_validity_check_stderr_content" class="short-output">No output</p>
+              <div v-if="!d_validity_check_stderr_content" class="short-output">No output</div>
               <pre v-else class="lengthy-output">{{d_validity_check_stderr_content}}
               </pre>
             </template>
@@ -446,14 +454,15 @@ export default class MutationSuiteResult extends Vue {
   }
 
   get show_student_tests_fieldset(): boolean {
-    return this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
-           || this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
-           || this.d_mutation_test_suite_result!.discarded_tests.length > 0
-           || (this.d_mutation_test_suite_result!.invalid_tests !== null
-               && this.d_mutation_test_suite_result!.invalid_tests!.length > 0)
-           || this.get_valid_tests().length > 0
-           || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout
-           || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr;
+    return true;
+      // this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
+      //      || this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
+      //      || this.d_mutation_test_suite_result!.discarded_tests.length > 0
+      //      || (this.d_mutation_test_suite_result!.invalid_tests !== null
+      //          && this.d_mutation_test_suite_result!.invalid_tests!.length > 0)
+      //      || this.get_valid_tests().length > 0
+      //      || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout
+      //      || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr;
   }
 
   async toggle_d_show_buggy_implementations_output() {
@@ -697,6 +706,10 @@ $bug-color: $navy-blue;
 
 .setup-timed-out-icon {
   padding-right: 3px;
+}
+
+#no-tests-submitted-message {
+  padding: 5px 2px;
 }
 
 .list-icon {

@@ -250,8 +250,8 @@ describe('show_fieldset/section tests', () => {
         expect(d_ag_test_command_result.actual_return_code).not.toBe(null);
         expect(d_ag_test_command_result.expected_return_code).toBe(null);
         expect(wrapper.vm.show_actual_and_expected_return_code).toBe(true);
-        expect(wrapper.find('#actual-return-code').exists()).toBe(true);
-        expect(wrapper.find('#expected-return-code').exists()).toBe(false);
+        expect(wrapper.find('#actual-return-code-section').exists()).toBe(true);
+        expect(wrapper.find('#expected-return-code-section').exists()).toBe(false);
     });
 
     test('show_actual_and_expected_return_code - return_code_fdbk_level ' +
@@ -265,8 +265,8 @@ describe('show_fieldset/section tests', () => {
         expect(d_ag_test_command_result.actual_return_code).toBe(null);
         expect(d_ag_test_command_result.expected_return_code).not.toBe(null);
         expect(wrapper.vm.show_actual_and_expected_return_code).toBe(true);
-        expect(wrapper.find('#actual-return-code').exists()).toBe(false);
-        expect(wrapper.find('#expected-return-code').exists()).toBe(true);
+        expect(wrapper.find('#actual-return-code-section').exists()).toBe(false);
+        expect(wrapper.find('#expected-return-code-section').exists()).toBe(true);
     });
 
     test('show_stdout_diff - false', () => {

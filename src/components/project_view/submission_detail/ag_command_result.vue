@@ -29,10 +29,11 @@
              id="actual-and-expected-return-code-section">
           <div v-if="d_ag_test_command_result.actual_return_code !== null"
                class="feedback-row"
-               id="actual-return-code">
+               id="actual-return-code-section">
             <div class="feedback-label"> Actual exit status: </div>
             <div class="feedback">
-              <div class="short-output">{{d_ag_test_command_result.actual_return_code}}</div>
+              <div class="short-output"
+                   id="actual-return-code">{{d_ag_test_command_result.actual_return_code}}</div>
             </div>
           </div>
 
@@ -40,10 +41,11 @@
                      && d_ag_test_command_result.expected_return_code
                      !== ExpectedReturnCode.none"
                class="feedback-row"
-               id="expected-return-code">
+               id="expected-return-code-section">
             <div class="feedback-label"> Expected exit status: </div>
             <div class="feedback">
-              <div class="short-output">{{d_ag_test_command_result.expected_return_code
+              <div class="short-output"
+                   id="expected-return-code">{{d_ag_test_command_result.expected_return_code
                 === ExpectedReturnCode.zero ? 0 : 'nonzero'}}</div>
             </div>
           </div>
@@ -368,6 +370,14 @@ export default class AGCommandResult extends Vue {
 
 .not-available-icon, .correct-icon, .incorrect-icon, .timed-out-icon {
   padding: 0 5px 0 0;
+}
+
+#actual-return-code {
+  color: black;
+}
+
+#expected-return-code {
+  color: black;
 }
 
 </style>
