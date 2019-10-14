@@ -155,7 +155,7 @@
                :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
             Annotations
           </div>
-          <div class="sidebar-section" v-if="!d_annotations_collapsed">
+          <div class="sidebar-section" v-show="!d_annotations_collapsed">
             <template
               v-for="(annotation, index) of d_handgrading_result.handgrading_rubric.annotations"
             >

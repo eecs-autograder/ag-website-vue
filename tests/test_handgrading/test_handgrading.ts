@@ -510,12 +510,75 @@ describe('Comment tests', () => {
 });
 
 describe('Annotations reference list', () => {
+    let annotations: ag_cli.Annotation[];
+
+    let wrapper: Wrapper<Handgrading>;
+
+    beforeEach(() => {
+        annotations = [
+            data_ut.make_annotation(
+                result.handgrading_rubric.pk,
+                {
+                    deduction: -1,
+                    short_description: 'I am annotation',
+                    long_description: 'I am long descriptions',
+                }
+            ),
+            data_ut.make_annotation(
+                result.handgrading_rubric.pk,
+                {
+                    deduction: -2,
+                    max_deduction: -8,
+                    short_description: 'I am max',
+                    long_description: ''
+                }
+            )
+        ];
+        result.handgrading_rubric.annotations = annotations;
+
+        wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
+    });
+
     test('Expand/collapse annotation list', async () => {
-        fail();
+        expect(wrapper.findAll('.annotation').length).toEqual(2);
+        expect(wrapper.findAll('.annotation').isVisible()).toBe(false);
+
+        wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.annotation').length).toEqual(2);
+        expect(wrapper.findAll('.annotation').isVisible()).toBe(true);
+
+        wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.annotation').length).toEqual(2);
+        expect(wrapper.findAll('.annotation').isVisible()).toBe(false);
     });
 
     test('Annotations listed', async () => {
-        fail();
+        wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let annotation_wrappers = wrapper.findAll('.annotation');
+        expect(annotation_wrappers.at(0).find('.short-description').text()).toEqual(
+            annotations[0].short_description);
+        expect(annotation_wrappers.at(0).find('.points').text()).toEqual(
+            annotations[0].deduction.toString());
+        expect(annotation_wrappers.at(0).find('.long-description').text()).toEqual(
+            annotations[0].long_description);
+        expect(annotation_wrappers.at(0).find('.max-deduction').exists()).toBe(false);
+
+        expect(annotation_wrappers.at(1).find('.short-description').text()).toEqual(
+            annotations[1].short_description);
+        expect(annotation_wrappers.at(1).find('.points').text()).toEqual(
+            annotations[1].deduction.toString());
+        expect(annotation_wrappers.at(1).find('.long-description').exists()).toBe(false);
+        expect(annotation_wrappers.at(1).find('.max-deduction').text()).toEqual(
+            `${annotations[1].max_deduction} max total deduction`);
     });
 });
 
@@ -557,9 +620,6 @@ describe('Observer updates', () => {
     test('Comment deleted', async () => {
         fail();
     });
-});
-test('', async () => {
-    fail();
 });
 
 test('Read-only mode', async () => {
