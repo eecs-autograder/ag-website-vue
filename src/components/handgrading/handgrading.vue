@@ -100,7 +100,7 @@
                   <div class="short-description">{{comment.text}}</div>
                   <i v-if="!readonly_handgrading_results"
                      @click="delete_comment(comment)"
-                     class="close fas fa-times"></i>
+                     class="delete fas fa-times"></i>
                 </div>
               </div>
             </template>
@@ -111,17 +111,21 @@
 
               <div class="comment"
                     :class="{'loading-cursor': saving}"
-                    :key="handgrading_comment.pk">
+                    :key="handgrading_comment.vue_key">
                 <div class="row">
                   <div class="short-description">
                     {{handgrading_comment.short_description}}
                     <span class="deduction"
                       v-if="handgrading_comment.deduction !== 0"
-                    >({{handgrading_comment.deduction}})</span>
+                    >({{
+                      handgrading_comment.deduction
+                    }}<template
+                        v-if="handgrading_comment.max_deduction !== null"
+                      >/{{handgrading_comment.max_deduction}} max</template>)</span>
                   </div>
                   <i v-if="!readonly_handgrading_results"
                      @click="delete_comment(handgrading_comment)"
-                     class="close fas fa-times"></i>
+                     class="delete fas fa-times"></i>
                 </div>
 
                 <div class="long-description" v-if="handgrading_comment.long_description !== ''">
@@ -385,6 +389,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     if (this.saving) {
       return;
     }
+
     return this.d_saving.process(() => {
       return comment.delete();
     });
@@ -684,7 +689,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     margin-top: 3px;
   }
 
-  .close {
+  .delete {
     margin-left: auto;
     padding: 1px;
 

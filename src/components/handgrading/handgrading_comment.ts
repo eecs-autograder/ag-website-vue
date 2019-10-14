@@ -30,34 +30,53 @@ export function handgrading_comment_factory(
     }
 }
 
-class AppliedAnnotationWrapper extends AppliedAnnotation implements HandgradingComment {
+class AppliedAnnotationWrapper implements HandgradingComment {
+    applied_annotation: AppliedAnnotation;
+
+    constructor(applied_annotation: AppliedAnnotation) {
+        this.applied_annotation = applied_annotation;
+    }
+
+    get location() {
+        return this.applied_annotation.location;
+    }
+
     get short_description() {
-        return this.annotation.short_description;
+        return this.applied_annotation.annotation.short_description;
     }
 
     get long_description() {
-        return this.annotation.long_description;
+        return this.applied_annotation.annotation.long_description;
     }
 
     get deduction() {
-        return this.annotation.deduction;
+        return this.applied_annotation.annotation.deduction;
     }
 
     get max_deduction() {
-        return this.annotation.max_deduction;
+        return this.applied_annotation.annotation.max_deduction;
+    }
+
+    delete() {
+        return this.applied_annotation.delete();
     }
 
     get vue_key(): string {
-        return `ann${this.pk}`;
+        return `ann${this.applied_annotation.pk}`;
     }
 
     compare(other: HandgradingComment) {
-        return location_compare(this.location, other.location);
+        return location_compare(this.applied_annotation.location, other.location);
     }
 }
 
 class CommentWrapper implements HandgradingComment {
     comment: Comment;
+
+    // Default values so that we implement HandgradingComment correctly
+    long_description = '';
+    deduction = 0;
+    max_deduction = null;
 
     constructor(comment: Comment) {
         this.comment = comment;
@@ -67,10 +86,6 @@ class CommentWrapper implements HandgradingComment {
     get short_description() {
         return this.comment.text;
     }
-
-    long_description = '';
-    deduction = 0;
-    max_deduction = null;
 
     get location() {
         return this.comment.location!;

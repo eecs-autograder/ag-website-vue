@@ -12,7 +12,9 @@ import {
     AGTestSuiteFeedbackConfig,
     AGTestSuiteResultFeedback,
     Annotation,
+    AppliedAnnotation,
     BugsExposedFeedbackLevel,
+    Comment,
     Course,
     Criterion,
     CriterionResult,
@@ -25,6 +27,7 @@ import {
     HandgradingResult,
     HandgradingRubric,
     InstructorFile,
+    Location,
     MutationTestSuite,
     MutationTestSuiteFeedbackConfig,
     MutationTestSuiteResultFeedback,
@@ -681,6 +684,38 @@ export function make_annotation(rubric_pk: number,
     safe_assign(defaults, args);
     defaults.handgrading_rubric = rubric_pk;
     return new Annotation(defaults);
+}
+
+const APPLIED_ANNOTATION_PKS = counter();
+
+export function make_applied_annotation(
+    handgrading_result: HandgradingResult, annotation: Annotation, location: Location
+) {
+    let result = new AppliedAnnotation({
+        pk: APPLIED_ANNOTATION_PKS.next().value,
+        handgrading_result: handgrading_result.pk,
+        annotation: annotation,
+        location: location,
+        last_modified: now_str(),
+    });
+    handgrading_result.applied_annotations.push(result);
+    return result;
+}
+
+const COMMENT_PKS = counter();
+
+export function make_comment(
+    handgrading_result: HandgradingResult, location: Location | null, text: string
+) {
+    let result = new Comment({
+        pk: COMMENT_PKS.next().value,
+        handgrading_result: handgrading_result.pk,
+        location: location,
+        text: text,
+        last_modified: now_str(),
+    });
+    handgrading_result.comments.push(result);
+    return result;
 }
 
 function random_id() {
