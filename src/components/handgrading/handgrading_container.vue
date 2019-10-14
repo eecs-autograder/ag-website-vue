@@ -173,7 +173,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     ag_cli.HandgradingResult.subscribe(this);
   }
 
-  destroyed() {
+  beforeDestroy() {
     ag_cli.HandgradingResult.unsubscribe(this);
   }
 

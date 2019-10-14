@@ -235,7 +235,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { Created, Destroyed } from '@/lifecycle';
+import { BeforeDestroy, Created } from '@/lifecycle';
 import { assert_not_null, deep_copy, toggle } from '@/utils';
 import {
   is_integer,
@@ -273,7 +273,7 @@ class ProcessingSemaphore {
 export default class Handgrading extends Vue implements AppliedAnnotationObserver,
                                                         CommentObserver,
                                                         Created,
-                                                        Destroyed {
+                                                        BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
@@ -318,7 +318,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     Comment.subscribe(this);
   }
 
-  destroyed() {
+  beforeDestroy() {
     AppliedAnnotation.unsubscribe(this);
     Comment.unsubscribe(this);
   }

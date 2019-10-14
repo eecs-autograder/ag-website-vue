@@ -262,7 +262,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { Created, Destroyed, Mounted } from "@/lifecycle";
+import { BeforeDestroy, Created, Mounted } from "@/lifecycle";
 import { assert_not_null, deep_copy, format_datetime, handle_api_errors_async } from "@/utils";
 import {
   is_integer,
@@ -292,7 +292,7 @@ import CriterionForm from './criterion_form.vue';
   }
 })
 export default class HandgradingSettings extends Vue implements Created,
-                                                                Destroyed,
+                                                                BeforeDestroy,
                                                                 AnnotationObserver,
                                                                 CriterionObserver {
   @Inject({from: 'globals'})
@@ -378,7 +378,7 @@ export default class HandgradingSettings extends Vue implements Created,
     this.d_loading = false;
   }
 
-  destroyed() {
+  beforeDestroy() {
     Annotation.unsubscribe(this);
     Criterion.unsubscribe(this);
   }

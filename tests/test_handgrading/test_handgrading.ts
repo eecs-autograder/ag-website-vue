@@ -72,9 +72,9 @@ describe('Adjust points test', () => {
         expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('43');
 
         set_validated_input_text(wrapper.find({ref: 'adjust_points'}), '-1');
-        expect(wrapper.vm.d_handgrading_result.points_adjustment).toEqual(-1);
+        expect(wrapper.vm.d_handgrading_result!.points_adjustment).toEqual(-1);
 
-        wrapper.vm.d_handgrading_result.points_adjustment = -2;
+        wrapper.vm.d_handgrading_result!.points_adjustment = -2;
         await wrapper.vm.$nextTick();
         expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('-2');
     });
@@ -91,7 +91,7 @@ describe('Adjust points test', () => {
 
         set_validated_input_text(wrapper.find({ref: 'adjust_points'}), '  ');
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_handgrading_result.points_adjustment).toEqual(0);
+        expect(wrapper.vm.d_handgrading_result!.points_adjustment).toEqual(0);
         expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(true);
     });
 
@@ -102,7 +102,7 @@ describe('Adjust points test', () => {
                 readonly_handgrading_results: false,
             }
         });
-        let save_stub = sinon.stub(wrapper.vm.d_handgrading_result, 'save');
+        let save_stub = sinon.stub(wrapper.vm.d_handgrading_result!, 'save');
         expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('0');
         expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(false);
 
@@ -111,7 +111,7 @@ describe('Adjust points test', () => {
         wrapper.find('#save-adjust-points').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-        expect(wrapper.vm.d_handgrading_result.points_adjustment).toEqual(-1);
+        expect(wrapper.vm.d_handgrading_result!.points_adjustment).toEqual(-1);
         expect(save_stub.calledOnce).toBe(true);
     });
 
@@ -149,7 +149,7 @@ test('One file panel per submitted file', async () => {
             readonly_handgrading_results: false,
         }
     });
-    let panels = <WrapperArray<FilePanel>>wrapper.findAll({name: 'FilePanel'});
+    let panels = <WrapperArray<FilePanel>> wrapper.findAll({name: 'FilePanel'});
     expect(panels.length).toEqual(3);
     expect(panels.at(0).vm.filename).toEqual('file1.txt');
     expect(panels.at(1).vm.filename).toEqual('file2.cpp');
@@ -273,10 +273,10 @@ describe('Checkbox tests', () => {
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/4');
             criteria = wrapper.findAll('.criterion');
             save_stub = sinon.stub(
-                wrapper.vm.d_handgrading_result.criterion_results[0], 'save'
+                wrapper.vm.d_handgrading_result!.criterion_results[0], 'save'
             ).callsFake(() => {
                 ag_cli.CriterionResult.notify_criterion_result_changed(
-                    wrapper.vm.d_handgrading_result.criterion_results[0]
+                    wrapper.vm.d_handgrading_result!.criterion_results[0]
                 );
             });
         });
@@ -285,41 +285,41 @@ describe('Checkbox tests', () => {
             criteria.at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(false);
+            expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(false);
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('0/4');
             expect(save_stub.calledOnce).toBe(true);
 
             criteria.at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(true);
+            expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(true);
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/4');
             expect(save_stub.calledTwice).toBe(true);
         });
 
         test('Toggle checkbox, grading marked as done, result refreshes', async () => {
-            wrapper.vm.d_handgrading_result.finished_grading = true;
+            wrapper.vm.d_handgrading_result!.finished_grading = true;
             let refresh_result_stub = sinon.stub(
-                wrapper.vm.d_handgrading_result, 'refresh'
+                wrapper.vm.d_handgrading_result!, 'refresh'
             ).onFirstCall().callsFake(() => {
-                wrapper.vm.d_handgrading_result.total_points = 3;
+                wrapper.vm.d_handgrading_result!.total_points = 3;
                 return Promise.resolve({});
             }).onSecondCall().callsFake(() => {
-                wrapper.vm.d_handgrading_result.total_points = 2;
+                wrapper.vm.d_handgrading_result!.total_points = 2;
                 return Promise.resolve({});
             });
 
             criteria.at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(false);
+            expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(false);
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('3/4');
             expect(save_stub.calledOnce).toBe(true);
 
             criteria.at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-            expect(wrapper.vm.d_handgrading_result.criterion_results[0].selected).toBe(true);
+            expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(true);
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/4');
             expect(save_stub.calledTwice).toBe(true);
 
@@ -413,11 +413,11 @@ describe('Comment tests', () => {
         wrapper.find('#new-comment .blue-button').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-        expect(wrapper.vm.d_handgrading_result.comments[2]).toEqual(new_comment);
+        expect(wrapper.vm.d_handgrading_result!.comments[2]).toEqual(new_comment);
     });
 
     test('Handgraders allowed to leave custom comments', async () => {
-        wrapper.vm.d_handgrading_result.handgrading_rubric.handgraders_can_leave_comments = true;
+        wrapper.vm.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments = true;
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
         wrapper.vm.$forceUpdate();
         await wrapper.vm.$nextTick();
@@ -431,7 +431,7 @@ describe('Comment tests', () => {
     });
 
     test('Handgraders not allowed to leave custom comments', async () => {
-        wrapper.vm.d_handgrading_result.handgrading_rubric.handgraders_can_leave_comments = false;
+        wrapper.vm.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments = false;
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
         expect(wrapper.find('#new-comment').exists()).toBe(false);
 
@@ -484,8 +484,8 @@ describe('Comment tests', () => {
     });
 
     test('Delete custom general comment', async () => {
-        expect(wrapper.vm.d_handgrading_result.comments.length).toEqual(2);
-        let to_delete = wrapper.vm.d_handgrading_result.comments[1];
+        expect(wrapper.vm.d_handgrading_result!.comments.length).toEqual(2);
+        let to_delete = wrapper.vm.d_handgrading_result!.comments[1];
         expect(to_delete).toEqual(comment_without_location_0);
 
         let delete_stub = sinon.stub(
@@ -496,13 +496,13 @@ describe('Comment tests', () => {
         wrapper.findAll('.comment').at(0).find('.delete').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-        expect(wrapper.vm.d_handgrading_result.comments).toEqual([comment_with_location_3]);
+        expect(wrapper.vm.d_handgrading_result!.comments).toEqual([comment_with_location_3]);
         expect(delete_stub.calledOnce).toBe(true);
     });
 
     test('Delete custom inline comment', async () => {
-        expect(wrapper.vm.d_handgrading_result.comments.length).toEqual(2);
-        let to_delete = wrapper.vm.d_handgrading_result.comments[0];
+        expect(wrapper.vm.d_handgrading_result!.comments.length).toEqual(2);
+        let to_delete = wrapper.vm.d_handgrading_result!.comments[0];
         expect(to_delete).toEqual(comment_with_location_3);
 
         let delete_stub = sinon.stub(
@@ -513,13 +513,13 @@ describe('Comment tests', () => {
         wrapper.findAll('.comment').at(3).find('.delete').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-        expect(wrapper.vm.d_handgrading_result.comments).toEqual([comment_without_location_0]);
+        expect(wrapper.vm.d_handgrading_result!.comments).toEqual([comment_without_location_0]);
         expect(delete_stub.calledOnce).toBe(true);
     });
 
     test('Delete applied annotation', async () => {
-        expect(wrapper.vm.d_handgrading_result.applied_annotations.length).toEqual(2);
-        let to_delete = wrapper.vm.d_handgrading_result.applied_annotations[0];
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(2);
+        let to_delete = wrapper.vm.d_handgrading_result!.applied_annotations[0];
         expect(to_delete).toEqual(applied_empty_long_description_annotation_2);
 
         let delete_stub = sinon.stub(
@@ -530,7 +530,7 @@ describe('Comment tests', () => {
         wrapper.findAll('.comment').at(2).find('.delete').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
-        expect(wrapper.vm.d_handgrading_result.applied_annotations).toEqual(
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations).toEqual(
             [applied_long_description_annotation_1]);
         expect(delete_stub.calledOnce).toBe(true);
     });
@@ -618,7 +618,7 @@ describe('Footer tests', () => {
             }
         });
 
-        let save_result_stub = sinon.stub(wrapper.vm.d_handgrading_result, 'save');
+        let save_result_stub = sinon.stub(wrapper.vm.d_handgrading_result!, 'save');
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
 
         wrapper.find('#finished-grading').trigger('click');
@@ -688,7 +688,7 @@ describe('Footer tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_handgrading_result.finished_grading).toBe(false);
+        expect(wrapper.vm.d_handgrading_result!.finished_grading).toBe(false);
         expect(wrapper.find('#next-button').text()).toEqual('Skip');
     });
 
@@ -700,7 +700,7 @@ describe('Footer tests', () => {
             }
         });
 
-        wrapper.vm.d_handgrading_result.finished_grading = true;
+        wrapper.vm.d_handgrading_result!.finished_grading = true;
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#next-button').text()).toEqual('Next');
     });
@@ -725,7 +725,7 @@ describe('Observer updates', () => {
 
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(1);
-        expect(wrapper.vm.d_handgrading_result.applied_annotations).toEqual([applied_annotation]);
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations).toEqual([applied_annotation]);
     });
 
     test('Comment created', async () => {
@@ -744,7 +744,7 @@ describe('Observer updates', () => {
 
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(1);
-        expect(wrapper.vm.d_handgrading_result.comments).toEqual([comment]);
+        expect(wrapper.vm.d_handgrading_result!.comments).toEqual([comment]);
     });
 });
 
@@ -795,7 +795,7 @@ test('Read-only mode', async () => {
 
     // Checkboxes are not toggleable
     let save_criterion_result_stub = sinon.stub(
-        wrapper.vm.d_handgrading_result.criterion_results[0], 'save');
+        wrapper.vm.d_handgrading_result!.criterion_results[0], 'save');
     let checkbox = wrapper.findAll('.criterion').at(0);
     checkbox.trigger('click');
     await wrapper.vm.$nextTick();
