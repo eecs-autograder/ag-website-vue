@@ -81,7 +81,7 @@
           Comments
         </div>
         <div v-show="!d_comments_collapsed">
-          <div class="new-comment" v-if="can_leave_comments">
+          <div id="new-comment" v-if="can_leave_comments">
             <textarea class="input" v-model="d_new_comment_text"></textarea>
             <button type="button" class="blue-button" @click="add_comment">Comment</button>
           </div>
@@ -98,7 +98,7 @@
                     :key="comment.pk">
                 <div class="row">
                   <div class="short-description">{{comment.text}}</div>
-                  <i v-if="!readonly_handgrading_results"
+                  <i v-if="!readonly_handgrading_results && can_leave_comments"
                      @click="delete_comment(comment)"
                      class="delete fas fa-times"></i>
                 </div>
@@ -123,7 +123,8 @@
                         v-if="handgrading_comment.max_deduction !== null"
                       >/{{handgrading_comment.max_deduction}} max</template>)</span>
                   </div>
-                  <i v-if="!readonly_handgrading_results"
+                  <i v-if="!readonly_handgrading_results
+                           && (can_leave_comments || !handgrading_comment.is_custom)"
                      @click="delete_comment(handgrading_comment)"
                      class="delete fas fa-times"></i>
                 </div>
@@ -148,7 +149,7 @@
         </div>
 
         <!-- Annotations -->
-        <template v-if="!readonly_handgrading_results">
+        <div v-if="!readonly_handgrading_results" ref="annotation_reference">
           <div class="collapsible-section-header"
               @click="d_annotations_collapsed = !d_annotations_collapsed">
             <i class="fas"
@@ -177,7 +178,7 @@
               </div>
             </template>
           </div>
-        </template>
+        </div>
       </div>
 
       <div class="grading-sidebar-footer" v-if="!readonly_handgrading_results">
@@ -234,6 +235,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { Created, Destroyed } from '@/lifecycle';
 import { assert_not_null, deep_copy, toggle } from '@/utils';
 import {
   is_integer,
@@ -269,7 +271,9 @@ class ProcessingSemaphore {
   }
 })
 export default class Handgrading extends Vue implements AppliedAnnotationObserver,
-                                                        CommentObserver {
+                                                        CommentObserver,
+                                                        Created,
+                                                        Destroyed {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
@@ -314,7 +318,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     Comment.subscribe(this);
   }
 
-  destroy() {
+  destroyed() {
     AppliedAnnotation.unsubscribe(this);
     Comment.unsubscribe(this);
   }
@@ -387,6 +391,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
   delete_comment(comment: Comment | HandgradingComment) {
     if (this.saving) {
+      // istanbul ignore next
       return;
     }
 
@@ -658,7 +663,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 }
 
-.new-comment {
+#new-comment {
   margin-bottom: 5px;
 
   .input {

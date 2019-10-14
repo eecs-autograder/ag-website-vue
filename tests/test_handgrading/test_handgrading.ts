@@ -11,11 +11,11 @@ import Handgrading from '@/components/handgrading/handgrading.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    checkbox_is_checked,
     compress_whitespace,
     get_validated_input_text,
     set_validated_input_text,
     wait_until,
-    checkbox_is_checked
 } from '@/tests/utils';
 
 let result: ag_cli.HandgradingResult;
@@ -42,6 +42,22 @@ test('Result input is deep copied', async () => {
     });
     expect(wrapper.vm.d_handgrading_result).toEqual(result);
     expect(wrapper.vm.d_handgrading_result).not.toBe(result);
+});
+
+test('Result changed, new result deep copied', async () => {
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: false,
+        }
+    });
+
+    let new_result = new ag_cli.HandgradingResult(result);
+    new_result.finished_grading = !new_result.finished_grading;
+    wrapper.setProps({handgrading_result: new_result});
+
+    expect(wrapper.vm.d_handgrading_result).toEqual(new_result);
+    expect(wrapper.vm.d_handgrading_result).not.toBe(new_result);
 });
 
 describe('Adjust points test', () => {
@@ -386,15 +402,15 @@ describe('Comment tests', () => {
     });
 
     test('Staff can leave custom comment', async () => {
-        expect(wrapper.find('.new-comment').exists()).toBe(true);
+        expect(wrapper.find('#new-comment').exists()).toBe(true);
         let new_comment_text = "noresatnersatoineratoienrastoier";
-        wrapper.find('.new-comment .input').setValue(new_comment_text);
+        wrapper.find('#new-comment .input').setValue(new_comment_text);
 
         let new_comment = data_ut.make_comment(result, null, new_comment_text);
         sinon.stub(ag_cli.Comment, 'create').withArgs(
             result.pk, {text: new_comment_text}
         ).resolves(new_comment);
-        wrapper.find('.new-comment .blue-button').trigger('click');
+        wrapper.find('#new-comment .blue-button').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
         expect(wrapper.vm.d_handgrading_result.comments[2]).toEqual(new_comment);
@@ -405,15 +421,25 @@ describe('Comment tests', () => {
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
         wrapper.vm.$forceUpdate();
         await wrapper.vm.$nextTick();
-        expect(wrapper.find('.new-comment').exists()).toBe(true);
+        expect(wrapper.find('#new-comment').exists()).toBe(true);
+
         expect(wrapper.findAll('.comment').at(0).find('.delete').exists()).toBe(true);
+        expect(wrapper.findAll('.comment').at(3).find('.delete').exists()).toBe(true);
+        // Can always delete applied annotations
+        expect(wrapper.findAll('.comment').at(1).find('.delete').exists()).toBe(true);
+        expect(wrapper.findAll('.comment').at(2).find('.delete').exists()).toBe(true);
     });
 
     test('Handgraders not allowed to leave custom comments', async () => {
         wrapper.vm.d_handgrading_result.handgrading_rubric.handgraders_can_leave_comments = false;
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
-        expect(wrapper.find('.new-comment').exists()).toBe(false);
+        expect(wrapper.find('#new-comment').exists()).toBe(false);
+
         expect(wrapper.findAll('.comment').at(0).find('.delete').exists()).toBe(false);
+        expect(wrapper.findAll('.comment').at(3).find('.delete').exists()).toBe(false);
+        // Can always delete applied annotations
+        expect(wrapper.findAll('.comment').at(1).find('.delete').exists()).toBe(true);
+        expect(wrapper.findAll('.comment').at(2).find('.delete').exists()).toBe(true);
     });
 
     test('Custom general and inline comments, applied annotations listed together', async () => {
@@ -682,32 +708,112 @@ describe('Footer tests', () => {
 
 describe('Observer updates', () => {
     test('Applied annotation created', async () => {
-        fail();
-    });
+        let annotation = data_ut.make_annotation(result.handgrading_rubric.pk);
+        result.handgrading_rubric.annotations = [annotation];
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
 
-    test('Applied annotation deleted', async () => {
-        fail();
+        expect(wrapper.findAll('.comment').length).toEqual(0);
+
+        let applied_annotation = data_ut.make_applied_annotation(
+            result, annotation, {filename: 'file1.txt', first_line: 1, last_line: 1});
+        ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.comment').length).toEqual(1);
+        expect(wrapper.vm.d_handgrading_result.applied_annotations).toEqual([applied_annotation]);
     });
 
     test('Comment created', async () => {
-        fail();
-    });
+        let wrapper = managed_mount(Handgrading, {
+            propsData: {
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+            }
+        });
 
-    test('Comment deleted', async () => {
-        fail();
+        expect(wrapper.findAll('.comment').length).toEqual(0);
+
+        let comment = data_ut.make_comment(
+            result, {filename: 'file1.txt', first_line: 1, last_line: 1}, 'nsetanost');
+        ag_cli.Comment.notify_comment_created(comment);
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.comment').length).toEqual(1);
+        expect(wrapper.vm.d_handgrading_result.comments).toEqual([comment]);
     });
 });
 
 test('Read-only mode', async () => {
-    // Use staff user, make handgraders can do things true,
-    // check that:
-    // - adjust points and leave comment are gone
-    // - checkboxes are not toggleable
-    // - deletion x's are gone
-    // - annotation list is not shown
-    // Make sure still there:
-    // - score
-    // - checkboxes
-    // - comments
-    fail();
+    let criterion = data_ut.make_criterion(
+        result.handgrading_rubric.pk,
+        {
+            short_description: "I am an criterion",
+            long_description: "I am such long description of very length",
+            points: 4
+        }
+    );
+    result.handgrading_rubric.criteria = [criterion];
+    result.criterion_results = [data_ut.make_criterion_result(result, criterion, true)];
+
+    let annotation = data_ut.make_annotation(
+        result.handgrading_rubric.pk,
+        {
+            short_description: "I am annotation",
+            long_description: "I am such long annotation description of length",
+            deduction: -2
+        }
+    );
+    result.handgrading_rubric.annotations = [annotation];
+    data_ut.make_comment(result, null, 'A general comment');
+    data_ut.make_comment(
+        result, {filename: 'file3.py', first_line: 1, last_line: 1}, 'What a comment');
+    data_ut.make_applied_annotation(
+        result, annotation, {filename: 'file3.py', first_line: 2, last_line: 2});
+
+    result.handgrading_rubric.handgraders_can_adjust_points = true;
+    result.handgrading_rubric.handgraders_can_leave_comments = true;
+
+    result.total_points = 3;
+    result.total_points_possible = 8;
+
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: true,
+        }
+    });
+
+    // Adjust points and leave comment are gone
+    expect(wrapper.find('#adjust-points-container').exists()).toBe(false);
+    expect(wrapper.find({ref: 'adjust_points'}).exists()).toBe(false);
+    expect(wrapper.find('#new-comment').exists()).toBe(false);
+
+    // Checkboxes are not toggleable
+    let save_criterion_result_stub = sinon.stub(
+        wrapper.vm.d_handgrading_result.criterion_results[0], 'save');
+    let checkbox = wrapper.findAll('.criterion').at(0);
+    checkbox.trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(save_criterion_result_stub.callCount).toEqual(0);
+
+    // Checkbox is still shown
+    expect(checkbox.find('.criterion-checkbox .fa-check').exists()).toBe(true);
+
+    // Deletion x's are gone
+    expect(wrapper.findAll('.delete').length).toEqual(0);
+
+    // Annotation reference list is not shown
+    expect(wrapper.find({ref: 'annotation_reference'}).exists()).toBe(false);
+    expect(wrapper.findAll('.annotation').length).toEqual(0);
+
+    // Comments still shown
+    expect(wrapper.findAll('.comment').length).toEqual(3);
+
+    // Score still shown
+    expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('3/8');
 });

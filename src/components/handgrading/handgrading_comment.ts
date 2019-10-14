@@ -15,6 +15,10 @@ export interface HandgradingComment {
     readonly max_deduction: number | null;
     readonly vue_key: string;
 
+    // Whether handgraders can delete this comment if they
+    // are NOT allowed to leave custom comments
+    readonly is_custom: boolean;
+
     delete(): Promise<void>;
     compare(other: HandgradingComment): number;
 }
@@ -68,6 +72,8 @@ class AppliedAnnotationWrapper implements HandgradingComment {
     compare(other: HandgradingComment) {
         return location_compare(this.applied_annotation.location, other.location);
     }
+
+    is_custom = false;
 }
 
 class CommentWrapper implements HandgradingComment {
@@ -102,6 +108,8 @@ class CommentWrapper implements HandgradingComment {
     get vue_key(): string {
         return `comm${this.comment.pk}`;
     }
+
+    is_custom = true;
 }
 
 function location_compare(first: Location, second: Location): number {
