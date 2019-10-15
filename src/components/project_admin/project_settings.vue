@@ -50,7 +50,8 @@
                 Hard Deadline
                 <i class="fas fa-question-circle input-tooltip">
                   <tooltip width="medium" placement="right">
-                    The deadline shown to students.
+                    The actual deadline. Submissions will not be accepted after this time
+                    unless late days are allowed. This date is NOT shown to students.
                   </tooltip>
                 </i>
               </div>
