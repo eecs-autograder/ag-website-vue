@@ -32,7 +32,11 @@
                id="actual-return-code-section">
             <div class="feedback-label"> Actual exit status: </div>
             <div class="feedback">
-              <div class="short-output"
+              <div :class="['short-output',
+                            {'actual-return-code-correct': return_code_correctness
+                             === ReturnCodeCorrectness.correct},
+                            {'actual-return-code-incorrect': return_code_correctness
+                             === ReturnCodeCorrectness.incorrect}]"
                    id="actual-return-code">{{d_ag_test_command_result.actual_return_code}}</div>
             </div>
           </div>
@@ -372,12 +376,12 @@ export default class AGCommandResult extends Vue {
   padding: 0 5px 0 0;
 }
 
-#actual-return-code {
-  color: black;
+.actual-return-code-correct {
+  color: $ocean-blue;
 }
 
-#expected-return-code {
-  color: black;
+.actual-return-code-incorrect {
+  color: lighten($warning-red, 5);
 }
 
 </style>
