@@ -98,55 +98,51 @@ export default class MutationSuiteResults extends Vue {
     let points_correctness = this.points_for_bugs_exposed_correctness(suite_result);
     let student_tests_correctness = this.student_tests_correctness(suite_result);
 
-    // 0 / nonzero points
+    // received no points
     if (points_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.none_correct;
     }
 
-    // all points
+    // received all points
     if (points_correctness === CorrectnessLevel.all_correct) {
-      // student_tests (all tests invalid, some tests invalid, invalid_tests === null)
+      // invalid_tests are present or hidden
       if (student_tests_correctness !== CorrectnessLevel.all_correct) {
         points_correctness = CorrectnessLevel.some_correct;
       }
     }
-    // point information not available
+    // points hidden
     else if (points_correctness === CorrectnessLevel.not_available) {
-      // invalid_tests === null or invalid_tests === []
+      // invalid_tests hidden or no invalid_tests
       if (student_tests_correctness === CorrectnessLevel.all_correct
           || student_tests_correctness === CorrectnessLevel.not_available) {
         points_correctness = CorrectnessLevel.info_only;
       }
-      // all tests invalid or some tests invalid
+      // invalid_tests present
       else {
         points_correctness = student_tests_correctness;
       }
     }
 
-    // no setup command
     if ((return_code_correctness === CorrectnessLevel.not_available)) {
-      // info_only, all, none, some (no N/A)
       return points_correctness;
     }
-    // has setup command & return code was correct
     else if (return_code_correctness === CorrectnessLevel.all_correct) {
-      // all tests invalid or some tests invalid / some points awarded
+      // invalid_tests present or some points awarded
       if (points_correctness === CorrectnessLevel.none_correct
           || points_correctness === CorrectnessLevel.some_correct) {
         return CorrectnessLevel.some_correct;
       }
-      // no invalid tests, info-only
+      // no invalid tests or invalid_tests hidden or points hidden
       else {
         return points_correctness;
       }
     }
-    // has setup command & return code was incorrect
-    // all tests valid or some tests valid / some points awarded
+    // all tests valid or some tests valid or some points awarded
     if (points_correctness === CorrectnessLevel.all_correct
         || points_correctness === CorrectnessLevel.some_correct) {
       return CorrectnessLevel.some_correct;
     }
-    // all tests invalid, invalid_tests hidden
+    // all tests invalid or invalid_tests hidden or points hidden
     return CorrectnessLevel.none_correct;
   }
 }
