@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts">
-
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { MutationTestSuiteResultFeedback, Submission } from 'ag-client-typescript';
@@ -55,31 +54,24 @@ export default class MutationSuiteResults extends Vue {
 
   setup_return_code_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.has_setup_command) {
-      // setup command correct
       if (suite_result.setup_return_code === 0) {
         return CorrectnessLevel.all_correct;
       }
-      // setup command incorrect
       return CorrectnessLevel.none_correct;
     }
-    // no setup command
     return CorrectnessLevel.not_available;
   }
 
   student_tests_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.invalid_tests !== null) {
-      // no tests invalid
       if (suite_result.invalid_tests.length === 0) {
         return CorrectnessLevel.all_correct;
       }
-      // all tests invalid
       if (suite_result.invalid_tests.length === suite_result.student_tests.length) {
         return CorrectnessLevel.none_correct;
       }
-      // some tests invalid
       return CorrectnessLevel.some_correct;
     }
-    // invalid test information hidden
     return CorrectnessLevel.not_available;
   }
 
@@ -90,78 +82,72 @@ export default class MutationSuiteResults extends Vue {
         ? parseFloat(suite_result.total_points_possible) : suite_result.total_points_possible;
 
     if (suite_result.num_bugs_exposed !== null) {
-      // if 0/nonzero
       if (total_points === 0 && total_points_possible !== 0) {
         return CorrectnessLevel.none_correct;
       }
-      // all points
       else if (suite_result.total_points === suite_result.total_points_possible) {
           return CorrectnessLevel.all_correct;
       }
-      // some points
       return CorrectnessLevel.some_correct;
     }
-    // points hidden
     return CorrectnessLevel.not_available;
   }
 
   mutation_suite_correctness(suite_result: MutationTestSuiteResultFeedback) {
-      let return_code_correctness = this.setup_return_code_correctness(suite_result);
-      let points_correctness = this.points_for_bugs_exposed_correctness(suite_result);
-      let student_tests_correctness = this.student_tests_correctness(suite_result);
+    let return_code_correctness = this.setup_return_code_correctness(suite_result);
+    let points_correctness = this.points_for_bugs_exposed_correctness(suite_result);
+    let student_tests_correctness = this.student_tests_correctness(suite_result);
 
-      // 0 / nonzero points
-      if (points_correctness === CorrectnessLevel.none_correct) {
-          return CorrectnessLevel.none_correct;
-      }
-
-      // all points
-      if (points_correctness === CorrectnessLevel.all_correct) {
-          // student_tests (all tests invalid, some tests invalid, invalid_tests === null)
-          if (student_tests_correctness !== CorrectnessLevel.all_correct) {
-              points_correctness = CorrectnessLevel.some_correct;
-          }
-      }
-      // point information not available
-      else if (points_correctness === CorrectnessLevel.not_available) {
-          // invalid_tests === null or invalid_tests === []
-          if (student_tests_correctness === CorrectnessLevel.all_correct
-              || student_tests_correctness === CorrectnessLevel.not_available) {
-              points_correctness = CorrectnessLevel.info_only;
-          }
-          // all tests invalid or some tests invalid
-          else {
-              points_correctness = student_tests_correctness;
-          }
-      }
-
-      // no setup command
-      if ((return_code_correctness === CorrectnessLevel.not_available)) {
-          // info_only, all, none, some (no N/A)
-          return points_correctness;
-      }
-
-      // has setup command & return code was correct
-      else if (return_code_correctness === CorrectnessLevel.all_correct) {
-          // all tests invalid or some tests invalid / some points awarded
-          if (points_correctness === CorrectnessLevel.none_correct
-              || points_correctness === CorrectnessLevel.some_correct) {
-              return CorrectnessLevel.some_correct;
-          }
-          // no invalid tests, info-only
-          else {
-              return points_correctness;
-          }
-      }
-
-      // has setup command & return code was incorrect
-      // all tests valid or some tests valid / some points awarded
-      if (points_correctness === CorrectnessLevel.all_correct
-          || points_correctness === CorrectnessLevel.some_correct) {
-          return CorrectnessLevel.some_correct;
-      }
-      // some tests invalid, all tests invalid
+    // 0 / nonzero points
+    if (points_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.none_correct;
+    }
+
+    // all points
+    if (points_correctness === CorrectnessLevel.all_correct) {
+      // student_tests (all tests invalid, some tests invalid, invalid_tests === null)
+      if (student_tests_correctness !== CorrectnessLevel.all_correct) {
+        points_correctness = CorrectnessLevel.some_correct;
+      }
+    }
+    // point information not available
+    else if (points_correctness === CorrectnessLevel.not_available) {
+      // invalid_tests === null or invalid_tests === []
+      if (student_tests_correctness === CorrectnessLevel.all_correct
+          || student_tests_correctness === CorrectnessLevel.not_available) {
+        points_correctness = CorrectnessLevel.info_only;
+      }
+      // all tests invalid or some tests invalid
+      else {
+        points_correctness = student_tests_correctness;
+      }
+    }
+
+    // no setup command
+    if ((return_code_correctness === CorrectnessLevel.not_available)) {
+      // info_only, all, none, some (no N/A)
+      return points_correctness;
+    }
+    // has setup command & return code was correct
+    else if (return_code_correctness === CorrectnessLevel.all_correct) {
+      // all tests invalid or some tests invalid / some points awarded
+      if (points_correctness === CorrectnessLevel.none_correct
+          || points_correctness === CorrectnessLevel.some_correct) {
+        return CorrectnessLevel.some_correct;
+      }
+      // no invalid tests, info-only
+      else {
+        return points_correctness;
+      }
+    }
+    // has setup command & return code was incorrect
+    // all tests valid or some tests valid / some points awarded
+    if (points_correctness === CorrectnessLevel.all_correct
+        || points_correctness === CorrectnessLevel.some_correct) {
+      return CorrectnessLevel.some_correct;
+    }
+    // all tests invalid, invalid_tests hidden
+    return CorrectnessLevel.none_correct;
   }
 }
 </script>
