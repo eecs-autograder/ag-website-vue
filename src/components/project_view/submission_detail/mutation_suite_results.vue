@@ -1,4 +1,3 @@
-import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div id="mutation-test-suite-results"
        class="suite-result">
@@ -15,9 +14,7 @@ import {CorrectnessLevel} from "@/components/project_view/submission_detail/corr
       <submission-detail-panel
         ref="mutation_test_suite_detail_panel"
         :name="mutation_test_suite_result.student_test_suite_name"
-        :correctness_level="get_mutation_test_validity_correctness_level(
-          mutation_test_suite_result
-        )"
+        :correctness_level="mutation_suite_correctness(mutation_test_suite_result)"
         :points_awarded="parseFloat(mutation_test_suite_result.total_points)"
         :points_possible="parseFloat(mutation_test_suite_result.total_points_possible)">
         <mutation-suite-result :submission="submission"
@@ -31,14 +28,13 @@ import {CorrectnessLevel} from "@/components/project_view/submission_detail/corr
 
 <script lang="ts">
 
-import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
-import MutationSuiteResult
-    from '@/components/project_view/submission_detail/mutation_suite_result.vue';
-import SubmissionDetailPanel
-    from "@/components/project_view/submission_detail/submission_detail_panel.vue";
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { MutationTestSuiteResultFeedback, Submission } from 'ag-client-typescript';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
+import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
 
 @Component({
   components: {
@@ -57,106 +53,115 @@ export default class MutationSuiteResults extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: string;
 
-  suite_return_code_correctness(suite_result: MutationTestSuiteResultFeedback) {
+  setup_return_code_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.has_setup_command) {
+      // setup command correct
       if (suite_result.setup_return_code === 0) {
         return CorrectnessLevel.all_correct;
       }
+      // setup command incorrect
       return CorrectnessLevel.none_correct;
     }
+    // no setup command
     return CorrectnessLevel.not_available;
   }
 
-  suite_student_test_correctness(suite_result: MutationTestSuiteResultFeedback) {
+  student_tests_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.invalid_tests !== null) {
-      // no test submitted is invalid
+      // no tests invalid
       if (suite_result.invalid_tests.length === 0) {
         return CorrectnessLevel.all_correct;
       }
-      // invalid cannot be zero at this point - all tests submitted are invalid
+      // all tests invalid
       if (suite_result.invalid_tests.length === suite_result.student_tests.length) {
         return CorrectnessLevel.none_correct;
       }
-      // more than zero invalid but less than total tests
+      // some tests invalid
       return CorrectnessLevel.some_correct;
     }
+    // invalid test information hidden
     return CorrectnessLevel.not_available;
   }
 
-  suite_bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
-    let student_tests_correctness = this.suite_student_test_correctness(suite_result);
+  points_for_bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
     let total_points = typeof(suite_result.total_points) === 'string'
         ? parseFloat(suite_result.total_points) : suite_result.total_points;
     let total_points_possible = typeof(suite_result.total_points_possible) === 'string'
         ? parseFloat(suite_result.total_points_possible) : suite_result.total_points_possible;
 
     if (suite_result.num_bugs_exposed !== null) {
+      // if 0/nonzero
       if (total_points === 0 && total_points_possible !== 0) {
-          console.log(suite_result.student_test_suite_name + " Received 0 points when points possible > 0");
         return CorrectnessLevel.none_correct;
       }
+      // all points
       else if (suite_result.total_points === suite_result.total_points_possible) {
-        if (student_tests_correctness !== CorrectnessLevel.all_correct) {
-            return CorrectnessLevel.some_correct;
-        }
-        return CorrectnessLevel.all_correct;
-      }
-      console.log(suite_result.student_test_suite_name + " received some points but not all");
-      return CorrectnessLevel.some_correct;
-    }
-    if (student_tests_correctness === CorrectnessLevel.all_correct ||
-        student_tests_correctness === CorrectnessLevel.not_available) {
-      return CorrectnessLevel.not_available;
-    }
-    return student_tests_correctness;
-  }
-
-  get_mutation_test_validity_correctness_level(suite_result: MutationTestSuiteResultFeedback) {
-    let return_code_correctness = this.suite_return_code_correctness(suite_result);
-    let bugs_exposed_correctness = this.suite_bugs_exposed_correctness(suite_result);
-
-    let total_points = typeof(suite_result.total_points) === 'string'
-        ? parseFloat(suite_result.total_points) : suite_result.total_points;
-    let total_points_possible = typeof(suite_result.total_points_possible) === 'string'
-        ? parseFloat(suite_result.total_points_possible) : suite_result.total_points_possible;
-
-    console.log(suite_result.student_test_suite_name);
-    console.log("Return code correctness: " + return_code_correctness);
-    console.log("Bugs exposed correctness: " + bugs_exposed_correctness);
-    console.log("******");
-
-    if (total_points === 0 && total_points_possible !== 0) {
-      return CorrectnessLevel.none_correct;
-    }
-
-    if ((return_code_correctness === CorrectnessLevel.not_available)) {
-      if (bugs_exposed_correctness === CorrectnessLevel.not_available) {
-        return CorrectnessLevel.info_only;
-      }
-      return bugs_exposed_correctness;
-    }
-
-    if (return_code_correctness === CorrectnessLevel.all_correct) {
-      if (bugs_exposed_correctness === CorrectnessLevel.all_correct) {
           return CorrectnessLevel.all_correct;
       }
-      else if (bugs_exposed_correctness === CorrectnessLevel.not_available) {
-        return CorrectnessLevel.info_only;
-      }
-      else {
-        return CorrectnessLevel.some_correct;
-      }
+      // some points
+      return CorrectnessLevel.some_correct;
     }
+    // points hidden
+    return CorrectnessLevel.not_available;
+  }
 
-    if (return_code_correctness === CorrectnessLevel.none_correct) {
-      if (bugs_exposed_correctness === CorrectnessLevel.all_correct
-          || bugs_exposed_correctness === CorrectnessLevel.some_correct) {
-        return CorrectnessLevel.some_correct;
+  mutation_suite_correctness(suite_result: MutationTestSuiteResultFeedback) {
+      let return_code_correctness = this.setup_return_code_correctness(suite_result);
+      let points_correctness = this.points_for_bugs_exposed_correctness(suite_result);
+      let student_tests_correctness = this.student_tests_correctness(suite_result);
+
+      // 0 / nonzero points
+      if (points_correctness === CorrectnessLevel.none_correct) {
+          return CorrectnessLevel.none_correct;
       }
+
+      // all points
+      if (points_correctness === CorrectnessLevel.all_correct) {
+          // student_tests (all tests invalid, some tests invalid, invalid_tests === null)
+          if (student_tests_correctness !== CorrectnessLevel.all_correct) {
+              points_correctness = CorrectnessLevel.some_correct;
+          }
+      }
+      // point information not available
+      else if (points_correctness === CorrectnessLevel.not_available) {
+          // invalid_tests === null or invalid_tests === []
+          if (student_tests_correctness === CorrectnessLevel.all_correct
+              || student_tests_correctness === CorrectnessLevel.not_available) {
+              points_correctness = CorrectnessLevel.info_only;
+          }
+          // all tests invalid or some tests invalid
+          else {
+              points_correctness = student_tests_correctness;
+          }
+      }
+
+      // no setup command
+      if ((return_code_correctness === CorrectnessLevel.not_available)) {
+          // info_only, all, none, some (no N/A)
+          return points_correctness;
+      }
+
+      // has setup command & return code was correct
+      else if (return_code_correctness === CorrectnessLevel.all_correct) {
+          // all tests invalid or some tests invalid / some points awarded
+          if (points_correctness === CorrectnessLevel.none_correct
+              || points_correctness === CorrectnessLevel.some_correct) {
+              return CorrectnessLevel.some_correct;
+          }
+          // no invalid tests, info-only
+          else {
+              return points_correctness;
+          }
+      }
+
+      // has setup command & return code was incorrect
+      // all tests valid or some tests valid / some points awarded
+      if (points_correctness === CorrectnessLevel.all_correct
+          || points_correctness === CorrectnessLevel.some_correct) {
+          return CorrectnessLevel.some_correct;
+      }
+      // some tests invalid, all tests invalid
       return CorrectnessLevel.none_correct;
-    }
-
-    return CorrectnessLevel.info_only;
   }
 }
 </script>

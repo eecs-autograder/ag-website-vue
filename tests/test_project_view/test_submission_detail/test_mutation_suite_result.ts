@@ -269,7 +269,7 @@ describe('show_student_tests_fieldset getter', () => {
         fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
     });
 
-    test('show_student_tests_fieldset - false', () => {
+    test('show_student_tests_fieldset - true always', () => {
         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
@@ -277,8 +277,7 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(false);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
     test('show_student_tests_fieldset - show_get_test_names_stdout === true', () => {
@@ -291,7 +290,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
@@ -305,7 +303,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
@@ -319,7 +316,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
@@ -333,7 +329,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
@@ -347,7 +342,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(1);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
@@ -361,7 +355,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(true);
         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 
@@ -375,7 +368,6 @@ describe('show_student_tests_fieldset getter', () => {
         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
         expect(fdbk_settings.show_validity_check_stderr).toBe(true);
-        expect(wrapper.vm.show_student_tests_fieldset).toBe(true);
         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
     });
 });
@@ -1675,6 +1667,7 @@ describe('MutationSuiteResult validity check related tests', () => {
     test('show_validity_check_stdout === true AND validity_check_stdout_content === null',
          async () => {
         mutation_test_suite_result.fdbk_settings.show_validity_check_stdout = true;
+        mutation_test_suite_result.student_tests = ['first_test'];
 
         get_output_size_stub.onFirstCall().returns(
             Promise.resolve(
@@ -1751,6 +1744,8 @@ describe('MutationSuiteResult validity check related tests', () => {
     test('show_validity_check_stdout === true AND validity_check_stdout_content !== null',
          async () => {
         mutation_test_suite_result.fdbk_settings.show_validity_check_stdout = true;
+        mutation_test_suite_result.student_tests = ['first_test'];
+
 
         wrapper = mount(MutationSuiteResult, {
             propsData: {
@@ -1816,6 +1811,7 @@ describe('MutationSuiteResult validity check related tests', () => {
     test('show_validity_check_stderr === true AND validity_check_stderr_content === null',
          async () => {
         mutation_test_suite_result.fdbk_settings.show_validity_check_stderr = true;
+        mutation_test_suite_result.student_tests = ['first_test'];
 
         get_output_size_stub.onFirstCall().returns(
             Promise.resolve(
@@ -1892,6 +1888,7 @@ describe('MutationSuiteResult validity check related tests', () => {
     test('show_validity_check_stderr === true AND validity_check_stderr_content !== null',
          async () => {
         mutation_test_suite_result.fdbk_settings.show_validity_check_stderr = true;
+        mutation_test_suite_result.student_tests = ['first_test'];
 
         wrapper = mount(MutationSuiteResult, {
             propsData: {

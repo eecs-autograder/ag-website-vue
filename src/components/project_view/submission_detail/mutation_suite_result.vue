@@ -78,8 +78,7 @@
       </div>
     </fieldset>
 
-    <fieldset v-if="show_student_tests_fieldset"
-              class="fieldset">
+    <fieldset class="fieldset">
       <legend class="legend"> Student Tests </legend>
       <div id="student-tests-section">
 
@@ -451,18 +450,6 @@ export default class MutationSuiteResult extends Vue {
     return this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
            || this.d_mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
            || this.d_mutation_test_suite_result!.num_bugs_exposed !== null;
-  }
-
-  get show_student_tests_fieldset(): boolean {
-    return true;
-      // this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
-      //      || this.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
-      //      || this.d_mutation_test_suite_result!.discarded_tests.length > 0
-      //      || (this.d_mutation_test_suite_result!.invalid_tests !== null
-      //          && this.d_mutation_test_suite_result!.invalid_tests!.length > 0)
-      //      || this.get_valid_tests().length > 0
-      //      || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout
-      //      || this.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr;
   }
 
   async toggle_d_show_buggy_implementations_output() {
