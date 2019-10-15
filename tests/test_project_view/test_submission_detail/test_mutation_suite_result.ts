@@ -247,130 +247,131 @@ describe('show_buggy_implementations_fieldset getter', () => {
     });
 });
 
-describe('show_student_tests_fieldset getter', () => {
-    let wrapper: Wrapper<MutationSuiteResult>;
-    let d_mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
-    let fdbk_settings: MutationTestSuiteFeedbackConfig;
-
-    beforeEach(async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
-        fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
-    });
-
-    test('show_student_tests_fieldset - true always', () => {
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - show_get_test_names_stdout === true', () => {
-        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout = true;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(true);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - show_get_test_names_stderr === true', () => {
-        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr = true;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(true);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - discarded_tests.length > 0', () => {
-        wrapper.vm.d_mutation_test_suite_result!.discarded_tests = ['one_test'];
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(1);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - invalid_tests.length > 0', () => {
-        wrapper.vm.d_mutation_test_suite_result!.invalid_tests = ['one_test'];
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests!.length).toEqual(1);
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - get_valid_tests().length > 0', () => {
-        wrapper.vm.d_mutation_test_suite_result!.student_tests = ['one_test'];
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(1);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - show_validity_check_stdout === true', () => {
-        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout = true;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(true);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(false);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-
-    test('show_student_tests_fieldset - show_validity_check_stderr === true', () => {
-        wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr = true;
-
-        expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
-        expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
-        expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
-        expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
-        expect(wrapper.vm.get_valid_tests().length).toEqual(0);
-        expect(fdbk_settings.show_validity_check_stdout).toBe(false);
-        expect(fdbk_settings.show_validity_check_stderr).toBe(true);
-        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
-    });
-});
+// describe('show_student_tests_fieldset getter', () => {
+//     let wrapper: Wrapper<MutationSuiteResult>;
+//     let d_mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
+//     let fdbk_settings: MutationTestSuiteFeedbackConfig;
+//
+//     beforeEach(async () => {
+//         wrapper = mount(MutationSuiteResult, {
+//             propsData: {
+//                 mutation_test_suite_result: mutation_test_suite_result,
+//                 submission: submission,
+//                 fdbk_category: ag_cli.FeedbackCategory.max
+//             }
+//         });
+//
+//         for (let i = 0; i < 9; ++i) {
+//             await wrapper.vm.$nextTick();
+//         }
+//
+//         d_mutation_test_suite_result = wrapper.vm.d_mutation_test_suite_result!;
+//         fdbk_settings = d_mutation_test_suite_result.fdbk_settings;
+//     });
+//
+//     test('show_student_tests_fieldset - true always', () => {
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//         expect()
+//     });
+//
+//     test('show_student_tests_fieldset - show_get_test_names_stdout === true', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout = true;
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(true);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+//
+//     test('show_student_tests_fieldset - show_get_test_names_stderr === true', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr = true;
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(true);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+//
+//     test('show_student_tests_fieldset - discarded_tests.length > 0', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.discarded_tests = ['one_test'];
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(1);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+//
+//     test('show_student_tests_fieldset - invalid_tests.length > 0', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.invalid_tests = ['one_test'];
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests!.length).toEqual(1);
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+//
+//     test('show_student_tests_fieldset - get_valid_tests().length > 0', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.student_tests = ['one_test'];
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(1);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+//
+//     test('show_student_tests_fieldset - show_validity_check_stdout === true', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout = true;
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(true);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(false);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+//
+//     test('show_student_tests_fieldset - show_validity_check_stderr === true', () => {
+//         wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr = true;
+//
+//         expect(fdbk_settings.show_get_test_names_stdout).toBe(false);
+//         expect(fdbk_settings.show_get_test_names_stderr).toBe(false);
+//         expect(d_mutation_test_suite_result.discarded_tests.length).toEqual(0);
+//         expect(d_mutation_test_suite_result.invalid_tests).toBeNull();
+//         expect(wrapper.vm.get_valid_tests().length).toEqual(0);
+//         expect(fdbk_settings.show_validity_check_stdout).toBe(false);
+//         expect(fdbk_settings.show_validity_check_stderr).toBe(true);
+//         expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+//     });
+// });
 
 describe('MutationSuiteResult setup section tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
@@ -1015,6 +1016,37 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 describe('MutationSuiteResult student tests section tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
+    test('student_tests === []', async () => {
+        mutation_test_suite_result.student_tests = [];
+
+        wrapper = mount(MutationSuiteResult, {
+            propsData: {
+                mutation_test_suite_result: mutation_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 9; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        expect(
+            wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
+        ).toBe(false);
+        expect(
+            wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_get_test_names_stderr
+        ).toBe(false);
+        expect(wrapper.vm.d_mutation_test_suite_result!.student_tests.length).toEqual(0);
+        expect(
+            wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout
+        ).toBe(false);
+        expect(
+            wrapper.vm.d_mutation_test_suite_result!.fdbk_settings.show_validity_check_stderr
+        ).toBe(false);
+        expect(wrapper.find('#student-tests-section').exists()).toBe(true);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(true);
+    });
+
     test('show_get_test_names_stdout === false && show_get_test_names_stderr === false',
          async () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
@@ -1367,6 +1399,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.find('#total-tests-submitted').text()).toEqual("5");
         expect(wrapper.find('#list-of-discarded-tests').text()).toContain("test_four");
         expect(wrapper.find('#list-of-discarded-tests').text()).toContain("test_five");
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('invalid_tests.length === null', async () => {
@@ -1388,6 +1421,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             0
         );
         expect(wrapper.find('#false-positive-tests-section').exists()).toBe(false);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('invalid_tests.length === 0', async () => {
@@ -1407,6 +1441,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#false-positive-tests-section').exists()).toBe(false);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('invalid_tests.length !== 0 AND no tests timed out', async () => {
@@ -1429,6 +1464,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_three");
         expect(wrapper.find('#list-of-false-positive-tests').text()).toContain("test_four");
         expect(wrapper.find('.test-timed-out').exists()).toBe(false);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('invalid_tests.length !== 0 AND tests timed out', async () => {
@@ -1458,6 +1494,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.findAll('.single-false-positive-test').at(1).find(
             '.test-timed-out'
         ).exists()).toBe(false);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('get_valid_tests.length === 0', async () => {
@@ -1487,6 +1524,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#valid-tests-section').exists()).toBe(false);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('get_valid_tests.length !== 0', async () => {
@@ -1516,6 +1554,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.find('#valid-tests-section').exists()).toBe(true);
         expect(wrapper.find('#list-of-valid-tests').text()).toContain('test_two');
         expect(wrapper.find('#list-of-valid-tests').text()).toContain('test_three');
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('get_valid_tests() - invalid_tests !== null', async () => {
@@ -1547,6 +1586,7 @@ describe('MutationSuiteResult student tests section tests', () => {
                 "test_three"
             ]
         );
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('get_valid_tests() - invalid_tests === null', async () => {
@@ -1577,6 +1617,7 @@ describe('MutationSuiteResult student tests section tests', () => {
                 "test_four"
             ]
         );
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('test_timed_out() - timed_out_tests === null', async () => {
@@ -1603,6 +1644,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
         expect(wrapper.vm.test_timed_out("test_three")).toBe(false);
         expect(wrapper.vm.test_timed_out("test_four")).toBe(false);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 
     test('test_timed_out() - timed_out_tests !== null', async () => {
@@ -1632,6 +1674,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
         expect(wrapper.vm.test_timed_out("test_three")).toBe(true);
         expect(wrapper.vm.test_timed_out("test_four")).toBe(true);
+        expect(wrapper.find('#no-tests-submitted-message').exists()).toBe(false);
     });
 });
 
