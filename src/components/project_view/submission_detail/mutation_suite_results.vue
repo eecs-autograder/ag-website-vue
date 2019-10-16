@@ -1,4 +1,3 @@
-import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div id="mutation-test-suite-results"
        class="suite-result">
