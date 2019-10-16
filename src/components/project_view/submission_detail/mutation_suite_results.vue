@@ -72,21 +72,27 @@ export default class MutationSuiteResults extends Vue {
   }
 
   points_for_bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
+    if (suite_result.num_bugs_exposed === null) {
+      return CorrectnessLevel.not_available;
+    }
+
+    if (suite_result.num_bugs_exposed === 0) {
+      return CorrectnessLevel.none_correct;
+    }
+
+    if (!suite_result.fdbk_settings.show_points && suite_result.num_bugs_exposed > 0) {
+      return CorrectnessLevel.info_only;
+    }
+
     let total_points = typeof(suite_result.total_points) === 'string'
         ? parseFloat(suite_result.total_points) : suite_result.total_points;
     let total_points_possible = typeof(suite_result.total_points_possible) === 'string'
         ? parseFloat(suite_result.total_points_possible) : suite_result.total_points_possible;
 
-    if (suite_result.num_bugs_exposed !== null) {
-      if (total_points === 0 && total_points_possible !== 0) {
-        return CorrectnessLevel.none_correct;
-      }
-      else if (suite_result.total_points === suite_result.total_points_possible) {
-          return CorrectnessLevel.all_correct;
-      }
-      return CorrectnessLevel.some_correct;
+    if (total_points === total_points_possible) {
+      return CorrectnessLevel.all_correct;
     }
-    return CorrectnessLevel.not_available;
+    return CorrectnessLevel.some_correct;
   }
 
   mutation_suite_correctness(suite_result: MutationTestSuiteResultFeedback) {
@@ -106,8 +112,9 @@ export default class MutationSuiteResults extends Vue {
         points_correctness = CorrectnessLevel.some_correct;
       }
     }
-    // points hidden
-    else if (points_correctness === CorrectnessLevel.not_available) {
+    // points hidden || points hidden and bugs exposed not hidden
+    else if (points_correctness === CorrectnessLevel.not_available
+             || points_correctness === CorrectnessLevel.info_only) {
       // invalid_tests hidden or no invalid_tests
       if (student_tests_correctness === CorrectnessLevel.all_correct
           || student_tests_correctness === CorrectnessLevel.not_available) {

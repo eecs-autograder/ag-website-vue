@@ -72,6 +72,8 @@ function set_points_correctness(suite_result: ag_cli.MutationTestSuiteResultFeed
         suite_result.num_bugs_exposed = null;
     }
     else {
+        suite_result.fdbk_settings.show_points = true;
+
         if (level === NONE_CORRECT) {
             suite_result.num_bugs_exposed = 0;
             suite_result.total_points = 0;
@@ -239,6 +241,16 @@ describe('points_for_bugs_exposed_correctness tests', () => {
         expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
     });
 
+    test('points_for_bugs_exposed_correctness - num_bugs_exposed === null ' +
+         '&& show_points === false',
+         () => {
+        set_points_correctness(mutation_suite_1_result, NOT_AVAILABLE);
+        mutation_suite_1_result.fdbk_settings.show_points = false;
+
+        expect(mutation_suite_1_result.num_bugs_exposed).toBeNull();
+        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
+    });
+
     test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
          '&& total_points === 0 && total_points_possible !== 0 ' +
          '&& type of total_points and total_points_possible is string',
@@ -265,13 +277,14 @@ describe('points_for_bugs_exposed_correctness tests', () => {
         expect(mutation_suite_1_result.num_bugs_exposed).toEqual(0);
         expect(mutation_suite_1_result.total_points).toEqual('0');
         expect(mutation_suite_1_result.total_points_possible).toEqual('0');
-        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(ALL_CORRECT);
+        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(NONE_CORRECT);
     });
 
     test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
          '&& total_points !== 0 && total_points === total_points_possible ' +
          '&& type of total_points and total_points_possible is string',
          () => {
+        mutation_suite_1_result.fdbk_settings.show_points = true;
         mutation_suite_1_result.num_bugs_exposed = 2;
         mutation_suite_1_result.total_points = '5';
         mutation_suite_1_result.total_points_possible = '5';
@@ -282,11 +295,12 @@ describe('points_for_bugs_exposed_correctness tests', () => {
         expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(ALL_CORRECT);
     });
 
-    // is it even possible to have points (catch bugs) if all of your tests are invalid?
     test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
          '&& total_points !== 0 && total_points !== total_points_possible ' +
+         '&& show_points === true ' +
          '&& type of total_points and total_points_possible is string',
          () => {
+        mutation_suite_1_result.fdbk_settings.show_points = true;
         mutation_suite_1_result.num_bugs_exposed = 2;
         mutation_suite_1_result.total_points = '3';
         mutation_suite_1_result.total_points_possible = '5';
@@ -295,6 +309,22 @@ describe('points_for_bugs_exposed_correctness tests', () => {
         expect(mutation_suite_1_result.total_points).toEqual('3');
         expect(mutation_suite_1_result.total_points_possible).toEqual('5');
         expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(SOME_CORRECT);
+    });
+
+    test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
+         '&& total_points !== 0 && total_points !== total_points_possible ' +
+         '&& show_points === false ' +
+         '&& type of total_points and total_points_possible is string',
+         () => {
+        mutation_suite_1_result.fdbk_settings.show_points = false;
+        mutation_suite_1_result.num_bugs_exposed = 2;
+        mutation_suite_1_result.total_points = '3';
+        mutation_suite_1_result.total_points_possible = '5';
+
+        expect(mutation_suite_1_result.num_bugs_exposed).toEqual(2);
+        expect(mutation_suite_1_result.total_points).toEqual('3');
+        expect(mutation_suite_1_result.total_points_possible).toEqual('5');
+        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(INFO_ONLY);
     });
 
     test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
@@ -320,7 +350,7 @@ describe('points_for_bugs_exposed_correctness tests', () => {
         expect(mutation_suite_1_result.num_bugs_exposed).toEqual(0);
         expect(mutation_suite_1_result.total_points).toEqual(0);
         expect(mutation_suite_1_result.total_points_possible).toEqual(0);
-        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(ALL_CORRECT);
+        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(NONE_CORRECT);
     });
 
     test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
@@ -337,6 +367,7 @@ describe('points_for_bugs_exposed_correctness tests', () => {
 
     test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
          '&& total_points !== 0 && total_points !== total_points_possible ' +
+         '&& show_points === true' +
          '&& type of total_points and total_points_possible is number',
          () => {
         set_points_correctness(mutation_suite_1_result, SOME_CORRECT);
@@ -345,6 +376,20 @@ describe('points_for_bugs_exposed_correctness tests', () => {
         expect(mutation_suite_1_result.total_points).toEqual(3);
         expect(mutation_suite_1_result.total_points_possible).toEqual(5);
         expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(SOME_CORRECT);
+    });
+
+    test('points_for_bugs_exposed_correctness - num_bugs_exposed !== null' +
+         '&& total_points !== 0 && total_points !== total_points_possible ' +
+         '&& show_points === false' +
+         '&& type of total_points and total_points_possible is number',
+         () => {
+        set_points_correctness(mutation_suite_1_result, SOME_CORRECT);
+        mutation_suite_1_result.fdbk_settings.show_points = false;
+
+        expect(mutation_suite_1_result.num_bugs_exposed).toEqual(2);
+        expect(mutation_suite_1_result.total_points).toEqual(3);
+        expect(mutation_suite_1_result.total_points_possible).toEqual(5);
+        expect(points_for_bugs_exposed_correctness(mutation_suite_1_result)).toEqual(INFO_ONLY);
     });
 });
 
