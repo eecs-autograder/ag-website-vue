@@ -113,10 +113,13 @@ describe('setup_return_code_correctness tests', () => {
 
     test('setup_return_code_correctness - has_setup_command === true && setup_return_code === 0',
          () => {
+        mutation_suite_1_result.fdbk_settings.show_setup_return_code = true;
         set_return_code_correctness(mutation_suite_1_result, ALL_CORRECT);
 
         expect(mutation_suite_1_result.has_setup_command).toBe(true);
         expect(mutation_suite_1_result.setup_return_code).toEqual(0);
+        expect(mutation_suite_1_result.setup_timed_out).toBe(null);
+        expect(mutation_suite_1_result.fdbk_settings.show_setup_return_code).toBe(true);
         expect(setup_return_code_correctness(mutation_suite_1_result)).toEqual(ALL_CORRECT);
     });
 
@@ -135,6 +138,13 @@ describe('setup_return_code_correctness tests', () => {
 
         expect(mutation_suite_1_result.has_setup_command).toBe(false);
         expect(setup_return_code_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
+    });
+
+    test('setup_return_code_correctness - setup_timed_out === true',
+         () => {
+        mutation_suite_1_result.setup_timed_out = true;
+
+        expect(setup_return_code_correctness(mutation_suite_1_result)).toEqual(NONE_CORRECT);
     });
 });
 
@@ -357,6 +367,7 @@ describe('mutation_suite_correctness tests', () => {
             }
         });
 
+        mutation_suite_1_result.setup_timed_out = false;
         setup_return_code_correctness = wrapper.vm.setup_return_code_correctness;
         student_tests_correctness = wrapper.vm.student_tests_correctness;
         points_for_bugs_exposed_correctness = wrapper.vm.points_for_bugs_exposed_correctness;
@@ -492,7 +503,7 @@ describe('mutation_suite_correctness tests', () => {
 
     test('setup_return_code_correctness === NOT_AVAILABLE ' +
          '&& student_tests_correctness === SOME_CORRECT ' +
-         '&& points_correctness === NOT_AVAILABLE',
+         '&& points_correctness === NONE_CORRECT',
          () => {
         set_return_code_correctness(mutation_suite_1_result, NOT_AVAILABLE);
         set_student_tests_correctness(mutation_suite_1_result, SOME_CORRECT);

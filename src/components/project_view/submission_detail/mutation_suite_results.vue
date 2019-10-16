@@ -1,3 +1,4 @@
+import {CorrectnessLevel} from "@/components/project_view/submission_detail/correctness_icon";
 <template>
   <div id="mutation-test-suite-results"
        class="suite-result">
@@ -31,6 +32,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { MutationTestSuiteResultFeedback, Submission } from 'ag-client-typescript';
 
+import { setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
 import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
 import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
@@ -53,13 +55,8 @@ export default class MutationSuiteResults extends Vue {
   fdbk_category!: string;
 
   setup_return_code_correctness(suite_result: MutationTestSuiteResultFeedback) {
-    if (suite_result.has_setup_command) {
-      if (suite_result.setup_return_code === 0) {
-        return CorrectnessLevel.all_correct;
-      }
-      return CorrectnessLevel.none_correct;
-    }
-    return CorrectnessLevel.not_available;
+    return setup_return_code_correctness(suite_result.setup_return_code,
+                                         suite_result.setup_timed_out);
   }
 
   student_tests_correctness(suite_result: MutationTestSuiteResultFeedback) {

@@ -56,6 +56,7 @@ import {
 
 import AGCaseResult from '@/components/project_view/submission_detail/ag_case_result.vue';
 import AGCaseSetupResult from '@/components/project_view/submission_detail/ag_case_setup_result.vue';
+import { setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
 import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
 
@@ -117,13 +118,11 @@ export default class AGSuiteResult extends Vue {
   }
 
   get setup_correctness_level(): CorrectnessLevel {
-    if (this.d_ag_test_suite_result!.setup_return_code === 0) {
-      return CorrectnessLevel.all_correct;
-    }
-    if (this.d_ag_test_suite_result!.setup_return_code === null) {
-      return CorrectnessLevel.not_available;
-    }
-    return CorrectnessLevel.none_correct;
+      if (!this.d_ag_test_suite_result!.fdbk_settings.show_setup_return_code) {
+          return CorrectnessLevel.info_only;
+      }
+      return setup_return_code_correctness(this.d_ag_test_suite_result!.setup_return_code,
+                                           this.d_ag_test_suite_result!.setup_timed_out);
   }
 
   decide_whether_to_open_setup() {
