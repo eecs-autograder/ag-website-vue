@@ -126,17 +126,17 @@ describe('Initialize handgrading tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_course_to_import_from).toEqual(course);
-        expect(wrapper.vm.d_project_pk_to_import_from).toBeNull();
+        expect(wrapper.vm.d_project_to_import_from).toBeNull();
         // The current project doesn't have a rubric, so it's filtered out.
         expect(wrapper.vm.d_selected_course_projects).toEqual(
             [other_project, project_to_import_from]);
-        let select_project_pk_to_import_from = <Wrapper<SelectObject>> wrapper.find(
-            {ref: 'project_pk_to_import_from'});
+        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
+            {ref: 'project_to_import_from'});
         // "Select a project" is index 0, other_project is 1, project_to_import_from is 2
-        select_project_pk_to_import_from.findAll('option').at(2).setSelected();
+        select_project_to_import_from.findAll('option').at(2).setSelected();
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_project_pk_to_import_from).toEqual(project_to_import_from.pk);
+        expect(wrapper.vm.d_project_to_import_from).toEqual(project_to_import_from);
 
         wrapper.find('#import-button-container .green-button').trigger('click');
 
@@ -199,16 +199,16 @@ describe('Initialize handgrading tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_project_pk_to_import_from).toBeNull();
+        expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual(
             [other_project, project_to_import_from]);
-        let select_project_pk_to_import_from = <Wrapper<SelectObject>> wrapper.find(
-            {ref: 'project_pk_to_import_from'});
+        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
+            {ref: 'project_to_import_from'});
         // "Select a project" is index 0, other_project is 1, project_to_import_from is 2
-        select_project_pk_to_import_from.findAll('option').at(2).setSelected();
+        select_project_to_import_from.findAll('option').at(2).setSelected();
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_project_pk_to_import_from).toEqual(project_to_import_from.pk);
+        expect(wrapper.vm.d_project_to_import_from).toEqual(project_to_import_from);
 
         wrapper.find('#import-button-container .green-button').trigger('click');
 
@@ -219,7 +219,7 @@ describe('Initialize handgrading tests', () => {
         expect(import_rubric_stub.calledOnceWith(current_project.pk, project_to_import_from.pk));
     });
 
-    test('Selecting course with no projects resets d_project_pk_to_import_from', async () => {
+    test('Selecting course with no projects resets d_project_to_import_from', async () => {
         let no_projects_course = data_ut.make_course();
         let current_course_project = data_ut.make_project(course.pk);
         let project_with_rubric = data_ut.make_project(course.pk, {has_handgrading_rubric: true});
@@ -243,15 +243,15 @@ describe('Initialize handgrading tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_project_pk_to_import_from).toBeNull();
+        expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual([project_with_rubric]);
 
-        let select_project_pk_to_import_from = <Wrapper<SelectObject>> wrapper.find(
-            {ref: 'project_pk_to_import_from'});
-        select_project_pk_to_import_from.findAll('option').at(1).setSelected();
+        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
+            {ref: 'project_to_import_from'});
+        select_project_to_import_from.findAll('option').at(1).setSelected();
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_project_pk_to_import_from).toEqual(project_with_rubric.pk);
+        expect(wrapper.vm.d_project_to_import_from).toEqual(project_with_rubric);
 
         expect(
             wrapper.find('#import-button-container .green-button').is('[disabled]')
@@ -261,7 +261,7 @@ describe('Initialize handgrading tests', () => {
             wrapper.find({ref: 'course_to_import_from'}), no_projects_course.pk);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_project_pk_to_import_from).toBeNull();
+        expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual([]);
 
         expect(
@@ -527,6 +527,13 @@ describe('Criteria and annotation tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(expected);
     });
 
+    test('Change criteria order', async () => {
+        let order_stub = sinon.stub(Criterion, 'update_order');
+        wrapper.find({ref: "criteria_order"}).trigger('change');
+        await wrapper.vm.$nextTick();
+        expect(order_stub.calledOnceWith(rubric.pk, rubric.criteria.map(item => item.pk)));
+    });
+
     test('Create annotation', async () => {
         let new_annotation = data_ut.make_annotation(rubric.pk);
         sinon.stub(Annotation, 'create').callsFake(() => {
@@ -598,5 +605,12 @@ describe('Criteria and annotation tests', () => {
 
         expect(wrapper.findAll({name: 'SingleAnnotation'}).length).toEqual(1);
         expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual(expected);
+    });
+
+    test('Change annotation order', async () => {
+        let order_stub = sinon.stub(Annotation, 'update_order');
+        wrapper.find({ref: "annotation_order"}).trigger('change');
+        await wrapper.vm.$nextTick();
+        expect(order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk)));
     });
 });

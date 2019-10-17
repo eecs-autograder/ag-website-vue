@@ -46,22 +46,21 @@
               <i class="fa fa-spinner fa-pulse"></i>
             </div>
             <template v-else-if="d_selected_course_projects !== null">
-              <select class="select"
-                      ref="project_pk_to_import_from"
-                      @change="d_project_pk_to_import_from = parseInt($event.target.value, 10)">
-                <option selected disabled>-- Select a Project --</option>
-                <option v-for="project of d_selected_course_projects"
-                        :key="project.pk"
-                        :value="project.pk">
-                  {{project.name}}
-                </option>
-              </select>
+              <select-object ref="project_to_import_from"
+                             :items="d_selected_course_projects"
+                             id_field="pk"
+                             v-model="d_project_to_import_from">
+                <option selected disabled :value="null">-- Select a Project --</option>
+                <template v-slot:option-text="{item}">
+                  {{item.name}}
+                </template>
+              </select-object>
             </template>
           </div>
           <div id="import-button-container">
             <button type="button"
                     class="green-button"
-                    :disabled="d_project_pk_to_import_from === null"
+                    :disabled="d_project_to_import_from === null"
                     @click="import_rubric">
               <i v-if="d_import_request_pending" class="fa fa-spinner fa-pulse"></i>
               <template v-else>Import</template>
@@ -164,7 +163,8 @@
               <i class="fas fa-plus"></i> New Checkbox
             </button>
           </div>
-          <draggable v-model="d_handgrading_rubric.criteria"
+          <draggable ref="criteria_order"
+                     v-model="d_handgrading_rubric.criteria"
                      @change="set_criteria_order"
                      handle=".handle" ghost-class="ghost">
             <single-criterion v-for="(criterion, index) of d_handgrading_rubric.criteria"
@@ -182,7 +182,8 @@
               <i class="fas fa-plus"></i> New Annotation
             </button>
           </div>
-          <draggable v-model="d_handgrading_rubric.annotations"
+          <draggable ref="annotation_order"
+                     v-model="d_handgrading_rubric.annotations"
                      @change="set_annotations_order"
                      handle=".handle" ghost-class="ghost">
             <single-annotation v-for="(annotation, index) of d_handgrading_rubric.annotations"
@@ -309,7 +310,7 @@ export default class HandgradingSettings extends Vue implements Created,
   // that course's projects and store them here.
   d_selected_course_projects: Project[] | null = null;
   d_loading_projects: boolean = false;
-  d_project_pk_to_import_from: number | null = null;
+  d_project_to_import_from: Project | null = null;
   d_new_rubric_request_pending = false;
   d_import_request_pending = false;
 
@@ -402,7 +403,7 @@ export default class HandgradingSettings extends Vue implements Created,
   }
 
   async load_projects_to_import_from(course: Course) {
-    this.d_project_pk_to_import_from = null;
+    this.d_project_to_import_from = null;
     try {
       this.d_loading_projects = true;
       let projects = await Project.get_all_from_course(course.pk);
@@ -415,11 +416,11 @@ export default class HandgradingSettings extends Vue implements Created,
   }
 
   async import_rubric() {
-    if (assert_not_null(this.d_project_pk_to_import_from)) {
+    if (assert_not_null(this.d_project_to_import_from)) {
       try {
         this.d_import_request_pending = true;
         this.d_handgrading_rubric = await HandgradingRubric.import_from_project(
-          this.project.pk, this.d_project_pk_to_import_from);
+          this.project.pk, this.d_project_to_import_from.pk);
       }
       finally {
         this.d_import_request_pending = false;
