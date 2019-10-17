@@ -1,55 +1,66 @@
 <template>
-  <select class="select" v-model="d_select_value" @change="update_value">
-    <slot></slot>
-    <option v-for="item of d_items"
-            :key="item[id_field]"
-            :value="item[id_field]"
-            :selected="item[id_field] === value[id_field]">
-      <slot name="option-text" v-bind:item="item"></slot>
-    </option>
-  </select>
+  <!-- This outer div insulates the wrapped select tag from attribute
+       and event bindings on the component. -->
+  <div>
+    <select class="select" v-model="d_value" @change="update_value">
+      <slot></slot>
+      <option v-for="item of d_items"
+              :key="item[id_field]"
+              :value="item[id_field]">
+        <slot name="option-text" v-bind:item="item">{{item[id_field]}}</slot>
+      </option>
+    </select>
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Model, Prop, Vue, Watch } from 'vue-property-decorator';
+
+type ItemType = {[key: string]: unknown};
 
 @Component
 export default class SelectObject extends Vue {
   @Prop({default: [], type: Array})
-  items!: object[];
+  items!: ItemType[];
 
-  d_items: object[] = [];
+  d_items: ItemType[] = [];
 
-  @Watch('items')
-  on_items_changed(old_value: object[], new_value: object[]) {
-    this.d_items = new_value;
-  }
+  @Model('change', {required: false, type: Object, default: null})
+  value!: ItemType | null;
+
+  d_value: unknown = null;
 
   // The name of the field used to uniquely identify the items.
   @Prop({type: String})
   id_field!: string;
 
-  @Prop({default: false, type: Object})
-  value!: object;
-
-  @Watch('value')
-  on_value_changed(new_value: object, old_value: object) {
-    // @ts-ignore
-    this.d_select_value = new_value[this.id_field];
+  @Watch('items')
+  on_items_changed(new_items: ItemType[], old_items: ItemType[]) {
+    this.d_items = new_items;
   }
 
-  d_select_value: unknown;
+  @Watch('value')
+  on_value_changed(new_value: ItemType | null, old_value: ItemType | null) {
+    this.set_d_value(new_value);
+  }
 
   created() {
     this.d_items = this.items;
-    // @ts-ignore
-    this.d_select_value = this.value[this.id_field];
+    this.set_d_value(this.value);
+  }
+
+  private set_d_value(value: ItemType | null) {
+    if (value === null) {
+      this.d_value = null;
+    }
+    else {
+      this.d_value = value[this.id_field];
+    }
   }
 
   private update_value() {
     let selected = this.d_items.find(
-      // @ts-ignore
-      (item) => item[this.id_field] === this.d_select_value);
+      (item) => item[this.id_field] === this.d_value);
     this.$emit('change', selected);
   }
 }

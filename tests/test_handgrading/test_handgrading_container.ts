@@ -12,7 +12,7 @@ import { HandgradingStatus } from '@/components/handgrading/handgrading_status';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, compress_whitespace, wait_until } from '@/tests/utils';
+import { checkbox_is_checked, compress_whitespace, find_by_name, wait_until } from '@/tests/utils';
 
 let course: ag_cli.Course;
 let project: ag_cli.Project;
@@ -463,8 +463,4 @@ async function make_wrapper() {
     });
     await wait_until(wrapper, w => !w.vm.d_loading_result_summaries);
     return wrapper;
-}
-
-function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
-    return <Wrapper<T>> wrapper.find({name: name});
 }

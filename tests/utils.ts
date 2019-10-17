@@ -186,3 +186,7 @@ export async function do_input_blank_or_not_integer_test(
     return do_invalid_text_input_test(
         component_wrapper, input_selector, 'not num', save_button_selector);
 }
+
+export function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
+    return <Wrapper<T>> wrapper.find({name: name});
+}
