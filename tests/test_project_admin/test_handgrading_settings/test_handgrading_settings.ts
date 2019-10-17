@@ -529,9 +529,11 @@ describe('Criteria and annotation tests', () => {
 
     test('Change criteria order', async () => {
         let order_stub = sinon.stub(Criterion, 'update_order');
-        wrapper.find({ref: "criteria_order"}).trigger('change');
+        wrapper.find({ref: "criteria_order"}).vm.$emit('change');
         await wrapper.vm.$nextTick();
-        expect(order_stub.calledOnceWith(rubric.pk, rubric.criteria.map(item => item.pk)));
+        expect(
+            order_stub.calledOnceWith(rubric.pk, rubric.criteria.map(item => item.pk))
+        ).toBe(true);
     });
 
     test('Create annotation', async () => {
@@ -609,8 +611,10 @@ describe('Criteria and annotation tests', () => {
 
     test('Change annotation order', async () => {
         let order_stub = sinon.stub(Annotation, 'update_order');
-        wrapper.find({ref: "annotation_order"}).trigger('change');
+        wrapper.find({ref: "annotation_order"}).vm.$emit('change');
         await wrapper.vm.$nextTick();
-        expect(order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk)));
+        expect(
+            order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk))
+        ).toBe(true);
     });
 });
