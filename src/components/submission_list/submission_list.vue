@@ -43,7 +43,7 @@
       <div v-if="d_selected_submission !== null"
            id="submission-detail-container">
         <submission-detail ref="submission_detail"
-                           :selected_submission_with_results="d_selected_submission"
+                           :submission_with_results="d_selected_submission"
                            :is_ultimate_submission="is_ultimate_submission"
                            :course="course"
                            :group="group">

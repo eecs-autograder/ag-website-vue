@@ -72,7 +72,7 @@ describe('SubmissionDetail tests', () => {
         });
     });
 
-    test('selected_submission_with_results Watcher', async () => {
+    test('submission_with_results Watcher', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
             {
@@ -91,7 +91,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -102,8 +102,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission).toEqual(new ag_cli.Submission(submission_with_results));
+        expect(wrapper.vm.submission).toEqual(new ag_cli.Submission(submission_with_results));
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(wrapper.vm.d_submission_fdbk_override).toEqual(submission_with_results.results);
         expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
@@ -115,19 +114,18 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
         expect(get_submission_result_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_submission).toEqual(
+        expect(wrapper.vm.submission).toEqual(
             new ag_cli.Submission(submission_with_results)
         );
         expect(wrapper.vm.d_submission_fdbk_override).toEqual(past_limit_submission_results);
         expect(wrapper.vm.submission_result).toEqual(past_limit_submission_results);
 
-        wrapper.setProps({selected_submission_with_results: another_submission_with_results});
+        wrapper.setProps({submission_with_results: another_submission_with_results});
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(submission_with_results).not.toEqual(another_submission_with_results);
-        expect(wrapper.vm.d_submission).toEqual(
+        expect(wrapper.vm.submission).toEqual(
             new ag_cli.Submission(another_submission_with_results)
         );
         expect(get_submission_result_stub.callCount).toEqual(1);
@@ -159,7 +157,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -170,14 +168,12 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(get_submission_result_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_submission_fdbk_override).not.toBeNull();
         expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
 
-        wrapper.setProps({selected_submission_with_results: another_submission_with_results});
+        wrapper.setProps({submission_with_results: another_submission_with_results});
 
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(get_submission_result_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_submission_fdbk_override).toBeNull();
         expect(wrapper.vm.submission_result).toEqual(another_submission_with_results.results);
@@ -197,7 +193,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -208,8 +204,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission!.submitter).toEqual(user.username);
+        expect(wrapper.vm.submission!.submitter).toEqual(user.username);
         expect(wrapper.find('#submitter').text()).toEqual(user.username);
     });
 
@@ -219,7 +214,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -230,8 +225,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission!.status).toEqual(ag_cli.GradingStatus.received);
+        expect(wrapper.vm.submission!.status).toEqual(ag_cli.GradingStatus.received);
         expect(wrapper.find('#grading-status-section').text()).toContain(
             "We got your submission! It should be queued soon."
         );
@@ -243,7 +237,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -254,8 +248,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission!.is_bonus_submission).toBe(false);
+        expect(wrapper.vm.submission!.is_bonus_submission).toBe(false);
         expect(wrapper.find('#is-bonus-submission-message').exists()).toBe(false);
     });
 
@@ -270,7 +263,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -281,8 +274,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.vm.d_submission!.is_bonus_submission).toBe(true);
+        expect(wrapper.vm.submission!.is_bonus_submission).toBe(true);
         expect(wrapper.find('#is-bonus-submission-message').exists()).toBe(true);
         expect(wrapper.find('#is-bonus-submission-message').text()).toEqual(
            "This submission used one of your bonus submissions."
@@ -302,7 +294,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -316,10 +308,6 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.is_group_member).toBe(true);
         expect(wrapper.vm.does_not_count_for_current_user).toBe(true);
         expect(wrapper.find('#does-not-count-for-user-message').exists()).toBe(true);
-        expect(wrapper.find('#does-not-count-for-user-message').text()).toEqual(
-            "Since you ran out of late days, this submission will not count towards " +
-            "your final grade."
-        );
     });
 
     test('does_not_count_for_user message - is group member === true AND ' +
@@ -335,7 +323,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -365,7 +353,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -381,9 +369,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.find('#does-not-count-for-user-message').exists()).toBe(false);
     });
 
-    test('submission score is only visible when (GradingStatus === Finished Grading ' +
-         '|| GradingStatus === Waiting for deferred) && total_points_possible is > 0',
-         async () => {
+    test('show_score - status === received', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
             {
@@ -398,7 +384,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -409,24 +395,195 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
+        expect(wrapper.vm.show_score).toBe(false);
         expect(wrapper.find('#submission-score').exists()).toBe(false);
+    });
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.removed_from_queue;
+    test('show_score - status === removed_from_queue', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.removed_from_queue
+            },
+            {
+                total_points: 10.25,
+                total_points_possible: 15
+            }
+        );
+
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.show_score).toBe(false);
         expect(wrapper.find('#submission-score').exists()).toBe(false);
+    });
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.being_graded;
+    test('show_score - status === being_graded', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.being_graded
+            },
+            {
+                total_points: 10.25,
+                total_points_possible: 15
+            }
+        );
+
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.show_score).toBe(false);
         expect(wrapper.find('#submission-score').exists()).toBe(false);
+    });
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.waiting_for_deferred;
+    test('show_score - status === waiting_for_deferred', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.waiting_for_deferred
+            },
+            {
+                total_points: 10.25,
+                total_points_possible: 15
+            }
+        );
+
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.show_score).toBe(true);
+        expect(wrapper.find('#submission-score').exists()).toBe(true);
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
+    });
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.error;
+    test('show_score - status === error', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.error
+            },
+            {
+                total_points: 10.25,
+                total_points_possible: 15
+            }
+        );
+
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.show_score).toBe(false);
         expect(wrapper.find('#submission-score').exists()).toBe(false);
+    });
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
+    test('show_score - status === finished_grading', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            },
+            {
+                total_points: 10.25,
+                total_points_possible: 15
+            }
+        );
+
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.show_score).toBe(true);
+        expect(wrapper.find('#submission-score').exists()).toBe(true);
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
+    });
 
-        wrapper.vm.d_submission_fdbk_override!.total_points_possible = 0;
+    test('show_score - status === finished_grading', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            },
+            {
+                total_points: 0,
+                total_points_possible: 0
+            }
+        );
+
+        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.show_score).toBe(false);
         expect(wrapper.find('#submission-score').exists()).toBe(false);
     });
 
@@ -445,7 +602,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -477,7 +634,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -488,7 +645,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        get_file_content_stub = sinon.stub(wrapper.vm.d_submission!, 'get_file_content').returns(
+        get_file_content_stub = sinon.stub(wrapper.vm.submission!, 'get_file_content').returns(
             Promise.resolve(
                 "File b contents"
             )
@@ -517,7 +674,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -530,7 +687,7 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
 
-        get_file_content_stub = sinon.stub(wrapper.vm.d_submission!, 'get_file_content').returns(
+        get_file_content_stub = sinon.stub(wrapper.vm.submission!, 'get_file_content').returns(
             Promise.resolve(
                 Promise.resolve("File b contents")
             )
@@ -557,7 +714,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -588,7 +745,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -599,7 +756,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
+        expect(wrapper.vm.submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
         expect(wrapper.find('#adjust-feedback-section').exists()).toBe(false);
     });
 
@@ -618,7 +775,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -630,7 +787,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
-        expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
+        expect(wrapper.vm.d_globals.user_roles!.is_admin).toBe(false);
         expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(false);
@@ -651,7 +808,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -663,7 +820,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(true);
-        expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
+        expect(wrapper.vm.d_globals.user_roles!.is_admin).toBe(false);
         expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(true);
@@ -687,7 +844,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -699,7 +856,7 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
-        expect(wrapper.vm.d_user_roles!.is_admin).toBe(true);
+        expect(wrapper.vm.d_globals.user_roles!.is_admin).toBe(true);
         expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(true);
@@ -716,7 +873,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -731,7 +888,7 @@ describe('SubmissionDetail tests', () => {
 
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.staff_viewer);
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
         expect(get_submission_result_stub.callCount).toEqual(1);
         expect(get_submission_result_stub.calledWith(
@@ -739,7 +896,7 @@ describe('SubmissionDetail tests', () => {
         ).toBe(true);
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.ultimate_submission);
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
         expect(get_submission_result_stub.callCount).toEqual(2);
         expect(get_submission_result_stub.calledWith(
@@ -747,7 +904,7 @@ describe('SubmissionDetail tests', () => {
         ).toBe(true);
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.normal);
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
         expect(get_submission_result_stub.callCount).toEqual(3);
         expect(get_submission_result_stub.calledWith(
@@ -755,7 +912,7 @@ describe('SubmissionDetail tests', () => {
         ).toBe(true);
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.past_limit_submission);
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_fdbk_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
@@ -765,7 +922,7 @@ describe('SubmissionDetail tests', () => {
         ).toBe(true);
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.max);
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_submission_result_stub.callCount).toEqual(5);
         expect(get_submission_result_stub.calledWith(
@@ -781,7 +938,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -812,7 +969,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -834,7 +991,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -865,7 +1022,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -881,7 +1038,7 @@ describe('SubmissionDetail tests', () => {
     });
 
     test('remove-submission-from-queue button is present only while ' +
-              'GradingStatus === (received || queued)',
+         'GradingStatus === (received || queued)',
          async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
@@ -893,7 +1050,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -906,22 +1063,58 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.error;
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.error
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.queued;
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.queued
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(true);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.received;
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.received
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(true);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.removed_from_queue;
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.removed_from_queue
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.waiting_for_deferred;
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.waiting_for_deferred
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
     });
 
@@ -936,7 +1129,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -971,7 +1164,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -982,9 +1175,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        remove_submission_from_queue_stub = sinon.stub(
-            wrapper.vm.d_submission!, 'remove_from_queue'
-        );
+        remove_submission_from_queue_stub = sinon.stub(wrapper.vm.submission!, 'remove_from_queue');
 
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
 
@@ -997,7 +1188,6 @@ describe('SubmissionDetail tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
     });
 
@@ -1010,7 +1200,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1021,7 +1211,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
+        expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_group_member).toBe(true);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
     });
@@ -1038,7 +1228,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: true
@@ -1049,9 +1239,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
+        expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_ultimate_submission).toBe(true);
-        expect(wrapper.vm.d_user_roles!.is_admin).toBe(true);
+        expect(wrapper.vm.d_globals.user_roles!.is_admin).toBe(true);
         expect(wrapper.vm.is_group_member).toBe(false);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
     });
@@ -1068,7 +1258,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1079,9 +1269,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles!.is_staff).toBe(true);
+        expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(true);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
-        expect(wrapper.vm.d_user_roles!.is_admin).toBe(false);
+        expect(wrapper.vm.d_globals.user_roles!.is_admin).toBe(false);
         expect(wrapper.vm.is_group_member).toBe(false);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
     });
@@ -1092,7 +1282,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: true
@@ -1103,7 +1293,7 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
+        expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(true);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
     });
@@ -1122,7 +1312,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1133,9 +1323,9 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
+        expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
-        expect(wrapper.vm.d_submission!.is_past_daily_limit).toBe(true);
+        expect(wrapper.vm.submission!.is_past_daily_limit).toBe(true);
         expect(wrapper.vm.d_fdbk_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
@@ -1149,7 +1339,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1160,13 +1350,13 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_user_roles!.is_staff).toBe(false);
+        expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(false);
         expect(wrapper.vm.is_ultimate_submission).toBe(false);
-        expect(wrapper.vm.d_submission!.is_past_daily_limit).toBe(false);
+        expect(wrapper.vm.submission!.is_past_daily_limit).toBe(false);
         expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
     });
 
-    test('being_processed - submission.status === GradingStatus.error', async () => {
+    test('show_auto_update_msg - is_staff === false', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
             {
@@ -1177,7 +1367,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1188,25 +1378,99 @@ describe('SubmissionDetail tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.being_processed).toBe(true);
+        expect(wrapper.vm.d_globals.user_roles.is_staff).toBe(false);
+        expect(wrapper.vm.show_auto_update_msg).toBe(true);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.error;
-        expect(wrapper.vm.being_processed).toBe(false);
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.error
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
+        expect(wrapper.vm.show_auto_update_msg).toBe(false);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.finished_grading;
-        expect(wrapper.vm.being_processed).toBe(false);
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.finished_grading
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
+        expect(wrapper.vm.show_auto_update_msg).toBe(false);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.received;
-        expect(wrapper.vm.being_processed).toBe(true);
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.received
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
+        expect(wrapper.vm.show_auto_update_msg).toBe(true);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(true);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.removed_from_queue;
-        expect(wrapper.vm.being_processed).toBe(false);
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.removed_from_queue
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
+        expect(wrapper.vm.show_auto_update_msg).toBe(false);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(false);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.queued;
-        expect(wrapper.vm.being_processed).toBe(true);
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.queued
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
+        expect(wrapper.vm.show_auto_update_msg).toBe(true);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(true);
 
-        wrapper.vm.d_submission!.status = ag_cli.GradingStatus.waiting_for_deferred;
-        expect(wrapper.vm.being_processed).toBe(true);
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.waiting_for_deferred
+            }
+        );
+        wrapper.setProps({submission_with_results: submission_with_results});
+        expect(wrapper.vm.show_auto_update_msg).toBe(false);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(false);
+    });
+
+    test('auto_update message - status === waiting_for_deferred && is_staff === true',
+         async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.waiting_for_deferred
+            }
+        );
+        get_submission_result_stub.resolves(submission_with_results.results);
+
+        user_roles.is_staff = true;
+        globals.user_roles = user_roles;
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_globals.user_roles.is_staff).toBe(true);
+        expect(wrapper.vm.show_auto_update_msg).toBe(true);
+        expect(wrapper.find('#auto-update-message').exists()).toBe(true);
     });
 
     test('does_not_count_for_current_users -- does_not_count_for contains username',
@@ -1221,7 +1485,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1247,7 +1511,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1274,7 +1538,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
@@ -1303,7 +1567,7 @@ describe('SubmissionDetail tests', () => {
 
         wrapper = mount(SubmissionDetail, {
             propsData: {
-                selected_submission_with_results: submission_with_results,
+                submission_with_results: submission_with_results,
                 course: course,
                 group: group,
                 is_ultimate_submission: false
