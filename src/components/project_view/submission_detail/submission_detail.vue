@@ -201,6 +201,8 @@
         </div>
       </div>
 
+      <APIErrors ref="api_errors"></APIErrors>
+
       <div class="modal-button-container">
         <button id="cancel-remove-submission-from-queue-button"
                 class="modal-cancel-button white-button"
@@ -230,23 +232,23 @@ import {
     Group,
     Submission,
     SubmissionResultFeedback,
-    SubmissionWithResults,
-    User,
-    UserRoles
+    SubmissionWithResults
 } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
+import APIErrors from "@/components/api_errors.vue";
 import Modal from '@/components/modal.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import AGTestSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
 import MutationSuiteResults from "@/components/project_view/submission_detail/mutation_suite_results.vue";
 import SubmissionDetailPanel from '@/components/project_view/submission_detail/submission_detail_panel.vue';
-import { format_datetime } from '@/utils';
+import { format_datetime, handle_api_errors_async } from '@/utils';
 
 @Component({
   components: {
+    APIErrors,
     AGTestSuiteResult,
     Modal,
     MultiFileViewer,
@@ -280,10 +282,10 @@ export default class SubmissionDetail extends Vue {
   }
 
   d_submission_fdbk_override: null | SubmissionResultFeedback = null;
-  d_fdbk_category: FeedbackCategory | null = null;
   d_show_remove_submission_from_queue_modal = false;
   d_loading_results = false;
   d_removing_from_queue = false;
+  d_fdbk_category: FeedbackCategory | null = null;
 
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly FeedbackCategory = FeedbackCategory;
@@ -365,12 +367,22 @@ export default class SubmissionDetail extends Vue {
     FileSaver.saveAs(new File([await this.submission!.get_file_content(filename)], filename));
   }
 
+  @handle_api_errors_async(handle_remove_submission_from_queue_error)
   async remove_submission_from_queue() {
-    this.d_removing_from_queue = true;
-    await this.submission!.remove_from_queue();
-    this.d_show_remove_submission_from_queue_modal = false;
-    this.d_removing_from_queue = false;
+    try {
+      this.d_removing_from_queue = true;
+      await this.submission!.remove_from_queue();
+      this.d_show_remove_submission_from_queue_modal = false;
+    }
+    finally {
+      this.d_removing_from_queue = false;
+    }
   }
+}
+
+export function handle_remove_submission_from_queue_error(component: SubmissionDetail,
+                                                          error: unknown) {
+    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -423,7 +435,7 @@ export default class SubmissionDetail extends Vue {
 }
 
 #grading-status {
-  color: lighten(black, 10);
+  color: $stormy-gray-dark;
 }
 
 .queued-symbol {
@@ -519,8 +531,6 @@ export default class SubmissionDetail extends Vue {
   padding: 10px 0 0 0;
 }
 
-
-
 .bonus-icon {
   color: darken($light-blue, 10);
   padding-right: 5px;
@@ -553,7 +563,6 @@ export default class SubmissionDetail extends Vue {
 
 #does-not-count-for-label {
   padding: 0 0 5px 0;
-  /*display: inline-block;*/
 }
 
 #list-of-group-members-submission-does-not-count-for {
