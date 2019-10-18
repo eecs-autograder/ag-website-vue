@@ -1153,7 +1153,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
     });
 
-    test('Remove submission from queue - confirm action', async () => {
+    test('Remove submission from queue - confirm action - successful', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
             {
@@ -1189,6 +1189,50 @@ describe('SubmissionDetail tests', () => {
 
         expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
+        expect(wrapper.find({ref: 'api_errors'}).exists()).toBe(false);
+    });
+
+    test('Remove submission from queue - confirm action - unsuccessful', async () => {
+        submission_with_results = data_ut.make_submission_with_results(
+            group,
+            {
+                status: ag_cli.GradingStatus.queued
+            }
+        );
+        get_submission_result_stub.resolves(submission_with_results.results);
+
+        wrapper = mount(SubmissionDetail, {
+            propsData: {
+                submission_with_results: submission_with_results,
+                course: course,
+                group: group,
+                is_ultimate_submission: false
+            },
+            provide: {
+                globals: globals
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        remove_submission_from_queue_stub = sinon.stub(
+            wrapper.vm.submission!, 'remove_from_queue'
+        ).returns(Promise.reject(
+            new ag_cli.HttpError(400, {__all__: "This submission is not currently queued"})
+        ));
+
+        expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
+
+        wrapper.find('#remove-submission-from-queue-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(true);
+
+        wrapper.find('#confirm-remove-submission-from-queue-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
+        expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(true);
+        expect(wrapper.find({ref: 'api_errors'}).exists()).toBe(true);
     });
 
     test('determine_feedback_type -- user is staff && is_group_member', async () => {

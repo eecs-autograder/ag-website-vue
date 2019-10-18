@@ -66,7 +66,7 @@
               This submission will not count towards your daily limit.
               Please wait a few minutes and try your submission again.
               If the problem persists, please contact <b>help@autograder.io</b> and include
-              the information "Submission ID: {{submission.pk}}" in your email.
+              the information <b>"Submission ID: {{submission.pk}}"</b> in your email.
             </div>
           </div>
         </div>
@@ -435,7 +435,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 }
 
 #grading-status {
-  color: $stormy-gray-dark;
+  color: darken($stormy-gray-dark, 15);
 }
 
 .queued-symbol {
@@ -585,6 +585,12 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 
 .last-username-in-list {
   padding-bottom: 0;
+}
+
+.modal-body {
+  li {
+    padding-bottom: 5px;
+  }
 }
 
 </style>
