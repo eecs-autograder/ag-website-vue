@@ -1,17 +1,17 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
-import SubmissionDetailPanel from '@/components/project_view/submission_detail/submission_detail_panel.vue';
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
+import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('SubmissionDetailPanel tests', () => {
-    let wrapper: Wrapper<SubmissionDetailPanel>;
+describe('ResultPanel tests', () => {
+    let wrapper: Wrapper<ResultPanel>;
 
     test('all correct panel', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.all_correct,
@@ -26,7 +26,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('none correct panel', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.none_correct,
@@ -41,7 +41,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('some correct', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,
@@ -57,7 +57,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('not available panel', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.not_available,
@@ -72,7 +72,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('info only panel', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.info_only,
@@ -87,7 +87,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('points possible === 0 - score is not displayed', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.all_correct,
@@ -99,7 +99,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('points possible !== 0 - score is displayed', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,
@@ -111,7 +111,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('toggle_d_is_open - correctness_level !== CorrectnessLevel.not_available', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,
@@ -131,7 +131,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('toggle_d_is_open - correctness_level === CorrectnessLevel.not_available', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.not_available,
@@ -147,20 +147,20 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('panel_is_active', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,
                 points_awarded: 0,
                 points_possible: 1,
-                panel_is_active: true
+                open_initially: true
             }
         });
         expect(wrapper.vm.d_is_open).toBe(true);
     });
 
     test('is_command is true', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,
@@ -177,7 +177,7 @@ describe('SubmissionDetailPanel tests', () => {
     });
 
     test('is_command is false', async () => {
-        wrapper = mount(SubmissionDetailPanel, {
+        wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,

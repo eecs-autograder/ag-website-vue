@@ -24,13 +24,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-export enum CorrectnessLevel {
-  not_available = "not available",
-  none_correct = 'none correct',
-  some_correct = 'some correct',
-  all_correct = 'all correct',
-  info_only = 'info only'
-}
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 
 @Component
 export default class CorrectnessIcon extends Vue {

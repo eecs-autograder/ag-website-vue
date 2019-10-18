@@ -2,7 +2,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 
 import * as data_ut from '@/tests/data_utils';

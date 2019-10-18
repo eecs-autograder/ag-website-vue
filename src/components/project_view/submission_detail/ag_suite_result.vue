@@ -16,7 +16,7 @@
             || d_ag_test_suite_result.setup_timed_out"
       :name="d_ag_test_suite_result.setup_name ? d_ag_test_suite_result.setup_name : 'Setup'"
       :correctness_level="setup_correctness_level"
-      :panel_is_active="setup_panel_is_active">
+      :open_initially="setup_panel_is_active">
       <AGCaseSetupResult :submission="submission"
                          :ag_test_suite_result="d_ag_test_suite_result"
                          :fdbk_category="fdbk_category">
@@ -30,7 +30,7 @@
         :correctness_level="case_result_correctness(ag_test_case_result)"
         :points_awarded="ag_test_case_result.total_points"
         :points_possible="ag_test_case_result.total_points_possible"
-        :panel_is_active="get_case_is_active(ag_test_case_result)"
+        :open_initially="get_case_is_active(ag_test_case_result)"
         :is_multi_command_case="ag_test_case_result.ag_test_command_results.length > 1">
         <AGCaseResult
           :submission="submission"
@@ -56,15 +56,14 @@ import {
 
 import AGCaseResult from '@/components/project_view/submission_detail/ag_case_result.vue';
 import AGCaseSetupResult from '@/components/project_view/submission_detail/ag_case_setup_result.vue';
-import { setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
-import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
-import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
+import { CorrectnessLevel, setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
+import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 @Component({
   components: {
     AGCaseResult,
     AGCaseSetupResult,
-    SubmissionDetailPanel
+    SubmissionDetailPanel: ResultPanel
   }
 })
 export default class AGSuiteResult extends Vue {

@@ -13,7 +13,6 @@
             </correctness-icon>
           </div>
       </template>
-
       <template v-else>
         <div class="name">{{name}}</div>
         <div class="correctness">
@@ -41,24 +40,15 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
-
-export enum PanelCorrectnessLevel {
-    not_available = "not-available",
-    none_correct = 'none-correct',
-    some_correct = 'some-correct',
-    all_correct = 'all-correct',
-    info_only = 'info-only',
-    output_only = 'output-only',
-    dont_check = 'dont-check'
-}
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
+import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
 
 @Component({
   components: {
     CorrectnessIcon
   }
 })
-export default class SubmissionDetailPanel extends Vue {
+export default class ResultPanel extends Vue {
   @Prop({required: true, type: String})
   name!: string;
 
@@ -72,7 +62,7 @@ export default class SubmissionDetailPanel extends Vue {
   points_possible!: number;
 
   @Prop({default: false, type: Boolean})
-  panel_is_active!: boolean;
+  open_initially!: boolean;
 
   @Prop({default: false, type: Boolean})
   is_command!: boolean;
@@ -80,46 +70,39 @@ export default class SubmissionDetailPanel extends Vue {
   @Prop({default: false, type: Boolean})
   is_multi_command_case!: boolean;
 
-  d_correctness_level: CorrectnessLevel = CorrectnessLevel.none_correct;
-  d_panel_is_active = false;
   d_is_open = false;
 
-  @Watch('panel_is_active')
-  on_panel_is_active_change(new_value: boolean, old_value: boolean) {
-    this.d_panel_is_active = new_value;
-    this.d_is_open = this.d_panel_is_active;
-  }
-
-  @Watch('correctness_level')
-  on_correctness_level_change(new_value: CorrectnessLevel, old_value: CorrectnessLevel) {
-    this.d_correctness_level = new_value;
-  }
-
   created() {
-    this.d_correctness_level = this.correctness_level;
-    this.d_panel_is_active = this.panel_is_active;
-    this.d_is_open = this.d_panel_is_active;
+    this.d_is_open = this.open_initially;
   }
 
   get panel_correctness() {
     if (this.correctness_level === CorrectnessLevel.not_available) {
-      return PanelCorrectnessLevel.not_available;
+      return CorrectnessLevel.not_available;
     }
     else if (this.correctness_level === CorrectnessLevel.all_correct) {
-      return PanelCorrectnessLevel.all_correct;
+      return CorrectnessLevel.all_correct;
     }
     else if (this.correctness_level === CorrectnessLevel.none_correct) {
-      return PanelCorrectnessLevel.none_correct;
+      return CorrectnessLevel.none_correct;
     }
     else if (this.correctness_level === CorrectnessLevel.info_only) {
-      return PanelCorrectnessLevel.info_only;
+      return CorrectnessLevel.info_only;
     }
-    return PanelCorrectnessLevel.some_correct;
+    return CorrectnessLevel.some_correct;
   }
 
   toggle_d_is_open() {
+    let top = this.$el.getBoundingClientRect().top;
     if (this.correctness_level !== CorrectnessLevel.not_available) {
       this.d_is_open = !this.d_is_open;
+    }
+    // This prevents any open panels below this one from being pushed
+    // into the top of the viewport due to the size change of the parent.
+    if (!this.d_is_open && top < 0) {
+      this.$nextTick(() => {
+        this.$el.scrollIntoView();
+      });
     }
   }
 }

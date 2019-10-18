@@ -360,7 +360,8 @@ import {
     Submission
 } from 'ag-client-typescript';
 
-import CorrectnessIcon, { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
+import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
 import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 
 @Component({

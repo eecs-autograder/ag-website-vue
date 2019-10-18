@@ -174,6 +174,7 @@
       <div v-for="(ag_test_suite_result, index) of submission_result.ag_test_suite_results"
            ref="ag_test_suite_results">
         <AGTestSuiteResult :submission="submission"
+                           :key="ag_test_suite_result.pk"
                            :ag_test_suite_result="ag_test_suite_result"
                            :fdbk_category="d_fdbk_category"
                            :is_first_suite="index === 0">
@@ -241,9 +242,9 @@ import APIErrors from "@/components/api_errors.vue";
 import Modal from '@/components/modal.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import AGTestSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
-import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from "@/components/project_view/submission_detail/mutation_suite_results.vue";
-import SubmissionDetailPanel from '@/components/project_view/submission_detail/submission_detail_panel.vue';
+import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 import { format_datetime, handle_api_errors_async } from '@/utils';
 
 @Component({
@@ -253,7 +254,7 @@ import { format_datetime, handle_api_errors_async } from '@/utils';
     Modal,
     MultiFileViewer,
     MutationSuiteResults,
-    SubmissionDetailPanel
+    SubmissionDetailPanel: ResultPanel
   }
 })
 export default class SubmissionDetail extends Vue {

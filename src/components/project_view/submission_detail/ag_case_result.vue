@@ -38,13 +38,14 @@ import {
 } from "ag-client-typescript";
 
 import AGCommandResult from '@/components/project_view/submission_detail/ag_command_result.vue';
-import CorrectnessIcon, { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
-import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
+import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
+import CorrectnessIcon from '@/components/project_view/submission_detail/correctness_icon.vue';
+import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 @Component({
   components: {
     AGCommandResult,
-    SubmissionDetailPanel,
+    SubmissionDetailPanel: ResultPanel,
     CorrectnessIcon
   }
 })

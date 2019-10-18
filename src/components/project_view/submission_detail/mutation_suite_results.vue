@@ -31,15 +31,14 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { MutationTestSuiteResultFeedback, Submission } from 'ag-client-typescript';
 
-import { setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
-import { CorrectnessLevel } from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { CorrectnessLevel, setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
 import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
-import SubmissionDetailPanel from "@/components/project_view/submission_detail/submission_detail_panel.vue";
+import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 @Component({
   components: {
     MutationSuiteResult,
-    SubmissionDetailPanel
+    SubmissionDetailPanel: ResultPanel
   }
 })
 export default class MutationSuiteResults extends Vue {

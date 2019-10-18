@@ -1,4 +1,11 @@
-import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness_icon.vue';
+// The fields are initialized with hyphenated strings for easier interpolation in CSS class names.
+export enum CorrectnessLevel {
+    not_available = "not-available",
+    none_correct = 'none-correct',
+    some_correct = 'some-correct',
+    all_correct = 'all-correct',
+    info_only = 'info-only'
+}
 
 export function setup_return_code_correctness(setup_return_code: number | null,
                                               setup_timed_out: boolean | null) {
