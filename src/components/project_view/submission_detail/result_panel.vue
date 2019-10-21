@@ -111,8 +111,9 @@ export default class ResultPanel extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
-@mixin panel_header($background-color: $white-gray, $border-color: $white-gray,
-                    $cursor-option: pointer) {
+@mixin panel_header($background-color: $white-gray,
+                    $border-color: $white-gray,
+                    $is_not_available: false) {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -120,12 +121,17 @@ export default class ResultPanel extends Vue {
   background-color: $background-color;
   border: 1px solid $border-color;
   font-weight: bold;
-  cursor: $cursor-option;
-}
 
-@mixin panel_header_hover($background-color: $white-gray, $border-color: $white-gray) {
-  background-color: $background-color;
-  border-color: $border-color;
+  @if $is_not_available {
+    cursor: default;
+  }
+  @else {
+    cursor: pointer;
+    &:hover {
+      background-color: darken($background-color, 5);
+      border-color: darken($background-color, 10);
+    }
+  }
 }
 
 @mixin panel_body($border-color: $white-gray) {
@@ -202,7 +208,7 @@ $border-radius-value: 3px;
 $not-available-color: darken($white-gray, 5);
 
 .not-available-panel-header {
-  @include panel_header($not-available-color, darken($not-available-color, 5), default);
+  @include panel_header($not-available-color, darken($not-available-color, 5), true);
   color: $stormy-gray-dark;
 }
 
@@ -211,11 +217,7 @@ $not-available-color: darken($white-gray, 5);
 $none-correct-color: lighten($warning-red, 20);
 
 .none-correct-panel-header {
-  @include panel_header($none-correct-color, darken($none-correct-color, 5), pointer);
-}
-
-.none-correct-panel-header:hover {
-  @include panel_header_hover(darken($none-correct-color, 5), darken($none-correct-color, 10));
+  @include panel_header($none-correct-color, darken($none-correct-color, 5));
 }
 
 .none-correct-panel-body {
@@ -227,11 +229,7 @@ $none-correct-color: lighten($warning-red, 20);
 $some-correct-color: lighten($orange, 5);
 
 .some-correct-panel-header {
-  @include panel_header($some-correct-color, darken($some-correct-color, 5), pointer);
-}
-
-.some-correct-panel-header:hover {
-  @include panel_header_hover(darken($some-correct-color, 5), darken($some-correct-color, 10));
+  @include panel_header($some-correct-color, darken($some-correct-color, 5));
 }
 
 .some-correct-panel-body {
@@ -243,11 +241,7 @@ $some-correct-color: lighten($orange, 5);
 $all-correct-color: darken($light-blue, 2);
 
 .all-correct-panel-header {
-  @include panel_header($all-correct-color, darken($all-correct-color, 5), pointer);
-}
-
-.all-correct-panel-header:hover {
-  @include panel_header_hover(darken($all-correct-color, 5), darken($all-correct-color, 10));
+  @include panel_header($all-correct-color, darken($all-correct-color, 5));
 }
 
 .all-correct-panel-body {
@@ -259,11 +253,7 @@ $all-correct-color: darken($light-blue, 2);
 $info-only-color: desaturate($all-correct-color, 50%);
 
 .info-only-panel-header {
-  @include panel_header($info-only-color, darken($info-only-color, 5), pointer);
-}
-
-.info-only-panel-header:hover {
-  @include panel_header_hover(darken($info-only-color, 5), darken($info-only-color, 10));
+  @include panel_header($info-only-color, darken($info-only-color, 5));
 }
 
 .info-only-panel-body {
