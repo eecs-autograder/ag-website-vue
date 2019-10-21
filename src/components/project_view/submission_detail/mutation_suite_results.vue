@@ -58,19 +58,23 @@ export default class MutationSuiteResults extends Vue {
   }
 
   student_tests_correctness(suite_result: MutationTestSuiteResultFeedback) {
-    if (suite_result.invalid_tests !== null) {
-      if (suite_result.invalid_tests.length === 0) {
-        return CorrectnessLevel.all_correct;
-      }
-      if (suite_result.invalid_tests.length === suite_result.student_tests.length) {
-        return CorrectnessLevel.none_correct;
-      }
-      return CorrectnessLevel.some_correct;
+    if (suite_result.invalid_tests === null) {
+      return suite_result.discarded_tests.length === 0
+            ? CorrectnessLevel.not_available : CorrectnessLevel.some_correct;
     }
-    return CorrectnessLevel.not_available;
+
+    if (suite_result.invalid_tests.length === 0 && suite_result.discarded_tests.length === 0) {
+      return CorrectnessLevel.all_correct;
+    }
+
+    if (suite_result.invalid_tests.length === suite_result.student_tests.length) {
+      return CorrectnessLevel.none_correct;
+    }
+
+    return CorrectnessLevel.some_correct;
   }
 
-  points_for_bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
+  bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.num_bugs_exposed === null) {
       return CorrectnessLevel.not_available;
     }
@@ -79,14 +83,14 @@ export default class MutationSuiteResults extends Vue {
       return CorrectnessLevel.none_correct;
     }
 
-    if (!suite_result.fdbk_settings.show_points && suite_result.num_bugs_exposed > 0) {
-      return CorrectnessLevel.info_only;
-    }
-
     let total_points = typeof(suite_result.total_points) === 'string'
         ? parseFloat(suite_result.total_points) : suite_result.total_points;
     let total_points_possible = typeof(suite_result.total_points_possible) === 'string'
         ? parseFloat(suite_result.total_points_possible) : suite_result.total_points_possible;
+
+    if (total_points_possible === 0 && suite_result.num_bugs_exposed > 0) {
+      return CorrectnessLevel.info_only;
+    }
 
     if (total_points === total_points_possible) {
       return CorrectnessLevel.all_correct;
@@ -96,7 +100,7 @@ export default class MutationSuiteResults extends Vue {
 
   mutation_suite_correctness(suite_result: MutationTestSuiteResultFeedback) {
     let return_code_correctness = this.setup_return_code_correctness(suite_result);
-    let points_correctness = this.points_for_bugs_exposed_correctness(suite_result);
+    let points_correctness = this.bugs_exposed_correctness(suite_result);
     let student_tests_correctness = this.student_tests_correctness(suite_result);
 
     // received no points
@@ -104,48 +108,28 @@ export default class MutationSuiteResults extends Vue {
       return CorrectnessLevel.none_correct;
     }
 
-    // received all points
-    if (points_correctness === CorrectnessLevel.all_correct) {
-      // invalid_tests are present or hidden
-      if (student_tests_correctness !== CorrectnessLevel.all_correct) {
-        points_correctness = CorrectnessLevel.some_correct;
-      }
-    }
-    // points hidden || points hidden and bugs exposed not hidden
-    else if (points_correctness === CorrectnessLevel.not_available
-             || points_correctness === CorrectnessLevel.info_only) {
-      // invalid_tests hidden or no invalid_tests
-      if (student_tests_correctness === CorrectnessLevel.all_correct
-          || student_tests_correctness === CorrectnessLevel.not_available) {
-        points_correctness = CorrectnessLevel.info_only;
-      }
-      // invalid_tests present
-      else {
-        points_correctness = student_tests_correctness;
-      }
+    let correctnesses = [return_code_correctness, points_correctness, student_tests_correctness];
+    correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
+
+    if (correctnesses.length === 0) {  // All 3 were not_available
+      return CorrectnessLevel.not_available;
     }
 
-    if ((return_code_correctness === CorrectnessLevel.not_available)) {
-      return points_correctness;
+    correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.info_only);
+    if (correctnesses.length === 0) {  // All remaining were info_only
+      return CorrectnessLevel.info_only;
     }
-    else if (return_code_correctness === CorrectnessLevel.all_correct) {
-      // invalid_tests present or some points awarded
-      if (points_correctness === CorrectnessLevel.none_correct
-          || points_correctness === CorrectnessLevel.some_correct) {
-        return CorrectnessLevel.some_correct;
-      }
-      // no invalid tests or invalid_tests hidden or points hidden
-      else {
-        return points_correctness;
-      }
+
+    if (correctnesses.every(val => val === CorrectnessLevel.all_correct)) {
+      return CorrectnessLevel.all_correct;
     }
-    // all tests valid or some tests valid or some points awarded
-    if (points_correctness === CorrectnessLevel.all_correct
-        || points_correctness === CorrectnessLevel.some_correct) {
-      return CorrectnessLevel.some_correct;
+
+    if (correctnesses.every(val => val === CorrectnessLevel.none_correct)) {
+      return CorrectnessLevel.none_correct;
     }
-    // all tests invalid or invalid_tests hidden or points hidden
-    return CorrectnessLevel.none_correct;
+
+    // We have a mix of all, some, and none correct
+    return CorrectnessLevel.some_correct;
   }
 }
 </script>
