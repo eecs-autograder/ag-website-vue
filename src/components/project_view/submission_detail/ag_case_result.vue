@@ -9,20 +9,20 @@
             :name="ag_test_command_result.ag_test_command_name"
             :correctness_level="command_result_correctness(ag_test_command_result)"
             :is_command="true">
-            <AGCommandResult :submission="submission"
+            <AGTestCommandResult :submission="submission"
                              :ag_test_command_result="ag_test_command_result"
                              :fdbk_category="fdbk_category">
-            </AGCommandResult>
+            </AGTestCommandResult>
           </submission-detail-panel>
         </div>
       </div>
     </template>
     <template v-else>
-      <AGCommandResult ref="ag_command_result"
+      <AGTestCommandResult ref="ag_command_result"
                        :submission="submission"
                        :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
                        :fdbk_category="fdbk_category">
-      </AGCommandResult>
+      </AGTestCommandResult>
     </template>
   </div>
 </template>
@@ -37,14 +37,14 @@ import {
     Submission
 } from "ag-client-typescript";
 
-import AGCommandResult from '@/components/project_view/submission_detail/ag_command_result.vue';
+import AGTestCommandResult from '@/components/project_view/submission_detail/ag_test_command_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from '@/components/project_view/submission_detail/correctness_icon.vue';
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 @Component({
   components: {
-    AGCommandResult,
+    AGTestCommandResult,
     SubmissionDetailPanel: ResultPanel,
     CorrectnessIcon
   }

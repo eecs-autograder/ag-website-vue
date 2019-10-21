@@ -112,7 +112,7 @@ export default class MutationSuiteResults extends Vue {
     correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
 
     if (correctnesses.length === 0) {  // All 3 were not_available
-      return CorrectnessLevel.not_available;
+      return CorrectnessLevel.info_only;
     }
 
     correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.info_only);

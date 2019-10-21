@@ -3,8 +3,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import AGCommandResult from '@/components/project_view/submission_detail/ag_command_result.vue';
-import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
+import AGTestCommandResult from '@/components/project_view/submission_detail/ag_test_command_result.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
@@ -89,12 +88,16 @@ afterEach(() => {
 });
 
 describe('show_fieldset/section tests', () => {
-    let wrapper: Wrapper<AGCommandResult>;
+    let wrapper: Wrapper<AGTestCommandResult>;
     let d_ag_test_command_result: ag_cli.AGTestCommandResultFeedback;
     let fdbk_settings: ag_cli.AGTestCommandFeedbackConfig;
 
-    beforeEach(async () => {
-        wrapper = mount(AGCommandResult, {
+    beforeEach(() => {
+        ag_test_command_result.timed_out = null;
+    });
+
+    test('show_correctness_fieldset - false', async () => {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -105,13 +108,9 @@ describe('show_fieldset/section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        d_ag_test_command_result = wrapper.vm.d_ag_test_command_result!;
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
         fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
-        wrapper.vm.d_ag_test_command_result!.timed_out = null;
-    });
-
-    test('show_correctness_fieldset - false', () => {
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(null);
         expect(fdbk_settings.return_code_fdbk_level).not.toEqual(expected_and_actual);
@@ -122,8 +121,22 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(false);
     });
 
-    test('show_correctness_fieldset - return_code_correct !== null', () => {
-        wrapper.vm.d_ag_test_command_result!.return_code_correct = false;
+    test('show_correctness_fieldset - return_code_correct !== null', async () => {
+        ag_test_command_result.return_code_correct = false;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(false);
         expect(d_ag_test_command_result.timed_out).toBe(null);
@@ -134,8 +147,22 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(true);
     });
 
-    test('show_correctness_fieldset - timed_out === true', () => {
-        wrapper.vm.d_ag_test_command_result!.timed_out = true;
+    test('show_correctness_fieldset - timed_out === true', async () => {
+        ag_test_command_result.timed_out = true;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(true);
@@ -149,9 +176,22 @@ describe('show_fieldset/section tests', () => {
 
     test('show_correctness_fieldset - return_code_fdbk_level ' +
          '=== ValueFeedbackLevel.expected_and_actual',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
-            = expected_and_actual;
+         async () => {
+        ag_test_command_result.fdbk_settings.return_code_fdbk_level = expected_and_actual;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(null);
@@ -163,10 +203,23 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(false);
     });
 
-    test('show_correctness_fieldset - actual_return_code !== null', () => {
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
-            = expected_and_actual;
-        wrapper.vm.d_ag_test_command_result!.actual_return_code = 1;
+    test('show_correctness_fieldset - actual_return_code !== null', async () => {
+        ag_test_command_result.fdbk_settings.return_code_fdbk_level = expected_and_actual;
+        ag_test_command_result.actual_return_code = 1;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(null);
@@ -178,11 +231,23 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(true);
     });
 
-    test('show_correctness_fieldset - expected_return_code !== null', () => {
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
-            = expected_and_actual;
-        wrapper.vm.d_ag_test_command_result!.expected_return_code
-            = ag_cli.ExpectedReturnCode.nonzero;
+    test('show_correctness_fieldset - expected_return_code !== null', async () => {
+        ag_test_command_result.fdbk_settings.return_code_fdbk_level = expected_and_actual;
+        ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.nonzero;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(null);
@@ -194,8 +259,22 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(true);
     });
 
-    test('show_correctness_fieldset - stdout_correct !== null', () => {
-        wrapper.vm.d_ag_test_command_result!.stdout_correct = true;
+    test('show_correctness_fieldset - stdout_correct !== null', async () => {
+        ag_test_command_result.timed_out = null;
+        ag_test_command_result.stdout_correct = true;
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(null);
@@ -207,8 +286,22 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(true);
     });
 
-    test('show_correctness_fieldset - stderr_correct !== null', () => {
-        wrapper.vm.d_ag_test_command_result!.stderr_correct = true;
+    test('show_correctness_fieldset - stderr_correct !== null', async () => {
+        ag_test_command_result.stderr_correct = true;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.return_code_correct).toBe(null);
         expect(d_ag_test_command_result.timed_out).toBe(null);
@@ -220,18 +313,44 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.vm.show_correctness_fieldset).toBe(true);
     });
 
-    test('show_actual_and_expected_return_code - false', () => {
-       expect(fdbk_settings.return_code_fdbk_level).not.toEqual(expected_and_actual);
-       expect(d_ag_test_command_result.actual_return_code).toBe(null);
-       expect(d_ag_test_command_result.expected_return_code).toBe(null);
-       expect(wrapper.vm.show_actual_and_expected_return_code).toBe(false);
+    test('show_actual_and_expected_return_code - false', async () => {
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
+        expect(fdbk_settings.return_code_fdbk_level).not.toEqual(expected_and_actual);
+        expect(d_ag_test_command_result.actual_return_code).toBe(null);
+        expect(d_ag_test_command_result.expected_return_code).toBe(null);
+        expect(wrapper.vm.show_actual_and_expected_return_code).toBe(false);
     });
 
     test('show_actual_and_expected_return_code - return_code_fdbk_level ' +
          '=== expected_and_actual',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
-            = expected_and_actual;
+         async () => {
+        ag_test_command_result.fdbk_settings.return_code_fdbk_level = expected_and_actual;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(fdbk_settings.return_code_fdbk_level).toEqual(expected_and_actual);
         expect(d_ag_test_command_result.actual_return_code).toBe(null);
@@ -241,10 +360,23 @@ describe('show_fieldset/section tests', () => {
 
     test('show_actual_and_expected_return_code - return_code_fdbk_level ' +
          '=== expected_and_actual && actual_return_code !== null',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
-            = expected_and_actual;
-        wrapper.vm.d_ag_test_command_result!.actual_return_code = 0;
+         async () => {
+        ag_test_command_result.fdbk_settings.return_code_fdbk_level = expected_and_actual;
+        ag_test_command_result.actual_return_code = 0;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(fdbk_settings.return_code_fdbk_level).toEqual(expected_and_actual);
         expect(d_ag_test_command_result.actual_return_code).not.toBe(null);
@@ -256,10 +388,23 @@ describe('show_fieldset/section tests', () => {
 
     test('show_actual_and_expected_return_code - return_code_fdbk_level ' +
          '=== expected_and_actual && expected_return_code !== null',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.return_code_fdbk_level
-            = expected_and_actual;
-        wrapper.vm.d_ag_test_command_result!.expected_return_code = ag_cli.ExpectedReturnCode.zero;
+         async () => {
+        ag_test_command_result.fdbk_settings.return_code_fdbk_level = expected_and_actual;
+        ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.zero;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(fdbk_settings.return_code_fdbk_level).toEqual(expected_and_actual);
         expect(d_ag_test_command_result.actual_return_code).toBe(null);
@@ -269,7 +414,21 @@ describe('show_fieldset/section tests', () => {
         expect(wrapper.find('#expected-return-code-section').exists()).toBe(true);
     });
 
-    test('show_stdout_diff - false', () => {
+    test('show_stdout_diff - false', async () => {
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
+
         expect(d_ag_test_command_result.stdout_correct).toBe(null);
         expect(fdbk_settings.stdout_fdbk_level).not.toEqual(expected_and_actual);
         expect(wrapper.vm.show_stdout_diff).toBe(false);
@@ -277,8 +436,22 @@ describe('show_fieldset/section tests', () => {
 
     test('show_stdout_diff - stdout_correct === false && stdout_fdbk_level ' +
          '!== ValueFeedbackLevel.expected_and_actual',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.stdout_correct = false;
+         async () => {
+        ag_test_command_result.stdout_correct = false;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.stdout_correct).toBe(false);
         expect(fdbk_settings.stdout_fdbk_level).not.toEqual(expected_and_actual);
@@ -287,16 +460,44 @@ describe('show_fieldset/section tests', () => {
 
     test('show_stdout_diff - stdout_correct === false && stdout_fdbk_level ' +
          '=== ValueFeedbackLevel.expected_and_actual',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.stdout_correct = false;
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level = expected_and_actual;
+         async () => {
+        ag_test_command_result.stdout_correct = false;
+        ag_test_command_result.fdbk_settings.stdout_fdbk_level = expected_and_actual;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.stdout_correct).toBe(false);
         expect(fdbk_settings.stdout_fdbk_level).toEqual(expected_and_actual);
         expect(wrapper.vm.show_stdout_diff).toBe(true);
     });
 
-    test('show_stderr_diff - false', () => {
+    test('show_stderr_diff - false', async () => {
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
+
         expect(d_ag_test_command_result.stderr_correct).toBe(null);
         expect(fdbk_settings.stderr_fdbk_level).not.toEqual(expected_and_actual);
         expect(wrapper.vm.show_stderr_diff).toBe(false);
@@ -304,8 +505,22 @@ describe('show_fieldset/section tests', () => {
 
     test('show_stderr_diff - stderr_correct === false && stderr_fdbk_level ' +
          '!== ValueFeedbackLevel.expected_and_actual',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.stderr_correct = false;
+         async () => {
+        ag_test_command_result.stderr_correct = false;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.stderr_correct).toBe(false);
         expect(fdbk_settings.stderr_fdbk_level).not.toEqual(expected_and_actual);
@@ -314,9 +529,23 @@ describe('show_fieldset/section tests', () => {
 
     test('show_stderr_diff - stderr_correct === false && stderr_fdbk_level ' +
          '=== ValueFeedbackLevel.expected_and_actual',
-         () => {
-        wrapper.vm.d_ag_test_command_result!.stderr_correct = false;
-        wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level = expected_and_actual;
+         async () => {
+        ag_test_command_result.stderr_correct = false;
+        ag_test_command_result.fdbk_settings.stderr_fdbk_level = expected_and_actual;
+
+        wrapper = mount(AGTestCommandResult, {
+            propsData: {
+                submission: submission,
+                ag_test_command_result: ag_test_command_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+        for (let i = 0; i < 4; ++i) {
+            await wrapper.vm.$nextTick();
+        }
+
+        d_ag_test_command_result = wrapper.vm.ag_test_command_result;
+        fdbk_settings = d_ag_test_command_result.fdbk_settings;
 
         expect(d_ag_test_command_result.stderr_correct).toBe(false);
         expect(fdbk_settings.stderr_fdbk_level).toEqual(expected_and_actual);
@@ -324,133 +553,11 @@ describe('show_fieldset/section tests', () => {
     });
 });
 
-describe('return_code_correctness tests', () => {
-    let wrapper: Wrapper<AGCommandResult>;
-
-    test('return_code_correctness - timed_out === null && return_code_correct === null',
-         async () => {
-        ag_test_command_result.timed_out = null;
-        ag_test_command_result.return_code_correct = null;
-
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
-        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
-        expect(wrapper.vm.return_code_correctness).toEqual("Not Available");
-        expect(wrapper.find('#return-code-correctness').exists()).toBe(false);
-    });
-
-    test('return_code_correctness - timed_out === true', async () => {
-        ag_test_command_result.timed_out = true;
-        ag_test_command_result.stdout_correct = true;
-
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBe(true);
-        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
-        expect(wrapper.vm.return_code_correctness).toEqual("Timed Out");
-        expect(wrapper.find('.correctness-output').find(
-            '.timed-out-icon'
-        ).exists()).toBe(true);
-    });
-
-    test('return_code_correctness - timed_out === false && return_code_correct === null',
-         async () => {
-        ag_test_command_result.timed_out = false;
-        ag_test_command_result.return_code_correct = null;
-        ag_test_command_result.stdout_correct = true;
-
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBe(false);
-        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBeNull();
-        expect(wrapper.vm.return_code_correctness).toEqual("Not Available");
-        expect(wrapper.find('.correctness-output').find(
-            '#return-code-correctness-section'
-        ).exists()).toBe(false);
-    });
-
-    test('return_code_correctness - timed_out === null && return_code_correct === true',
-         async () => {
-        ag_test_command_result.timed_out = null;
-        ag_test_command_result.return_code_correct = true;
-
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
-        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBe(true);
-        expect(wrapper.vm.return_code_correctness).toEqual(ReturnCodeCorrectness.correct);
-        expect(wrapper.find('.correctness-output').find(
-            '.correct-icon'
-        ).exists()).toBe(true);
-    });
-
-    test('return_code_correctness - timed_out === null && return_code_correct === false',
-         async () => {
-        ag_test_command_result.timed_out = null;
-        ag_test_command_result.return_code_correct = false;
-
-        wrapper = mount(AGCommandResult, {
-            propsData: {
-                submission: submission,
-                ag_test_command_result: ag_test_command_result,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.d_ag_test_command_result!.timed_out).toBeNull();
-        expect(wrapper.vm.d_ag_test_command_result!.return_code_correct).toBe(false);
-        expect(wrapper.vm.return_code_correctness).toEqual(ReturnCodeCorrectness.incorrect);
-        expect(wrapper.find('.correctness-output').find(
-            '.incorrect-icon'
-        ).exists()).toBe(true);
-    });
-});
-
-describe('AGCommandResult section exists tests', () => {
-    let wrapper: Wrapper<AGCommandResult>;
+describe('AGTestCommandResult section exists tests', () => {
+    let wrapper: Wrapper<AGTestCommandResult>;
 
     test('stdout_section - stdout_correct === null', async () => {
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -461,7 +568,7 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(wrapper.vm.ag_test_command_result.stdout_correct).toBeNull();
         expect(wrapper.find('#stdout-correctness-section').exists()).toBe(false);
         expect(wrapper.find('#stdout-diff-section').exists()).toBe(false);
     });
@@ -478,7 +585,7 @@ describe('AGCommandResult section exists tests', () => {
             }
         ));
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -489,8 +596,8 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).not.toBeNull();
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level).not.toEqual(
+        expect(wrapper.vm.ag_test_command_result.stdout_correct).not.toBeNull();
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.stdout_fdbk_level).not.toEqual(
             expected_and_actual
         );
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
@@ -507,7 +614,7 @@ describe('AGCommandResult section exists tests', () => {
          async () => {
         ag_test_command_result.stdout_correct = false;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -518,8 +625,8 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).not.toBeNull();
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level).not.toEqual(
+        expect(wrapper.vm.ag_test_command_result.stdout_correct).not.toBeNull();
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.stdout_fdbk_level).not.toEqual(
             expected_and_actual
         );
         expect(wrapper.find('#stdout-correctness-section').find(
@@ -534,7 +641,7 @@ describe('AGCommandResult section exists tests', () => {
         ag_test_command_result.stdout_correct = false;
         ag_test_command_result.fdbk_settings.stdout_fdbk_level = expected_and_actual;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -545,10 +652,10 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).not.toBeNull();
+        expect(wrapper.vm.ag_test_command_result.stdout_correct).not.toBeNull();
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_diff_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stdout_fdbk_level).toEqual(
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.stdout_fdbk_level).toEqual(
             expected_and_actual
         );
         expect(wrapper.find('#stdout-correctness-section').find(
@@ -570,7 +677,7 @@ describe('AGCommandResult section exists tests', () => {
             }
         ));
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -581,7 +688,7 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stdout).toBe(true);
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stdout_content).toBeNull();
@@ -591,7 +698,7 @@ describe('AGCommandResult section exists tests', () => {
     test('stdout_section - show_actual_stdout === true and stdout_content !== null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = true;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -602,7 +709,7 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stdout).toBe(true);
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_stdout_content).toEqual(stdout_content);
@@ -612,7 +719,7 @@ describe('AGCommandResult section exists tests', () => {
     test('stdout_section - show_actual_stdout === false', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stdout = false;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -623,12 +730,12 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stdout).toBe(false);
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(false);
         expect(wrapper.find('#actual-stdout-section').exists()).toBe(false);
     });
 
     test('stderr_section - stderr_correct === null', async () => {
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -639,7 +746,7 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stdout_correct).toBeNull();
+        expect(wrapper.vm.ag_test_command_result.stdout_correct).toBeNull();
         expect(wrapper.find('#stderr-correctness-section').exists()).toBe(false);
         expect(wrapper.find('#stderr-diff-section').exists()).toBe(false);
     });
@@ -656,7 +763,7 @@ describe('AGCommandResult section exists tests', () => {
             }
         ));
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -667,8 +774,8 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).toBe(true);
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level).toEqual(
+        expect(wrapper.vm.ag_test_command_result.stderr_correct).toBe(true);
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.stderr_fdbk_level).toEqual(
             ag_cli.ValueFeedbackLevel.no_feedback
         );
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
@@ -685,7 +792,7 @@ describe('AGCommandResult section exists tests', () => {
          async () => {
         ag_test_command_result.stderr_correct = false;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -696,8 +803,8 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).not.toBeNull();
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level).toEqual(
+        expect(wrapper.vm.ag_test_command_result.stderr_correct).not.toBeNull();
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.stderr_fdbk_level).toEqual(
             ag_cli.ValueFeedbackLevel.no_feedback
         );
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
@@ -714,7 +821,7 @@ describe('AGCommandResult section exists tests', () => {
         ag_test_command_result.stderr_correct = false;
         ag_test_command_result.fdbk_settings.stderr_fdbk_level = expected_and_actual;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -725,10 +832,10 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.stderr_correct).not.toBeNull();
+        expect(wrapper.vm.ag_test_command_result.stderr_correct).not.toBeNull();
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_diff_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.stderr_fdbk_level).toEqual(
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.stderr_fdbk_level).toEqual(
             expected_and_actual
         );
         expect(wrapper.find('#stderr-correctness-section').find(
@@ -750,7 +857,7 @@ describe('AGCommandResult section exists tests', () => {
             }
         ));
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -761,7 +868,7 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stderr).toBe(true);
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stderr).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_stderr_content).toBeNull();
@@ -771,7 +878,7 @@ describe('AGCommandResult section exists tests', () => {
     test('stderr_section - show_actual_stderr === true and stderr_content !== null', async () => {
         ag_test_command_result.fdbk_settings.show_actual_stderr = true;
 
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -782,7 +889,7 @@ describe('AGCommandResult section exists tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result!.fdbk_settings.show_actual_stderr).toBe(true);
+        expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stderr).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_stderr_content).toEqual(stderr_content);
@@ -790,11 +897,11 @@ describe('AGCommandResult section exists tests', () => {
     });
 });
 
-describe('AGCommandResult Watchers tests', () => {
-    let wrapper: Wrapper<AGCommandResult>;
+describe('AGTestCommandResult Watchers tests', () => {
+    let wrapper: Wrapper<AGTestCommandResult>;
 
     beforeEach(() => {
-        wrapper = mount(AGCommandResult, {
+        wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
                 ag_test_command_result: ag_test_command_result,
@@ -808,7 +915,7 @@ describe('AGCommandResult Watchers tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_submission).toEqual(submission);
+        expect(wrapper.vm.submission).toEqual(submission);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
@@ -823,7 +930,7 @@ describe('AGCommandResult Watchers tests', () => {
         }
 
         expect(submission).not.toEqual(updated_submission);
-        expect(wrapper.vm.d_submission).toEqual(updated_submission);
+        expect(wrapper.vm.submission).toEqual(updated_submission);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
@@ -836,7 +943,7 @@ describe('AGCommandResult Watchers tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_command_result).toEqual(ag_test_command_result);
+        expect(wrapper.vm.ag_test_command_result).toEqual(ag_test_command_result);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
@@ -851,7 +958,7 @@ describe('AGCommandResult Watchers tests', () => {
         }
 
         expect(ag_test_command_result).not.toEqual(updated_ag_test_command_result);
-        expect(wrapper.vm.d_ag_test_command_result).toEqual(updated_ag_test_command_result);
+        expect(wrapper.vm.ag_test_command_result).toEqual(updated_ag_test_command_result);
         expect(get_ag_test_cmd_result_output_size_stub.calledTwice).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledTwice).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledTwice).toBe(true);
@@ -864,7 +971,7 @@ describe('AGCommandResult Watchers tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
@@ -877,7 +984,7 @@ describe('AGCommandResult Watchers tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.ultimate_submission);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);

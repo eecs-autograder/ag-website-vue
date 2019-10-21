@@ -432,7 +432,7 @@ describe('mutation_suite_correctness tests', () => {
         expect(setup_return_code_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
         expect(student_tests_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
         expect(bugs_exposed_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
-        expect(mutation_suite_correctness(mutation_suite_1_result)).toEqual(NOT_AVAILABLE);
+        expect(mutation_suite_correctness(mutation_suite_1_result)).toEqual(INFO_ONLY);
     });
 
     test('setup_return_code_correctness === NOT_AVAILABLE ' +
