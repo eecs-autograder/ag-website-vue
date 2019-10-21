@@ -1,9 +1,10 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
+import { expect_dates_equal } from 'ag-client-typescript/dist/tests/utils';
 import * as sinon from 'sinon';
 
-import AGCaseSetupResult from '@/components/project_view/submission_detail/ag_case_setup_result.vue';
+import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_suite_setup_result.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
@@ -54,11 +55,11 @@ afterEach(() => {
     sinon.restore();
 });
 
-describe('AGCaseSetupResult tests', () => {
-    let wrapper: Wrapper<AGCaseSetupResult>;
+describe('AGSuiteSetupResult tests', () => {
+    let wrapper: Wrapper<AGSuiteSetupResult>;
 
     test('show_setup_stdout === false', async () => {
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -68,7 +69,7 @@ describe('AGCaseSetupResult tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(false);
+        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(false);
         expect(wrapper.find('#setup-stdout-section').exists()).toBe(false);
     });
 
@@ -82,7 +83,7 @@ describe('AGCaseSetupResult tests', () => {
             }
         ));
 
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -93,10 +94,10 @@ describe('AGCaseSetupResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
+        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
         expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stdout_size).toBeNull();
+        expect(wrapper.vm.d_output_size!.setup_stdout_size).toBeNull();
         expect(wrapper.vm.d_setup_stdout).toEqual(null);
         expect(wrapper.find('#setup-stdout-section').text()).toContain("No output");
     });
@@ -104,7 +105,7 @@ describe('AGCaseSetupResult tests', () => {
     test('setup_stdout !== null and show_setup_stdout === true', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
 
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -115,7 +116,7 @@ describe('AGCaseSetupResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
+        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toEqual(setup_stdout_content);
@@ -123,7 +124,7 @@ describe('AGCaseSetupResult tests', () => {
     });
 
     test('show_setup_stderr === false', async () => {
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -134,7 +135,7 @@ describe('AGCaseSetupResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(false);
+        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(false);
         expect(wrapper.find('#setup-stderr-section').exists()).toBe(false);
     });
 
@@ -148,7 +149,7 @@ describe('AGCaseSetupResult tests', () => {
             }
         ));
 
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -159,10 +160,10 @@ describe('AGCaseSetupResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
+        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_ag_test_suite_result_output_size!.setup_stderr_size).toBeNull();
+        expect(wrapper.vm.d_output_size!.setup_stderr_size).toBeNull();
         expect(wrapper.vm.d_setup_stderr).toEqual(null);
         expect(wrapper.find('#setup-stderr-section').text()).toContain("No output");
     });
@@ -170,7 +171,7 @@ describe('AGCaseSetupResult tests', () => {
     test('setup_stderr !== null and show_setup_stderr === true', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
 
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -181,7 +182,7 @@ describe('AGCaseSetupResult tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
+        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stderr).toEqual(setup_stderr_content);
@@ -189,56 +190,76 @@ describe('AGCaseSetupResult tests', () => {
     });
 });
 
-describe('AGCaseSetupResult setup_exit_status tests', () => {
-    let wrapper: Wrapper<AGCaseSetupResult>;
+describe('AGSuiteSetupResult exit_status tests', () => {
+    let wrapper: Wrapper<AGSuiteSetupResult>;
 
-    beforeEach(() => {
-        wrapper = mount(AGCaseSetupResult, {
+    test('setup_exit_status - setup_timed_out === null && setup_return_code === null', () => {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-    });
 
-    test('setup_exit_status - setup_timed_out === null && setup_return_code === null', () => {
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.setup_exit_status).toEqual("Not Available");
+        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.find('#exit-status-section').exists()).toBe(false);
     });
 
     test('setup_exit_status - setup_timed_out === null && setup_return_code !== null',  () => {
-        wrapper.vm.d_ag_test_suite_result!.setup_return_code = 1;
+        ag_test_suite_result!.setup_return_code = 1;
 
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(1);
-        expect(wrapper.vm.setup_exit_status).toEqual(1);
+        wrapper = mount(AGSuiteSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+
+        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBe(1);
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
+        expect(wrapper.find('#exit-status-section').exists()).toBe(true);
         expect(wrapper.find('#exit-status-section').text()).toContain("1");
     });
 
     test('setup_exit_status - setup_timed_out === false && setup_return_code === null', () => {
-        wrapper.vm.d_ag_test_suite_result!.setup_timed_out = false;
+        ag_test_suite_result!.setup_timed_out = false;
 
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(false);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.setup_exit_status).toEqual("Not Available");
+        wrapper = mount(AGSuiteSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+
+        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBe(false);
+        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.find('#exit-status-section').exists()).toBe(false);
     });
 
     test('setup_exit_status - setup_timed_out === true && setup_return_code === null',  () => {
-        wrapper.vm.d_ag_test_suite_result!.setup_timed_out = true;
+        ag_test_suite_result!.setup_timed_out = true;
 
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(true);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.setup_exit_status).toEqual("Timed Out");
+        wrapper = mount(AGSuiteSetupResult, {
+            propsData: {
+                ag_test_suite_result: ag_test_suite_result,
+                submission: submission,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+
+        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBe(true);
+        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.find('#exit-status-section').text()).toContain('(Timed out)');
     });
 });
 
-describe('AGCaseSetupResult tests concerning Watchers', () => {
-    let wrapper: Wrapper<AGCaseSetupResult>;
+describe('AGSuiteSetupResult tests concerning Watchers', () => {
+    let wrapper: Wrapper<AGSuiteSetupResult>;
 
     beforeEach(() => {
         get_ag_test_suite_result_setup_stdout_stub.onFirstCall().returns(Promise.resolve(null));
@@ -251,7 +272,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
             setup_stderr_content
         ));
 
-        wrapper = mount(AGCaseSetupResult, {
+        wrapper = mount(AGSuiteSetupResult, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -265,7 +286,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_submission).toEqual(submission);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toBeNull();
@@ -277,7 +298,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toBeNull();
@@ -289,7 +310,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_ag_test_suite_result).toEqual(ag_test_suite_result);
+        expect(wrapper.vm.ag_test_suite_result).toEqual(ag_test_suite_result);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toBeNull();
@@ -302,7 +323,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
         }
 
         expect(ag_test_suite_result).not.toEqual(updated_ag_test_suite_result);
-        expect(wrapper.vm.d_ag_test_suite_result).toEqual(updated_ag_test_suite_result);
+        expect(wrapper.vm.ag_test_suite_result).toEqual(updated_ag_test_suite_result);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toEqual(setup_stdout_content);
@@ -314,7 +335,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toBeNull();
@@ -325,7 +346,7 @@ describe('AGCaseSetupResult tests concerning Watchers', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.d_fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
+        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_setup_stdout).toBeNull();

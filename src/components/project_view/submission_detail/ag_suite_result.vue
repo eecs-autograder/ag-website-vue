@@ -17,10 +17,10 @@
       :name="d_ag_test_suite_result.setup_name ? d_ag_test_suite_result.setup_name : 'Setup'"
       :correctness_level="setup_correctness_level"
       :open_initially="setup_panel_is_active">
-      <AGCaseSetupResult :submission="submission"
+      <AGSuiteSetupResult :submission="submission"
                          :ag_test_suite_result="d_ag_test_suite_result"
                          :fdbk_category="fdbk_category">
-      </AGCaseSetupResult>
+      </AGSuiteSetupResult>
     </submission-detail-panel>
 
     <template v-for="ag_test_case_result of d_ag_test_suite_result.ag_test_case_results">
@@ -55,14 +55,14 @@ import {
 } from "ag-client-typescript";
 
 import AGCaseResult from '@/components/project_view/submission_detail/ag_case_result.vue';
-import AGCaseSetupResult from '@/components/project_view/submission_detail/ag_case_setup_result.vue';
+import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_suite_setup_result.vue';
 import { CorrectnessLevel, setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 @Component({
   components: {
     AGCaseResult,
-    AGCaseSetupResult,
+    AGSuiteSetupResult,
     SubmissionDetailPanel: ResultPanel
   }
 })
