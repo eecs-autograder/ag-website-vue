@@ -18,15 +18,16 @@
           <div class="feedback">
             <div class="correctness-output"
                id="setup-return-code-correctness-icon">
-              <span v-if="setup_return_code_correctness === ReturnCodeCorrectness.correct">
-                <i class="fas fa-check correct-icon"></i>
-              </span>
-              <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.incorrect">
-                <i class="fas fa-times incorrect-icon"></i>
-              </span>
-              <span v-else-if="setup_return_code_correctness === ReturnCodeCorrectness.timed_out">
+              <span v-if="d_mutation_test_suite_result.setup_timed_out !== null
+                               && d_mutation_test_suite_result.setup_timed_out">
                 <i class="far fa-clock timed-out-icon setup-timed-out-icon"></i>
                 <span> (Timed Out) </span>
+              </span>
+              <span v-else-if="d_mutation_test_suite_result.setup_return_code === 0">
+                <i class="fas fa-check correct-icon"></i>
+              </span>
+              <span v-else-if="d_mutation_test_suite_result.setup_return_code !== 0">
+                <i class="fas fa-times incorrect-icon"></i>
               </span>
             </div>
           </div>
@@ -362,7 +363,6 @@ import {
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
-import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 
 @Component({
   components: {
@@ -398,7 +398,6 @@ export default class MutationSuiteResult extends Vue {
 
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
-  readonly ReturnCodeCorrectness = ReturnCodeCorrectness;
 
   d_setup_stdout_content: string | null = null;
   d_setup_stderr_content: string | null = null;
@@ -666,17 +665,6 @@ export default class MutationSuiteResult extends Vue {
           (invalid_test) => invalid_test === student_test)
       === -1);
     return valid_tests;
-  }
-
-  get setup_return_code_correctness(): string {
-    if (this.d_mutation_test_suite_result!.setup_timed_out !== null
-        && this.d_mutation_test_suite_result!.setup_timed_out!) {
-        return ReturnCodeCorrectness.timed_out;
-    }
-    else if (this.d_mutation_test_suite_result!.setup_return_code === 0) {
-        return ReturnCodeCorrectness.correct;
-    }
-    return ReturnCodeCorrectness.incorrect;
   }
 }
 </script>

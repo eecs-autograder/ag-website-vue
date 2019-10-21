@@ -5,7 +5,6 @@ import { MutationTestSuiteFeedbackConfig } from 'ag-client-typescript/dist/src/m
 import * as sinon from 'sinon';
 
 import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
-import { ReturnCodeCorrectness } from '@/components/project_view/submission_detail/return_code_correctness';
 
 import * as data_ut from '@/tests/data_utils';
 let group: ag_cli.Group;
@@ -287,7 +286,7 @@ describe('MutationSuiteResult setup section tests', () => {
         expect(wrapper.find('#setup-command-name').text()).toContain("Compile");
     });
 
-    test('get_setup_return_code_correctness - setup_timed_out === true', async () => {
+    test('setup_timed_out === true', async () => {
         mutation_test_suite_result.setup_timed_out = true;
         wrapper = mount(MutationSuiteResult, {
             propsData: {
@@ -300,14 +299,13 @@ describe('MutationSuiteResult setup section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.setup_return_code_correctness).toEqual(ReturnCodeCorrectness.timed_out);
         expect(wrapper.find('#setup-return-code-correctness-icon').find(
             '.timed-out-icon'
         ).exists()).toBe(true);
         expect(wrapper.find('#setup-return-code').exists()).toBe(false);
     });
 
-    test('get_setup_return_code_correctness - setup_return_code === 0', async () => {
+    test('setup_return_code === 0', async () => {
         mutation_test_suite_result.setup_return_code = 0;
         wrapper = mount(MutationSuiteResult, {
             propsData: {
@@ -320,14 +318,13 @@ describe('MutationSuiteResult setup section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.setup_return_code_correctness).toEqual("Correct");
         expect(wrapper.find('#setup-return-code-correctness-icon').find(
             '.correct-icon'
         ).exists()).toBe(true);
         expect(wrapper.find('#setup-return-code').text()).toContain("0");
     });
 
-    test('get_setup_return_code_correctness - setup_return_code === 1', async () => {
+    test('setup_return_code === 1', async () => {
         mutation_test_suite_result.setup_return_code = 1;
         wrapper = mount(MutationSuiteResult, {
             propsData: {
@@ -340,7 +337,6 @@ describe('MutationSuiteResult setup section tests', () => {
             await wrapper.vm.$nextTick();
         }
 
-        expect(wrapper.vm.setup_return_code_correctness).toEqual("Incorrect");
         expect(wrapper.find('#setup-return-code-correctness-icon').find(
             '.incorrect-icon'
         ).exists()).toBe(true);
