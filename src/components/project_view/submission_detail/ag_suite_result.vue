@@ -1,9 +1,8 @@
 <template>
-  <div v-if="!d_loading"
-       id="ag-suite-result"
+  <div id="ag-suite-result"
        class="suite-result">
 
-    <div id="ag-test-suite-name">{{d_ag_test_suite_result.ag_test_suite_name}}</div>
+    <div id="ag-test-suite-name">{{ag_test_suite_result.ag_test_suite_name}}</div>
     <div class="ag-test-case-results-header">
       <div class="column-1"> Test Case </div>
       <div class="column-2"> Passed </div>
@@ -11,21 +10,22 @@
     </div>
 
     <submission-detail-panel
+      v-if="ag_test_suite_result.setup_return_code !== null
+            || ag_test_suite_result.setup_timed_out"
       ref="ag_case_setup_result_detail_panel"
-      v-if="d_ag_test_suite_result.setup_return_code !== null
-            || d_ag_test_suite_result.setup_timed_out"
-      :name="d_ag_test_suite_result.setup_name ? d_ag_test_suite_result.setup_name : 'Setup'"
+      :name="ag_test_suite_result.setup_name ? ag_test_suite_result.setup_name : 'Setup'"
       :correctness_level="setup_correctness_level"
       :open_initially="setup_panel_is_active">
       <AGSuiteSetupResult :submission="submission"
-                         :ag_test_suite_result="d_ag_test_suite_result"
+                         :ag_test_suite_result="ag_test_suite_result"
                          :fdbk_category="fdbk_category">
       </AGSuiteSetupResult>
     </submission-detail-panel>
 
-    <template v-for="ag_test_case_result of d_ag_test_suite_result.ag_test_case_results">
+    <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
       <submission-detail-panel
         ref="ag_case_result_detail_panel"
+        :key="ag_test_case_result.pk"
         :name="ag_test_case_result.ag_test_case_name"
         :correctness_level="case_result_correctness(ag_test_case_result)"
         :points_awarded="ag_test_case_result.total_points"
@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import {
     AGTestCaseResultFeedback,
@@ -82,58 +82,45 @@ export default class AGSuiteResult extends Vue {
 
   readonly CorrectnessLevel = CorrectnessLevel;
 
-  d_first_incorrect_setup: null | AGTestSuiteResultFeedback = null;
-  d_first_incorrect_case: null | AGTestCaseResultFeedback = null;
-
-  d_loading = true;
-
-  d_ag_test_suite_result: AGTestSuiteResultFeedback | null = null;
-  d_fdbk_category: FeedbackCategory = FeedbackCategory.past_limit_submission;
-
-  @Watch('ag_test_suite_result')
-  on_ag_test_suite_result_change(new_value: object, old_value: object) {
-    this.d_ag_test_suite_result = JSON.parse(JSON.stringify(new_value));
-    this.determine_active_panels();
+  get first_incorrect_setup(): AGTestSuiteResultFeedback | null {
+    if (this.setup_correctness_level === CorrectnessLevel.none_correct ||
+        (this.ag_test_suite_result!.setup_timed_out !== null
+         && this.ag_test_suite_result!.setup_timed_out!)) {
+      return this.ag_test_suite_result;
+    }
+    return null;
   }
 
-  created() {
-    this.d_ag_test_suite_result = this.ag_test_suite_result;
-    this.d_fdbk_category = this.fdbk_category;
-    this.determine_active_panels();
-    this.d_loading = false;
-  }
+  get first_incorrect_case(): AGTestCaseResultFeedback | null {
+    if (this.first_incorrect_setup !== null) {
+      return null;
+    }
 
-  determine_active_panels() {
-    this.d_first_incorrect_setup = null;
-    this.d_first_incorrect_case = null;
-    this.decide_whether_to_open_setup();
-    this.ag_test_suite_result.ag_test_case_results.forEach(
-      (ag_case) => {
-        this.decide_whether_to_open_case(
-          this.case_result_correctness(ag_case), ag_case
-        );
+    for (let ag_case of this.ag_test_suite_result.ag_test_case_results) {
+      let case_correctness = this.case_result_correctness(ag_case);
+      if (case_correctness === CorrectnessLevel.some_correct
+          || case_correctness === CorrectnessLevel.none_correct) {
+        return ag_case;
       }
-    );
+    }
+    return null;
   }
 
   get setup_correctness_level(): CorrectnessLevel {
-      if (!this.d_ag_test_suite_result!.fdbk_settings.show_setup_return_code) {
-          return CorrectnessLevel.info_only;
-      }
-      return setup_return_code_correctness(this.d_ag_test_suite_result!.setup_return_code,
-                                           this.d_ag_test_suite_result!.setup_timed_out);
-  }
-
-  decide_whether_to_open_setup() {
-    if (this.setup_correctness_level === CorrectnessLevel.none_correct ||
-        (this.d_ag_test_suite_result!.setup_timed_out !== null
-         && this.d_ag_test_suite_result!.setup_timed_out!)) {
-        this.d_first_incorrect_setup = this.d_ag_test_suite_result;
+    if (!this.ag_test_suite_result!.fdbk_settings.show_setup_return_code) {
+      return CorrectnessLevel.info_only;
     }
+    return setup_return_code_correctness(this.ag_test_suite_result!.setup_return_code,
+                                         this.ag_test_suite_result!.setup_timed_out);
   }
 
   get setup_panel_is_active(): boolean {
-    return this.is_first_suite && this.d_first_incorrect_setup !== null;
+    return this.is_first_suite && this.first_incorrect_setup !== null;
+  }
+
+  get_case_is_active(ag_test_case: AGTestCaseResultFeedback): boolean {
+    return this.first_incorrect_case !== null
+           && this.first_incorrect_case.pk === ag_test_case.pk;
   }
 
   case_result_correctness(case_result: AGTestCaseResultFeedback): CorrectnessLevel {
@@ -189,7 +176,7 @@ export default class AGSuiteResult extends Vue {
       (cmd_result) => cmd_result.return_code_correct === null);
 
     let some_show_return_code_only = case_result.ag_test_command_results.some(
-        (cmd_result) => cmd_result.fdbk_settings.show_actual_return_code);
+      (cmd_result) => cmd_result.fdbk_settings.show_actual_return_code);
 
     if (not_available) {
       if (some_show_return_code_only) {
@@ -246,21 +233,6 @@ export default class AGSuiteResult extends Vue {
       return CorrectnessLevel.none_correct;
     }
     return CorrectnessLevel.some_correct;
-  }
-
-  decide_whether_to_open_case(case_level_correctness: CorrectnessLevel,
-                              ag_test_case_result: AGTestCaseResultFeedback) {
-    if (this.d_first_incorrect_setup === null
-        && this.d_first_incorrect_case === null
-        && (case_level_correctness === CorrectnessLevel.none_correct
-            || case_level_correctness === CorrectnessLevel.some_correct)) {
-      this.d_first_incorrect_case = ag_test_case_result;
-    }
-  }
-
-  get_case_is_active(ag_test_case: AGTestCaseResultFeedback): boolean {
-    return this.d_first_incorrect_case !== null
-           && this.d_first_incorrect_case.pk === ag_test_case.pk;
   }
 }
 </script>

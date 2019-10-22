@@ -1300,7 +1300,10 @@ describe('case_result_output_correctness tests', () => {
 describe('setup_correctness_level tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
-    beforeEach(() => {
+    test('setup_correctness_level - show_setup_return_code === false', async () => {
+        ag_test_suite_result.fdbk_settings.show_setup_return_code = false;
+        ag_test_suite_result.setup_return_code = 0;
+
         wrapper = mount(AGSuiteResult, {
             propsData: {
                 submission: submission,
@@ -1308,35 +1311,46 @@ describe('setup_correctness_level tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-    });
 
-    test('setup_correctness_level - show_setup_return_code === false', async () => {
-        wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code = false;
-        wrapper.vm.ag_test_suite_result.setup_return_code = 0;
-
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toEqual(0);
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toEqual(0);
         expect(wrapper.vm.setup_correctness_level).toEqual(
             CorrectnessLevel.info_only
         );
     });
 
     test('setup_correctness_level - setup_return_code === 0', async () => {
-        wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        wrapper.vm.ag_test_suite_result.setup_return_code = 0;
+        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
+        ag_test_suite_result.setup_return_code = 0;
 
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toEqual(0);
+        wrapper = mount(AGSuiteResult, {
+            propsData: {
+                submission: submission,
+                ag_test_suite_result: ag_test_suite_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toEqual(0);
         expect(wrapper.vm.setup_correctness_level).toEqual(
             CorrectnessLevel.all_correct
         );
     });
 
     test('setup_correctness_level - setup_return_code === null', async () => {
-        wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        wrapper.vm.ag_test_suite_result.setup_return_code = null;
+        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
+        ag_test_suite_result.setup_return_code = null;
 
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
+        wrapper = mount(AGSuiteResult, {
+            propsData: {
+                submission: submission,
+                ag_test_suite_result: ag_test_suite_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBeNull();
         expect(wrapper.vm.setup_correctness_level).toEqual(
             CorrectnessLevel.not_available
         );
@@ -1344,11 +1358,19 @@ describe('setup_correctness_level tests', () => {
 
     test('setup_correctness_level - setup_return_code !== 0 && setup_return_code !== null',
          async () => {
-        wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        wrapper.vm.ag_test_suite_result.setup_return_code = 1;
+        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
+        ag_test_suite_result.setup_return_code = 1;
 
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).not.toEqual(0);
+        wrapper = mount(AGSuiteResult, {
+            propsData: {
+                submission: submission,
+                ag_test_suite_result: ag_test_suite_result,
+                fdbk_category: ag_cli.FeedbackCategory.max
+            }
+        });
+
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toEqual(0);
         expect(wrapper.vm.setup_correctness_level).toEqual(
             CorrectnessLevel.none_correct
         );
@@ -1371,10 +1393,10 @@ describe('panel_is_active - setup_case tests', () => {
         });
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.info_only);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(1);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.fdbk_settings.show_setup_return_code).toBe(false);
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(1);
+        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code).toBe(false);
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
     });
 
     test('decide_whether_to_open_setup - setup_correctness_level !== correct',
@@ -1391,9 +1413,9 @@ describe('panel_is_active - setup_case tests', () => {
         });
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(1);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_setup).toEqual(wrapper.vm.d_ag_test_suite_result);
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(1);
+        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
+        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
     });
 
     test('decide_whether_to_open_setup - setup_return_code === correct but ' +
@@ -1412,9 +1434,9 @@ describe('panel_is_active - setup_case tests', () => {
         });
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(0);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(true);
-        expect(wrapper.vm.d_first_incorrect_setup).toEqual(wrapper.vm.d_ag_test_suite_result);
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
+        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBe(true);
+        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
     });
 
     test('decide_whether_to_open_setup - setup_return_code === correct',
@@ -1432,9 +1454,9 @@ describe('panel_is_active - setup_case tests', () => {
         });
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(0);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBe(false);
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
+        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBe(false);
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
     });
 
     test('decide_whether_to_open_setup - setup_return_code === correct' +
@@ -1452,9 +1474,9 @@ describe('panel_is_active - setup_case tests', () => {
         });
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBe(0);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
+        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
     });
 
     test('decide_whether_to_open_setup - setup_return_code === null', async () => {
@@ -1469,9 +1491,9 @@ describe('panel_is_active - setup_case tests', () => {
         });
 
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.not_available);
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_return_code).toBeNull();
-        expect(wrapper.vm.d_ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBeNull();
+        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
     });
 
     test('setup_panel_is_active - is_first_suite === false AND' +
@@ -1490,7 +1512,7 @@ describe('panel_is_active - setup_case tests', () => {
 
         expect(wrapper.vm.is_first_suite).toBe(false);
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.d_first_incorrect_setup).toEqual(wrapper.vm.d_ag_test_suite_result);
+        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
         expect(wrapper.vm.setup_panel_is_active).toBe(false);
     });
 
@@ -1512,7 +1534,7 @@ describe('panel_is_active - setup_case tests', () => {
 
         expect(wrapper.vm.is_first_suite).toBe(true);
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.d_first_incorrect_setup).toEqual(wrapper.vm.d_ag_test_suite_result);
+        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
         expect(wrapper.vm.setup_panel_is_active).toBe(true);
     });
 
@@ -1533,7 +1555,7 @@ describe('panel_is_active - setup_case tests', () => {
 
         expect(wrapper.vm.is_first_suite).toBe(true);
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
         expect(wrapper.vm.setup_panel_is_active).toBe(false);
     });
 });
@@ -1604,13 +1626,13 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_first_incorrect_setup).toEqual(wrapper.vm.d_ag_test_suite_result);
-        expect(wrapper.vm.d_first_incorrect_case).toBeNull();
+        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
+        expect(wrapper.vm.first_incorrect_case).toBeNull();
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         )).toBe(false);
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         )).toBe(false);
     });
 
@@ -1637,15 +1659,15 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_case).toEqual(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.first_incorrect_case).toEqual(
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         );
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         )).toBe(true);
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         )).toBe(false);
     });
 
@@ -1672,13 +1694,13 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_case).toBeNull();
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.first_incorrect_case).toBeNull();
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         )).toBe(false);
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         )).toBe(false);
     });
 
@@ -1705,15 +1727,15 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_case).toEqual(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.first_incorrect_case).toEqual(
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         );
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         )).toBe(true);
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         )).toBe(false);
     });
 
@@ -1740,15 +1762,15 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_first_incorrect_setup).toBeNull();
-        expect(wrapper.vm.d_first_incorrect_case).toEqual(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.first_incorrect_case).toEqual(
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         );
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         )).toBe(false);
         expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         )).toBe(true);
     });
 });
@@ -1833,9 +1855,9 @@ describe('AGSuiteResult Watchers tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_ag_test_suite_result).toEqual(ag_test_suite_result);
-        expect(wrapper.vm.d_first_incorrect_case).toEqual(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[0]
+        expect(wrapper.vm.ag_test_suite_result).toEqual(ag_test_suite_result);
+        expect(wrapper.vm.first_incorrect_case).toEqual(
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         );
 
         let updated_ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(
@@ -1887,9 +1909,9 @@ describe('AGSuiteResult Watchers tests', () => {
         wrapper.setProps({ag_test_suite_result: updated_ag_test_suite_result});
 
         expect(updated_ag_test_suite_result).not.toEqual(ag_test_suite_result);
-        expect(wrapper.vm.d_ag_test_suite_result).toEqual(updated_ag_test_suite_result);
-        expect(wrapper.vm.d_first_incorrect_case).toEqual(
-            wrapper.vm.d_ag_test_suite_result!.ag_test_case_results[1]
+        expect(wrapper.vm.ag_test_suite_result).toEqual(updated_ag_test_suite_result);
+        expect(wrapper.vm.first_incorrect_case).toEqual(
+            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         );
     });
 
