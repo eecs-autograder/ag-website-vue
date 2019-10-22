@@ -145,7 +145,7 @@ export default class MutationSuiteResults extends Vue {
 }
 
 #mutation-test-suites-title {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: bold;
   padding: 0 0 10px 0;
 }

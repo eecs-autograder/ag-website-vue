@@ -200,7 +200,7 @@ $border-radius-value: 3px;
 
 .multiple-command-panel-body {
   padding: 20px 20px 15px 20px !important;
-  background-color: #f5f5f5 !important;
+  background: linear-gradient(30deg, darken(white, 1), darken(white, 2)) !important;
 }
 
 /* ---------------- Not Available Panel ---------------- */

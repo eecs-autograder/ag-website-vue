@@ -398,16 +398,16 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 }
 
 #submission-detail {
-  padding: 9px 30px 30px 30px;
+  padding: 0 15px 30px 15px;
 }
 
 #submission-detail-overview {
-  padding: 6px 0 0 1px;
+  padding: 0 0 0 1px;
 }
 
 #submitted-by {
-  font-size: 22px;
-  padding: 0 0 5px 0;
+  font-size: 19px;
+  padding: 10px 0 5px 0;
 }
 
 #submitter {
@@ -461,7 +461,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 }
 
 #submission-score {
-  font-size: 20px;
+  font-size: 19px;
   padding: 5px 0 5px 0;
 }
 

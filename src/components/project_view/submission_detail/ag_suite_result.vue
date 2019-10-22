@@ -241,7 +241,7 @@ export default class AGSuiteResult extends Vue {
 @import '@/styles/components/submission_detail.scss';
 
 #ag-test-suite-name {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: bold;
   padding: 0 0 10px 0;
 }
