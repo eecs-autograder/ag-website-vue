@@ -15,14 +15,15 @@
                                                 && index <= d_last_highlighted_line}"
             @mousedown="start_highlighting(index)"
             @mouseenter="grow_highlighted_region(index)"
-            @mouseup="stop_highlighting($event, index)">
+            @mouseup="stop_highlighting($event, index)"
+            ref="code_line">
           <td class="line-number">{{index + 1}}</td>
           <td class="line-of-file-content"
               :style="{'user-select': (handgrading_enabled
                                        && !readonly_handgrading_results) ? 'none' : 'auto'}"
           >{{line === "" ? "\n" : line}}</td>
         </tr>
-        <tr v-for="comment of handgrading_comments.get(index, [])">
+        <tr v-for="comment of handgrading_comments.get(index, [])" ref="comment_row">
           <td></td>
           <td>
             <div class="comment"
@@ -40,9 +41,11 @@
               </div>
               <div class="comment-message">
                 {{comment.short_description}}
-                ({{comment.deduction}}<template
-                  v-if="comment.max_deduction !== null"
-                >, {{comment.max_deduction}} max</template>)
+                <template
+                  v-if="comment.deduction !== 0"
+                >({{comment.deduction}}<template v-if="comment.max_deduction !== null"
+                >/{{comment.max_deduction}} max</template>)
+                </template>
               </div>
             </div>
           </td>
@@ -313,6 +316,7 @@ export default class ViewFile extends Vue implements Created {
   }
 
   on_menu_is_open_changed(is_open: boolean) {
+    console.log('hai ' + is_open);
     this.d_context_menu_is_open = is_open;
     if (!this.d_context_menu_is_open) {
       this.d_first_highlighted_line = null;

@@ -1,6 +1,13 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
+import * as ag_cli from 'ag-client-typescript';
+import * as sinon from 'sinon';
+
 import ViewFile from '@/components/view_file.vue';
+
+import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
+import { compress_whitespace, wait_until } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -78,25 +85,154 @@ describe('ViewFile.vue', () => {
 });
 
 describe('ViewFile handgrading tests', () => {
-    // Add some non-location comments to the handgrading results
+    let wrapper: Wrapper<ViewFile>;
 
-    test('Single-line annotation', () => {
-        fail();
+    let content = Promise.resolve(Array(20).fill('line').join('\n'));
+    let filename = 'an_file.txt';
+
+    let rubric: ag_cli.HandgradingRubric;
+    let annotation_no_long_description: ag_cli.Annotation;
+    let annotation_with_long_description: ag_cli.Annotation;
+    let result: ag_cli.HandgradingResult;
+    let comment: ag_cli.Comment;
+    let applied_annotation_no_long_description: ag_cli.AppliedAnnotation;
+    let applied_annotation_with_long_description: ag_cli.AppliedAnnotation;
+
+    beforeEach(() => {
+        let project = data_ut.make_project(data_ut.make_course().pk);
+        rubric = data_ut.make_handgrading_rubric(project.pk);
+        annotation_no_long_description = data_ut.make_annotation(rubric.pk, {
+            short_description: 'I short description',
+            long_description: '',
+            deduction: -1,
+            max_deduction: -2,
+        });
+        annotation_with_long_description = data_ut.make_annotation(rubric.pk, {
+            short_description: 'I haz descriptions',
+            long_description: 'Such descriptive longness',
+            deduction: -4,
+        });
+        rubric.annotations = [annotation_no_long_description, annotation_with_long_description];
+
+        let group = data_ut.make_group(project.pk);
+        result = data_ut.make_handgrading_result(
+            rubric, group.pk, data_ut.make_submission(group).pk);
+
+        comment = data_ut.make_comment(
+            result, {filename: filename, first_line: 3, last_line: 5}, 'I am such very comment');
+        applied_annotation_no_long_description = data_ut.make_applied_annotation(
+            result, annotation_no_long_description,
+            {filename: filename, first_line: 5, last_line: 5}
+        );
+        applied_annotation_with_long_description = data_ut.make_applied_annotation(
+            result, annotation_with_long_description,
+            {filename: filename, first_line: 10, last_line: 13}
+        );
+
+        wrapper = managed_mount(ViewFile, {
+            propsData: {
+                filename: filename,
+                file_contents: content,
+                handgrading_result: result
+            }
+        });
     });
 
-    test('Multi-line annotations', () => {
-        fail();
+    test('Commented lines highlighted', () => {
+        let highlighted_line_indices = [
+            3, 4, 5,
+            10, 11, 12, 13
+        ];
+        expect(wrapper.findAll('.commented-line').length).toEqual(highlighted_line_indices.length);
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        for (let index of highlighted_line_indices) {
+            expect(code_lines.at(index).classes()).toEqual(['commented-line']);
+        }
     });
 
-    test('Overlapping multi-line annotations', () => {
-        fail();
+    test('Comments and applied annotations displayed at last highlighted line', () => {
+        let rows = wrapper.findAll('tr');
+        let comment_wrapper = rows.at(6);
+        expect(comment_wrapper.find('.comment-line-range').text()).toEqual('Lines 4 - 6');
+        expect(comment_wrapper.find('.comment-message').text()).toEqual(comment.text);
+
+        let no_long_description_wrapper = rows.at(7);
+        expect(no_long_description_wrapper.find('.comment-line-range').text()).toEqual('Line 6');
+        expect(
+            compress_whitespace(no_long_description_wrapper.find('.comment-message').text())
+        ).toEqual(
+            annotation_no_long_description.short_description
+            + ` (${annotation_no_long_description.deduction}`
+            + `/${annotation_no_long_description.max_deduction} max)`
+        );
+
+        let with_long_description_wrapper = rows.at(16);
+        expect(with_long_description_wrapper.find('.comment-line-range').text()).toEqual(
+            'Lines 11 - 14'
+        );
+        expect(
+            compress_whitespace(with_long_description_wrapper.find('.comment-message').text())
+        ).toEqual(
+            annotation_with_long_description.short_description
+            + ` (${annotation_with_long_description.deduction})`
+        );
     });
 
-    test('Hovered annotation highlighted differently', () => {
-        fail();
+    test('Hovered comment highlighted differently', () => {
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let single_line_comment = wrapper.findAll('.comment').at(1);
+        single_line_comment.trigger('mouseenter');
+        expect(code_lines.at(5).classes()).toContain('hovered-comment-line');
+        single_line_comment.trigger('mouseleave');
+        expect(code_lines.at(5).classes()).not.toContain('hovered-comment-line');
     });
 
-    test('Add new single-line annotation', () => {
+    test('Add new single-line applied annotation', async () => {
+        expect(wrapper.findAll('.comment').length).toEqual(3);
+
+        let new_applied_annotation = data_ut.make_applied_annotation(
+            result,
+            annotation_no_long_description,
+            {
+                filename: filename,
+                first_line: 0,
+                last_line: 0,
+            },
+        );
+        let create_stub = sinon.stub(ag_cli.AppliedAnnotation, 'create').resolves(
+            new_applied_annotation);
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(0).trigger('mouseup');
+
+        await wrapper.vm.$nextTick();
+
+        console.log('clicky')
+        wrapper.findAll({name: 'ContextMenuItem'}).at(0).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+
+        expect(create_stub.calledOnce).toBe(true);
+        // console.log(create_stub.getCall(0));
+        expect(create_stub.calledOnceWith(
+            result.pk,
+            {
+                annotation: annotation_no_long_description.pk,
+                location: {
+                    first_line: 0,
+                    last_line: 0,
+                    filename: filename,
+                }
+            }
+        )).toBe(true);
+
+        wrapper.vm.handgrading_result.applied_annotations.push(new_applied_annotation);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.comment').length).toEqual(4);
+        expect(wrapper.findAll('.comment').at(0).find('comment-header').text()).toContain(
+            annotation_no_long_description.short_description
+        );
         fail();
     });
 
