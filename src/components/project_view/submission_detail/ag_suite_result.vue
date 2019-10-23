@@ -59,6 +59,7 @@ import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_s
 import { CorrectnessLevel, setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
+
 @Component({
   components: {
     AGCaseResult,
@@ -127,47 +128,30 @@ export default class AGSuiteResult extends Vue {
     let return_code_correctness = this.case_result_return_code_correctness(case_result);
     let output_correctness = this.case_result_output_correctness(case_result);
 
-    if (return_code_correctness === CorrectnessLevel.info_only
-        && output_correctness === CorrectnessLevel.not_available) {
-      return CorrectnessLevel.info_only;
-    }
-
-    if (output_correctness === CorrectnessLevel.info_only
-        && return_code_correctness === CorrectnessLevel.not_available) {
-      return CorrectnessLevel.info_only;
-    }
-
-    if (return_code_correctness === CorrectnessLevel.not_available
-        || return_code_correctness === CorrectnessLevel.info_only) {
-      return output_correctness;
-    }
-
-    if (output_correctness === CorrectnessLevel.not_available
-        || output_correctness === CorrectnessLevel.info_only) {
-      return return_code_correctness;
-    }
-
     if (case_result.total_points === 0 && case_result.total_points_possible !== 0) {
       return CorrectnessLevel.none_correct;
     }
 
-    if (return_code_correctness === CorrectnessLevel.all_correct
-        && output_correctness === CorrectnessLevel.all_correct) {
-      return CorrectnessLevel.all_correct;
-    }
-    if (return_code_correctness === CorrectnessLevel.none_correct
-        && output_correctness === CorrectnessLevel.none_correct) {
-      return CorrectnessLevel.none_correct;
-    }
-    if (return_code_correctness === CorrectnessLevel.some_correct
-        || output_correctness === CorrectnessLevel.some_correct) {
-      return CorrectnessLevel.some_correct;
+    let correctnesses = [return_code_correctness, output_correctness];
+
+    correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
+    if (correctnesses.length === 0) {
+      return CorrectnessLevel.not_available;
     }
 
-    if (return_code_correctness === CorrectnessLevel.all_correct
-        && output_correctness === CorrectnessLevel.none_correct) {
-      return CorrectnessLevel.some_correct;
+    correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.info_only);
+    if (correctnesses.length === 0) {
+      return CorrectnessLevel.info_only;
     }
+
+    if (correctnesses.every(val => val === CorrectnessLevel.all_correct)) {
+      return CorrectnessLevel.all_correct;
+    }
+
+    if (correctnesses.every(val => val === CorrectnessLevel.none_correct)) {
+      return CorrectnessLevel.none_correct;
+    }
+
     return CorrectnessLevel.some_correct;
   }
 
