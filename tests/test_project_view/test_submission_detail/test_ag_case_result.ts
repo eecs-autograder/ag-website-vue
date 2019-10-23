@@ -223,6 +223,54 @@ describe('command_result_correctness tests', () => {
         );
     });
 
+    test('command_result_correctness - total_points < 0', async () => {
+        let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
+            1,
+            {
+                return_code_correct: true,
+                stdout_correct: false,
+                stderr_correct: false
+            }
+        );
+        ag_test_command_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_result.total_points = -1;
+
+        expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
+    test('command_result_correctness - total_points === 0 && total_points_possible !== 0',
+         async () => {
+        let ag_test_command_result = data_ut.make_ag_test_command_result_feedback(
+            1,
+            {
+                return_code_correct: true,
+                stdout_correct: false,
+                stderr_correct: false
+            }
+        );
+        ag_test_command_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_result.total_points = 0;
+        ag_test_command_result.total_points_possible = 5;
+
+        expect(wrapper.vm.command_result_return_code_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.command_result_output_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+        expect(wrapper.vm.command_result_correctness(ag_test_command_result)).toEqual(
+            CorrectnessLevel.none_correct
+        );
+    });
+
     test('command_result_correctness - return_code_correctness === info_only AND' +
          ' output_correctness === some_correct',
          async () => {

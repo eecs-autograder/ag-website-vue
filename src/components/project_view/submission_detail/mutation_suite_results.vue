@@ -124,10 +124,6 @@ export default class MutationSuiteResults extends Vue {
       return CorrectnessLevel.all_correct;
     }
 
-    if (correctnesses.every(val => val === CorrectnessLevel.none_correct)) {
-      return CorrectnessLevel.none_correct;
-    }
-
     // We have a mix of all, some, and none correct
     return CorrectnessLevel.some_correct;
   }
