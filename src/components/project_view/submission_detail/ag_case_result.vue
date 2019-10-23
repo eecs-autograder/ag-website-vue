@@ -43,6 +43,7 @@ import { CorrectnessLevel } from '@/components/project_view/submission_detail/co
 import CorrectnessIcon from '@/components/project_view/submission_detail/correctness_icon.vue';
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
+
 @Component({
   components: {
     AGTestCommandResult,
@@ -64,17 +65,28 @@ export default class AGCaseResult extends Vue {
 
   command_result_correctness(command_result: AGTestCommandResultFeedback) {
     let return_code_correctness = this.command_result_return_code_correctness(command_result);
-    let output_correctness = this.command_result_output_correctness(command_result);
+    let stdout_correctness = this.command_result_output_correctness(command_result.stdout_correct);
+    let stderr_correctness = this.command_result_output_correctness(command_result.stderr_correct);
 
     if (command_result.total_points < 0 || (command_result.total_points === 0
          && command_result.total_points_possible !== 0)) {
       return CorrectnessLevel.none_correct;
     }
 
-    let correctnesses = [return_code_correctness, output_correctness];
+    let show_info_only = (
+      (command_result.stdout_points_possible === 0
+      && command_result.stderr_points_possible === 0)
+      && (command_result.fdbk_settings.show_actual_stdout
+          || command_result.fdbk_settings.show_actual_stderr)
+    );
 
+    let correctnesses = [return_code_correctness, stdout_correctness, stderr_correctness];
     correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
+
     if (correctnesses.length === 0) {
+      if (show_info_only) {
+        return CorrectnessLevel.info_only;
+      }
       return CorrectnessLevel.not_available;
     }
 
@@ -107,40 +119,12 @@ export default class AGCaseResult extends Vue {
     return CorrectnessLevel.none_correct;
   }
 
-  command_result_output_correctness(command_result: AGTestCommandResultFeedback) {
-    let output_not_available = command_result.stdout_correct === null &&
-                               command_result.stderr_correct === null;
-
-    let show_info_only = (
-        (command_result.stdout_points_possible === 0
-        && command_result.stderr_points_possible === 0)
-        && (command_result.fdbk_settings.show_actual_stdout
-            || command_result.fdbk_settings.show_actual_stderr)
-    );
-
-    if (output_not_available) {
-      if (show_info_only) {
-        return CorrectnessLevel.info_only;
-      }
+  command_result_output_correctness(output_is_correct: null | boolean) {
+    if (output_is_correct === null) {
       return CorrectnessLevel.not_available;
     }
-
-    let output_correct = (
-      (command_result.stdout_correct === null || command_result.stdout_correct)
-      && (command_result.stderr_correct === null || command_result.stderr_correct)
-    );
-
-    if (output_correct) {
+    else if (output_is_correct) {
       return CorrectnessLevel.all_correct;
-    }
-
-    let some_output_correct = (
-        (command_result.stdout_correct !== null && command_result.stdout_correct)
-        || (command_result.stderr_correct !== null && command_result.stderr_correct)
-    );
-
-    if (some_output_correct) {
-      return CorrectnessLevel.some_correct;
     }
     return CorrectnessLevel.none_correct;
   }

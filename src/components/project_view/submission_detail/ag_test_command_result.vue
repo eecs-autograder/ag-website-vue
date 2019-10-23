@@ -106,7 +106,8 @@
           </div>
         </template>
         <template v-else class="feedback-output-content-lengthy">
-          <div class="diff-container" v-if="d_stdout_diff !== null">
+          <div v-if="d_stdout_diff !== null"
+               class="diff-container">
             <diff ref="stdout_diff"
                   :diff_contents="d_stdout_diff"
                   diff_height="50vh"
@@ -126,7 +127,8 @@
           </div>
         </template>
         <template v-else>
-          <div class="diff-container" v-if="d_stderr_diff !== null">
+          <div v-if="d_stderr_diff !== null"
+               class="diff-container">
             <diff ref="stderr_diff"
                   :diff_contents="d_stderr_diff"
                   diff_height="50vh"
