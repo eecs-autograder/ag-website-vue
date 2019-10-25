@@ -23,7 +23,7 @@
                                        && !readonly_handgrading_results) ? 'none' : 'auto'}"
           >{{line === "" ? "\n" : line}}</td>
         </tr>
-        <tr v-for="comment of handgrading_comments.get(index, [])" ref="comment_row">
+        <tr v-for="comment of handgrading_comments.get(index, [])">
           <td></td>
           <td>
             <div class="comment"
@@ -35,9 +35,10 @@
                     ? `Lines ${comment.location.first_line + 1} - ${comment.location.last_line + 1}`
                     :`Line ${comment.location.first_line + 1}`}}
                 </div>
-                <i v-if="!readonly_handgrading_results"
+                <i v-if="!readonly_handgrading_results
+                         && (enable_custom_comments || !comment.is_custom)"
                    @click="delete_handgrading_comment(comment)"
-                   class="close fas fa-times"></i>
+                   class="delete fas fa-times"></i>
               </div>
               <div class="comment-message">
                 {{comment.short_description}}
@@ -55,22 +56,18 @@
 
     <context-menu ref="handgrading_context_menu"
                   v-if="handgrading_enabled"
-                  @is_open_changed="on_menu_is_open_changed">
-      <template v-slot:context_menu_items>
-        <context-menu-item v-for="annotation of handgrading_result.handgrading_rubric.annotations"
-                           :key="annotation.pk"
-                           @click="apply_annotation(annotation)">
-          <template slot="label">
-            {{annotation.short_description}} ({{annotation.deduction}})
-          </template>
-        </context-menu-item>
-        <div class="context-menu-divider"> </div>
-        <context-menu-item @click="open_comment_modal" v-if="enable_custom_comments">
-          <template slot="label">
-            Leave a comment
-          </template>
-        </context-menu-item>
-      </template>
+                  :is_open="d_context_menu_is_open"
+                  :coordinates="d_context_menu_coordinates"
+                  @close="d_context_menu_is_open = false">
+      <context-menu-item v-for="annotation of handgrading_result.handgrading_rubric.annotations"
+                          :key="annotation.pk"
+                          @click="apply_annotation(annotation)">
+        {{annotation.short_description}} ({{annotation.deduction}})
+      </context-menu-item>
+      <div class="context-menu-divider"> </div>
+      <context-menu-item @click="open_comment_modal" v-if="enable_custom_comments">
+        Leave a comment
+      </context-menu-item>
     </context-menu>
 
     <modal v-if="d_show_comment_modal"
@@ -151,6 +148,8 @@ export default class ViewFile extends Vue implements Created {
   // When this field is non-null, handgrading functionality will be made available.
   @Prop({default: null, type: HandgradingResult})
   handgrading_result!: HandgradingResult | null;
+  // Aliasing handgrading result for reactivity on members of handgrading_result
+  d_handgrading_result: HandgradingResult | null = null;
 
   @Prop({default: false, type: Boolean})
   enable_custom_comments!: boolean;
@@ -162,17 +161,16 @@ export default class ViewFile extends Vue implements Created {
   d_hovered_comment: HandgradingComment | null = null;
 
   d_context_menu_is_open = false;
+  d_context_menu_coordinates = {x: 0, y: 0};
   d_show_comment_modal = false;
-  // Since the context menu closes before the comment modal opens,
-  // the first and last lines are set to null before we can use them
-  // (can we fix that???). For now, we'll store the location here temporarily
-  d_pending_comment_location: Location | null = null;
   d_comment_text = '';
 
+  d_is_highlighting = false;
   d_first_highlighted_line: number | null = null;
   d_last_highlighted_line: number | null = null;
 
   async created() {
+    this.d_handgrading_result = this.handgrading_result;
     this.d_file_contents = await this.file_contents;
     this.d_filename = this.filename;
 
@@ -196,16 +194,16 @@ export default class ViewFile extends Vue implements Created {
   }
 
   get handgrading_comments(): SafeMap<number, HandgradingComment[]> {
-    if (this.handgrading_result === null) {
+    if (this.d_handgrading_result === null) {
       return new SafeMap();
     }
 
     let result =  new SafeMap<number, HandgradingComment[]>();
 
-    let annotations = this.handgrading_result.applied_annotations.filter(
+    let annotations = this.d_handgrading_result.applied_annotations.filter(
       (item) => item.location.filename === this.filename);
 
-    let comments = this.handgrading_result.comments.filter(
+    let comments = this.d_handgrading_result.comments.filter(
       (item) => item.location !== null && item.location.filename === this.filename);
 
     for (let item of chain<AppliedAnnotation | Comment>(annotations, comments)) {
@@ -238,10 +236,13 @@ export default class ViewFile extends Vue implements Created {
   start_highlighting(line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
+        || this.d_is_highlighting
         || this.d_context_menu_is_open
         || this.d_saving) {
       return;
     }
+
+    this.d_is_highlighting = true;
     this.d_first_highlighted_line = line_index;
     this.d_last_highlighted_line = line_index;
   }
@@ -249,9 +250,7 @@ export default class ViewFile extends Vue implements Created {
   grow_highlighted_region(line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
-        || this.d_first_highlighted_line === null
-        || this.d_last_highlighted_line === null
-        || this.d_context_menu_is_open) {
+        || !this.d_is_highlighting) {
       return;
     }
 
@@ -266,29 +265,23 @@ export default class ViewFile extends Vue implements Created {
   stop_highlighting(event: MouseEvent, line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
-        || this.d_first_highlighted_line === null
-        || this.d_last_highlighted_line === null
-        || this.d_context_menu_is_open) {
+        || !this.d_is_highlighting) {
       return;
     }
 
-    (<ContextMenu> this.$refs.handgrading_context_menu).show_context_menu(
-      event.pageX, event.pageY);
+    this.d_is_highlighting = false;
+    this.d_context_menu_coordinates = {x: event.pageX, y: event.pageY};
+    this.d_context_menu_is_open = true;
   }
 
   open_comment_modal() {
-    this.d_pending_comment_location = {
-      filename: this.filename,
-      first_line: this.d_first_highlighted_line!,
-      last_line: this.d_last_highlighted_line!,
-    };
     this.d_show_comment_modal = true;
     this.$nextTick(() => (<HTMLElement> this.$refs.comment_text).focus());
   }
 
   apply_annotation(annotation: Annotation) {
-    return toggle(this, 'd_saving', () => {
-      return AppliedAnnotation.create(this.handgrading_result!.pk, {
+    return toggle(this, 'd_saving', async () => {
+      await AppliedAnnotation.create(this.d_handgrading_result!.pk, {
         annotation: annotation.pk,
         location: {
           first_line: this.d_first_highlighted_line!,
@@ -296,32 +289,39 @@ export default class ViewFile extends Vue implements Created {
           filename: this.filename,
         }
       });
+      this.finish_commenting();
     });
   }
 
   create_comment() {
     return toggle(this, 'd_saving', async () => {
-      await Comment.create(this.handgrading_result!.pk, {
+      await Comment.create(this.d_handgrading_result!.pk, {
         text: this.d_comment_text,
-        location: this.d_pending_comment_location!
+        location: {
+          first_line: this.d_first_highlighted_line!,
+          last_line: this.d_last_highlighted_line!,
+          filename: this.filename,
+        }
       });
+      this.finish_commenting();
       this.d_show_comment_modal = false;
       this.d_comment_text = '';
     });
   }
 
   async delete_handgrading_comment(handgrading_comment: HandgradingComment) {
-    await handgrading_comment.delete();
-    this.d_hovered_comment = null;
+    if (!this.d_saving) {
+      await toggle(this, 'd_saving', async () => {
+        await handgrading_comment.delete();
+        this.d_hovered_comment = null;
+      });
+    }
   }
 
-  on_menu_is_open_changed(is_open: boolean) {
-    console.log('hai ' + is_open);
-    this.d_context_menu_is_open = is_open;
-    if (!this.d_context_menu_is_open) {
-      this.d_first_highlighted_line = null;
-      this.d_last_highlighted_line = null;
-    }
+  finish_commenting() {
+    this.d_context_menu_is_open = false;
+    this.d_first_highlighted_line = null;
+    this.d_last_highlighted_line = null;
   }
 }
 
@@ -411,7 +411,7 @@ $light-green: hsl(97, 42%, 79%);
       font-style: italic;
     }
 
-    .close {
+    .delete {
       margin-left: auto;
       // padding: 1px;
 

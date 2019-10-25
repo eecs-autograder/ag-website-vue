@@ -689,7 +689,8 @@ export function make_annotation(rubric_pk: number,
 const APPLIED_ANNOTATION_PKS = counter();
 
 export function make_applied_annotation(
-    handgrading_result: HandgradingResult, annotation: Annotation, location: Location
+    handgrading_result: HandgradingResult, annotation: Annotation, location: Location,
+    add_to_result = true
 ) {
     let result = new AppliedAnnotation({
         pk: APPLIED_ANNOTATION_PKS.next().value,
@@ -698,14 +699,17 @@ export function make_applied_annotation(
         location: location,
         last_modified: now_str(),
     });
-    handgrading_result.applied_annotations.push(result);
+    if (add_to_result) {
+        handgrading_result.applied_annotations.push(result);
+    }
     return result;
 }
 
 const COMMENT_PKS = counter();
 
 export function make_comment(
-    handgrading_result: HandgradingResult, location: Location | null, text: string
+    handgrading_result: HandgradingResult, location: Location | null, text: string,
+    add_to_result = true
 ) {
     let result = new Comment({
         pk: COMMENT_PKS.next().value,
@@ -714,7 +718,9 @@ export function make_comment(
         text: text,
         last_modified: now_str(),
     });
-    handgrading_result.comments.push(result);
+    if (add_to_result) {
+        handgrading_result.comments.push(result);
+    }
     return result;
 }
 

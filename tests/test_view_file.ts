@@ -98,7 +98,7 @@ describe('ViewFile handgrading tests', () => {
     let applied_annotation_no_long_description: ag_cli.AppliedAnnotation;
     let applied_annotation_with_long_description: ag_cli.AppliedAnnotation;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         let project = data_ut.make_project(data_ut.make_course().pk);
         rubric = data_ut.make_handgrading_rubric(project.pk);
         annotation_no_long_description = data_ut.make_annotation(rubric.pk, {
@@ -118,6 +118,8 @@ describe('ViewFile handgrading tests', () => {
         result = data_ut.make_handgrading_result(
             rubric, group.pk, data_ut.make_submission(group).pk);
 
+        // The comment with no location should get filtered out
+        data_ut.make_comment(result, null, 'No');
         comment = data_ut.make_comment(
             result, {filename: filename, first_line: 3, last_line: 5}, 'I am such very comment');
         applied_annotation_no_long_description = data_ut.make_applied_annotation(
@@ -133,9 +135,12 @@ describe('ViewFile handgrading tests', () => {
             propsData: {
                 filename: filename,
                 file_contents: content,
-                handgrading_result: result
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+                enable_custom_comments: true,
             }
         });
+        await wrapper.vm.$nextTick();
     });
 
     test('Commented lines highlighted', () => {
@@ -188,37 +193,150 @@ describe('ViewFile handgrading tests', () => {
         expect(code_lines.at(5).classes()).not.toContain('hovered-comment-line');
     });
 
-    test('Add new single-line applied annotation', async () => {
-        expect(wrapper.findAll('.comment').length).toEqual(3);
+    describe('Add applied annotation tests', () => {
+        let create_stub: sinon.SinonStub;
 
-        let new_applied_annotation = data_ut.make_applied_annotation(
+        function make_create_result(first_line: number, last_line: number) {
+            return data_ut.make_applied_annotation(
+                result,
+                annotation_no_long_description,
+                {
+                    filename: filename,
+                    first_line: first_line,
+                    last_line: last_line,
+                },
+                false
+            );
+        }
+
+        beforeEach(() => {
+            create_stub = sinon.stub(
+                ag_cli.AppliedAnnotation, 'create').rejects(new Error('Stub me'));
+        });
+
+        test('Add new single-line applied annotation', async () => {
+            expect(wrapper.findAll('.comment').length).toEqual(3);
+            let new_applied_annotation = make_create_result(0, 0);
+            create_stub.resolves(new_applied_annotation);
+
+            let code_lines = wrapper.findAll({ref: 'code_line'});
+            code_lines.at(0).trigger('mousedown');
+            code_lines.at(0).trigger('mouseup');
+
+            await wrapper.vm.$nextTick();
+
+            wrapper.findAll({name: 'ContextMenuItem'}).at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+
+            expect(create_stub.calledOnce).toBe(true);
+            expect(create_stub.calledOnceWith(
+                result.pk,
+                {
+                    annotation: annotation_no_long_description.pk,
+                    location: {
+                        first_line: 0,
+                        last_line: 0,
+                        filename: filename,
+                    }
+                }
+            )).toBe(true);
+
+            // Modifying the object we passed in should work because
+            // view file should not by copying or modifying the object.
+            result.applied_annotations.push(new_applied_annotation);
+            await wrapper.vm.$nextTick();
+            expect(wrapper.findAll('.comment').length).toEqual(4);
+            expect(wrapper.findAll('.comment').at(0).find('.comment-message').text()).toContain(
+                annotation_no_long_description.short_description
+            );
+
+            expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(false);
+            expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+            expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        });
+
+        test('Add new multi-line-annotation', async () => {
+            expect(wrapper.findAll('.comment').length).toEqual(3);
+
+            let new_applied_annotation = make_create_result(0, 2);
+            create_stub.resolves(new_applied_annotation);
+
+            let code_lines = wrapper.findAll({ref: 'code_line'});
+            // Highlighed region expands up and down
+            code_lines.at(1).trigger('mousedown');
+            code_lines.at(0).trigger('mouseenter');
+            code_lines.at(1).trigger('mouseenter');
+            code_lines.at(2).trigger('mouseenter');
+            code_lines.at(2).trigger('mouseup');
+
+            await wrapper.vm.$nextTick();
+
+            wrapper.findAll({name: 'ContextMenuItem'}).at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+
+            expect(create_stub.calledOnce).toBe(true);
+            expect(create_stub.calledOnceWith(
+                result.pk,
+                {
+                    annotation: annotation_no_long_description.pk,
+                    location: {
+                        first_line: 0,
+                        last_line: 2,
+                        filename: filename,
+                    }
+                }
+            )).toBe(true);
+
+            wrapper.vm.handgrading_result.applied_annotations.push(new_applied_annotation);
+            await wrapper.vm.$nextTick();
+            expect(wrapper.findAll('.comment').length).toEqual(4);
+            expect(wrapper.findAll('.comment').at(0).find('.comment-message').text()).toContain(
+                annotation_no_long_description.short_description
+            );
+
+            expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(false);
+            expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+            expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        });
+    });
+
+    test('Custom comments enabled', async () => {
+        expect(wrapper.vm.enable_custom_comments).toBe(true);
+        expect(wrapper.findAll('.comment').length).toEqual(3);
+        expect(wrapper.findAll('.delete').length).toEqual(3);
+
+        let text = 'I am such a very comment indeed';
+        let new_comment = data_ut.make_comment(
             result,
-            annotation_no_long_description,
             {
                 filename: filename,
-                first_line: 0,
-                last_line: 0,
+                first_line: 2,
+                last_line: 2,
             },
+            text,
+            false
         );
-        let create_stub = sinon.stub(ag_cli.AppliedAnnotation, 'create').resolves(
-            new_applied_annotation);
+        let create_stub = sinon.stub(ag_cli.Comment, 'create').resolves(new_comment);
 
         let code_lines = wrapper.findAll({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
-
         await wrapper.vm.$nextTick();
 
-        console.log('clicky')
-        wrapper.findAll({name: 'ContextMenuItem'}).at(0).trigger('click');
+        wrapper.findAll({name: 'ContextMenuItem'}).at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'comment_text'}).setValue(text);
+        wrapper.find('.modal .green-button').trigger('click');
+
         expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        expect(wrapper.find('.modal').exists()).toBe(false);
 
         expect(create_stub.calledOnce).toBe(true);
-        // console.log(create_stub.getCall(0));
         expect(create_stub.calledOnceWith(
             result.pk,
             {
-                annotation: annotation_no_long_description.pk,
+                text: text,
                 location: {
                     first_line: 0,
                     last_line: 0,
@@ -227,40 +345,166 @@ describe('ViewFile handgrading tests', () => {
             }
         )).toBe(true);
 
-        wrapper.vm.handgrading_result.applied_annotations.push(new_applied_annotation);
+        wrapper.vm.handgrading_result.comments.push(new_comment);
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').at(0).find('comment-header').text()).toContain(
-            annotation_no_long_description.short_description
+        expect(wrapper.findAll('.comment').at(0).find('.comment-message').text()).toContain(
+            text
         );
-        fail();
     });
 
-    test('Add new multi-line-annotation', () => {
-        fail();
+    test('Custom comments disabled', async () => {
+        wrapper.setProps({enable_custom_comments: false});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.delete').length).toEqual(2);
+        // Custom comments should NOT be deletable, but applied annotations
+        // should be
+        expect(wrapper.findAll('.comment').at(0).find('.delete').exists()).toBe(false);
+        expect(wrapper.findAll('.comment').at(1).find('.delete').exists()).toBe(true);
+        expect(wrapper.findAll('.comment').at(2).find('.delete').exists()).toBe(true);
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(0).trigger('mouseup');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findAll({name: 'ContextMenuItem'}).length).toEqual(2);
     });
 
-    test('Highlighted region can expand up and down', () => {
-        fail();
+    test('Delete applied annotation', async () => {
+        expect(wrapper.findAll('.comment').length).toEqual(3);
+
+        let delete_stub = sinon.stub(applied_annotation_with_long_description, 'delete');
+        wrapper.findAll('.delete').at(2).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        expect(delete_stub.calledOnce).toBe(true);
+
+        wrapper.vm.handgrading_result.applied_annotations.pop();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.comment').length).toEqual(2);
     });
 
-    test('Readonly mode', () => {
-        fail();
+    test('Delete comment', async () => {
+        expect(wrapper.findAll('.comment').length).toEqual(3);
+
+        let delete_stub = sinon.stub(comment, 'delete');
+        wrapper.findAll('.delete').at(0).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        expect(delete_stub.calledOnce).toBe(true);
+
+        wrapper.vm.handgrading_result.comments.pop();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.comment').length).toEqual(2);
     });
 
-    test('Handgraders can leave comments', () => {
-        fail();
+    test('Readonly mode', async () => {
+        wrapper.setProps({readonly_handgrading_results: true});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.delete').length).toEqual(0);
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(1).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseup');
+
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
     });
 
-    test('Handgraders cannot leave comments', () => {
-        fail();
+    test('Highlighting events ignored while saving', async () => {
+        wrapper.setData({d_saving: true});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(1).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseup');
+
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
     });
 
-    test('Delete comment or annotation', () => {
-        fail();
+    test('Highlight events out of order ignored', () => {
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mouseenter');
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+
+        code_lines.at(0).trigger('mouseup');
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(1).trigger('mousedown');
+        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
     });
 
-    test('File changed, handgrading data updated', () => {
-        fail();
+    test('Highlighting disabled when context menu open', async () => {
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(0).trigger('mouseup');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
+
+        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+
+        code_lines.at(1).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseenter');
+        code_lines.at(3).trigger('mouseenter');
+        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+
+        code_lines.at(4).trigger('mousedown');
+        code_lines.at(4).trigger('mouseup');
+        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+    });
+
+    test('Deletion disabled while saving', async () => {
+        wrapper.setData({d_saving: true});
+        await wrapper.vm.$nextTick();
+        let delete_stubs = [
+            sinon.stub(comment, 'delete'),
+            sinon.stub(applied_annotation_with_long_description, 'delete'),
+            sinon.stub(applied_annotation_no_long_description, 'delete'),
+        ];
+
+        for (let delete_button of wrapper.findAll('.delete').wrappers) {
+            delete_button.trigger('click');
+            await wrapper.vm.$nextTick();
+        }
+
+        for (let stub of delete_stubs) {
+            expect(stub.callCount).toEqual(0);
+        }
+    });
+
+    test('Highlighting events ignored while handgrading disabled', () => {
+        wrapper.setProps({handgrading_result: null});
+        wrapper.setData({d_handgrading_result: null});
+
+        expect(wrapper.findAll('.delete').length).toEqual(0);
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(1).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseenter');
+        code_lines.at(2).trigger('mouseup');
+
+        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
     });
 });
