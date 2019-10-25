@@ -19,33 +19,26 @@ afterEach(() => {
 @Component({
     template: `<div class="outermost">
                 <div>
-                    <div class="context-menu-area"
-                         @click="$refs.context_menu.show_context_menu($event.pageX, $event.pageY)">
-                      <p class="greeting"
-                         :style="[{color: 'black', font: 'Arial'}]"> Happy Halloween </p>
-                    </div>
-                    <context-menu ref="context_menu">
-                      <template slot="context_menu_items">
-                          <context-menu-item ref="item_1"
-                            @click="change_greeting_color('orange')">
-                            <template slot="label">
-                              One
-                            </template>
-                          </context-menu-item>
-                          <context-menu-item ref="item_2"
-                            @click="make_greeting_cursive()">
-                            <template slot="label">
-                              Two
-                            </template>
-                          </context-menu-item>
-                          <context-menu-item ref="item_3"
-                            @click="change_greeting_text('Boo!')">
-                            <template slot="label">
-                              Three
-                            </template>
-                          </context-menu-item>
-                      </template>
-                    </context-menu>
+                  <div class="context-menu-area"
+                       @click="show_menu">
+                    <p class="greeting"
+                       :style="[{color: 'black', font: 'Arial'}]"> Happy Halloween </p>
+                  </div>
+                  <context-menu ref="context_menu" :is_open="is_open" :coordinates="coordinates"
+                                @close="is_open = false">
+                    <context-menu-item ref="item_1" @click="change_greeting_color('orange')">
+                      One
+                    </context-menu-item>
+                    <context-menu-item ref="item_2" @click="make_greeting_cursive()">
+                      Two
+                    </context-menu-item>
+                    <context-menu-item ref="item_3" @click="change_greeting_text('Boo!')">
+                      Three
+                    </context-menu-item>
+                    <context-menu-item ref="disabled_item" :disabled="true">
+                      Disabled
+                    </context-menu-item>
+                  </context-menu>
                 </div>
               <input id="outside" type="text"/>
              </div>`,
@@ -55,6 +48,9 @@ afterEach(() => {
     }
 })
 class WrapperComponent extends Vue {
+    coordinates = {x: 0, y: 0};
+    is_open = false;
+
     change_greeting_color(color_in: string) {
         let greeting = <HTMLElement> this.$el.getElementsByClassName(
             'greeting'
@@ -75,95 +71,15 @@ class WrapperComponent extends Vue {
         )[0];
         greeting.innerHTML = new_text;
     }
+
+    show_menu(event: MouseEvent) {
+        this.is_open = true;
+        this.coordinates = {x: event.pageX, y: event.pageY};
+    }
 }
 
 describe('ContextMenu tests', () => {
-    test("Context Menu Item data is set to the values passed in",
-         async () => {
-         @Component({
-             template: `<div>
-                <div class="context-menu-area"
-                     @click="$refs.context_menu.show_context_menu($event.pageX, $event.pageY)">
-                  <p class="greeting"> Happy Halloween </p>
-                </div>
-                <context-menu ref="context_menu">
-                  <template slot="context_menu_items">
-                      <context-menu-item ref="item_1"
-                        @click="fun('one')">
-                        <template slot="label">
-                          One
-                        </template>
-                      </context-menu-item>
-                      <context-menu-item ref="item_2"
-                        :disabled="true">
-                        <template slot="label">
-                          Two
-                        </template>
-                      </context-menu-item>
-                      <context-menu-item ref="item_3"
-                        @click="fun('three')">
-                        <template slot="label">
-                          Three
-                        </template>
-                      </context-menu-item>
-                  </template>
-                </context-menu>
-              </div>`,
-             components: {
-                 'context-menu': ContextMenu,
-                 'context-menu-item': ContextMenuItem
-             }
-         })
-         class WrapperComponent2 extends Vue {
-             fun(word: string) {}
-         }
-         let wrapper = mount(WrapperComponent2);
-         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
-
-         let context_menu_area = wrapper.find('.context-menu-area');
-
-         context_menu_area.trigger('click');
-         await context_menu.$nextTick();
-
-         let context_menu_item_1 = <ContextMenuItem> wrapper.find({ref: 'item_1'}).vm;
-         let context_menu_item_2 = <ContextMenuItem> wrapper.find({ref: 'item_2'}).vm;
-         let context_menu_item_3 = <ContextMenuItem> wrapper.find({ref: 'item_3'}).vm;
-
-         expect(context_menu_item_1.$el.classList).toContain('hoverable-item');
-         expect(context_menu_item_2.$el.classList).toContain('disabled-item');
-         expect(context_menu_item_3.$el.classList).toContain('hoverable-item');
-
-         wrapper.destroy();
-    });
-
-    test("Clicking on a context menu item closes the context menu",
-         async () => {
-        let wrapper = mount(WrapperComponent);
-        let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
-
-        let context_menu_area = wrapper.find('.context-menu-area');
-
-        context_menu_area.trigger('click');
-        await context_menu.vm.$nextTick();
-
-        expect(context_menu.isVisible()).toBe(true);
-        expect(context_menu.vm.menu_is_open).toBe(true);
-        expect(context_menu.emitted().is_open_changed[0][0]).toBe(true);
-
-        let context_menu_item_1 = wrapper.find({ref: 'item_1'});
-
-        context_menu_item_1.trigger('click');
-        await context_menu.vm.$nextTick();
-
-        expect(context_menu.isVisible()).toBe(false);
-        expect(context_menu.vm.menu_is_open).toBe(false);
-        expect(context_menu.emitted().is_open_changed[1][0]).toBe(false);
-
-        wrapper.destroy();
-    });
-
-    test("Context Menu Items in a Context Menu can handle click events differently",
-         async () => {
+    test("Context Menu Item click handlers", async () => {
         let wrapper = mount(WrapperComponent);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
@@ -205,9 +121,7 @@ describe('ContextMenu tests', () => {
         wrapper.destroy();
     });
 
-    test("Clicking inside the context menu area makes the menu visible, and clicking" +
-         "outside the context menu area hides it",
-         async () => {
+    test("Clicking outside the context menu emits close event", async () => {
         let wrapper = mount(WrapperComponent);
         let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
         let context_menu_area = wrapper.find('.context-menu-area');
@@ -221,163 +135,70 @@ describe('ContextMenu tests', () => {
         outside_input.element.focus();
         await context_menu.vm.$nextTick();
 
+        expect(context_menu.emitted().close.length).not.toEqual(0);
         expect(context_menu.isVisible()).toBe(false);
 
         wrapper.destroy();
     });
 
-    test("toggle disabled property on context menu item",
-         async () => {
-        @Component({
-            template: `<div>
-            <div class="context-menu-area"
-                 @click="$refs.context_menu.show_context_menu($event.pageX, $event.pageY)">
-            </div>
-            <context-menu ref="context_menu">
-              <template slot="context_menu_items">
-                  <context-menu-item ref="item_1"
-                    :disabled="is_disabled"
-                    @click="print_label('One')">
-                    <template slot="label">
-                      One
-                    </template>
-                  </context-menu-item>
-              </template>
-            </context-menu>
-          </div>`,
-            components: {
-                'context-menu': ContextMenu,
-                'context-menu-item': ContextMenuItem
-            }
-        })
-        class WrapperComponent2 extends Vue {
-            is_disabled = true;
+    test("Click event not emitted when disabled item clicked", async () => {
+        let wrapper = mount(WrapperComponent);
+        let menu_wrapper = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
+        wrapper.find('.context-menu-area').trigger('click');
+        await menu_wrapper.vm.$nextTick();
 
-            print_label(label: string) {}
-        }
-        let wrapper = mount(WrapperComponent2);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
-        let context_menu_area = wrapper.find('.context-menu-area');
-
-        context_menu_area.trigger('click');
-        await context_menu.$nextTick();
-
-        let context_menu_item_1 = wrapper.find({ref: 'item_1'});
-        context_menu_item_1.trigger('click');
-
-        expect(context_menu_item_1.emitted().click).toBeUndefined();
-
-        wrapper.vm.is_disabled = false;
-        context_menu_item_1.trigger('click');
-
-        expect(context_menu_item_1.emitted().click.length).toBe(1);
-
-        wrapper.destroy();
+        let disabled_wrapper = wrapper.find({ref: 'disabled_item'});
+        disabled_wrapper.trigger('click');
+        expect(disabled_wrapper.emitted().click).toBeUndefined();
     });
 
-    test("Menu is not closed when disabled context menu items are clicked",
-         async () => {
-        @Component({
-            template: `<div>
-        <div class="context-menu-area"
-             @click="$refs.context_menu.show_context_menu($event.pageX, $event.pageY)">
-          <p class="greeting" :style="[{color: 'black'}]"> Hello </p>
-        </div>
-        <context-menu ref="context_menu">
-          <template slot="context_menu_items">
-              <context-menu-item ref="item_1"
-                :disabled="true"
-                @click="change_greeting_color('red')">
-                <template slot="label">
-                  One
-                </template>
-              </context-menu-item>
-          </template>
-        </context-menu>
-      </div>`,
-            components: {
-                'context-menu': ContextMenu,
-                'context-menu-item': ContextMenuItem
-            }
-        })
-        class WrapperComponent2 extends Vue {
-            change_greeting_color(color_in: string) {
-                let greeting_para = <HTMLElement> this.$el.getElementsByClassName(
-                    'greeting'
-                )[0];
-                greeting_para.style.color = color_in;
-            }
-        }
-        let wrapper = mount(WrapperComponent2);
-        let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
-        let context_menu_area = wrapper.find('.context-menu-area');
-        let greeting = wrapper.find('.greeting');
+    test("Position adjusted when too near right edge", async () => {
+        // @Component({
+        //     template: `<div>
+        //                  <div class="too-far-right-square"
+        //                       @click="$refs.context_menu.show_context_menu($event)">
+        //                  </div>
+        //                 <context-menu ref="context_menu">
+        //                   <template slot="context_menu_items">
+        //                       <context-menu-item ref="item_1"
+        //                         @click="change_greeting_color('red')">
+        //                         <template slot="label">
+        //                          One
+        //                         </template>
+        //                       </context-menu-item>
+        //                       <context-menu-item ref="item_2"
+        //                         @click="change_greeting_color('blue')">
+        //                         <template slot="label">
+        //                           Two
+        //                         </template>
+        //                       </context-menu-item>
+        //                   </template>
+        //                 </context-menu>
+        //               </div>`,
+        //     components: {
+        //         'context-menu': ContextMenu,
+        //         'context-menu-item': ContextMenuItem
+        //     }
+        // })
+        // class WrapperComponent2 extends Vue {
 
-        expect(greeting.element.style.color).toBe("black");
+        //     change_greeting_color(color_in: string) {
+        //         let greeting = <HTMLElement> this.$el.getElementsByClassName(
+        //             'greeting'
+        //         )[0];
+        //         greeting.style.color = color_in;
+        //     }
+        // }
 
-        context_menu_area.trigger('click');
-        await context_menu.vm.$nextTick();
-
-        let context_menu_item_1 = <ContextMenuItem> wrapper.find({ref: 'item_1'}).vm;
-        expect(context_menu_item_1.disabled).toBe(true);
-
-        wrapper.find({ref: 'item_1'}).trigger('click');
-        await context_menu.vm.$nextTick();
-
-        expect(greeting.element.style.color).toBe("black");
-        expect(context_menu.isVisible()).toBe(true);
-
-        wrapper.destroy();
-    });
-
-    test("When a user clicks too near to the right edge, the positioning of the " +
-              "context menu is adjusted",
-         async () => {
-        @Component({
-            template: `<div>
-                         <div class="too-far-right-square"
-                              @click="$refs.context_menu.show_context_menu($event)">
-                         </div>
-                        <context-menu ref="context_menu">
-                          <template slot="context_menu_items">
-                              <context-menu-item ref="item_1"
-                                @click="change_greeting_color('red')">
-                                <template slot="label">
-                                 One
-                                </template>
-                              </context-menu-item>
-                              <context-menu-item ref="item_2"
-                                @click="change_greeting_color('blue')">
-                                <template slot="label">
-                                  Two
-                                </template>
-                              </context-menu-item>
-                          </template>
-                        </context-menu>
-                      </div>`,
-            components: {
-                'context-menu': ContextMenu,
-                'context-menu-item': ContextMenuItem
-            }
-        })
-        class WrapperComponent2 extends Vue {
-
-            change_greeting_color(color_in: string) {
-                let greeting = <HTMLElement> this.$el.getElementsByClassName(
-                    'greeting'
-                )[0];
-                greeting.style.color = color_in;
-            }
-        }
-
-        let wrapper = mount(WrapperComponent2);
+        let wrapper = mount(WrapperComponent);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
         sinon.stub(document.body, 'clientWidth').value(800);
         sinon.stub(document.body, 'clientHeight').value(500);
         sinon.stub(context_menu.$el, 'clientWidth').value(10);
 
-        context_menu.show_context_menu(798, 2);
+        wrapper.vm.coordinates = {x: 798, y: 2};
+        wrapper.vm.is_open = true;
         await context_menu.$nextTick();
         let new_left = (<HTMLElement> context_menu.$el).style.left;
         expect(new_left).not.toBeNull();
@@ -390,54 +211,16 @@ describe('ContextMenu tests', () => {
         wrapper.destroy();
     });
 
-    test("When a user clicks too near to the bottom edge, the positioning of the " +
-              "context menu is adjusted",
-         async () => {
-        @Component({
-            template: `<div>
-                     <div class="too-far-right-square"
-                          @click="$refs.context_menu.show_context_menu($event)">
-                     </div>
-                    <context-menu ref="context_menu">
-                      <template slot="context_menu_items">
-                          <context-menu-item ref="item_1"
-                            @click="change_greeting_color('red')">
-                            <template slot="label">
-                              One
-                            </template>
-                          </context-menu-item>
-                          <context-menu-item ref="item_2"
-                            @click="change_greeting_color('blue')">
-                            <template slot="label">
-                              Two
-                            </template>
-                          </context-menu-item>
-                      </template>
-                    </context-menu>
-                  </div>`,
-            components: {
-                'context-menu': ContextMenu,
-                'context-menu-item': ContextMenuItem
-            }
-        })
-        class WrapperComponent2 extends Vue {
-
-            change_greeting_color(color_in: string) {
-                let greeting = <HTMLElement> this.$el.getElementsByClassName(
-                    'greeting'
-                )[0];
-                greeting.style.color = color_in;
-            }
-        }
-
-        let wrapper = mount(WrapperComponent2);
+    test("Position adjusted when too close to bottom edge", async () => {
+        let wrapper = mount(WrapperComponent);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
         sinon.stub(document.body, 'clientWidth').value(800);
         sinon.stub(document.body, 'clientHeight').value(500);
         sinon.stub(context_menu.$el, 'clientHeight').value(15);
 
-        context_menu.show_context_menu(2, 498);
+        wrapper.vm.coordinates = {x: 2, y: 498};
+        wrapper.vm.is_open = true;
         await context_menu.$nextTick();
         let new_top = (<HTMLElement> context_menu.$el).style.top;
         expect(new_top).not.toBeNull();
@@ -461,13 +244,18 @@ describe('ContextMenu tests', () => {
     test('Invalid Context Menu Content', () => {
         sinon.stub(console, 'error');
         const component = {
-            template:  `<context_menu ref="context_menu">
-                          <template slot="context_menu_items">
-                            <div>Hello</div>
-                          </template>
+            template:  `<context_menu ref="context_menu"
+                                      :is_open="is_open" :coordinates="coordinates">
+                          <div>Hello</div>
                         </context_menu>`,
             components: {
                 'context_menu': ContextMenu,
+            },
+            data: function() {
+                return {
+                    is_open: false,
+                    coordinates: {x: 0, y: 0}
+                }
             }
         };
 
@@ -480,16 +268,16 @@ describe('ContextMenu tests', () => {
         let wrapper = mount(WrapperComponent);
         let context_menu_area = wrapper.find('.context-menu-area');
         let context_menu_wrapper = wrapper.find('#context-menu-container');
-        let context_menu_component = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
         context_menu_area.trigger('click');
-
-        expect(context_menu_component.menu_is_open).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(context_menu_wrapper.isVisible()).toBe(true);
 
         context_menu_wrapper.trigger('keyup.esc');
-        await context_menu_component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(context_menu_component.menu_is_open).toBe(false);
+        expect(context_menu_wrapper.isVisible()).toBe(false);
+
         wrapper.destroy();
     });
 });

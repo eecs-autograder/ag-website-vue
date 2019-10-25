@@ -4,21 +4,24 @@
        id="context-menu-container"
        @blur="hide_context_menu"
        @keyup.esc="hide_context_menu"
-       v-show="d_is_open">
-    <slot name="context_menu_items">
+       v-show="is_open">
+    <slot>
       <context-menu-item :disabled="true">
-        <template slot="label">
-          <div style="width: 100px; height: 20px"> </div>
-        </template>
+        <div style="width: 100px; height: 20px"> </div>
       </context-menu-item>
     </slot>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
+
+interface MenuCoordinates {
+  x: number;
+  y: number;
+}
 
 @Component({
   components: {
@@ -26,7 +29,11 @@ import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
   }
 })
 export default class ContextMenu extends Vue {
-  private d_is_open = false;
+  @Prop({required: true})
+  coordinates!: MenuCoordinates;
+
+  @Prop({required: true, type: Boolean})
+  is_open!: boolean;
 
   mounted() {
     let children = this.$el.getElementsByClassName('context-menu-option');
@@ -35,18 +42,15 @@ export default class ContextMenu extends Vue {
     }
   }
 
-  get menu_is_open() {
-    return this.d_is_open;
-  }
-
   hide_context_menu() {
-    this.d_is_open = false;
-    this.$emit('is_open_changed', false);
+    this.$emit('close');
   }
 
-  show_context_menu(x_coordinate: number, y_coordinate: number) {
-    this.d_is_open = true;
-    this.$emit('is_open_changed', true);
+  @Watch('is_open')
+  is_open_changed(new_value: boolean, old_value: boolean) {
+    if (!this.is_open) {
+      this.$emit('close');
+    }
 
     this.$nextTick(() => {
       (<HTMLElement> this.$el).style.left = "0px";
@@ -54,19 +58,19 @@ export default class ContextMenu extends Vue {
       let height = (<HTMLElement> this.$el).clientHeight;
       let width = (<HTMLElement> this.$el).clientWidth;
 
-      let right_edge: number = x_coordinate + width;
-      let bottom_edge: number = y_coordinate + height;
+      let right_edge: number = this.coordinates.x + width;
+      let bottom_edge: number = this.coordinates.y + height;
 
       if ((right_edge) > document.body.clientWidth) {
-        x_coordinate = (x_coordinate - width) - 5;
+        this.coordinates.x = (this.coordinates.x - width) - 5;
       }
 
       if ((bottom_edge) > document.body.clientHeight) {
-        y_coordinate = (y_coordinate - height) - 5;
+        this.coordinates.y = (this.coordinates.y - height) - 5;
       }
 
-      (<HTMLElement> this.$el).style.left = x_coordinate + "px";
-      (<HTMLElement> this.$el).style.top = y_coordinate + "px";
+      (<HTMLElement> this.$el).style.left = this.coordinates.x + "px";
+      (<HTMLElement> this.$el).style.top = this.coordinates.y + "px";
 
       // focus must be applied after the element is visible for the ESC
       // key to work

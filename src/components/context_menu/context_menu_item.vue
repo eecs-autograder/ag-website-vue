@@ -2,7 +2,7 @@
   <div class="context-menu-option"
        :class="{'hoverable-item': !disabled, 'disabled-item': disabled}"
        @click.stop="handle_click">
-    <slot name="label"> </slot>
+    <slot></slot>
   </div>
 </template>
 
@@ -19,8 +19,6 @@
     handle_click(event: Event) {
       if (!this.disabled) {
         this.$emit('click');
-        let parent = <ContextMenu> this.$parent;
-        parent.hide_context_menu();
       }
     }
   }
