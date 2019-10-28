@@ -47,7 +47,11 @@
             </template>
             <template v-else>
               <div v-if="!d_setup_stdout_content" class="short-output"> No output </div>
-              <pre v-else class="lengthy-output">{{d_setup_stdout_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_setup_stdout_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -64,7 +68,11 @@
             </template>
             <template v-else>
               <div v-if="!d_setup_stderr_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_setup_stderr_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_setup_stderr_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -183,7 +191,11 @@
             </template>
             <template v-else>
               <div v-if="!d_student_test_names_stdout_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_student_test_names_stdout_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_student_test_names_stdout_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -201,7 +213,11 @@
             </template>
             <template v-else>
               <div v-if="!d_student_test_names_stderr_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_student_test_names_stderr_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_student_test_names_stderr_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -234,7 +250,11 @@
             </template>
             <template v-else>
               <div v-if="!d_validity_check_stdout_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_validity_check_stdout_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_validity_check_stdout_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -252,8 +272,11 @@
             </template>
             <template v-else>
               <div v-if="!d_validity_check_stderr_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_validity_check_stderr_content}}
-              </pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_validity_check_stderr_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -315,7 +338,11 @@
             </template>
             <template v-else>
               <div v-if="!d_grade_buggy_stdout_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_grade_buggy_stdout_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_grade_buggy_stdout_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -333,7 +360,11 @@
             </template>
             <template v-else>
               <div v-if="!d_grade_buggy_stderr_content" class="short-output">No output</div>
-              <pre v-else class="lengthy-output">{{d_grade_buggy_stderr_content}}</pre>
+              <div v-else
+                   class="lengthy-output">
+                <view-file :file_contents="d_grade_buggy_stderr_content"
+                           view_file_max_height="50vh"></view-file>
+              </div>
             </template>
           </div>
         </div>
@@ -356,10 +387,12 @@ import {
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
+import ViewFile from "@/components/view_file.vue";
 
 @Component({
   components: {
-    CorrectnessIcon
+    CorrectnessIcon,
+    ViewFile
   }
 })
 export default class MutationSuiteResult extends Vue {
@@ -381,14 +414,14 @@ export default class MutationSuiteResult extends Vue {
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
 
-  d_setup_stdout_content: string | null = null;
-  d_setup_stderr_content: string | null = null;
-  d_student_test_names_stdout_content: string | null = null;
-  d_student_test_names_stderr_content: string | null = null;
-  d_validity_check_stdout_content: string | null = null;
-  d_validity_check_stderr_content: string | null = null;
-  d_grade_buggy_stdout_content: string | null = null;
-  d_grade_buggy_stderr_content: string | null = null;
+  d_setup_stdout_content: Promise<string> | null = null;
+  d_setup_stderr_content: Promise<string> | null = null;
+  d_student_test_names_stdout_content: Promise<string> | null = null;
+  d_student_test_names_stderr_content: Promise<string> | null = null;
+  d_validity_check_stdout_content: Promise<string> | null = null;
+  d_validity_check_stderr_content: Promise<string> | null = null;
+  d_grade_buggy_stdout_content: Promise<string> | null = null;
+  d_grade_buggy_stderr_content: Promise<string> | null = null;
 
   d_show_buggy_implementations_output = false;
   d_show_student_test_names_output = false;
@@ -435,8 +468,8 @@ export default class MutationSuiteResult extends Vue {
         this.d_load_grade_buggy_output = true;
         this.d_grade_buggy_stdout_loaded = false;
         this.d_grade_buggy_stderr_loaded = false;
-        await this.load_grade_buggy_stdout_content();
-        await this.load_grade_buggy_stderr_content();
+        this.load_grade_buggy_stdout_content();
+        this.load_grade_buggy_stderr_content();
       }
     }
   }
@@ -449,8 +482,8 @@ export default class MutationSuiteResult extends Vue {
         this.d_load_student_test_names_output = true;
         this.d_student_test_names_stdout_loaded = false;
         this.d_student_test_names_stderr_loaded = false;
-        await this.load_student_test_names_stdout_content();
-        await this.load_student_test_names_stderr_content();
+        this.load_student_test_names_stdout_content();
+        this.load_student_test_names_stderr_content();
       }
     }
   }
@@ -463,8 +496,8 @@ export default class MutationSuiteResult extends Vue {
         this.d_load_validity_check_output = true;
         this.d_validity_check_stdout_loaded = false;
         this.d_validity_check_stderr_loaded = false;
-        await this.load_validity_check_stdout_content();
-        await this.load_validity_check_stderr_content();
+        this.load_validity_check_stdout_content();
+        this.load_validity_check_stderr_content();
       }
     }
   }
@@ -485,28 +518,29 @@ export default class MutationSuiteResult extends Vue {
     this.d_validity_check_stdout_loaded = false;
     this.d_validity_check_stderr_loaded = false;
 
-    await this.load_setup_stdout_content();
-    await this.load_setup_stderr_content();
+    this.load_setup_stdout_content();
+    this.load_setup_stderr_content();
     if (this.d_load_student_test_names_output) {
-      await this.load_student_test_names_stdout_content();
-      await this.load_student_test_names_stderr_content();
+      this.load_student_test_names_stdout_content();
+      this.load_student_test_names_stderr_content();
     }
     if (this.d_load_validity_check_output) {
-      await this.load_validity_check_stdout_content();
-      await this.load_validity_check_stderr_content();
+      this.load_validity_check_stdout_content();
+      this.load_validity_check_stderr_content();
     }
     if (this.d_load_grade_buggy_output) {
-      await this.load_grade_buggy_stdout_content();
-      await this.load_grade_buggy_stderr_content();
+      this.load_grade_buggy_stdout_content();
+      this.load_grade_buggy_stderr_content();
     }
   }
 
-  async load_setup_stdout_content() {
-    if (this.d_output_size!.setup_stdout_size === null) {
+  load_setup_stdout_content() {
+    if (this.d_output_size!.setup_stdout_size === null
+        || this.d_output_size!.setup_stdout_size === 0) {
       this.d_setup_stdout_content = null;
     }
     else {
-      this.d_setup_stdout_content = await ResultOutput.get_mutation_test_suite_result_setup_stdout(
+      this.d_setup_stdout_content = ResultOutput.get_mutation_test_suite_result_setup_stdout(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category
@@ -515,12 +549,13 @@ export default class MutationSuiteResult extends Vue {
     this.d_setup_stdout_loaded = true;
   }
 
-  async load_setup_stderr_content() {
-    if (this.d_output_size!.setup_stderr_size === null) {
+  load_setup_stderr_content() {
+    if (this.d_output_size!.setup_stderr_size === null
+        || this.d_output_size!.setup_stderr_size === 0) {
       this.d_setup_stderr_content = null;
     }
     else {
-      this.d_setup_stderr_content = await ResultOutput.get_mutation_test_suite_result_setup_stderr(
+      this.d_setup_stderr_content = ResultOutput.get_mutation_test_suite_result_setup_stderr(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category
@@ -529,14 +564,14 @@ export default class MutationSuiteResult extends Vue {
     this.d_setup_stderr_loaded = true;
   }
 
-  async load_student_test_names_stdout_content() {
-    if (this.d_output_size!.get_student_test_names_stdout_size
-        === null) {
+  load_student_test_names_stdout_content() {
+    if (this.d_output_size!.get_student_test_names_stdout_size === null
+        || this.d_output_size!.get_student_test_names_stdout_size === 0) {
       this.d_student_test_names_stdout_content = null;
     }
     else {
       this.d_student_test_names_stdout_content
-          = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
+          = ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category
@@ -545,14 +580,14 @@ export default class MutationSuiteResult extends Vue {
     this.d_student_test_names_stdout_loaded = true;
   }
 
-  async load_student_test_names_stderr_content() {
-    if (this.d_output_size!.get_student_test_names_stderr_size
-        === null) {
+  load_student_test_names_stderr_content() {
+    if (this.d_output_size!.get_student_test_names_stderr_size === null
+        || this.d_output_size!.get_student_test_names_stderr_size === 0) {
       this.d_student_test_names_stderr_content = null;
     }
     else {
       this.d_student_test_names_stderr_content
-          = await ResultOutput.get_mutation_test_suite_result_get_student_test_names_stderr(
+          = ResultOutput.get_mutation_test_suite_result_get_student_test_names_stderr(
         this.submission.pk,
         this.mutation_test_suite_result.pk,
         this.fdbk_category
@@ -561,13 +596,14 @@ export default class MutationSuiteResult extends Vue {
     this.d_student_test_names_stderr_loaded = true;
   }
 
-  async load_validity_check_stdout_content() {
-    if (this.d_output_size!.validity_check_stdout_size === null) {
+  load_validity_check_stdout_content() {
+    if (this.d_output_size!.validity_check_stdout_size === null
+        || this.d_output_size!.validity_check_stdout_size === 0) {
       this.d_validity_check_stdout_content = null;
     }
     else {
       this.d_validity_check_stdout_content
-          = await ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
+          = ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category
@@ -576,13 +612,14 @@ export default class MutationSuiteResult extends Vue {
     this.d_validity_check_stdout_loaded = true;
   }
 
-  async load_validity_check_stderr_content() {
-    if (this.d_output_size!.validity_check_stderr_size === null) {
+  load_validity_check_stderr_content() {
+    if (this.d_output_size!.validity_check_stderr_size === null
+        || this.d_output_size!.validity_check_stderr_size === 0) {
       this.d_validity_check_stderr_content = null;
     }
     else {
       this.d_validity_check_stderr_content
-          = await ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
+          = ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category
@@ -591,13 +628,14 @@ export default class MutationSuiteResult extends Vue {
     this.d_validity_check_stderr_loaded = true;
   }
 
-  async load_grade_buggy_stdout_content() {
-    if (this.d_output_size!.grade_buggy_impls_stdout_size === null) {
+  load_grade_buggy_stdout_content() {
+    if (this.d_output_size!.grade_buggy_impls_stdout_size === null
+        || this.d_output_size!.grade_buggy_impls_stdout_size === 0) {
       this.d_grade_buggy_stdout_content = null;
     }
     else {
       this.d_grade_buggy_stdout_content
-          = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
+          = ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category
@@ -606,13 +644,14 @@ export default class MutationSuiteResult extends Vue {
     this.d_grade_buggy_stdout_loaded = true;
   }
 
-  async load_grade_buggy_stderr_content() {
-    if (this.d_output_size!.grade_buggy_impls_stderr_size === null) {
+  load_grade_buggy_stderr_content() {
+    if (this.d_output_size!.grade_buggy_impls_stderr_size === null
+        || this.d_output_size!.grade_buggy_impls_stderr_size === 0) {
       this.d_grade_buggy_stderr_content = null;
     }
     else {
       this.d_grade_buggy_stderr_content
-          = await ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
+          = ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
         this.submission.pk,
         this.mutation_test_suite_result!.pk,
         this.fdbk_category

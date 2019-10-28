@@ -712,7 +712,7 @@ describe('AGTestCommandResult section exists tests', () => {
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stdout).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_stdout_content).toEqual(stdout_content);
+        expect(wrapper.vm.d_stdout_content).toEqual(Promise.resolve(stdout_content));
         expect(wrapper.find('#actual-stdout-section').text()).toContain(stdout_content);
     });
 
@@ -892,7 +892,7 @@ describe('AGTestCommandResult section exists tests', () => {
         expect(wrapper.vm.ag_test_command_result.fdbk_settings.show_actual_stderr).toBe(true);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_stderr_content).toEqual(stderr_content);
+        expect(wrapper.vm.d_stderr_content).toEqual(Promise.resolve(stderr_content));
         expect(wrapper.find('#actual-stderr-section').text()).toContain(stderr_content);
     });
 });
@@ -900,7 +900,7 @@ describe('AGTestCommandResult section exists tests', () => {
 describe('AGTestCommandResult Watchers tests', () => {
     let wrapper: Wrapper<AGTestCommandResult>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         wrapper = mount(AGTestCommandResult, {
             propsData: {
                 submission: submission,
@@ -908,13 +908,13 @@ describe('AGTestCommandResult Watchers tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-    });
 
-    test('submission Watcher', async () => {
         for (let i = 0; i < 4; ++i) {
             await wrapper.vm.$nextTick();
         }
+    });
 
+    test('submission Watcher', async () => {
         expect(wrapper.vm.submission).toEqual(submission);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
@@ -939,10 +939,6 @@ describe('AGTestCommandResult Watchers tests', () => {
     });
 
     test('ag_test_command_result Watcher', async () => {
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(wrapper.vm.ag_test_command_result).toEqual(ag_test_command_result);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);
@@ -967,10 +963,6 @@ describe('AGTestCommandResult Watchers tests', () => {
     });
 
     test('fdbk_category Watcher', async () => {
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_ag_test_cmd_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_cmd_result_stdout_stub.calledOnce).toBe(true);

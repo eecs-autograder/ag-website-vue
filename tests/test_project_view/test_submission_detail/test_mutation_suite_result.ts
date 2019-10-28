@@ -495,7 +495,7 @@ describe('MutationSuiteResult setup section tests', () => {
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
         expect(wrapper.find('#setup-stdout-section').text()).toContain(setup_stdout_content);
     });
@@ -593,7 +593,7 @@ describe('MutationSuiteResult setup section tests', () => {
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
         expect(wrapper.find('#setup-stderr-section').text()).toContain(
             setup_stderr_content
         );
@@ -809,7 +809,9 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(grade_buggy_impls_stdout_content);
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(
+            Promise.resolve(grade_buggy_impls_stdout_content)
+        );
         expect(wrapper.find('#buggy-stdout-section').text()).toContain(
             grade_buggy_impls_stdout_content
         );
@@ -833,7 +835,9 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(grade_buggy_impls_stdout_content);
+        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(
+            Promise.resolve(grade_buggy_impls_stdout_content)
+        );
         expect(wrapper.find('#buggy-stdout-section').text()).toContain(
             grade_buggy_impls_stdout_content
         );
@@ -947,7 +951,9 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(grade_buggy_impls_stderr_content);
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(
+            Promise.resolve(grade_buggy_impls_stderr_content)
+        );
         expect(wrapper.find('#buggy-stderr-section').text()).toContain(
             grade_buggy_impls_stderr_content
         );
@@ -971,7 +977,9 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(grade_buggy_impls_stderr_content);
+        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(
+            Promise.resolve(grade_buggy_impls_stderr_content)
+        );
         expect(wrapper.find('#buggy-stderr-section').text()).toContain(
             grade_buggy_impls_stderr_content
         );
@@ -1142,7 +1150,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            student_test_names_stdout_content
+            Promise.resolve(student_test_names_stdout_content)
         );
         expect(wrapper.find('#test-names-stdout-section').text()).toContain(
             student_test_names_stdout_content
@@ -1158,7 +1166,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            student_test_names_stdout_content
+            Promise.resolve(student_test_names_stdout_content)
         );
         expect(wrapper.find('#test-names-stdout-section').exists()).toBe(false);
 
@@ -1172,7 +1180,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            student_test_names_stdout_content
+            Promise.resolve(student_test_names_stdout_content)
         );
         expect(wrapper.find('#test-names-stdout-section').text()).toContain(
             student_test_names_stdout_content
@@ -1290,7 +1298,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            student_test_names_stderr_content
+            Promise.resolve(student_test_names_stderr_content)
         );
         expect(wrapper.find('#test-names-stderr-section').text()).toContain(
             student_test_names_stderr_content
@@ -1306,7 +1314,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            student_test_names_stderr_content
+            Promise.resolve(student_test_names_stderr_content)
         );
         expect(wrapper.find('#test-names-stderr-section').exists()).toBe(false);
 
@@ -1320,7 +1328,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            student_test_names_stderr_content
+            Promise.resolve(student_test_names_stderr_content)
         );
         expect(wrapper.find('#test-names-stderr-section').text()).toContain(
             student_test_names_stderr_content
@@ -1784,7 +1792,9 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(validity_check_stdout_content);
+        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(
+            Promise.resolve(validity_check_stdout_content)
+        );
         expect(wrapper.find('#validity-check-stdout-section').text()).toContain(
             validity_check_stdout_content
         );
@@ -1798,7 +1808,9 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(false);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(validity_check_stdout_content);
+        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(
+            Promise.resolve(validity_check_stdout_content)
+        );
         expect(wrapper.find('#validity-check-stdout-section').exists()).toBe(false);
 
         // show again
@@ -1810,7 +1822,9 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(validity_check_stdout_content);
+        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(
+            Promise.resolve(validity_check_stdout_content)
+        );
         expect(wrapper.find('#validity-check-stdout-section').text()).toContain(
             validity_check_stdout_content
         );
@@ -1927,7 +1941,9 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(validity_check_stderr_content);
+        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(
+            Promise.resolve(validity_check_stderr_content)
+        );
         expect(wrapper.find('#validity-check-stderr-section').text()).toContain(
             validity_check_stderr_content
         );
@@ -1941,7 +1957,9 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(false);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(validity_check_stderr_content);
+        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(
+            Promise.resolve(validity_check_stderr_content)
+        );
         expect(wrapper.find('#validity-check-stderr-section').exists()).toBe(false);
 
         // show again
@@ -1953,7 +1971,9 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(validity_check_stderr_content);
+        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(
+            Promise.resolve(validity_check_stderr_content)
+        );
         expect(wrapper.find('#validity-check-stderr-section').text()).toContain(
             validity_check_stderr_content
         );
@@ -2043,8 +2063,8 @@ describe('MutationSuiteResult Watcher tests', () => {
         expect(get_grade_buggy_impls_stdout_stub.callCount).toEqual(0);
         expect(get_grade_buggy_impls_stderr_stub.callCount).toEqual(0);
 
-        expect(wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
-        expect(wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
         expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
         expect(wrapper.vm.d_student_test_names_stderr_content).toBeNull();
         expect(wrapper.vm.d_validity_check_stdout_content).toBeNull();

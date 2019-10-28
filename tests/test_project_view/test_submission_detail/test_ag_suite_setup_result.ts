@@ -1,7 +1,6 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
-import { expect_dates_equal } from 'ag-client-typescript/dist/tests/utils';
 import * as sinon from 'sinon';
 
 import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_suite_setup_result.vue';
@@ -98,7 +97,7 @@ describe('AGSuiteSetupResult tests', () => {
         expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_output_size!.setup_stdout_size).toBeNull();
-        expect(wrapper.vm.d_setup_stdout).toEqual(null);
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(null);
         expect(wrapper.find('#setup-stdout-section').text()).toContain("No output");
     });
 
@@ -119,7 +118,7 @@ describe('AGSuiteSetupResult tests', () => {
         expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toEqual(setup_stdout_content);
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
         expect(wrapper.find('#setup-stdout-section').text()).toContain(setup_stdout_content);
     });
 
@@ -164,7 +163,7 @@ describe('AGSuiteSetupResult tests', () => {
         expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_output_size!.setup_stderr_size).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toEqual(null);
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(null);
         expect(wrapper.find('#setup-stderr-section').text()).toContain("No output");
     });
 
@@ -185,7 +184,7 @@ describe('AGSuiteSetupResult tests', () => {
         expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
         expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stderr).toEqual(setup_stderr_content);
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
         expect(wrapper.find('#setup-stderr-section').text()).toContain(setup_stderr_content);
     });
 });
@@ -261,16 +260,32 @@ describe('AGSuiteSetupResult exit_status tests', () => {
 describe('AGSuiteSetupResult tests concerning Watchers', () => {
     let wrapper: Wrapper<AGSuiteSetupResult>;
 
-    beforeEach(() => {
-        get_ag_test_suite_result_setup_stdout_stub.onFirstCall().returns(Promise.resolve(null));
-        get_ag_test_suite_result_setup_stdout_stub.onSecondCall().returns(Promise.resolve(
-            setup_stdout_content
-        ));
+    beforeEach(async () => {
+        get_ag_test_suite_result_output_size_stub.onFirstCall().returns(
+            Promise.resolve(
+                {
+                    setup_stdout_size: 0,
+                    setup_stderr_size: 0
+                }
+            )
+        );
 
-        get_ag_test_suite_result_setup_stderr_stub.onFirstCall().returns(Promise.resolve(null));
-        get_ag_test_suite_result_setup_stderr_stub.onSecondCall().returns(Promise.resolve(
-            setup_stderr_content
-        ));
+        get_ag_test_suite_result_output_size_stub.onSecondCall().returns(
+            Promise.resolve(
+                {
+                    setup_stdout_size: 1,
+                    setup_stderr_size: 1
+                }
+            )
+        );
+
+
+        get_ag_test_suite_result_setup_stdout_stub.onFirstCall().returns(
+            Promise.resolve(setup_stdout_content)
+        );
+        get_ag_test_suite_result_setup_stderr_stub.onFirstCall().returns(
+            Promise.resolve(setup_stderr_content)
+        );
 
         wrapper = mount(AGSuiteSetupResult, {
             propsData: {
@@ -279,18 +294,18 @@ describe('AGSuiteSetupResult tests concerning Watchers', () => {
                 fdbk_category: ag_cli.FeedbackCategory.max
             }
         });
-    });
 
-    test('submission Watcher', async () => {
         for (let i = 0; i < 4; ++i) {
             await wrapper.vm.$nextTick();
         }
+    });
 
+    test('submission Watcher', async () => {
         expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toBeNull();
+        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
 
         let updated_submission = data_ut.make_submission(group);
         wrapper.setProps({submission: updated_submission});
@@ -299,22 +314,19 @@ describe('AGSuiteSetupResult tests concerning Watchers', () => {
         }
 
         expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toBeNull();
+        expect(get_ag_test_suite_result_output_size_stub.calledTwice).toBe(false);
+        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
     });
 
     test('ag_test_suite_result Watcher', async () => {
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(wrapper.vm.ag_test_suite_result).toEqual(ag_test_suite_result);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toBeNull();
+        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
 
         let updated_ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
         wrapper.setProps({ag_test_suite_result: updated_ag_test_suite_result});
@@ -324,22 +336,18 @@ describe('AGSuiteSetupResult tests concerning Watchers', () => {
 
         expect(ag_test_suite_result).not.toEqual(updated_ag_test_suite_result);
         expect(wrapper.vm.ag_test_suite_result).toEqual(updated_ag_test_suite_result);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledTwice).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledTwice).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toEqual(setup_stdout_content);
-        expect(wrapper.vm.d_setup_stderr).toEqual(setup_stderr_content);
+        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(1);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(1);
+        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
+        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
     });
 
     test('fdbk_category Watcher', async () => {
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
         expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toBeNull();
+        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
 
         wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.normal});
         for (let i = 0; i < 4; ++i) {
@@ -347,9 +355,9 @@ describe('AGSuiteSetupResult tests concerning Watchers', () => {
         }
 
         expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout).toBeNull();
-        expect(wrapper.vm.d_setup_stderr).toBeNull();
+        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
+        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
+        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
     });
 });

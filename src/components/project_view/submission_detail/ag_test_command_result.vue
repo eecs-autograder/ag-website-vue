@@ -158,7 +158,11 @@
             <div v-if="!d_stdout_content"
                  class="short-output"> No output
             </div>
-            <pre v-else class="lengthy-output">{{d_stdout_content}}</pre>
+            <div v-else
+                 class="lengthy-output">
+              <view-file :file_contents="d_stdout_content"
+                         view_file_max_height="50vh"></view-file>
+            </div>
           </template>
         </div>
       </div>
@@ -177,7 +181,11 @@
             <div v-if="!d_stderr_content"
                  class="short-output"> No output
             </div>
-            <pre v-else class="lengthy-output">{{d_stderr_content}}</pre>
+            <div v-else
+                 class="lengthy-output">
+              <view-file :file_contents="d_stderr_content"
+                         view_file_max_height="50vh"></view-file>
+            </div>
           </template>
         </div>
       </div>
@@ -200,10 +208,12 @@ import {
 } from "ag-client-typescript";
 
 import Diff from '@/components/diff.vue';
+import ViewFile from "@/components/view_file.vue";
 
 @Component({
   components: {
-    Diff
+    Diff,
+    ViewFile
   }
 })
 export default class AGTestCommandResult extends Vue {
@@ -216,8 +226,8 @@ export default class AGTestCommandResult extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
-  d_stdout_content: string | null = null;
-  d_stderr_content: string | null = null;
+  d_stdout_content: Promise<string> | null = null;
+  d_stderr_content: Promise<string> | null = null;
   d_stdout_diff: string[] | null = null;
   d_stderr_diff: string[] | null = null;
   d_stdout_content_loaded = false;
@@ -249,8 +259,8 @@ export default class AGTestCommandResult extends Vue {
     this.d_stderr_content_loaded = false;
     this.d_stdout_diff_loaded = false;
     this.d_stderr_content_loaded = false;
-    await this.load_stdout_content();
-    await this.load_stderr_content();
+    this.load_stdout_content();
+    this.load_stderr_content();
     await this.load_stdout_diff();
     await this.load_stderr_diff();
   }
@@ -285,12 +295,12 @@ export default class AGTestCommandResult extends Vue {
            === ValueFeedbackLevel.expected_and_actual;
   }
 
-  async load_stdout_content() {
-    if (this.d_output_size!.stdout_size === null) {
+  load_stdout_content() {
+    if (this.d_output_size!.stdout_size === null || this.d_output_size!.stdout_size === 0) {
       this.d_stdout_content = null;
     }
     else {
-      this.d_stdout_content = await ResultOutput.get_ag_test_cmd_result_stdout(
+      this.d_stdout_content = ResultOutput.get_ag_test_cmd_result_stdout(
         this.submission!.pk,
         this.ag_test_command_result.pk,
         this.fdbk_category
@@ -299,12 +309,12 @@ export default class AGTestCommandResult extends Vue {
     this.d_stdout_content_loaded = true;
   }
 
-  async load_stderr_content() {
-    if (this.d_output_size!.stderr_size === null) {
+  load_stderr_content() {
+    if (this.d_output_size!.stderr_size === null || this.d_output_size!.stderr_size === 0) {
       this.d_stderr_content = null;
     }
     else {
-      this.d_stderr_content = await ResultOutput.get_ag_test_cmd_result_stderr(
+      this.d_stderr_content = ResultOutput.get_ag_test_cmd_result_stderr(
         this.submission!.pk,
         this.ag_test_command_result.pk,
         this.fdbk_category

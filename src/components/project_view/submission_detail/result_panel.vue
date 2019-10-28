@@ -99,6 +99,7 @@ export default class ResultPanel extends Vue {
     }
     // This prevents any open panels below this one from being pushed
     // into the top of the viewport due to the size change of the parent.
+    // istanbul ignore next
     if (!this.d_is_open && top < 0) {
       this.$nextTick(() => {
         this.$el.scrollIntoView();

@@ -40,10 +40,13 @@
             </div>
           </template>
           <template v-else>
-            <div v-if="!d_setup_stdout"
+            <div v-if="!d_setup_stdout_content"
                  class="short-output"> No output </div>
-            <pre v-else
-                 class="lengthy-output">{{d_setup_stdout}}</pre>
+            <div v-else
+                 class="lengthy-output">
+              <view-file :file_contents="d_setup_stdout_content"
+                         view_file_max_height="50vh"></view-file>
+            </div>
           </template>
         </div>
       </div>
@@ -59,10 +62,13 @@
             </div>
           </template>
           <template v-else>
-            <div v-if="!d_setup_stderr"
+            <div v-if="!d_setup_stderr_content"
                  class="short-output"> No output </div>
-            <pre v-else
-                 class="lengthy-output">{{d_setup_stderr}}</pre>
+            <div v-else
+                 class="lengthy-output">
+              <view-file :file_contents="d_setup_stderr_content"
+                         view_file_max_height="50vh"></view-file>
+            </div>
           </template>
         </div>
       </div>
@@ -80,7 +86,13 @@ import {
     Submission
 } from "ag-client-typescript";
 
-@Component
+import ViewFile from "@/components/view_file.vue";
+
+@Component({
+  components: {
+    ViewFile
+  }
+})
 export default class AGSuiteSetupResult extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
@@ -91,8 +103,8 @@ export default class AGSuiteSetupResult extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
-  d_setup_stdout: string | null = null;
-  d_setup_stderr: string | null = null;
+  d_setup_stdout_content: Promise<string> | null = null;
+  d_setup_stderr_content: Promise<string> | null = null;
   d_setup_stdout_loaded = false;
   d_setup_stderr_loaded = false;
   d_output_size: ResultOutput.AGTestSuiteResultOutputSize | null = null;
@@ -116,16 +128,17 @@ export default class AGSuiteSetupResult extends Vue {
     );
     this.d_setup_stdout_loaded = false;
     this.d_setup_stderr_loaded = false;
-    await this.load_setup_stdout();
-    await this.load_setup_stderr();
+    this.load_setup_stdout();
+    this.load_setup_stderr();
   }
 
-  async load_setup_stdout() {
-    if (this.d_output_size!.setup_stdout_size === null) {
-      this.d_setup_stdout = null;
+  load_setup_stdout() {
+    if (this.d_output_size!.setup_stdout_size === null
+        || this.d_output_size!.setup_stdout_size === 0) {
+      this.d_setup_stdout_content = null;
     }
     else {
-      this.d_setup_stdout = await ResultOutput.get_ag_test_suite_result_setup_stdout(
+      this.d_setup_stdout_content = ResultOutput.get_ag_test_suite_result_setup_stdout(
         this.submission!.pk,
         this.ag_test_suite_result!.pk,
         this.fdbk_category
@@ -134,12 +147,13 @@ export default class AGSuiteSetupResult extends Vue {
     this.d_setup_stdout_loaded = true;
   }
 
-  async load_setup_stderr() {
-    if (this.d_output_size!.setup_stderr_size === null) {
-        this.d_setup_stderr = null;
+  load_setup_stderr() {
+    if (this.d_output_size!.setup_stderr_size === null
+        || this.d_output_size!.setup_stderr_size === 0) {
+        this.d_setup_stderr_content = null;
     }
     else {
-      this.d_setup_stderr = await ResultOutput.get_ag_test_suite_result_setup_stderr(
+      this.d_setup_stderr_content = ResultOutput.get_ag_test_suite_result_setup_stderr(
         this.submission!.pk,
         this.ag_test_suite_result!.pk,
         this.fdbk_category
