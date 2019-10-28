@@ -324,7 +324,8 @@ export default class AGTestCommandResult extends Vue {
   }
 
   async load_stdout_diff() {
-    if (this.d_output_size!.stdout_diff_size === null) {
+    if (this.d_output_size!.stdout_diff_size === null
+        || this.d_output_size!.stdout_diff_size === 0) {
       this.d_stdout_diff = null;
     }
     else {
@@ -338,7 +339,8 @@ export default class AGTestCommandResult extends Vue {
   }
 
   async load_stderr_diff() {
-    if (this.d_output_size!.stderr_diff_size === null) {
+    if (this.d_output_size!.stderr_diff_size === null
+        || this.d_output_size!.stderr_diff_size === 0) {
       this.d_stderr_diff = null;
     }
     else {
