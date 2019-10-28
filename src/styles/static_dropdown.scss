@@ -1,0 +1,41 @@
+@mixin static-dropdown($open-on-hover, $orient-left: false) {
+    position: relative;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .menu {
+        display: none;
+        position: absolute;
+        z-index: 1;
+        background-color: white;
+
+        @if $orient-left {
+            right: 0;
+        }
+
+        border: 1px solid $pebble-light;
+        box-shadow: 0 8px 15px opacify(lighten($baking-pan, 50%), .2);
+        // box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+
+        min-width: 150px;
+    }
+
+    .menu-item {
+        &:hover {
+            background-color: $pebble-medium;
+            cursor: pointer;
+        }
+    }
+
+    .menu-divider {
+        border-bottom: 1px solid $pebble-medium;
+    }
+
+    @if $open-on-hover {
+        &:hover .menu {
+            display: block;
+        }
+    }
+}

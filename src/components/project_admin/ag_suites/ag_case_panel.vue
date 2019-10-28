@@ -17,48 +17,39 @@
         <span>{{ag_test_case.name}}</span>
       </div>
 
-      <div id="ag-test-case-menu"
-           @click.stop="$emit('update_active_item', ag_test_case);
-                        $refs.ag_test_case_context_menu.show_context_menu($event.pageX,
-                                                                          $event.pageY)">
-        <i class="fas fa-ellipsis-v"></i>
+      <div id="ag-test-case-menu" class="dropdown"
+           @click.stop="$emit('update_active_item', ag_test_case)">
+        <i class="menu-icon fas fa-ellipsis-v"></i>
+        <div class="menu">
+          <div ref="add_ag_test_command_menu_item"
+               @click="open_new_ag_test_command_modal"
+               class="menu-item">
+            <i class="fas fa-plus"></i>
+            <span class="menu-item-text">Add command</span>
+          </div>
+          <div class="menu-divider"> </div>
+          <div ref="edit_ag_test_case_menu_item"
+               @click="d_show_ag_test_case_settings_modal = true"
+               class="menu-item">
+            <i class="fas fa-pencil-alt"></i>
+            <span class="menu-item-text">Edit test case settings</span>
+          </div>
+          <div class="menu-divider"> </div>
+          <div ref="clone_ag_test_case_menu_item"
+               @click="open_clone_ag_test_case_modal"
+               class="menu-item">
+            <i class="far fa-copy"></i>
+            <span class="menu-item-text"> Clone test case </span>
+          </div>
+          <div class="menu-divider"> </div>
+          <div ref="delete_ag_test_case_menu_item"
+               @click="d_show_delete_ag_test_case_modal = true"
+               class="menu-item">
+            <i class="fas fa-trash-alt"></i>
+            <span id="delete-case-label" class="menu-item-text"> Delete test case </span>
+          </div>
+        </div>
       </div>
-      <context-menu ref="ag_test_case_context_menu">
-        <template slot="context_menu_items">
-          <context-menu-item ref="add_ag_test_command_menu_item"
-                             @click="open_new_ag_test_command_modal">
-            <template slot="label">
-              <i class="fas fa-plus"></i>
-              <span class="context-menu-item-text">Add command</span>
-            </template>
-          </context-menu-item>
-          <div class="context-menu-divider"> </div>
-          <context-menu-item ref="edit_ag_test_case_menu_item"
-                             @click="d_show_ag_test_case_settings_modal = true">
-            <template slot="label">
-              <i class="fas fa-pencil-alt"></i>
-              <span class="context-menu-item-text">Edit test case settings</span>
-            </template>
-          </context-menu-item>
-          <div class="context-menu-divider"> </div>
-          <context-menu-item ref="clone_ag_test_case_menu_item"
-                             @click="open_clone_ag_test_case_modal">
-            <template slot="label">
-              <i class="far fa-copy"></i>
-              <span class="context-menu-item-text"> Clone test case </span>
-            </template>
-          </context-menu-item>
-          <div class="context-menu-divider"> </div>
-          <context-menu-item ref="delete_ag_test_case_menu_item"
-                             @click="d_show_delete_ag_test_case_modal = true">
-            <template slot="label">
-              <i class="fas fa-trash-alt"></i>
-              <span id="delete-case-label" class="context-menu-item-text"> Delete test case </span>
-            </template>
-          </context-menu-item>
-        </template>
-      </context-menu>
-
     </div>
 
     <div class="commands-container"
@@ -362,7 +353,11 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
-@import '@/styles/context_menu_styles.scss';
+@import '@/styles/static_dropdown.scss';
+
+* {
+  box-sizing: border-box;
+}
 
 #delete-ag-test-case-label {
   color: $warning-red;
@@ -380,16 +375,23 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
     @extend .caret-down;
   }
 
-  #ag-test-case-menu {
+  .dropdown {
     padding: 5px 9px;
-    position: relative;
+    @include static-dropdown($open-on-hover: true, $orient-left: true);
+
+    .menu-item {
+      padding: 6px 6px;
+    }
+  }
+
+  .menu-icon {
     visibility: hidden;
   }
-}
 
-.ag-test-case:hover {
-  #ag-test-case-menu {
-    visibility: visible;
+  &:hover {
+    .menu-icon {
+      visibility: visible;
+    }
   }
 }
 
@@ -402,14 +404,14 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 }
 
 .active-ag-test-case-multiple-commands {
-  #ag-test-case-menu, #ag-test-case-menu:hover {
+  .menu-icon {
     visibility: visible;
   }
 }
 
 .active-ag-test-case-one-command {
   @extend .active-level;
-  #ag-test-case-menu, #ag-test-case-menu:hover {
+  .menu-icon {
     visibility: visible;
     color: white;
   }
@@ -428,7 +430,7 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
   @extend .active-level;
 }
 
-.context-menu-item-text {
+.menu-item-text {
   margin-left: 10px;
 }
 

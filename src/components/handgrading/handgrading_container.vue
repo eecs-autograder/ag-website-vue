@@ -12,69 +12,69 @@
               {{project.max_group_size === 1 ? 'Students' : 'Groups'}}
             </div>
             <div class="progress dropdown" v-if="!d_loading_result_summaries">
-                <div ref="progress_text">
-                  {{num_finished}}/{{total_num_to_grade}}
-                  ({{staff_filtered_groups.length}} total)
-                  <i class="fas fa-caret-down"></i>
+              <div ref="progress_text">
+                {{num_finished}}/{{total_num_to_grade}}
+                ({{staff_filtered_groups.length}} total)
+                <i class="fas fa-caret-down"></i>
+              </div>
+
+              <div id="filter-menu" class="menu">
+                <div class="checkbox-input-container">
+                  <input v-model="d_include_staff"
+                          id="include-staff"
+                          type="checkbox"
+                          class="checkbox">
+                  <label for="include-staff">Include Staff</label>
                 </div>
 
-                <div id="filter-menu" class="menu">
-                  <div class="checkbox-input-container">
-                    <input v-model="d_include_staff"
-                           id="include-staff"
-                           type="checkbox"
-                           class="checkbox">
-                    <label for="include-staff">Include Staff</label>
+                <div id="select-status">
+                  <div class="header">Status</div>
+                  <div class="radio-container">
+                    <input type="radio" name="status"
+                            id="all"
+                            class="radio"
+                            v-model="d_status_filter"
+                            :value="null">
+                    <label class="label" for="all">All</label>
                   </div>
-
-                  <div id="select-status">
-                    <div class="header">Status</div>
-                    <div class="radio-container">
-                      <input type="radio" name="status"
-                             id="all"
-                             class="radio"
-                             v-model="d_status_filter"
-                             :value="null">
-                      <label class="label" for="all">All</label>
-                    </div>
-                    <div class="radio-container">
-                      <input type="radio" name="status"
-                             id="graded"
-                             class="radio"
-                             v-model="d_status_filter"
-                             :value="HandgradingStatus.graded">
-                      <label class="label"
-                             for="graded">{{HandgradingStatus.graded}}</label>
-                    </div>
-                    <div class="radio-container">
-                      <input type="radio" name="status"
-                             id="in-progress"
-                             class="radio"
-                             v-model="d_status_filter"
-                             :value="HandgradingStatus.in_progress">
-                      <label class="label"
-                             for="in-progress">{{HandgradingStatus.in_progress}}</label>
-                    </div>
-                    <div class="radio-container">
-                      <input type="radio" name="status"
-                             id="ungraded"
-                             class="radio"
-                             v-model="d_status_filter"
-                             :value="HandgradingStatus.ungraded">
-                      <label class="label"
-                             for="ungraded">{{HandgradingStatus.ungraded}}</label>
-                    </div>
-                    <div class="radio-container">
-                      <input type="radio" name="status"
-                             id="no-submission"
-                             class="radio"
-                             v-model="d_status_filter"
-                             :value="HandgradingStatus.no_submission">
-                      <label class="label"
-                             for="no-submission">{{HandgradingStatus.no_submission}}</label>
-                    </div>
+                  <div class="radio-container">
+                    <input type="radio" name="status"
+                            id="graded"
+                            class="radio"
+                            v-model="d_status_filter"
+                            :value="HandgradingStatus.graded">
+                    <label class="label"
+                            for="graded">{{HandgradingStatus.graded}}</label>
+                  </div>
+                  <div class="radio-container">
+                    <input type="radio" name="status"
+                            id="in-progress"
+                            class="radio"
+                            v-model="d_status_filter"
+                            :value="HandgradingStatus.in_progress">
+                    <label class="label"
+                            for="in-progress">{{HandgradingStatus.in_progress}}</label>
+                  </div>
+                  <div class="radio-container">
+                    <input type="radio" name="status"
+                            id="ungraded"
+                            class="radio"
+                            v-model="d_status_filter"
+                            :value="HandgradingStatus.ungraded">
+                    <label class="label"
+                            for="ungraded">{{HandgradingStatus.ungraded}}</label>
+                  </div>
+                  <div class="radio-container">
+                    <input type="radio" name="status"
+                            id="no-submission"
+                            class="radio"
+                            v-model="d_status_filter"
+                            :value="HandgradingStatus.no_submission">
+                    <label class="label"
+                            for="no-submission">{{HandgradingStatus.no_submission}}</label>
                   </div>
                 </div>
+              </div>
             </div>
           </template>
         </div>
@@ -300,6 +300,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/global.scss';
+@import '@/styles/static_dropdown.scss';
 
 * {
   box-sizing: border-box;
@@ -395,27 +396,7 @@ $active-color: $light-blue;
 }
 
 .dropdown {
-  position: relative;
-
-  * {
-    box-sizing: border-box;
-  }
-
-  .menu {
-    display: none;
-    position: absolute;
-    z-index: 1;
-    background-color: white;
-
-    border: 1px solid $pebble-light;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-
-    min-width: 150px;
-  }
-
-  &:hover .menu {
-    display: block;
-  }
+  @include static-dropdown($open-on-hover: true);
 }
 
 </style>
