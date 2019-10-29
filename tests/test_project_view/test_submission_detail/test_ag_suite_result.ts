@@ -73,11 +73,11 @@ function check_command_result_correctness(command: ag_cli.AGTestCommandResultFee
     expect(command.stderr_correct).toEqual(stderr_correctness);
 }
 
-function check_all_command_correctnesses(wrapper: Wrapper<AGSuiteResult>,
-                                         case_result: ag_cli.AGTestCaseResultFeedback,
-                                         return_code_correctness: CorrectnessLevel,
-                                         output_correctness: CorrectnessLevel,
-                                         overall_correctness: CorrectnessLevel) {
+function check_all_case_correctness_levels(wrapper: Wrapper<AGSuiteResult>,
+                                           case_result: ag_cli.AGTestCaseResultFeedback,
+                                           return_code_correctness: CorrectnessLevel,
+                                           output_correctness: CorrectnessLevel,
+                                           overall_correctness: CorrectnessLevel) {
     expect(wrapper.vm.case_result_return_code_correctness(case_result)).toEqual(
         return_code_correctness
     );
@@ -117,11 +117,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.not_available);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.not_available);
     });
 
     test('case_result_correctness - return_code_correctness === not_available ' +
@@ -146,11 +146,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.info_only);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.info_only);
     });
 
     test('case_result_correctness - return_code_correctness === not_available ' +
@@ -175,11 +175,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.none_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.none_correct);
     });
 
     test('case_result_correctness - return_code_correctness === not_available ' +
@@ -203,11 +203,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === not_available ' +
@@ -231,11 +231,11 @@ describe('case_result_correctness tests', () => {
                                          true,
                                          true);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.all_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.all_correct);
     });
 
     test('case_result_correctness - return_code_correctness === info_only ' +
@@ -257,11 +257,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.info_only);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.info_only);
     });
 
     test('case_result_correctness - return_code_correctness === info_only ' +
@@ -286,11 +286,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.info_only);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.info_only);
     });
 
     test('case_result_correctness - return_code_correctness === info_only ' +
@@ -315,11 +315,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.none_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.none_correct);
     });
 
     test('case_result_correctness - return_code_correctness === info_only ' +
@@ -343,11 +343,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null,
                                          false);
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === info_only ' +
@@ -372,11 +372,11 @@ describe('case_result_correctness tests', () => {
                                          true,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.all_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.all_correct);
     });
 
     test('case_result_correctness - return_code_correctness === none_correct ' +
@@ -400,11 +400,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.none_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.none_correct);
     });
 
     test('case_result_correctness - return_code_correctness === none_correct ' +
@@ -430,11 +430,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          null,
                                          null);
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.none_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.none_correct);
     });
 
     test('case_result_correctness - return_code_correctness === none_correct ' +
@@ -457,11 +457,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          false,
                                          false);
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.none_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.none_correct);
     });
 
     test('case_result_correctness - return_code_correctness === none_correct ' +
@@ -485,11 +485,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === none_correct ' +
@@ -513,11 +513,11 @@ describe('case_result_correctness tests', () => {
                                          true,
                                          true);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === some_correct ' +
@@ -542,11 +542,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === some_correct ' +
@@ -573,11 +573,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === some_correct ' +
@@ -601,11 +601,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === some_correct ' +
@@ -629,11 +629,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === some_correct ' +
@@ -657,11 +657,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          true);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === all_correct ' +
@@ -685,11 +685,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.not_available,
-                                        CorrectnessLevel.all_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.not_available,
+                                          CorrectnessLevel.all_correct);
     });
 
     test('case_result_correctness - return_code_correctness === all_correct ' +
@@ -716,11 +716,11 @@ describe('case_result_correctness tests', () => {
                                          null,
                                          null);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.info_only,
-                                        CorrectnessLevel.all_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.info_only,
+                                          CorrectnessLevel.all_correct);
     });
 
     test('case_result_correctness - return_code_correctness === all_correct ' +
@@ -744,11 +744,11 @@ describe('case_result_correctness tests', () => {
                                          false,
                                          false);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.none_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.none_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === all_correct ' +
@@ -772,11 +772,11 @@ describe('case_result_correctness tests', () => {
                                          true,
                                          true);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.some_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.some_correct);
     });
 
     test('case_result_correctness - return_code_correctness === all_correct ' +
@@ -800,11 +800,11 @@ describe('case_result_correctness tests', () => {
                                          true,
                                          true);
 
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.all_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.all_correct);
     });
 
     test('case_result_correctness - total_points === 0 && total_points_possible !== 0',
@@ -829,11 +829,11 @@ describe('case_result_correctness tests', () => {
                                          true,
                                          true,
                                          true);
-        check_all_command_correctnesses(wrapper,
-                                        ag_test_case_result,
-                                        CorrectnessLevel.some_correct,
-                                        CorrectnessLevel.all_correct,
-                                        CorrectnessLevel.none_correct);
+        check_all_case_correctness_levels(wrapper,
+                                          ag_test_case_result,
+                                          CorrectnessLevel.some_correct,
+                                          CorrectnessLevel.all_correct,
+                                          CorrectnessLevel.none_correct);
     });
 });
 
