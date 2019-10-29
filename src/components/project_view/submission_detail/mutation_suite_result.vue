@@ -406,9 +406,9 @@ export default class MutationSuiteResult extends Vue {
   fdbk_category!: FeedbackCategory;
 
   @Watch('mutation_test_suite_result')
-  async on_mutation_test_suite_results_change(new_value: MutationTestSuiteResultFeedback,
-                                              old_value: MutationTestSuiteResultFeedback) {
-    await this.get_output();
+  on_mutation_test_suite_results_change(new_value: MutationTestSuiteResultFeedback,
+                                        old_value: MutationTestSuiteResultFeedback) {
+    return this.get_output();
   }
 
   readonly CorrectnessLevel = CorrectnessLevel;
@@ -439,8 +439,7 @@ export default class MutationSuiteResult extends Vue {
   d_validity_check_stderr_loaded = false;
   d_grade_buggy_stdout_loaded = false;
   d_grade_buggy_stderr_loaded = false;
-  d_output_size: ResultOutput.MutationTestSuiteResultOutputSize
-                                            | null = null;
+  d_output_size: ResultOutput.MutationTestSuiteResultOutputSize | null = null;
 
   async created() {
     await this.get_output();
@@ -461,44 +460,35 @@ export default class MutationSuiteResult extends Vue {
   }
 
   async toggle_d_show_buggy_implementations_output() {
-    let old_toggle_val = this.d_show_buggy_implementations_output;
     this.d_show_buggy_implementations_output = !this.d_show_buggy_implementations_output;
-    if (!old_toggle_val) {
-      if (!this.d_load_grade_buggy_output) {
-        this.d_load_grade_buggy_output = true;
-        this.d_grade_buggy_stdout_loaded = false;
-        this.d_grade_buggy_stderr_loaded = false;
-        this.load_grade_buggy_stdout_content();
-        this.load_grade_buggy_stderr_content();
-      }
+    if (this.d_show_buggy_implementations_output && !this.d_load_grade_buggy_output) {
+      this.d_load_grade_buggy_output = true;
+      this.d_grade_buggy_stdout_loaded = false;
+      this.d_grade_buggy_stderr_loaded = false;
+      this.load_grade_buggy_stdout_content();
+      this.load_grade_buggy_stderr_content();
     }
   }
 
   async toggle_d_show_student_test_names_output() {
-    let old_toggle_val = this.d_show_student_test_names_output;
     this.d_show_student_test_names_output = !this.d_show_student_test_names_output;
-    if (!old_toggle_val) {
-      if (!this.d_load_student_test_names_output) {
-        this.d_load_student_test_names_output = true;
-        this.d_student_test_names_stdout_loaded = false;
-        this.d_student_test_names_stderr_loaded = false;
-        this.load_student_test_names_stdout_content();
-        this.load_student_test_names_stderr_content();
-      }
+    if (this.d_show_student_test_names_output && !this.d_load_student_test_names_output) {
+      this.d_load_student_test_names_output = true;
+      this.d_student_test_names_stdout_loaded = false;
+      this.d_student_test_names_stderr_loaded = false;
+      this.load_student_test_names_stdout_content();
+      this.load_student_test_names_stderr_content();
     }
   }
 
   async toggle_d_show_validity_check_output() {
-    let old_toggle_val = this.d_show_validity_check_output;
     this.d_show_validity_check_output = !this.d_show_validity_check_output;
-    if (!old_toggle_val) {
-      if (!this.d_load_validity_check_output) {
-        this.d_load_validity_check_output = true;
-        this.d_validity_check_stdout_loaded = false;
-        this.d_validity_check_stderr_loaded = false;
-        this.load_validity_check_stdout_content();
-        this.load_validity_check_stderr_content();
-      }
+    if (this.d_show_validity_check_output && !this.d_load_validity_check_output) {
+      this.d_load_validity_check_output = true;
+      this.d_validity_check_stdout_loaded = false;
+      this.d_validity_check_stderr_loaded = false;
+      this.load_validity_check_stdout_content();
+      this.load_validity_check_stderr_content();
     }
   }
 
