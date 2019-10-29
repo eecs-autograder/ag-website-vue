@@ -1380,7 +1380,7 @@ describe('setup_correctness_level tests', () => {
 describe('panel_is_active - setup_case tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
-    test('decide_whether_to_open_setup - show_setup_return_code === false',
+    test('setup_panel_is_active - show_setup_return_code === false',
          async () => {
         ag_test_suite_result.setup_return_code = 1;
 
@@ -1396,10 +1396,10 @@ describe('panel_is_active - setup_case tests', () => {
         expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(1);
         expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
         expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code).toBe(false);
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
     });
 
-    test('decide_whether_to_open_setup - setup_correctness_level !== correct',
+    test('setup_panel_is_active - setup_correctness_level !== correct',
          async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
         ag_test_suite_result.setup_return_code = 1;
@@ -1415,10 +1415,10 @@ describe('panel_is_active - setup_case tests', () => {
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
         expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(1);
         expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
+        expect(wrapper.vm.setup_is_incorrect).toBe(true);
     });
 
-    test('decide_whether_to_open_setup - setup_return_code === correct but ' +
+    test('setup_panel_is_active - setup_return_code === correct but ' +
          'setup_timed_out === true',
          async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
@@ -1436,11 +1436,10 @@ describe('panel_is_active - setup_case tests', () => {
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
         expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
         expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBe(true);
-        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
+        expect(wrapper.vm.setup_is_incorrect).toBe(true);
     });
 
-    test('decide_whether_to_open_setup - setup_return_code === correct',
-         async () => {
+    test('setup_panel_is_active - setup_return_code === correct', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
         ag_test_suite_result.setup_return_code = 0;
         ag_test_suite_result.setup_timed_out = false;
@@ -1456,10 +1455,10 @@ describe('panel_is_active - setup_case tests', () => {
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
         expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
         expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBe(false);
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
     });
 
-    test('decide_whether_to_open_setup - setup_return_code === correct' +
+    test('setup_panel_is_active - setup_return_code === correct' +
          'AND setup_timed_out === null',
          async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
@@ -1476,10 +1475,10 @@ describe('panel_is_active - setup_case tests', () => {
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
         expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
         expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
     });
 
-    test('decide_whether_to_open_setup - setup_return_code === null', async () => {
+    test('setup_panel_is_active - setup_return_code === null', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
 
         wrapper = mount(AGSuiteResult, {
@@ -1493,11 +1492,10 @@ describe('panel_is_active - setup_case tests', () => {
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.not_available);
         expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBeNull();
         expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
     });
 
-    test('setup_panel_is_active - is_first_suite === false AND' +
-         'd_first_incorrect_setup !== d_ag_test_suite_result',
+    test('setup_panel_is_active - is_first_suite is false AND setup_is_incorrect is true',
          async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
         ag_test_suite_result.setup_return_code = 1;
@@ -1512,13 +1510,12 @@ describe('panel_is_active - setup_case tests', () => {
 
         expect(wrapper.vm.is_first_suite).toBe(false);
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
+        expect(wrapper.vm.setup_is_incorrect).toBe(true);
         expect(wrapper.vm.setup_panel_is_active).toBe(false);
     });
 
 
-    test('setup_panel_is_active - is_first_suite === true AND' +
-         'd_first_incorrect_setup === d_ag_test_suite_result',
+    test('setup_panel_is_active - is_first_suite is true AND setup_is_incorrect is true',
          async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
         ag_test_suite_result.setup_return_code = 1;
@@ -1534,12 +1531,11 @@ describe('panel_is_active - setup_case tests', () => {
 
         expect(wrapper.vm.is_first_suite).toBe(true);
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
+        expect(wrapper.vm.setup_is_incorrect).toBe(true);
         expect(wrapper.vm.setup_panel_is_active).toBe(true);
     });
 
-    test('setup_panel_is_active - is_first_suite === true AND' +
-         'd_first_incorrect_setup !== d_ag_test_suite_result',
+    test('setup_panel_is_active - is_first_suite is true AND setup_is_incorrect is false',
          async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
         ag_test_suite_result.setup_return_code = 0;
@@ -1555,7 +1551,7 @@ describe('panel_is_active - setup_case tests', () => {
 
         expect(wrapper.vm.is_first_suite).toBe(true);
         expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
         expect(wrapper.vm.setup_panel_is_active).toBe(false);
     });
 });
@@ -1602,7 +1598,7 @@ describe('panel_is_active - case tests', () => {
         ];
     });
 
-    test('decide_whether_to_open_case - first_incorrect_setup !== null', async () => {
+    test('setup_panel_is_active - setup_is_incorrect is true', async () => {
         ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
         ag_test_suite_result.setup_return_code = 1;
 
@@ -1626,7 +1622,7 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.first_incorrect_setup).toEqual(wrapper.vm.ag_test_suite_result);
+        expect(wrapper.vm.setup_is_incorrect).toBe(true);
         expect(wrapper.vm.first_incorrect_case).toBeNull();
         expect(wrapper.vm.get_case_is_active(
             wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
@@ -1636,8 +1632,8 @@ describe('panel_is_active - case tests', () => {
         )).toBe(false);
     });
 
-    test('first_incorrect_setup === null && all cases have case_level_correctness ' +
-         '=== none_correcct - d_first_incorrect_case applied to first incorrect case',
+    test('setup_is_incorrect is false && all cases have case_level_correctness ' +
+         '=== none_correcct - first_incorrect_case applied to first incorrect case',
          async () => {
         for (let command of ag_test_case_red_result.ag_test_command_results) {
             command.return_code_correct = false;
@@ -1659,7 +1655,7 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
         expect(wrapper.vm.first_incorrect_case).toEqual(
             wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         );
@@ -1671,8 +1667,8 @@ describe('panel_is_active - case tests', () => {
         )).toBe(false);
     });
 
-    test('first_incorrect_setup === null && all cases have case_level_correctness ' +
-         '=== all_correct - d_first_incorrect_case never set',
+    test('setup_is_incorrect is walse && all cases have case_level_correctness ' +
+         '=== all_correct - first_incorrect_case never set',
          async () => {
         for (let command of ag_test_case_red_result.ag_test_command_results) {
             command.return_code_correct = true;
@@ -1694,7 +1690,7 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
         expect(wrapper.vm.first_incorrect_case).toBeNull();
         expect(wrapper.vm.get_case_is_active(
             wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
@@ -1704,8 +1700,8 @@ describe('panel_is_active - case tests', () => {
         )).toBe(false);
     });
 
-    test('first_incorrect_setup === null && all cases have case_level_correctness ' +
-         '=== some_correct - d_first_incorrect_case set to first incorrect case',
+    test('setup_is_incorrect is false && all cases have case_level_correctness ' +
+         '=== some_correct - first_incorrect_case set to first incorrect case',
          async () => {
         for (let command of ag_test_case_red_result.ag_test_command_results) {
             command.return_code_correct = true;
@@ -1727,7 +1723,7 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
         expect(wrapper.vm.first_incorrect_case).toEqual(
             wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
         );
@@ -1739,8 +1735,8 @@ describe('panel_is_active - case tests', () => {
         )).toBe(false);
     });
 
-    test('first_incorrect_setup === null && some cases have case_level_correctness ' +
-         '=== all_correct - d_first_incorrect_case set to first incorrect case',
+    test('setup_is_incorrect is false && some cases have case_level_correctness ' +
+         '=== all_correct - first_incorrect_case set to first incorrect case',
          async () => {
         for (let command of ag_test_case_red_result.ag_test_command_results) {
             command.return_code_correct = true;
@@ -1762,7 +1758,7 @@ describe('panel_is_active - case tests', () => {
             }
         });
 
-        expect(wrapper.vm.first_incorrect_setup).toBeNull();
+        expect(wrapper.vm.setup_is_incorrect).toBe(false);
         expect(wrapper.vm.first_incorrect_case).toEqual(
             wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
         );

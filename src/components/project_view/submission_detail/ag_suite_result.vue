@@ -83,17 +83,14 @@ export default class AGSuiteResult extends Vue {
 
   readonly CorrectnessLevel = CorrectnessLevel;
 
-  get first_incorrect_setup(): AGTestSuiteResultFeedback | null {
-    if (this.setup_correctness_level === CorrectnessLevel.none_correct ||
-        (this.ag_test_suite_result!.setup_timed_out !== null
-         && this.ag_test_suite_result!.setup_timed_out!)) {
-      return this.ag_test_suite_result;
-    }
-    return null;
+  get setup_is_incorrect(): boolean {
+    return this.setup_correctness_level === CorrectnessLevel.none_correct
+           || (this.ag_test_suite_result!.setup_timed_out !== null
+               && this.ag_test_suite_result!.setup_timed_out!);
   }
 
   get first_incorrect_case(): AGTestCaseResultFeedback | null {
-    if (this.first_incorrect_setup !== null) {
+    if (this.setup_is_incorrect) {
       return null;
     }
 
@@ -116,7 +113,7 @@ export default class AGSuiteResult extends Vue {
   }
 
   get setup_panel_is_active(): boolean {
-    return this.is_first_suite && this.first_incorrect_setup !== null;
+    return this.is_first_suite && this.setup_is_incorrect;
   }
 
   get_case_is_active(ag_test_case: AGTestCaseResultFeedback): boolean {
