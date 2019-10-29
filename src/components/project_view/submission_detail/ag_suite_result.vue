@@ -9,7 +9,7 @@
       <div class="column-3"> Score </div>
     </div>
 
-    <submission-detail-panel
+    <result-panel
       v-if="ag_test_suite_result.setup_return_code !== null
             || ag_test_suite_result.setup_timed_out"
       ref="ag_case_setup_result_detail_panel"
@@ -20,10 +20,10 @@
                          :ag_test_suite_result="ag_test_suite_result"
                          :fdbk_category="fdbk_category">
       </AGSuiteSetupResult>
-    </submission-detail-panel>
+    </result-panel>
 
     <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
-      <submission-detail-panel
+      <result-panel
         ref="ag_case_result_detail_panel"
         :key="ag_test_case_result.pk"
         :name="ag_test_case_result.ag_test_case_name"
@@ -38,7 +38,7 @@
           :fdbk_category="fdbk_category"
           :ag_test_case_row_correctness_level="case_result_correctness(ag_test_case_result)">
         </AGCaseResult>
-      </submission-detail-panel>
+      </result-panel>
     </template>
 
   </div>
@@ -64,7 +64,7 @@ import ResultPanel from "@/components/project_view/submission_detail/result_pane
   components: {
     AGCaseResult,
     AGSuiteSetupResult,
-    SubmissionDetailPanel: ResultPanel
+    ResultPanel
   }
 })
 export default class AGSuiteResult extends Vue {

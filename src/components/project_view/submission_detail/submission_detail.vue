@@ -254,7 +254,7 @@ import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
     Modal,
     MultiFileViewer,
     MutationSuiteResults,
-    SubmissionDetailPanel: ResultPanel
+    ResultPanel
   }
 })
 export default class SubmissionDetail extends Vue {

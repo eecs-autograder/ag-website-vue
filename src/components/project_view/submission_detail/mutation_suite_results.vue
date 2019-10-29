@@ -11,7 +11,7 @@
     <div v-for="mutation_test_suite_result of mutation_test_suite_results"
          :key="mutation_test_suite_result.pk">
 
-      <submission-detail-panel
+      <result-panel
         ref="mutation_test_suite_detail_panel"
         :name="mutation_test_suite_result.student_test_suite_name"
         :correctness_level="mutation_suite_correctness(mutation_test_suite_result)"
@@ -21,7 +21,7 @@
                                :mutation_test_suite_result="mutation_test_suite_result"
                                :fdbk_category="fdbk_category">
         </mutation-suite-result>
-      </submission-detail-panel>
+      </result-panel>
     </div>
   </div>
 </template>
@@ -38,7 +38,7 @@ import ResultPanel from "@/components/project_view/submission_detail/result_pane
 @Component({
   components: {
     MutationSuiteResult,
-    SubmissionDetailPanel: ResultPanel
+    ResultPanel
   }
 })
 export default class MutationSuiteResults extends Vue {

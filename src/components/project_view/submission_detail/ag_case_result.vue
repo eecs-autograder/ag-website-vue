@@ -4,7 +4,7 @@
     <template v-if="ag_test_case_result.ag_test_command_results.length > 1">
       <div id="multi-command-body">
         <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
-          <submission-detail-panel
+          <result-panel
             ref="ag_test_command_panel"
             :key="ag_test_command_result.pk"
             :name="ag_test_command_result.ag_test_command_name"
@@ -14,7 +14,7 @@
                              :ag_test_command_result="ag_test_command_result"
                              :fdbk_category="fdbk_category">
             </AGTestCommandResult>
-          </submission-detail-panel>
+          </result-panel>
         </div>
       </div>
     </template>
@@ -47,7 +47,7 @@ import ResultPanel from "@/components/project_view/submission_detail/result_pane
 @Component({
   components: {
     AGTestCommandResult,
-    SubmissionDetailPanel: ResultPanel,
+    ResultPanel,
     CorrectnessIcon
   }
 })
