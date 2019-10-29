@@ -6,8 +6,8 @@
         <submission-panel
           :submission="d_ultimate_submission"
           :class="{
-            'selected-submission': d_selected_submission !== null
-                                   && d_selected_submission.pk === d_ultimate_submission.pk
+            'active': d_selected_submission !== null
+                      && d_selected_submission.pk === d_ultimate_submission.pk
           }"
           @click.native="d_selected_submission = d_ultimate_submission"></submission-panel>
       </template>
@@ -165,7 +165,9 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
     await this.get_ultimate_submission();
     this.d_submissions = await Submission.get_all_from_group_with_results(group.pk);
 
+    console.log('weeee-')
     if (this.d_submissions.length !== 0) {
+    console.log('aaaaa')
       this.d_selected_submission = (
         this.d_ultimate_submission !== null ? this.d_ultimate_submission : this.d_submissions[0]
       );
@@ -339,7 +341,7 @@ $border-color: $pebble-medium;
   @include header(19px, 10px);
 }
 
-.selected-submission {
+.active {
   background-color: $active-color;
 }
 

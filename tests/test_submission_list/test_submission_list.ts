@@ -9,6 +9,7 @@ import * as utils from '@/utils';
 
 
 import * as data_ut from '@/tests/data_utils';
+import {wait_for_load} from '@/tests/utils';
 
 let user: ag_cli.User;
 let course: ag_cli.Course;
@@ -53,7 +54,7 @@ describe('Submission list tests', () => {
 
         expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(0);
-        expect(wrapper.findAll('.selected-submission').length).toEqual(0);
+        expect(wrapper.findAll('.active').length).toEqual(0);
         expect(wrapper.vm.d_selected_submission).toBeNull();
         expect(wrapper.vm.d_ultimate_submission).toBeNull();
         expect(wrapper.vm.d_submissions).toEqual([]);
@@ -112,11 +113,10 @@ describe('Submission list tests', () => {
             }
         });
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
-        expect(wrapper.findAll('.selected-submission').length).toEqual(1);
+        expect(wrapper.findAll('.active').length).toEqual(1);
         expect(wrapper.vm.d_selected_submission).toEqual(submission1);
     });
 
@@ -216,7 +216,7 @@ describe('Ultimate submission tests', () => {
 
         // Ultimate submission shows up once on its own and once in "All Submissions"
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
-        expect(wrapper.findAll('.selected-submission').length).toEqual(2);
+        expect(wrapper.findAll('.active').length).toEqual(2);
         expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
 
         expect(wrapper.vm.d_submissions).toEqual([submission, ultimate_submission]);
