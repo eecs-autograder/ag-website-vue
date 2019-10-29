@@ -254,10 +254,10 @@ export default class ViewFile extends Vue implements Created {
       return;
     }
 
-    if (line_index < this.d_first_highlighted_line) {
+    if (line_index < this.d_first_highlighted_line!) {
       this.d_first_highlighted_line = line_index;
     }
-    if (line_index > this.d_last_highlighted_line) {
+    if (line_index > this.d_last_highlighted_line!) {
       this.d_last_highlighted_line = line_index;
     }
   }

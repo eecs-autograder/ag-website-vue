@@ -255,7 +255,7 @@ describe('ContextMenu tests', () => {
                 return {
                     is_open: false,
                     coordinates: {x: 0, y: 0}
-                }
+                };
             }
         };
 

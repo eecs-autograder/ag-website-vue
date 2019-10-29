@@ -287,7 +287,7 @@ describe('ViewFile handgrading tests', () => {
                 }
             )).toBe(true);
 
-            wrapper.vm.handgrading_result.applied_annotations.push(new_applied_annotation);
+            wrapper.vm.handgrading_result!.applied_annotations.push(new_applied_annotation);
             await wrapper.vm.$nextTick();
             expect(wrapper.findAll('.comment').length).toEqual(4);
             expect(wrapper.findAll('.comment').at(0).find('.comment-message').text()).toContain(
@@ -345,7 +345,7 @@ describe('ViewFile handgrading tests', () => {
             }
         )).toBe(true);
 
-        wrapper.vm.handgrading_result.comments.push(new_comment);
+        wrapper.vm.handgrading_result!.comments.push(new_comment);
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(4);
         expect(wrapper.findAll('.comment').at(0).find('.comment-message').text()).toContain(
@@ -379,7 +379,7 @@ describe('ViewFile handgrading tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         expect(delete_stub.calledOnce).toBe(true);
 
-        wrapper.vm.handgrading_result.applied_annotations.pop();
+        wrapper.vm.handgrading_result!.applied_annotations.pop();
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(2);
     });
@@ -392,7 +392,7 @@ describe('ViewFile handgrading tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         expect(delete_stub.calledOnce).toBe(true);
 
-        wrapper.vm.handgrading_result.comments.pop();
+        wrapper.vm.handgrading_result!.comments.pop();
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(2);
     });
