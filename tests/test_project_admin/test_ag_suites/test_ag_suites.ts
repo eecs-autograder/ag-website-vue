@@ -629,15 +629,305 @@ describe('deleting ag_test_case', () => {
 });
 
 describe('prev_ag_test_case_is_available', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
 
+    let suite_1: AGTestSuite;
+    let suite_1_case_1: AGTestCase;
+    let suite_1_case_1_command_1: AGTestCommand;
+    let suite_1_case_2: AGTestCase;
+    let suite_1_case_2_command_1: AGTestCommand;
+    let suite_1_case_2_command_2: AGTestCommand;
+
+    let suite_2: AGTestSuite;
+    let suite_2_case_1: AGTestCase;
+    let suite_2_case_1_command_1: AGTestCommand;
+    let suite_2_case_1_command_2: AGTestCommand;
+
+    let suite_3: AGTestSuite;
+    let suite_3_case_1: AGTestCase;
+    let suite_3_case_1_command_1: AGTestCommand;
+
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        suite_1 = data_ut.make_ag_test_suite(project.pk);
+        suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
+        suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+        suite_1_case_2 = data_ut.make_ag_test_case(suite_1.pk);
+        suite_1_case_2_command_1 = data_ut.make_ag_test_command(suite_1_case_2.pk);
+        suite_1_case_2_command_2 = data_ut.make_ag_test_command(suite_1_case_2.pk);
+
+        suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
+        suite_1_case_2.ag_test_commands = [suite_1_case_2_command_1, suite_1_case_2_command_2];
+        suite_1.ag_test_cases = [suite_1_case_1, suite_1_case_2];
+
+        suite_2 = data_ut.make_ag_test_suite(project.pk);
+        suite_2_case_1 = data_ut.make_ag_test_case(suite_2.pk);
+        suite_2_case_1_command_1 = data_ut.make_ag_test_command(suite_2_case_1.pk);
+        suite_2_case_1_command_2 = data_ut.make_ag_test_command(suite_2_case_1.pk);
+
+        suite_2_case_1.ag_test_commands = [suite_2_case_1_command_1, suite_2_case_1_command_2];
+        suite_2.ag_test_cases = [suite_2_case_1];
+
+        suite_3 = data_ut.make_ag_test_suite(project.pk);
+        suite_3_case_1 = data_ut.make_ag_test_case(suite_3.pk);
+        suite_3_case_1_command_1 = data_ut.make_ag_test_command(suite_3_case_1.pk);
+
+        suite_3_case_1.ag_test_commands = [suite_3_case_1_command_1];
+        suite_3.ag_test_cases = [suite_3_case_1];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
+            [suite_1, suite_2, suite_3]
+        ));
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('prev_ag_test_case_is_available (false) - d_active_ag_test_suite is null', async () => {
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
+        expect(wrapper.findAll('#prev-ag-test-case-button').length).toEqual(0);
+    });
+
+    test('prev_ag_test_case_is_available (false) - d_active_ag_test_command is null', async () => {
+        wrapper.vm.update_active_item(suite_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
+        expect(wrapper.findAll('#prev-ag-test-case-button').length).toEqual(0);
+    });
+
+    test('prev_ag_test_case_is_available (false) - suite index is 0, case index is 0', async () => {
+        wrapper.vm.update_active_item(suite_1_case_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test('prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, ' +
+         'prev suite doesnt have any cases',
+         async () => {
+        AGTestCase.notify_ag_test_case_deleted(suite_2_case_1);
+        await wrapper.vm.$nextTick();
+
+        wrapper.vm.update_active_item(suite_3_case_1_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test("prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, " +
+         "prev suite's last case doesnt have enough commands",
+         async () => {
+        AGTestCommand.notify_ag_test_command_deleted(suite_1_case_2_command_2);
+        await wrapper.vm.$nextTick();
+
+        wrapper.vm.update_active_item(suite_2_case_1_command_2);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test("prev_ag_test_case_is_available (true) - suite index != 0, case index is 0, " +
+         "prev suite's last case has enough commands",
+         async () => {
+        wrapper.vm.update_active_item(suite_3_case_1_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+    });
+
+    test('prev_ag_test_case_is_available (false) - suite index is 0, case index != 0, ' +
+         'prev case does not have enough commands',
+         async () => {
+        wrapper.vm.update_active_item(suite_1_case_2_command_2);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test('prev_ag_test_case_is_available (true) - suite index is 0, case index != 0, prev ' +
+         'case has enough commands',
+         async () => {
+        wrapper.vm.update_active_item(suite_1_case_2_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+    });
 });
 
 describe('go_to_prev_command', () => {
 
 });
 
-describe('next_ag_test_case_is_available', () => {
+describe.only('next_ag_test_case_is_available', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
 
+    let suite_1: AGTestSuite;
+    let suite_1_case_1: AGTestCase;
+    let suite_1_case_1_command_1: AGTestCommand;
+    let suite_1_case_2: AGTestCase;
+    let suite_1_case_2_command_1: AGTestCommand;
+    let suite_1_case_2_command_2: AGTestCommand;
+
+    let suite_2: AGTestSuite;
+    let suite_2_case_1: AGTestCase;
+    let suite_2_case_1_command_1: AGTestCommand;
+    let suite_2_case_1_command_2: AGTestCommand;
+
+    let suite_3: AGTestSuite;
+    let suite_3_case_1: AGTestCase;
+    let suite_3_case_1_command_1: AGTestCommand;
+
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        suite_1 = data_ut.make_ag_test_suite(project.pk);
+        suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
+        suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+        suite_1_case_2 = data_ut.make_ag_test_case(suite_1.pk);
+        suite_1_case_2_command_1 = data_ut.make_ag_test_command(suite_1_case_2.pk);
+        suite_1_case_2_command_2 = data_ut.make_ag_test_command(suite_1_case_2.pk);
+
+        suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
+        suite_1_case_2.ag_test_commands = [suite_1_case_2_command_1, suite_1_case_2_command_2];
+        suite_1.ag_test_cases = [suite_1_case_1, suite_1_case_2];
+
+        suite_2 = data_ut.make_ag_test_suite(project.pk);
+        suite_2_case_1 = data_ut.make_ag_test_case(suite_2.pk);
+        suite_2_case_1_command_1 = data_ut.make_ag_test_command(suite_2_case_1.pk);
+        suite_2_case_1_command_2 = data_ut.make_ag_test_command(suite_2_case_1.pk);
+
+        suite_2_case_1.ag_test_commands = [suite_2_case_1_command_1, suite_2_case_1_command_2];
+        suite_2.ag_test_cases = [suite_2_case_1];
+
+        suite_3 = data_ut.make_ag_test_suite(project.pk);
+        suite_3_case_1 = data_ut.make_ag_test_case(suite_3.pk);
+        suite_3_case_1_command_1 = data_ut.make_ag_test_command(suite_3_case_1.pk);
+
+        suite_3_case_1.ag_test_commands = [suite_3_case_1_command_1];
+        suite_3.ag_test_cases = [suite_3_case_1];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
+            [suite_1, suite_2, suite_3]
+        ));
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('next_ag_test_case_is_available (false) - d_active_ag_test_suite is null',
+         async () => {
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
+        expect(wrapper.findAll('#next-ag-test-case-button').length).toEqual(0);
+    });
+
+    test('next_ag_test_case_is_available (false) - d_active_ag_test_command is null',
+         async () => {
+        wrapper.vm.update_active_item(suite_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
+        expect(wrapper.findAll('#next-ag-test-case-button').length).toEqual(0);
+    });
+
+    test('next_ag_test_case_is_available (false) - suite index is 0, case index is 0, ' +
+         'next case doesnt have enough commands',
+         async () => {
+        let suite_1_case_1_command_2 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+        let suite_1_case_1_command_3 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+
+        AGTestCommand.notify_ag_test_command_created(suite_1_case_1_command_2);
+        AGTestCommand.notify_ag_test_command_created(suite_1_case_1_command_3);
+
+        wrapper.vm.update_active_item(suite_1_case_1_command_3);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test('next_ag_test_case_is_available (true) - suite index is 0, case index is 0, next ' +
+         'case has enough commands',
+         async () => {
+        wrapper.vm.update_active_item(suite_1_case_1_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+    });
+
+    test('next_ag_test_case_is_available (false) - suite is the last suite, case is the ' +
+         'last case in the suite',
+         async () => {
+        wrapper.vm.update_active_item(suite_3_case_1_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
+         'case is the last case in the suite, next suite doesnt have any cases',
+         async () => {
+        AGTestCase.notify_ag_test_case_deleted(suite_3_case_1);
+
+        wrapper.vm.update_active_item(suite_2_case_1_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test('next_ag_test_case_is_available (false) - suite is not the last suite, case is ' +
+         'the last case in the suite, first case in next suite doesnt have enough commands',
+         async () => {
+        wrapper.vm.update_active_item(suite_2_case_1_command_2);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+    });
+
+    test('next_ag_test_case_is_available (true) - suite is not the last suite, case is' +
+         'the last case in the suite, first case in the next suite has enough commands',
+         async () => {
+        wrapper.vm.update_active_item(suite_2_case_1_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+    });
 });
 
 describe('go_to_next_command', () => {
@@ -1046,95 +1336,6 @@ describe('AGSuites tests', () => {
 
     // Visiting Previous Test Case ---------------------------------------------------------------
 
-    test.skip('prev_ag_test_case_is_available (false) - d_active_ag_test_suite is null',
-              async () => {
-        expect(component.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.findAll('#prev-ag-test-case-button').length).toEqual(0);
-    });
-
-    test.skip('prev_ag_test_case_is_available (false) - d_active_ag_test_command is null',
-              async () => {
-        component.update_active_item(ag_suite_colors);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.findAll('#prev-ag-test-case-button').length).toEqual(0);
-    });
-
-    test.skip('prev_ag_test_case_is_available (false) - suite index is 0, case index is 0',
-         async () => {
-        component.update_active_item(ag_case_purple);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip('prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, ' +
-         'prev suite doesnt have any cases',
-         async () => {
-        AGTestCase.notify_ag_test_case_deleted(ag_case_dog);
-        await component.$nextTick();
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_bird);
-        await component.$nextTick();
-
-        component.update_active_item(ag_command_sprite_1);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip("prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, " +
-         "prev suite's last case doesnt have enough commands",
-         async () => {
-        let ag_case_cat = data_ut.make_ag_test_case(ag_suite_pets.pk);
-
-        AGTestCase.notify_ag_test_case_created(ag_case_cat);
-        await component.$nextTick();
-
-        component.update_active_item(ag_case_sprite);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip("prev_ag_test_case_is_available (true) - suite index != 0, case index is 0, " +
-         "prev suite's last case has enough commands",
-         async () => {
-        component.update_active_item(ag_command_sprite_1);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
-    });
-
-    test.skip('prev_ag_test_case_is_available (false) - suite index is 0, case index != 0, ' +
-         'prev case does not have enough commands',
-         async () => {
-        component.update_active_item(ag_command_green_3);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip('prev_ag_test_case_is_available (true) - suite index is 0, case index != 0, prev ' +
-         'case has enough commands',
-         async () => {
-        let ag_command_blue_2 = data_ut.make_ag_test_command(ag_case_blue.pk);
-
-        AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
-        await component.$nextTick();
-
-        component.update_active_item(ag_command_green_2);
-        await component.$nextTick();
-
-        expect(component.prev_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
-    });
 
     test.skip('go_to_prev_command - prev case in same suite', async () => {
         component.update_active_item(ag_command_blue_1);
@@ -1164,85 +1365,7 @@ describe('AGSuites tests', () => {
 
     // Visiting Next Test Case -------------------------------------------------------------------
 
-    test.skip('next_ag_test_case_is_available (false) - d_active_ag_test_suite is null',
-              async () => {
-        expect(component.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.findAll('#next-ag-test-case-button').length).toEqual(0);
-    });
 
-    test.skip('next_ag_test_case_is_available (false) - d_active_ag_test_command is null',
-              async () => {
-        component.update_active_item(ag_suite_colors);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.findAll('#next-ag-test-case-button').length).toEqual(0);
-    });
-
-    test.skip('next_ag_test_case_is_available (false) - suite index is 0, case index is 0, ' +
-         'next case doesnt have enough commands',
-         async () => {
-        component.update_active_item(ag_command_purple_2);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip('next_ag_test_case_is_available (true) - suite index is 0, case index is 0, next ' +
-         'case has enough commands',
-         async () => {
-        component.update_active_item(ag_command_purple_1);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
-    });
-
-    test.skip('next_ag_test_case_is_available (false) - suite is the last suite, case is the ' +
-         'last case in the suite',
-         async () => {
-        component.update_active_item(ag_command_sprite_1);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
-         'case is the last case in the suite, next suite doesnt have any cases',
-         async () => {
-        let new_suite = data_ut.make_ag_test_suite(project.pk);
-
-        AGTestSuite.notify_ag_test_suite_created(new_suite);
-        await component.$nextTick();
-
-        component.update_active_item(ag_command_sprite_1);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip('next_ag_test_case_is_available (false) - suite is not the last suite, case is ' +
-         'the last case in the suite, first case in next suite doesnt have enough commands',
-         async () => {
-        component.update_active_item(ag_command_green_2);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
-    });
-
-    test.skip('next_ag_test_case_is_available (true) - suite is not the last suite, case is' +
-         'the last case in the suite, first case in the next suite has enough commands',
-         async () => {
-        component.update_active_item(ag_command_green_1);
-        await component.$nextTick();
-
-        expect(component.next_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
-    });
 
     test.skip('go_to_next_command - next case in same suite', async () => {
         component.update_active_item(ag_command_dog_1);
