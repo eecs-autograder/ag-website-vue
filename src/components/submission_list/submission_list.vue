@@ -165,9 +165,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
     await this.get_ultimate_submission();
     this.d_submissions = await Submission.get_all_from_group_with_results(group.pk);
 
-    console.log('weeee-')
     if (this.d_submissions.length !== 0) {
-    console.log('aaaaa')
       this.d_selected_submission = (
         this.d_ultimate_submission !== null ? this.d_ultimate_submission : this.d_submissions[0]
       );

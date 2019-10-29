@@ -9,7 +9,7 @@ import * as utils from '@/utils';
 
 
 import * as data_ut from '@/tests/data_utils';
-import {wait_for_load} from '@/tests/utils';
+import { wait_for_load } from '@/tests/utils';
 
 let user: ag_cli.User;
 let course: ag_cli.Course;
