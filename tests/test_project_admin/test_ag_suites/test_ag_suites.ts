@@ -159,7 +159,147 @@ describe('ag_test_suite changed', () => {
 });
 
 describe('deleting ag_test_suite', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
+    let first_suite: AGTestSuite;
+    let middle_suite: AGTestSuite;
+    let last_suite: AGTestSuite;
 
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        first_suite = data_ut.make_ag_test_suite(project.pk);
+        middle_suite = data_ut.make_ag_test_suite(project.pk);
+        last_suite = data_ut.make_ag_test_suite(project.pk);
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
+            Promise.resolve(
+                [
+                    first_suite,
+                    middle_suite,
+                    last_suite
+                ]
+            )
+        );
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('Delete first suite in suites', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        AGTestSuite.notify_ag_test_suite_deleted(first_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(middle_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(last_suite);
+    });
+
+    test('Delete active first suite in suites', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        wrapper.vm.update_active_item(first_suite);
+        await wrapper.vm.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(first_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_suite!.pk).toEqual(middle_suite.pk);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(middle_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(last_suite);
+    });
+
+    test('Delete last suite in suites', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        AGTestSuite.notify_ag_test_suite_deleted(last_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(first_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(middle_suite);
+    });
+
+    test('Delete active last suite in suites', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        wrapper.vm.update_active_item(last_suite);
+        await wrapper.vm.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(last_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_suite!.pk).toEqual(middle_suite.pk);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(first_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(middle_suite);
+    });
+
+    test('Delete middle suite in suites', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(first_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(last_suite);
+    });
+
+    test('Delete active middle suite in suites', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        wrapper.vm.update_active_item(middle_suite);
+        await wrapper.vm.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_suite!.pk).toEqual(last_suite.pk);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(first_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(last_suite);
+    });
+
+    test('Delete all suites - active_suite gets set to null', async () => {
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
+
+        wrapper.vm.update_active_item(first_suite);
+        await wrapper.vm.$nextTick();
+
+        AGTestSuite.notify_ag_test_suite_deleted(first_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(middle_suite);
+        expect(wrapper.vm.d_ag_test_suites[1]).toEqual(last_suite);
+
+        AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(1);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(last_suite);
+
+        AGTestSuite.notify_ag_test_suite_deleted(last_suite);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
+        expect(wrapper.vm.d_active_ag_test_suite).toBe(null);
+    });
 });
 
 describe('creating ag_test_case', () => {
@@ -204,8 +344,288 @@ describe('creating ag_test_case', () => {
     });
 });
 
-describe('deleting ag_test_case', () => {
+describe('ag_test_case changed', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
+    let ag_test_suite: AGTestSuite;
+    let ag_test_case: AGTestCase;
 
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        ag_test_suite = data_ut.make_ag_test_suite(project.pk);
+        ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
+        ag_test_case.ag_test_commands = [data_ut.make_ag_test_command(ag_test_case.pk)];
+        ag_test_suite.ag_test_cases = [ag_test_case];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
+            [ag_test_suite]
+        ));
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('Case changed', async () => {
+        let updated_ag_test_case = deep_copy(ag_test_case, AGTestCase);
+        updated_ag_test_case.name = 'Updated name';
+
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(ag_test_suite);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(ag_test_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).not.toEqual(updated_ag_test_case);
+
+        AGTestCase.notify_ag_test_case_changed(updated_ag_test_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(updated_ag_test_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).not.toEqual(ag_test_case);
+    });
+});
+
+describe('cloning ag_test_case', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
+    let suite: AGTestSuite;
+    let case_to_clone: AGTestCase;
+    let clone_of_case: AGTestCase;
+
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        suite = data_ut.make_ag_test_suite(project.pk);
+        case_to_clone = data_ut.make_ag_test_case(suite.pk);
+        case_to_clone.ag_test_commands = [data_ut.make_ag_test_command(case_to_clone.pk)];
+        suite.ag_test_cases = [case_to_clone];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
+            [suite]
+        ));
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('Clone an ag test case', async () => {
+        let new_case_name = "New Case Name";
+        clone_of_case = data_ut.make_ag_test_case(suite.pk, { name: new_case_name });
+
+        let clone_case_stub = sinon.stub(case_to_clone, 'copy').callsFake(
+            () => AGTestCase.notify_ag_test_case_created(clone_of_case)
+        );
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
+
+        wrapper.vm.update_active_item(case_to_clone);
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('#ag-test-case-menu').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let case_to_clone_panel = wrapper.findAll('#ag-test-case-panel').at(0);
+        case_to_clone_panel.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let ag_test_case_clone_name = case_to_clone_panel.find(
+            {ref: 'ag_test_case_clone_name'}
+        );
+        set_validated_input_text(ag_test_case_clone_name, new_case_name);
+
+        case_to_clone_panel.find('#clone-ag-test-case-form').trigger('submit');
+        await wrapper.vm.$nextTick();
+
+        expect(clone_case_stub.calledOnce).toBe(true);
+        expect(clone_case_stub.firstCall.calledWith(new_case_name)).toBe(true);
+        expect(clone_case_stub.calledOn(case_to_clone)).toBe(true);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(clone_of_case);
+    });
+});
+
+describe('deleting ag_test_case', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
+    let suite: AGTestSuite;
+    let first_case: AGTestCase;
+    let middle_case: AGTestCase;
+    let last_case: AGTestCase;
+
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        suite = data_ut.make_ag_test_suite(project.pk);
+        first_case = data_ut.make_ag_test_case(suite.pk);
+        middle_case = data_ut.make_ag_test_case(suite.pk);
+        last_case = data_ut.make_ag_test_case(suite.pk);
+
+        first_case.ag_test_commands = [data_ut.make_ag_test_command(first_case.pk)];
+        middle_case.ag_test_commands = [data_ut.make_ag_test_command(middle_case.pk)];
+        last_case.ag_test_commands = [data_ut.make_ag_test_command(last_case.pk)];
+
+        suite.ag_test_cases = [
+          first_case,
+          middle_case,
+          last_case
+        ];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
+            [suite]
+        ));
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('First case deleted', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(first_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(middle_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(last_case);
+    });
+
+    test('active first case deleted', async () => {
+        wrapper.vm.update_active_item(first_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(first_case.ag_test_commands[0]);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(first_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_case.ag_test_commands[0]);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(middle_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(last_case);
+    });
+
+    test('Middle case deleted', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(middle_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(first_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(last_case);
+    });
+
+    test('Active middle case deleted', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        wrapper.vm.update_active_item(middle_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_case.ag_test_commands[0]);
+
+        AGTestCase.notify_ag_test_case_deleted(middle_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(last_case.ag_test_commands[0]);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(first_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(last_case);
+    });
+
+    test('last case deleted', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        AGTestCase.notify_ag_test_case_deleted(last_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(first_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(middle_case);
+    });
+
+    test('active last case deleted', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        wrapper.vm.update_active_item(last_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(last_case.ag_test_commands[0]);
+
+        AGTestCase.notify_ag_test_case_deleted(last_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_case.ag_test_commands[0]);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(first_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(middle_case);
+    });
+
+    test('Delete all cases in suite - suite becomes active', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
+
+        wrapper.vm.update_active_item(first_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(first_case.ag_test_commands[0]);
+
+        AGTestCase.notify_ag_test_case_deleted(first_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(middle_case);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(last_case);
+        expect(wrapper.vm.d_active_ag_test_suite).toBeNull();
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_case.ag_test_commands[0]);
+
+        AGTestCase.notify_ag_test_case_deleted(middle_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(last_case);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(last_case.ag_test_commands[0]);
+
+        AGTestCase.notify_ag_test_case_deleted(last_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(0);
+        expect(wrapper.vm.d_active_ag_test_command).toBeNull();
+        expect(wrapper.vm.d_active_ag_test_suite).toEqual(suite);
+    });
 });
 
 describe('prev_ag_test_case_is_available', () => {
@@ -233,11 +653,7 @@ describe('AGSuites getter functions', () => {
     let project: Project;
 
     beforeEach(() => {
-        wrapper = mount(AGSuites, {
-           propsData: {
-               project: project
-           }
-        });
+        project = data_ut.make_project(data_ut.make_course().pk);
     });
 
     afterEach(() => {
@@ -248,51 +664,123 @@ describe('AGSuites getter functions', () => {
         }
     });
 
-    test.skip('parent_ag_test_case getter', async () => {
-        let ag_test_suite: AGTestSuite;
-        let ag_test_case_1: AGTestCase;
-        let ag_test_command_1: AGTestCommand;
-        let ag_test_case_a: AGTestCase;
-        let ag_test_command_a: AGTestCommand;
+    test('parent_ag_test_case getter', async () => {
+        let ag_test_suite_colors = data_ut.make_ag_test_suite(project.pk);
+        let ag_test_case_purple = data_ut.make_ag_test_case(ag_test_suite_colors.pk);
+        let ag_test_command_purple = data_ut.make_ag_test_command(ag_test_case_purple.pk);
+        let ag_test_case_blue = data_ut.make_ag_test_case(ag_test_suite_colors.pk);
+        let ag_test_command_blue = data_ut.make_ag_test_command(ag_test_case_blue.pk);
+
+        ag_test_case_purple.ag_test_commands = [ag_test_command_purple];
+        ag_test_case_blue.ag_test_commands = [ ag_test_command_blue];
+        ag_test_suite_colors.ag_test_cases = [ag_test_case_purple, ag_test_case_blue];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
+            Promise.resolve([ag_test_suite_colors])
+        );
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
 
         expect(wrapper.vm.parent_ag_test_case).toBeNull();
 
-        wrapper.vm.update_active_item(ag_test_case_1);
+        wrapper.vm.update_active_item(ag_test_case_purple);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_case).toEqual(ag_test_case_1);
+        expect(wrapper.vm.parent_ag_test_case).toEqual(ag_test_case_purple);
 
-        wrapper.vm.update_active_item(ag_test_command_a);
+        wrapper.vm.update_active_item(ag_test_command_blue);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_case).toEqual(ag_test_case_a);
+        expect(wrapper.vm.parent_ag_test_case).toEqual(ag_test_case_blue);
     });
 
-    test.skip('parent_ag_test_suite getter', async () => {
-        let ag_test_suite_1: AGTestSuite;
-        let ag_test_case_1: AGTestCase;
-        let ag_test_command_1: AGTestCommand;
-        let ag_test_suite_2: AGTestSuite;
-        let ag_test_case_2
+    test('parent_ag_test_suite getter', async () => {
+        let ag_test_suite_coke = data_ut.make_ag_test_suite(project.pk);
+        let ag_test_case_coke = data_ut.make_ag_test_case(ag_test_suite_coke.pk);
+        let ag_test_command_coke = data_ut.make_ag_test_command(ag_test_case_coke.pk);
+        let ag_test_suite_pepsi = data_ut.make_ag_test_suite(project.pk);
+        let ag_test_case_pepsi = data_ut.make_ag_test_case(ag_test_suite_pepsi.pk);
+        let ag_test_command_pepsi = data_ut.make_ag_test_command(ag_test_case_pepsi.pk);
+
+        ag_test_case_coke.ag_test_commands = [ag_test_command_coke];
+        ag_test_case_pepsi.ag_test_commands = [ag_test_command_pepsi];
+
+        ag_test_suite_coke.ag_test_cases = [ag_test_case_coke];
+        ag_test_suite_pepsi.ag_test_cases = [ag_test_case_pepsi];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
+            Promise.resolve([ag_test_suite_coke, ag_test_suite_pepsi])
+        );
+
+        wrapper = mount(AGSuites, {
+            propsData: {
+                project: project
+            }
+        });
 
         expect(wrapper.vm.parent_ag_test_suite).toBeNull();
 
-        wrapper.vm.update_active_item(ag_suite_pets);
+        wrapper.vm.update_active_item(ag_test_suite_coke);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.parent_ag_test_suite).toBeNull();
 
-        wrapper.vm.update_active_item(ag_case_blue);
+        wrapper.vm.update_active_item(ag_test_case_coke);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_suite).toEqual(ag_suite_colors);
+        expect(wrapper.vm.parent_ag_test_suite).toEqual(ag_test_suite_coke);
 
-        wrapper.vm.update_active_item(ag_command_bird_1);
+        wrapper.vm.update_active_item(ag_test_case_pepsi);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_suite).toEqual(ag_suite_pets);
+        expect(wrapper.vm.parent_ag_test_suite).toEqual(ag_test_suite_pepsi);
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -454,241 +942,6 @@ describe('AGSuites tests', () => {
 
         component.d_new_ag_test_suite_name = "Suite II";
         expect(get_validated_input_text(d_new_ag_test_suite_name_input)).toEqual("Suite II");
-    });
-
-    test.skip('Delete first suite in suites', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-    });
-
-    test.skip('Delete active first suite in suites', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        component.update_active_item(ag_suite_colors);
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-        expect(component.d_active_ag_test_suite!.pk).toEqual(ag_suite_pets.pk);
-    });
-
-    test.skip('Delete last suite in suites', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-    });
-
-    test.skip('Delete active last suite in suites', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        component.update_active_item(ag_suite_beverages);
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-        expect(component.d_active_ag_test_suite!.pk).toEqual(ag_suite_pets.pk);
-    });
-
-    test.skip('Delete middle suite in suites', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-    });
-
-    test.skip('Delete active middle suite in suites', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        component.update_active_item(ag_suite_pets);
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-        expect(component.d_active_ag_test_suite!.pk).toEqual(ag_suite_beverages.pk);
-    });
-
-    test.skip('Delete all suites - active_suite gets set to null', async () => {
-        expect(component.d_ag_test_suites.length).toEqual(3);
-
-        component.update_active_item(ag_suite_colors);
-        await component.$nextTick();
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_colors);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(2);
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_pets);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(1);
-
-        AGTestSuite.notify_ag_test_suite_deleted(ag_suite_beverages);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites.length).toEqual(0);
-        expect(component.d_active_ag_test_suite).toBe(null);
-    });
-
-    // Case Related ------------------------------------------------------------------------------
-
-    test.skip('Case changed', async () => {
-        let updated_ag_case_bird = deep_copy(ag_case_bird, AGTestCase);
-        updated_ag_case_bird.name = 'Updated name';
-
-        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.d_ag_test_suites[1].ag_test_cases[1]).toEqual(ag_case_bird);
-        expect(component.d_ag_test_suites[1].ag_test_cases[1]).not.toEqual(updated_ag_case_bird);
-
-        AGTestCase.notify_ag_test_case_changed(updated_ag_case_bird);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.d_ag_test_suites[1].ag_test_cases[1]).toEqual(updated_ag_case_bird);
-    });
-
-    test.skip('Clone an ag test case', async () => {
-        let new_case = data_ut.make_ag_test_case(ag_suite_colors.pk);
-        let new_case_name = "New Case Name";
-        let clone_case_stub = sinon.stub(ag_case_blue, 'copy').callsFake(
-            () => AGTestCase.notify_ag_test_case_created(new_case)
-        );
-
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        wrapper.vm.update_active_item(ag_case_blue);
-        await wrapper.vm.$nextTick();
-
-        wrapper.find('#ag-test-case-menu').trigger('click');
-        await component.$nextTick();
-
-        let ag_case_blue_panel = wrapper.findAll('#ag-test-case-panel').at(1);
-        ag_case_blue_panel.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let ag_test_case_clone_name = ag_case_blue_panel.find({ref: 'ag_test_case_clone_name'});
-        set_validated_input_text(ag_test_case_clone_name, new_case_name);
-
-        ag_case_blue_panel.find('#clone-ag-test-case-form').trigger('submit');
-        await wrapper.vm.$nextTick();
-
-        expect(clone_case_stub.calledOnce).toBe(true);
-        expect(clone_case_stub.firstCall.calledWith(new_case_name)).toBe(true);
-        expect(clone_case_stub.calledOn(ag_case_blue)).toBe(true);
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(4);
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[3]).toEqual(new_case);
-    });
-
-    test.skip('First case deleted', async () => {
-        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_purple);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
-    });
-
-    test.skip('active first case deleted', async () => {
-        component.update_active_item(ag_case_purple);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_purple_1);
-        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_purple);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
-    });
-
-    test.skip('Middle case deleted', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_blue);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
-    });
-
-    test.skip('Active middle case deleted', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        component.update_active_item(ag_case_blue);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_blue);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
-    });
-
-    test.skip('last case deleted', async () => {
-        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_green);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
-    });
-
-    test.skip('active last case deleted', async () => {
-        component.update_active_item(ag_case_green);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
-        expect(component.d_ag_test_suites[0]).toEqual(ag_suite_colors);
-        expect(component.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_green);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
-    });
-
-    test.skip('Delete all cases in suite - suite becomes active', async () => {
-        component.update_active_item(ag_case_dog);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
-        expect(component.d_ag_test_suites[1]).toEqual(ag_suite_pets);
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(2);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_dog);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(1);
-        expect(component.d_active_ag_test_suite).toBeNull();
-        expect(component.d_active_ag_test_command).toEqual(ag_command_bird_1);
-
-        AGTestCase.notify_ag_test_case_deleted(ag_case_bird);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[1].ag_test_cases.length).toEqual(0);
-        expect(component.d_active_ag_test_suite).toEqual(ag_suite_pets);
     });
 
     // Command Related ---------------------------------------------------------------------------
