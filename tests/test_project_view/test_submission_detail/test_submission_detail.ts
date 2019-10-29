@@ -524,7 +524,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.find('#submission-score').exists()).toBe(false);
     });
 
-    test('show_score - status === finished_grading', async () => {
+    test('show_score - status === finished_grading, points possible nonzero', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
             {
@@ -556,7 +556,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.find('#submission-score').text()).toContain("10.25/15");
     });
 
-    test('show_score - status === finished_grading', async () => {
+    test('show_score - status === finished_grading, points possible zero', async () => {
         submission_with_results = data_ut.make_submission_with_results(
             group,
             {
@@ -585,6 +585,8 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.vm.show_score).toBe(false);
         expect(wrapper.find('#submission-score').exists()).toBe(false);
+
+        expect(wrapper.find('#deferred-tests-message').text()).toContain('All tests finished');
     });
 
     test('submitted files are listed', async () => {
@@ -1515,6 +1517,7 @@ describe('SubmissionDetail tests', () => {
         expect(wrapper.vm.d_globals.user_roles.is_staff).toBe(true);
         expect(wrapper.vm.show_auto_update_msg).toBe(true);
         expect(wrapper.find('#auto-update-message').exists()).toBe(true);
+        expect(wrapper.find('#deferred-tests-message').text()).toContain('Core tests finished');
     });
 
     test('does_not_count_for_current_users -- does_not_count_for contains username',

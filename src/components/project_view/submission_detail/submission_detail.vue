@@ -12,15 +12,14 @@
              id="submission-score"> Score:
           <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
         </div>
-        <div v-if="d_globals.user_roles.is_staff
-                   && (submission.status === GradingStatus.waiting_for_deferred
-                       || submission.status === GradingStatus.waiting_for_deferred)"
-             id="staff-score-message">
-          <div v-if="submission.status === GradingStatus.waiting_for_deferred">
-            Deferred tests pending
+        <div class="grading-status" v-if="!show_score || d_globals.user_roles.is_staff">
+          <div id="deferred-tests-message"
+               v-if="submission.status === GradingStatus.waiting_for_deferred">
+            Core tests finished. You can submit again now!
           </div>
-          <div v-else-if="submission.status === GradingStatus.finished_grading">
-            Deferred tests finished
+          <div id="deferred-tests-message"
+               v-else-if="submission.status === GradingStatus.finished_grading">
+            All tests finished.
           </div>
         </div>
 
@@ -46,7 +45,7 @@
             </span>
           </div>
 
-          <div id="grading-status">
+          <div class="grading-status">
             <div v-if="submission.status === GradingStatus.received">
               We got your submission! It should be queued soon.
             </div>
@@ -431,7 +430,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   padding-left: 3px;
 }
 
-#grading-status {
+.grading-status {
   color: darken($stormy-gray-dark, 15);
 }
 
@@ -544,7 +543,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   padding: 5px 0;
 }
 
-#staff-score-message {
+#deferred-tests-message {
   padding: 5px 0;
 }
 
