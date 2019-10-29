@@ -14,7 +14,7 @@
         </div>
         <div v-if="d_globals.user_roles.is_staff
                    && (submission.status === GradingStatus.waiting_for_deferred
-                   || submission.status === GradingStatus.waiting_for_deferred)"
+                       || submission.status === GradingStatus.waiting_for_deferred)"
              id="staff-score-message">
           <div v-if="submission.status === GradingStatus.waiting_for_deferred">
             Deferred tests pending
@@ -245,7 +245,7 @@ import AGTestSuiteResult from '@/components/project_view/submission_detail/ag_su
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from "@/components/project_view/submission_detail/mutation_suite_results.vue";
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
-import { format_datetime, handle_api_errors_async } from '@/utils';
+import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 
 @Component({
   components: {
@@ -309,7 +309,7 @@ export default class SubmissionDetail extends Vue {
 
   get show_score() {
     return (this.submission.status === GradingStatus.waiting_for_deferred
-           || this.submission.status === GradingStatus.finished_grading)
+            || this.submission.status === GradingStatus.finished_grading)
            && this.submission_result !== null
            && this.submission_result.total_points_possible !== 0;
   }
@@ -339,12 +339,12 @@ export default class SubmissionDetail extends Vue {
                 && this.submission.status === GradingStatus.waiting_for_deferred);
   }
 
-  async load_results() {
-    this.d_loading_results = true;
-    this.d_submission_fdbk_override = await get_submission_result(
-      this.submission!.pk, this.d_fdbk_category!
-    );
-    this.d_loading_results = false;
+  load_results() {
+    return toggle(this, 'd_loading_results', async () => {
+      this.d_submission_fdbk_override = await get_submission_result(
+        this.submission!.pk, this.d_fdbk_category!
+      );
+    });
   }
 
   get does_not_count_for_current_user() {
@@ -359,7 +359,7 @@ export default class SubmissionDetail extends Vue {
     ) !== -1;
   }
 
-  async open_file(filename: string) {
+  open_file(filename: string) {
     let multi_file_viewer = <MultiFileViewer> this.$refs.view_submission_result_files;
     multi_file_viewer.add_to_viewing(filename, this.submission!.get_file_content(filename));
   }
@@ -369,15 +369,11 @@ export default class SubmissionDetail extends Vue {
   }
 
   @handle_api_errors_async(handle_remove_submission_from_queue_error)
-  async remove_submission_from_queue() {
-    try {
-      this.d_removing_from_queue = true;
+  remove_submission_from_queue() {
+    return toggle(this, 'd_removing_from_queue', async () => {
       await this.submission!.remove_from_queue();
       this.d_show_remove_submission_from_queue_modal = false;
-    }
-    finally {
-      this.d_removing_from_queue = false;
-    }
+    });
   }
 }
 
@@ -581,7 +577,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 }
 
 .does-not-count {
-  color: $coral-pink;
+  font-weight: bold;
 }
 
 .last-username-in-list {
