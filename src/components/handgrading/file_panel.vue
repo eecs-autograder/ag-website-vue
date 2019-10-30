@@ -45,7 +45,6 @@ export default class FilePanel extends Vue {
   d_is_open = false;
 
   d_content: Promise<string> | null = null;
-  d_loading_file = false;
 
   toggle_open() {
     let top = this.$el.getBoundingClientRect().top;

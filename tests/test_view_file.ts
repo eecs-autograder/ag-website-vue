@@ -507,4 +507,26 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
     });
+
+    test('No annotations, custom comments not allowed', async () => {
+        result.handgrading_rubric.annotations = [];
+        wrapper = managed_mount(ViewFile, {
+            propsData: {
+                filename: filename,
+                file_contents: content,
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+                enable_custom_comments: false,
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        let code_lines = wrapper.findAll({ref: 'code_line'});
+        code_lines.at(0).trigger('mousedown');
+        code_lines.at(0).trigger('mouseup');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
+        expect(wrapper.find({ref: 'handgrading_context_menu'}).text()).toEqual('');
+    });
 });

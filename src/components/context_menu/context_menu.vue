@@ -5,42 +5,25 @@
        @blur="hide_context_menu"
        @keyup.esc="hide_context_menu"
        v-show="is_open">
-    <slot>
-      <context-menu-item :disabled="true">
-        <div style="width: 100px; height: 20px"> </div>
-      </context-menu-item>
-    </slot>
+    <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
-
 interface MenuCoordinates {
   x: number;
   y: number;
 }
 
-@Component({
-  components: {
-    'context-menu-item': ContextMenuItem
-  }
-})
+@Component({})
 export default class ContextMenu extends Vue {
   @Prop({required: true})
   coordinates!: MenuCoordinates;
 
   @Prop({required: true, type: Boolean})
   is_open!: boolean;
-
-  mounted() {
-    let children = this.$el.getElementsByClassName('context-menu-option');
-    if (children.length === 0) {
-      throw new Error('Context Menus must contain at least one Context Menu Item');
-    }
-  }
 
   hide_context_menu() {
     this.$emit('close');
@@ -90,6 +73,9 @@ export default class ContextMenu extends Vue {
   box-shadow: 0 0 15px opacify(lighten($baking-pan, 50%), .2);
   position: absolute;
   z-index: 1;
+
+  min-width: 100px;
+  min-height: 20px;
 }
 
 #context-menu-container:focus {

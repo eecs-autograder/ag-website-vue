@@ -232,17 +232,7 @@ describe('ContextMenu tests', () => {
         wrapper.destroy();
      });
 
-    test('Default menu slot', () => {
-        let wrapper = mount(ContextMenu);
-
-        let menu_items = wrapper.findAll('.context-menu-option');
-        expect(menu_items.length).toBe(1);
-
-        wrapper.destroy();
-    });
-
-    test('Invalid Context Menu Content', () => {
-        sinon.stub(console, 'error');
+    test('Arbitrary Context Menu Content', () => {
         const component = {
             template:  `<context_menu ref="context_menu"
                                       :is_open="is_open" :coordinates="coordinates">
@@ -253,15 +243,14 @@ describe('ContextMenu tests', () => {
             },
             data: function() {
                 return {
-                    is_open: false,
+                    is_open: true,
                     coordinates: {x: 0, y: 0}
                 };
             }
         };
 
-        expect(
-            () => mount(component)
-        ).toThrow("Context Menus must contain at least one Context Menu Item");
+        let wrapper = mount(component);
+        expect(wrapper.find({ref: 'context_menu'}).text()).toContain('Hello');
     });
 
     test("Pressing esc closes the context menu", async () => {
