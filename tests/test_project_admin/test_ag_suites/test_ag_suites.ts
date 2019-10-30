@@ -5,7 +5,6 @@ import {
     AGTestCommand,
     AGTestSuite,
     HttpError,
-    InstructorFile,
     Project,
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
@@ -23,9 +22,14 @@ import {
     validated_input_is_valid
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+function make_wrapper(project: Project) {
+    let wrapper = mount(AGSuites, {
+        propsData: {
+            project: project
+        }
+    });
+    return wrapper;
+}
 
 describe('creating ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
@@ -37,11 +41,7 @@ describe('creating ag_test_suite', () => {
         sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
         sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -50,6 +50,26 @@ describe('creating ag_test_suite', () => {
         if (wrapper.exists()) {
             wrapper.destroy();
         }
+    });
+
+    test('d_new_ag_test_suite_name binding', async () => {
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+
+        wrapper.find('#add-ag-test-suite-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
+        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+
+        let d_new_ag_test_suite_name_input = wrapper.find({ref: 'new_ag_test_suite_name'});
+
+        set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
+        expect(validated_input_is_valid(d_new_ag_test_suite_name_input)).toBe(true);
+        expect(wrapper.vm.d_new_ag_test_suite_name).toEqual("Suite I");
+
+        wrapper.vm.d_new_ag_test_suite_name = "Suite II";
+        expect(get_validated_input_text(d_new_ag_test_suite_name_input)).toEqual("Suite II");
     });
 
     test('Creating a suite - successfully', async () => {
@@ -127,11 +147,7 @@ describe('ag_test_suite changed', () => {
         sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
         sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve([suite]));
 
-        wrapper = mount(AGSuites, {
-           propsData: {
-               project: project
-           }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -182,11 +198,7 @@ describe('deleting ag_test_suite', () => {
             )
         );
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -316,11 +328,7 @@ describe('creating ag_test_case', () => {
             [ag_test_suite]
         ));
 
-        wrapper = mount(AGSuites, {
-           propsData: {
-               project: project
-           }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -362,11 +370,7 @@ describe('ag_test_case changed', () => {
             [ag_test_suite]
         ));
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -414,11 +418,7 @@ describe('cloning ag_test_case', () => {
             [suite]
         ));
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -495,11 +495,7 @@ describe('deleting ag_test_case', () => {
             [suite]
         ));
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -628,7 +624,243 @@ describe('deleting ag_test_case', () => {
     });
 });
 
-describe('prev_ag_test_case_is_available', () => {
+describe('ag_test_command Created', () => {
+    test('Command created', async () => {
+        let project = data_ut.make_project(data_ut.make_course().pk);
+        let suite_1 = data_ut.make_ag_test_suite(project.pk);
+        let suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
+        let suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+
+        suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
+        suite_1.ag_test_cases = [suite_1_case_1];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
+        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
+            [suite_1]
+        ));
+
+        let wrapper = make_wrapper(project);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(1);
+
+        let command_created = data_ut.make_ag_test_command(suite_1_case_1.pk);
+        AGTestCommand.notify_ag_test_command_created(command_created);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            suite_1_case_1_command_1
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            command_created
+        );
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(command_created);
+
+        sinon.restore();
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+});
+
+describe('ag_test_command Changed', () => {
+    test('Command changed', async () => {
+        let project: Project;
+
+        let suite_1: AGTestSuite;
+        let case_1: AGTestCase;
+        let command_1: AGTestCommand;
+        let command_2: AGTestCommand;
+
+        project = data_ut.make_project(data_ut.make_course().pk);
+        suite_1 = data_ut.make_ag_test_suite(project.pk);
+        case_1 = data_ut.make_ag_test_case(suite_1.pk);
+        command_1 = data_ut.make_ag_test_command(case_1.pk);
+        command_2 = data_ut.make_ag_test_command(case_1.pk);
+
+        case_1.ag_test_commands = [command_1, command_2];
+        suite_1.ag_test_cases = [case_1];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
+            Promise.resolve([])
+        );
+        sinon.stub(AGTestSuite, 'get_all_from_project').resolves([suite_1]);
+
+        let wrapper = make_wrapper(project);
+        await wrapper.vm.$nextTick();
+
+        let updated_command_2 = deep_copy(command_2, AGTestCommand);
+        updated_command_2.name = 'Updated name';
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            command_1
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            command_2
+        );
+        expect(command_2).not.toEqual(updated_command_2);
+        AGTestCommand.notify_ag_test_command_changed(updated_command_2);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            command_1
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            updated_command_2
+        );
+        sinon.restore();
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+});
+
+describe('ag_test_command Deleted', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
+
+    let parent_suite: AGTestSuite;
+    let parent_case: AGTestCase;
+    let first_command: AGTestCommand;
+    let middle_command: AGTestCommand;
+    let last_command: AGTestCommand;
+
+
+    beforeEach(async () => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        parent_suite = data_ut.make_ag_test_suite(project.pk);
+        parent_case = data_ut.make_ag_test_case(parent_suite.pk);
+        first_command = data_ut.make_ag_test_command(parent_case.pk);
+        middle_command = data_ut.make_ag_test_command(parent_case.pk);
+        last_command = data_ut.make_ag_test_command(parent_case.pk);
+
+        parent_case.ag_test_commands = [
+            first_command,
+            middle_command,
+            last_command
+        ];
+
+        parent_suite.ag_test_cases = [parent_case];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
+            Promise.resolve([])
+        );
+
+        sinon.stub(AGTestSuite, 'get_all_from_project').resolves([parent_suite]);
+
+        wrapper = make_wrapper(project);
+        await wrapper.vm.$nextTick();
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('First command deleted in case', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
+        AGTestCommand.notify_ag_test_command_deleted(first_command);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            middle_command
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            last_command
+        );
+    });
+
+    test('active First command deleted in case', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
+
+        wrapper.vm.update_active_item(first_command);
+        await wrapper.vm.$nextTick();
+        AGTestCommand.notify_ag_test_command_deleted(first_command);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_command);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            middle_command
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            last_command
+        );
+    });
+
+    test('Middle command deleted in case', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
+        AGTestCommand.notify_ag_test_command_deleted(middle_command);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            first_command
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            last_command
+        );
+    });
+
+    test('Active middle command deleted in case', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
+
+        wrapper.vm.update_active_item(middle_command);
+        await wrapper.vm.$nextTick();
+        AGTestCommand.notify_ag_test_command_deleted(middle_command);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(last_command);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            first_command
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            last_command
+        );
+    });
+
+    test('Last command deleted in case', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
+        AGTestCommand.notify_ag_test_command_deleted(last_command);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            first_command
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            middle_command
+        );
+    });
+
+    test('Active last command deleted in case', async () => {
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
+
+        wrapper.vm.update_active_item(last_command);
+        await wrapper.vm.$nextTick();
+        AGTestCommand.notify_ag_test_command_deleted(last_command);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_command);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
+            first_command
+        );
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
+            middle_command
+        );
+    });
+});
+
+describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
 
@@ -648,7 +880,7 @@ describe('prev_ag_test_case_is_available', () => {
     let suite_3_case_1: AGTestCase;
     let suite_3_case_1_command_1: AGTestCommand;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         project = data_ut.make_project(data_ut.make_course().pk);
         suite_1 = data_ut.make_ag_test_suite(project.pk);
         suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
@@ -681,11 +913,8 @@ describe('prev_ag_test_case_is_available', () => {
             [suite_1, suite_2, suite_3]
         ));
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
+        await wrapper.vm.$nextTick();
     });
 
     afterEach(() => {
@@ -772,13 +1001,35 @@ describe('prev_ag_test_case_is_available', () => {
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
         expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
     });
+
+    test('go_to_prev_command - prev case in same suite', async () => {
+        wrapper.vm.update_active_item(suite_1_case_2_command_1);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_1);
+
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        wrapper.find('#prev-ag-test-case-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_1_command_1);
+    });
+
+    test('go_to_prev_command - last case in previous suite', async () => {
+        wrapper.vm.update_active_item(suite_2_case_1_command_2);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_2_case_1_command_2);
+
+        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        wrapper.find('#prev-ag-test-case-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_2);
+    });
 });
 
-describe('go_to_prev_command', () => {
-
-});
-
-describe.only('next_ag_test_case_is_available', () => {
+describe('next_ag_test_case_is_available AND go_to_next_command', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
 
@@ -831,11 +1082,7 @@ describe.only('next_ag_test_case_is_available', () => {
             [suite_1, suite_2, suite_3]
         ));
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
     });
 
     afterEach(() => {
@@ -928,14 +1175,100 @@ describe.only('next_ag_test_case_is_available', () => {
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
         expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
     });
-});
 
-describe('go_to_next_command', () => {
+    test('go_to_next_command - next case in same suite', async () => {
+        wrapper.vm.update_active_item(suite_1_case_1_command_1);
+        await wrapper.vm.$nextTick();
 
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_1_command_1);
+
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        wrapper.find('#next-ag-test-case-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_1);
+    });
+
+    test('go_to_next_command - first case in next suite', async () => {
+        wrapper.vm.update_active_item(suite_1_case_2_command_2);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_2);
+
+        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        wrapper.find('#next-ag-test-case-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_2_case_1_command_2);
+    });
 });
 
 describe('active_level', () => {
+    let wrapper: Wrapper<AGSuites>;
+    let project: Project;
 
+    let ag_test_suite: AGTestSuite;
+    let ag_test_case: AGTestCase;
+    let ag_test_command: AGTestCommand;
+
+
+    beforeEach(() => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        ag_test_suite = data_ut.make_ag_test_suite(project.pk);
+        ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
+        ag_test_command = data_ut.make_ag_test_command(ag_test_case.pk);
+
+        ag_test_case.ag_test_commands = [ag_test_command];
+        ag_test_suite.ag_test_cases = [ag_test_case];
+
+        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
+            Promise.resolve([])
+        );
+
+        sinon.stub(AGTestSuite, 'get_all_from_project').resolves([ag_test_suite]);
+
+        wrapper = make_wrapper(project);
+    });
+
+    afterEach(() => {
+        sinon.restore();
+
+        if (wrapper.exists()) {
+            wrapper.destroy();
+        }
+    });
+
+    test('active_level_is_suite', async () => {
+        expect(wrapper.vm.active_level_is_suite).toBe(false);
+
+        wrapper.vm.update_active_item(ag_test_suite);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.active_level_is_suite).toBe(true);
+
+        wrapper.vm.update_active_item(ag_test_case);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.active_level_is_suite).toBe(false);
+
+        wrapper.vm.update_active_item(ag_test_command);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.active_level_is_suite).toBe(false);
+    });
+
+    test('active_level_is_command', async () => {
+        expect(wrapper.vm.active_level_is_command).toBe(false);
+
+        wrapper.vm.update_active_item(ag_test_suite);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.active_level_is_command).toBe(false);
+
+        wrapper.vm.update_active_item(ag_test_case);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.active_level_is_command).toBe(true);
+
+        wrapper.vm.update_active_item(ag_test_command);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.active_level_is_command).toBe(true);
+    });
 });
 
 describe('AGSuites getter functions', () => {
@@ -955,473 +1288,74 @@ describe('AGSuites getter functions', () => {
     });
 
     test('parent_ag_test_case getter', async () => {
-        let ag_test_suite_colors = data_ut.make_ag_test_suite(project.pk);
-        let ag_test_case_purple = data_ut.make_ag_test_case(ag_test_suite_colors.pk);
-        let ag_test_command_purple = data_ut.make_ag_test_command(ag_test_case_purple.pk);
-        let ag_test_case_blue = data_ut.make_ag_test_case(ag_test_suite_colors.pk);
-        let ag_test_command_blue = data_ut.make_ag_test_command(ag_test_case_blue.pk);
+        let suite_1 = data_ut.make_ag_test_suite(project.pk);
+        let suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
+        let suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+        let suite_1_case_2 = data_ut.make_ag_test_case(suite_1.pk);
+        let suite_1_case_2_command_1 = data_ut.make_ag_test_command(suite_1_case_2.pk);
 
-        ag_test_case_purple.ag_test_commands = [ag_test_command_purple];
-        ag_test_case_blue.ag_test_commands = [ ag_test_command_blue];
-        ag_test_suite_colors.ag_test_cases = [ag_test_case_purple, ag_test_case_blue];
+        suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
+        suite_1_case_2.ag_test_commands = [ suite_1_case_2_command_1];
+        suite_1.ag_test_cases = [suite_1_case_1, suite_1_case_2];
 
         sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
 
         sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([ag_test_suite_colors])
+            Promise.resolve([suite_1])
         );
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
 
         expect(wrapper.vm.parent_ag_test_case).toBeNull();
 
-        wrapper.vm.update_active_item(ag_test_case_purple);
+        wrapper.vm.update_active_item(suite_1_case_1);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_case).toEqual(ag_test_case_purple);
+        expect(wrapper.vm.parent_ag_test_case).toEqual(suite_1_case_1);
 
-        wrapper.vm.update_active_item(ag_test_command_blue);
+        wrapper.vm.update_active_item(suite_1_case_2_command_1);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_case).toEqual(ag_test_case_blue);
+        expect(wrapper.vm.parent_ag_test_case).toEqual(suite_1_case_2);
     });
 
     test('parent_ag_test_suite getter', async () => {
-        let ag_test_suite_coke = data_ut.make_ag_test_suite(project.pk);
-        let ag_test_case_coke = data_ut.make_ag_test_case(ag_test_suite_coke.pk);
-        let ag_test_command_coke = data_ut.make_ag_test_command(ag_test_case_coke.pk);
-        let ag_test_suite_pepsi = data_ut.make_ag_test_suite(project.pk);
-        let ag_test_case_pepsi = data_ut.make_ag_test_case(ag_test_suite_pepsi.pk);
-        let ag_test_command_pepsi = data_ut.make_ag_test_command(ag_test_case_pepsi.pk);
+        let suite_1 = data_ut.make_ag_test_suite(project.pk);
+        let suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
+        let suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
+        let suite_2 = data_ut.make_ag_test_suite(project.pk);
+        let suite_2_case_1 = data_ut.make_ag_test_case(suite_2.pk);
+        let suite_2_case_1_command_1 = data_ut.make_ag_test_command(suite_2_case_1.pk);
 
-        ag_test_case_coke.ag_test_commands = [ag_test_command_coke];
-        ag_test_case_pepsi.ag_test_commands = [ag_test_command_pepsi];
+        suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
+        suite_2_case_1.ag_test_commands = [suite_2_case_1_command_1];
 
-        ag_test_suite_coke.ag_test_cases = [ag_test_case_coke];
-        ag_test_suite_pepsi.ag_test_cases = [ag_test_case_pepsi];
+        suite_1.ag_test_cases = [suite_1_case_1];
+        suite_2.ag_test_cases = [suite_2_case_1];
 
         sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
 
         sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([ag_test_suite_coke, ag_test_suite_pepsi])
+            Promise.resolve([suite_1, suite_2])
         );
 
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
+        wrapper = make_wrapper(project);
 
         expect(wrapper.vm.parent_ag_test_suite).toBeNull();
 
-        wrapper.vm.update_active_item(ag_test_suite_coke);
+        wrapper.vm.update_active_item(suite_1);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.parent_ag_test_suite).toBeNull();
 
-        wrapper.vm.update_active_item(ag_test_case_coke);
+        wrapper.vm.update_active_item(suite_1_case_1);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_suite).toEqual(ag_test_suite_coke);
+        expect(wrapper.vm.parent_ag_test_suite).toEqual(suite_1);
 
-        wrapper.vm.update_active_item(ag_test_case_pepsi);
+        wrapper.vm.update_active_item(suite_2_case_1);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.parent_ag_test_suite).toEqual(ag_test_suite_pepsi);
-    });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-describe('AGSuites tests', () => {
-    let wrapper: Wrapper<AGSuites>;
-    let component: AGSuites;
-    let ag_suite_colors: AGTestSuite;
-
-    let ag_case_purple: AGTestCase;
-    let ag_command_purple_1: AGTestCommand;
-    let ag_command_purple_2: AGTestCommand;
-
-    let ag_case_blue: AGTestCase;
-    let ag_command_blue_1: AGTestCommand;
-
-    let ag_case_green: AGTestCase;
-    let ag_command_green_1: AGTestCommand;
-    let ag_command_green_2: AGTestCommand;
-    let ag_command_green_3: AGTestCommand;
-
-    let ag_suite_pets: AGTestSuite;
-
-    let ag_case_dog: AGTestCase;
-    let ag_command_dog_1: AGTestCommand;
-
-    let ag_case_bird: AGTestCase;
-    let ag_command_bird_1: AGTestCommand;
-
-    let ag_suite_beverages: AGTestSuite;
-    let ag_case_sprite: AGTestCase;
-    let ag_command_sprite_1: AGTestCommand;
-
-    let instructor_file_1: InstructorFile;
-    let instructor_file_2: InstructorFile;
-    let instructor_file_3: InstructorFile;
-    let project: Project;
-
-    beforeEach(() => {
-        instructor_file_1 = new InstructorFile({
-            pk: 1,
-            project: 10,
-            name: "antarctica.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        instructor_file_2 = new InstructorFile({
-            pk: 2,
-            project: 10,
-            name: "africa.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        instructor_file_3 = new InstructorFile({
-            pk: 3,
-            project: 10,
-            name: "asia.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        project = data_ut.make_project(
-            data_ut.make_course().pk,
-            {
-                instructor_files: [
-                    instructor_file_1,
-                    instructor_file_2,
-                    instructor_file_3
-                ]
-            }
-        );
-
-        ag_suite_colors = data_ut.make_ag_test_suite(project.pk);
-        ag_case_purple = data_ut.make_ag_test_case(ag_suite_colors.pk);
-        ag_command_purple_1 = data_ut.make_ag_test_command(ag_case_purple.pk);
-        ag_command_purple_2 = data_ut.make_ag_test_command(ag_case_purple.pk);
-        ag_case_blue = data_ut.make_ag_test_case(ag_suite_colors.pk);
-        ag_command_blue_1 = data_ut.make_ag_test_command(ag_case_blue.pk);
-        ag_case_green = data_ut.make_ag_test_case(ag_suite_colors.pk);
-        ag_command_green_1 = data_ut.make_ag_test_command(ag_case_green.pk);
-        ag_command_green_2 = data_ut.make_ag_test_command(ag_case_green.pk);
-        ag_command_green_3 = data_ut.make_ag_test_command(ag_case_green.pk);
-
-        ag_case_purple.ag_test_commands = [
-            ag_command_purple_1,
-            ag_command_purple_2
-        ];
-        ag_case_blue.ag_test_commands = [
-            ag_command_blue_1
-        ];
-        ag_case_green.ag_test_commands = [
-            ag_command_green_1,
-            ag_command_green_2,
-            ag_command_green_3
-        ];
-        ag_suite_colors.ag_test_cases = [
-            ag_case_purple,
-            ag_case_blue,
-            ag_case_green
-        ];
-
-        ag_suite_pets = data_ut.make_ag_test_suite(project.pk);
-        ag_case_dog = data_ut.make_ag_test_case(ag_suite_pets.pk);
-        ag_command_dog_1 = data_ut.make_ag_test_command(ag_case_dog.pk);
-        ag_case_bird = data_ut.make_ag_test_case(ag_suite_pets.pk);
-        ag_command_bird_1 = data_ut.make_ag_test_command(ag_case_bird.pk);
-
-        ag_case_dog.ag_test_commands = [ag_command_dog_1];
-        ag_case_bird.ag_test_commands = [ag_command_bird_1];
-        ag_suite_pets.ag_test_cases = [ag_case_dog, ag_case_bird];
-
-        ag_suite_beverages = data_ut.make_ag_test_suite(project.pk);
-        ag_case_sprite = data_ut.make_ag_test_case(ag_suite_beverages.pk);
-        ag_command_sprite_1 = data_ut.make_ag_test_command(ag_case_sprite.pk);
-
-        ag_case_sprite.ag_test_commands = [ag_command_sprite_1];
-        ag_suite_beverages.ag_test_cases = [ag_case_sprite];
-
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([ag_suite_colors, ag_suite_pets, ag_suite_beverages])
-        );
-
-        wrapper = mount(AGSuites, {
-            propsData: {
-                project: project
-            }
-        });
-        component = wrapper.vm;
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-    // Suite Related -----------------------------------------------------------------------------
-
-    test.skip('d_new_ag_test_suite_name binding', async () => {
-        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
-
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await component.$nextTick();
-
-        expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
-
-        let d_new_ag_test_suite_name_input = wrapper.find({ref: 'new_ag_test_suite_name'});
-
-        set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
-        expect(validated_input_is_valid(d_new_ag_test_suite_name_input)).toBe(true);
-        expect(component.d_new_ag_test_suite_name).toEqual("Suite I");
-
-        component.d_new_ag_test_suite_name = "Suite II";
-        expect(get_validated_input_text(d_new_ag_test_suite_name_input)).toEqual("Suite II");
-    });
-
-    // Command Related ---------------------------------------------------------------------------
-
-    test.skip('Command created', async () => {
-        let ag_command_blue_2 = data_ut.make_ag_test_command(ag_case_blue.pk);
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(1);
-
-        AGTestCommand.notify_ag_test_command_created(ag_command_blue_2);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[1].ag_test_commands.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_2);
-    });
-
-    test.skip('Command changed', async () => {
-        let updated_ag_command_purple_2 = deep_copy(ag_command_purple_2, AGTestCommand);
-        updated_ag_command_purple_2.name = 'Updated name';
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[0]).toEqual(
-            ag_command_purple_1
-        );
-        expect(ag_command_purple_2).not.toEqual(updated_ag_command_purple_2);
-
-        AGTestCommand.notify_ag_test_command_changed(updated_ag_command_purple_2);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
-        expect(component.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands[1]).toEqual(
-            updated_ag_command_purple_2
-        );
-    });
-
-    test.skip('First command deleted in case', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
-
-        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-    });
-
-    test.skip('active First command deleted in case', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
-
-        component.update_active_item(ag_command_green_1);
-        await component.$nextTick();
-
-        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_1);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_2);
-    });
-
-    test.skip('Middle command deleted in case',
-         async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
-
-        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-    });
-
-    test.skip('Active middle command deleted in case', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
-
-        component.update_active_item(ag_command_green_2);
-        await component.$nextTick();
-
-        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_2);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_3);
-    });
-
-    test.skip('Last command deleted in case', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
-
-        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-    });
-
-    test.skip('Active last command deleted in case', async () => {
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(3);
-
-        component.update_active_item(ag_command_green_3);
-        await component.$nextTick();
-
-        AGTestCommand.notify_ag_test_command_deleted(ag_command_green_3);
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suites[0].ag_test_cases[2].ag_test_commands.length).toEqual(2);
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_2);
-    });
-
-    // Visiting Previous Test Case ---------------------------------------------------------------
-
-
-    test.skip('go_to_prev_command - prev case in same suite', async () => {
-        component.update_active_item(ag_command_blue_1);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_blue_1);
-
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
-        wrapper.find('#prev-ag-test-case-button').trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_purple_1);
-    });
-
-    test.skip('go_to_prev_command - last case in previous suite', async () => {
-        component.update_active_item(ag_command_dog_1);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
-
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
-        wrapper.find('#prev-ag-test-case-button').trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
-    });
-
-    // Visiting Next Test Case -------------------------------------------------------------------
-
-
-
-    test.skip('go_to_next_command - next case in same suite', async () => {
-        component.update_active_item(ag_command_dog_1);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
-
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
-        wrapper.find('#next-ag-test-case-button').trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_bird_1);
-    });
-
-    test.skip('go_to_next_command - first case in next suite', async () => {
-        component.update_active_item(ag_command_green_1);
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_green_1);
-
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
-        wrapper.find('#next-ag-test-case-button').trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_active_ag_test_command).toEqual(ag_command_dog_1);
-    });
-
-    test.skip('active_level_is_suite', async () => {
-        expect(component.active_level_is_suite).toBe(false);
-
-        component.update_active_item(ag_suite_colors);
-        await component.$nextTick();
-        expect(component.active_level_is_suite).toBe(true);
-
-        component.update_active_item(ag_case_green);
-        await component.$nextTick();
-        expect(component.active_level_is_suite).toBe(false);
-
-        component.update_active_item(ag_command_green_1);
-        await component.$nextTick();
-        expect(component.active_level_is_suite).toBe(false);
-    });
-
-    test.skip('active_level_is_command', async () => {
-        expect(component.active_level_is_command).toBe(false);
-
-        component.update_active_item(ag_suite_colors);
-        await component.$nextTick();
-        expect(component.active_level_is_command).toBe(false);
-
-        component.update_active_item(ag_case_green);
-        await component.$nextTick();
-        expect(component.active_level_is_command).toBe(true);
-
-        component.update_active_item(ag_command_green_1);
-        await component.$nextTick();
-        expect(component.active_level_is_command).toBe(true);
+        expect(wrapper.vm.parent_ag_test_suite).toEqual(suite_2);
     });
 });
