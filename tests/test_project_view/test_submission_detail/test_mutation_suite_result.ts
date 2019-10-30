@@ -101,17 +101,7 @@ describe('show_setup_fieldset getter', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     test('show_setup_fieldset - show_setup_stdout === false', async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stdout).toBe(false);
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stderr).toBe(false);
@@ -124,17 +114,7 @@ describe('show_setup_fieldset getter', () => {
     test('show_setup_fieldset - show_setup_stdout === true', async () => {
         mutation_test_suite_result!.fdbk_settings.show_setup_stdout = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stdout).toBe(true);
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stderr).toBe(false);
@@ -147,17 +127,7 @@ describe('show_setup_fieldset getter', () => {
     test('show_setup_fieldset - show_setup_stderr === true', async () => {
         mutation_test_suite_result!.fdbk_settings.show_setup_stderr = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stdout).toBe(false);
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stderr).toBe(true);
@@ -170,17 +140,7 @@ describe('show_setup_fieldset getter', () => {
     test('show_setup_fieldset - setup_return_code !== null', async () => {
         mutation_test_suite_result!.setup_return_code = 0;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stdout).toBe(false);
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stderr).toBe(false);
@@ -193,17 +153,7 @@ describe('show_setup_fieldset getter', () => {
     test('show_setup_fieldset - setup_timed_out === false', async () => {
         mutation_test_suite_result!.setup_timed_out = false;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stdout).toBe(false);
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stderr).toBe(false);
@@ -216,17 +166,7 @@ describe('show_setup_fieldset getter', () => {
     test('show_setup_fieldset - setup_timed_out === true', async () => {
         mutation_test_suite_result!.setup_timed_out = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stdout).toBe(false);
         expect(wrapper.vm.mutation_test_suite_result.fdbk_settings.show_setup_stderr).toBe(false);
@@ -241,17 +181,7 @@ describe('show_buggy_implementations_fieldset getter', async () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     test('show_buggy_implementations_fieldset - false', async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
@@ -267,17 +197,7 @@ describe('show_buggy_implementations_fieldset getter', async () => {
     test('show_buggy_implementations_fieldset - show_grade_buggy_impls_stdout === true',
          async () => {
         mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout = true;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
@@ -293,17 +213,7 @@ describe('show_buggy_implementations_fieldset getter', async () => {
     test('show_buggy_implementations_fieldset - show_grade_buggy_impls_stdout === true',
          async () => {
         mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr = true;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
@@ -318,17 +228,7 @@ describe('show_buggy_implementations_fieldset getter', async () => {
 
     test('show_buggy_implementations_fieldset - num_bugs_exposed !== null', async () => {
         mutation_test_suite_result!.num_bugs_exposed = 1;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
@@ -348,16 +248,7 @@ describe('MutationSuiteResult setup section tests', () => {
     test('Setup command name === null', async () => {
         mutation_test_suite_result.setup_return_code = 0;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result!.setup_command_name).toBeNull();
         expect(wrapper.find('#setup-command-name').text()).toContain("Setup");
@@ -367,16 +258,7 @@ describe('MutationSuiteResult setup section tests', () => {
         mutation_test_suite_result.setup_return_code = 0;
         mutation_test_suite_result.setup_command_name = "Compile";
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.mutation_test_suite_result!.setup_command_name).toEqual("Compile");
         expect(wrapper.find('#setup-command-name').text()).toContain("Compile");
@@ -384,16 +266,7 @@ describe('MutationSuiteResult setup section tests', () => {
 
     test('setup_timed_out === true', async () => {
         mutation_test_suite_result.setup_timed_out = true;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.find('#setup-return-code').find(
             '.timed-out-icon'
@@ -402,16 +275,7 @@ describe('MutationSuiteResult setup section tests', () => {
 
     test('setup_return_code === 0', async () => {
         mutation_test_suite_result.setup_return_code = 0;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.find('#setup-return-code').find(
             '.correct-icon'
@@ -421,16 +285,7 @@ describe('MutationSuiteResult setup section tests', () => {
 
     test('setup_return_code === 1', async () => {
         mutation_test_suite_result.setup_return_code = 1;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.find('#setup-return-code').find(
             '.incorrect-icon'
@@ -458,16 +313,7 @@ describe('MutationSuiteResult setup section tests', () => {
             }
         ));
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stdout_stub.callCount).toEqual(0);
@@ -482,16 +328,7 @@ describe('MutationSuiteResult setup section tests', () => {
         mutation_test_suite_result.setup_return_code = 1;
         mutation_test_suite_result.fdbk_settings.show_setup_stdout = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stdout_stub.calledOnce).toBe(true);
@@ -503,16 +340,7 @@ describe('MutationSuiteResult setup section tests', () => {
     test('setup-stdout-section is not visible when show_setup_stdout === false', async () => {
         mutation_test_suite_result.setup_return_code = 1;
         mutation_test_suite_result.fdbk_settings.show_setup_stdout = false;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(
             false
@@ -523,16 +351,7 @@ describe('MutationSuiteResult setup section tests', () => {
     test('setup-stderr-section is not visible when show_setup_stderr === false', async () => {
         mutation_test_suite_result.setup_return_code = 1;
         mutation_test_suite_result.fdbk_settings.show_setup_stderr = false;
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(
             false
@@ -557,16 +376,7 @@ describe('MutationSuiteResult setup section tests', () => {
             }
         ));
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_output_size_stub.calledOnce).toBe(true);
@@ -579,16 +389,7 @@ describe('MutationSuiteResult setup section tests', () => {
         mutation_test_suite_result.setup_return_code = 1;
         mutation_test_suite_result.fdbk_settings.show_setup_stderr = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_output_size_stub.calledOnce).toBe(true);
@@ -604,16 +405,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     test('num_bugs_exposed === null', async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.num_bugs_exposed).toBeNull();
         expect(wrapper.find('#num-bugs-exposed-section').exists()).toBe(false);
     });
@@ -622,16 +414,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         mutation_test_suite_result.setup_return_code = 1;
         mutation_test_suite_result.num_bugs_exposed = 5;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.vm.mutation_test_suite_result!.num_bugs_exposed).toBe(5);
         expect(wrapper.find('#num-bugs-exposed-section').text()).toContain('5');
     });
@@ -642,16 +425,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         mutation_test_suite_result.num_bugs_exposed = 2;
         mutation_test_suite_result.bugs_exposed = ["bug_1", "bug_2"];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.bugs_exposed_fdbk_level
         ).toEqual(ag_cli.BugsExposedFeedbackLevel.exposed_bug_names);
@@ -664,16 +438,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
             = ag_cli.BugsExposedFeedbackLevel.num_bugs_exposed;
         mutation_test_suite_result.num_bugs_exposed = 2;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.bugs_exposed_fdbk_level
         ).toEqual(ag_cli.BugsExposedFeedbackLevel.num_bugs_exposed);
@@ -682,16 +447,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 
     test('show_grade_buggy_impls_stdout === false && show_grade_buggy_impls_stderr === false',
          async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
         ).toBe(false);
@@ -719,16 +475,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
             }
         ));
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
         ).toBe(true);
@@ -779,16 +526,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
          async () => {
         mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
@@ -861,16 +599,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
             }
         ));
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
         ).toBe(true);
@@ -921,16 +650,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
          async () => {
         mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
         ).toBe(true);
@@ -992,16 +712,7 @@ describe('MutationSuiteResult student tests section tests', () => {
     test('student_tests === []', async () => {
         mutation_test_suite_result.student_tests = [];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_get_test_names_stdout
@@ -1026,16 +737,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout = false;
         mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr = false;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.find('#test-names-stdout-section').exists()).toBe(false);
     });
@@ -1060,16 +762,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             )
         );
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
@@ -1121,16 +814,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
@@ -1207,16 +891,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             )
         );
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
@@ -1268,16 +943,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr = true;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
@@ -1339,16 +1005,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.discarded_tests = [];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(wrapper.find('#discarded-tests-section').exists()).toBe(false);
     });
 
@@ -1356,16 +1013,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two", "test_three"];
         mutation_test_suite_result.discarded_tests = ["test_four", "test_five"];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#discarded-tests-section').exists()).toBe(true);
         expect(wrapper.find('#num-tests-accepted').text()).toEqual("3");
@@ -1379,16 +1027,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.invalid_tests = null;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(
             0
@@ -1401,16 +1040,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.invalid_tests = [];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#false-positive-tests-section').exists()).toBe(false);
@@ -1421,16 +1051,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.invalid_tests = ["test_three", "test_four"];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#false-positive-tests-section').exists()).toBe(true);
@@ -1445,16 +1066,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         mutation_test_suite_result.invalid_tests = ["test_three", "test_four"];
         mutation_test_suite_result.timed_out_tests = ["test_three"];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#false-positive-tests-section').exists()).toBe(true);
@@ -1484,16 +1096,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             "test_four"
         ];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#valid-tests-section').exists()).toBe(false);
@@ -1512,16 +1115,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             "test_four"
         ];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_student_test_names_stdout_stub.callCount).toEqual(0);
         expect(wrapper.find('#valid-tests-section').exists()).toBe(true);
@@ -1542,16 +1136,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             "test_four"
         ];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.get_valid_tests()).toEqual(
             [
@@ -1571,16 +1156,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         ];
         mutation_test_suite_result.invalid_tests = null;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.get_valid_tests()).toEqual(
             [
@@ -1602,16 +1178,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         ];
         mutation_test_suite_result.timed_out_tests = null;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.test_timed_out("test_one")).toBe(false);
         expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
@@ -1632,16 +1199,7 @@ describe('MutationSuiteResult student tests section tests', () => {
             "test_four"
         ];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(wrapper.vm.test_timed_out("test_one")).toBe(false);
         expect(wrapper.vm.test_timed_out("test_two")).toBe(false);
@@ -1660,16 +1218,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         mutation_test_suite_result.student_tests = ["test_one", "test_two"];
         mutation_test_suite_result.fdbk_settings.show_validity_check_stdout = false;
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(
             wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_validity_check_stdout
@@ -1700,16 +1249,7 @@ describe('MutationSuiteResult validity check related tests', () => {
             )
         );
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(0);
@@ -1763,16 +1303,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         mutation_test_suite_result.student_tests = ['first_test'];
 
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(0);
@@ -1850,16 +1381,7 @@ describe('MutationSuiteResult validity check related tests', () => {
             )
         );
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(0);
@@ -1912,16 +1434,7 @@ describe('MutationSuiteResult validity check related tests', () => {
         mutation_test_suite_result.fdbk_settings.show_validity_check_stderr = true;
         mutation_test_suite_result.student_tests = ['first_test'];
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(0);
@@ -2010,17 +1523,7 @@ describe('MutationSuiteResult Watcher tests', () => {
             }
         ));
 
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
     });
 
     test('mutation_test_suite_result Watcher', async () => {
@@ -2172,17 +1675,7 @@ describe('MutationSuiteResult get_output tests', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     beforeEach(async () => {
-        wrapper = mount(MutationSuiteResult, {
-            propsData: {
-                mutation_test_suite_result: mutation_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 9; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        wrapper = await make_wrapper();
     });
 
     test('get_output - d_load_student_test_names_output === false ' +
@@ -2292,3 +1785,19 @@ describe('MutationSuiteResult get_output tests', () => {
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
     });
 });
+
+async function make_wrapper() {
+    let wrapper = mount(MutationSuiteResult, {
+        propsData: {
+            mutation_test_suite_result: mutation_test_suite_result,
+            submission: submission,
+            fdbk_category: ag_cli.FeedbackCategory.max
+        }
+    });
+
+    for (let i = 0; i < 9; ++i) {
+        await wrapper.vm.$nextTick();
+    }
+
+    return wrapper;
+}
