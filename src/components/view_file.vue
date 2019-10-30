@@ -105,7 +105,6 @@ import {
   UserRoles,
 } from "ag-client-typescript";
 
-import { ArrayMap } from '@/array_map';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
