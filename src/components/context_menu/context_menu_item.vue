@@ -1,8 +1,8 @@
 <template>
   <div class="context-menu-option"
-      :class="[{'hoverable-item': !d_disabled, 'disabled-item': d_disabled}]"
-      @click="check_if_valid_click($event)">
-    <slot name="label"> </slot>
+       :class="{'hoverable-item': !disabled, 'disabled-item': disabled}"
+       @click.stop="handle_click">
+    <slot></slot>
   </div>
 </template>
 
@@ -13,30 +13,14 @@
 
   @Component
   export default class ContextMenuItem extends Vue {
-
-    @Watch('disabled')
-    on_disabled_change(new_value: boolean, old_value: boolean) {
-      this.d_disabled = new_value;
-    }
-
     @Prop({default: false, type: Boolean})
     disabled!: boolean;
 
-    d_disabled = false;
-
-    created() {
-      this.d_disabled = this.disabled;
-    }
-
-    check_if_valid_click(event: KeyboardEvent) {
-      event.stopPropagation();
-      let parent = <ContextMenu> this.$parent;
+    handle_click(event: Event) {
       if (!this.disabled) {
-        parent.hide_context_menu();
-        this.$emit('context_menu_item_clicked');
+        this.$emit('click');
       }
     }
-
   }
 </script>
 
@@ -46,16 +30,6 @@
 .context-menu-option {
   color: black;
   padding: 6px 15px;
-}
-
-.first-child {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
-.last-child {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
 }
 
 .hoverable-item:hover {

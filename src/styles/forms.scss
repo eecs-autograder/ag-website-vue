@@ -1,13 +1,32 @@
 @import '@/styles/colors.scss';
 
+$input-border-color: #ced4da;
+$input-text-color: #495057;
+
+.input {
+    font-size: 1rem;
+    padding: 6px 7px;
+    border-radius: 2px;
+    color: $input-text-color;
+    background-color: white;
+    border: 1px solid $input-border-color;
+}
+
 .select {
     background-color: white;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
+    border: 1px solid $input-border-color;
+    border-radius: 2px;
     box-sizing: border-box;
-    color: #495057;
+    color: $input-text-color;
     font-size: 1rem;
     padding: 6px 4px;
+}
+
+.radio-container {
+    padding: 2px 4px;
+    .label {
+        padding-left: 3px;
+    }
 }
 
 // Organization -----------------------------------
@@ -38,6 +57,24 @@
     font-weight: 700;
     margin: 0 0 4px 0;
     text-align: right;
+}
+
+.input-spacing {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.last-saved-timestamp {
+    color: lighten(#495057, 40);
+    font-size: 15px;
+}
+
+.save-button {
+    @import '@/styles/button_styles.scss';
+
+    @extend .green-button;
+    display: block;
+    margin: 0 10px 10px 0;
 }
 
 // Checkbox ---------------------------------------

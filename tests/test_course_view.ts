@@ -2,7 +2,7 @@ import { Location } from 'vue-router';
 
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Project, Semester, UltimateSubmissionPolicy, User, UserRoles } from 'ag-client-typescript';
+import { Course, Project, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import CourseView from '@/components/course_view.vue';

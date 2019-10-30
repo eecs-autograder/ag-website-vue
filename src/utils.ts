@@ -78,6 +78,14 @@ export function* zip<T1, T2>(iterable1: IterableType<T1>,
     }
 }
 
+export function* chain<T>(...iterables: IterableType<T>[]): IterableIterator<T> {
+    for (let iterable of iterables) {
+        for (let item of iterable) {
+            yield item;
+        }
+    }
+}
+
 // array_add_unique, array_has_unique, and array_remove_unique are
 // intended to be used together to achieve Set-like behavior with an
 // array. This is a workaround until Vue implements reactivity for
@@ -197,8 +205,67 @@ export function format_time(time: string | null): string {
     return moment(time, ['HH:mm', 'HH:mm:ss']).format('hh:mm A');
 }
 
+const ONE_GB = Math.pow(10, 9);
+const ONE_MB = Math.pow(10, 6);
+const ONE_KB = 1000;
+
+export function format_mem_size(size: number): string {
+    if (size > ONE_GB) {
+        return `${convert_size(size, ONE_GB)} GB`;
+    }
+    if (size > ONE_MB) {
+        return `${convert_size(size, ONE_MB)} MB`;
+    }
+    if (size > ONE_KB) {
+        return `${convert_size(size, ONE_KB)} KB`;
+    }
+    return `${size} bytes`;
+}
+
+function convert_size(size: number, div_by: number) {
+    // The + converts the string back to a number, which chops off extra
+    // zeros.
+    return +(size * 1. / div_by).toFixed(2);
+}
+
 const VALID_EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export function is_email(str: string): boolean {
     return VALID_EMAIL_REGEX.test(str);
+}
+
+// A type guard that throws NonNullAssertionError if the given object is null or undefined.
+// This can be used one of two ways:
+// - As a type guard in a conditional.
+// - Call this function on the expression that may be null, then use the non-null assertion
+//   operator (!) on subsequent uses of the expression. This has the disadvantage of
+//   more error-prone, but has the advantage of not artificially decreasing our branch coverage.
+// Note: In test case code, using the non-null-assertion operator without calling this
+// function is OK.
+export function assert_not_null<T>(obj: T | null | undefined, msg?: string): obj is T {
+    // istanbul ignore next
+    if (msg === undefined) {
+        msg = 'Value was unexpectedly null or undefined';
+    }
+    // istanbul ignore next
+    if (obj === null) {
+        throw new NonNullAssertionError(msg);
+    }
+    // istanbul ignore next
+    if (obj === undefined) {
+        throw new NonNullAssertionError(msg);
+    }
+    return true;
+}
+
+export class NonNullAssertionError extends Error {
+    // See https://github.com/Microsoft/TypeScript/issues/13965
+    __proto__: Error; // tslint:disable-line
+
+    // istanbul ignore next
+    constructor(msg?: string) {
+        const actual_proto = new.target.prototype;
+        super(msg);
+        this.__proto__ = actual_proto;
+    }
 }

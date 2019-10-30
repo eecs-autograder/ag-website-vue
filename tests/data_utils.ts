@@ -9,17 +9,29 @@ import {
     AGTestCommandFeedbackConfig,
     AGTestCommandResultFeedback,
     AGTestSuite,
-    AGTestSuiteFeedbackConfig, AGTestSuiteResultFeedback,
+    AGTestSuiteFeedbackConfig,
+    AGTestSuiteResultFeedback,
+    Annotation,
+    AppliedAnnotation,
     BugsExposedFeedbackLevel,
+    Comment,
     Course,
+    Criterion,
+    CriterionResult,
     ExpectedOutputSource,
     ExpectedReturnCode,
     ExpectedStudentFile,
     GradingStatus,
     Group,
+    GroupWithHandgradingResultSummary,
+    HandgradingResult,
+    HandgradingRubric,
     InstructorFile,
+    Location,
     MutationTestSuite,
-    MutationTestSuiteFeedbackConfig, MutationTestSuiteResultFeedback,
+    MutationTestSuiteFeedbackConfig,
+    MutationTestSuiteResultFeedback,
+    PointsStyle,
     Project,
     Semester,
     StdinSource,
@@ -44,9 +56,30 @@ function* counter() {
 }
 
 export function set_global_current_user(user: User) {
-    let globals = new GlobalData();
-    globals.current_user = user;
-    vue_test_utils.config.provide!['globals'] = globals;
+   provided_global_data().current_user = user;
+}
+
+export function set_global_user_roles(user_roles: UserRoles) {
+    provided_global_data().user_roles = user_roles;
+}
+
+export function set_global_current_course(course: Course) {
+   provided_global_data().current_course = course;
+}
+
+export function set_global_current_project(project: Project) {
+   provided_global_data().current_project = project;
+}
+
+export function reset_provided_global_data() {
+    vue_test_utils.config.provide!['globals'] = undefined;
+}
+
+function provided_global_data(): GlobalData {
+    if (vue_test_utils.config.provide!['globals'] === undefined) {
+        vue_test_utils.config.provide!['globals'] = new GlobalData();
+    }
+    return vue_test_utils.config.provide!['globals'];
 }
 
 const USER_PKS = counter();
@@ -537,6 +570,158 @@ export function make_mutation_test_suite_result_feedback(
     };
     safe_assign(defaults, args);
     return defaults;
+}
+
+const HANDGRADING_RUBRIC_PKS = counter();
+
+export function make_handgrading_rubric(project_pk: number,
+                                        args: Partial<HandgradingRubric> = {}): HandgradingRubric {
+    let defaults = {
+        pk: HANDGRADING_RUBRIC_PKS.next().value,
+        project: project_pk,
+        last_modified: now_str(),
+        criteria: [],
+        annotations: [],
+        handgraders_can_leave_comments: false,
+        handgraders_can_adjust_points: false,
+        points_style: PointsStyle.start_at_zero_and_add,
+        max_points: null,
+        show_grades_and_rubric_to_students: false,
+    };
+    safe_assign(defaults, args);
+    defaults.project = project_pk;
+    return new HandgradingRubric(defaults);
+}
+
+const HANDGRADING_RESULT_PKS = counter();
+
+export function make_handgrading_result(handgrading_rubric: HandgradingRubric,
+                                        group_pk: number,
+                                        submission_pk: number,
+                                        args: Partial<HandgradingResult> = {}): HandgradingResult {
+    let defaults = {
+        pk: HANDGRADING_RESULT_PKS.next().value,
+        handgrading_rubric: handgrading_rubric,
+        group: group_pk,
+        submission: submission_pk,
+        last_modified: now_str(),
+        finished_grading: false,
+        points_adjustment: 0,
+        submitted_filenames: [],
+        total_points: 0,
+        total_points_possible: 0,
+        applied_annotations: [],
+        comments: [],
+        criterion_results: [],
+    };
+    safe_assign(defaults, args);
+    return new HandgradingResult(defaults);
+}
+
+export function make_group_summary(
+    project_pk: number,
+    num_members: number = 1,
+    group_args: Partial<Group> = {},
+    handgrading_result: {
+        finished_grading: boolean;
+        total_points: number;
+        total_points_possible: number;
+    } | null = null
+): GroupWithHandgradingResultSummary {
+    let group = make_group(project_pk, num_members, group_args);
+    return {
+        handgrading_result: handgrading_result,
+        ...group
+    };
+}
+
+const CRITERION_PKS = counter();
+
+export function make_criterion(rubric_pk: number,
+                               args: Partial<Criterion> = {}): Criterion {
+    let defaults = {
+        pk: CRITERION_PKS.next().value,
+        handgrading_rubric: rubric_pk,
+        short_description: 'An criteria',
+        long_description: '',
+        points: 0,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.handgrading_rubric = rubric_pk;
+    return new Criterion(defaults);
+}
+
+const CRITERION_RESULT_PKS = counter();
+
+export function make_criterion_result(
+    handgrading_result: HandgradingResult, criterion: Criterion, checked: boolean
+): CriterionResult {
+    let result = new CriterionResult({
+        pk: CRITERION_RESULT_PKS.next().value,
+        criterion: criterion,
+        handgrading_result: handgrading_result.pk,
+        selected: checked,
+        last_modified: now_str(),
+    });
+    handgrading_result.criterion_results.push(result);
+    return result;
+}
+
+const ANNOTATION_PKS = counter();
+
+export function make_annotation(rubric_pk: number,
+                                args: Partial<Annotation> = {}): Annotation {
+    let defaults = {
+        pk: ANNOTATION_PKS.next().value,
+        handgrading_rubric: rubric_pk,
+        short_description: 'An criteria',
+        long_description: '',
+        deduction: 0,
+        max_deduction: null,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.handgrading_rubric = rubric_pk;
+    return new Annotation(defaults);
+}
+
+const APPLIED_ANNOTATION_PKS = counter();
+
+export function make_applied_annotation(
+    handgrading_result: HandgradingResult, annotation: Annotation, location: Location,
+    add_to_result = true
+) {
+    let result = new AppliedAnnotation({
+        pk: APPLIED_ANNOTATION_PKS.next().value,
+        handgrading_result: handgrading_result.pk,
+        annotation: annotation,
+        location: location,
+        last_modified: now_str(),
+    });
+    if (add_to_result) {
+        handgrading_result.applied_annotations.push(result);
+    }
+    return result;
+}
+
+const COMMENT_PKS = counter();
+
+export function make_comment(
+    handgrading_result: HandgradingResult, location: Location | null, text: string,
+    add_to_result = true
+) {
+    let result = new Comment({
+        pk: COMMENT_PKS.next().value,
+        handgrading_result: handgrading_result.pk,
+        location: location,
+        text: text,
+        last_modified: now_str(),
+    });
+    if (add_to_result) {
+        handgrading_result.comments.push(result);
+    }
+    return result;
 }
 
 function random_id() {

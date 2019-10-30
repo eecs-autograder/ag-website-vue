@@ -4,10 +4,15 @@ import {
     array_add_unique,
     array_get_unique,
     array_has_unique,
-    array_remove_unique, format_course_name, format_datetime, format_time,
+    array_remove_unique,
+    chain,
+    format_course_name,
+    format_datetime,
+    format_mem_size,
+    format_time,
     safe_assign,
     UniqueArrayError,
-    zip
+    zip,
 } from '@/utils';
 
 
@@ -67,6 +72,18 @@ describe('zip function tests', () => {
     });
 });
 
+describe('chain() tests', () => {
+    test('One iterable', () => {
+        let actual = chain([1, 2, 3]);
+        expect([...actual]).toEqual([1, 2, 3]);
+    });
+
+    test('Several iterables', () => {
+        let actual = chain([1, 2, 3], [5, 4, 3]);
+        expect([...actual]).toEqual([1, 2, 3, 5, 4, 3]);
+    });
+});
+
 describe('Datetime format tests', () => {
     test('format_datetime null', () => {
         expect(format_datetime(null)).toEqual('--- --, ----, --:-- --');
@@ -108,6 +125,16 @@ describe('format_course_name tests', () => {
     test('Year is null', () => {
         course.year = null;
         expect(format_course_name(course)).toEqual("EECS 388 Fall");
+    });
+});
+
+describe('format_mem_size_tests', () => {
+    test('format_mem_size', () => {
+        expect(format_mem_size(2500000000)).toEqual('2.5 GB');
+        expect(format_mem_size(1500000)).toEqual('1.5 MB');
+        expect(format_mem_size(4250)).toEqual('4.25 KB');
+        expect(format_mem_size(4255)).toEqual('4.25 KB');
+        expect(format_mem_size(150)).toEqual('150 bytes');
     });
 });
 

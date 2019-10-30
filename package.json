@@ -10,7 +10,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
     "@types/minimatch": "^3.0.3",
-    "ag-client-typescript": "0.0.0-dev.35",
+    "ag-client-typescript": "0.0.0-dev.39",
     "file-saver": "^2.0.1",
     "lodash": "^4.17.11",
     "minimatch": "^3.0.4",
@@ -18,7 +18,8 @@
     "vue": "^2.6.10",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
-    "vue-router": "^3.0.2"
+    "vue-router": "^3.0.2",
+    "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.0",

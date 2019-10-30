@@ -1,8 +1,9 @@
 <template>
   <div class="context-menu-demo-outer">
     <div class="context-menu-demo-1">
-      <div class="area-of-focus-1"
-           @click="$refs.context_menu_1.show_context_menu($event.pageX, $event.pageY)">
+      <div class="area-of-focus-1 menu-parent"
+           @click="menu_1_coordinates = {x: $event.pageX, y: $event.pageY};
+                   menu_1_is_open = true">
         As Harry and a severely weakened Dumbledore flee the cave where Dumbledore drank the
         potion of despair to obtain what he thought was one of Voldemort’s Horcruxes, Harry
         pleads for the headmaster to remain calm. His plea prompts this touching display of
@@ -27,37 +28,33 @@
         wizarding world.”
       </div>
     </div>
-    <context-menu ref="context_menu_1">
-      <template slot="context_menu_items">
-        <context-menu-item @context_menu_item_clicked="choice_alert('A Fish!')">
-          <template slot="label">
-            One Fish <i class="fas fa-fish fish"></i>
-          </template>
-        </context-menu-item>
-        <div class="context-menu-divider"> </div>
-        <context-menu-item @context_menu_item_clicked="choice_alert('Two Fish!')">
-          <template slot="label"> Two Fish
-            <i class="fas fa-fish fish"></i>
-            <i class="fas fa-fish fish"></i>
-          </template>
-        </context-menu-item>
-        <div class="context-menu-divider"> </div>
-        <context-menu-item
-          @context_menu_item_clicked="change_color('red')">
-          <template slot="label">
-            Red Fish <i class="fas fa-fish red-fish"></i>
-          </template>
-        </context-menu-item>
-        <div class="context-menu-divider"> </div>
-        <context-menu-item @context_menu_item_clicked="change_color('blue')">
-          <template slot="label"> Blue Fish <i class="fas fa-fish blue-fish"></i> </template>
-        </context-menu-item>
-      </template>
+    <context-menu ref="context_menu_1"
+                  :is_open="menu_1_is_open" :coordinates="menu_1_coordinates"
+                  @close="menu_1_is_open = false">
+      <context-menu-item @click="choice_alert('A Fish!')">
+        One Fish <i class="fas fa-fish fish"></i>
+      </context-menu-item>
+      <div class="context-menu-divider"> </div>
+      <context-menu-item @click="choice_alert('Two Fish!')">
+        Two Fish
+        <i class="fas fa-fish fish"></i>
+        <i class="fas fa-fish fish"></i>
+      </context-menu-item>
+      <div class="context-menu-divider"> </div>
+      <context-menu-item
+        @click="change_color('red')">
+        Red Fish <i class="fas fa-fish red-fish"></i>
+      </context-menu-item>
+      <div class="context-menu-divider"> </div>
+      <context-menu-item @click="change_color('blue')">
+        Blue Fish <i class="fas fa-fish blue-fish"></i>
+      </context-menu-item>
     </context-menu>
 
     <div class="context-menu-demo-2">
-      <div class="area-of-focus-2"
-           @click="$refs.context_menu_2.show_context_menu($event.pageX, $event.pageY)">
+      <div class="area-of-focus-2 menu-parent"
+           @click="menu_2_coordinates = {x: $event.pageX, y: $event.pageY};
+                   menu_2_is_open = true">
         Today is Toby Flenderson's last day.
         I couldn't sleep last night.
         I came in extra early.
@@ -90,20 +87,20 @@
         Let me be clear.
       </div>
     </div>
-    <context-menu ref="context_menu_2">
-      <template slot="context_menu_items">
-        <context-menu-item v-for="item of items"
-                           :disabled="item.disabled"
-                           @context_menu_item_clicked="choice_alert(item.name)">
-          <template slot="label">
-            {{item.name}}
-          </template>
-        </context-menu-item>
-      </template>
+    <context-menu ref="context_menu_2"
+                  :is_open="menu_2_is_open" :coordinates="menu_2_coordinates"
+                  @close="menu_2_is_open = false">
+      <context-menu-item v-for="item of items"
+                         :disabled="item.disabled"
+                         @click="choice_alert(item.name)">
+        {{item.name}}
+      </context-menu-item>
     </context-menu>
 
     <br>
-    <div @click="$refs.empty_context_menu.show_context_menu($event.pageX, $event.pageY)">
+    <div @click="empty_menu_coordinates = {x: $event.pageX, y: $event.pageY};
+                 empty_menu_is_open = true"
+         class="menu-parent">
       This context menu is empty <br> <br>
 
       EmptymenuEmptymenuEmptymenuEmptymenuEmptymenuEm
@@ -111,7 +108,10 @@
       EmptymenuEmptymenuEmptymenuEmptymenuEmptymenuEmptymenu
       EmptymenuEmptymenuEmptymenuEmptymenuEmptymenu
     </div>
-    <context-menu ref="empty_context_menu"></context-menu>
+    <context-menu ref="empty_context_menu"
+                  :is_open="empty_menu_is_open"
+                  :coordinates="empty_menu_coordinates"
+                  @close="empty_menu_is_open = false"></context-menu>
   </div>
 </template>
 
@@ -125,6 +125,14 @@ import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
   components: {ContextMenu, ContextMenuItem}
 })
 export default class ContextMenuDemo extends Vue {
+  menu_1_is_open = false;
+  menu_1_coordinates = {x: 0, y: 0};
+
+  menu_2_is_open = false;
+  menu_2_coordinates = {x: 0, y: 0};
+
+  empty_menu_is_open = false;
+  empty_menu_coordinates = {x: 0, y: 0};
 
   choice_alert(word: string) {
     alert('You have clicked on: ' + word);
@@ -150,15 +158,18 @@ export default class ContextMenuDemo extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/context_menu_styles.scss';
 
-.context-menu-demo-1{
-  overflow: scroll;
+.context-menu-demo-1 {
+  overflow: auto;
   height: 1000px;
+}
+
+.menu-parent {
+  position: relative;
 }
 
 .area-of-focus-1 {
   height: 2500px;
   padding: 20px;
-  position: relative;
 }
 
 .context-menu-demo-2{
@@ -168,7 +179,6 @@ export default class ContextMenuDemo extends Vue {
 .area-of-focus-2 {
   background-color: mediumpurple;
   padding: 20px;
-  position: relative;
 }
 
 .fish {

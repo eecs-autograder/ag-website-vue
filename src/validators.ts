@@ -50,8 +50,11 @@ export function is_integer(value: string): ValidatorResponse {
     };
 }
 
-export function make_min_value_validator(min_value: number) {
+export function make_min_value_validator(min_value: number, allow_empty: boolean =  false) {
     return (value: string) => {
+        if (allow_empty && value === '') {
+            return {is_valid: true, error_msg: ''};
+        }
         return {
             is_valid: string_to_num(value) >= min_value,
             error_msg: `Please enter a number >= ${min_value}`
@@ -59,8 +62,11 @@ export function make_min_value_validator(min_value: number) {
     };
 }
 
-export function make_max_value_validator(max_value: number) {
+export function make_max_value_validator(max_value: number, allow_empty: boolean =  false) {
     return (value: string) => {
+        if (allow_empty && value === '') {
+            return {is_valid: true, error_msg: ''};
+        }
         return {
             is_valid: string_to_num(value) <= max_value,
             error_msg: `Please enter a number <= ${max_value}`
