@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -31,15 +31,24 @@ function make_wrapper(project: Project) {
     return wrapper;
 }
 
-describe('creating ag_test_suite', () => {
+let get_sandbox_docker_images: sinon.SinonStub;
+let get_all_suites_from_project: sinon.SinonStub;
+
+beforeEach(() => {
+    get_sandbox_docker_images = sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
+        Promise.resolve([])
+    );
+    get_all_suites_from_project = sinon.stub(AGTestSuite, 'get_all_from_project').rejects();
+});
+
+describe('Creating ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve([]));
+        get_all_suites_from_project.resolves([]);
 
         wrapper = make_wrapper(project);
     });
@@ -135,7 +144,7 @@ describe('creating ag_test_suite', () => {
     });
 });
 
-describe('ag_test_suite changed', () => {
+describe('Changing ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
     let suite: AGTestSuite;
@@ -144,8 +153,7 @@ describe('ag_test_suite changed', () => {
         project = data_ut.make_project(data_ut.make_course().pk);
         suite = data_ut.make_ag_test_suite(project.pk);
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve([suite]));
+        get_all_suites_from_project.resolves([suite]);
 
         wrapper = make_wrapper(project);
     });
@@ -174,7 +182,7 @@ describe('ag_test_suite changed', () => {
     });
 });
 
-describe('deleting ag_test_suite', () => {
+describe('Deleting ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
     let first_suite: AGTestSuite;
@@ -187,16 +195,7 @@ describe('deleting ag_test_suite', () => {
         middle_suite = data_ut.make_ag_test_suite(project.pk);
         last_suite = data_ut.make_ag_test_suite(project.pk);
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve(
-                [
-                    first_suite,
-                    middle_suite,
-                    last_suite
-                ]
-            )
-        );
+        get_all_suites_from_project.resolves([first_suite, middle_suite, last_suite]);
 
         wrapper = make_wrapper(project);
     });
@@ -314,7 +313,7 @@ describe('deleting ag_test_suite', () => {
     });
 });
 
-describe('creating ag_test_case', () => {
+describe('Creating ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
     let ag_test_suite: AGTestSuite;
     let project: Project;
@@ -323,11 +322,7 @@ describe('creating ag_test_case', () => {
         project = data_ut.make_project(data_ut.make_course().pk);
         ag_test_suite = data_ut.make_ag_test_suite(project.pk);
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [ag_test_suite]
-        ));
-
+        get_all_suites_from_project.resolves([ag_test_suite]);
         wrapper = make_wrapper(project);
     });
 
@@ -352,7 +347,7 @@ describe('creating ag_test_case', () => {
     });
 });
 
-describe('ag_test_case changed', () => {
+describe('Changing ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
     let ag_test_suite: AGTestSuite;
@@ -365,10 +360,7 @@ describe('ag_test_case changed', () => {
         ag_test_case.ag_test_commands = [data_ut.make_ag_test_command(ag_test_case.pk)];
         ag_test_suite.ag_test_cases = [ag_test_case];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [ag_test_suite]
-        ));
+        get_all_suites_from_project.resolves([ag_test_suite]);
 
         wrapper = make_wrapper(project);
     });
@@ -399,7 +391,7 @@ describe('ag_test_case changed', () => {
     });
 });
 
-describe('cloning ag_test_case', () => {
+describe('Cloning ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
     let suite: AGTestSuite;
@@ -413,10 +405,7 @@ describe('cloning ag_test_case', () => {
         case_to_clone.ag_test_commands = [data_ut.make_ag_test_command(case_to_clone.pk)];
         suite.ag_test_cases = [case_to_clone];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [suite]
-        ));
+        get_all_suites_from_project.resolves([suite]);
 
         wrapper = make_wrapper(project);
     });
@@ -465,7 +454,7 @@ describe('cloning ag_test_case', () => {
     });
 });
 
-describe('deleting ag_test_case', () => {
+describe('Deleting ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
     let suite: AGTestSuite;
@@ -490,10 +479,7 @@ describe('deleting ag_test_case', () => {
           last_case
         ];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [suite]
-        ));
+        get_all_suites_from_project.resolves([suite]);
 
         wrapper = make_wrapper(project);
     });
@@ -624,7 +610,7 @@ describe('deleting ag_test_case', () => {
     });
 });
 
-describe('ag_test_command Created', () => {
+describe('Creating ag_test_command', () => {
     test('Command created', async () => {
         let project = data_ut.make_project(data_ut.make_course().pk);
         let suite_1 = data_ut.make_ag_test_suite(project.pk);
@@ -634,10 +620,7 @@ describe('ag_test_command Created', () => {
         suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
         suite_1.ag_test_cases = [suite_1_case_1];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [suite_1]
-        ));
+        get_all_suites_from_project.resolves([suite_1]);
 
         let wrapper = make_wrapper(project);
         await wrapper.vm.$nextTick();
@@ -664,7 +647,7 @@ describe('ag_test_command Created', () => {
     });
 });
 
-describe('ag_test_command Changed', () => {
+describe('Changing ag_test_command', () => {
     test('Command changed', async () => {
         let project: Project;
 
@@ -682,10 +665,7 @@ describe('ag_test_command Changed', () => {
         case_1.ag_test_commands = [command_1, command_2];
         suite_1.ag_test_cases = [case_1];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
-            Promise.resolve([])
-        );
-        sinon.stub(AGTestSuite, 'get_all_from_project').resolves([suite_1]);
+        get_all_suites_from_project.resolves([suite_1]);
 
         let wrapper = make_wrapper(project);
         await wrapper.vm.$nextTick();
@@ -718,7 +698,7 @@ describe('ag_test_command Changed', () => {
     });
 });
 
-describe('ag_test_command Deleted', () => {
+describe('Deleting ag_test_command', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
 
@@ -745,11 +725,7 @@ describe('ag_test_command Deleted', () => {
 
         parent_suite.ag_test_cases = [parent_case];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
-            Promise.resolve([])
-        );
-
-        sinon.stub(AGTestSuite, 'get_all_from_project').resolves([parent_suite]);
+        get_all_suites_from_project.resolves([parent_suite]);
 
         wrapper = make_wrapper(project);
         await wrapper.vm.$nextTick();
@@ -908,10 +884,7 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
         suite_3_case_1.ag_test_commands = [suite_3_case_1_command_1];
         suite_3.ag_test_cases = [suite_3_case_1];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [suite_1, suite_2, suite_3]
-        ));
+        get_all_suites_from_project.resolves([suite_1, suite_2, suite_3]);
 
         wrapper = make_wrapper(project);
         await wrapper.vm.$nextTick();
@@ -1077,10 +1050,7 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
         suite_3_case_1.ag_test_commands = [suite_3_case_1_command_1];
         suite_3.ag_test_cases = [suite_3_case_1];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(Promise.resolve(
-            [suite_1, suite_2, suite_3]
-        ));
+        get_all_suites_from_project.resolves([suite_1, suite_2, suite_3]);
 
         wrapper = make_wrapper(project);
     });
@@ -1203,7 +1173,7 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
     });
 });
 
-describe('active_level', () => {
+describe('Active_level', () => {
     let wrapper: Wrapper<AGSuites>;
     let project: Project;
 
@@ -1221,11 +1191,7 @@ describe('active_level', () => {
         ag_test_case.ag_test_commands = [ag_test_command];
         ag_test_suite.ag_test_cases = [ag_test_case];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
-            Promise.resolve([])
-        );
-
-        sinon.stub(AGTestSuite, 'get_all_from_project').resolves([ag_test_suite]);
+        get_all_suites_from_project.resolves([ag_test_suite]);
 
         wrapper = make_wrapper(project);
     });
@@ -1298,11 +1264,7 @@ describe('AGSuites getter functions', () => {
         suite_1_case_2.ag_test_commands = [ suite_1_case_2_command_1];
         suite_1.ag_test_cases = [suite_1_case_1, suite_1_case_2];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([suite_1])
-        );
+        get_all_suites_from_project.resolves([suite_1]);
 
         wrapper = make_wrapper(project);
 
@@ -1333,11 +1295,7 @@ describe('AGSuites getter functions', () => {
         suite_1.ag_test_cases = [suite_1_case_1];
         suite_2.ag_test_cases = [suite_2_case_1];
 
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([]));
-
-        sinon.stub(AGTestSuite, 'get_all_from_project').returns(
-            Promise.resolve([suite_1, suite_2])
-        );
+        get_all_suites_from_project.resolves([suite_1, suite_2]);
 
         wrapper = make_wrapper(project);
 
