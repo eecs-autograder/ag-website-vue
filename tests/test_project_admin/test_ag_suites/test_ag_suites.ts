@@ -14,19 +14,22 @@ import {
     validated_input_is_valid
 } from '@/tests/utils';
 
-function make_wrapper(project: ag_cli.Project) {
+function make_wrapper(project_in: ag_cli.Project) {
     let wrapper = mount(AGSuites, {
         propsData: {
-            project: project
+            project: project_in
         }
     });
     return wrapper;
 }
 
+let project: ag_cli.Project;
 let get_sandbox_docker_images: sinon.SinonStub;
 let get_all_suites_from_project: sinon.SinonStub;
 
 beforeEach(() => {
+    project = data_ut.make_project(data_ut.make_course().pk);
+
     get_sandbox_docker_images = sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
         Promise.resolve([])
     );
@@ -35,11 +38,8 @@ beforeEach(() => {
 
 describe('Creating ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
-
         get_all_suites_from_project.resolves([]);
 
         wrapper = make_wrapper(project);
@@ -138,11 +138,9 @@ describe('Creating ag_test_suite', () => {
 
 describe('Changing ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
     let suite: ag_cli.AGTestSuite;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         suite = data_ut.make_ag_test_suite(project.pk);
 
         get_all_suites_from_project.resolves([suite]);
@@ -176,13 +174,11 @@ describe('Changing ag_test_suite', () => {
 
 describe('Deleting ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
     let first_suite: ag_cli.AGTestSuite;
     let middle_suite: ag_cli.AGTestSuite;
     let last_suite: ag_cli.AGTestSuite;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         first_suite = data_ut.make_ag_test_suite(project.pk);
         middle_suite = data_ut.make_ag_test_suite(project.pk);
         last_suite = data_ut.make_ag_test_suite(project.pk);
@@ -308,10 +304,8 @@ describe('Deleting ag_test_suite', () => {
 describe('Creating ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
     let ag_test_suite: ag_cli.AGTestSuite;
-    let project: ag_cli.Project;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         ag_test_suite = data_ut.make_ag_test_suite(project.pk);
 
         get_all_suites_from_project.resolves([ag_test_suite]);
@@ -341,12 +335,10 @@ describe('Creating ag_test_case', () => {
 
 describe('Changing ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
     let ag_test_suite: ag_cli.AGTestSuite;
     let ag_test_case: ag_cli.AGTestCase;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         ag_test_suite = data_ut.make_ag_test_suite(project.pk);
         ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
         ag_test_case.ag_test_commands = [data_ut.make_ag_test_command(ag_test_case.pk)];
@@ -385,13 +377,11 @@ describe('Changing ag_test_case', () => {
 
 describe('Cloning ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
     let suite: ag_cli.AGTestSuite;
     let case_to_clone: ag_cli.AGTestCase;
     let clone_of_case: ag_cli.AGTestCase;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         suite = data_ut.make_ag_test_suite(project.pk);
         case_to_clone = data_ut.make_ag_test_case(suite.pk);
         case_to_clone.ag_test_commands = [data_ut.make_ag_test_command(case_to_clone.pk)];
@@ -448,14 +438,12 @@ describe('Cloning ag_test_case', () => {
 
 describe('Deleting ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
     let suite: ag_cli.AGTestSuite;
     let first_case: ag_cli.AGTestCase;
     let middle_case: ag_cli.AGTestCase;
     let last_case: ag_cli.AGTestCase;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         suite = data_ut.make_ag_test_suite(project.pk);
         first_case = data_ut.make_ag_test_case(suite.pk);
         middle_case = data_ut.make_ag_test_case(suite.pk);
@@ -604,7 +592,6 @@ describe('Deleting ag_test_case', () => {
 
 describe('Creating ag_test_command', () => {
     test('Command created', async () => {
-        let project = data_ut.make_project(data_ut.make_course().pk);
         let suite_1 = data_ut.make_ag_test_suite(project.pk);
         let suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
         let suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
@@ -641,14 +628,11 @@ describe('Creating ag_test_command', () => {
 
 describe('Changing ag_test_command', () => {
     test('Command changed', async () => {
-        let project: ag_cli.Project;
-
         let suite_1: ag_cli.AGTestSuite;
         let case_1: ag_cli.AGTestCase;
         let command_1: ag_cli.AGTestCommand;
         let command_2: ag_cli.AGTestCommand;
 
-        project = data_ut.make_project(data_ut.make_course().pk);
         suite_1 = data_ut.make_ag_test_suite(project.pk);
         case_1 = data_ut.make_ag_test_case(suite_1.pk);
         command_1 = data_ut.make_ag_test_command(case_1.pk);
@@ -692,8 +676,6 @@ describe('Changing ag_test_command', () => {
 
 describe('Deleting ag_test_command', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
-
     let parent_suite: ag_cli.AGTestSuite;
     let parent_case: ag_cli.AGTestCase;
     let first_command: ag_cli.AGTestCommand;
@@ -702,7 +684,6 @@ describe('Deleting ag_test_command', () => {
 
 
     beforeEach(async () => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         parent_suite = data_ut.make_ag_test_suite(project.pk);
         parent_case = data_ut.make_ag_test_case(parent_suite.pk);
         first_command = data_ut.make_ag_test_command(parent_case.pk);
@@ -830,8 +811,6 @@ describe('Deleting ag_test_command', () => {
 
 describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
-
     let suite_1: ag_cli.AGTestSuite;
     let suite_1_case_1: ag_cli.AGTestCase;
     let suite_1_case_1_command_1: ag_cli.AGTestCommand;
@@ -849,7 +828,6 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
     let suite_3_case_1_command_1: ag_cli.AGTestCommand;
 
     beforeEach(async () => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         suite_1 = data_ut.make_ag_test_suite(project.pk);
         suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
         suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
@@ -996,8 +974,6 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
 
 describe('next_ag_test_case_is_available AND go_to_next_command', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
-
     let suite_1: ag_cli.AGTestSuite;
     let suite_1_case_1: ag_cli.AGTestCase;
     let suite_1_case_1_command_1: ag_cli.AGTestCommand;
@@ -1015,7 +991,6 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
     let suite_3_case_1_command_1: ag_cli.AGTestCommand;
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         suite_1 = data_ut.make_ag_test_suite(project.pk);
         suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
         suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
@@ -1167,15 +1142,12 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
 
 describe('Active_level', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
-
     let ag_test_suite: ag_cli.AGTestSuite;
     let ag_test_case: ag_cli.AGTestCase;
     let ag_test_command: ag_cli.AGTestCommand;
 
 
     beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
         ag_test_suite = data_ut.make_ag_test_suite(project.pk);
         ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
         ag_test_command = data_ut.make_ag_test_command(ag_test_case.pk);
@@ -1231,11 +1203,6 @@ describe('Active_level', () => {
 
 describe('AGSuites getter functions', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: ag_cli.Project;
-
-    beforeEach(() => {
-        project = data_ut.make_project(data_ut.make_course().pk);
-    });
 
     afterEach(() => {
         sinon.restore();
