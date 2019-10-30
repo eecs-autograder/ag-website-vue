@@ -12,6 +12,27 @@ import * as data_ut from '@/tests/data_utils.ts';
 
 jest.mock('file-saver');
 
+function make_wrapper(submission_with_results: ag_cli.SubmissionWithResults,
+                      course: ag_cli.Course,
+                      group: ag_cli.Group,
+                      is_ultimate_submission: boolean,
+                      globals: GlobalData) {
+
+    let wrapper = mount(SubmissionDetail, {
+        propsData: {
+            submission_with_results: submission_with_results,
+            course: course,
+            group: group,
+            is_ultimate_submission: is_ultimate_submission
+        },
+        provide: {
+            globals: globals
+        }
+    });
+
+    return wrapper;
+}
+
 describe('SubmissionDetail tests', () => {
     let wrapper: Wrapper<SubmissionDetail>;
     let course: ag_cli.Course;
@@ -89,17 +110,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.submission).toEqual(new ag_cli.Submission(submission_with_results));
@@ -155,17 +166,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(get_submission_result_stub.callCount).toEqual(0);
@@ -191,17 +192,7 @@ describe('SubmissionDetail tests', () => {
         submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.submission!.submitter).toEqual(user.username);
@@ -212,17 +203,7 @@ describe('SubmissionDetail tests', () => {
         submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.submission!.status).toEqual(ag_cli.GradingStatus.received);
@@ -235,17 +216,7 @@ describe('SubmissionDetail tests', () => {
         submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.submission!.is_bonus_submission).toBe(false);
@@ -261,17 +232,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.submission!.is_bonus_submission).toBe(true);
@@ -292,17 +253,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(true);
@@ -321,17 +272,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(true);
@@ -351,17 +292,7 @@ describe('SubmissionDetail tests', () => {
         user.username = "Moira";
         globals.current_user = user;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
@@ -382,17 +313,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(false);
@@ -413,17 +334,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(false);
@@ -444,17 +355,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(false);
@@ -475,17 +376,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(true);
@@ -507,17 +398,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(false);
@@ -538,17 +419,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(true);
@@ -570,17 +441,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.show_score).toBe(false);
@@ -602,17 +463,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
@@ -634,17 +485,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         get_file_content_stub = sinon.stub(wrapper.vm.submission!, 'get_file_content').returns(
@@ -674,17 +515,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
@@ -714,17 +545,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('#adjust-feedback-section').exists()).toBe(false);
@@ -745,17 +566,7 @@ describe('SubmissionDetail tests', () => {
         globals.user_roles = user_roles;
         globals.current_user = user;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
@@ -775,17 +586,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
@@ -808,17 +609,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(true);
@@ -844,17 +635,7 @@ describe('SubmissionDetail tests', () => {
         globals.user_roles = user_roles;
         globals.current_user = user;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_group_member).toBe(false);
@@ -873,17 +654,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(get_submission_result_stub.callCount).toEqual(0);
@@ -938,17 +709,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_submission_fdbk_override!.student_test_suite_results.length).toEqual(0);
@@ -969,18 +730,9 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
+
         expect(wrapper.vm.d_submission_fdbk_override!.student_test_suite_results.length).toEqual(2);
         expect(wrapper.find({ref: 'mutation_suite_results'}).exists()).toBe(true);
     });
@@ -991,17 +743,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_submission_fdbk_override!.ag_test_suite_results.length).toEqual(0);
@@ -1022,17 +764,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_submission_fdbk_override!.ag_test_suite_results.length).toEqual(2);
@@ -1050,17 +782,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
@@ -1129,17 +851,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
@@ -1164,17 +876,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         remove_submission_from_queue_stub = sinon.stub(wrapper.vm.submission!, 'remove_from_queue');
@@ -1203,17 +905,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         remove_submission_from_queue_stub = sinon.stub(
@@ -1244,17 +936,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(true);
@@ -1272,17 +954,7 @@ describe('SubmissionDetail tests', () => {
         globals.user_roles = user_roles;
         globals.current_user = user;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: true
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, true, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(true);
@@ -1302,17 +974,7 @@ describe('SubmissionDetail tests', () => {
         globals.user_roles = user_roles;
         globals.current_user = user;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(true);
@@ -1326,17 +988,7 @@ describe('SubmissionDetail tests', () => {
         submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: true
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, true, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(false);
@@ -1356,17 +1008,7 @@ describe('SubmissionDetail tests', () => {
 
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(false);
@@ -1383,17 +1025,7 @@ describe('SubmissionDetail tests', () => {
         submission_with_results = data_ut.make_submission_with_results(group);
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles!.is_staff).toBe(false);
@@ -1411,17 +1043,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles.is_staff).toBe(false);
@@ -1501,17 +1123,7 @@ describe('SubmissionDetail tests', () => {
         user_roles.is_staff = true;
         globals.user_roles = user_roles;
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_globals.user_roles.is_staff).toBe(true);
@@ -1530,17 +1142,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.does_not_count_for_current_user).toBe(true);
@@ -1556,17 +1158,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.does_not_count_for_current_user).toBe(false);
@@ -1583,17 +1175,7 @@ describe('SubmissionDetail tests', () => {
         globals.current_user = user;
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.group.member_names.length).toEqual(3);
@@ -1612,17 +1194,7 @@ describe('SubmissionDetail tests', () => {
         );
         get_submission_result_stub.resolves(submission_with_results.results);
 
-        wrapper = mount(SubmissionDetail, {
-            propsData: {
-                submission_with_results: submission_with_results,
-                course: course,
-                group: group,
-                is_ultimate_submission: false
-            },
-            provide: {
-                globals: globals
-            }
-        });
+        wrapper = make_wrapper(submission_with_results, course, group, false, globals);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.group.member_names[0]).toEqual(user.username);
