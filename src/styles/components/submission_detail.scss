@@ -1,0 +1,139 @@
+@import '@/styles/colors.scss';
+
+%column-padding {
+    padding: 7px 10px;
+}
+
+.column-1 {
+    @extend %column-padding;
+    box-sizing: border-box;
+    width: 60%;
+    word-wrap: break-word;
+}
+
+.column-2 {
+    @extend %column-padding;
+    box-sizing: border-box;
+    width: 20%;
+}
+
+.column-3 {
+    @extend %column-padding;
+    box-sizing: border-box;
+    width: 20%;
+}
+
+.suite-result {
+    border: 2px solid darken($white-gray, 5);
+    padding: 10px 10px 4px 10px;
+    margin: 15px 0;
+    border-radius: 2px;
+    box-shadow: 3px 4px 5px lighten($white-gray, 1);
+}
+
+.fieldset {
+    margin-top: 5px;
+    border-width: 1px;
+    border-color: $light-blue;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    min-width: 0;
+    padding-right: 0;
+    padding-bottom: 5px;
+}
+
+.legend {
+    font-weight: bold;
+    font-size: 18px;
+    color: black;
+}
+
+.feedback-row {
+    margin: 8px 0;
+}
+
+.feedback-label {
+    background-color: white;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 5px 2px;
+}
+
+.feedback {
+    background-color: white;
+    display: inline;
+    vertical-align: top;
+}
+
+.lengthy-output {
+    background-color: $pebble-light;
+    border: 2px solid $pebble-medium;
+    border-radius: 3px;
+    overflow: auto;
+    padding: 5px;
+    max-height: 50vh;
+    white-space: pre-wrap;
+    margin: 0 0 5px 0;
+}
+
+.short-output {
+    display: inline-block;
+    padding: 5px 5px 5px 7px;
+}
+
+.loading-output {
+    display: inline-block;
+    padding: 5px 5px 5px 3px;
+}
+
+.correctness-output {
+    padding: 5px 0 5px 7px;
+    display: inline-block;
+}
+
+.correctness-icon {
+    padding: 5px 5px 5px 7px;
+}
+
+.diff-container {
+    background-color: white;
+    border: 2px solid $pebble-medium;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.correctness {
+    display: inline-block;
+}
+
+.not-available-icon {
+    color: darken($pebble-dark, 5);
+}
+
+.correct-icon {
+    color: $ocean-blue;
+}
+
+.incorrect-icon {
+    color: lighten($warning-red, 10);
+}
+
+.timed-out-icon {
+    color: lighten($warning-red, 10);
+}
+
+@media only screen and (min-width: 700px) {
+    $feedback-label-width: 200px;
+
+    .feedback-label {
+        width: $feedback-label-width;
+        padding: 5px 2px;
+    }
+
+    .feedback {
+        display: inline-block;
+        width: calc(100% - #{$feedback-label-width});
+    }
+}
+

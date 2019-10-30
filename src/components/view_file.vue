@@ -1,5 +1,6 @@
 <template>
-  <div id="view-file-component" :style="{height: view_file_height}">
+  <div id="view-file-component"
+       :style="{height: view_file_height, max_height: view_file_max_height}">
     <div v-if="d_loading" class="loading-spinner">
       <div><i class="fa fa-spinner fa-pulse"></i></div>
     </div>
@@ -19,7 +20,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 @Component
 export default class ViewFile extends Vue {
 
-  @Prop({required: true, type: String})
+  @Prop({default: "", type: String})
   filename!: string;
 
   @Prop({required: true, type: Promise})
@@ -27,6 +28,9 @@ export default class ViewFile extends Vue {
 
   @Prop({default: "", type: String})
   view_file_height!: string;
+
+  @Prop({default: "", type: String})
+  view_file_max_height!: string;
 
   @Watch('file_contents')
   async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {

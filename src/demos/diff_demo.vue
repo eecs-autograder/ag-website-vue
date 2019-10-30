@@ -12,12 +12,19 @@
     <div class="diff_wrapper">
       <diff :diff_contents="wide_diff"
             left_header="Expected Output"
-          right_header="Student Output"></diff>
+            right_header="Student Output"></diff>
     </div>
 
     <h3>This one should have wrapped text</h3>
     <div class="diff_wrapper">
       <diff :diff_contents="diff_no_right"
+            left_header="Expected Output"
+            right_header="Student Output"></diff>
+    </div>
+
+    <h3>Empty Array</h3>
+    <div class="diff_wrapper">
+      <diff :diff_contents="diff_empty"
             left_header="Expected Output"
             right_header="Student Output"></diff>
     </div>
@@ -74,6 +81,8 @@ export default class DiffDemo extends Vue {
     "- Jack of Diamonds turned up\n",
     "- Hand 0\n",
   ];
+
+  diff_empty = [];
 }
 </script>
 

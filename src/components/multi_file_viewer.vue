@@ -119,7 +119,7 @@ export default class MultiFileViewer extends Vue {
   text-align: center;
   padding: 10px;
   position: absolute;
-  width: 100%;
+  /*width: 100%;*/
   top: 0;
 }
 
