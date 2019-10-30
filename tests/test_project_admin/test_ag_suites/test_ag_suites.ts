@@ -1,13 +1,5 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
-import {
-    AGTestCase,
-    AGTestCommand,
-    AGTestSuite,
-    HttpError,
-    Project,
-} from 'ag-client-typescript';
-// tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
@@ -22,7 +14,7 @@ import {
     validated_input_is_valid
 } from '@/tests/utils';
 
-function make_wrapper(project: Project) {
+function make_wrapper(project: ag_cli.Project) {
     let wrapper = mount(AGSuites, {
         propsData: {
             project: project
@@ -38,12 +30,12 @@ beforeEach(() => {
     get_sandbox_docker_images = sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
         Promise.resolve([])
     );
-    get_all_suites_from_project = sinon.stub(AGTestSuite, 'get_all_from_project').rejects();
+    get_all_suites_from_project = sinon.stub(ag_cli.AGTestSuite, 'get_all_from_project').rejects();
 });
 
 describe('Creating ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
+    let project: ag_cli.Project;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -82,8 +74,8 @@ describe('Creating ag_test_suite', () => {
     });
 
     test('Creating a suite - successfully', async () => {
-        let create_ag_suite_stub = sinon.stub(AGTestSuite, 'create').callsFake(
-            () => AGTestSuite.notify_ag_test_suite_created(new_suite)
+        let create_ag_suite_stub = sinon.stub(ag_cli.AGTestSuite, 'create').callsFake(
+            () => ag_cli.AGTestSuite.notify_ag_test_suite_created(new_suite)
         );
 
         let new_suite = data_ut.make_ag_test_suite(project.pk);
@@ -111,11 +103,11 @@ describe('Creating ag_test_suite', () => {
     });
 
     test('Creating a suite - unsuccessfully', async () => {
-        let create_ag_suite_stub = sinon.stub(AGTestSuite, 'create').returns(
+        let create_ag_suite_stub = sinon.stub(ag_cli.AGTestSuite, 'create').returns(
             Promise.reject(
-                new HttpError(
+                new ag_cli.HttpError(
                     400,
-                    {__all__: "Ag test suite with this Name and Project already exists."}
+                    {__all__: "Ag test suite with this Name and ag_cli.Project already exists."}
                 )
             )
         );
@@ -146,8 +138,8 @@ describe('Creating ag_test_suite', () => {
 
 describe('Changing ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
-    let suite: AGTestSuite;
+    let project: ag_cli.Project;
+    let suite: ag_cli.AGTestSuite;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -167,13 +159,13 @@ describe('Changing ag_test_suite', () => {
     });
 
     test('Suite changed', async () => {
-        let updated_suite = deep_copy(suite, AGTestSuite);
+        let updated_suite = deep_copy(suite, ag_cli.AGTestSuite);
         updated_suite.name = 'Updated name';
 
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
         expect(wrapper.vm.d_ag_test_suites[0]).not.toEqual(updated_suite);
 
-        AGTestSuite.notify_ag_test_suite_changed(updated_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_changed(updated_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0]).not.toEqual(suite);
@@ -184,10 +176,10 @@ describe('Changing ag_test_suite', () => {
 
 describe('Deleting ag_test_suite', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
-    let first_suite: AGTestSuite;
-    let middle_suite: AGTestSuite;
-    let last_suite: AGTestSuite;
+    let project: ag_cli.Project;
+    let first_suite: ag_cli.AGTestSuite;
+    let middle_suite: ag_cli.AGTestSuite;
+    let last_suite: ag_cli.AGTestSuite;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -211,7 +203,7 @@ describe('Deleting ag_test_suite', () => {
     test('Delete first suite in suites', async () => {
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
 
-        AGTestSuite.notify_ag_test_suite_deleted(first_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(first_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
@@ -225,7 +217,7 @@ describe('Deleting ag_test_suite', () => {
         wrapper.vm.update_active_item(first_suite);
         await wrapper.vm.$nextTick();
 
-        AGTestSuite.notify_ag_test_suite_deleted(first_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(first_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
@@ -237,7 +229,7 @@ describe('Deleting ag_test_suite', () => {
     test('Delete last suite in suites', async () => {
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
 
-        AGTestSuite.notify_ag_test_suite_deleted(last_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(last_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
@@ -251,7 +243,7 @@ describe('Deleting ag_test_suite', () => {
         wrapper.vm.update_active_item(last_suite);
         await wrapper.vm.$nextTick();
 
-        AGTestSuite.notify_ag_test_suite_deleted(last_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(last_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
@@ -263,7 +255,7 @@ describe('Deleting ag_test_suite', () => {
     test('Delete middle suite in suites', async () => {
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(3);
 
-        AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
@@ -277,7 +269,7 @@ describe('Deleting ag_test_suite', () => {
         wrapper.vm.update_active_item(middle_suite);
         await wrapper.vm.$nextTick();
 
-        AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
@@ -292,20 +284,20 @@ describe('Deleting ag_test_suite', () => {
         wrapper.vm.update_active_item(first_suite);
         await wrapper.vm.$nextTick();
 
-        AGTestSuite.notify_ag_test_suite_deleted(first_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(first_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(2);
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(middle_suite);
         expect(wrapper.vm.d_ag_test_suites[1]).toEqual(last_suite);
 
-        AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(middle_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(1);
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(last_suite);
 
-        AGTestSuite.notify_ag_test_suite_deleted(last_suite);
+        ag_cli.AGTestSuite.notify_ag_test_suite_deleted(last_suite);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
@@ -315,8 +307,8 @@ describe('Deleting ag_test_suite', () => {
 
 describe('Creating ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let ag_test_suite: AGTestSuite;
-    let project: Project;
+    let ag_test_suite: ag_cli.AGTestSuite;
+    let project: ag_cli.Project;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -339,7 +331,7 @@ describe('Creating ag_test_case', () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(0);
 
         let ag_test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
-        AGTestCase.notify_ag_test_case_created(ag_test_case);
+        ag_cli.AGTestCase.notify_ag_test_case_created(ag_test_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
@@ -349,9 +341,9 @@ describe('Creating ag_test_case', () => {
 
 describe('Changing ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
-    let ag_test_suite: AGTestSuite;
-    let ag_test_case: AGTestCase;
+    let project: ag_cli.Project;
+    let ag_test_suite: ag_cli.AGTestSuite;
+    let ag_test_case: ag_cli.AGTestCase;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -374,7 +366,7 @@ describe('Changing ag_test_case', () => {
     });
 
     test('Case changed', async () => {
-        let updated_ag_test_case = deep_copy(ag_test_case, AGTestCase);
+        let updated_ag_test_case = deep_copy(ag_test_case, ag_cli.AGTestCase);
         updated_ag_test_case.name = 'Updated name';
 
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(ag_test_suite);
@@ -382,7 +374,7 @@ describe('Changing ag_test_case', () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(ag_test_case);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).not.toEqual(updated_ag_test_case);
 
-        AGTestCase.notify_ag_test_case_changed(updated_ag_test_case);
+        ag_cli.AGTestCase.notify_ag_test_case_changed(updated_ag_test_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
@@ -393,10 +385,10 @@ describe('Changing ag_test_case', () => {
 
 describe('Cloning ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
-    let suite: AGTestSuite;
-    let case_to_clone: AGTestCase;
-    let clone_of_case: AGTestCase;
+    let project: ag_cli.Project;
+    let suite: ag_cli.AGTestSuite;
+    let case_to_clone: ag_cli.AGTestCase;
+    let clone_of_case: ag_cli.AGTestCase;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -423,7 +415,7 @@ describe('Cloning ag_test_case', () => {
         clone_of_case = data_ut.make_ag_test_case(suite.pk, { name: new_case_name });
 
         let clone_case_stub = sinon.stub(case_to_clone, 'copy').callsFake(
-            () => AGTestCase.notify_ag_test_case_created(clone_of_case)
+            () => ag_cli.AGTestCase.notify_ag_test_case_created(clone_of_case)
         );
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
@@ -456,11 +448,11 @@ describe('Cloning ag_test_case', () => {
 
 describe('Deleting ag_test_case', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
-    let suite: AGTestSuite;
-    let first_case: AGTestCase;
-    let middle_case: AGTestCase;
-    let last_case: AGTestCase;
+    let project: ag_cli.Project;
+    let suite: ag_cli.AGTestSuite;
+    let first_case: ag_cli.AGTestCase;
+    let middle_case: ag_cli.AGTestCase;
+    let last_case: ag_cli.AGTestCase;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -496,7 +488,7 @@ describe('Deleting ag_test_case', () => {
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
-        AGTestCase.notify_ag_test_case_deleted(first_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(first_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -512,7 +504,7 @@ describe('Deleting ag_test_case', () => {
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
-        AGTestCase.notify_ag_test_case_deleted(first_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(first_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -524,7 +516,7 @@ describe('Deleting ag_test_case', () => {
     test('Middle case deleted', async () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
-        AGTestCase.notify_ag_test_case_deleted(middle_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(middle_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -540,7 +532,7 @@ describe('Deleting ag_test_case', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_case.ag_test_commands[0]);
 
-        AGTestCase.notify_ag_test_case_deleted(middle_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(middle_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -552,7 +544,7 @@ describe('Deleting ag_test_case', () => {
     test('last case deleted', async () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(3);
 
-        AGTestCase.notify_ag_test_case_deleted(last_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(last_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -568,7 +560,7 @@ describe('Deleting ag_test_case', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(last_case.ag_test_commands[0]);
 
-        AGTestCase.notify_ag_test_case_deleted(last_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(last_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -585,7 +577,7 @@ describe('Deleting ag_test_case', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(first_case.ag_test_commands[0]);
 
-        AGTestCase.notify_ag_test_case_deleted(first_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(first_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
@@ -594,14 +586,14 @@ describe('Deleting ag_test_case', () => {
         expect(wrapper.vm.d_active_ag_test_suite).toBeNull();
         expect(wrapper.vm.d_active_ag_test_command).toEqual(middle_case.ag_test_commands[0]);
 
-        AGTestCase.notify_ag_test_case_deleted(middle_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(middle_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(last_case);
         expect(wrapper.vm.d_active_ag_test_command).toEqual(last_case.ag_test_commands[0]);
 
-        AGTestCase.notify_ag_test_case_deleted(last_case);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(last_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(0);
@@ -628,7 +620,7 @@ describe('Creating ag_test_command', () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(1);
 
         let command_created = data_ut.make_ag_test_command(suite_1_case_1.pk);
-        AGTestCommand.notify_ag_test_command_created(command_created);
+        ag_cli.AGTestCommand.notify_ag_test_command_created(command_created);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -649,12 +641,12 @@ describe('Creating ag_test_command', () => {
 
 describe('Changing ag_test_command', () => {
     test('Command changed', async () => {
-        let project: Project;
+        let project: ag_cli.Project;
 
-        let suite_1: AGTestSuite;
-        let case_1: AGTestCase;
-        let command_1: AGTestCommand;
-        let command_2: AGTestCommand;
+        let suite_1: ag_cli.AGTestSuite;
+        let case_1: ag_cli.AGTestCase;
+        let command_1: ag_cli.AGTestCommand;
+        let command_2: ag_cli.AGTestCommand;
 
         project = data_ut.make_project(data_ut.make_course().pk);
         suite_1 = data_ut.make_ag_test_suite(project.pk);
@@ -670,7 +662,7 @@ describe('Changing ag_test_command', () => {
         let wrapper = make_wrapper(project);
         await wrapper.vm.$nextTick();
 
-        let updated_command_2 = deep_copy(command_2, AGTestCommand);
+        let updated_command_2 = deep_copy(command_2, ag_cli.AGTestCommand);
         updated_command_2.name = 'Updated name';
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -681,7 +673,7 @@ describe('Changing ag_test_command', () => {
             command_2
         );
         expect(command_2).not.toEqual(updated_command_2);
-        AGTestCommand.notify_ag_test_command_changed(updated_command_2);
+        ag_cli.AGTestCommand.notify_ag_test_command_changed(updated_command_2);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -700,13 +692,13 @@ describe('Changing ag_test_command', () => {
 
 describe('Deleting ag_test_command', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
+    let project: ag_cli.Project;
 
-    let parent_suite: AGTestSuite;
-    let parent_case: AGTestCase;
-    let first_command: AGTestCommand;
-    let middle_command: AGTestCommand;
-    let last_command: AGTestCommand;
+    let parent_suite: ag_cli.AGTestSuite;
+    let parent_case: ag_cli.AGTestCase;
+    let first_command: ag_cli.AGTestCommand;
+    let middle_command: ag_cli.AGTestCommand;
+    let last_command: ag_cli.AGTestCommand;
 
 
     beforeEach(async () => {
@@ -741,7 +733,7 @@ describe('Deleting ag_test_command', () => {
 
     test('First command deleted in case', async () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
-        AGTestCommand.notify_ag_test_command_deleted(first_command);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(first_command);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -758,7 +750,7 @@ describe('Deleting ag_test_command', () => {
 
         wrapper.vm.update_active_item(first_command);
         await wrapper.vm.$nextTick();
-        AGTestCommand.notify_ag_test_command_deleted(first_command);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(first_command);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -773,7 +765,7 @@ describe('Deleting ag_test_command', () => {
 
     test('Middle command deleted in case', async () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
-        AGTestCommand.notify_ag_test_command_deleted(middle_command);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(middle_command);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -790,7 +782,7 @@ describe('Deleting ag_test_command', () => {
 
         wrapper.vm.update_active_item(middle_command);
         await wrapper.vm.$nextTick();
-        AGTestCommand.notify_ag_test_command_deleted(middle_command);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(middle_command);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -805,7 +797,7 @@ describe('Deleting ag_test_command', () => {
 
     test('Last command deleted in case', async () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(3);
-        AGTestCommand.notify_ag_test_command_deleted(last_command);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(last_command);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -822,7 +814,7 @@ describe('Deleting ag_test_command', () => {
 
         wrapper.vm.update_active_item(last_command);
         await wrapper.vm.$nextTick();
-        AGTestCommand.notify_ag_test_command_deleted(last_command);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(last_command);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(2);
@@ -838,23 +830,23 @@ describe('Deleting ag_test_command', () => {
 
 describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
+    let project: ag_cli.Project;
 
-    let suite_1: AGTestSuite;
-    let suite_1_case_1: AGTestCase;
-    let suite_1_case_1_command_1: AGTestCommand;
-    let suite_1_case_2: AGTestCase;
-    let suite_1_case_2_command_1: AGTestCommand;
-    let suite_1_case_2_command_2: AGTestCommand;
+    let suite_1: ag_cli.AGTestSuite;
+    let suite_1_case_1: ag_cli.AGTestCase;
+    let suite_1_case_1_command_1: ag_cli.AGTestCommand;
+    let suite_1_case_2: ag_cli.AGTestCase;
+    let suite_1_case_2_command_1: ag_cli.AGTestCommand;
+    let suite_1_case_2_command_2: ag_cli.AGTestCommand;
 
-    let suite_2: AGTestSuite;
-    let suite_2_case_1: AGTestCase;
-    let suite_2_case_1_command_1: AGTestCommand;
-    let suite_2_case_1_command_2: AGTestCommand;
+    let suite_2: ag_cli.AGTestSuite;
+    let suite_2_case_1: ag_cli.AGTestCase;
+    let suite_2_case_1_command_1: ag_cli.AGTestCommand;
+    let suite_2_case_1_command_2: ag_cli.AGTestCommand;
 
-    let suite_3: AGTestSuite;
-    let suite_3_case_1: AGTestCase;
-    let suite_3_case_1_command_1: AGTestCommand;
+    let suite_3: ag_cli.AGTestSuite;
+    let suite_3_case_1: ag_cli.AGTestCase;
+    let suite_3_case_1_command_1: ag_cli.AGTestCommand;
 
     beforeEach(async () => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -922,7 +914,7 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
     test('prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, ' +
          'prev suite doesnt have any cases',
          async () => {
-        AGTestCase.notify_ag_test_case_deleted(suite_2_case_1);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(suite_2_case_1);
         await wrapper.vm.$nextTick();
 
         wrapper.vm.update_active_item(suite_3_case_1_command_1);
@@ -935,7 +927,7 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
     test("prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, " +
          "prev suite's last case doesnt have enough commands",
          async () => {
-        AGTestCommand.notify_ag_test_command_deleted(suite_1_case_2_command_2);
+        ag_cli.AGTestCommand.notify_ag_test_command_deleted(suite_1_case_2_command_2);
         await wrapper.vm.$nextTick();
 
         wrapper.vm.update_active_item(suite_2_case_1_command_2);
@@ -1004,23 +996,23 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
 
 describe('next_ag_test_case_is_available AND go_to_next_command', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
+    let project: ag_cli.Project;
 
-    let suite_1: AGTestSuite;
-    let suite_1_case_1: AGTestCase;
-    let suite_1_case_1_command_1: AGTestCommand;
-    let suite_1_case_2: AGTestCase;
-    let suite_1_case_2_command_1: AGTestCommand;
-    let suite_1_case_2_command_2: AGTestCommand;
+    let suite_1: ag_cli.AGTestSuite;
+    let suite_1_case_1: ag_cli.AGTestCase;
+    let suite_1_case_1_command_1: ag_cli.AGTestCommand;
+    let suite_1_case_2: ag_cli.AGTestCase;
+    let suite_1_case_2_command_1: ag_cli.AGTestCommand;
+    let suite_1_case_2_command_2: ag_cli.AGTestCommand;
 
-    let suite_2: AGTestSuite;
-    let suite_2_case_1: AGTestCase;
-    let suite_2_case_1_command_1: AGTestCommand;
-    let suite_2_case_1_command_2: AGTestCommand;
+    let suite_2: ag_cli.AGTestSuite;
+    let suite_2_case_1: ag_cli.AGTestCase;
+    let suite_2_case_1_command_1: ag_cli.AGTestCommand;
+    let suite_2_case_1_command_2: ag_cli.AGTestCommand;
 
-    let suite_3: AGTestSuite;
-    let suite_3_case_1: AGTestCase;
-    let suite_3_case_1_command_1: AGTestCommand;
+    let suite_3: ag_cli.AGTestSuite;
+    let suite_3_case_1: ag_cli.AGTestCase;
+    let suite_3_case_1_command_1: ag_cli.AGTestCommand;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -1084,8 +1076,8 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
         let suite_1_case_1_command_2 = data_ut.make_ag_test_command(suite_1_case_1.pk);
         let suite_1_case_1_command_3 = data_ut.make_ag_test_command(suite_1_case_1.pk);
 
-        AGTestCommand.notify_ag_test_command_created(suite_1_case_1_command_2);
-        AGTestCommand.notify_ag_test_command_created(suite_1_case_1_command_3);
+        ag_cli.AGTestCommand.notify_ag_test_command_created(suite_1_case_1_command_2);
+        ag_cli.AGTestCommand.notify_ag_test_command_created(suite_1_case_1_command_3);
 
         wrapper.vm.update_active_item(suite_1_case_1_command_3);
         await wrapper.vm.$nextTick();
@@ -1117,7 +1109,7 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
     test('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
          'case is the last case in the suite, next suite doesnt have any cases',
          async () => {
-        AGTestCase.notify_ag_test_case_deleted(suite_3_case_1);
+        ag_cli.AGTestCase.notify_ag_test_case_deleted(suite_3_case_1);
 
         wrapper.vm.update_active_item(suite_2_case_1_command_1);
         await wrapper.vm.$nextTick();
@@ -1175,11 +1167,11 @@ describe('next_ag_test_case_is_available AND go_to_next_command', () => {
 
 describe('Active_level', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
+    let project: ag_cli.Project;
 
-    let ag_test_suite: AGTestSuite;
-    let ag_test_case: AGTestCase;
-    let ag_test_command: AGTestCommand;
+    let ag_test_suite: ag_cli.AGTestSuite;
+    let ag_test_case: ag_cli.AGTestCase;
+    let ag_test_command: ag_cli.AGTestCommand;
 
 
     beforeEach(() => {
@@ -1239,7 +1231,7 @@ describe('Active_level', () => {
 
 describe('AGSuites getter functions', () => {
     let wrapper: Wrapper<AGSuites>;
-    let project: Project;
+    let project: ag_cli.Project;
 
     beforeEach(() => {
         project = data_ut.make_project(data_ut.make_course().pk);
