@@ -23,8 +23,10 @@
         My Submissions
       </div>
       <div class="nav-link"
+           ref="student_lookup_tab"
            :class="{'active': d_current_tab === 'student_lookup'}"
-           @click="set_current_tab('student_lookup')">
+           @click="set_current_tab('student_lookup')"
+           v-if="d_globals.user_roles.is_staff">
         Student Lookup
       </div>
       <div class="nav-link"
@@ -65,7 +67,10 @@
                        v-show="d_current_tab === 'my_submissions'"
                        :course="course" :project="project" :group="group"></submission-list>
 
-      <div v-show="d_current_tab === 'student_lookup'">TODO</div>
+      <student-lookup v-show="d_current_tab === 'student_lookup'"
+                      v-if="d_loaded_tabs.has('student_lookup')"
+                      :course="course"
+                      :project="project"></student-lookup>
 
       <handgrading-container v-show="d_current_tab === 'handgrading'"
                              v-if="handgrading_rubric !== null && d_loaded_tabs.has('handgrading')"
@@ -98,6 +103,7 @@ import { GlobalData } from '@/app.vue';
 import Handgrading from '@/components/handgrading/handgrading.vue';
 import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
+import StudentLookup from '@/components/project_view/student_lookup.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
 import Tab from '@/components/tabs/tab.vue';
@@ -110,6 +116,7 @@ import { assert_not_null, format_datetime, get_query_param } from '@/utils';
     GroupRegistration,
     Handgrading,
     HandgradingContainer,
+    StudentLookup,
     SubmissionList,
     Submit,
     Tab,

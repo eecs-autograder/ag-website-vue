@@ -123,6 +123,13 @@ describe('Submission list tests', () => {
     test('Group input change', async () => {
         let current_group_submission = data_ut.make_submission_with_results(group);
         get_submissions_with_results_stub.withArgs(group.pk).resolves([current_group_submission]);
+        // We need to make sure that the ultimate submission is reset
+        // to null if unavailable for the new group.
+        get_ultimate_submission_stub.withArgs(group.pk).resolves(
+            new ag_cli.Submission(current_group_submission));
+        get_submission_result_stub.withArgs(
+            current_group_submission.pk, ag_cli.FeedbackCategory.ultimate_submission
+        ).resolves(current_group_submission.results);
 
         let other_group = data_ut.make_group(project.pk);
         let other_group_submission2 = data_ut.make_submission_with_results(other_group);
@@ -141,7 +148,9 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(1);
+        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(
+            wrapper.find('.sidebar-content').findAll({name: 'SubmissionPanel'}).length).toEqual(1);
         expect(wrapper.vm.d_submissions).toEqual([current_group_submission]);
 
         wrapper.setProps({group: other_group});
@@ -149,10 +158,13 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(
+            wrapper.find('.sidebar-content').findAll({name: 'SubmissionPanel'}).length).toEqual(2);
         expect(wrapper.vm.d_submissions).toEqual(
             [other_group_submission, other_group_submission2]);
 
         expect(wrapper.vm.d_selected_submission).toEqual(other_group_submission);
+        expect(wrapper.vm.d_ultimate_submission).toBeNull();
     });
 
     test('update_submission_created', async () => {

@@ -1,7 +1,7 @@
 <template>
   <div id="submission-list" class="sidebar-container">
     <div class="sidebar-menu">
-      <template v-if="d_ultimate_submission !== null && !d_collapsed">
+      <template v-if="d_ultimate_submission !== null && !d_collapsed && !d_loading">
         <div class="header">Final Graded Submission</div>
         <submission-panel
           :submission="d_ultimate_submission"
@@ -25,16 +25,19 @@
         <div id="list-loading-container" v-if="d_loading">
           <i class="loading fa fa-spinner fa-pulse"></i>
         </div>
-        <template v-for="(submission, index) of d_submissions">
-          <div v-if="index !== 0" class="divider"></div>
-          <submission-panel
-            :submission="d_ultimate_submission !== null
-                            && d_ultimate_submission.pk === submission.pk
-                          ? d_ultimate_submission : submission"
-            :key="submission.pk"
-            :class="{'active': d_selected_submission !== null
-                                            && d_selected_submission.pk === submission.pk}"
-            @click.native="d_selected_submission = submission"></submission-panel>
+        <template v-else>
+          <div class="no-submissions" v-if="d_submissions.length === 0">No submissions</div>
+          <template v-for="(submission, index) of d_submissions">
+            <div v-if="index !== 0" class="divider"></div>
+            <submission-panel
+              :submission="d_ultimate_submission !== null
+                              && d_ultimate_submission.pk === submission.pk
+                            ? d_ultimate_submission : submission"
+              :key="submission.pk"
+              :class="{'active': d_selected_submission !== null
+                                              && d_selected_submission.pk === submission.pk}"
+              @click.native="d_selected_submission = submission"></submission-panel>
+          </template>
         </template>
       </div>
     </div>
@@ -161,7 +164,9 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
   private async initialize(group: Group) {
     this.d_loading = true;
 
+    // Reset these values in case we're changing submissions.
     this.d_selected_submission = null;
+    this.d_ultimate_submission = null;
     await this.get_ultimate_submission();
     this.d_submissions = await Submission.get_all_from_group_with_results(group.pk);
 
@@ -341,6 +346,11 @@ $border-color: $pebble-medium;
 
 .active {
   background-color: $active-color;
+}
+
+.no-submissions {
+  padding: 5px 8px;
+  color: darken($stormy-gray-dark, 15%);
 }
 
 </style>
