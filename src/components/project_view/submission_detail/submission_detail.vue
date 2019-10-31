@@ -315,9 +315,9 @@ export default class SubmissionDetail extends Vue {
 
   determine_feedback_type(): FeedbackCategory {
     if (this.d_globals.user_roles!.is_staff) {
-      if (this.is_group_member || (this.is_ultimate_submission
-          && this.d_globals.user_roles!.is_admin)) {
-          return FeedbackCategory.max;
+      if (this.is_group_member
+          || (this.is_ultimate_submission && this.d_globals.user_roles!.is_admin)) {
+        return FeedbackCategory.max;
       }
       return FeedbackCategory.staff_viewer;
     }
