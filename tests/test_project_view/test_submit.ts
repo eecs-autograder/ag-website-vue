@@ -317,6 +317,41 @@ describe('Submission limit, bonus submission, late day tests', () => {
         );
     });
 
+    test("Num submissions used towards total submission limit, project does not have a " +
+         "total_submission_limit",
+         () => {
+        project.total_submission_limit = null;
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+
+        expect(wrapper.find('#total-submissions-limit').exists()).toBe(false);
+    });
+
+    test("Num submissions used towards total submission limit, project has a" +
+         "total_submission_limit",
+         () => {
+        project.total_submission_limit = 10;
+        group.num_submits_towards_limit = 4;
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+
+        expect(compress_whitespace(wrapper.find('#total-submission-limit').text())).toEqual(
+            '4/10 total submissions used (forever!).'
+        );
+    });
+
     test("Project doesn't allot bonus submissions, group has no bonus submissions", () => {
         const wrapper = mount(Submit, {
             propsData: {
