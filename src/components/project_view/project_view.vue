@@ -23,6 +23,7 @@
         My Submissions
       </div>
       <div class="nav-link"
+           ref="student_lookup_tab"
            :class="{'active': d_current_tab === 'student_lookup'}"
            @click="set_current_tab('student_lookup')"
            v-if="d_globals.user_roles.is_staff">

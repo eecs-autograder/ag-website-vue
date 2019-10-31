@@ -203,18 +203,32 @@ describe('My submissions tab tests', () => {
     });
 });
 
-// Implement when we add the student lookup tab
-describe.skip('Student lookup tab tests', () => {
+describe('Student lookup tab tests', () => {
     test('Student lookup tab hidden from students', async () => {
-        fail();
+        user_roles_stub.resolves(data_ut.make_user_roles({is_student: true}));
+        wrapper = managed_shallow_mount(
+            ProjectView, {mocks: get_router_mocks({current_tab: 'student_lookup'})});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.find({ref: 'student_lookup_tab'}).exists()).toBe(false);
     });
 
     test('Student lookup tab hidden from handgraders', async () => {
-        fail();
+        user_roles_stub.resolves(data_ut.make_user_roles({is_handgrader: true}));
+        wrapper = managed_shallow_mount(
+            ProjectView, {mocks: get_router_mocks({current_tab: 'student_lookup'})});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.find({ref: 'student_lookup_tab'}).exists()).toBe(false);
     });
 
     test('Staff can see student lookup tab', async () => {
-        fail();
+        user_roles_stub.resolves(data_ut.make_user_roles({is_staff: true}));
+        wrapper = managed_shallow_mount(
+            ProjectView, {mocks: get_router_mocks({current_tab: 'student_lookup'})});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.find({ref: 'student_lookup_tab'}).exists()).toBe(true);
     });
 });
 
@@ -400,6 +414,9 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(wrapper.vm.d_current_tab).toEqual('student_lookup');
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'student_lookup'}}));
+
+        expect(wrapper.find({name: 'StudentLookup'}).exists()).toBe(true);
+        expect(wrapper.find({name: 'StudentLookup'}).isVisible()).toBe(true);
     });
 
     test('Clicking on handgrading tab', async () => {
