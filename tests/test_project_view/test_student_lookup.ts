@@ -19,11 +19,10 @@ beforeEach(async () => {
     let course = data_ut.make_course();
     project = data_ut.make_project(course.pk);
     groups = [
-        data_ut.make_group(project.pk),
-        data_ut.make_group(project.pk),
-        data_ut.make_group(project.pk),
+        data_ut.make_group(project.pk, 1, {member_names: ['user1']}),
+        data_ut.make_group(project.pk, 1, {member_names: ['user2']}),
+        data_ut.make_group(project.pk, 1, {member_names: ['user4']}),
     ];
-    groups.sort((first, second) => first.member_names[0].localeCompare(second.member_names[0]));
 
     sinon.stub(ag_cli.Group, 'get_all_from_project').withArgs(project.pk).resolves(groups.slice());
 
@@ -52,13 +51,9 @@ test('Group lookup and submission list input and event bindings', async () => {
 });
 
 test('New group created', () => {
-    let new_group = data_ut.make_group(project.pk);
+    let new_group = data_ut.make_group(project.pk, 1, {member_names: ['user3']});
     ag_cli.Group.notify_group_created(new_group);
 
-    let sorted_names = [...groups, new_group].map(group => group.member_names[0]).sort(
-        (first, second) => first.localeCompare(second)
-    );
-
     let actual_names = wrapper.vm.d_groups.data.map(group => group.member_names[0]);
-    expect(actual_names).toEqual(sorted_names);
+    expect(actual_names).toEqual(['user1', 'user2', 'user3', 'user4']);
 });
