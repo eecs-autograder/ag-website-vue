@@ -933,15 +933,15 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 @import '@/styles/forms.scss';
 
 .ag-test-command-input-container {
-  padding: 10px 0 10px 3px;
+  padding: 10px 0 10px 0;
 }
 
 #ag-test-command-name-container {
-  padding: 0 12px 12px 12px;
+  padding: 10px 14px 12px 14px;
 }
 
 #ag-test-command-container {
-  padding: 10px 12px 22px 12px;
+  padding: 10px 14px 22px 14px;
 }
 
 .file-dropdown-container {
@@ -1035,7 +1035,7 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 }
 
 #time-limit-and-stack-size {
-  padding: 0 0 0 0;
+  padding: 0;
 }
 
 #danger-zone-container {
@@ -1054,7 +1054,7 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 
 @media only screen and (min-width: 481px) {
   .point-assignment-container {
-    padding: 10px 0 0 3px;
+    padding: 10px 0 0 0;
     min-width: 500px;
   }
 
