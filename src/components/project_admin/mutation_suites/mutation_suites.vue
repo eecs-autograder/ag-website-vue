@@ -538,6 +538,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async save_mutation_test_suite() {
     try {
       this.d_saving = true;
+      (<APIErrors> this.$refs.api_errors).clear();
       await this.d_active_mutation_test_suite!.save();
     }
     finally {

@@ -570,7 +570,7 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).not.toEqual(905.5);
 
         set_validated_input_text(wrapper.find('#points-per-exposed-bug'), '905.5');
-        expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).toEqual(905.5);
+        expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).toEqual("905.5");
 
         // override max points
         expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toBeNull();

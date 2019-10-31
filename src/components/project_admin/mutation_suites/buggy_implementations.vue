@@ -15,7 +15,6 @@
                            has_less_than_or_equal_to_two_decimal_places
                          ]"
                        input_style="max-width: 500px; width: 100%"
-                       :from_string_fn="string_to_num"
                        @input="$emit('input', d_mutation_test_suite)">
       </validated-input>
     </div>
@@ -139,7 +138,6 @@ export default class BuggyImplementations extends Vue {
 
   d_buggy_impl_names_text = "";
   d_mutation_test_suite: MutationTestSuite | null = null;
-  d_mutation_test_suite_settings_form_is_valid = true;
   d_saving = false;
   d_override_max_points = false;
 
