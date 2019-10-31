@@ -39,8 +39,7 @@
         </span>
         submissions used today.
       </div>
-
-      <div id="total-submission-limit"
+      <div id="submissions-used-towards-limit"
            class="limit-container"
            v-if="project.total_submission_limit !== null">
         <span class="allotment">
@@ -48,7 +47,6 @@
         </span>
         total submissions used <b>(forever!)</b>.
       </div>
-
       <div id="bonus-submissions-remaining"
            class="limit-container"
            v-if="project.num_bonus_submissions !== 0 || group.bonus_submissions_remaining !== 0">

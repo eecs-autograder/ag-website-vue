@@ -330,7 +330,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
             }
         });
 
-        expect(wrapper.find('#total-submissions-limit').exists()).toBe(false);
+        expect(wrapper.find('#submissions-used-towards-limit').exists()).toBe(false);
     });
 
     test("Num submissions used towards total submission limit, project has a" +
@@ -347,7 +347,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
             }
         });
 
-        expect(compress_whitespace(wrapper.find('#total-submission-limit').text())).toEqual(
+        expect(compress_whitespace(wrapper.find('#submissions-used-towards-limit').text())).toEqual(
             '4/10 total submissions used (forever!).'
         );
     });
