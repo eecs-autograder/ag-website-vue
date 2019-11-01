@@ -225,46 +225,72 @@ describe('Submission list tests', () => {
 });
 
 describe('Ultimate submission tests', () => {
-    test('Ultimate submission available, results requested', async () => {
-        let ultimate_submission_with_results = data_ut.make_submission_with_results(
-            group, {}, {total_points: 24, total_points_possible: 38});
-        let ultimate_submission = new ag_cli.Submission(ultimate_submission_with_results);
-        let submission = data_ut.make_submission_with_results(group);
-        get_submissions_with_results_stub.withArgs(group.pk).resolves(
-            [submission, ultimate_submission]);
+    describe('Ultimate submission available tests', () => {
+        let ultimate_submission_with_results: ag_cli.SubmissionWithResults;
+        let ultimate_submission: ag_cli.Submission;
+        let submission: ag_cli.SubmissionWithResults;
 
-        get_ultimate_submission_stub.withArgs(group.pk).resolves(
-            new ag_cli.Submission(ultimate_submission_with_results)
-        );
-        get_submission_result_stub.withArgs(
-            ultimate_submission_with_results.pk, ag_cli.FeedbackCategory.ultimate_submission
-        ).resolves(ultimate_submission_with_results.results);
+        beforeEach(() => {
+            ultimate_submission_with_results = data_ut.make_submission_with_results(
+                group, {}, {total_points: 24, total_points_possible: 38});
+            ultimate_submission = new ag_cli.Submission(ultimate_submission_with_results);
+            submission = data_ut.make_submission_with_results(group);
+            get_submissions_with_results_stub.withArgs(group.pk).resolves(
+                [submission, ultimate_submission_with_results]);
 
-        let wrapper = mount(SubmissionList, {
-            propsData: {
-                course: course,
-                project: project,
-                group: group,
-            }
+            get_ultimate_submission_stub.withArgs(group.pk).resolves(
+                new ag_cli.Submission(ultimate_submission_with_results)
+            );
+            get_submission_result_stub.withArgs(
+                ultimate_submission_with_results.pk, ag_cli.FeedbackCategory.ultimate_submission
+            ).resolves(ultimate_submission_with_results.results);
         });
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        test('Ultimate submission fdbk results requested for non-staff', async () => {
+            data_ut.set_global_user_roles(data_ut.make_user_roles({is_student: true}));
+            let wrapper = mount(SubmissionList, {
+                propsData: {
+                    course: course,
+                    project: project,
+                    group: group,
+                }
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+            check_data(wrapper);
+            expect(get_submission_result_stub.calledOnce).toBe(true);
+        });
 
-        expect(wrapper.vm.d_ultimate_submission).toEqual(ultimate_submission_with_results);
+        test('Results from submissions with results used for staff', async () => {
+            data_ut.set_global_user_roles(data_ut.make_user_roles({is_staff: true}));
+            let wrapper = mount(SubmissionList, {
+                propsData: {
+                    course: course,
+                    project: project,
+                    group: group,
+                }
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+            check_data(wrapper);
+            expect(get_submission_result_stub.calledOnce).toBe(false);
+        });
 
-        // Ultimate submission shows up once on its own and once in "All Submissions"
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
-        expect(wrapper.findAll('.active').length).toEqual(2);
-        expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
+        function check_data(wrapper: Wrapper<SubmissionList>) {
+            expect(wrapper.vm.d_ultimate_submission).toEqual(ultimate_submission_with_results);
 
-        expect(wrapper.vm.d_submissions).toEqual([submission, ultimate_submission]);
+            // Ultimate submission shows up once on its own and once in "All Submissions"
+            expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
+            expect(wrapper.findAll('.active').length).toEqual(2);
+            expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
 
-        let ultimate_submission_regular_panel = (
-            <Wrapper<SubmissionPanel>> wrapper.findAll({name: 'SubmissionPanel'}).at(2)
-        );
-        expect(ultimate_submission_regular_panel.vm.submission).toEqual(
-            ultimate_submission_with_results);
+            expect(wrapper.vm.d_submissions).toEqual(
+                [submission, ultimate_submission_with_results]);
+
+            let ultimate_submission_regular_panel = (
+                <Wrapper<SubmissionPanel>> wrapper.findAll({name: 'SubmissionPanel'}).at(2)
+            );
+            expect(ultimate_submission_regular_panel.vm.submission).toEqual(
+                ultimate_submission_with_results);
+        }
     });
 
     test('403 response ignored', async () => {

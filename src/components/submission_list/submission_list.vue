@@ -164,11 +164,13 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
   private async initialize(group: Group) {
     this.d_loading = true;
 
-    // Reset these values in case we're changing submissions.
+    // Reset these two values in case we're changing submissions.
     this.d_selected_submission = null;
     this.d_ultimate_submission = null;
-    await this.get_ultimate_submission();
+    // We have to load d_submissions first, as get_ultimate_submission
+    // needs its value when the current user is staff.
     this.d_submissions = await Submission.get_all_from_group_with_results(group.pk);
+    await this.get_ultimate_submission();
 
     if (this.d_submissions.length !== 0) {
       this.d_selected_submission = (
@@ -225,13 +227,25 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
 
   private async get_ultimate_submission() {
     try {
-      let submission = await Submission.get_final_graded_submission_from_group(this.group.pk);
-      let results = await get_submission_result(
-        submission.pk, FeedbackCategory.ultimate_submission);
-      this.d_ultimate_submission = {
-        results: results,
-        ...submission
-      };
+      let ultimate_submission
+        = await Submission.get_final_graded_submission_from_group(this.group.pk);
+      // For staff, we want to use the feedback config deduced by the server
+      // in Submission.get_all_from_group_with_results (could be max or
+      // staff viewer).
+      // For students, we want to request ultimate submission feedback and
+      // use that.
+      if (this.d_globals.user_roles.is_staff) {
+        this.d_ultimate_submission = this.d_submissions.find(
+          submission => submission.pk === ultimate_submission.pk)!;
+      }
+      else {
+        let results = await get_submission_result(
+          ultimate_submission.pk, FeedbackCategory.ultimate_submission);
+        this.d_ultimate_submission = {
+          results: results,
+          ...ultimate_submission
+        };
+      }
     }
     catch (e) {
       // 403 status: can't view ultimate submission
