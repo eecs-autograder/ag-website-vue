@@ -23,6 +23,7 @@ describe('APIErrors component tests', () => {
         expect(() => {
             component.show_errors_from_response(new Error('Uncaught error'));
         }).toThrowError('Uncaught error');
+        expect(wrapper.emitted().num_errors_changed).toBeUndefined();
     });
 
     test('504 error',  () => {
@@ -33,6 +34,7 @@ describe('APIErrors component tests', () => {
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual(
             'Error: The request timed out. Please try again later.');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('413 error', () => {
@@ -43,6 +45,7 @@ describe('APIErrors component tests', () => {
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual(
             'Error: Request too large. If you are uploading files, please reduce their size.');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('400 error with __all__ string', () => {
@@ -52,6 +55,7 @@ describe('APIErrors component tests', () => {
 
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual('Duplicate course');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('400 error with __all__ array', () => {
@@ -62,6 +66,7 @@ describe('APIErrors component tests', () => {
 
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual('Duplicate course');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('400 error with specific field validation errors', () => {
@@ -81,6 +86,7 @@ describe('APIErrors component tests', () => {
 
         expect(actual_messages[0]).toEqual('Error in "name": Name cannot be blank');
         expect(actual_messages[1]).toEqual('Error in "size": Size must be < 42');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(2);
     });
 
     test('400 error with string data', () => {
@@ -88,6 +94,7 @@ describe('APIErrors component tests', () => {
         let messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual('I am error');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('General case API error', () => {
@@ -98,6 +105,7 @@ describe('APIErrors component tests', () => {
         expect(messages.length).toEqual(1);
         expect(messages.at(0).text()).toEqual(
             'An unexpected error occurred: 403 "forbidden"');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('Clear errors', () => {
@@ -105,11 +113,13 @@ describe('APIErrors component tests', () => {
 
         let messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(1);
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
 
         component.clear();
 
         messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(0);
+        expect(wrapper.emitted().num_errors_changed[1][0]).toEqual(0);
     });
 
     test('Dismiss single error', () => {
@@ -122,9 +132,11 @@ describe('APIErrors component tests', () => {
 
         let messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(2);
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(2);
 
         wrapper.findAll('.dismiss-error').at(1).trigger('click');
         messages = wrapper.findAll('.error-msg');
         expect(messages.length).toEqual(1);
+        expect(wrapper.emitted().num_errors_changed[1][0]).toEqual(1);
     });
 });
