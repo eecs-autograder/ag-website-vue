@@ -908,7 +908,6 @@ describe('AGTestCommandSettings tests', () => {
         return do_invalid_text_input_test(wrapper, {ref: 'stack_size_limit'}, '0', '.save-button');
     });
 
-
     test('process_spawn_limit binding', async () => {
         let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
 
@@ -934,6 +933,7 @@ describe('AGTestCommandSettings tests', () => {
     test('Save command settings - successful', async () => {
         let save_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'save');
         expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.sticky-save-button').is('[disabled]')).toBe(false);
 
         wrapper.find('#ag-test-command-settings-form').trigger('submit');
         await wrapper.vm.$nextTick();
@@ -941,7 +941,24 @@ describe('AGTestCommandSettings tests', () => {
         expect(save_stub.calledOnce).toBe(true);
     });
 
+    test('Sticky save button icon', () => {
+        expect(wrapper.find('.sticky-save-button .fa-save').exists()).toBe(true);
+        expect(wrapper.find('.sticky-save-button .fa-exclamation-triangle').exists()).toBe(false);
+    });
+
+    test('Sticky save button disabled when form invalid', () => {
+        return do_input_blank_or_not_integer_test(
+            wrapper, {ref: 'process_spawn_limit'}, '.sticky-save-button');
+    });
+
+    test('Sticky save button disabled while saving', async () => {
+        wrapper.vm.d_saving = true;
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.sticky-save-button').is('[disabled]')).toBe(true);
+    });
+
     test('Save command settings - unsuccessful', async () => {
+        Element.prototype.scrollIntoView = () => {};
         let save_stub = sinon.stub(wrapper.vm.d_ag_test_command!, 'save');
         save_stub.returns(
             Promise.reject(
@@ -960,6 +977,9 @@ describe('AGTestCommandSettings tests', () => {
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+
+        expect(wrapper.find('.sticky-save-button .fa-exclamation-triangle').exists()).toBe(true);
+        expect(wrapper.find('.sticky-save-button .fa-save').exists()).toBe(false);
     });
 
     test('Delete command', async () => {
