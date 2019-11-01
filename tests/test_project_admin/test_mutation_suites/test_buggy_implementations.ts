@@ -55,14 +55,14 @@ describe('BuggyImplementation tests', () => {
     test('points_per_exposed_bug binding', async () => {
         let points_per_exposed_bug_input = wrapper.find({ref: 'points_per_exposed_bug'});
 
-        set_validated_input_text(points_per_exposed_bug_input, '905.5');
+        set_validated_input_text(points_per_exposed_bug_input, '905.7');
 
-        expect(wrapper.vm.d_mutation_test_suite!.points_per_exposed_bug).toEqual(905.5);
+        expect(wrapper.vm.d_mutation_test_suite!.points_per_exposed_bug).toEqual("905.7");
         expect(validated_input_is_valid(points_per_exposed_bug_input)).toEqual(true);
         expect(wrapper.emitted().input.length).toEqual(1);
 
-        wrapper.vm.d_mutation_test_suite!.points_per_exposed_bug = "10.51";
-        expect(get_validated_input_text(points_per_exposed_bug_input)).toEqual('10.51');
+        wrapper.vm.d_mutation_test_suite!.points_per_exposed_bug = "10.52";
+        expect(get_validated_input_text(points_per_exposed_bug_input)).toEqual('10.52');
     });
 
     test('Error: points_per_exposed_bug is blank or not a number', () => {
