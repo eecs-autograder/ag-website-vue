@@ -18,12 +18,12 @@
           </validated-input>
         </div>
 
-        <div class="checkbox-container">
+        <div class="checkbox-input-container checkbox-container">
           <input id="synchronous-or-deferred"
-                  type="checkbox"
-                  class="checkbox"
-                  :checked="!d_ag_test_suite.deferred"
-                  @change="d_ag_test_suite.deferred = !$event.target.checked"/>
+                 type="checkbox"
+                 class="checkbox"
+                 :checked="!d_ag_test_suite.deferred"
+                 @change="d_ag_test_suite.deferred = !$event.target.checked"/>
           <label class="checkbox-label"
                   for="synchronous-or-deferred">
             Suite must finish before students can submit again
@@ -483,13 +483,26 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
   margin: 15px 0 10px 0;
 }
 
+#ag-test-suite-name-container {
+  padding: 10px 14px 22px 14px;
+}
+
 .checkbox-container {
-  padding: 0 12px 22px 12px;
+  padding: 0 14px 22px 14px;
+}
+
+.sandbox-container {
+  padding: 10px 0 10px 0;
+}
+
+.sandbox-docker-image-dropdown {
+  min-width: 400px;
+  width: 100%;
 }
 
 .toggle-container {
   font-size: 14px;
-  margin: 12px 5px 3px 3px;
+  margin: 12px 5px 3px 0;
   padding-bottom: 10px;
   min-width: 500px;
 }
@@ -549,19 +562,6 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
   .delete-ag-test-suite-button span {
     margin-left: 5px;
   }
-}
-
-.sandbox-container {
-  padding: 10px 0 10px 3px;
-}
-
-.sandbox-docker-image-dropdown {
-  min-width: 400px;
-  width: 100%;
-}
-
-#ag-test-suite-name-container {
-  padding: 10px 12px 22px 12px;
 }
 
 </style>
