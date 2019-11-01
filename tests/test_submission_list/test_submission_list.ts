@@ -195,6 +195,33 @@ describe('Submission list tests', () => {
         expect(wrapper.vm.d_submissions).toEqual([new_submission_with_results, submission]);
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
     });
+
+    test('update_submission_changed', async () => {
+        let submissions = [
+            data_ut.make_submission_with_results(
+                group, {status: ag_cli.GradingStatus.finished_grading}),
+            data_ut.make_submission_with_results(group, {status: ag_cli.GradingStatus.queued}),
+        ];
+        get_submissions_with_results_stub.withArgs(group.pk).resolves(submissions);
+
+        let wrapper = mount(SubmissionList, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+
+        let removed_submission = new ag_cli.Submission(submissions[1]);
+        removed_submission.status = ag_cli.GradingStatus.removed_from_queue;
+
+        ag_cli.Submission.notify_submission_changed(removed_submission);
+        expect(wrapper.vm.d_submissions[0].status).toEqual(ag_cli.GradingStatus.finished_grading);
+        expect(wrapper.vm.d_submissions[1].status).toEqual(
+            ag_cli.GradingStatus.removed_from_queue);
+    });
 });
 
 describe('Ultimate submission tests', () => {

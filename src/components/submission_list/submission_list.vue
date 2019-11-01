@@ -258,6 +258,10 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
   }
 
   update_submission_changed(submission: Submission): void {
+    let index = this.d_submissions.findIndex(s => s.pk === submission.pk);
+    if (index !== -1) {
+      safe_assign(this.d_submissions[index], new SubmissionData(submission));
+    }
   }
 }
 </script>
