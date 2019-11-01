@@ -195,23 +195,14 @@ describe('Submission list tests', () => {
         expect(wrapper.vm.d_submissions).toEqual([new_submission_with_results, submission]);
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
     });
-});
 
-describe('Ultimate submission tests', () => {
-    test('Ultimate submission available, results requested', async () => {
-        let ultimate_submission_with_results = data_ut.make_submission_with_results(
-            group, {}, {total_points: 24, total_points_possible: 38});
-        let ultimate_submission = new ag_cli.Submission(ultimate_submission_with_results);
-        let submission = data_ut.make_submission_with_results(group);
-        get_submissions_with_results_stub.withArgs(group.pk).resolves(
-            [submission, ultimate_submission]);
-
-        get_ultimate_submission_stub.withArgs(group.pk).resolves(
-            new ag_cli.Submission(ultimate_submission_with_results)
-        );
-        get_submission_result_stub.withArgs(
-            ultimate_submission_with_results.pk, ag_cli.FeedbackCategory.ultimate_submission
-        ).resolves(ultimate_submission_with_results.results);
+    test('update_submission_changed', async () => {
+        let submissions = [
+            data_ut.make_submission_with_results(
+                group, {status: ag_cli.GradingStatus.finished_grading}),
+            data_ut.make_submission_with_results(group, {status: ag_cli.GradingStatus.queued}),
+        ];
+        get_submissions_with_results_stub.withArgs(group.pk).resolves(submissions);
 
         let wrapper = mount(SubmissionList, {
             propsData: {
@@ -220,24 +211,86 @@ describe('Ultimate submission tests', () => {
                 group: group,
             }
         });
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        let removed_submission = new ag_cli.Submission(submissions[1]);
+        removed_submission.status = ag_cli.GradingStatus.removed_from_queue;
 
-        expect(wrapper.vm.d_ultimate_submission).toEqual(ultimate_submission_with_results);
+        ag_cli.Submission.notify_submission_changed(removed_submission);
+        expect(wrapper.vm.d_submissions[0].status).toEqual(ag_cli.GradingStatus.finished_grading);
+        expect(wrapper.vm.d_submissions[1].status).toEqual(
+            ag_cli.GradingStatus.removed_from_queue);
+    });
+});
 
-        // Ultimate submission shows up once on its own and once in "All Submissions"
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
-        expect(wrapper.findAll('.active').length).toEqual(2);
-        expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
+describe('Ultimate submission tests', () => {
+    describe('Ultimate submission available tests', () => {
+        let ultimate_submission_with_results: ag_cli.SubmissionWithResults;
+        let ultimate_submission: ag_cli.Submission;
+        let submission: ag_cli.SubmissionWithResults;
 
-        expect(wrapper.vm.d_submissions).toEqual([submission, ultimate_submission]);
+        beforeEach(() => {
+            ultimate_submission_with_results = data_ut.make_submission_with_results(
+                group, {}, {total_points: 24, total_points_possible: 38});
+            ultimate_submission = new ag_cli.Submission(ultimate_submission_with_results);
+            submission = data_ut.make_submission_with_results(group);
+            get_submissions_with_results_stub.withArgs(group.pk).resolves(
+                [submission, ultimate_submission_with_results]);
 
-        let ultimate_submission_regular_panel = (
-            <Wrapper<SubmissionPanel>> wrapper.findAll({name: 'SubmissionPanel'}).at(2)
-        );
-        expect(ultimate_submission_regular_panel.vm.submission).toEqual(
-            ultimate_submission_with_results);
+            get_ultimate_submission_stub.withArgs(group.pk).resolves(
+                new ag_cli.Submission(ultimate_submission_with_results)
+            );
+            get_submission_result_stub.withArgs(
+                ultimate_submission_with_results.pk, ag_cli.FeedbackCategory.ultimate_submission
+            ).resolves(ultimate_submission_with_results.results);
+        });
+
+        test('Ultimate submission fdbk results requested for non-staff', async () => {
+            data_ut.set_global_user_roles(data_ut.make_user_roles({is_student: true}));
+            let wrapper = mount(SubmissionList, {
+                propsData: {
+                    course: course,
+                    project: project,
+                    group: group,
+                }
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+            check_data(wrapper);
+            expect(get_submission_result_stub.calledOnce).toBe(true);
+        });
+
+        test('Results from submissions with results used for staff', async () => {
+            data_ut.set_global_user_roles(data_ut.make_user_roles({is_staff: true}));
+            let wrapper = mount(SubmissionList, {
+                propsData: {
+                    course: course,
+                    project: project,
+                    group: group,
+                }
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+            check_data(wrapper);
+            expect(get_submission_result_stub.calledOnce).toBe(false);
+        });
+
+        function check_data(wrapper: Wrapper<SubmissionList>) {
+            expect(wrapper.vm.d_ultimate_submission).toEqual(ultimate_submission_with_results);
+
+            // Ultimate submission shows up once on its own and once in "All Submissions"
+            expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
+            expect(wrapper.findAll('.active').length).toEqual(2);
+            expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
+
+            expect(wrapper.vm.d_submissions).toEqual(
+                [submission, ultimate_submission_with_results]);
+
+            let ultimate_submission_regular_panel = (
+                <Wrapper<SubmissionPanel>> wrapper.findAll({name: 'SubmissionPanel'}).at(2)
+            );
+            expect(ultimate_submission_regular_panel.vm.submission).toEqual(
+                ultimate_submission_with_results);
+        }
     });
 
     test('403 response ignored', async () => {
