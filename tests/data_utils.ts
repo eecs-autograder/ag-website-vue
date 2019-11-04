@@ -247,7 +247,9 @@ export function make_submission_with_results(
     submission_args: Partial<Submission> = {},
     result_args: Partial<SubmissionResultFeedback> = {}
 ): SubmissionWithResults {
-    let submission = make_submission(group, submission_args);
+    let args = submission_args.status === undefined
+               ? {...submission_args, status: GradingStatus.finished_grading} : submission_args;
+    let submission = make_submission(group, args);
     let result_defaults = {
         pk: submission.pk,
         total_points: 0,

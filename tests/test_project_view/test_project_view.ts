@@ -162,6 +162,18 @@ describe('Submit tab tests', () => {
         expect(wrapper.find({name: 'Submit'}).exists()).toBe(true);
         expect(wrapper.find({ref: 'submit_tab'}).exists()).toBe(true);
     });
+
+    test('My Submissions tab selected after submission', async () => {
+        let refresh_stub = sinon.stub(group, 'refresh');
+        wrapper = managed_mount(ProjectView, {mocks: get_router_mocks()});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(refresh_stub.callCount).toEqual(0);
+        wrapper.find({name: 'Submit'}).vm.$emit('submitted');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_current_tab).toEqual('my_submissions');
+        expect(refresh_stub.callCount).toEqual(1);
+    });
 });
 
 describe('My submissions tab tests', () => {
@@ -341,7 +353,7 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.find({name: 'Submit'}).exists()).toBe(true);
         expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(false);
-        // expect(wrapper.find({name: 'StudentLookup'}).exists()).toBe(false);
+        expect(wrapper.find({name: 'StudentLookup'}).exists()).toBe(false);
         expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(false);
         expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
     });

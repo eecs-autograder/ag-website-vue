@@ -59,7 +59,7 @@
                             :course="course">
         </group-registration>
         <submit v-else
-                @submitted="set_current_tab('my_submissions')"
+                @submitted="on_submit"
                 :course="course" :project="project" :group="group"></submit>
       </div>
 
@@ -233,6 +233,11 @@ export default class ProjectView extends Vue implements GroupObserver {
     return !this.d_globals.user_roles.is_handgrader
            || this.d_globals.user_roles.is_student
            || this.d_globals.user_roles.is_staff;
+  }
+
+  on_submit() {
+    this.set_current_tab('my_submissions');
+    return this.group!.refresh();
   }
 
   update_group_changed(group: Group): void {}

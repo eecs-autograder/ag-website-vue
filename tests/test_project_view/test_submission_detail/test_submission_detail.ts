@@ -200,7 +200,8 @@ describe('SubmissionDetail tests', () => {
     });
 
     test('grading status section', async () => {
-        submission_with_results = data_ut.make_submission_with_results(group);
+        submission_with_results = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.received});
         get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
 
         wrapper = make_wrapper(submission_with_results, course, group, false, globals);
