@@ -21,15 +21,7 @@
       </div>
     </div>
 
-    <div id="group-members-container" v-if="group.member_names.length > 1">
-      <div id="group-members-title">Group members</div>
-      <div v-for="(member, index) of group.member_names">
-        <div :class="['group-member',
-                      {'odd-row': index % 2 !== 0}]">
-          {{member}}
-        </div>
-      </div>
-    </div>
+    <group-members :group="group"></group-members>
 
     <div id="all-limits-container">
       <div id="submissions-used"
@@ -162,6 +154,7 @@ import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
+import GroupMembers from '@/components/project_view/group_members.vue';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 
 interface ExpectedFilePatternMismatch {
@@ -174,6 +167,7 @@ interface ExpectedFilePatternMismatch {
   components: {
     APIErrors,
     FileUpload,
+    GroupMembers,
     Modal,
     ProgressBar,
   }
@@ -410,28 +404,6 @@ function num_glob_matches(names: string[], pattern: string): number {
   .date {
     font-weight: bold;
   }
-}
-
-#group-members-container {
-  margin-bottom: 20px;
-  border: 2px solid $pebble-medium;
-  border-radius: 3px;
-  max-width: 500px;
-}
-
-#group-members-title {
-  padding: 14px 15px 14px 15px;
-  font-weight: bold;
-  background-color: $white-gray;
-}
-
-.group-member {
-  font-size: 1rem;
-  padding: 12px 15px 12px 15px;
-}
-
-#group-members-container .odd-row {
-  background-color: $white-gray;
 }
 
 #all-limits-container {

@@ -85,25 +85,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 
-import { ArraySet } from "@/array_set";
+import { ArraySet, HasMemberNames, HasPK, member_names_less, pk_less } from "@/array_set";
 import GroupLookup from '@/components/group_lookup.vue';
 import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 import MergeGroups from '@/components/project_admin/edit_groups/merge_groups.vue';
 import { deep_copy, format_datetime } from "@/utils";
-
-function member_names_less(first: HasMemberNames, second: HasMemberNames) {
-  return first.member_names[0] < second.member_names[0];
-}
-
-type HasMemberNames = {member_names: string[]};
-
-function pk_less(first: HasPK, second: HasPK) {
-  return first.pk < second.pk;
-}
-
-type HasPK = {pk: number};
 
 @Component({
   components: {

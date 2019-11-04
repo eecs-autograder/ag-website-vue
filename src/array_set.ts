@@ -168,3 +168,17 @@ export class ArraySetElementNotFoundError extends Error {
         this.__proto__ = actual_proto;
     }
 }
+
+// Some sentinal types and comparators
+
+export type HasPK = {pk: number};
+
+export function member_names_less(first: HasMemberNames, second: HasMemberNames) {
+  return first.member_names[0] < second.member_names[0];
+}
+
+export type HasMemberNames = {member_names: string[]};
+
+export function pk_less(first: HasPK, second: HasPK) {
+  return first.pk < second.pk;
+}

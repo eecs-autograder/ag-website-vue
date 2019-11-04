@@ -32,7 +32,6 @@ beforeEach(async () => {
             project: project,
         }
     });
-
     expect(await wait_for_load(wrapper)).toBe(true);
 });
 

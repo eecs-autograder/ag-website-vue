@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { config, Wrapper } from '@vue/test-utils';
 
 import {
     Course,
@@ -11,6 +11,8 @@ import * as sinon from "sinon";
 
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import MergeGroups from "@/components/project_admin/edit_groups/merge_groups.vue";
+
+import { managed_shallow_mount } from '@/tests/setup';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -134,20 +136,12 @@ describe('EditGroups tests', () => {
         let get_course_by_pk_stub = sinon.stub(Course, 'get_by_pk');
         get_course_by_pk_stub.returns(Promise.resolve(course));
 
-        wrapper = mount(EditGroups, {
+        wrapper = managed_shallow_mount(EditGroups, {
             propsData: {
                 project: project
             }
         });
         component = wrapper.vm;
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('groups_with_extensions sorted by extension ASC, first group member name ASC ' +
@@ -221,15 +215,11 @@ describe('EditGroups tests', () => {
         expect(component.selected_group).toEqual(new_group);
      });
 
-    test('Selected group set to group selected in GroupLookup',
-         async () => {
+    test('Selected group set to group selected in GroupLookup', () => {
         expect(component.selected_group).toBeNull();
 
         let group_lookup = wrapper.find({ref: 'group_lookup'});
-        let search_bar = group_lookup.find({ref: 'group_typeahead'}).find('input');
-        search_bar.trigger("click");
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await component.$nextTick();
+        group_lookup.vm.$emit('update_group_selected', group_1);
 
         expect(component.selected_group).toEqual(group_1);
     });
