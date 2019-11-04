@@ -124,6 +124,9 @@ describe('MergeGroups tests', () => {
             propsData: {
                 groups: groups,
                 project: project
+            },
+            stubs: {
+                'group-lookup': true
             }
         });
         component = wrapper.vm;

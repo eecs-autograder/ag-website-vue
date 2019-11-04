@@ -4,7 +4,7 @@
       <dropdown-typeahead ref="group_typeahead"
                           placeholder_text="Enter a username"
                           :choices="groups"
-                          @update_item_chosen="$emit('update_group_selected', $event)"
+                          @update_item_chosen="on_group_selected"
                           :filter_fn="group_filter_fn">
         <template slot-scope="{item}">
           <span v-for="(member, index) of item.member_names">
@@ -24,16 +24,24 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Group } from 'ag-client-typescript';
 
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import { Created } from '@/lifecycle';
+import { get_query_param } from '@/utils';
 
 @Component({
   components: {
     DropdownTypeahead
   }
 })
-export default class GroupLookup extends Vue {
-
+export default class GroupLookup extends Vue implements Created {
   @Prop({required: true, type: Array})
   groups!: Group[];
+
+  created() {
+    let requested_group_pk = get_query_param(this.$route.query, "current_student_lookup");
+    if (requested_group_pk !== null) {
+      this.on_group_selected(this.groups.find(group => group.pk === Number(requested_group_pk))!);
+    }
+  }
 
   group_filter_fn(group: Group, filter_text: string) {
     for (let member_name of group.member_names) {
@@ -42,6 +50,12 @@ export default class GroupLookup extends Vue {
       }
     }
     return false;
+  }
+
+  on_group_selected(group: Group) {
+    this.$emit('update_group_selected', group);
+    this.$router.replace(
+      {query: {...this.$route.query, current_student_lookup: group.pk.toString()}});
   }
 }
 </script>

@@ -165,7 +165,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
 
   private set_current_tab(tab_id: string) {
     this.d_current_tab = tab_id;
-    this.$router.replace({query: {current_tab: tab_id}});
+    this.$router.replace({query: {...this.$route.query, current_tab: tab_id}});
     this.mark_tab_as_loaded(tab_id);
   }
 

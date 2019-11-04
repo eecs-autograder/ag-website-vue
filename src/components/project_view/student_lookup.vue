@@ -6,10 +6,12 @@
     <group-lookup class="lookup-container"
                   :groups="d_groups.data"
                   @update_group_selected="d_selected_group = $event"></group-lookup>
-    <submission-list v-if="d_selected_group !== null"
-                     :course="course"
-                     :project="project"
-                     :group="d_selected_group"></submission-list>
+    <template v-if="d_selected_group !== null">
+      <group-members class="group-members" :group="d_selected_group"></group-members>
+      <submission-list :course="course"
+                       :project="project"
+                       :group="d_selected_group"></submission-list>
+    </template>
   </div>
 </template>
 
@@ -18,19 +20,18 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, Group, GroupObserver, Project } from 'ag-client-typescript';
 
-import { ArraySet } from '@/array_set';
+import { ArraySet, member_names_less } from '@/array_set';
 import GroupLookup from '@/components/group_lookup.vue';
+import GroupMembers from '@/components/project_view/group_members.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
 import { Created, Destroyed } from '@/lifecycle';
 import { safe_assign } from '@/utils';
 
-function member_names_less(first: Group, second: Group) {
-  return first.member_names[0] < second.member_names[0];
-}
 
 @Component({
   components: {
       GroupLookup,
+      GroupMembers,
       SubmissionList,
   }
 })
@@ -78,8 +79,11 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 @import '@/styles/global.scss';
 
 .lookup-container {
-  padding: 8px;
-  // z-index: inherit;
+  margin: 8px;
+}
+
+.group-members {
+  margin: 8px;
 }
 
 </style>
