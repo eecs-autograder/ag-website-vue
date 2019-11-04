@@ -621,11 +621,18 @@
       </fieldset>
 
       <div class="bottom-of-form">
-        <APIErrors ref="api_errors"></APIErrors>
+        <APIErrors ref="api_errors" @num_errors_changed="d_num_api_errors = $event"></APIErrors>
 
         <button type="submit"
                 class="save-button"
                 :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+
+        <button type="submit"
+                class="sticky-save-button"
+                :disabled="!d_settings_form_is_valid || d_saving">
+          <i v-if="d_num_api_errors === 0" class="far fa-save"></i>
+          <i v-else class="fas fa-exclamation-triangle"></i>
+        </button>
 
         <div v-if="!d_saving" class="last-saved-timestamp">
           <span> Last Saved: </span> {{format_datetime(d_ag_test_command.last_modified)}}
@@ -759,6 +766,7 @@ export default class AGTestCommandSettings extends Vue {
   d_ag_test_case: AGTestCase | null = null;
 
   d_saving = false;
+  d_num_api_errors = 0;
   d_settings_form_is_valid = true;
   d_deleting = false;
   d_show_delete_ag_test_command_modal = false;
@@ -921,7 +929,11 @@ export default class AGTestCommandSettings extends Vue {
 }
 
 function handle_save_ag_command_settings_error(component: AGTestCommandSettings, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  let api_errors_elt = <APIErrors> component.$refs.api_errors;
+  api_errors_elt.show_errors_from_response(error);
+  if (component.d_num_api_errors !== 0) {
+    api_errors_elt.$el.scrollIntoView({behavior: 'smooth'});
+  }
 }
 </script>
 
@@ -996,7 +1008,6 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
   box-sizing: border-box;
   width: 200px;
   margin-right: 5px;
-  vertical-align: top;
 }
 
 .subtract-points-container {
@@ -1036,6 +1047,20 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 
 #time-limit-and-stack-size {
   padding: 0;
+}
+
+.sticky-save-button {
+  @extend .green-button;
+  position: fixed;
+  bottom: $footer-height;
+  right: 0;
+
+  font-size: 20px;
+  padding: 5px 10px;
+
+  color: white;
+
+  border-radius: 1px;
 }
 
 #danger-zone-container {

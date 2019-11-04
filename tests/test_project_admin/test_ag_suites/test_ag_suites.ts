@@ -781,7 +781,7 @@ describe('Deleting ag_test_command', () => {
     });
 });
 
-describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
+describe('Next/prev test buttons', () => {
     let wrapper: Wrapper<AGSuites>;
     let suite_1: ag_cli.AGTestSuite;
     let suite_1_case_1: ag_cli.AGTestCase;
@@ -941,65 +941,6 @@ describe('prev_ag_test_case_is_available and go_to_prev_command', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_2);
-    });
-});
-
-describe('next_ag_test_case_is_available AND go_to_next_command', () => {
-    let wrapper: Wrapper<AGSuites>;
-    let suite_1: ag_cli.AGTestSuite;
-    let suite_1_case_1: ag_cli.AGTestCase;
-    let suite_1_case_1_command_1: ag_cli.AGTestCommand;
-    let suite_1_case_2: ag_cli.AGTestCase;
-    let suite_1_case_2_command_1: ag_cli.AGTestCommand;
-    let suite_1_case_2_command_2: ag_cli.AGTestCommand;
-
-    let suite_2: ag_cli.AGTestSuite;
-    let suite_2_case_1: ag_cli.AGTestCase;
-    let suite_2_case_1_command_1: ag_cli.AGTestCommand;
-    let suite_2_case_1_command_2: ag_cli.AGTestCommand;
-
-    let suite_3: ag_cli.AGTestSuite;
-    let suite_3_case_1: ag_cli.AGTestCase;
-    let suite_3_case_1_command_1: ag_cli.AGTestCommand;
-
-    beforeEach(() => {
-        suite_1 = data_ut.make_ag_test_suite(project.pk);
-        suite_1_case_1 = data_ut.make_ag_test_case(suite_1.pk);
-        suite_1_case_1_command_1 = data_ut.make_ag_test_command(suite_1_case_1.pk);
-        suite_1_case_2 = data_ut.make_ag_test_case(suite_1.pk);
-        suite_1_case_2_command_1 = data_ut.make_ag_test_command(suite_1_case_2.pk);
-        suite_1_case_2_command_2 = data_ut.make_ag_test_command(suite_1_case_2.pk);
-
-        suite_1_case_1.ag_test_commands = [suite_1_case_1_command_1];
-        suite_1_case_2.ag_test_commands = [suite_1_case_2_command_1, suite_1_case_2_command_2];
-        suite_1.ag_test_cases = [suite_1_case_1, suite_1_case_2];
-
-        suite_2 = data_ut.make_ag_test_suite(project.pk);
-        suite_2_case_1 = data_ut.make_ag_test_case(suite_2.pk);
-        suite_2_case_1_command_1 = data_ut.make_ag_test_command(suite_2_case_1.pk);
-        suite_2_case_1_command_2 = data_ut.make_ag_test_command(suite_2_case_1.pk);
-
-        suite_2_case_1.ag_test_commands = [suite_2_case_1_command_1, suite_2_case_1_command_2];
-        suite_2.ag_test_cases = [suite_2_case_1];
-
-        suite_3 = data_ut.make_ag_test_suite(project.pk);
-        suite_3_case_1 = data_ut.make_ag_test_case(suite_3.pk);
-        suite_3_case_1_command_1 = data_ut.make_ag_test_command(suite_3_case_1.pk);
-
-        suite_3_case_1.ag_test_commands = [suite_3_case_1_command_1];
-        suite_3.ag_test_cases = [suite_3_case_1];
-
-        get_all_suites_from_project.resolves([suite_1, suite_2, suite_3]);
-
-        wrapper = make_wrapper(project);
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('next_ag_test_case_is_available (false) - d_active_ag_test_suite is null',

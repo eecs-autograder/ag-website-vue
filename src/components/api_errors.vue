@@ -5,7 +5,8 @@
       <div class="error-msg">{{error}}</div>
       <button class="dismiss-error-button"
               type="button"
-              @click="d_api_errors.splice(index, 1)">
+              @click="d_api_errors.splice(index, 1);
+                      $emit('num_errors_changed', d_api_errors.length)">
         <span class="dismiss-error">Dismiss</span>
       </button>
     </div>
@@ -41,6 +42,8 @@ export default class APIErrors extends Vue {
         'An unexpected error occurred: '
         + `${error_response.status} ${JSON.stringify(error_response.data)}`);
     }
+
+    this.$emit('num_errors_changed', this.d_api_errors.length);
   }
 
   private show_400_error_data(error: HttpError) {
@@ -66,6 +69,7 @@ export default class APIErrors extends Vue {
 
   clear() {
     this.d_api_errors = [];
+    this.$emit('num_errors_changed', 0);
   }
 }
 </script>
@@ -82,7 +86,7 @@ export default class APIErrors extends Vue {
   border: 1px solid #f5c6cb;
   padding: 10px 90px 10px 10px;
   border-radius: .25rem;
-  margin-top: 11px;
+  margin: 8px 0;
 }
 
 .dismiss-error-button {

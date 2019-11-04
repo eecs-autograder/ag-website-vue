@@ -122,7 +122,7 @@ import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vu
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { deep_copy, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -152,6 +152,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
   d_active_ag_test_suite: AGTestSuite | null = null;
   d_active_ag_test_command: AGTestCommand | null = null;
+
   d_loading = true;
   d_ag_test_suites: AGTestSuite[] = [];
 
@@ -521,7 +522,6 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
   box-sizing: border-box;
 }
 
-$footer-height: 45px;
 $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(
