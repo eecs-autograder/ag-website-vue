@@ -472,8 +472,9 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
-@import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
+
+@import './ag_tests.scss';
 
 .tab-body {
   padding: 15px;

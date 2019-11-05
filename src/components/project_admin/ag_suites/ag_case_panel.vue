@@ -364,9 +364,10 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/ag_tests.scss';
 @import '@/styles/list_panels.scss';
 @import '@/styles/static_dropdown.scss';
+
+@import './ag_tests.scss';
 
 * {
   box-sizing: border-box;

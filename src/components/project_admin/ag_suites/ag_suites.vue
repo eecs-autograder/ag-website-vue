@@ -521,9 +521,10 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/collapsible_sidebar.scss';
-@import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/global.scss';
+
+@import './ag_tests.scss';
 
 * {
   padding: 0;
