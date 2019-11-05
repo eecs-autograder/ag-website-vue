@@ -98,12 +98,48 @@ describe('Submission list tests', () => {
         expect(wrapper.find({ref: 'submission_detail'}).exists()).toBe(true);
     });
 
-    test('Most recent submission selected automatically on load', async () => {
+    test('received submission selected on load', () => {
+        let received = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.received});
+        let finished = data_ut.make_submission_with_results(group);
+        get_ultimate_submission_stub.resolves(new ag_cli.Submission(finished));
+        get_submission_result_stub.resolves(finished.results);
+        return do_initially_selected_submission_test([finished, received], received, true);
+    });
+
+    test('queued submission selected on load', () => {
+        let queued = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.queued});
+        let finished = data_ut.make_submission_with_results(group);
+        get_ultimate_submission_stub.resolves(new ag_cli.Submission(finished));
+        get_submission_result_stub.resolves(finished.results);
+        return do_initially_selected_submission_test([finished, queued], queued, true);
+    });
+
+    test('being_graded submission selected on load', () => {
+        let being_graded = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.being_graded});
+        let finished = data_ut.make_submission_with_results(group);
+        get_ultimate_submission_stub.resolves(new ag_cli.Submission(finished));
+        get_submission_result_stub.resolves(finished.results);
+        return do_initially_selected_submission_test([finished, being_graded], being_graded, true);
+    });
+
+    test('Most recent submission selected on load if no ultimate or new submission', () => {
         let submission3 = data_ut.make_submission_with_results(group);
         let submission2 = data_ut.make_submission_with_results(group);
         let submission1 = data_ut.make_submission_with_results(group);
-        get_submissions_with_results_stub.withArgs(group.pk).resolves(
-            [submission1, submission2, submission3]);
+
+        return do_initially_selected_submission_test(
+            [submission1, submission2, submission3], submission1);
+    });
+
+    async function do_initially_selected_submission_test(
+        submissions: ag_cli.SubmissionWithResults[],
+        expected: ag_cli.SubmissionWithResults,
+        has_ultimate_submission = false
+    ) {
+        get_submissions_with_results_stub.withArgs(group.pk).resolves(submissions);
 
         let wrapper = mount(SubmissionList, {
             propsData: {
@@ -115,10 +151,11 @@ describe('Submission list tests', () => {
 
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
+        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(
+            has_ultimate_submission ? submissions.length + 1 : submissions.length);
         expect(wrapper.findAll('.active').length).toEqual(1);
-        expect(wrapper.vm.d_selected_submission).toEqual(submission1);
-    });
+        expect(wrapper.vm.d_selected_submission).toEqual(expected);
+    }
 
     test('Group input change', async () => {
         let current_group_submission = data_ut.make_submission_with_results(group);
@@ -395,6 +432,7 @@ describe('Polling tests', () => {
     });
 
     test('Submission status changed when refreshed, results reloaded', async () => {
+        submission.status = ag_cli.GradingStatus.received;
         let new_status_submission = new ag_cli.Submission(submission);
         new_status_submission.status = ag_cli.GradingStatus.finished_grading;
         get_submissions_stub.withArgs(group.pk).onFirstCall().resolves(

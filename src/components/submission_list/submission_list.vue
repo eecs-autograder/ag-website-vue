@@ -173,9 +173,20 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
     await this.get_ultimate_submission();
 
     if (this.d_submissions.length !== 0) {
-      this.d_selected_submission = (
-        this.d_ultimate_submission !== null ? this.d_ultimate_submission : this.d_submissions[0]
+      let submission_being_graded = this.d_submissions.find(
+        submission => submission.status === GradingStatus.received
+                      || submission.status === GradingStatus.queued
+                      || submission.status === GradingStatus.being_graded
       );
+      if (submission_being_graded !== undefined) {
+        this.d_selected_submission = submission_being_graded;
+      }
+      else if (this.d_ultimate_submission !== null) {
+        this.d_selected_submission = this.d_ultimate_submission;
+      }
+      else {
+        this.d_selected_submission = this.d_submissions[0];
+      }
     }
 
     if (this.plain_submissions_poller !== null) {
