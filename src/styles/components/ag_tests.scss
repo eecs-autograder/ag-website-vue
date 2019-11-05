@@ -1,41 +1,5 @@
-$active-color: teal;
-$parent-of-active-color: white;
-$suite-in-active-container-color: white;
-
 $footer-height: 45px;
-
-.panel {
-    cursor: pointer;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    font-size: 14px;
-    align-items: flex-start;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.caret-right, .caret-down {
-    font-size: 15px;
-    color: black;
-    width: 16px;
-    box-sizing: border-box;
-}
-
-.level-name {
-    padding: 5px 5px 5px 15px;
-    word-break: break-word;
-    word-wrap: break-word;
-}
-
-.caret-right {
-    padding: 0 0 0 3px;
-}
-
-::-webkit-scrollbar {
-    background: transparent;
-    width: 0;
-}
+$panel-indentation: 20px;
 
 .loading-spinner {
     color: $ocean-blue;
@@ -72,26 +36,6 @@ $footer-height: 45px;
 
 .delete-level-button span {
     margin-left: 5px;
-}
-
-.add-level-button {
-    color: lighten(black, 25);
-    box-sizing: border-box;
-    cursor: pointer;
-}
-
-.active-level {
-    background-color: $active-color;
-    color: white;
-}
-
-.parent-of-active-level {
-    background-color: inherit;
-    color: black;
-}
-
-.tab-heading {
-    font-size: 14px;
 }
 
 // Modal Related ***********************************************************

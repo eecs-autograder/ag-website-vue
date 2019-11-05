@@ -212,7 +212,7 @@ describe('AGSuitePanel tests', () => {
 
     test('Suite (closed, suite is not active, child command is not active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
@@ -246,7 +246,7 @@ describe('AGSuitePanel tests', () => {
             student_files_needed: []
         });
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
@@ -257,7 +257,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: another_suite});
         await component.$nextTick();
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_suite);
@@ -266,7 +266,7 @@ describe('AGSuitePanel tests', () => {
 
     test('Suite (open, suite is active, child command is not active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted('update_active_item').length).toEqual(1);
@@ -276,7 +276,7 @@ describe('AGSuitePanel tests', () => {
 
         expect(component.d_cases_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(component.d_cases_are_visible).toBe(false);
@@ -289,7 +289,7 @@ describe('AGSuitePanel tests', () => {
 
         expect(component.d_cases_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
@@ -308,7 +308,7 @@ describe('AGSuitePanel tests', () => {
          async () => {
         expect(component.active_ag_test_suite).toBeNull();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted('update_active_item').length).toEqual(1);
@@ -318,7 +318,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
@@ -349,7 +349,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -386,7 +386,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -433,7 +433,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -480,7 +480,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -523,7 +523,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -571,7 +571,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
@@ -613,7 +613,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         component.d_new_case_name = "Case A";
@@ -635,7 +635,7 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
@@ -669,7 +669,7 @@ describe('AGSuitePanel tests', () => {
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
@@ -683,7 +683,7 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
@@ -742,7 +742,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
@@ -759,7 +759,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
 
         let new_case_name_input = wrapper.find({ref: 'new_case_name'}).find('#input');
         let new_case_name_validator = <ValidatedInput> wrapper.find({ref: 'new_case_name'}).vm;
@@ -784,7 +784,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
@@ -804,7 +804,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
@@ -840,7 +840,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
         await component.$nextTick();
 
         let first_new_command_input = wrapper.find({ref: 'command'});
@@ -857,7 +857,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons').trigger('click');
 
         let new_command_input = wrapper.find({ref: 'command'}).find('#input');
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'command'}).vm;

@@ -1,72 +1,73 @@
 <template>
-  <div v-if="ag_test_case !== null"
-       id="ag-test-case-panel">
-    <div :class="['ag-test-case',
-                  {'closed-but-active': !is_open && command_in_case_is_active,
-                   'active-ag-test-case-multiple-commands':
-                      ag_test_case.ag_test_commands.length > 1 && command_in_case_is_active,
-                   'active-ag-test-case-one-command':
-                      ag_test_case.ag_test_commands.length === 1 && command_in_case_is_active}]"
+  <div>
+    <div class="ag-test-case"
          @click="update_ag_test_case_panel_when_clicked">
+      <div class="panel level-1"
+           :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}">
+        <div class="text">
+          <i v-if="ag_test_case.ag_test_commands.length > 1"
+            class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+          <span>{{ag_test_case.name}}</span>
+        </div>
 
-      <div class="ag-test-case-name">
-        <i v-if="ag_test_case.ag_test_commands.length > 1 && !is_open"
-           class="fas fa-caret-right ag-test-case-symbol-right"></i>
-        <i v-else-if="ag_test_case.ag_test_commands.length > 1 && is_open"
-           class="fas fa-caret-down ag-test-case-symbol-down"></i>
-        <span>{{ag_test_case.name}}</span>
-      </div>
-
-      <div id="ag-test-case-menu" class="dropdown"
-           @click.stop="$emit('update_active_item', ag_test_case)">
-        <i class="menu-icon fas fa-ellipsis-v"></i>
-        <div class="menu">
-          <div ref="add_ag_test_command_menu_item"
-               @click="open_new_ag_test_command_modal"
-               class="menu-item">
-            <i class="fas fa-plus"></i>
-            <span class="menu-item-text">Add command</span>
-          </div>
-          <div class="menu-divider"> </div>
-          <div ref="edit_ag_test_case_menu_item"
-               @click="d_show_ag_test_case_settings_modal = true"
-               class="menu-item">
-            <i class="fas fa-pencil-alt"></i>
-            <span class="menu-item-text">Edit test case settings</span>
-          </div>
-          <div class="menu-divider"> </div>
-          <div ref="clone_ag_test_case_menu_item"
-               @click="open_clone_ag_test_case_modal"
-               class="menu-item">
-            <i class="far fa-copy"></i>
-            <span class="menu-item-text"> Clone test case </span>
-          </div>
-          <div class="menu-divider"> </div>
-          <div ref="delete_ag_test_case_menu_item"
-               @click="d_show_delete_ag_test_case_modal = true"
-               class="menu-item">
-            <i class="fas fa-trash-alt"></i>
-            <span id="delete-case-label" class="menu-item-text"> Delete test case </span>
+        <div class="icons">
+          <i class="icon handle fas fa-arrows-alt"></i>
+          <div class="dropdown" @click.stop="$emit('update_active_item', ag_test_case)">
+            <i class="menu-icon icon fas fa-ellipsis-h"></i>
+            <div class="menu">
+              <div ref="add_ag_test_command_menu_item"
+                  @click="open_new_ag_test_command_modal"
+                  class="menu-item">
+                <i class="fas fa-plus"></i>
+                <span class="menu-item-text">Add command</span>
+              </div>
+              <div class="menu-divider"> </div>
+              <div ref="edit_ag_test_case_menu_item"
+                  @click="d_show_ag_test_case_settings_modal = true"
+                  class="menu-item">
+                <i class="fas fa-pencil-alt"></i>
+                <span class="menu-item-text">Edit test case settings</span>
+              </div>
+              <div class="menu-divider"> </div>
+              <div ref="clone_ag_test_case_menu_item"
+                  @click="open_clone_ag_test_case_modal"
+                  class="menu-item">
+                <i class="far fa-copy"></i>
+                <span class="menu-item-text"> Clone test case </span>
+              </div>
+              <div class="menu-divider"> </div>
+              <div ref="delete_ag_test_case_menu_item"
+                  @click="d_show_delete_ag_test_case_modal = true"
+                  class="menu-item">
+                <i class="fas fa-trash-alt"></i>
+                <span class="delete-ag-test-case-label menu-item-text"> Delete test case </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="commands-container"
-         v-if="is_open && ag_test_case.ag_test_commands.length > 1">
-      <div v-for="ag_test_command of ag_test_case.ag_test_commands"
-           :class="['ag-test-command',
-                   {'active-ag-test-command': active_ag_test_command !== null
-                                              && active_ag_test_command.pk === ag_test_command.pk}
-           ]"
-           @click="$emit('update_active_item', ag_test_command)"
-           :key="ag_test_command.pk">
-
-        <div class="ag-test-command-name">
-          <span>{{ag_test_command.name}}</span>
+    <div class="commands-container" v-if="is_open && has_multiple_commands">
+      <draggable ref="ag_test_command_order"
+                 v-model="ag_test_case.ag_test_commands"
+                 @change="set_ag_test_command_order"
+                 @end="$event.item.style.transform = 'none'"
+                 handle=".handle">
+        <div class="ag-test-command panel level-2"
+             v-for="ag_test_command of ag_test_case.ag_test_commands"
+             :key="ag_test_command.pk"
+             :class="{'active': active_ag_test_command !== null
+                                 && active_ag_test_command.pk === ag_test_command.pk}"
+             @click="$emit('update_active_item', ag_test_command)">
+          <div class="text">
+            <span>{{ag_test_command.name}}</span>
+          </div>
+          <div class="icons">
+            <i class="icon handle fas fa-arrows-alt"></i>
+          </div>
         </div>
-
-      </div>
+      </draggable>
     </div>
 
     <modal v-if="d_show_new_ag_test_command_modal"
@@ -189,6 +190,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Draggable from 'vuedraggable';
 
 import { AGTestCase, AGTestCommand, AGTestSuite } from 'ag-client-typescript';
 
@@ -208,6 +210,7 @@ import { is_not_empty } from '@/validators';
     AGCaseSettings,
     ContextMenu,
     ContextMenuItem,
+    Draggable,
     Modal,
     ValidatedForm,
     ValidatedInput
@@ -257,6 +260,10 @@ export default class AGCasePanel extends Vue {
     if (this.command_in_case_is_active) {
       this.d_commands_are_visible = true;
     }
+  }
+
+  get has_multiple_commands() {
+    return this.ag_test_case.ag_test_commands.length > 1;
   }
 
   get command_in_case_is_active() {
@@ -324,6 +331,11 @@ export default class AGCasePanel extends Vue {
     }
   }
 
+  set_ag_test_command_order() {
+    return AGTestCommand.update_order(
+      this.ag_test_case.pk, this.ag_test_case.ag_test_commands.map(cmd => cmd.pk));
+  }
+
   @handle_api_errors_async(handle_add_ag_test_command_error)
   async add_ag_test_command() {
     try {
@@ -353,90 +365,30 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/ag_tests.scss';
+@import '@/styles/list_panels.scss';
 @import '@/styles/static_dropdown.scss';
 
 * {
   box-sizing: border-box;
 }
 
-#delete-ag-test-case-label {
+.delete-ag-test-case-label {
   color: $warning-red;
 }
 
-.ag-test-case {
-  @extend .panel;
-  padding: 0 5px 0 26px;
+@include list-panels($indentation: $panel-indentation);
 
-  .ag-test-case-symbol-right {
-    @extend .caret-right;
+.dropdown {
+  color: black;  // For when the case panel is active
+  @include static-dropdown($open-on-hover: true, $orient-left: true);
+
+  .menu-item {
+    padding: 6px 6px;
   }
-
-  .ag-test-case-symbol-down {
-    @extend .caret-down;
-  }
-
-  .dropdown {
-    padding: 5px 9px;
-    color: black;  // For when the case panel is active
-    @include static-dropdown($open-on-hover: true, $orient-left: true);
-
-    .menu-item {
-      padding: 6px 6px;
-    }
-  }
-
-  .menu-icon {
-    visibility: hidden;
-  }
-
-  &:hover {
-    .menu-icon {
-      visibility: visible;
-    }
-  }
-}
-
-.ag-test-case-name {
-  @extend .level-name;
-}
-
-.closed-but-active {
-  @extend .active-level;
-}
-
-.active-ag-test-case-multiple-commands {
-  .menu-icon {
-    visibility: visible;
-  }
-}
-
-.active-ag-test-case-one-command {
-  @extend .active-level;
-  .menu-icon {
-    visibility: visible;
-    color: white;
-  }
-}
-
-.ag-test-command {
-  @extend .panel;
-  padding: 5px 5px 5px 70px;
-}
-
-.ag-test-test-command-name {
-  @extend .level-name;
-}
-
-.active-ag-test-command, .active-single-ag-test-command {
-  @extend .active-level;
 }
 
 .menu-item-text {
   margin-left: 10px;
-}
-
-#delete-case-label {
-  color: $warning-red;
 }
 
 // Modal **************************************************************
