@@ -1,11 +1,10 @@
 <template>
   <div ref="single-course-component" class="single-course-component">
     <div class="course">
-      <router-link tag="div"
-                   :to="`/web/course/${course.pk}`"
+      <router-link :to="`/web/course/${course.pk}`"
                    class="course-info">
-        <p class="course-name">{{course.name}} </p>
-        <p class="course-subtitle">{{course.subtitle}}</p>
+        <div class="course-name">{{course.name}} </div>
+        <div class="course-subtitle">{{course.subtitle}}</div>
       </router-link>
 
       <div class="toolbox">
@@ -13,22 +12,20 @@
              @click="d_show_clone_course_modal = true"
              :title="'Clone ' + course.name"
              v-if="is_admin">
-          <p class="clone-course-label">
+          <div class="clone-course-label">
             <i class="fas fa-copy copier"> </i>
-          </p>
+          </div>
         </div>
-        <router-link tag="div"
+        <router-link
                      :to="`/web/course_admin/${course.pk}`"
                      style="display: inline-block"
                      :title="'Edit ' + course.name"
                      v-if="is_admin">
-          <a>
-            <div class="edit-course-settings">
-              <p class="edit-settings-label">
-                <i class="fas fa-cog cog"></i>
-              </p>
+          <div class="edit-course-settings">
+            <div class="edit-settings-label">
+              <i class="fas fa-cog cog"></i>
             </div>
-          </a>
+          </div>
         </router-link>
       </div>
     </div>
@@ -197,12 +194,10 @@ a {
 
 .cog {
   font-size: 18px;
-  transition-duration: 1s;
 }
 
 .copier {
   font-size: 18px;
-  transition-duration: 1s;
 }
 
 .edit-course-settings, .clone-course {
@@ -218,7 +213,6 @@ a {
 
 .edit-course-settings:hover .cog  {
   color: mediumvioletred;
-  transform: rotate(180deg);
 }
 
 .clone-course:hover .copier {
@@ -234,12 +228,12 @@ a {
 }
 
 .course-info {
+  display: block;
   padding: 15px;
   background-image: linear-gradient(to bottom right, $gray-blue-1, $gray-blue-2);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   border-bottom: none;
-  cursor: pointer;
 }
 
 .course-name {
