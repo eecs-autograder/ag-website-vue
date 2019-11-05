@@ -110,7 +110,7 @@
                class="diff-container">
             <diff ref="stdout_diff"
                   :diff_contents="d_stdout_diff"
-                  diff_height="50vh"
+                  diff_max_height="50vh"
                   left_header="Expected Output"
                   right_header="Student Output">
             </diff>
@@ -131,7 +131,7 @@
                class="diff-container">
             <diff ref="stderr_diff"
                   :diff_contents="d_stderr_diff"
-                  diff_height="50vh"
+                  diff_max_height="50vh"
                   left_header="Expected Error Output"
                   right_header="Student Error Output">
             </diff>

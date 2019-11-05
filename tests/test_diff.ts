@@ -30,21 +30,6 @@ describe('Diff tests', () => {
         ];
     });
 
-    test.skip('Overflow y scrolling', () => {
-        // FIXME: element.scrollHeight is 0 for some reason.
-
-        const wrapper = mount(Diff, {
-            propsData: {
-                diff_contents: diff,
-                diff_height: '100px'
-            }
-        });
-
-        let body_wrapper = wrapper.find('#diff-body-wrapper');
-        expect(body_wrapper.element.style.height).toEqual("100px");
-        expect(body_wrapper.element.scrollHeight).toBeGreaterThan(100);
-    });
-
     test('Diff rendering no whitespace', () => {
         const wrapper = mount(Diff, {
             propsData: {
@@ -52,7 +37,7 @@ describe('Diff tests', () => {
             }
         });
 
-        let rows = wrapper.findAll('#diff-body tr');
+        let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(10);
 
         let expected_left = [
@@ -97,7 +82,7 @@ describe('Diff tests', () => {
         wrapper.setData({d_show_whitespace: true});
         await wrapper.vm.$nextTick();
 
-        let rows = wrapper.findAll('#diff-body tr');
+        let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(1);
         let cells = rows.at(0).findAll('td');
 
@@ -114,7 +99,7 @@ describe('Diff tests', () => {
         wrapper.setData({d_show_whitespace: true});
         await wrapper.vm.$nextTick();
 
-        let rows = wrapper.findAll('#diff-body tr');
+        let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(10);
 
         expect(wrapper.vm.$el).toMatchSnapshot();
@@ -129,7 +114,7 @@ describe('Diff test edge cases', () => {
             }
         });
 
-        let rows = wrapper.findAll('#diff-body tr');
+        let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(0);
     });
 
@@ -144,7 +129,7 @@ describe('Diff test edge cases', () => {
             }
         });
 
-        let rows = wrapper.findAll('#diff-body tr');
+        let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(3);
 
         expect(wrapper.vm.d_left).toEqual([
@@ -173,7 +158,7 @@ describe('Diff test edge cases', () => {
             }
         });
 
-        let rows = wrapper.findAll('#diff-body tr');
+        let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(3);
 
         let expected_left = [
