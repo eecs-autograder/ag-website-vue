@@ -1,12 +1,18 @@
 <template>
-  <div>
+  <div :class="{'fullscreen': d_fullscreen}">
     <div class="diff-headers">
-      <div class="header"> {{left_header}} </div>
-      <div class="header"> {{right_header}} </div>
+      <div class="header">{{left_header}}</div>
+      <div class="header right-header">
+        {{right_header}}
+        <div class="fullscreen-icon" @click="d_fullscreen = !d_fullscreen">
+          <i v-if="!d_fullscreen" class="fas fa-expand"></i>
+          <i v-else class="fas fa-compress"></i>
+        </div>
+      </div>
     </div>
 
-    <div id="diff-body-wrapper" :style="{'height': diff_height}">
-      <table id="diff-body" cellpadding="0" cellspacing="0">
+    <div class="diff-body-wrapper" :style="{'max-height': diff_max_height}">
+      <table class="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
           <tr v-for="(left_cell, i) of d_left">
             <td :class="['line-num', line_num_highlighting[left_cell.prefix]]">
@@ -21,10 +27,10 @@
                     ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
             </td>
 
-            <td :class="['line-num', line_num_highlighting[d_right[i].prefix], 'code-cell']">
+            <td :class="['line-num', line_num_highlighting[d_right[i].prefix]]">
               {{d_right[i].line_number}}
             </td>
-            <td :class="[content_highlighting[d_right[i].prefix]]">
+            <td :class="[content_highlighting[d_right[i].prefix], 'code-cell']">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these <span> elements.-->
               <span class="prefix">{{
@@ -41,10 +47,10 @@
     <div class="toggle-container">
       <toggle v-model="d_show_whitespace" active_background_color="slategray">
         <template slot="on">
-          <p>Show Whitespace</p>
+          Show Whitespace
         </template>
         <template slot="off">
-          <p>Hide Whitespace</p>
+          Hide Whitespace
         </template>
       </toggle>
     </div>
@@ -80,12 +86,14 @@ export default class Diff extends Vue {
   right_header!: string;
 
   @Prop({default: '100%', type: String})
-  diff_height!: string;
+  diff_max_height!: string;
 
   d_left: DiffCell[] = [];
   d_right: DiffCell[] = [];
 
   d_show_whitespace: boolean = false;
+
+  d_fullscreen = false;
 
   created() {
     let left_line_number = 1;
@@ -165,32 +173,62 @@ export default class Diff extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  box-sizing: border-box;
+}
+
+.fullscreen {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background-color: white;
+  z-index: 10;
+}
+
+.fullscreen-icon {
+  position: absolute;
+  right: 8px;
+
+  &:hover {
+    color: $stormy-gray-dark;
+  }
+}
+
+.right-header {
+  position: relative;
+}
+
 .diff-headers {
+  display: flex;
   width: 100%;
+  background-color: $pebble-light;
+  padding: 10px 0;
 }
 
 .header {
-  display: inline-block;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
   width: 50%;
 
   font-size: 20px;
   font-weight: 500;
   margin: 0;
-  padding: 18px 0;
-
-  text-align: center;
 }
 
-#diff-body-wrapper {
-  overflow-y: scroll;
+.diff-body-wrapper {
+  overflow-y: auto;
 }
 
-#diff-body {
+.diff-body {
   width: 100%;
 }
 
 .code-cell {
-  width: 49%;
+  display: flex;
 }
 
 .line-num, .prefix, .content {
@@ -241,7 +279,7 @@ $positive-color: hsl(120, 100%, 95%);
 .toggle-container {
   background-color: $pebble-light;
   display: block;
-  padding: 22px 10px 20px 10px;
+  padding: 10px;
   text-align: center;
 }
 

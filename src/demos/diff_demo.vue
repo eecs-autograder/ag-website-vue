@@ -2,7 +2,7 @@
   <div>
     <h3>This one should have vertical scrolling</h3>
     <div class="diff_wrapper">
-      <diff diff_height="150px"
+      <diff diff_max_height="150px"
           :diff_contents="balanced_diff"
           left_header="Expected Output"
           right_header="Student Output"></diff>
