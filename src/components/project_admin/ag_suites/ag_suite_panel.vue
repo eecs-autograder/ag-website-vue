@@ -7,9 +7,11 @@
         <span>{{ag_test_suite.name}}</span>
       </div>
 
-      <div class="icons" @click.stop="open_new_ag_test_case_modal">
+      <div class="icons">
         <i class="icon handle fas fa-arrows-alt"></i>
-        <i class="icon fas fa-plus" title="Add Test Case"></i>
+        <i class="icon fas fa-plus"
+           @click.stop="open_new_ag_test_case_modal"
+           title="Add Test Case"></i>
       </div>
     </div>
 
