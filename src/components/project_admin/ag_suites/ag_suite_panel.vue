@@ -1,30 +1,35 @@
 <template>
-  <div id="ag-test-suite-panel" v-if="ag_test_suite !== null">
-      <div :class="['ag-test-suite', {'active-ag-test-suite': suite_is_active}]"
-           @click="update_ag_test_suite_panel_when_clicked()">
-        <div class="ag-test-suite-name">
-          <i v-if="is_open" class="fas fa-caret-down ag-test-suite-symbol-down"></i>
-          <i v-else class="fas fa-caret-right ag-test-suite-symbol-right"></i>
-          <span>{{ag_test_suite.name}}</span>
-        </div>
-
-        <div id="ag-test-suite-menu"
-             title="Add Test Case"
-             @click.stop="open_new_ag_test_case_modal">
-          <i class="fas fa-plus"></i>
-        </div>
+  <div>
+    <div class="panel" :class="{'active': suite_is_active}"
+         @click="update_ag_test_suite_panel_when_clicked()">
+      <div class="text">
+        <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+        <span>{{ag_test_suite.name}}</span>
       </div>
 
-      <div class="ag-test-cases-container" v-if="is_open">
-        <div v-for="test_case of ag_test_suite.ag_test_cases"
-             :key="test_case.pk">
-          <AGCasePanel :ag_test_case="test_case"
-                       :ag_test_suite="ag_test_suite"
-                       :active_ag_test_command="active_ag_test_command"
-                       @update_active_item="$emit('update_active_item', $event)">
-          </AGCasePanel>
-        </div>
+      <div class="icons">
+        <i class="icon handle fas fa-arrows-alt"></i>
+        <i class="icon fas fa-plus"
+           @click.stop="open_new_ag_test_case_modal"
+           title="Add Test Case"></i>
       </div>
+    </div>
+
+    <div v-if="is_open">
+      <draggable ref="ag_test_case_order"
+                 v-model="ag_test_suite.ag_test_cases"
+                 @change="set_ag_test_case_order"
+                 @end="$event.item.style.transform = 'none'"
+                 handle=".handle">
+        <AGCasePanel v-for="test_case of ag_test_suite.ag_test_cases"
+                   :key="test_case.pk"
+                   :ag_test_case="test_case"
+                   :ag_test_suite="ag_test_suite"
+                   :active_ag_test_command="active_ag_test_command"
+                   @update_active_item="$emit('update_active_item', $event)">
+        </AGCasePanel>
+      </draggable>
+    </div>
 
     <modal v-if="d_show_new_ag_test_case_modal"
            @close="d_show_new_ag_test_case_modal = false"
@@ -41,7 +46,7 @@
                           @submit="create_ag_test_case"
                           @form_validity_changed="d_add_case_form_is_valid = $event">
 
-            <div id="case-name-container">
+            <div class="case-name-container">
               <label class="text-label"> Test name </label>
               <validated-input ref="new_case_name"
                                v-model="d_new_case_name"
@@ -113,7 +118,7 @@
             <APIErrors ref="new_ag_test_case_api_errors"></APIErrors>
 
             <div class="modal-button-footer">
-              <div id="add-ag-test-command-button-container">
+              <div class="add-ag-test-command-button-container">
                 <button class="add-ag-test-command-button"
                         type="button"
                         :disabled="d_new_commands.length === 3"
@@ -142,6 +147,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import Draggable from 'vuedraggable';
 
 import {
   AGTestCase,
@@ -172,6 +178,7 @@ export class NewCommandFields {
   components: {
     AGCasePanel,
     APIErrors,
+    Draggable,
     Modal,
     Tooltip,
     ValidatedForm,
@@ -283,6 +290,11 @@ export default class AGSuitePanel extends Vue {
     return "";
   }
 
+  set_ag_test_case_order() {
+    return AGTestCase.update_order(
+      this.ag_test_suite.pk, this.ag_test_suite.ag_test_cases.map(test_case => test_case.pk));
+  }
+
   @handle_api_errors_async(handle_create_ag_test_case_error)
   async create_ag_test_case() {
     try {
@@ -326,79 +338,16 @@ function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknow
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/list_panels.scss';
 
-.ag-test-suite {
-  @extend .panel;
-  padding: 0 5px 0 0;
+@import './ag_tests.scss';
 
-  .ag-test-suite-symbol-right {
-    @extend .caret-right;
-  }
-
-  .ag-test-suite-symbol-down {
-    @extend .caret-down;
-  }
-
-  #ag-test-suite-menu {
-    padding: 5px;
-    visibility: hidden;
-  }
-}
-
-.ag-test-suite:hover {
-  #ag-test-suite-menu {
-    visibility: visible;
-    color: darken($stormy-gray-dark, 10);
-  }
-}
-
-.ag-test-suite-name {
-  @extend .level-name;
-}
-
-.active-ag-test-suite {
-  @extend .active-level;
-
-  #ag-test-suite-menu, #ag-test-suite-menu:hover {
-    visibility: visible;
-    color: white;
-  }
-
-  .ag-test-suite-symbol-right, .ag-test-suite-symbol-down {
-    color: white;
-  }
-}
-
-.active-ag-test-suite:hover {
-  #ag-test-suite-menu {
-    color: white;
-  }
-}
-
-.ag-test-suite-in-active-container {
-  @extend .parent-of-active-level;
-  background-color: white;
-
-  #ag-test-suite-menu, .ag-test-suite-symbol-right, .ag-test-suite-symbol-down {
-    color: darken(teal, 10);
-  }
-
-  #ag-test-suite-menu {
-    visibility: visible;
-  }
-}
-
-.ag-test-suite-in-active-container:hover {
-  #suite-menu {
-    color: darken(teal, 10);
-  }
-}
+@include list-panels($indentation: $panel-indentation);
 
 // Modal **************************************************************
 
-#ag-test-case-name-container {
+.ag-test-case-name-container {
   padding: 0;
 }
 

@@ -8,24 +8,26 @@ import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
 import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import {
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
 } from '@/tests/utils';
 
-function make_wrapper(project_in: ag_cli.Project) {
-    let wrapper = mount(AGSuites, {
-        propsData: {
-            project: project_in
-        }
-    });
-    return wrapper;
-}
 
 let project: ag_cli.Project;
 let get_sandbox_docker_images: sinon.SinonStub;
 let get_all_suites_from_project: sinon.SinonStub;
+
+function make_wrapper() {
+    let wrapper = managed_mount(AGSuites, {
+        propsData: {
+            project: project
+        }
+    });
+    return wrapper;
+}
 
 beforeEach(() => {
     project = data_ut.make_project(data_ut.make_course().pk);
@@ -42,7 +44,7 @@ describe('Creating ag_test_suite', () => {
     beforeEach(() => {
         get_all_suites_from_project.resolves([]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
     });
 
     afterEach(() => {
@@ -142,7 +144,7 @@ describe('Changing ag_test_suite', () => {
 
         get_all_suites_from_project.resolves([suite]);
 
-        let wrapper = make_wrapper(project);
+        let wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         let updated_suite = deep_copy(suite, ag_cli.AGTestSuite);
@@ -179,7 +181,7 @@ describe('Deleting ag_test_suite', () => {
 
         get_all_suites_from_project.resolves([first_suite, middle_suite, last_suite]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
     });
 
     afterEach(() => {
@@ -295,13 +297,31 @@ describe('Deleting ag_test_suite', () => {
     });
 });
 
+test('Update suites order', async () => {
+    let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites);
+    let wrapper = make_wrapper();
+    await wrapper.vm.$nextTick();
+
+    wrapper.find({ref: 'ag_test_suite_order'}).vm.$emit('change');
+    await wrapper.vm.$nextTick();
+    expect(
+        order_stub.calledOnceWith(project.pk, suites.map(suite => suite.pk))
+    ).toBe(true);
+});
+
 describe('Creating ag_test_case', () => {
+    // Note that this also covers the case where a test was cloned
     test('Case created', async () => {
         let suite_1 = data_ut.make_ag_test_suite(project.pk);
 
         get_all_suites_from_project.resolves([suite_1]);
 
-        let wrapper = make_wrapper(project);
+        let wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite_1);
@@ -313,12 +333,6 @@ describe('Creating ag_test_case', () => {
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(case_created);
-
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 });
 
@@ -331,7 +345,7 @@ describe('Changing ag_test_case', () => {
 
         get_all_suites_from_project.resolves([suite_1]);
 
-        let wrapper = make_wrapper(project);
+        let wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         let updated_case_1 = deep_copy(case_1, ag_cli.AGTestCase);
@@ -348,58 +362,6 @@ describe('Changing ag_test_case', () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(updated_case_1);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).not.toEqual(case_1);
-
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-});
-
-describe('Cloning ag_test_case', () => {
-    test('Clone an ag test case', async () => {
-        let suite = data_ut.make_ag_test_suite(project.pk);
-        let case_to_clone = data_ut.make_ag_test_case(suite.pk);
-        case_to_clone.ag_test_commands = [data_ut.make_ag_test_command(case_to_clone.pk)];
-        suite.ag_test_cases = [case_to_clone];
-
-        let new_case_name = "New Case Name";
-        let clone_of_case = data_ut.make_ag_test_case(suite.pk, { name: new_case_name });
-        let clone_case_stub = sinon.stub(case_to_clone, 'copy').callsFake(
-            () => ag_cli.AGTestCase.notify_ag_test_case_created(clone_of_case)
-        );
-
-        get_all_suites_from_project.resolves([suite]);
-
-        let wrapper = make_wrapper(project);
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
-
-        wrapper.vm.update_active_item(case_to_clone);
-        await wrapper.vm.$nextTick();
-
-        wrapper.find('#ag-test-case-menu').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let case_to_clone_panel = wrapper.findAll('#ag-test-case-panel').at(0);
-        case_to_clone_panel.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let ag_test_case_clone_name = case_to_clone_panel.find(
-            {ref: 'ag_test_case_clone_name'}
-        );
-        set_validated_input_text(ag_test_case_clone_name, new_case_name);
-
-        case_to_clone_panel.find('#clone-ag-test-case-form').trigger('submit');
-        await wrapper.vm.$nextTick();
-
-        expect(clone_case_stub.calledOnce).toBe(true);
-        expect(clone_case_stub.firstCall.calledWith(new_case_name)).toBe(true);
-        expect(clone_case_stub.calledOn(case_to_clone)).toBe(true);
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(2);
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[1]).toEqual(clone_of_case);
 
         sinon.restore();
 
@@ -434,7 +396,7 @@ describe('Deleting ag_test_case', () => {
 
         get_all_suites_from_project.resolves([suite]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
     });
 
     afterEach(() => {
@@ -574,7 +536,7 @@ describe('Creating ag_test_command', () => {
 
         get_all_suites_from_project.resolves([suite_1]);
 
-        let wrapper = make_wrapper(project);
+        let wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0].ag_test_commands.length).toEqual(1);
@@ -616,7 +578,7 @@ describe('Changing ag_test_command', () => {
 
         get_all_suites_from_project.resolves([suite_1]);
 
-        let wrapper = make_wrapper(project);
+        let wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         let updated_command_2 = deep_copy(command_2, ag_cli.AGTestCommand);
@@ -672,7 +634,7 @@ describe('Deleting ag_test_command', () => {
 
         get_all_suites_from_project.resolves([parent_suite]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
     });
 
@@ -828,7 +790,7 @@ describe('Next/prev test buttons', () => {
 
         get_all_suites_from_project.resolves([suite_1, suite_2, suite_3]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
     });
 
@@ -1069,7 +1031,7 @@ describe('Active_level', () => {
 
         get_all_suites_from_project.resolves([suite_1]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
     });
 
     afterEach(() => {
@@ -1137,7 +1099,7 @@ describe('AGSuites getter functions', () => {
 
         get_all_suites_from_project.resolves([suite_1]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.parent_ag_test_case).toBeNull();
@@ -1169,7 +1131,7 @@ describe('AGSuites getter functions', () => {
 
         get_all_suites_from_project.resolves([suite_1, suite_2]);
 
-        wrapper = make_wrapper(project);
+        wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.parent_ag_test_suite).toBeNull();

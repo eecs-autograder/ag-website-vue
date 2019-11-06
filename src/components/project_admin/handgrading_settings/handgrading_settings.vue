@@ -166,6 +166,7 @@
           <draggable ref="criteria_order"
                      v-model="d_handgrading_rubric.criteria"
                      @change="set_criteria_order"
+                     @end="$event.item.style.transform = 'none'"
                      handle=".handle" ghost-class="ghost">
             <single-criterion v-for="(criterion, index) of d_handgrading_rubric.criteria"
                               :key="criterion.pk"
@@ -185,6 +186,7 @@
           <draggable ref="annotation_order"
                      v-model="d_handgrading_rubric.annotations"
                      @change="set_annotations_order"
+                     @end="$event.item.style.transform = 'none'"
                      handle=".handle" ghost-class="ghost">
             <single-annotation v-for="(annotation, index) of d_handgrading_rubric.annotations"
                                :key="annotation.pk"

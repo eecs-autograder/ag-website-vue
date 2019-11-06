@@ -14,6 +14,7 @@ import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue'
 import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -660,4 +661,33 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.ag_test_suite).toEqual(another_suite);
     });
+});
+
+test('Update test commands order', async () => {
+    let order_stub = sinon.stub(AGTestCommand, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_case = data_ut.make_ag_test_case(suite.pk);
+    suite.ag_test_cases = [test_case];
+    let cmds = [
+        data_ut.make_ag_test_command(test_case.pk),
+        data_ut.make_ag_test_command(test_case.pk),
+        data_ut.make_ag_test_command(test_case.pk),
+    ];
+    test_case.ag_test_commands = cmds;
+
+    let wrapper = managed_mount(AGCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+            }
+    });
+    wrapper.find('.panel').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    wrapper.find({ref: 'ag_test_command_order'}).vm.$emit('change');
+    await wrapper.vm.$nextTick();
+    expect(
+        order_stub.calledOnceWith(test_case.pk, cmds.map(cmd => cmd.pk))
+    ).toBe(true);
 });

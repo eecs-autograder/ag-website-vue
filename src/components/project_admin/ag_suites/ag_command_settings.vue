@@ -940,9 +940,10 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
-@import '@/styles/components/ag_tests.scss';
 @import '@/styles/components/feedback_config.scss';
 @import '@/styles/forms.scss';
+
+@import './ag_tests.scss';
 
 .ag-test-command-input-container {
   padding: 10px 0 10px 0;

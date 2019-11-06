@@ -19,8 +19,13 @@
           </div>
 
           <div class="sidebar-content" v-if="!d_collapsed">
-            <div v-for="mutation_test_suite of d_mutation_test_suites"
-                  class="mutation-test-suite-panel"
+            <draggable ref="mutation_test_suite_order"
+                       v-model="d_mutation_test_suites"
+                       @change="set_mutation_test_suite_order"
+                       @end="$event.item.style.transform = 'none'"
+                       handle=".handle">
+              <div v-for="mutation_test_suite of d_mutation_test_suites"
+                  class="mutation-test-suite-panel panel level-1"
                   :class="{
                     'active':
                       d_active_mutation_test_suite !== null
@@ -28,8 +33,12 @@
                   }"
                   :key="mutation_test_suite.pk"
                   @click="d_active_mutation_test_suite = mutation_test_suite">
-              {{mutation_test_suite.name}}
-            </div>
+                <div class="text">{{mutation_test_suite.name}}</div>
+                <div class="icons">
+                  <i class="icon handle fas fa-arrows-alt"></i>
+                </div>
+              </div>
+            </draggable>
           </div>
         </div>
 
@@ -264,6 +273,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import Draggable from 'vuedraggable';
 
 import {
     BugsExposedFeedbackLevel,
@@ -296,6 +306,7 @@ import { is_not_empty } from '@/validators';
   components: {
     APIErrors,
     BuggyImplementations,
+    Draggable,
     FeedbackConfigPanel,
     Modal,
     MutationCommand,
@@ -362,6 +373,11 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
       this.d_show_delete_mutation_test_suite_modal = false;
       this.d_active_mutation_test_suite = null;
     });
+  }
+
+  set_mutation_test_suite_order() {
+    return MutationTestSuite.update_order(
+      this.project.pk, this.d_mutation_test_suites.map(suite => suite.pk));
   }
 
   open_new_mutation_test_suite_modal() {
@@ -561,6 +577,7 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/list_panels.scss';
 
 * {
   box-sizing: border-box;
@@ -572,7 +589,6 @@ $border-color: $gray-blue-1;
   $sidebar-width: 300px,
   $sidebar-header-height: 50px,
   $background-color: white,
-  $active-color: $light-blue,
   $border-color: $border-color,
   $stretch: true,
 );
@@ -622,12 +638,7 @@ $border-color: $gray-blue-1;
   margin-right: 3px;
 }
 
-.mutation-test-suite-panel {
-  border-top: 1px solid $border-color;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 8px;
-}
+@include list-panels();
 
 #config-panels-container {
   padding: 6px 0 14px 2px;

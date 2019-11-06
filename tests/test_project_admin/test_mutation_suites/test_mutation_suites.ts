@@ -166,6 +166,19 @@ describe('MutationSuites tests', () => {
         }
     });
 
+    test('Update mutation test suites order', async () => {
+        let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+        wrapper.find({ref: 'mutation_test_suite_order'}).vm.$emit('change');
+        await wrapper.vm.$nextTick();
+        expect(
+            order_stub.calledOnceWith(project.pk, [
+                mutation_test_suite_1.pk,
+                mutation_test_suite_2.pk,
+                mutation_test_suite_3.pk,
+            ])
+        ).toBe(true);
+    });
+
     test('Clicking on a mutation test suite makes it the active_mutation_test_suite ',
          async () => {
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);

@@ -18,15 +18,19 @@
           </div>
 
           <div class="sidebar-content" v-if="!d_collapsed">
-            <div v-for="ag_test_suite of d_ag_test_suites"
-                 class="ag-test-suite-container"
-                 :key="ag_test_suite.pk">
-              <AGSuitePanel :ag_test_suite="ag_test_suite"
+            <draggable ref="ag_test_suite_order"
+                       v-model="d_ag_test_suites"
+                       @change="set_ag_test_suite_order"
+                       @end="$event.item.style.transform = 'none'"
+                       handle=".handle">
+              <AGSuitePanel v-for="ag_test_suite of d_ag_test_suites"
+                            :key="ag_test_suite.pk"
+                            :ag_test_suite="ag_test_suite"
                             :active_ag_test_suite="d_active_ag_test_suite"
                             :active_ag_test_command="d_active_ag_test_command"
                             @update_active_item="update_active_item($event)">
               </AGSuitePanel>
-            </div>
+            </draggable>
           </div>
         </div>
 
@@ -102,6 +106,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import Draggable from 'vuedraggable';
 
 import {
   AGTestCase,
@@ -112,7 +117,6 @@ import {
   AGTestSuiteObserver,
   Project
 } from 'ag-client-typescript';
-import { ID } from 'ag-client-typescript/dist/src/base';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
@@ -132,6 +136,7 @@ import { is_not_empty } from '@/validators';
     AGSuitePanel,
     AGSuiteSettings,
     APIErrors,
+    Draggable,
     Modal,
     ValidatedForm,
     ValidatedInput
@@ -210,6 +215,10 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_ag_test_suite_name).focus();
     });
+  }
+
+  set_ag_test_suite_order() {
+    return AGTestSuite.update_order(this.project.pk, this.d_ag_test_suites.map(suite => suite.pk));
   }
 
   get prev_ag_test_case_is_available() {
@@ -388,7 +397,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     }
   }
 
-  update_ag_test_suites_order_changed(project_pk: number, ag_test_suite_order: ID[]): void {}
+  update_ag_test_suites_order_changed(project_pk: number, ag_test_suite_order: number[]): void {}
 
   // CaseObserver --------------------------------------------------------------------------------
   update_ag_test_case_changed(ag_test_case: AGTestCase): void {
@@ -512,9 +521,10 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/collapsible_sidebar.scss';
-@import '@/styles/components/ag_tests.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/global.scss';
+
+@import './ag_tests.scss';
 
 * {
   padding: 0;

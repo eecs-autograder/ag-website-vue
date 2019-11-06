@@ -1,17 +1,11 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { config, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
-    AGTestCaseFeedbackConfig,
     AGTestCommand,
-    AGTestCommandFeedbackConfig,
     AGTestSuite,
-    AGTestSuiteFeedbackConfig,
-    ExpectedOutputSource,
-    ExpectedReturnCode,
     HttpError,
-    StdinSource,
-    ValueFeedbackLevel,
+    Project,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
@@ -19,6 +13,8 @@ import APIErrors from '@/components/api_errors.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import {
     get_validated_input_text,
     set_validated_input_text,
@@ -32,221 +28,51 @@ beforeAll(() => {
 describe('AGSuitePanel tests', () => {
     let wrapper: Wrapper<AGSuitePanel>;
     let component: AGSuitePanel;
+    let project: Project;
     let ag_suite: AGTestSuite;
     let ag_case_a: AGTestCase;
     let ag_case_b: AGTestCase;
     let ag_case_c: AGTestCase;
     let ag_command: AGTestCommand;
     let case_from_different_suite: AGTestCase;
-    let default_suite_feedback_config: AGTestSuiteFeedbackConfig;
-    let default_case_feedback_config: AGTestCaseFeedbackConfig;
-    let default_command_feedback_config: AGTestCommandFeedbackConfig;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
+        project = data_ut.make_project(data_ut.make_course().pk);
+        ag_suite = data_ut.make_ag_test_suite(project.pk);
 
-        default_suite_feedback_config = {
-            show_individual_tests: false,
-            show_setup_return_code: false,
-            show_setup_stderr: false,
-            show_setup_stdout: false,
-            show_setup_timed_out: false,
-            visible: false
-        };
+        ag_case_a = data_ut.make_ag_test_case(ag_suite.pk);
+        ag_command = data_ut.make_ag_test_command(ag_case_a.pk);
 
-        default_case_feedback_config = {
-            visible: false,
-            show_individual_commands: false
-        };
+        ag_case_b = data_ut.make_ag_test_case(ag_suite.pk);
+        ag_case_c = data_ut.make_ag_test_case(ag_suite.pk);
 
-        default_command_feedback_config = {
-            visible: false,
-            return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect,
-            show_points: false,
-            show_actual_return_code: false,
-            show_actual_stdout: false,
-            show_actual_stderr: false,
-            show_whether_timed_out: false
-        };
+        ag_suite.ag_test_cases = [ag_case_a, ag_case_b, ag_case_c];
 
-        ag_command = new AGTestCommand({
-            pk: 1,
-            name: "Command 1",
-            ag_test_case: 1,
-            last_modified: "",
-            cmd: "Say please and thank you",
-            stdin_source: StdinSource.none,
-            stdin_text: "",
-            stdin_instructor_file: null,
-            expected_return_code: ExpectedReturnCode.none,
-            expected_stdout_source: ExpectedOutputSource.none,
-            expected_stdout_text: "",
-            expected_stdout_instructor_file: null,
-            expected_stderr_source: ExpectedOutputSource.none,
-            expected_stderr_text: "",
-            expected_stderr_instructor_file: null,
-            ignore_case: false,
-            ignore_whitespace: false,
-            ignore_whitespace_changes: false,
-            ignore_blank_lines: false,
-            points_for_correct_return_code: 1,
-            points_for_correct_stdout: 1,
-            points_for_correct_stderr: 1,
-            deduction_for_wrong_return_code: 1,
-            deduction_for_wrong_stdout: 1,
-            deduction_for_wrong_stderr: 1,
-            normal_fdbk_config: default_command_feedback_config,
-            first_failed_test_normal_fdbk_config: default_command_feedback_config,
-            ultimate_submission_fdbk_config: default_command_feedback_config,
-            past_limit_submission_fdbk_config: default_command_feedback_config,
-            staff_viewer_fdbk_config: default_command_feedback_config,
-            time_limit: 1,
-            stack_size_limit: 1,
-            virtual_memory_limit: 1,
-            process_spawn_limit: 1
-        });
+        case_from_different_suite = data_ut.make_ag_test_case(
+            data_ut.make_ag_test_suite(project.pk).pk);
 
-        ag_case_a = new AGTestCase({
-            pk: 1,
-            name: "Case A",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: [ag_command]
-        });
-
-        ag_case_b = new AGTestCase({
-            pk: 2,
-            name: "Case B",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
-        ag_case_c = new AGTestCase({
-            pk: 3,
-            name: "Case C",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
-        case_from_different_suite = new AGTestCase({
-            pk: 4,
-            name: "Casey's Corner",
-            ag_test_suite: 2,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
-        ag_suite = new AGTestSuite({
-            pk: 1,
-            name: "Suite 1",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-                pk: 1,
-                name: "Sandy",
-                tag: "",
-                display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_suite_feedback_config,
-            past_limit_submission_fdbk_config: default_suite_feedback_config,
-            staff_viewer_fdbk_config: default_suite_feedback_config,
-            ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [ag_case_a, ag_case_b, ag_case_c],
-            instructor_files_needed: [],
-            student_files_needed: []
-        });
-
-        wrapper = mount(AGSuitePanel, {
+        wrapper = managed_mount(AGSuitePanel, {
             propsData: {
                 ag_test_suite: ag_suite,
                 active_ag_test_suite: null,
-                active_ag_test_case: null,
                 active_ag_test_command: null
             }
         });
         component = wrapper.vm;
     });
 
-    afterEach(() => {
-        sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-    test('Suite (closed, suite is not active, child command is not active) is clicked on',
-         async () => {
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+    test('Click on suite that is closed, inactive, child command is not active', async () => {
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
         expect(component.d_cases_are_visible).toBe(true);
     });
 
-    test('Suite (open, suite is not active, child command is not active) is clicked on',
-         async () => {
-        let another_suite = new AGTestSuite({
-            pk: 2,
-            name: "Suite 2",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-            pk: 2,
-            name: "Spongebob",
-            tag: "",
-            display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_suite_feedback_config,
-            past_limit_submission_fdbk_config: default_suite_feedback_config,
-            staff_viewer_fdbk_config: default_suite_feedback_config,
-            ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [],
-            instructor_files_needed: [],
-            student_files_needed: []
-        });
+    test('Click on suite that is open, inactive, child command is not active', async () => {
+        let another_suite = data_ut.make_ag_test_suite(project.pk);
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
@@ -257,16 +83,15 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: another_suite});
         await component.$nextTick();
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_suite);
         expect(component.d_cases_are_visible).toBe(true);
     });
 
-    test('Suite (open, suite is active, child command is not active) is clicked on',
-         async () => {
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+    test('Click on suite that is open, active, child command is not active', async () => {
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted('update_active_item').length).toEqual(1);
@@ -276,20 +101,19 @@ describe('AGSuitePanel tests', () => {
 
         expect(component.d_cases_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
         expect(component.d_cases_are_visible).toBe(false);
     });
 
-    test('Suite (open, suite is not active, child command is active) is clicked on',
-         async () => {
+    test('Click on suite that is open, inactive, with active child command', async () => {
         wrapper.setProps({active_ag_test_command: ag_command});
         await component.$nextTick();
 
         expect(component.d_cases_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-suite').at(0).trigger('click');
+        wrapper.find('.panel').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
@@ -303,12 +127,10 @@ describe('AGSuitePanel tests', () => {
         expect(component.is_open).toBe(true);
     });
 
-    test('Clicking on the suite-menu when the suite is not active prompts an event ' +
-         'to be emitted',
-         async () => {
+    test('Clicking on inactive suite panel emits event', async () => {
         expect(component.active_ag_test_suite).toBeNull();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.panel').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.emitted('update_active_item').length).toEqual(1);
@@ -318,7 +140,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
@@ -331,25 +153,15 @@ describe('AGSuitePanel tests', () => {
         expect(get_validated_input_text(d_new_case_name_input)).toEqual("Case 2");
     });
 
-    test('Add case (and first command of the same name) - successful', async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
+    test('Add case with first command having the same name - successful', async () => {
+        let new_case = data_ut.make_ag_test_case(ag_suite.pk);
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -367,26 +179,16 @@ describe('AGSuitePanel tests', () => {
         expect(create_command_stub.firstCall.args[1].name).toEqual("Case 2");
     });
 
-    test('Add case with two commands (first command has same name as case) - successful',
+    test('Add case with two commands, first command has same name as case - successful',
          async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
+        let new_case = data_ut.make_ag_test_case(ag_suite.pk);
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -413,27 +215,16 @@ describe('AGSuitePanel tests', () => {
         expect(create_command_stub.secondCall.args[1].cmd).toEqual("bananas");
     });
 
-    test('Add case with two commands (first command has a different name than the case) ' +
-         '- successful',
+    test('Add case with two commands, first command has a different name - successful',
          async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
+        let new_case = data_ut.make_ag_test_case(ag_suite.pk);
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
         wrapper.setProps({active_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -461,18 +252,8 @@ describe('AGSuitePanel tests', () => {
         expect(create_command_stub.secondCall.args[1].cmd).toEqual("bananas");
     });
 
-    test('Attempt to add case with duplicate command name present (1st and 2nd', async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
+    test('Attempt to add case with duplicate command name present', async () => {
+        let new_case = data_ut.make_ag_test_case(ag_suite.pk);
 
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
@@ -480,50 +261,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
-
-        component.d_new_case_name = "Casey";
-
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-
-        component.d_new_commands[0].name = "APPLES";
-        component.d_new_commands[0].cmd = "apples";
-        component.d_new_commands[1].name = "APPLES";
-        component.d_new_commands[1].cmd = "bananas";
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(create_case_stub.callCount).toEqual(0);
-        expect(create_command_stub.callCount).toEqual(0);
-
-        expect(wrapper.findAll('.duplicate-ag-test-command-msg').length).toEqual(2);
-    });
-
-    test('Attempt to add case with duplicate command name present (1st and 3rd', async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
-        let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
-        let create_command_stub = sinon.stub(AGTestCommand, 'create');
-
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
-
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(component.d_new_case_name).toEqual("");
@@ -552,55 +290,7 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.findAll('.duplicate-ag-test-command-msg').length).toEqual(2);
     });
 
-    test('Attempt to add case with duplicate command name present (2nd and 3rd', async () => {
-        let new_case = new AGTestCase({
-            pk: 4,
-            name: "New Case",
-            ag_test_suite: 1,
-            normal_fdbk_config: default_case_feedback_config,
-            ultimate_submission_fdbk_config: default_case_feedback_config,
-            past_limit_submission_fdbk_config: default_case_feedback_config,
-            staff_viewer_fdbk_config: default_case_feedback_config,
-            last_modified: '',
-            ag_test_commands: []
-        });
-
-        let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
-        let create_command_stub = sinon.stub(AGTestCommand, 'create');
-
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
-
-        wrapper.find('#ag-test-suite-menu').trigger('click');
-        await component.$nextTick();
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
-
-        component.d_new_case_name = "Casey";
-
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-
-        component.d_new_commands[0].name = "APPLES";
-        component.d_new_commands[0].cmd = "apples";
-        component.d_new_commands[1].name = "BANANAS";
-        component.d_new_commands[1].cmd = "bananas";
-        component.d_new_commands[2].name = "BANANAS";
-        component.d_new_commands[2].cmd = "cherries";
-
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(create_case_stub.callCount).toEqual(0);
-        expect(create_command_stub.callCount).toEqual(0);
-
-        expect(wrapper.findAll('.duplicate-ag-test-command-msg').length).toEqual(2);
-    });
-
-    test('Add case (and first command) - unsuccessful', async () => {
+    test('Add test case - unsuccessful', async () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(
             Promise.reject(
                 new HttpError(
@@ -613,7 +303,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         component.d_new_case_name = "Case A";
@@ -635,7 +325,7 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
@@ -669,7 +359,7 @@ describe('AGSuitePanel tests', () => {
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
@@ -683,7 +373,7 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
@@ -700,31 +390,7 @@ describe('AGSuitePanel tests', () => {
     });
 
     test('is_active_suite getter', async () => {
-        let another_suite = new AGTestSuite({
-            pk: 2,
-            name: "Suite 2",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-                pk: 2,
-                name: "Spongebob",
-                tag: "",
-                display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_suite_feedback_config,
-            past_limit_submission_fdbk_config: default_suite_feedback_config,
-            staff_viewer_fdbk_config: default_suite_feedback_config,
-            ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [],
-            instructor_files_needed: [],
-            student_files_needed: []
-        });
-
+        let another_suite = data_ut.make_ag_test_suite(project.pk);
         expect(component.suite_is_active).toBe(false);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
@@ -738,28 +404,11 @@ describe('AGSuitePanel tests', () => {
         expect(component.suite_is_active).toBe(false);
     });
 
-    test('d_new_case_name binding', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
-
-        wrapper.find('#ag-test-suite-menu').trigger('click');
-        await component.$nextTick();
-
-        let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
-
-        set_validated_input_text(d_new_case_name_input, "Case 1");
-        expect(validated_input_is_valid(d_new_case_name_input)).toBe(true);
-        expect(component.d_new_case_name).toEqual("Case 1");
-
-        component.d_new_case_name = "Case 2";
-        expect(get_validated_input_text(d_new_case_name_input)).toEqual("Case 2");
-    });
-
     test('error - new case name is blank', async () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
 
         let new_case_name_input = wrapper.find({ref: 'new_case_name'}).find('#input');
         let new_case_name_validator = <ValidatedInput> wrapper.find({ref: 'new_case_name'}).vm;
@@ -784,7 +433,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
@@ -804,7 +453,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         wrapper.find('.add-ag-test-command-button').trigger('click');
@@ -840,7 +489,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
         await component.$nextTick();
 
         let first_new_command_input = wrapper.find({ref: 'command'});
@@ -857,7 +506,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
 
-        wrapper.find('#ag-test-suite-menu').trigger('click');
+        wrapper.find('.icons .fa-plus').trigger('click');
 
         let new_command_input = wrapper.find({ref: 'command'}).find('#input');
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'command'}).vm;
@@ -881,30 +530,7 @@ describe('AGSuitePanel tests', () => {
     });
 
     test('Watcher for test_suite', async () => {
-        let another_suite = new AGTestSuite({
-            pk: 2,
-            name: "Suite 2",
-            project: 10,
-            last_modified: "",
-            read_only_instructor_files: true,
-            setup_suite_cmd: "",
-            setup_suite_cmd_name: "",
-            sandbox_docker_image: {
-                pk: 1,
-                name: "Sandy",
-                tag: "",
-                display_name: "Hi everyone"
-            },
-            allow_network_access: false,
-            deferred: true,
-            normal_fdbk_config: default_suite_feedback_config,
-            past_limit_submission_fdbk_config: default_suite_feedback_config,
-            staff_viewer_fdbk_config: default_suite_feedback_config,
-            ultimate_submission_fdbk_config: default_suite_feedback_config,
-            ag_test_cases: [],
-            instructor_files_needed: [],
-            student_files_needed: []
-        });
+        let another_suite = data_ut.make_ag_test_suite(project.pk);
         expect(component.ag_test_suite).toEqual(ag_suite);
 
         wrapper.setProps({ag_test_suite: another_suite});
@@ -959,4 +585,30 @@ describe('AGSuitePanel tests', () => {
         ];  // all have different names
         expect(component.duplicate_command_name).toEqual("");
     });
+});
+
+test('Update test cases order', async () => {
+    let order_stub = sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases;
+    let wrapper = managed_mount(AGSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null
+        }
+    });
+    wrapper.find('.panel').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    wrapper.find({ref: 'ag_test_case_order'}).vm.$emit('change');
+    await wrapper.vm.$nextTick();
+    expect(
+        order_stub.calledOnceWith(suite.pk, test_cases.map(test_case => test_case.pk))
+    ).toBe(true);
 });

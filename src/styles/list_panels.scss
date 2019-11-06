@@ -1,0 +1,90 @@
+@import '@/styles/colors.scss';
+
+@mixin list-panels(
+    $text-padding: 5px,
+    $active-color: $light-blue,
+    $active-text-color: black,
+    $icon-hover-color: darken($stormy-gray-dark, 20%),
+    $indentation: 10px,
+    $font-size: 14px,
+    // Show icons only when hovering over a panel or
+    // when a panel is accurate.
+    $hide-icons: true,
+) {
+    .panel {
+        * {
+            box-sizing: border-box;
+        }
+
+        display: flex;
+
+        cursor: pointer;
+        font-size: $font-size;
+        align-items: flex-start;
+        justify-content: space-between;
+        width: 100%;
+
+        &.level-0 {
+            padding-left: 0;
+        }
+        &.level-1 {
+            padding-left: $indentation;
+        }
+        &.level-2 {
+            padding-left: $indentation * 2;
+        }
+        &.level-3 {
+            padding-left: $indentation * 3;
+        }
+
+        .caret {
+            // Set the width of the element wide enough so that
+            // the text doesn't shift when switching from a right
+            // caret to a down caret.
+            width: $font-size;
+        }
+
+        .text {
+            padding: 5px;
+            word-break: break-word;
+            word-wrap: break-word;
+        }
+
+        .icons {
+            display: flex;
+            // padding: 5px;
+            @if $hide-icons {
+                visibility: hidden;
+            }
+        }
+
+        .icon {
+            padding: 5px;
+
+            &:hover {
+                color: $icon-hover-color;
+            }
+        }
+
+        .handle {
+            cursor: grabbing;
+        }
+
+        @if $hide-icons {
+            &:hover {
+                .icons {
+                    visibility: visible;
+                }
+            }
+        }
+
+        &.active {
+            background-color: $active-color;
+            color: $active-text-color;
+
+            .icons {
+                visibility: visible;
+            }
+        }
+    }
+}
