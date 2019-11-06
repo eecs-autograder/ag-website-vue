@@ -1,47 +1,45 @@
 <template>
   <div>
-    <div class="ag-test-case"
-         @click="update_ag_test_case_panel_when_clicked">
-      <div class="panel level-1"
-           :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}">
-        <div class="text">
-          <i v-if="ag_test_case.ag_test_commands.length > 1"
-            class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
-          <span>{{ag_test_case.name}}</span>
-        </div>
+    <div class="ag-test-case panel level-1"
+          :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}"
+          @click="update_ag_test_case_panel_when_clicked">
+      <div class="text">
+        <i v-if="ag_test_case.ag_test_commands.length > 1"
+          class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+        <span>{{ag_test_case.name}}</span>
+      </div>
 
-        <div class="icons">
-          <i class="icon handle fas fa-arrows-alt"></i>
-          <div class="dropdown" @click.stop="$emit('update_active_item', ag_test_case)">
-            <i class="menu-icon icon fas fa-ellipsis-h"></i>
-            <div class="menu">
-              <div ref="add_ag_test_command_menu_item"
-                  @click="open_new_ag_test_command_modal"
-                  class="menu-item">
-                <i class="fas fa-plus"></i>
-                <span class="menu-item-text">Add command</span>
-              </div>
-              <div class="menu-divider"> </div>
-              <div ref="edit_ag_test_case_menu_item"
-                  @click="d_show_ag_test_case_settings_modal = true"
-                  class="menu-item">
-                <i class="fas fa-pencil-alt"></i>
-                <span class="menu-item-text">Edit test case settings</span>
-              </div>
-              <div class="menu-divider"> </div>
-              <div ref="clone_ag_test_case_menu_item"
-                  @click="open_clone_ag_test_case_modal"
-                  class="menu-item">
-                <i class="far fa-copy"></i>
-                <span class="menu-item-text"> Clone test case </span>
-              </div>
-              <div class="menu-divider"> </div>
-              <div ref="delete_ag_test_case_menu_item"
-                  @click="d_show_delete_ag_test_case_modal = true"
-                  class="menu-item">
-                <i class="fas fa-trash-alt"></i>
-                <span class="delete-ag-test-case-label menu-item-text"> Delete test case </span>
-              </div>
+      <div class="icons">
+        <i class="icon handle fas fa-arrows-alt"></i>
+        <div class="dropdown" @click.stop="$emit('update_active_item', ag_test_case)">
+          <i class="menu-icon icon fas fa-ellipsis-h"></i>
+          <div class="menu">
+            <div ref="add_ag_test_command_menu_item"
+                @click="open_new_ag_test_command_modal"
+                class="menu-item">
+              <i class="fas fa-plus"></i>
+              <span class="menu-item-text">Add command</span>
+            </div>
+            <div class="menu-divider"> </div>
+            <div ref="edit_ag_test_case_menu_item"
+                @click="d_show_ag_test_case_settings_modal = true"
+                class="menu-item">
+              <i class="fas fa-pencil-alt"></i>
+              <span class="menu-item-text">Edit test case settings</span>
+            </div>
+            <div class="menu-divider"> </div>
+            <div ref="clone_ag_test_case_menu_item"
+                @click="open_clone_ag_test_case_modal"
+                class="menu-item">
+              <i class="far fa-copy"></i>
+              <span class="menu-item-text"> Clone test case </span>
+            </div>
+            <div class="menu-divider"> </div>
+            <div ref="delete_ag_test_case_menu_item"
+                @click="d_show_delete_ag_test_case_modal = true"
+                class="menu-item">
+              <i class="fas fa-trash-alt"></i>
+              <span class="delete-ag-test-case-label menu-item-text"> Delete test case </span>
             </div>
           </div>
         </div>
