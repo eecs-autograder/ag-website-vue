@@ -33,10 +33,33 @@ describe('Progress bar tests', () => {
         expect(wrapper.vm.$el).toMatchSnapshot();
     });
 
+    test('Progress > 100% default slot', () => {
+        const wrapper = mount(ProgressBar, {
+            propsData: {
+                progress: 115
+            }
+        });
+
+        expect(wrapper.vm.$el).toMatchSnapshot();
+    });
+
     test('Progress 100% custom slot', () => {
         const wrapper = mount(ProgressBar, {
             propsData: {
                 progress: 100
+            },
+            slots: {
+                default: 'Finishing request'
+            }
+        });
+
+        expect(wrapper.vm.$el).toMatchSnapshot();
+    });
+
+    test('Progress > 100% custom slot', () => {
+        const wrapper = mount(ProgressBar, {
+            propsData: {
+                progress: 110
             },
             slots: {
                 default: 'Finishing request'

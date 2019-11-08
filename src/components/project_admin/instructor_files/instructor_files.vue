@@ -1,8 +1,13 @@
 <template>
   <div id="instructor-files-component">
-    <FileUpload ref="instructor_files_upload"
-                @upload_files="add_instructor_files($event)">
-    </FileUpload>
+    <file-upload ref="instructor_files_upload"
+                 @upload_files="add_instructor_files($event)"
+                 :disable_upload_button="d_uploading">
+    </file-upload>
+
+    <div v-if="d_upload_progress !== null" class="progress-wrapper">
+      <progress-bar :progress="d_upload_progress"></progress-bar>
+    </div>
 
     <div class="sidebar-container">
       <div class="sidebar-menu">
@@ -26,7 +31,8 @@
       </div>
       <div :class="['body', {'body-closed': d_collapsed}]" v-if="d_current_filename !== null">
         <view-file :filename="d_current_filename"
-                   :file_contents="current_file_contents"></view-file>
+                   :file_contents="current_file_contents"
+                   :progress="d_load_contents_progress"></view-file>
       </div>
     </div>
   </div>
@@ -39,6 +45,7 @@ import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-types
 
 import FileUpload from '@/components/file_upload.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
+import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
 import { SafeMap } from '@/safe_map';
 import { array_get_unique, array_has_unique, array_remove_unique, toggle } from '@/utils';
@@ -49,6 +56,7 @@ import SingleInstructorFile from './single_instructor_file.vue';
   components: {
     FileUpload,
     MultiFileViewer,
+    ProgressBar,
     SingleInstructorFile,
     ViewFile,
   }
@@ -58,6 +66,9 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
   project!: Project;
 
   d_collapsed = false;
+  d_load_contents_progress: number | null = null;
+  d_uploading = false;
+  d_upload_progress: number | null = null;
 
   // Do NOT modify the contents of this array!!
   get instructor_files(): ReadonlyArray<Readonly<InstructorFile>> {
@@ -86,33 +97,50 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
   }
 
   view_file(file: InstructorFile) {
+    this.d_load_contents_progress = null;
     if (!this.d_open_files.has(file.name)) {
-      this.d_open_files.set(file.name, file.get_content());
+      let content = file.get_content((event: ProgressEvent) => {
+        this.d_load_contents_progress = 100 * (1.0 * event.loaded / file.size);
+      });
+      this.d_open_files.set(file.name, content);
     }
     this.d_current_filename = file.name;
   }
 
-  async add_instructor_files(files: File[]) {
-    for (let file of files) {
-      let file_already_exists = array_has_unique(
-        this.instructor_files,
-        file.name,
-        (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
-      );
-
-      if (file_already_exists) {
-        let file_to_update = array_get_unique(
+  add_instructor_files(files: File[]) {
+    return toggle(this, 'd_uploading', async () => {
+      for (let file of files) {
+        let file_already_exists = array_has_unique(
           this.instructor_files,
           file.name,
           (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
         );
-        await file_to_update.set_content(file);
+
+        if (file_already_exists) {
+          let file_to_update = array_get_unique(
+            this.instructor_files,
+            file.name,
+            (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
+          );
+          await file_to_update.set_content(file, (event: ProgressEvent) => {
+            if (event.lengthComputable) {
+              this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
+            }
+          });
+        }
+        else {
+          let file_to_add = await InstructorFile.create(
+            this.project.pk, file.name, file, (event: ProgressEvent) => {
+              if (event.lengthComputable) {
+                this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
+              }
+            }
+          );
+        }
       }
-      else {
-        let file_to_add = await InstructorFile.create(this.project.pk, file.name, file);
-      }
-    }
-    (<FileUpload> this.$refs.instructor_files_upload).clear_files();
+      this.d_upload_progress =  null;
+      (<FileUpload> this.$refs.instructor_files_upload).clear_files();
+    });
   }
 
   update_instructor_file_content_changed(instructor_file: InstructorFile,
@@ -151,6 +179,10 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
 
 #instructor-files-component {
   margin-top: 10px;
+}
+
+.progress-wrapper {
+  padding-top: 10px;
 }
 
 $border-color: hsl(220, 40%, 94%);

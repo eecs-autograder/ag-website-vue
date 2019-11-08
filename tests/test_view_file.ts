@@ -82,6 +82,24 @@ describe('ViewFile.vue', () => {
 
         expect(component.d_filename).toEqual(new_filename);
     });
+
+    test('File too large, user prompted before displaying', async () => {
+        wrapper.setProps({display_size_threshold: 2});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.line-of-file-content').length).toEqual(0);
+        expect(wrapper.find('.large-file-message').exists()).toBe(true);
+
+        wrapper.find('.large-file-message .orange-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.line-of-file-content').length).toEqual(2);
+        expect(wrapper.find('.large-file-message').exists()).toBe(false);
+
+        // display anyway flag should be reset when content changes.
+        wrapper.setProps({file_contents: Promise.resolve('Some content')});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.line-of-file-content').length).toEqual(0);
+        expect(wrapper.find('.large-file-message').exists()).toBe(true);
+    });
 });
 
 describe('ViewFile handgrading tests', () => {

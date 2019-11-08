@@ -62,6 +62,13 @@
         </div>
       </modal>
     </div>
+
+    <div v-if="d_downloading" class="download-overlay">
+      <i v-if="d_download_progress === null" class="fa fa-spinner fa-pulse"></i>
+      <progress-bar v-else
+                    class="download-progress"
+                    :progress="d_download_progress"></progress-bar>
+    </div>
   </div>
 </template>
 
@@ -73,15 +80,17 @@ import * as FileSaver from 'file-saver';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
+import ProgressBar from '@/components/progress_bar.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { format_datetime, handle_api_errors_async } from '@/utils';
+import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
     APIErrors,
     Modal,
+    ProgressBar,
     ValidatedForm,
     ValidatedInput
   }
@@ -100,6 +109,9 @@ export default class SingleInstructorFile extends Vue {
   new_name_is_valid = true;
   d_show_delete_instructor_file_modal = false;
 
+  d_download_progress: number | null = null;
+  d_downloading = false;
+
   @handle_api_errors_async(handle_rename_file_error)
   async rename_file() {
     if (this.new_file_name !== this.file.name) {
@@ -112,8 +124,14 @@ export default class SingleInstructorFile extends Vue {
     this.editing = false;
   }
 
-  async download_file() {
-    FileSaver.saveAs(new File([await this.file.get_content()], this.file.name));
+  download_file() {
+    return toggle(this, 'd_downloading', async () => {
+      let file_content = this.file.get_content((event: ProgressEvent) => {
+          this.d_download_progress = 100 * (1.0 * event.loaded / this.file.size);
+      });
+      FileSaver.saveAs(new File([await file_content], this.file.name));
+      this.d_download_progress = null;
+    });
   }
 
   async delete_file_permanently() {
@@ -152,7 +170,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 }
 
 .icon-holder {
-  // display: inline-block;
   padding-top: 2px;
 }
 
@@ -160,7 +177,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   display: flex;
 
   .file-name {
-    // max-width: 200px;
     font-size: 16px;
     padding-bottom: 2px;
   }
@@ -217,6 +233,33 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   display: block;
   color: hsl(220, 20%, 65%);
   font-size: 15px;
+}
+
+.download-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  cursor: default;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, .5);
+
+  .fa-spinner {
+    color: white;
+    font-size: 50px;
+  }
+
+  .download-progress {
+    background-color: white;
+    width: 75%;
+    border: none;
+  }
 }
 
 /* ---------------- MODAL ---------------- */
