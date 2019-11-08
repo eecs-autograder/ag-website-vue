@@ -98,6 +98,11 @@ describe('InstructorFiles.vue', () => {
 
     test('Uploading file with same name as an existing instructor file', async () => {
         let set_content_stub = sinon.stub(instructor_file_1, 'set_content');
+        set_content_stub.callsFake((content, on_upload_progress) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 10});
+            return Promise.resolve();
+        });
 
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
@@ -130,7 +135,11 @@ describe('InstructorFiles.vue', () => {
         file_upload_component.d_files.insert(uniquely_named_file);
 
         let create_stub = sinon.stub(InstructorFile, 'create');
-        create_stub.resolves(new_uniquely_named_instructor_file);
+        create_stub.callsFake((project_pk, name, content, on_upload_progress) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 10});
+            return Promise.resolve(new_uniquely_named_instructor_file);
+        });
 
         final_upload_button.trigger('click');
         await wrapper.vm.$nextTick();
@@ -146,7 +155,13 @@ describe('InstructorFiles.vue', () => {
     });
 
     test('Viewing a file', async () => {
-        let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content').resolves("Monday");
+        let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content').callsFake(
+            (on_upload_progress) => {
+                // tslint:disable-next-line: no-object-literal-type-assertion
+                on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
+                return Promise.resolve('Monday');
+            }
+        );
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
