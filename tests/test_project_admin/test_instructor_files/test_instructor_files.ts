@@ -187,6 +187,26 @@ describe('InstructorFiles.vue', () => {
         expect(get_content_stub_1.calledOnce).toBe(true);
     });
 
+    test('Rename opened file', async () => {
+        let expected_content = 'I am contenttt';
+        sinon.stub(instructor_file_1, 'get_content').resolves(expected_content);
+        let renamed = new InstructorFile(instructor_file_1);
+        renamed.name = 'Renamed';
+
+        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
+        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
+        expect(await view_file.vm.file_contents).toEqual(expected_content);
+
+        InstructorFile.notify_instructor_file_renamed(renamed, instructor_file_1.name);
+        await wrapper.vm.$nextTick();
+
+        expect(view_file.vm.filename).toEqual(renamed.name);
+        expect(await view_file.vm.file_contents).toEqual(expected_content);
+    });
+
     test('Deleting a file removes it from the list of instructor files', async () => {
         let delete_stub = sinon.stub(instructor_file_1, 'delete');
         delete_stub.callsFake(

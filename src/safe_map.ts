@@ -55,15 +55,6 @@ export class SafeMap<K, V>  {
             throw new SafeMapError(`Key Error: "${key}" not found in map`);
         }
         return this._map.get(key)!;
-
-        //         let index = this._index_of(key, default_val === undefined);
-        // if (index === -1) {
-        //     if (insert) {
-        //         this.insert(key, default_val!);
-        //     }
-        //     return default_val!;
-        // }
-        // return this.data[index][1];
     }
 
     has(key: K): boolean {

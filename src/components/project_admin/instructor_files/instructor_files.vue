@@ -16,7 +16,7 @@
             <i class="fas fa-bars"></i>
           </span>
           <span class="header-text"
-                v-if="!d_collapsed || d_current_filename === null">Uploaded Files</span>
+                v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
         </div>
 
         <div class="sidebar-content" v-if="!d_collapsed">
@@ -25,12 +25,12 @@
                                   :file="instructor_file"
                                   @click="view_file(instructor_file)"
                                   class="sidebar-item"
-                                  :class="{'active': d_current_filename === instructor_file.name}">
+                                  :class="{'active': current_filename === instructor_file.name}">
           </single-instructor-file>
         </div>
       </div>
-      <div :class="['body', {'body-closed': d_collapsed}]" v-if="d_current_filename !== null">
-        <view-file :filename="d_current_filename"
+      <div :class="['body', {'body-closed': d_collapsed}]" v-if="current_filename !== null">
+        <view-file :filename="current_filename"
                    :file_contents="current_file_contents"
                    :progress="d_load_contents_progress"></view-file>
       </div>
@@ -47,6 +47,7 @@ import FileUpload from '@/components/file_upload.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
+import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
 import { array_get_unique, array_has_unique, array_remove_unique, toggle } from '@/utils';
 
@@ -61,12 +62,11 @@ import SingleInstructorFile from './single_instructor_file.vue';
     ViewFile,
   }
 })
-export default class InstructorFiles extends Vue implements InstructorFileObserver {
+export default class InstructorFiles extends OpenFilesMixin implements InstructorFileObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
   d_collapsed = false;
-  d_load_contents_progress: number | null = null;
   d_uploading = false;
   d_upload_progress: number | null = null;
 
@@ -75,17 +75,6 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
     // Since this component is only used in project admin, we know that
     // this.project.instructor files will never be undefined.
     return this.project.instructor_files!;
-  }
-
-  d_open_files: SafeMap<string, Promise<string>> = new SafeMap();
-  d_current_filename: string | null  = null;
-
-  get current_file_contents() {
-    if (this.d_current_filename === null) {
-      // istanbul ignore next
-      throw new Error('current_file_contents requested when d_current_filename is null');
-    }
-    return this.d_open_files.get(this.d_current_filename);
   }
 
   created() {
@@ -97,14 +86,7 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
   }
 
   view_file(file: InstructorFile) {
-    this.d_load_contents_progress = null;
-    if (!this.d_open_files.has(file.name)) {
-      let content = file.get_content((event: ProgressEvent) => {
-        this.d_load_contents_progress = 100 * (1.0 * event.loaded / file.size);
-      });
-      this.d_open_files.set(file.name, content);
-    }
-    this.d_current_filename = file.name;
+    this.open_file(file.name, (progress_callback) => file.get_content(progress_callback));
   }
 
   add_instructor_files(files: File[]) {
@@ -143,24 +125,18 @@ export default class InstructorFiles extends Vue implements InstructorFileObserv
     });
   }
 
-  update_instructor_file_content_changed(instructor_file: InstructorFile,
-                                         file_content: string) {
-    let new_open_files = new SafeMap(this.d_open_files);
-    new_open_files.set(instructor_file.name, Promise.resolve(file_content));
-    this.d_open_files = new_open_files;
+  update_instructor_file_content_changed(instructor_file: InstructorFile, file_content: string) {
+    this.update_file(instructor_file.name, Promise.resolve(file_content));
   }
 
   update_instructor_file_deleted(instructor_file: InstructorFile) {
-    if (this.d_current_filename === instructor_file.name) {
-      this.d_current_filename = null;
-    }
-
-    let new_open_files = new SafeMap(this.d_open_files);
-    new_open_files.delete(instructor_file.name);
-    this.d_open_files = new_open_files;
+    this.delete_file(instructor_file.name);
   }
 
-  update_instructor_file_renamed(instructor_file: InstructorFile) {}
+  update_instructor_file_renamed(instructor_file: InstructorFile, old_name: string) {
+    this.rename_file(old_name, instructor_file.name);
+  }
+
   update_instructor_file_created(instructor_file: InstructorFile) {}
 }
 
