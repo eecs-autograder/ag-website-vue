@@ -225,11 +225,17 @@ describe('InstructorFiles.vue', () => {
     });
 
     test('Instructor file deleted while being viewed', async () => {
-        sinon.stub(instructor_file_1, 'get_content').resolves("File 1 Content");
+        let get_content_stub = sinon.stub(
+            instructor_file_1, 'get_content'
+        ).callsFake((callback) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            callback!(<ProgressEvent> {lengthComputable: true, loaded: 10, total: 20});
+            return Promise.resolve("File 1 Content");
+        });
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_current_filename).toBe(instructor_file_1.name);
+        expect(wrapper.vm.current_filename).toBe(instructor_file_1.name);
 
         sinon.stub(instructor_file_1, 'delete').callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1)
@@ -242,8 +248,15 @@ describe('InstructorFiles.vue', () => {
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_current_filename).toBeNull();
-        expect(wrapper.vm.d_open_files.has(instructor_file_1.name)).toBe(false);
+        expect(wrapper.vm.current_filename).toBeNull();
+
+        // If we re-add the file and open it, get_content should be called again because
+        // the cached contents should have been cleared.
+        expect(get_content_stub.calledOnce).toBe(true);
+        InstructorFile.notify_instructor_file_created(instructor_file_1);
+        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(get_content_stub.calledTwice).toBe(true);
     });
 
     test('Open/close the sidebar', async () => {

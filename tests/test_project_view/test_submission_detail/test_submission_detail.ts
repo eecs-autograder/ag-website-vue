@@ -5,7 +5,6 @@ import * as FileSaver from 'file-saver';
 import * as sinon from 'sinon';
 
 import { GlobalData } from '@/app.vue';
-import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import SubmissionDetail from '@/components/project_view/submission_detail/submission_detail.vue';
 
 import * as data_ut from '@/tests/data_utils.ts';
@@ -521,23 +520,28 @@ describe('SubmissionDetail tests', () => {
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
 
-        get_file_content_stub = sinon.stub(wrapper.vm.submission!, 'get_file_content').returns(
-            Promise.resolve(
-                Promise.resolve("File b contents")
-            )
-        );
-        let multi_file_viewer = <MultiFileViewer> (wrapper.find(
-            {ref: 'view_submission_result_files'}
-        )).vm;
-        expect(multi_file_viewer.files_currently_viewing.length).toEqual(0);
+        get_file_content_stub = sinon.stub(
+            wrapper.vm.submission!, 'get_file_content'
+        ).callsFake((filename, callback) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            callback!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 15});
+            return Promise.resolve("File b contents");
+        });
+        expect(wrapper.vm.current_filename).toBeNull();
 
-        let file_b_row = wrapper.findAll('.submitted-file').at(1);
-        file_b_row.find('.open-file').trigger('click');
+        let submitted_files = wrapper.findAll('.submitted-file');
+        submitted_files.at(1).find('.open-file').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         expect(get_file_content_stub.calledOnce).toBe(true);
-        expect(multi_file_viewer.files_currently_viewing.length).toEqual(1);
+        expect(wrapper.vm.current_filename).toEqual('file_b');
+
+        submitted_files.at(0).find('.open-file').trigger('click');
+        await wrapper.vm.$nextTick();
+        submitted_files.at(1).find('.open-file').trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
     });
 
     test('adjust_feedback - is_staff === false', async () => {

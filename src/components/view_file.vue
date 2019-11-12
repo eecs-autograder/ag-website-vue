@@ -1,5 +1,5 @@
 <template>
-  <div id="view-file-component"
+  <div class="view-file-component"
        :style="{height: view_file_height, max_height: view_file_max_height}">
     <div v-if="d_loading" class="loading-container">
       <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
@@ -11,7 +11,7 @@
         Click here to display its contents
       </button>
     </div>
-    <table v-else id="viewing-container" :class="{'saving': d_saving}">
+    <table v-else class="viewing-container" :class="{'saving': d_saving}">
       <template v-for="(line, index) of d_file_contents.split('\n')">
         <tr :class="{'commented-line': line_in_comment(index),
                      'hovered-comment-line': d_hovered_comment !== null
@@ -366,13 +366,13 @@ table {
   border-spacing: 0;
 }
 
-#view-file-component {
+.view-file-component {
   overflow-y: auto;
 }
 
-#viewing-container {
+.viewing-container {
   font-family: monospace;
-  padding: 5px 0 0 0;
+  padding: 5px 0;
   width: 100%;
 }
 

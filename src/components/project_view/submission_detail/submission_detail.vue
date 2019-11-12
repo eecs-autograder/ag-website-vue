@@ -104,11 +104,13 @@
         </div>
 
         <div class="submitted-files">
-          <div v-for="submitted_filename of submission.submitted_filenames"
+          <div v-for="filename of submission.submitted_filenames"
                class="submitted-file">
-            <a class="open-file" @click="open_file(submitted_filename)">{{submitted_filename}}</a>
-            <i class="cursor-pointer fa fa-download download-file-icon"
-               @click="download_file(submitted_filename)">
+            <a class="open-file"
+               :class="{'current-file': current_filename === filename}"
+               @click="view_file(filename)">{{filename}}</a>
+            <i class="cursor-pointer fa fa-file-download download-file-icon"
+               @click="download_file(filename)">
             </i>
           </div>
         </div>
@@ -120,10 +122,11 @@
           Remove from queue
         </button>
 
-        <div id="multi-file-viewer-container">
-          <multi-file-viewer ref="view_submission_result_files"
-                             height_of_view_file="50vh">
-          </multi-file-viewer>
+        <div id="view-file-container" v-if="current_filename !== null">
+          <view-file :filename="current_filename"
+                     :file_contents="current_file_contents"
+                     :progress="load_contents_progress"
+                     view_file_max_height="50vh"></view-file>
         </div>
 
         <div v-if="d_globals.user_roles.is_staff
@@ -239,11 +242,12 @@ import * as FileSaver from 'file-saver';
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import Modal from '@/components/modal.vue';
-import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import AGTestSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from "@/components/project_view/submission_detail/mutation_suite_results.vue";
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
+import ViewFile from '@/components/view_file.vue';
+import { OpenFilesMixin } from '@/open_files_mixin';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 
 @Component({
@@ -251,12 +255,12 @@ import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
     APIErrors,
     AGTestSuiteResult,
     Modal,
-    MultiFileViewer,
     MutationSuiteResults,
-    ResultPanel
+    ResultPanel,
+    ViewFile,
   }
 })
-export default class SubmissionDetail extends Vue {
+export default class SubmissionDetail extends OpenFilesMixin {
 
   @Inject({from: 'globals'})
   globals!: GlobalData;
@@ -358,9 +362,11 @@ export default class SubmissionDetail extends Vue {
     ) !== -1;
   }
 
-  open_file(filename: string) {
-    let multi_file_viewer = <MultiFileViewer> this.$refs.view_submission_result_files;
-    multi_file_viewer.add_to_viewing(filename, this.submission!.get_file_content(filename));
+  view_file(filename: string) {
+    this.open_file(
+      filename,
+      (progress_callback) => this.submission!.get_file_content(filename, progress_callback)
+    );
   }
 
   async download_file(filename: string) {
@@ -473,14 +479,19 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   cursor: pointer;
 }
 
+.current-file {
+  color: black;
+}
+
 .download-file-icon {
   padding: 0 10px;
   color: $navy-blue;
   cursor: pointer;
 }
 
-#multi-file-viewer-container {
+#view-file-container {
   margin-bottom: 2px;
+  border: 1px solid $pebble-medium;
 }
 
 #adjust-feedback-section {

@@ -32,7 +32,7 @@
       <div :class="['body', {'body-closed': d_collapsed}]" v-if="current_filename !== null">
         <view-file :filename="current_filename"
                    :file_contents="current_file_contents"
-                   :progress="d_load_contents_progress"></view-file>
+                   :progress="load_contents_progress"></view-file>
       </div>
     </div>
   </div>
