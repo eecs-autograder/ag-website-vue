@@ -2,20 +2,18 @@
   <div v-if="ag_test_case_result.ag_test_command_results.length"
        class="ag-case-result">
     <template v-if="ag_test_case_result.ag_test_command_results.length > 1">
-      <div id="multi-command-body">
-        <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
-          <result-panel
-            ref="ag_test_command_panel"
-            :key="ag_test_command_result.pk"
-            :name="ag_test_command_result.ag_test_command_name"
-            :correctness_level="command_result_correctness(ag_test_command_result)"
-            :is_command="true">
-            <AGTestCommandResult :submission="submission"
-                             :ag_test_command_result="ag_test_command_result"
-                             :fdbk_category="fdbk_category">
-            </AGTestCommandResult>
-          </result-panel>
-        </div>
+      <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
+        <result-panel
+          ref="ag_test_command_panel"
+          :key="ag_test_command_result.pk"
+          :name="ag_test_command_result.ag_test_command_name"
+          :correctness_level="command_result_correctness(ag_test_command_result)"
+          :is_command="true">
+          <AGTestCommandResult :submission="submission"
+                            :ag_test_command_result="ag_test_command_result"
+                            :fdbk_category="fdbk_category">
+          </AGTestCommandResult>
+        </result-panel>
       </div>
     </template>
     <template v-else>

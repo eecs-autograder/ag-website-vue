@@ -1,189 +1,168 @@
 <template>
   <div id="submission-detail">
-    <div id="view-submission">
-      <div id="submission-detail-overview">
-
-        <div id="submitted-by"> Submitted by:
-          <span id="submitter">{{submission.submitter}}</span>
-          on <span id="submission-timestamp">{{format_datetime(submission.timestamp)}}</span>
-        </div>
-
-        <div v-if="show_score"
-             id="submission-score"> Score:
-          <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
-        </div>
-        <div class="grading-status" v-if="!show_score || d_globals.user_roles.is_staff">
-          <div id="deferred-tests-message"
-               v-if="submission.status === GradingStatus.waiting_for_deferred">
-            Core tests finished. You can submit again now!
-          </div>
-          <div id="deferred-tests-message"
-               v-else-if="submission.status === GradingStatus.finished_grading">
-            All tests finished.
-          </div>
-        </div>
-
-        <div v-if="show_auto_update_msg"
-             id="auto-update-message">
-          This page will update automatically.
-        </div>
-
-        <div v-if="submission.status !== GradingStatus.waiting_for_deferred
-                   && submission.status !== GradingStatus.finished_grading"
-             id="grading-status-section">
-          <div id="grading-status-label">
-            Grading status:
-            <span>
-              <i v-if="submission.status === GradingStatus.queued"
-                 class="queued-symbol">Q</i>
-              <i v-else-if="submission.status === GradingStatus.being_graded"
-                 class="fas fa-list being-graded-symbol"></i>
-              <i v-else-if="submission.status === GradingStatus.removed_from_queue"
-                 class="fas fa-eject removed-symbol"></i>
-              <i v-else-if="submission.status === GradingStatus.error"
-                 class="fas fa-skull error-symbol"></i>
-            </span>
-          </div>
-
-          <div class="grading-status">
-            <div v-if="submission.status === GradingStatus.received">
-              We got your submission! It should be queued soon.
-            </div>
-            <div v-else-if="submission.status === GradingStatus.queued">
-              Your submission is at position {{submission.position_in_queue}} in the queue.
-            </div>
-            <div v-else-if="submission.status === GradingStatus.being_graded">
-              Your submission is being graded!
-            </div>
-            <div v-else-if="submission.status === GradingStatus.removed_from_queue">
-              You removed this submission from the queue. That means it won't be graded,
-              and it won't count towards your daily submission limit.
-            </div>
-            <div v-else-if="submission.status === GradingStatus.error"
-                 id="grading-status-error-message">
-              An unexpected error occurred while grading your submission.
-              This submission will not count towards your daily limit.
-              Please wait a few minutes and try your submission again.
-              If the problem persists, please contact <b>help@autograder.io</b> and include
-              the information <b>"Submission ID: {{submission.pk}}"</b> in your email.
-            </div>
-          </div>
-        </div>
-
-        <div v-if="submission.is_bonus_submission"
-             id="is-bonus-submission-message"
-             class="additional-submission-info">
-          <i class="fas fa-star bonus-icon"></i>
-          This submission used one of your bonus submissions.
-        </div>
-        <div v-if="is_group_member && does_not_count_for_current_user"
-             id="does-not-count-for-user-message"
-             class="additional-submission-info">
-          <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
-          Since you ran out of late days, this submission will
-          <span class="does-not-count">NOT</span> count towards your final grade.
-        </div>
-
-        <div v-if="!is_group_member && submission.does_not_count_for.length"
-             class="additional-submission-info">
-          <div id="does-not-count-for-label">
-            This submission does <span class="does-not-count">NOT</span> count
-            for the following users:
-          </div>
-          <div id="list-of-group-members-submission-does-not-count-for">
-            <div v-for="(username, index) of submission.does_not_count_for"
-                 :class="['single-user-submission-does-not-count-for',
-                          {'last-username-in-list':
-                           index === submission.does_not_count_for.length - 1}]">
-              <span class="list-icon">
-                <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
-              </span>
-              <span class="username">{{username}}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="submitted-files">
-          <div v-for="filename of submission.submitted_filenames"
-               class="submitted-file">
-            <a class="open-file"
-               :class="{'current-file': current_filename === filename}"
-               @click="view_file(filename)">{{filename}}</a>
-            <i class="cursor-pointer fa fa-file-download download-file-icon"
-               @click="download_file(filename)">
-            </i>
-          </div>
-        </div>
-
-        <button v-if="is_group_member && (submission.status === GradingStatus.received
-                      || submission.status === GradingStatus.queued)"
-                id="remove-submission-from-queue-button"
-                @click="d_show_remove_submission_from_queue_modal = true">
-          Remove from queue
-        </button>
-
-        <div id="view-file-container" v-if="current_filename !== null">
-          <view-file :filename="current_filename"
-                     :file_contents="current_file_contents"
-                     :progress="load_contents_progress"
-                     view_file_max_height="50vh"></view-file>
-        </div>
-
-        <div v-if="d_globals.user_roles.is_staff
-                   && submission.status !== GradingStatus.removed_from_queue"
-             id="adjust-feedback-section">
-          <span id="adjust-feedback-label"> Adjust Feedback </span>
-          <select id="adjust-feedback-select"
-                  class="select"
-                  v-model="d_fdbk_category"
-                  :disabled="d_loading_results"
-                  @change="load_results()">
-            <option v-if="d_globals.user_roles.is_admin || is_group_member"
-                    ref="normal_feedback_option"
-                    :value="FeedbackCategory.normal">
-              Normal
-            </option>
-            <option v-if="d_globals.user_roles.is_admin || is_group_member"
-                    ref="past_limit_feedback_option"
-                    :value="FeedbackCategory.past_limit_submission">
-              Past Limit
-            </option>
-            <option ref="ultimate_submission_feedback_option"
-                    :value="FeedbackCategory.ultimate_submission">
-              Final Graded
-            </option>
-            <option ref="staff_viewer_feedback_option"
-                    :value="FeedbackCategory.staff_viewer">
-              Student Lookup
-            </option>
-            <option v-if="d_globals.user_roles.is_admin || is_group_member"
-                    ref="max_feedback_option"
-                    :value="FeedbackCategory.max">
-              Max
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <mutation-suite-results
-        ref="mutation_suite_results"
-        v-if="submission_result.student_test_suite_results.length"
-        :submission="submission"
-        :mutation_test_suite_results="submission_result.student_test_suite_results"
-        :fdbk_category="d_fdbk_category">
-      </mutation-suite-results>
-
-      <div v-for="(ag_test_suite_result, index) of submission_result.ag_test_suite_results"
-           ref="ag_test_suite_results">
-        <AGTestSuiteResult :submission="submission"
-                           :key="ag_test_suite_result.pk"
-                           :ag_test_suite_result="ag_test_suite_result"
-                           :fdbk_category="d_fdbk_category"
-                           :is_first_suite="index === 0">
-        </AGTestSuiteResult>
-      </div>
-
+    <div id="submitted-by"> Submitted by:
+      <span id="submitter">{{submission.submitter}}</span>
+      on <span id="submission-timestamp">{{format_datetime(submission.timestamp)}}</span>
     </div>
+
+    <div v-if="show_score"
+          id="submission-score"> Score:
+      <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
+    </div>
+    <div v-else-if="submission.status === GradingStatus.waiting_for_deferred"
+          id="deferred-tests-message" class="grading-status">
+      Score hidden. Core tests finished. You can submit again now!
+    </div>
+    <div v-else-if="submission.status === GradingStatus.finished_grading"
+          id="deferred-tests-message" class="grading-status">
+      Score hidden. All tests finished.
+    </div>
+
+    <div v-if="show_auto_update_msg"
+          id="auto-update-message">
+      This page will update automatically.
+    </div>
+
+    <div v-if="submission.status !== GradingStatus.waiting_for_deferred
+                && submission.status !== GradingStatus.finished_grading"
+          id="grading-status-section"
+          class="grading-status">
+      <div v-if="submission.status === GradingStatus.received">
+        We got your submission! It should be queued soon.
+      </div>
+      <div v-else-if="submission.status === GradingStatus.queued">
+        <i class="queued-symbol">Q</i>
+        Your submission is at position {{submission.position_in_queue}} in the queue.
+      </div>
+      <div v-else-if="submission.status === GradingStatus.being_graded">
+        <i class="fas fa-list being-graded-symbol"></i>
+        Your submission is being graded!
+      </div>
+      <div v-else-if="submission.status === GradingStatus.removed_from_queue">
+        <i class="fas fa-eject removed-symbol"></i>
+        You removed this submission from the queue. That means it won't be graded,
+        and it won't count towards your daily submission limit.
+      </div>
+      <div v-else-if="submission.status === GradingStatus.error">
+        <i class="fas fa-skull error-symbol"></i>
+        An unexpected error occurred while grading your submission.
+        This submission will not count towards your daily limit.
+        Please wait a few minutes and try your submission again.
+        If the problem persists, please contact <b>help@autograder.io</b> and include
+        the information <b>"Submission ID: {{submission.pk}}"</b> in your email.
+      </div>
+    </div>
+
+    <div v-if="submission.is_bonus_submission"
+          id="is-bonus-submission-message"
+          class="additional-submission-info">
+      <i class="fas fa-star bonus-icon"></i>
+      This submission used one of your bonus submissions.
+    </div>
+
+    <div v-if="does_not_count_for_current_user"
+         id="does-not-count-for-user-message"
+         class="additional-submission-info">
+      <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
+      Since you ran out of late days, this submission will
+      <span class="does-not-count">NOT</span> count towards your final grade.
+    </div>
+    <div v-else-if="submission_with_results.does_not_count_for.length"
+         class="additional-submission-info">
+      <div id="does-not-count-for-label">
+        This submission does <span class="does-not-count">NOT</span> count
+        for the following users:
+      </div>
+      <div id="does-not-count-for-list">
+        <div v-for="(username, index) of submission.does_not_count_for"
+              :class="['single-user-submission-does-not-count-for',
+                      {'last-username-in-list':
+                        index === submission.does_not_count_for.length - 1}]">
+          <span class="list-icon">
+            <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
+          </span>
+          <span class="username">{{username}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="submitted-files">
+      <div v-for="filename of submission.submitted_filenames"
+            class="submitted-file">
+        <a class="open-file-link"
+            :class="{'current-file': current_filename === filename}"
+            @click="view_file(filename)">{{filename}}</a>
+        <i class="cursor-pointer fa fa-file-download download-file-icon"
+            @click="download_file(filename)">
+        </i>
+      </div>
+    </div>
+
+    <button v-if="is_group_member
+                  && (submission_with_results.status === GradingStatus.received
+                      || submission_with_results.status === GradingStatus.queued)"
+            id="remove-submission-from-queue-button"
+            @click="d_show_remove_submission_from_queue_modal = true">
+      Remove from queue
+    </button>
+
+    <div id="view-file-container" v-if="current_filename !== null">
+      <view-file :filename="current_filename"
+                  :file_contents="current_file_contents"
+                  :progress="load_contents_progress"
+                  view_file_max_height="50vh"></view-file>
+    </div>
+
+    <div v-if="d_globals.user_roles.is_staff
+                && submission_with_results.status !== GradingStatus.removed_from_queue"
+          id="adjust-feedback-section">
+      <span id="adjust-feedback-label"> Adjust Feedback </span>
+      <select id="adjust-feedback-select"
+              class="select"
+              :disabled="d_loading_results"
+              @change="load_adjusted_fdbk($event.target.value)">
+        <option v-if="d_globals.user_roles.is_admin || is_group_member"
+                ref="normal_feedback_option"
+                :value="FeedbackCategory.normal">
+          Normal
+        </option>
+        <option v-if="d_globals.user_roles.is_admin || is_group_member"
+                ref="past_limit_feedback_option"
+                :value="FeedbackCategory.past_limit_submission">
+          Past Limit
+        </option>
+        <option ref="ultimate_submission_feedback_option"
+                :value="FeedbackCategory.ultimate_submission">
+          Final Graded
+        </option>
+        <option ref="staff_viewer_feedback_option"
+                :value="FeedbackCategory.staff_viewer">
+          Student Lookup
+        </option>
+        <option v-if="d_globals.user_roles.is_admin || is_group_member"
+                ref="max_feedback_option"
+                :value="FeedbackCategory.max">
+          Max
+        </option>
+      </select>
+    </div>
+
+    <mutation-suite-results
+      ref="mutation_suite_results"
+      v-if="submission_result.student_test_suite_results.length"
+      :submission="submission"
+      :mutation_test_suite_results="submission_result.student_test_suite_results"
+      :fdbk_category="feedback_category">
+    </mutation-suite-results>
+
+    <AGSuiteResult
+      v-for="(ag_test_suite_result, index) of submission_result.ag_test_suite_results"
+      :key="ag_test_suite_result.pk"
+      :submission="submission"
+      :ag_test_suite_result="ag_test_suite_result"
+      :fdbk_category="feedback_category"
+      :is_first_suite="index === 0"
+    ></AGSuiteResult>
 
     <modal v-if="d_show_remove_submission_from_queue_modal"
            @close="d_show_remove_submission_from_queue_modal = false"
@@ -242,9 +221,9 @@ import * as FileSaver from 'file-saver';
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import Modal from '@/components/modal.vue';
-import AGTestSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
+import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
-import MutationSuiteResults from "@/components/project_view/submission_detail/mutation_suite_results.vue";
+import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 import ViewFile from '@/components/view_file.vue';
 import { OpenFilesMixin } from '@/open_files_mixin';
@@ -253,7 +232,7 @@ import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 @Component({
   components: {
     APIErrors,
-    AGTestSuiteResult,
+    AGSuiteResult,
     Modal,
     MutationSuiteResults,
     ResultPanel,
@@ -282,24 +261,19 @@ export default class SubmissionDetail extends OpenFilesMixin {
   on_selected_submission_change(new_value: SubmissionWithResults,
                                 old_value: SubmissionWithResults) {
     this.d_submission_fdbk_override = null;
-    this.d_fdbk_category = this.determine_feedback_type();
+    this.d_fdbk_category_override = null;
   }
 
   d_submission_fdbk_override: null | SubmissionResultFeedback = null;
+  d_fdbk_category_override: FeedbackCategory | null = null;
   d_show_remove_submission_from_queue_modal = false;
   d_loading_results = false;
   d_removing_from_queue = false;
-  d_fdbk_category: FeedbackCategory | null = null;
 
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly FeedbackCategory = FeedbackCategory;
   readonly GradingStatus = GradingStatus;
   readonly format_datetime = format_datetime;
-
-  created() {
-    this.d_submission_fdbk_override = this.submission_with_results.results;
-    this.d_fdbk_category = this.determine_feedback_type();
-  }
 
   get submission() {
     return new Submission(this.submission_with_results);
@@ -310,14 +284,18 @@ export default class SubmissionDetail extends OpenFilesMixin {
         ? this.submission_with_results.results : this.d_submission_fdbk_override;
   }
 
-  get show_score() {
+  private get show_score() {
     return (this.submission.status === GradingStatus.waiting_for_deferred
             || this.submission.status === GradingStatus.finished_grading)
            && this.submission_result !== null
            && this.submission_result.total_points_possible !== 0;
   }
 
-  determine_feedback_type(): FeedbackCategory {
+  get feedback_category(): FeedbackCategory {
+    if (this.d_fdbk_category_override !== null) {
+      return this.d_fdbk_category_override;
+    }
+
     if (this.d_globals.user_roles!.is_staff) {
       if (this.is_group_member
           || (this.is_ultimate_submission && this.d_globals.user_roles!.is_admin)) {
@@ -334,7 +312,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
     return FeedbackCategory.normal;
   }
 
-  get show_auto_update_msg() {
+  private get show_auto_update_msg() {
     return (this.submission!.status === GradingStatus.received
             || this.submission!.status === GradingStatus.queued
             || this.submission!.status === GradingStatus.being_graded)
@@ -342,39 +320,40 @@ export default class SubmissionDetail extends OpenFilesMixin {
                 && this.submission.status === GradingStatus.waiting_for_deferred);
   }
 
-  load_results() {
+  private load_adjusted_fdbk(fdbk_category: FeedbackCategory) {
     return toggle(this, 'd_loading_results', async () => {
       this.d_submission_fdbk_override = await get_submission_result(
-        this.submission!.pk, this.d_fdbk_category!
+        this.submission!.pk, fdbk_category
       );
+      this.d_fdbk_category_override = fdbk_category;
     });
   }
 
-  get does_not_count_for_current_user() {
+  private get does_not_count_for_current_user() {
     return this.submission!.does_not_count_for.findIndex(
         username => username === this.d_globals.current_user!.username
     ) !== -1;
   }
 
-  get is_group_member() {
+  private get is_group_member() {
     return this.group.member_names.findIndex(
         member_name => member_name === this.d_globals.current_user!.username
     ) !== -1;
   }
 
-  view_file(filename: string) {
+  private view_file(filename: string) {
     this.open_file(
       filename,
       (progress_callback) => this.submission!.get_file_content(filename, progress_callback)
     );
   }
 
-  async download_file(filename: string) {
+  private async download_file(filename: string) {
     FileSaver.saveAs(new File([await this.submission!.get_file_content(filename)], filename));
   }
 
   @handle_api_errors_async(handle_remove_submission_from_queue_error)
-  remove_submission_from_queue() {
+  private remove_submission_from_queue() {
     return toggle(this, 'd_removing_from_queue', async () => {
       await this.submission!.remove_from_queue();
       this.d_show_remove_submission_from_queue_modal = false;
@@ -384,7 +363,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
 
 export function handle_remove_submission_from_queue_error(component: SubmissionDetail,
                                                           error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -472,20 +451,20 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 
 .submitted-file {
   padding: 4px 0;
+  color: $ocean-blue;
 }
 
-.open-file {
-  color: $ocean-blue;
+.open-file-link {
   cursor: pointer;
 }
 
 .current-file {
   color: black;
+  cursor: default;
 }
 
 .download-file-icon {
   padding: 0 10px;
-  color: $navy-blue;
   cursor: pointer;
 }
 
@@ -572,7 +551,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   padding: 0 0 5px 0;
 }
 
-#list-of-group-members-submission-does-not-count-for {
+#does-not-count-for-list {
   padding: 4px 0 0 0;
   display: inline-block;
   vertical-align: top;

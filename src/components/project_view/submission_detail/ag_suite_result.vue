@@ -1,6 +1,5 @@
 <template>
-  <div id="ag-suite-result"
-       class="suite-result">
+  <div class="suite-result">
 
     <div id="ag-test-suite-name">{{ag_test_suite_result.ag_test_suite_name}}</div>
     <div class="ag-test-case-results-header">

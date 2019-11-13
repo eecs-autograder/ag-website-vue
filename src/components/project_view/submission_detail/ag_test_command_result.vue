@@ -1,5 +1,5 @@
 <template>
-  <div id="ag-command-result">
+  <div>
     <fieldset v-if="show_correctness_fieldset" class="fieldset">
       <legend class="legend"> Correctness </legend>
 
