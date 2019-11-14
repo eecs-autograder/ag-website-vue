@@ -53,7 +53,7 @@ describe('MultiFileViewer.vue', () => {
         await component.$nextTick();
 
         let view_file_component = wrapper.find({ref: 'view_file_component'});
-        let view_file_wrapper = view_file_component.find('#view-file-component');
+        let view_file_wrapper = view_file_component.find('.view-file-component');
 
         expect(view_file_wrapper.element.style.height).toEqual(height_of_view_file_in);
     });
@@ -459,14 +459,14 @@ describe('MultiFileViewer.vue', () => {
         component.add_to_viewing('banana.cpp', Promise.resolve('Old banana'));
         await component.$nextTick();
 
-        expect(wrapper.find('#viewing-container').text()).toContain("Old banana");
+        expect(wrapper.find('.viewing-container').text()).toContain("Old banana");
         expect(component.files_currently_viewing.length).toEqual(1);
         expect(component.active_tab_index).toEqual(0);
 
         component.update_contents_by_name('banana.cpp', Promise.resolve('New banana'));
         await component.$nextTick();
 
-        expect(wrapper.find('#viewing-container').text()).toContain("New banana");
+        expect(wrapper.find('.viewing-container').text()).toContain("New banana");
         expect(component.files_currently_viewing.length).toEqual(1);
         expect(component.active_tab_index).toEqual(0);
     });
@@ -477,14 +477,14 @@ describe('MultiFileViewer.vue', () => {
         component.add_to_viewing('banana.cpp', Promise.resolve('Old banana'));
         await component.$nextTick();
 
-        expect(wrapper.find('#viewing-container').text()).toContain("Old banana");
+        expect(wrapper.find('.viewing-container').text()).toContain("Old banana");
         expect(component.files_currently_viewing.length).toEqual(1);
         expect(component.active_tab_index).toEqual(0);
 
         component.update_contents_by_name('bananas.cpp', Promise.resolve('New banana'));
         await component.$nextTick();
 
-        expect(wrapper.find('#viewing-container').text()).toContain("Old banana");
+        expect(wrapper.find('.viewing-container').text()).toContain("Old banana");
         expect(component.files_currently_viewing.length).toEqual(1);
         expect(component.active_tab_index).toEqual(0);
     });
