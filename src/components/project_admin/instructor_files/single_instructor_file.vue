@@ -63,12 +63,7 @@
       </modal>
     </div>
 
-    <div v-if="d_downloading" class="download-overlay">
-      <i v-if="d_download_progress === null" class="fa fa-spinner fa-pulse"></i>
-      <progress-bar v-else
-                    class="download-progress"
-                    :progress="d_download_progress"></progress-bar>
-    </div>
+    <progress-overlay v-if="d_downloading" :progress="d_download_progress"></progress-overlay>
   </div>
 </template>
 
@@ -80,7 +75,7 @@ import * as FileSaver from 'file-saver';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import ProgressBar from '@/components/progress_bar.vue';
+import ProgressOverlay from '@/components/progress_overlay.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
@@ -90,7 +85,7 @@ import { is_not_empty } from '@/validators';
   components: {
     APIErrors,
     Modal,
-    ProgressBar,
+    ProgressOverlay,
     ValidatedForm,
     ValidatedInput
   }
@@ -233,33 +228,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   display: block;
   color: hsl(220, 20%, 65%);
   font-size: 15px;
-}
-
-.download-overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  cursor: default;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, .5);
-
-  .fa-spinner {
-    color: white;
-    font-size: 50px;
-  }
-
-  .download-progress {
-    background-color: white;
-    width: 75%;
-    border: none;
-  }
 }
 
 /* ---------------- MODAL ---------------- */
