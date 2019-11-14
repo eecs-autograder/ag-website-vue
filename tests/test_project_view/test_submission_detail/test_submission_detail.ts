@@ -272,11 +272,13 @@ describe('Submitted files tests', () => {
 
         let wrapper = make_wrapper();
 
-        let get_file_content_stub = sinon.stub(wrapper.vm.submission!, 'get_file_content').returns(
-            Promise.resolve(
-                "File b contents"
-            )
-        );
+        let get_file_content_stub = sinon.stub(
+            wrapper.vm.submission!, 'get_file_content'
+        ).withArgs('file_b').callsFake((filename, on_download_progress) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
+            return Promise.resolve("File b contents");
+        });
 
         let middle_file = wrapper.findAll('.submitted-file').at(1);
         middle_file.find('.download-file-icon').trigger('click');

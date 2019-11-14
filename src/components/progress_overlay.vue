@@ -18,7 +18,7 @@ import ProgressBar from '@/components/progress_bar.vue';
   }
 })
 export default class  extends Vue {
-  @Prop({required: true, type: Number})
+  @Prop({default: null, type: Number})
   progress!: number | null;
 }
 </script>
@@ -26,6 +26,7 @@ export default class  extends Vue {
 <style scoped lang="scss">
 
 .progress-overlay {
+  z-index: 10;
   position: fixed;
   top: 0;
   bottom: 0;

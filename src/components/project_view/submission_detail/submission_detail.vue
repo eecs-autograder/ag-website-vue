@@ -98,6 +98,8 @@
       </div>
     </div>
 
+    <progress-overlay v-if="d_downloading_file" :progress="d_download_progress"></progress-overlay>
+
     <button v-if="is_group_member
                   && (submission_with_results.status === GradingStatus.received
                       || submission_with_results.status === GradingStatus.queued)"
@@ -221,6 +223,7 @@ import * as FileSaver from 'file-saver';
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import Modal from '@/components/modal.vue';
+import ProgressOverlay from '@/components/progress_overlay.vue';
 import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
@@ -235,6 +238,7 @@ import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
     AGSuiteResult,
     Modal,
     MutationSuiteResults,
+    ProgressOverlay,
     ResultPanel,
     ViewFile,
   }
@@ -269,6 +273,8 @@ export default class SubmissionDetail extends OpenFilesMixin {
   d_show_remove_submission_from_queue_modal = false;
   d_loading_results = false;
   d_removing_from_queue = false;
+  d_downloading_file = false;
+  d_download_progress: number | null = null;
 
   readonly CorrectnessLevel = CorrectnessLevel;
   readonly FeedbackCategory = FeedbackCategory;
@@ -348,8 +354,15 @@ export default class SubmissionDetail extends OpenFilesMixin {
     );
   }
 
-  private async download_file(filename: string) {
-    FileSaver.saveAs(new File([await this.submission!.get_file_content(filename)], filename));
+  private download_file(filename: string) {
+    return toggle(this, 'd_downloading_file', async () => {
+      let content = this.submission!.get_file_content(filename, (event) => {
+        if (event.lengthComputable) {
+          this.d_download_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      });
+      FileSaver.saveAs(new File([await content], filename));
+    });
   }
 
   @handle_api_errors_async(handle_remove_submission_from_queue_error)
