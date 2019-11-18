@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     container_name: ag-vue-dev-nginx
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
 
