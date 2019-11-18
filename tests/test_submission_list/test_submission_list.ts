@@ -23,6 +23,7 @@ let get_submission_result_stub: sinon.SinonStub;
 
 beforeEach(() => {
     user = data_ut.make_user();
+    data_ut.set_global_current_user(user);
 
     course = data_ut.make_course();
     project = data_ut.make_project(course.pk);
@@ -231,6 +232,7 @@ describe('Submission list tests', () => {
 
         expect(wrapper.vm.d_submissions).toEqual([new_submission_with_results, submission]);
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.vm.d_selected_submission).toEqual(new_submission_with_results);
     });
 
     test('update_submission_changed', async () => {

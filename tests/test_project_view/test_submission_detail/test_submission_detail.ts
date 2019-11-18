@@ -57,7 +57,7 @@ beforeEach(() => {
 describe('SubmissionDetail tests', () => {
     test('Submitted by', () => {
         let wrapper = make_wrapper();
-        expect(wrapper.vm.submission!.submitter).toEqual(user.username);
+        expect(wrapper.vm.submission.submitter).toEqual(user.username);
         expect(wrapper.find('#submitter').text()).toEqual(user.username);
     });
 
@@ -236,19 +236,15 @@ describe('Score and status display tests', () => {
 });
 
 describe('Submitted files tests', () => {
-    test('submitted files are listed', async () => {
-        submission_with_results = data_ut.make_submission_with_results(
-            group,
-            {
-                submitted_filenames: [
-                    "file_a",
-                    "file_b",
-                    "file_c"
-                ]
-            }
-        );
-        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
+    beforeEach(() => {
+        submission_with_results.submitted_filenames = [
+            "file_a",
+            "file_b",
+            "file_c"
+        ];
+    });
 
+    test('submitted files are listed', async () => {
         let wrapper = make_wrapper();
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
@@ -258,22 +254,10 @@ describe('Submitted files tests', () => {
     });
 
     test('downloading a file', async () => {
-        submission_with_results = data_ut.make_submission_with_results(
-            group,
-            {
-                submitted_filenames: [
-                    "file_a",
-                    "file_b",
-                    "file_c"
-                ]
-            }
-        );
-        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
-
         let wrapper = make_wrapper();
 
         let get_file_content_stub = sinon.stub(
-            wrapper.vm.submission!, 'get_file_content'
+            wrapper.vm.submission, 'get_file_content'
         ).withArgs('file_b').callsFake((filename, on_download_progress) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
@@ -289,24 +273,12 @@ describe('Submitted files tests', () => {
     });
 
     test('viewing a file', async () => {
-        submission_with_results = data_ut.make_submission_with_results(
-            group,
-            {
-                submitted_filenames: [
-                    "file_a",
-                    "file_b",
-                    "file_c"
-                ]
-            }
-        );
-        get_submission_result_stub.returns(Promise.resolve(submission_with_results.results));
-
         let wrapper = make_wrapper();
 
         expect(wrapper.findAll('.submitted-file').length).toEqual(3);
 
         let get_file_content_stub = sinon.stub(
-            wrapper.vm.submission!, 'get_file_content'
+            wrapper.vm.submission, 'get_file_content'
         ).callsFake((filename, callback) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             callback!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 15});
@@ -342,7 +314,7 @@ describe('Adjust feedback tests', () => {
 
         let wrapper = make_wrapper();
 
-        expect(wrapper.vm.submission!.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
+        expect(wrapper.vm.submission.status).toEqual(ag_cli.GradingStatus.removed_from_queue);
         expect(wrapper.find('#adjust-feedback-section').exists()).toBe(false);
     });
 
@@ -437,19 +409,51 @@ describe('Adjust feedback tests', () => {
     });
 
     test('submission_with_results Watcher', async () => {
-        let another_submission_with_results = data_ut.make_submission_with_results(group);
+        let filename = 'i_am_file.txt';
+        let first_content = 'content 1';
+        let second_content = 'content 2';
+        submission_with_results.submitted_filenames = [filename];
+        let another_submission_with_results = data_ut.make_submission_with_results(
+            group, {submitted_filenames: [filename]});
 
         let wrapper = make_wrapper();
+        // We'll open a file to make sure it gets closed when the watched
+        // submission changes.
+        sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(first_content);
+        let submitted_files = wrapper.findAll('.submitted-file');
+        submitted_files.at(0).find('.open-file-link').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.current_filename).toEqual(filename);
+        expect(await wrapper.vm.current_file_contents).toEqual(first_content);
+
         wrapper.vm.d_submission_fdbk_override = submission_with_results.results;
         wrapper.vm.d_fdbk_category_override = ag_cli.FeedbackCategory.max;
 
-        expect(wrapper.vm.submission).toEqual(new ag_cli.Submission(submission_with_results));
+        // Mocking get_file_content messes up this check, so we just check
+        // the SubmissionData fields.
+        expect(
+            new ag_cli.SubmissionData(wrapper.vm.submission)
+        ).toEqual(new ag_cli.SubmissionData(submission_with_results));
         expect(wrapper.vm.submission_result).toEqual(submission_with_results.results);
         expect(get_submission_result_stub.callCount).toEqual(0);
 
         wrapper.setProps({submission_with_results: another_submission_with_results});
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_fdbk_category_override).toBeNull();
         expect(wrapper.vm.d_submission_fdbk_override).toBeNull();
+        expect(wrapper.vm.current_filename).toEqual(null);
+        expect(
+            new ag_cli.SubmissionData(wrapper.vm.submission)
+        ).toEqual(new ag_cli.SubmissionData(another_submission_with_results));
+
+        // The file contents should be re-requested, even though the file has
+        // the same name. This will indicate that the stored file data was
+        // cleared.
+        sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(second_content);
+        submitted_files.at(0).find('.open-file-link').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.current_filename).toEqual(filename);
+        expect(await wrapper.vm.current_file_contents).toEqual(second_content);
     });
 
     test('Submission feedback override', async () => {
@@ -553,7 +557,7 @@ describe('Remove from queue tests', async () => {
 
         let wrapper = make_wrapper();
         let remove_submission_from_queue_stub = sinon.stub(
-            wrapper.vm.submission!, 'remove_from_queue');
+            wrapper.vm.submission, 'remove_from_queue');
 
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
 
@@ -576,7 +580,7 @@ describe('Remove from queue tests', async () => {
         let wrapper = make_wrapper();
 
         let remove_submission_from_queue_stub = sinon.stub(
-            wrapper.vm.submission!, 'remove_from_queue'
+            wrapper.vm.submission, 'remove_from_queue'
         ).rejects(
             new ag_cli.HttpError(400, {__all__: "This submission is not currently queued"})
         );

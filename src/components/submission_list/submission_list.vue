@@ -280,6 +280,11 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
       ...JSON.parse(JSON.stringify(submission))
     };
     this.d_submissions.unshift(submission_with_empty_results);
+    // Future proofing: we only want to switch to the new submission
+    // if it was made by the current user.
+    if (submission.submitter === this.d_globals.current_user.username) {
+      this.d_selected_submission = submission_with_empty_results;
+    }
   }
 
   update_submission_changed(submission: Submission): void {

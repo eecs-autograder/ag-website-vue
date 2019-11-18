@@ -43,6 +43,12 @@ export class OpenFilesMixin extends Vue {
         this.d_open_files = new_open_files;
     }
 
+    close_all_files() {
+        this.d_open_files = new SafeMap();
+        this.d_current_filename = null;
+        this.d_load_contents_progress = null;
+    }
+
     rename_file(current_name: string, new_name: string) {
         let content = this.d_open_files.get(current_name, Promise.resolve(''));
         this.d_open_files.delete(current_name);
