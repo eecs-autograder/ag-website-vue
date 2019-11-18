@@ -31,7 +31,11 @@ beforeEach(() => {
 
     get_file_stub = sinon.stub(
         ag_cli.HandgradingResult, 'get_file_from_handgrading_result'
-    ).withArgs(group.pk, filename).resolves(content);
+    ).withArgs(group.pk, filename).callsFake((group_pk, file, on_download_progress) => {
+        // tslint:disable-next-line: no-object-literal-type-assertion
+        on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 8});
+        return Promise.resolve(content);
+    });
 
     wrapper = managed_mount(FilePanel, {
         propsData: {

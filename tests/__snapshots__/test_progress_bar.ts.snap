@@ -2,70 +2,106 @@
 
 exports[`Progress bar tests Partial progress 1`] = `
 <div
-  id="total-progress"
+  class="total-progress"
 >
   <div
-    id="completed-progress"
+    class="completed-progress"
     style="width: 51%;"
+  />
+   
+  <div
+    class="progress-text"
   >
-    <div
-      id="progress-text"
-    >
-      51%
-    </div>
+    51%
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests Progress > 100% custom slot 1`] = `
+<div
+  class="total-progress"
+>
+  <div
+    class="completed-progress fully-round"
+    style="width: 100%;"
+  />
+   
+  <div
+    class="progress-text"
+  >
+    Finishing request
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests Progress > 100% default slot 1`] = `
+<div
+  class="total-progress"
+>
+  <div
+    class="completed-progress fully-round"
+    style="width: 100%;"
+  />
+   
+  <div
+    class="progress-text"
+  >
+    
+        Please wait...
+      
   </div>
 </div>
 `;
 
 exports[`Progress bar tests Progress 0 1`] = `
 <div
-  id="total-progress"
+  class="total-progress"
 >
   <div
-    id="completed-progress"
+    class="completed-progress"
     style="width: 0%;"
+  />
+   
+  <div
+    class="progress-text"
   >
-    <div
-      id="progress-text"
-    >
-      0%
-    </div>
+    0%
   </div>
 </div>
 `;
 
 exports[`Progress bar tests Progress 100% custom slot 1`] = `
 <div
-  id="total-progress"
+  class="total-progress"
 >
   <div
-    id="completed-progress"
+    class="completed-progress fully-round"
     style="width: 100%;"
+  />
+   
+  <div
+    class="progress-text"
   >
-    <div
-      id="progress-text"
-    >
-      Finishing request
-    </div>
+    Finishing request
   </div>
 </div>
 `;
 
 exports[`Progress bar tests Progress 100% default slot 1`] = `
 <div
-  id="total-progress"
+  class="total-progress"
 >
   <div
-    id="completed-progress"
+    class="completed-progress fully-round"
     style="width: 100%;"
+  />
+   
+  <div
+    class="progress-text"
   >
-    <div
-      id="progress-text"
-    >
+    
+        Please wait...
       
-          Please wait...
-        
-    </div>
   </div>
 </div>
 `;

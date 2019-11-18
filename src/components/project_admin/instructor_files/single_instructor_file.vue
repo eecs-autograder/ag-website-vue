@@ -62,6 +62,8 @@
         </div>
       </modal>
     </div>
+
+    <progress-overlay v-if="d_downloading" :progress="d_download_progress"></progress-overlay>
   </div>
 </template>
 
@@ -73,15 +75,17 @@ import * as FileSaver from 'file-saver';
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
+import ProgressOverlay from '@/components/progress_overlay.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { format_datetime, handle_api_errors_async } from '@/utils';
+import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
     APIErrors,
     Modal,
+    ProgressOverlay,
     ValidatedForm,
     ValidatedInput
   }
@@ -100,6 +104,9 @@ export default class SingleInstructorFile extends Vue {
   new_name_is_valid = true;
   d_show_delete_instructor_file_modal = false;
 
+  d_download_progress: number | null = null;
+  d_downloading = false;
+
   @handle_api_errors_async(handle_rename_file_error)
   async rename_file() {
     if (this.new_file_name !== this.file.name) {
@@ -112,8 +119,16 @@ export default class SingleInstructorFile extends Vue {
     this.editing = false;
   }
 
-  async download_file() {
-    FileSaver.saveAs(new File([await this.file.get_content()], this.file.name));
+  download_file() {
+    return toggle(this, 'd_downloading', async () => {
+      let file_content = this.file.get_content((event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_download_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      });
+      FileSaver.saveAs(new File([await file_content], this.file.name));
+      this.d_download_progress = null;
+    });
   }
 
   async delete_file_permanently() {
@@ -152,7 +167,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 }
 
 .icon-holder {
-  // display: inline-block;
   padding-top: 2px;
 }
 
@@ -160,7 +174,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   display: flex;
 
   .file-name {
-    // max-width: 200px;
     font-size: 16px;
     padding-bottom: 2px;
   }

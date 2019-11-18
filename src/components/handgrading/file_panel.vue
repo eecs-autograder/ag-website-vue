@@ -8,6 +8,7 @@
       <view-file v-if="d_content !== null"
                  :filename="filename"
                  :file_contents="d_content"
+                 :progress="d_progress"
                  :handgrading_result="handgrading_result"
                  :enable_custom_comments="enable_custom_comments"
                  :readonly_handgrading_results="readonly_handgrading_results"></view-file>
@@ -45,6 +46,7 @@ export default class FilePanel extends Vue {
   d_is_open = false;
 
   d_content: Promise<string> | null = null;
+  d_progress: number | null = null;
 
   toggle_open() {
     let top = this.$el.getBoundingClientRect().top;
@@ -52,7 +54,13 @@ export default class FilePanel extends Vue {
     this.d_is_open = !this.d_is_open;
     if (this.d_content === null) {
       this.d_content = HandgradingResult.get_file_from_handgrading_result(
-        this.handgrading_result.group, this.filename);
+        this.handgrading_result.group, this.filename,
+        (event: ProgressEvent) => {
+          if (event.lengthComputable) {
+            this.d_progress = 100 * (1.0 * event.loaded / event.total);
+          }
+        }
+      );
     }
 
     // This prevents any open files below this one from being pushed

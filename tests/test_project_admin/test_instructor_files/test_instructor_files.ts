@@ -1,8 +1,9 @@
 import { config, mount, Wrapper, WrapperArray } from '@vue/test-utils';
 
-import { InstructorFile, Project } from 'ag-client-typescript';
+import { HttpError, InstructorFile, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
+import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import ViewFile from '@/components/view_file.vue';
@@ -98,6 +99,11 @@ describe('InstructorFiles.vue', () => {
 
     test('Uploading file with same name as an existing instructor file', async () => {
         let set_content_stub = sinon.stub(instructor_file_1, 'set_content');
+        set_content_stub.callsFake((content, on_upload_progress) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 10});
+            return Promise.resolve();
+        });
 
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
@@ -130,7 +136,11 @@ describe('InstructorFiles.vue', () => {
         file_upload_component.d_files.insert(uniquely_named_file);
 
         let create_stub = sinon.stub(InstructorFile, 'create');
-        create_stub.resolves(new_uniquely_named_instructor_file);
+        create_stub.callsFake((project_pk, name, content, on_upload_progress) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 10});
+            return Promise.resolve(new_uniquely_named_instructor_file);
+        });
 
         final_upload_button.trigger('click');
         await wrapper.vm.$nextTick();
@@ -145,8 +155,30 @@ describe('InstructorFiles.vue', () => {
         // project_admin.vue listens for created instructor files
     });
 
+    test('Error uploading instructor file', async () => {
+        let final_upload_button = wrapper.find('.upload-files-button');
+        file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
+        file_upload_component.d_files.insert(uniquely_named_file);
+
+        sinon.stub(InstructorFile, 'create').rejects(
+            new HttpError(413, 'Too large'));
+
+        final_upload_button.trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
+    });
+
     test('Viewing a file', async () => {
-        let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content').resolves("Monday");
+        let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content').callsFake(
+            (on_upload_progress) => {
+                // tslint:disable-next-line: no-object-literal-type-assertion
+                on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
+                return Promise.resolve('Monday');
+            }
+        );
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -172,6 +204,26 @@ describe('InstructorFiles.vue', () => {
         expect(get_content_stub_1.calledOnce).toBe(true);
     });
 
+    test('Rename opened file', async () => {
+        let expected_content = 'I am contenttt';
+        sinon.stub(instructor_file_1, 'get_content').resolves(expected_content);
+        let renamed = new InstructorFile(instructor_file_1);
+        renamed.name = 'Renamed';
+
+        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
+        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
+        expect(await view_file.vm.file_contents).toEqual(expected_content);
+
+        InstructorFile.notify_instructor_file_renamed(renamed, instructor_file_1.name);
+        await wrapper.vm.$nextTick();
+
+        expect(view_file.vm.filename).toEqual(renamed.name);
+        expect(await view_file.vm.file_contents).toEqual(expected_content);
+    });
+
     test('Deleting a file removes it from the list of instructor files', async () => {
         let delete_stub = sinon.stub(instructor_file_1, 'delete');
         delete_stub.callsFake(
@@ -190,11 +242,17 @@ describe('InstructorFiles.vue', () => {
     });
 
     test('Instructor file deleted while being viewed', async () => {
-        sinon.stub(instructor_file_1, 'get_content').resolves("File 1 Content");
+        let get_content_stub = sinon.stub(
+            instructor_file_1, 'get_content'
+        ).callsFake((callback) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            callback!(<ProgressEvent> {lengthComputable: true, loaded: 10, total: 20});
+            return Promise.resolve("File 1 Content");
+        });
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_current_filename).toBe(instructor_file_1.name);
+        expect(wrapper.vm.current_filename).toBe(instructor_file_1.name);
 
         sinon.stub(instructor_file_1, 'delete').callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1)
@@ -207,8 +265,15 @@ describe('InstructorFiles.vue', () => {
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_current_filename).toBeNull();
-        expect(wrapper.vm.d_open_files.has(instructor_file_1.name)).toBe(false);
+        expect(wrapper.vm.current_filename).toBeNull();
+
+        // If we re-add the file and open it, get_content should be called again because
+        // the cached contents should have been cleared.
+        expect(get_content_stub.calledOnce).toBe(true);
+        InstructorFile.notify_instructor_file_created(instructor_file_1);
+        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(get_content_stub.calledTwice).toBe(true);
     });
 
     test('Open/close the sidebar', async () => {

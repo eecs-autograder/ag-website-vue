@@ -1,14 +1,23 @@
 version: '3'
 
 services:
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    container_name: ag-vue-dev-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+
   website:
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile-website-dev
     container_name: ag-vue-dev-website
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     volumes:
       - ./src:/usr/src/app/src
       - ./tests:/usr/src/app/tests
@@ -23,9 +32,11 @@ services:
     container_name: ag-vue-dev-django
     expose:
       - "8001"
+    ports:
+      - "9001:8001"
     volumes:
       - ./autograder-server:/usr/src/app
-    command: python3 /usr/src/app/manage.py runserver django:8001
+    command: /usr/local/bin/uwsgi --py-autoreload 1 --ini /usr/src/app/uwsgi/uwsgi.ini
     env_file:
       - ./autograder-server/_dev.env
     environment:
@@ -100,7 +111,6 @@ services:
     volumes:
       - ./autograder-server:/usr/src/app
     command: /usr/local/bin/celery worker --beat -c 1 -A autograder -l info -Q periodic_tasks -n periodic_tasks@%h
-
 
    # environment:
    #  AG_SUBMISSION_LISTENER_INTERVAL: 5

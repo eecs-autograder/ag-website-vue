@@ -296,8 +296,9 @@ describe('InstructorFileObserver tests', () => {
     });
 
     test('Instructor file renamed', () => {
+        let old_name = instructor_files[0].name;
         instructor_files[0].name = 'file4';
-        InstructorFile.notify_instructor_file_renamed(instructor_files[0]);
+        InstructorFile.notify_instructor_file_renamed(instructor_files[0], old_name);
         expect(wrapper.vm.project!.instructor_files).toEqual([
             instructor_files[1],
             instructor_files[2],

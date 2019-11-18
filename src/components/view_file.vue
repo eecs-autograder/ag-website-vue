@@ -1,10 +1,17 @@
 <template>
-  <div id="view-file-component"
+  <div class="view-file-component"
        :style="{height: view_file_height, max_height: view_file_max_height}">
-    <div v-if="d_loading" class="loading-spinner">
-      <div><i class="fa fa-spinner fa-pulse"></i></div>
+    <div v-if="d_loading" class="loading-container">
+      <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
+      <i v-else class="loading-spinner fa fa-spinner fa-pulse"></i>
     </div>
-    <table v-else id="viewing-container" :class="{'saving': d_saving}">
+    <div v-else-if="file_is_large && !d_show_anyway" class="large-file-message">
+      <div class="text">This file is very large ({{d_file_contents.length}} bytes)</div>
+      <button type="button" class="orange-button" @click="d_show_anyway = true">
+        Click here to display its contents
+      </button>
+    </div>
+    <table v-else class="viewing-container" :class="{'saving': d_saving}">
       <template v-for="(line, index) of d_file_contents.split('\n')">
         <tr :class="{'commented-line': line_in_comment(index),
                      'hovered-comment-line': d_hovered_comment !== null
@@ -108,6 +115,7 @@ import {
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
+import ProgressBar from '@/components/progress_bar.vue';
 import { Created } from '@/lifecycle';
 import { SafeMap } from '@/safe_map';
 import { chain, toggle } from '@/utils';
@@ -122,6 +130,7 @@ import {
     ContextMenu,
     ContextMenuItem,
     Modal,
+    ProgressBar,
   }
 })
 export default class ViewFile extends Vue implements Created {
@@ -131,6 +140,16 @@ export default class ViewFile extends Vue implements Created {
 
   @Prop({required: true, type: Promise})
   file_contents!: Promise<string>;
+
+  // A number from 0 to 100 that will be displayed as
+  // the progress in loading file_contents.
+  @Prop({default: null, type: Number})
+  progress!: number | null;
+
+  // If the file is larger than this number, the user will be prompted before
+  // it's displayed.
+  @Prop({default: Math.pow(10, 6), type: Number})
+  display_size_threshold!: number;
 
   @Prop({default: "", type: String})
   view_file_height!: string;
@@ -142,6 +161,7 @@ export default class ViewFile extends Vue implements Created {
   d_file_contents: string = "";
   d_loading = true;
   d_saving = false;
+  d_show_anyway = false;
 
   // If null, the component will behave normally (no handgrading).
   // When this field is non-null, handgrading functionality will be made available.
@@ -179,6 +199,7 @@ export default class ViewFile extends Vue implements Created {
   @Watch('file_contents')
   async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {
     this.d_loading = true;
+    this.d_show_anyway = false;
     this.d_file_contents = await new_content;
     this.d_loading = false;
   }
@@ -186,6 +207,10 @@ export default class ViewFile extends Vue implements Created {
   @Watch('filename')
   on_filename_change(new_file_name: string, old_file_name: string) {
     this.d_filename = new_file_name;
+  }
+
+  get file_is_large() {
+    return this.d_file_contents.length > this.display_size_threshold;
   }
 
   get handgrading_enabled() {
@@ -341,14 +366,29 @@ table {
   border-spacing: 0;
 }
 
-#view-file-component {
+.view-file-component {
   overflow-y: auto;
 }
 
-#viewing-container {
+.viewing-container {
   font-family: monospace;
-  padding: 5px 0 0 0;
+  padding: 5px 0;
   width: 100%;
+}
+
+.large-file-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px;
+
+  .text {
+    font-size: 20px;
+  }
+
+  .button {
+    margin-top: 8px;
+  }
 }
 
 .saving:hover {
@@ -375,13 +415,17 @@ table {
   word-wrap: break-word;
 }
 
+.loading-container {
+  margin: 15px;
+  overflow: hidden;
+}
+
 .loading-spinner {
-  color: mediumvioletred;
+  color: $pebble-dark;
   font-size: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 90%;
 }
 
 $light-green: hsl(97, 42%, 79%);

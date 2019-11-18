@@ -139,7 +139,11 @@ describe('SingleInstructorFile tests', () => {
 
     test('Users have the ability to download a file', async () => {
         let get_content_stub = sinon.stub(file_1, 'get_content');
-        get_content_stub.resolves("File Contents");
+        get_content_stub.callsFake((on_download_progress) => {
+            // tslint:disable-next-line: no-object-literal-type-assertion
+            on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
+            return Promise.resolve('File Contents');
+        });
 
         wrapper.find('.download-file').trigger('click');
         await component.$nextTick();

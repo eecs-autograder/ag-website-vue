@@ -46,7 +46,9 @@
         </tr>
       </tbody>
     </table>
-    <button class="upload-files-button green-button" @click="attempt_to_upload()">
+    <button class="upload-files-button green-button"
+            @click="attempt_to_upload()"
+            :disabled="disable_upload_button">
       <slot name="upload_button_text">Upload</slot>
     </button>
 
@@ -84,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { ArraySet } from '@/array_set';
 import Modal from '@/components/modal.vue';
@@ -102,6 +104,9 @@ function name_less(first: HasName, second: HasName) {
   components: { Modal }
 })
 export default class FileUpload extends Vue {
+  @Prop({default: false, type: Boolean})
+  disable_upload_button!: boolean;
+
   d_files: ArraySet<File, HasName> = new ArraySet<File, HasName>([], {less_func: name_less});
   d_empty_filenames: ArraySet<string> = new ArraySet<string>([]);
   d_show_empty_files_found_in_upload_attempt_modal = false;
