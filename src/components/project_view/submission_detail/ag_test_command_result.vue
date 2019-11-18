@@ -228,8 +228,6 @@ export default class AGTestCommandResult extends Vue {
 
   d_stdout_content: Promise<string> | null = null;
   d_stderr_content: Promise<string> | null = null;
-  d_stdout_content_progress: number | null = null;
-  d_stderr_content_progress: number | null = null;
   d_stdout_diff: string[] | null = null;
   d_stderr_diff: string[] | null = null;
   d_stdout_content_loaded = false;

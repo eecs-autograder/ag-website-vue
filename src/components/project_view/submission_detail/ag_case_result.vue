@@ -10,17 +10,17 @@
           :correctness_level="command_result_correctness(ag_test_command_result)"
           :is_command="true">
           <AGTestCommandResult :submission="submission"
-                            :ag_test_command_result="ag_test_command_result"
-                            :fdbk_category="fdbk_category">
+                               :ag_test_command_result="ag_test_command_result"
+                               :fdbk_category="fdbk_category">
           </AGTestCommandResult>
         </result-panel>
       </div>
     </template>
     <template v-else>
       <AGTestCommandResult ref="ag_command_result"
-                       :submission="submission"
-                       :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
-                       :fdbk_category="fdbk_category">
+                           :submission="submission"
+                           :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
+                           :fdbk_category="fdbk_category">
       </AGTestCommandResult>
     </template>
   </div>

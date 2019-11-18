@@ -64,15 +64,6 @@ export class OpenFilesMixin extends Vue {
         return this.d_load_contents_progress;
     }
 
-    // IDEA????? How to reconcile the "current file" behavion of this class with
-    // having stdout/stderr open at the same time in other places?
-    // We might need a different mixin for that case?
-    // private set_progress_dict_key(key: string, progress: number | null) {
-    //     let new_dict = new SafeMap(this.d_file_progress_dict);
-    //     new_dict.set(key, progress);
-    //     this.d_file_progress_dict = new_dict;
-    // }
-
     get current_filename() {
         return this.d_current_filename;
     }
