@@ -122,7 +122,9 @@ export default class SingleInstructorFile extends Vue {
   download_file() {
     return toggle(this, 'd_downloading', async () => {
       let file_content = this.file.get_content((event: ProgressEvent) => {
-          this.d_download_progress = 100 * (1.0 * event.loaded / this.file.size);
+        if (event.lengthComputable) {
+          this.d_download_progress = 100 * (1.0 * event.loaded / event.total);
+        }
       });
       FileSaver.saveAs(new File([await file_content], this.file.name));
       this.d_download_progress = null;

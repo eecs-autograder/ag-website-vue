@@ -9,6 +9,8 @@
       <progress-bar :progress="d_upload_progress"></progress-bar>
     </div>
 
+    <APIErrors ref="api_errors"></APIErrors>
+
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
@@ -43,18 +45,20 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
+import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
-import { array_get_unique, array_has_unique, array_remove_unique, toggle } from '@/utils';
+import { array_get_unique, array_has_unique, array_remove_unique, handle_api_errors_async, toggle } from '@/utils';
 
 import SingleInstructorFile from './single_instructor_file.vue';
 
 @Component({
   components: {
+    APIErrors,
     FileUpload,
     MultiFileViewer,
     ProgressBar,
@@ -89,7 +93,9 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     this.open_file(file.name, (progress_callback) => file.get_content(progress_callback));
   }
 
+  @handle_api_errors_async(handle_file_upload_errors)
   add_instructor_files(files: File[]) {
+    (<APIErrors> this.$refs.api_errors).clear();
     return toggle(this, 'd_uploading', async () => {
       for (let file of files) {
         let file_already_exists = array_has_unique(
@@ -138,6 +144,10 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   }
 
   update_instructor_file_created(instructor_file: InstructorFile) {}
+}
+
+function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
+  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 
 </script>

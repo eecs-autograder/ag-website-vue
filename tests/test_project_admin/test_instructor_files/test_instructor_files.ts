@@ -1,8 +1,9 @@
 import { config, mount, Wrapper, WrapperArray } from '@vue/test-utils';
 
-import { InstructorFile, Project } from 'ag-client-typescript';
+import { HttpError, InstructorFile, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
+import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import ViewFile from '@/components/view_file.vue';
@@ -152,6 +153,22 @@ describe('InstructorFiles.vue', () => {
         )).toBe(true);
 
         // project_admin.vue listens for created instructor files
+    });
+
+    test('Error uploading instructor file', async () => {
+        let final_upload_button = wrapper.find('.upload-files-button');
+        file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
+        file_upload_component.d_files.insert(uniquely_named_file);
+
+        sinon.stub(InstructorFile, 'create').rejects(
+            new HttpError(413, 'Too large'));
+
+        final_upload_button.trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
     });
 
     test('Viewing a file', async () => {
