@@ -296,6 +296,28 @@ describe('AGSuiteSettings tests', () => {
         expect(component.d_ag_test_suite!.allow_network_access).toEqual(true);
     });
 
+    test('Read-only instructor files binding', () => {
+        let read_only_checkbox = wrapper.find('#read-only-instructor-files');
+        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(true);
+
+        read_only_checkbox.setChecked(false);
+        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(false);
+
+        read_only_checkbox.setChecked(true);
+        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(true);
+
+        read_only_checkbox.setChecked(false);
+        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(false);
+
+        expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
+
+        component.d_ag_test_suite!.read_only_instructor_files = true;
+        expect(checkbox_is_checked(read_only_checkbox)).toEqual(true);
+
+        component.d_ag_test_suite!.read_only_instructor_files = false;
+        expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
+    });
+
     test('Adding an instructor file', async () => {
         let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
             {ref: 'instructor_files_typeahead'}

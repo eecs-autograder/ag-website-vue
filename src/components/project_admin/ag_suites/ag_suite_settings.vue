@@ -16,18 +16,18 @@
                             v-model="d_ag_test_suite.name"
                             :validators="[is_not_empty]">
           </validated-input>
-        </div>
 
-        <div class="checkbox-input-container checkbox-container">
-          <input id="synchronous-or-deferred"
-                 type="checkbox"
-                 class="checkbox"
-                 :checked="!d_ag_test_suite.deferred"
-                 @change="d_ag_test_suite.deferred = !$event.target.checked"/>
-          <label class="checkbox-label"
-                  for="synchronous-or-deferred">
-            Suite must finish before students can submit again
-          </label>
+          <div class="checkbox-input-container">
+            <input id="synchronous-or-deferred"
+                  type="checkbox"
+                  class="checkbox"
+                  :checked="!d_ag_test_suite.deferred"
+                  @change="d_ag_test_suite.deferred = !$event.target.checked"/>
+            <label class="checkbox-label"
+                    for="synchronous-or-deferred">
+              Suite must finish before students can submit again
+            </label>
+          </div>
         </div>
 
         <fieldset class="fieldset">
@@ -70,6 +70,16 @@
             </toggle>
           </div>
 
+          <div class="checkbox-input-container">
+            <input id="read-only-instructor-files"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_suite.read_only_instructor_files"/>
+            <label class="checkbox-label"
+                   for="read-only-instructor-files">
+              Instructor files are read-only
+            </label>
+          </div>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -485,11 +495,17 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 }
 
 #ag-test-suite-name-container {
-  padding: 10px 14px 22px 14px;
+  padding: 10px 14px;
+
+  .checkbox-input-container {
+    padding: 15px 0 5px;
+  }
 }
 
-.checkbox-container {
-  padding: 0 14px 22px 14px;
+.checkbox-input-container {
+  // padding: 0 14px 22px 14px;
+  padding-top: 0;
+  padding-left: 0;
 }
 
 .sandbox-container {
