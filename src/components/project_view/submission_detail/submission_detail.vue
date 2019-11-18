@@ -266,6 +266,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
                                 old_value: SubmissionWithResults) {
     this.d_submission_fdbk_override = null;
     this.d_fdbk_category_override = null;
+    this.close_all_files();
   }
 
   d_submission_fdbk_override: null | SubmissionResultFeedback = null;
@@ -312,16 +313,16 @@ export default class SubmissionDetail extends OpenFilesMixin {
     if (this.is_ultimate_submission) {
       return FeedbackCategory.ultimate_submission;
     }
-    if (this.submission!.is_past_daily_limit) {
+    if (this.submission.is_past_daily_limit) {
       return FeedbackCategory.past_limit_submission;
     }
     return FeedbackCategory.normal;
   }
 
   private get show_auto_update_msg() {
-    return (this.submission!.status === GradingStatus.received
-            || this.submission!.status === GradingStatus.queued
-            || this.submission!.status === GradingStatus.being_graded)
+    return (this.submission.status === GradingStatus.received
+            || this.submission.status === GradingStatus.queued
+            || this.submission.status === GradingStatus.being_graded)
             || (this.d_globals.user_roles.is_staff
                 && this.submission.status === GradingStatus.waiting_for_deferred);
   }
@@ -329,14 +330,14 @@ export default class SubmissionDetail extends OpenFilesMixin {
   private load_adjusted_fdbk(fdbk_category: FeedbackCategory) {
     return toggle(this, 'd_loading_results', async () => {
       this.d_submission_fdbk_override = await get_submission_result(
-        this.submission!.pk, fdbk_category
+        this.submission.pk, fdbk_category
       );
       this.d_fdbk_category_override = fdbk_category;
     });
   }
 
   private get does_not_count_for_current_user() {
-    return this.submission!.does_not_count_for.findIndex(
+    return this.submission.does_not_count_for.findIndex(
         username => username === this.d_globals.current_user!.username
     ) !== -1;
   }
@@ -350,13 +351,13 @@ export default class SubmissionDetail extends OpenFilesMixin {
   private view_file(filename: string) {
     this.open_file(
       filename,
-      (progress_callback) => this.submission!.get_file_content(filename, progress_callback)
+      (progress_callback) => this.submission.get_file_content(filename, progress_callback)
     );
   }
 
   private download_file(filename: string) {
     return toggle(this, 'd_downloading_file', async () => {
-      let content = this.submission!.get_file_content(filename, (event) => {
+      let content = this.submission.get_file_content(filename, (event) => {
         if (event.lengthComputable) {
           this.d_download_progress = 100 * (1.0 * event.loaded / event.total);
         }
@@ -368,7 +369,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
   @handle_api_errors_async(handle_remove_submission_from_queue_error)
   private remove_submission_from_queue() {
     return toggle(this, 'd_removing_from_queue', async () => {
-      await this.submission!.remove_from_queue();
+      await this.submission.remove_from_queue();
       this.d_show_remove_submission_from_queue_modal = false;
     });
   }
