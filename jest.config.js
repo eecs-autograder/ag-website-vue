@@ -22,7 +22,7 @@ module.exports = {
     roots: [
         "tests"
     ],
-    testRegex: "(test_.*)|(test_.*\\.ts)$",
+    testRegex: "^(test_.*)|(test_.*\\.ts)$",
     testPathIgnorePatterns: ["/node_modules/", "/__snapshots__/"],
     testURL: 'http://localhost/',
 

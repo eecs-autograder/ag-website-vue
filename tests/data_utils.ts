@@ -487,7 +487,7 @@ export function make_ag_test_command_result_feedback(
         ag_test_command_pk: ag_test_command_pk,
         ag_test_command_name: `AG Test Command ${ag_test_command_pk}`,
         fdbk_settings: make_ag_test_command_fdbk_config(),
-        timed_out: false,
+        timed_out: null,
         return_code_correct: null,
         expected_return_code: null,
         actual_return_code: null,

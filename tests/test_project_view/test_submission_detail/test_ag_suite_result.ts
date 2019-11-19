@@ -100,8 +100,7 @@ describe('case_result_correctness tests', () => {
         wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
     });
 
-    test('case_result_correctness - return_code_correctness === not_available ' +
-         'AND output_correctness === not_available',
+    test('return_code_correctness === not_available AND output_correctness === not_available',
          async () => {
         check_all_case_correctness_levels(wrapper,
                                           ag_test_case_result,
@@ -110,8 +109,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.not_available);
     });
 
-    test('case_result_correctness - return_code_correctness === not_available ' +
-         'AND output_correctness === info_only',
+    test('return_code_correctness === not_available AND output_correctness === info_only',
          async () => {
         ag_test_case_result.ag_test_command_results[2].stdout_points_possible = 0;
         ag_test_case_result.ag_test_command_results[2].stderr_points_possible = 0;
@@ -124,8 +122,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.info_only);
     });
 
-    test('case_result_correctness - return_code_correctness === not_available ' +
-         'AND output_correctness === none_correct',
+    test('return_code_correctness === not_available AND output_correctness === none_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, null, false, false);
         set_command_result_correctness(ag_test_command_2_result, null, false, false);
@@ -138,8 +135,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.none_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === not_available ' +
-         'AND output_correctness === some_correct',
+    test('return_code_correctness === not_available AND output_correctness === some_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, null, true, true);
         set_command_result_correctness(ag_test_command_2_result, null, false, false);
@@ -152,8 +148,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === not_available ' +
-         'AND output_correctness === all_correct',
+    test('return_code_correctness === not_available AND output_correctness === all_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, null, true, true);
         set_command_result_correctness(ag_test_command_2_result, null, true, true);
@@ -166,10 +161,9 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.all_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === info_only ' +
-         'AND output_correctness === not_available',
+    test('return_code_correctness === info_only AND output_correctness === not_available',
          async () => {
-        ag_test_command_1_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_1_result.actual_return_code = 5;
 
         check_all_case_correctness_levels(wrapper,
                                           ag_test_case_result,
@@ -178,10 +172,9 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.info_only);
     });
 
-    test('case_result_correctness - return_code_correctness === info_only ' +
-         'AND output_correctness === info_only',
+    test('return_code_correctness === info_only AND output_correctness === info_only',
          async () => {
-        ag_test_command_1_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_1_result.actual_return_code = 5;
 
         ag_test_command_3_result.stdout_points_possible = 0;
         ag_test_command_3_result.stderr_points_possible = 0;
@@ -194,14 +187,13 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.info_only);
     });
 
-    test('case_result_correctness - return_code_correctness === info_only ' +
-         'AND output_correctness === none_correct',
+    test('return_code_correctness === info_only AND output_correctness === none_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, null, false, false);
         set_command_result_correctness(ag_test_command_2_result, null, false, false);
         set_command_result_correctness(ag_test_command_3_result, null, false, false);
 
-        ag_test_command_2_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_2_result.actual_return_code = 5;
 
         check_all_case_correctness_levels(wrapper,
                                           ag_test_case_result,
@@ -210,14 +202,13 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.none_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === info_only ' +
-         'AND output_correctness === some_correct',
+    test('return_code_correctness === info_only AND output_correctness === some_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, null, false, true);
         set_command_result_correctness(ag_test_command_2_result, null, true, true);
         set_command_result_correctness(ag_test_command_3_result, null, null, false);
 
-        ag_test_command_2_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_2_result.actual_return_code = 5;
 
         check_all_case_correctness_levels(wrapper,
                                           ag_test_case_result,
@@ -226,14 +217,13 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === info_only ' +
-         'AND output_correctness === all_correct',
+    test('return_code_correctness === info_only AND output_correctness === all_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, null, true, true);
         set_command_result_correctness(ag_test_command_2_result, null, null, true);
         set_command_result_correctness(ag_test_command_3_result, null, true, null);
 
-        ag_test_command_3_result.fdbk_settings.show_actual_return_code = true;
+        ag_test_command_3_result.actual_return_code = 5;
 
         check_all_case_correctness_levels(wrapper,
                                           ag_test_case_result,
@@ -242,8 +232,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.all_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === none_correct ' +
-         'AND output_correctness === not_available',
+    test('return_code_correctness === none_correct AND output_correctness === not_available',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, null, null);
         set_command_result_correctness(ag_test_command_2_result, false, null, null);
@@ -256,8 +245,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.none_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === none_correct ' +
-         'AND output_correctness === info_only',
+    test('return_code_correctness === none_correct AND output_correctness === info_only',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, null, null);
         set_command_result_correctness(ag_test_command_2_result, false, null, null);
@@ -274,8 +262,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.none_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === none_correct ' +
-         'AND output_correctness === none_correct',
+    test('return_code_correctness === none_correct AND output_correctness === none_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, false, null);
         set_command_result_correctness(ag_test_command_2_result, false, null, false);
@@ -288,8 +275,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.none_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === none_correct ' +
-         'AND output_correctness === some_correct',
+    test('return_code_correctness === none_correct AND output_correctness === some_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, false, null);
         set_command_result_correctness(ag_test_command_2_result, false, null, true);
@@ -302,8 +288,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === none_correct ' +
-         'AND output_correctness === all_correct',
+    test('return_code_correctness === none_correct AND output_correctness === all_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, true, true);
         set_command_result_correctness(ag_test_command_2_result, false, true, true);
@@ -316,8 +301,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === some_correct ' +
-         'AND output_correctness === not_available',
+    test('return_code_correctness === some_correct AND output_correctness === not_available',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, null, null);
         set_command_result_correctness(ag_test_command_2_result, true, null, null);
@@ -330,8 +314,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === some_correct ' +
-         'AND output_correctness === info_only',
+    test('return_code_correctness === some_correct AND output_correctness === info_only',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, null, null);
         set_command_result_correctness(ag_test_command_2_result, true, null, null);
@@ -348,8 +331,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === some_correct ' +
-         'AND output_correctness === none_correct',
+    test('return_code_correctness === some_correct AND output_correctness === none_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, false, false);
         set_command_result_correctness(ag_test_command_2_result, true, null, null);
@@ -362,8 +344,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === some_correct ' +
-         'AND output_correctness === some_correct',
+    test('return_code_correctness === some_correct AND output_correctness === some_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, null, null);
         set_command_result_correctness(ag_test_command_2_result, true, true, null);
@@ -376,8 +357,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === some_correct ' +
-         'AND output_correctness === all_correct',
+    test('return_code_correctness === some_correct AND output_correctness === all_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, false, true, null);
         set_command_result_correctness(ag_test_command_2_result, true, true, true);
@@ -390,8 +370,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === all_correct ' +
-         'AND output_correctness === not_available',
+    test('return_code_correctness === all_correct AND output_correctness === not_available',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, true, null, null);
         set_command_result_correctness(ag_test_command_2_result, true, null, null);
@@ -404,8 +383,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.all_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === all_correct ' +
-         'AND output_correctness === info_only',
+    test('return_code_correctness === all_correct AND output_correctness === info_only',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, true, null, null);
         set_command_result_correctness(ag_test_command_2_result, true, null, null);
@@ -422,8 +400,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.all_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === all_correct ' +
-         'AND output_correctness === none_correct',
+    test('return_code_correctness === all_correct AND output_correctness === none_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, true, false, false);
         set_command_result_correctness(ag_test_command_2_result, true, false, false);
@@ -436,8 +413,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === all_correct ' +
-         'AND output_correctness === some_correct',
+    test('return_code_correctness === all_correct AND output_correctness === some_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, true, true, false);
         set_command_result_correctness(ag_test_command_2_result, true, false, true);
@@ -450,8 +426,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.some_correct);
     });
 
-    test('case_result_correctness - return_code_correctness === all_correct ' +
-         'AND output_correctness === all_correct',
+    test('return_code_correctness === all_correct AND output_correctness === all_correct',
          async () => {
         set_command_result_correctness(ag_test_command_1_result, true, true, true);
         set_command_result_correctness(ag_test_command_2_result, true, true, true);
@@ -464,8 +439,7 @@ describe('case_result_correctness tests', () => {
                                           CorrectnessLevel.all_correct);
     });
 
-    test('case_result_correctness - total_points === 0 && total_points_possible !== 0',
-         async () => {
+    test('total_points === 0 && total_points_possible !== 0', async () => {
         set_command_result_correctness(ag_test_command_1_result, false, true, true);
         set_command_result_correctness(ag_test_command_2_result, false, true, true);
         set_command_result_correctness(ag_test_command_3_result, true, true, true);
@@ -485,35 +459,44 @@ describe('case_result_return_code_correctness tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
     beforeEach(() => {
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-    });
-
-    test('case_result_return_code_correctness - all commands have return_code_correct === null',
-         async () => {
         expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBeNull();
         expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBeNull();
         expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBeNull();
 
+        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
+    });
+
+    test('all commands have return_code_correct === null', async () => {
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.not_available
         );
     });
 
-    test('case_result_return_code_correctness - all commands have return_code_correct === null -' +
+    test('all commands have return_code_correct === null -' +
          ' at least one command has show_actual_return_code === true',
          async () => {
-        ag_test_case_result.ag_test_command_results[1].fdbk_settings.show_actual_return_code = true;
-
-        expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBeNull();
-        expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBeNull();
+        ag_test_case_result.ag_test_command_results[1].actual_return_code = 2;
 
         expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
             CorrectnessLevel.info_only
         );
     });
 
-    test('case_result_return_code_correctness - all commands have return_code_correct === true',
+    test('all return_code_corrects null, one timed_out_false', async () => {
+        ag_test_case_result.ag_test_command_results[1].timed_out = false;
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.not_available
+        );
+    });
+
+    test('All return_code_corrects null, one timed_out true', async () => {
+        ag_test_case_result.ag_test_command_results[1].timed_out = true;
+        expect(wrapper.vm.case_result_return_code_correctness(ag_test_case_result)).toEqual(
+            CorrectnessLevel.info_only
+        );
+    });
+
+    test('all commands have return_code_correct === true',
          async () => {
         ag_test_command_1_result.return_code_correct = true;
         expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBe(true);
@@ -529,7 +512,7 @@ describe('case_result_return_code_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - at least one command has return_code_correct ' +
+    test('at least one command has return_code_correct ' +
          '=== true, the rest have return_code_correct === null',
          async () => {
         ag_test_command_1_result.return_code_correct = true;
@@ -545,7 +528,7 @@ describe('case_result_return_code_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - at least one command has ' +
+    test('at least one command has ' +
          'return_code_correct === true and at least one command has return_code_correct ' +
          '=== false',
          async () => {
@@ -562,7 +545,7 @@ describe('case_result_return_code_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - all commands have return_code_correct ' +
+    test('all commands have return_code_correct ' +
          '=== false',
          async () => {
         ag_test_command_1_result.return_code_correct = false;
@@ -579,7 +562,7 @@ describe('case_result_return_code_correctness tests', () => {
         );
     });
 
-    test('case_result_return_code_correctness - at least one command has ' +
+    test('at least one command has ' +
          'return_code_correct === false and no command has return_code_correct === true',
          async () => {
         ag_test_command_1_result.return_code_correct = false;

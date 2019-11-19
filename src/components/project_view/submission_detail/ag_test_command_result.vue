@@ -1,104 +1,97 @@
 <template>
   <div>
-    <fieldset v-if="show_correctness_fieldset" class="fieldset">
+    <fieldset ref="correctness" v-if="show_correctness_fieldset" class="fieldset">
       <legend class="legend"> Correctness </legend>
 
-      <div id="exit-status-section">
-        <div class="feedback-row"
-             id="return-code-correctness-section"
-             v-if="ag_test_command_result.return_code_correct !== null">
-          <div class="feedback-label"> Exit status:
-          </div>
-          <div class="feedback">
-            <div class="correctness-output">
-              <span v-if="ag_test_command_result.timed_out !== null
-                          && this.ag_test_command_result.timed_out">
-                <i class="far fa-clock timed-out-icon"></i>
-                <span class="timed-out-msg"> (Timed out) </span>
-              </span>
-              <span v-else-if="ag_test_command_result.return_code_correct !== null
-                               && ag_test_command_result.return_code_correct">
-                <i class="fas fa-check correct-icon"></i>
-              </span>
-              <span v-else-if="ag_test_command_result !== null
-                               && !ag_test_command_result.return_code_correct">
-                <i class="fas fa-times incorrect-icon"></i>
-              </span>
-            </div>
+      <div class="feedback-row"
+            ref="return_code_correctness"
+            v-if="ag_test_command_result.return_code_correct !== null
+                  || ag_test_command_result.timed_out">
+        <div class="feedback-label">Exit status:</div>
+        <div class="feedback">
+          <div class="correctness-output">
+            <span v-if="ag_test_command_result.timed_out !== null
+                        && this.ag_test_command_result.timed_out">
+              <i class="far fa-clock timed-out-icon"></i>
+              <span class="timed-out-msg"> (Timed out) </span>
+            </span>
+            <span v-else-if="ag_test_command_result.return_code_correct !== null">
+              <i v-if="ag_test_command_result.return_code_correct"
+                  class="fas fa-check correct-icon"></i>
+              <i v-else class="fas fa-times incorrect-icon"></i>
+            </span>
           </div>
         </div>
+      </div>
 
-        <div v-if="show_actual_and_expected_return_code"
-             id="actual-and-expected-return-code-section">
-          <div v-if="ag_test_command_result.actual_return_code !== null"
-               class="feedback-row"
-               id="actual-return-code-section">
-            <div class="feedback-label"> Actual exit status: </div>
-            <div class="feedback">
-              <div :class="['short-output',
-                            {'actual-return-code-correct': ag_test_command_result !== null
-                              && ag_test_command_result.return_code_correct,
-                             'actual-return-code-incorrect': ag_test_command_result !== null
-                              && !ag_test_command_result.return_code_correct}]"
-                   id="actual-return-code">{{ag_test_command_result.actual_return_code}}</div>
-            </div>
-          </div>
+      <div v-if="ag_test_command_result.actual_return_code !== null"
+            class="feedback-row"
+            ref="actual_return_code">
+        <div class="feedback-label">Actual exit status:</div>
+        <div class="feedback">
+          <div :class="['short-output',
+                        {'actual-return-code-correct': ag_test_command_result !== null
+                          && ag_test_command_result.return_code_correct,
+                          'actual-return-code-incorrect': ag_test_command_result !== null
+                          && !ag_test_command_result.return_code_correct}]"
+          >{{ag_test_command_result.actual_return_code}}</div>
+        </div>
+      </div>
 
-          <div v-if="ag_test_command_result.expected_return_code !== null
-                     && ag_test_command_result.expected_return_code
-                     !== ExpectedReturnCode.none"
-               class="feedback-row"
-               id="expected-return-code-section">
-            <div class="feedback-label"> Expected exit status: </div>
-            <div class="feedback">
-              <div class="short-output"
-                   id="expected-return-code">{{
-                ag_test_command_result.expected_return_code === ExpectedReturnCode.zero
-                ? 0 : 'nonzero'}}</div>
-            </div>
+      <div v-if="ag_test_command_result.expected_return_code !== null
+                 && ag_test_command_result.expected_return_code !== ExpectedReturnCode.none"
+            class="feedback-row"
+            ref="expected_return_code">
+        <div class="feedback-label"> Expected exit status: </div>
+        <div class="feedback">
+          <div class="short-output">
+            {{ag_test_command_result.expected_return_code === ExpectedReturnCode.zero
+              ? 0 : 'nonzero'}}
           </div>
         </div>
+      </div>
 
-        <div v-if="ag_test_command_result.stdout_correct !== null"
-             id="stdout-correctness-section"
-             class="feedback-row">
-          <div class="feedback-label"> Output: </div>
-          <div class="feedback">
-            <div class="correctness-output">
-              <span v-if="ag_test_command_result.stdout_correct">
-                <i class="fas fa-check correct-icon"></i>
-              </span>
-              <span v-else>
-                <i class="fas fa-times incorrect-icon"></i>
-              </span>
-            </div>
+      <div v-if="ag_test_command_result.stdout_correct !== null"
+            ref="stdout_correctness"
+            class="feedback-row">
+        <div class="feedback-label"> Output: </div>
+        <div class="feedback">
+          <div class="correctness-output">
+            <span v-if="ag_test_command_result.stdout_correct">
+              <i class="fas fa-check correct-icon"></i>
+            </span>
+            <span v-else>
+              <i class="fas fa-times incorrect-icon"></i>
+            </span>
           </div>
         </div>
+      </div>
 
-        <div v-if="ag_test_command_result.stderr_correct !== null"
-             id="stderr-correctness-section"
-             class="feedback-row">
-          <div class="feedback-label"> Error output: </div>
-          <div class="feedback">
-            <div class="correctness-output">
-              <span v-if="ag_test_command_result.stderr_correct">
-                <i class="fas fa-check correct-icon"></i>
-              </span>
-              <span v-else>
-                <i class="fas fa-times incorrect-icon"></i>
-              </span>
-            </div>
+      <div v-if="ag_test_command_result.stderr_correct !== null"
+            ref="stderr_correctness"
+            class="feedback-row">
+        <div class="feedback-label"> Error output: </div>
+        <div class="feedback">
+          <div class="correctness-output">
+            <span v-if="ag_test_command_result.stderr_correct">
+              <i class="fas fa-check correct-icon"></i>
+            </span>
+            <span v-else>
+              <i class="fas fa-times incorrect-icon"></i>
+            </span>
           </div>
         </div>
       </div>
     </fieldset>
 
-    <fieldset v-if="show_stdout_diff || show_stderr_diff"
-              class="fieldset">
+    <fieldset v-if="d_output_size !== null
+                    && (d_output_size.stdout_diff_size !== null
+                        || d_output_size.stderr_diff_size !== null)"
+              class="fieldset"
+              ref="diffs">
       <legend class="legend"> Output Diffs </legend>
 
       <div v-if="show_stdout_diff"
-           id="stdout-diff-section"
            class="feedback-row">
         <template v-if="!d_stdout_diff_loaded">
           <div class="loading-output">
@@ -119,7 +112,6 @@
       </div>
 
       <div v-if="show_stderr_diff"
-           id="stderr-diff-section"
            class="feedback-row">
         <template v-if="!d_stderr_diff_loaded">
           <div class="loading-output">
@@ -140,11 +132,13 @@
       </div>
     </fieldset>
 
-    <fieldset v-if="ag_test_command_result.fdbk_settings.show_actual_stdout
-                    || ag_test_command_result.fdbk_settings.show_actual_stderr"
-              class="fieldset">
+    <fieldset v-if="d_output_size !== null &&
+                    (d_output_size.stdout_size !== null || d_output_size.stderr_size !== null)"
+              class="fieldset"
+              ref="actual_output">
       <legend class="legend"> Actual Output </legend>
-      <div v-if="ag_test_command_result.fdbk_settings.show_actual_stdout"
+
+      <div v-if="d_output_size.stdout_size !== null"
            id="actual-stdout-section"
            class="feedback-row">
         <div class="feedback-label"> Output: </div>
@@ -161,13 +155,14 @@
             <div v-else
                  class="lengthy-output">
               <view-file :file_contents="d_stdout_content"
-                         view_file_max_height="50vh"></view-file>
+                         view_file_max_height="50vh"
+                         ref="stdout"></view-file>
             </div>
           </template>
         </div>
       </div>
 
-      <div v-if="ag_test_command_result.fdbk_settings.show_actual_stderr"
+      <div v-if="d_output_size.stderr_size !== null"
            id="actual-stderr-section"
            class="feedback-row">
         <div class="feedback-label"> Error output: </div>
@@ -184,7 +179,8 @@
             <div v-else
                  class="lengthy-output">
               <view-file :file_contents="d_stderr_content"
-                         view_file_max_height="50vh"></view-file>
+                         view_file_max_height="50vh"
+                         ref="stderr"></view-file>
             </div>
           </template>
         </div>
@@ -269,30 +265,26 @@ export default class AGTestCommandResult extends Vue {
     return this.ag_test_command_result.return_code_correct !== null
            || (this.ag_test_command_result.timed_out !== null
                && this.ag_test_command_result.timed_out!)
-           || this.show_actual_and_expected_return_code
+           || this.ag_test_command_result.actual_return_code !== null
            || this.ag_test_command_result.stdout_correct !== null
            || this.ag_test_command_result.stderr_correct !== null;
   }
 
-  get show_actual_and_expected_return_code() {
-    return this.ag_test_command_result.fdbk_settings.return_code_fdbk_level
-           === ValueFeedbackLevel.expected_and_actual
-           && (this.ag_test_command_result.actual_return_code !== null
-               || this.ag_test_command_result.expected_return_code !== null);
-  }
-
   get show_stdout_diff() {
-    return this.ag_test_command_result.stdout_correct !== null
-           && !this.ag_test_command_result.stdout_correct!
-           && this.ag_test_command_result.fdbk_settings.stdout_fdbk_level
-           === ValueFeedbackLevel.expected_and_actual;
+    return this.d_output_size!.stdout_diff_size !== null;
+
+    // this.ag_test_command_result.stdout_correct !== null
+    //        && !this.ag_test_command_result.stdout_correct!
+    //        && this.ag_test_command_result.fdbk_settings.stdout_fdbk_level
+    //        === ValueFeedbackLevel.expected_and_actual;
   }
 
   get show_stderr_diff() {
-    return this.ag_test_command_result.stderr_correct !== null
-           && !this.ag_test_command_result.stderr_correct!
-           && this.ag_test_command_result.fdbk_settings.stderr_fdbk_level
-           === ValueFeedbackLevel.expected_and_actual;
+    return this.d_output_size!.stderr_diff_size !== null;
+    // this.ag_test_command_result.stderr_correct !== null
+    //        && !this.ag_test_command_result.stderr_correct!
+    //        && this.ag_test_command_result.fdbk_settings.stderr_fdbk_level
+    //        === ValueFeedbackLevel.expected_and_actual;
   }
 
   load_stdout_content() {
