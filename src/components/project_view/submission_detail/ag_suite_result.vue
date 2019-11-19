@@ -152,17 +152,19 @@ export default class AGSuiteResult extends Vue {
   }
 
   case_result_return_code_correctness(case_result: AGTestCaseResultFeedback) {
-    let not_available = case_result.ag_test_command_results.every(
-      (cmd_result) => cmd_result.return_code_correct === null);
-
-    let some_show_return_code_only = case_result.ag_test_command_results.some(
-      (cmd_result) => cmd_result.fdbk_settings.show_actual_return_code);
-
-    if (not_available) {
-      if (some_show_return_code_only) {
-          return CorrectnessLevel.info_only;
-      }
+    let without_not_available = case_result.ag_test_command_results.filter(
+      (cmd_result) => cmd_result.return_code_correct !== null
+                      || cmd_result.timed_out!
+                      || cmd_result.actual_return_code !== null);
+    if (without_not_available.length === 0) {
       return CorrectnessLevel.not_available;
+    }
+
+    let all_show_return_code_only = without_not_available.every(
+      (cmd_result) => cmd_result.actual_return_code !== null || cmd_result.timed_out!);
+
+    if (all_show_return_code_only) {
+        return CorrectnessLevel.info_only;
     }
 
     let all_correct = case_result.ag_test_command_results.every(
