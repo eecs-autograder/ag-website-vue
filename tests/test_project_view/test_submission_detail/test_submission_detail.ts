@@ -7,7 +7,7 @@ import SubmissionDetail from '@/components/project_view/submission_detail/submis
 
 import * as data_ut from '@/tests/data_utils.ts';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, find_by_name, expect_html_element_has_value } from '@/tests/utils';
+import { compress_whitespace, expect_html_element_has_value, find_by_name } from '@/tests/utils';
 
 jest.mock('file-saver');
 
