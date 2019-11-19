@@ -122,6 +122,7 @@
       <select id="adjust-feedback-select"
               class="select"
               :disabled="d_loading_results"
+              :value="feedback_category"
               @change="load_adjusted_fdbk($event.target.value)">
         <option v-if="d_globals.user_roles.is_admin || is_group_member"
                 ref="normal_feedback_option"

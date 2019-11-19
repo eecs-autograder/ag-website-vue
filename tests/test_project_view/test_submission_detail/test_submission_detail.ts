@@ -7,7 +7,7 @@ import SubmissionDetail from '@/components/project_view/submission_detail/submis
 
 import * as data_ut from '@/tests/data_utils.ts';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, find_by_name } from '@/tests/utils';
+import { compress_whitespace, find_by_name, expect_html_element_has_value } from '@/tests/utils';
 
 jest.mock('file-saver');
 
@@ -607,6 +607,8 @@ describe('Feedback category deduction tests', () => {
 
         let wrapper = make_wrapper();
         expect(wrapper.vm.feedback_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect_html_element_has_value(
+            wrapper.find('#adjust-feedback-select'), ag_cli.FeedbackCategory.max);
     });
 
     test('Admin non group member, ultimate_submission, max feedback', () => {
@@ -615,6 +617,8 @@ describe('Feedback category deduction tests', () => {
 
         let wrapper = make_wrapper(true);
         expect(wrapper.vm.feedback_category).toEqual(ag_cli.FeedbackCategory.max);
+        expect_html_element_has_value(
+            wrapper.find('#adjust-feedback-select'), ag_cli.FeedbackCategory.max);
     });
 
     test('Staff non group member, staff_viewer feedback', () => {
@@ -623,6 +627,8 @@ describe('Feedback category deduction tests', () => {
 
         let wrapper = make_wrapper();
         expect(wrapper.vm.feedback_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
+        expect_html_element_has_value(
+            wrapper.find('#adjust-feedback-select'), ag_cli.FeedbackCategory.staff_viewer);
     });
 
     test('Student viewing own ultimate submission, ultimate submission feedback', () => {
