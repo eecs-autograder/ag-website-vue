@@ -40,24 +40,11 @@
             <input type="radio" name="submissions_choice"
                    id="all-choice"
                    class="radio"
-                   v-model="d_download_grades"
+                   v-model="d_final_graded_submissions_only"
                    :value="false">
             <label class="label" for="all-choice">All submissions</label>
           </div>
         </div>
-        <!-- <div class="download-option-label">Which submissions?</div>
-
-        <div class="option-container">
-          <toggle v-model="d_final_graded_submissions_only"
-                  ref="final_graded_submissions_only">
-            <div slot="on">
-              <p class="toggle-option"> Final Graded Submissions Only </p>
-            </div>
-            <div slot="off">
-              <p class="toggle-option"> All Submissions </p>
-            </div>
-          </Toggle>
-        </div> -->
 
         <div class="option-container">
           <div class="checkbox-input-container">
@@ -76,13 +63,13 @@
                 type="button"
                 :disabled="d_creating_download_task"
                 @click="create_download_task">
-          Start Download
+          Start task
         </button>
       </div>
     </div>
 
     <div id="download-results">
-      <div id="download-results-label"> Downloads </div>
+      <div id="download-results-label"> Tasks </div>
       <div id="downloads-table">
 
         <div id="download-table-labels">
@@ -119,7 +106,6 @@ import * as FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
-import Toggle from "@/components/toggle.vue";
 import { Created, Destroyed } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { format_datetime_short, sleep, toggle, zip } from '@/utils';
@@ -146,7 +132,6 @@ export interface DownloadTask {
 @Component({
   components: {
     ProgressOverlay,
-    Toggle
   }
 })
 export default class DownloadGrades extends Vue implements Created, Destroyed {
@@ -173,9 +158,10 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
   readonly format_datetime_short = format_datetime_short;
 
   async created() {
-    this.load_download_tasks();
+    await this.load_download_tasks();
     this.d_loading = false;
     this.downloads_poller = new Poller(() => this.load_download_tasks(), 15);
+    // tslint:disable-next-line no-floating-promises
     this.downloads_poller.start_after_delay();
   }
 
@@ -262,7 +248,9 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
           }
         }
       );
+      console.log('haij;');
       FileSaver.saveAs(new File([response.data], this.get_filename(download_task)));
+      console.log('eh');
       this.d_downloading_result_progress = null;
     });
   }
@@ -293,9 +281,7 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
 }
 
 #download-grades-section {
-  // min-width: 500px;
   padding: 10px 0 0;
-  // width: 50%;
 }
 
 .download-section-label {
