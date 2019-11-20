@@ -6,6 +6,7 @@ import * as sinon from 'sinon';
 import DownloadGrades from '@/components/project_admin/download_grades.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import {managed_mount} from '@/tests/setup';
 
 export enum DownloadType {
     all_scores = 'all_scores',
@@ -34,19 +35,16 @@ describe('DownloadGrades tests', () => {
         course = data_ut.make_course();
         project = data_ut.make_project(course.pk);
 
-        wrapper = mount(DownloadGrades, {
+        wrapper = managed_mount(DownloadGrades, {
             propsData: {
                 project: project
             }
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     test('d_downloads fetched, sorted, and displayed', () => {
         expect(wrapper.vm.project).toEqual(project);
+        fail();
     });
 
     test('d_download_grades binding', async () => {
@@ -191,22 +189,22 @@ describe('DownloadGrades tests', () => {
     });
 });
 
-describe.skip('Polling tests', () => {
+// describe.skip('Polling tests', () => {
 
-    test('Download submission files', async () => {
+//     test('Download submission files', async () => {
 
-    });
+//     });
 
-    test('Download submission scores', async () => {
+//     test('Download submission scores', async () => {
 
-    });
+//     });
 
-    test('Downloads unchanged when refreshed', async () => {
+//     test('Downloads unchanged when refreshed', async () => {
 
-    });
+//     });
 
-    test('Downloads changed when refreshed', async () => {
+//     test('Downloads changed when refreshed', async () => {
 
-    });
+//     });
 
-});
+// });

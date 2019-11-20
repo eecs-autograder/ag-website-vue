@@ -76,42 +76,9 @@ import {
 import { GlobalData } from '@/app.vue';
 import SubmissionDetail from "@/components/project_view/submission_detail/submission_detail.vue";
 import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
-import { Created, Destroyed } from '@/lifecycle';
+import { BeforeDestroy, Created } from '@/lifecycle';
+import { Poller } from '@/poller';
 import { deep_copy, safe_assign, sleep, toggle, zip } from '@/utils';
-
-export class Poller {
-  private poll_fn: () => Promise<void>;
-  private delay_seconds: number;
-
-  get continue() {
-    return this._continue;
-  }
-  private _continue: boolean = false;
-
-  constructor(poll_fn: () => Promise<void>,
-              delay_seconds: number) {
-    this.poll_fn = poll_fn;
-    this.delay_seconds = delay_seconds;
-  }
-
-  async start_after_delay() {
-    if (this._continue) {
-      // istanbul ignore next
-      throw new Error('This poller has already been started');
-    }
-
-    this._continue = true;
-    await sleep(this.delay_seconds);
-    while (this._continue) {
-      await this.poll_fn();
-      await sleep(this.delay_seconds);
-    }
-  }
-
-  stop() {
-    this._continue = false;
-  }
-}
 
 @Component({
   components: {
@@ -119,7 +86,8 @@ export class Poller {
     SubmissionPanel
   }
 })
-export default class SubmissionList extends Vue implements SubmissionObserver, Created, Destroyed {
+export default class SubmissionList extends Vue implements SubmissionObserver,
+                                                           Created, BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
@@ -154,7 +122,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver, C
     return this.initialize(this.group);
   }
 
-  destroyed() {
+  beforeDestroy() {
     Submission.unsubscribe(this);
     if (this.plain_submissions_poller !== null) {
       this.plain_submissions_poller.stop();

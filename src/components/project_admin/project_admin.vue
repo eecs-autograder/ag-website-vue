@@ -37,7 +37,7 @@
       <div class="nav-link"
             :class="{'active': d_current_tab === 'download_grades'}"
             @click="set_current_tab('download_grades')">
-        Grades
+        Grades & Files
       </div>
       <div class="nav-link"
             :class="{'active': d_current_tab === 'rerun_tests'}"
