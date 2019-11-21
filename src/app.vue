@@ -4,46 +4,44 @@
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>
-      <div id="navbar">
-        <div id="breadcrumbs">
-          <router-link to="/" id="home-logo">
-            Autograder
+      <div id="breadcrumbs">
+        <router-link to="/" id="home-logo">
+          Autograder
+        </router-link>
+        <template v-if="globals.current_course !== null">
+          <router-link :to="`/web/course/${globals.current_course.pk}`"
+                        class="breadcrumb-link">
+            <span> - {{globals.current_course.name}}</span>
+            <span v-if="globals.current_course.semester !== null">
+              {{globals.current_course.semester}}
+            </span>
+            <span v-if="globals.current_course.year !== null">
+              {{globals.current_course.year}}
+            </span>
           </router-link>
-          <template v-if="globals.current_course !== null">
-            <router-link :to="`/web/course/${globals.current_course.pk}`"
-                         class="breadcrumb-link">
-              <span>{{globals.current_course.name}}</span>
-              <span v-if="globals.current_course.semester !== null">
-                {{globals.current_course.semester}}
-              </span>
-              <span v-if="globals.current_course.year !== null">
-                {{globals.current_course.year}}
-              </span>
+
+          <span v-if="globals.user_roles.is_admin">
+            <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
+                          class="breadcrumb-link">
+              <i class="fas fa-cog cog"></i>
+            </router-link>
+          </span>
+
+          <span v-if="globals.current_project !== null">
+            -
+            <router-link :to="`/web/project/${globals.current_project.pk}`"
+                          class="breadcrumb-link">
+              {{globals.current_project.name}}
             </router-link>
 
             <span v-if="globals.user_roles.is_admin">
-              <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
-                           class="breadcrumb-link">
+              <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
+                            class="breadcrumb-link">
                 <i class="fas fa-cog cog"></i>
               </router-link>
             </span>
-
-            <span v-if="globals.current_project !== null">
-              -
-              <router-link :to="`/web/project/${globals.current_project.pk}`"
-                           class="breadcrumb-link">
-                {{globals.current_project.name}}
-              </router-link>
-
-              <span v-if="globals.user_roles.is_admin">
-                <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
-                             class="breadcrumb-link">
-                  <i class="fas fa-cog cog"></i>
-                </router-link>
-              </span>
-            </span>
-          </template>
-        </div>
+          </span>
+        </template>
       </div>
       <router-view></router-view>
     </template>
@@ -142,19 +140,16 @@ export default class App extends Vue {
   margin: 0;
 }
 
-#navbar {
-  width: 100%;
-  height: 44px;
-  font-size: 24px;
-}
-
-#home-logo {
-  text-decoration: none;
-  padding: 15px;
-}
-
 #breadcrumbs {
-  padding: 9px 0;
+  padding: .25rem .5rem;
+  width: 100%;
+  font-size: 1.5rem;
+  white-space: nowrap;
+  overflow-x: auto;
+
+  #home-logo {
+    text-decoration: none;
+  }
 
   .breadcrumb-link {
     text-decoration: none;
@@ -174,11 +169,6 @@ body, #app {
   padding: 0;
   height: 100%;
   width: 100%;
-}
-
-#app {
-  display: flex;
-  flex-direction: column;
 }
 
 html {
