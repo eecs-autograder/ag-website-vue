@@ -4,7 +4,7 @@
       <router-link :to="`/web/course/${course.pk}`"
                    class="course-info">
         <div class="course-name">{{course.name}} </div>
-        <div class="course-subtitle">{{course.subtitle}}</div>
+        <div class="course-subtitle" v-if="course.subtitle.length !== 0">{{course.subtitle}}</div>
       </router-link>
 
       <div class="toolbox">
@@ -12,19 +12,13 @@
              @click="d_show_clone_course_modal = true"
              :title="'Clone ' + course.name"
              v-if="is_admin">
-          <div class="clone-course-label">
-            <i class="fas fa-copy copier"> </i>
-          </div>
+          <i class="fas fa-copy"> </i>
         </div>
-        <router-link
-                     :to="`/web/course_admin/${course.pk}`"
-                     style="display: inline-block"
+        <router-link :to="`/web/course_admin/${course.pk}`"
                      :title="'Edit ' + course.name"
                      v-if="is_admin">
           <div class="edit-course-settings">
-            <div class="edit-settings-label">
-              <i class="fas fa-cog cog"></i>
-            </div>
+            <i class="fas fa-cog"></i>
           </div>
         </router-link>
       </div>
@@ -171,85 +165,62 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
-.toolbox {
-  background-color: hsl(212, 60%, 94%);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-top: none;
-  box-sizing: border-box;
-  padding: 1px 10px;
-  min-height: 37px;
-  text-align: right;
-}
-
 a {
   text-decoration: none;
   color: inherit;
 }
 
-.edit-settings-label, .clone-course-label {
-  font-size: 16px;
-  margin: 0;
-}
-
-.cog {
-  font-size: 18px;
-}
-
-.copier {
-  font-size: 18px;
-}
-
-.edit-course-settings, .clone-course {
-  color: $dark-blue;
-  cursor: pointer;
-  display: inline-block;
-  padding: 8px 10px;
-}
-
-.clone-course {
-  margin-right: 5px;
-}
-
-.edit-course-settings:hover .cog  {
-  color: mediumvioletred;
-}
-
-.clone-course:hover .copier {
-  color: mediumvioletred;
-}
+$border-radius: 3px;
 
 .course {
   box-sizing: border-box;
-  font-size: 23px;
   margin-bottom: 1rem;
-  min-height: 75px;
-  position: relative;
 }
 
 .course-info {
   display: block;
-  padding: 15px;
-  background-image: linear-gradient(to bottom right, $gray-blue-1, $gray-blue-2);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  padding: .5rem;
+  background-color: $gray-blue-1;
+  border-top-left-radius: $border-radius;
+  border-top-right-radius: $border-radius;
   border-bottom: none;
 }
 
 .course-name {
   color: $dark-blue;
-  font-size: 26px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 0;
+  font-size: 1.25rem;
 }
 
 .course-subtitle {
-  color: $dark-blue;
-  font-size: 14px;
-  margin: 0;
-  min-height: 21px;
-  padding-top: 2px;
+  color: darken($stormy-gray-dark, 15%);
+  font-size: 1rem;
+  margin-top: .25rem;
+}
+
+.toolbox {
+  background-color: hsl(212, 60%, 94%);
+  border-bottom-left-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
+  border-top: none;
+  padding: 0 .25rem;
+
+  display: flex;
+  justify-content: space-around;
+
+  font-size: 1rem;
+}
+
+.clone-course {
+  margin-left: auto;
+}
+
+.edit-course-settings, .clone-course {
+  cursor: pointer;
+  padding: .375rem .5rem;
+
+  &:hover {
+    color: darken($stormy-gray-dark, 15%);
+  }
 }
 
 /**** Modal *******************************************************************/

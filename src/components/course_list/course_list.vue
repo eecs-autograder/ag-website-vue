@@ -183,11 +183,10 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 #course-list {
   margin: 0 5%;
   width: 90%;
-  height: 100%;
 }
 
 .semester-name {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin: .5rem 0;
   font-weight: bold;
 
