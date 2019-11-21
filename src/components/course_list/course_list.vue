@@ -14,12 +14,12 @@
           {{current_term.term.semester}} {{current_term.term.year}}
         </div>
         <div class="courses-in-semester">
-          <span v-for="(course) of current_term.course_list"
-              :key="course.id">
-            <single-course :course="course"
-                          :is_admin="is_admin(course)">
-            </single-course>
-          </span>
+          <single-course v-for="(course) of current_term.course_list"
+                         :key="course.id"
+                         class="course"
+                         :course="course"
+                         :is_admin="is_admin(course)">
+          </single-course>
         </div>
       </div>
     </div>
@@ -191,6 +191,17 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
   font-weight: bold;
 
   @include section-header();
+}
+
+.course {
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 300px;
+
+  @media only screen and (min-width: 700px) {
+    display: inline-block;
+    margin-right: 20px;
+  }
 }
 
 #not-enrolled-message {

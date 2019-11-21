@@ -4,7 +4,7 @@
       <router-link :to="`/web/course/${course.pk}`"
                    class="course-info">
         <div class="course-name">{{course.name}} </div>
-        <div class="course-subtitle" v-if="course.subtitle.length !== 0">{{course.subtitle}}</div>
+        <div class="course-subtitle">{{course.subtitle}}</div>
       </router-link>
 
       <div class="toolbox">
@@ -159,12 +159,11 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
 
-$border-radius: 3px;
-
-.course {
+* {
   box-sizing: border-box;
-  margin-bottom: 1rem;
 }
+
+$border-radius: 3px;
 
 .course-info {
   display: block;
@@ -182,8 +181,12 @@ $border-radius: 3px;
 
 .course-subtitle {
   color: darken($stormy-gray-dark, 15%);
+
   font-size: 1rem;
-  margin-top: .25rem;
+  padding-top: .25rem;
+  min-height: 1.25rem;
+
+  line-height: 1;
 }
 
 .toolbox {
@@ -222,23 +225,6 @@ $border-radius: 3px;
 
 .create-clone-button {
   @extend .green-button;
-}
-
-@media only screen and (min-width: 681px) {
-  .single-course-component {
-    display: inline-block;
-    vertical-align: top;
-    width: 50%;
-  }
-}
-
-@media only screen and (min-width: 1081px) {
-  .single-course-component {
-    display: inline-block;
-    min-width: 400px;
-    max-width: 450px;
-    width: 40%;
-  }
 }
 
 </style>
