@@ -222,7 +222,7 @@ a {
 .course {
   box-sizing: border-box;
   font-size: 23px;
-  margin: 0 15px 15px 0;
+  margin-bottom: 1rem;
   min-height: 75px;
   position: relative;
 }

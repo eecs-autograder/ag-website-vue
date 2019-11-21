@@ -1,6 +1,6 @@
 @mixin section-header(
     // The margin width on either side of the header text.
-    $line-spacing: 3px,
+    $line-spacing: .1875rem,  // 3/16
     $line-color: black,
     // When false, leaves out the divider on the left side.
     $with-left-divider: true,

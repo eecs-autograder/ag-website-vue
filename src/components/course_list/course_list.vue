@@ -1,31 +1,27 @@
 <template>
-  <div ref="course_list_component">
-    <div id="course-list">
-
-      <div v-if="loading" class="loading-spinner">
-        <div> <i class="fa fa-spinner fa-pulse"></i> </div>
-      </div>
-
-      <div v-else-if="courses_by_term.length === 0"
-           id="not-enrolled-message">
-        <p> You are not enrolled in any courses. </p>
-      </div>
-
-      <div v-else id="all-semesters">
-        <div v-for="current_term of courses_by_term"
-             class="single-semester-container">
-          <p class="semester-name"> {{current_term.term.semester}} {{current_term.term.year}} </p>
-          <div class="courses-in-semester">
-            <span v-for="(course) of current_term.course_list"
-                 :key="course.id">
-              <single-course :course="course"
-                             :is_admin="is_admin(course)">
-              </single-course>
-            </span>
-          </div>
+  <div v-if="loading" class="loading-large">
+    <div> <i class="fa fa-spinner fa-pulse"></i> </div>
+  </div>
+  <div v-else id="course-list">
+    <div v-if="courses_by_term.length === 0"
+        id="not-enrolled-message">
+      <div> You are not enrolled in any courses. </div>
+    </div>
+    <div v-else id="all-semesters">
+      <div v-for="current_term of courses_by_term"
+          class="single-semester-container">
+        <div class="semester-name">
+          {{current_term.term.semester}} {{current_term.term.year}}
+        </div>
+        <div class="courses-in-semester">
+          <span v-for="(course) of current_term.course_list"
+              :key="course.id">
+            <single-course :course="course"
+                          :is_admin="is_admin(course)">
+            </single-course>
+          </span>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -173,54 +169,34 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
+@import '@/styles/section_header.scss';
 
-#course-list {
-  margin-left: 5%;
-  margin-right: 5%;
-  width: 90%;
-}
-
-.single-semester-container {
-  display: block;
-}
-
-.semester-name {
-  font-size: 24px;
-  margin: 25px 15px 15px 15px;
-  text-align: left;
-  min-height: 35px;
-  font-weight: 600;
-}
-
-#not-enrolled-message {
-  padding: 20px;
-  text-align: center;
-}
-
-.courses-in-semester {
+* {
+  box-sizing: border-box;
+  padding: 0;
   margin: 0;
 }
 
-#all-semesters {
-  margin-top: 40px;
+#course-list {
+  margin: 0 5%;
+  width: 90%;
+  height: 100%;
 }
 
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+.semester-name {
+  font-size: 1.5rem;
+  margin: .5rem 0;
+  font-weight: bold;
+
+  @include section-header();
 }
 
-@media only screen and (min-width: 481px) {
-  #course-list {
-    margin: 0 5%;
-    width: 90%;
-  }
+#not-enrolled-message {
+  padding: 1rem 0;
+  text-align: center;
 }
 
 </style>
