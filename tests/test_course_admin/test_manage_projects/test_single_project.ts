@@ -213,7 +213,7 @@ describe('SingleProject.vue', () => {
 
         expect(validated_input.is_valid).toBe(false);
 
-        wrapper.find("#close-button").trigger('click');
+        wrapper.find({ref: 'clone_project_modal'}).vm.$emit('close');
         await single_project.$nextTick();
 
         expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(false);

@@ -365,27 +365,11 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
-        // clicking closing_x to close the modal
-        wrapper.find('#close-button').trigger('click');
+        wrapper.find({ref: 'new_ag_test_case_modal'}).vm.$emit('close');
         await component.$nextTick();
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
-
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
-
-        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
-
-        // clicking outside the modal to close the modal
-        wrapper.find('#modal-mask').trigger('click');
-        await component.$nextTick();
-
-        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
-        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
-
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
     });
 

@@ -29,60 +29,53 @@
            ref="clone_course_modal"
            click_outside_to_close
            size="large">
-      <span class="modal-container">
-        <p class="modal-header"> Cloning course:
-          <span class="course-to-copy">{{format_course_name(course)}}</span>
-        </p>
-        <hr>
-        <div id="clone-course-modal">
-          <ValidatedForm ref="clone_course_form"
-                         id="clone-course-form"
-                         autocomplete="off"
-                         @submit="make_copy_of_course">
-
-            <div class="name-container">
-              <label class="text-label"> Course name: </label>
-              <ValidatedInput ref="copy_of_course_name"
-                              v-model="new_course_name"
-                              input_style="width: 100%; max-width: 500px;"
-                              :validators="[is_not_empty]"
-                              :num_rows="1"
-                              @input_validity_changed="clone_course_form_is_valid = $event">
-              </ValidatedInput>
-            </div>
-
-            <div class="semester-container">
-              <label class="text-label"> Semester: </label>
-              <div class="dropdown">
-                <select id="semester"
-                        v-model="new_course_semester"
-                        class="select">
-                  <option v-for="semester of semesters" :value="semester">{{semester}}</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="year-container">
-              <label class="text-label"> Year: </label>
-              <ValidatedInput ref="copy_of_course_year"
-                              v-model="new_course_year"
-                              :num_rows="1"
-                              input_style="width: 65px;"
-                              :validators="[is_not_empty, is_number, is_valid_course_year]"
-                              @input_validity_changed="clone_course_form_is_valid = $event">
-              </ValidatedInput>
-            </div>
-
-            <APIErrors ref="api_errors"></APIErrors>
-
-            <button type="submit"
-                   class="create-clone-button"
-                   :disabled="!clone_course_form_is_valid || clone_course_pending">
-              Clone Course
-            </button>
-          </ValidatedForm>
+      <div class="modal-header">
+        Clone <span class="course-to-copy">"{{format_course_name(course)}}"</span>
+      </div>
+      <ValidatedForm ref="clone_course_form" autocomplete="off" @submit="make_copy_of_course">
+        <div class="form-field-wrapper">
+          <label class="text-label"> Name </label>
+          <ValidatedInput ref="copy_of_course_name"
+                          v-model="new_course_name"
+                          input_style="width: 100%; max-width: 500px;"
+                          :validators="[is_not_empty]"
+                          :num_rows="1"
+                          @input_validity_changed="clone_course_form_is_valid = $event">
+          </ValidatedInput>
         </div>
-      </span>
+
+        <div class="form-field-wrapper">
+          <label class="text-label"> Semester </label>
+          <div class="dropdown">
+            <select id="semester"
+                    v-model="new_course_semester"
+                    class="select">
+              <option v-for="semester of semesters" :value="semester">{{semester}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field-wrapper">
+          <label class="text-label"> Year </label>
+          <ValidatedInput ref="copy_of_course_year"
+                          v-model="new_course_year"
+                          :num_rows="1"
+                          input_style="width: 65px;"
+                          :validators="[is_not_empty, is_number, is_valid_course_year]"
+                          @input_validity_changed="clone_course_form_is_valid = $event">
+          </ValidatedInput>
+        </div>
+
+        <APIErrors ref="api_errors"></APIErrors>
+
+        <div class="button-footer">
+          <button type="submit"
+                  class="create-clone-button"
+                  :disabled="!clone_course_form_is_valid || clone_course_pending">
+            Clone Course
+          </button>
+        </div>
+      </ValidatedForm>
     </modal>
   </div>
 </template>
@@ -164,6 +157,7 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 $border-radius: 3px;
 
@@ -221,45 +215,13 @@ $border-radius: 3px;
 
 /**** Modal *******************************************************************/
 
-.modal-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-  padding: 5px 0;
-}
-
-.name-container, .year-container,
-.semester-container {
-  display: block;
-  max-width: 500px;
-  padding-bottom: 16px;
-}
-
-.name-container {
-  padding-top: 10px;
-}
-
-#all-semesters {
-  margin-top: 40px;
-}
-
-.semester-dropdown-header {
-  height: 39px;
-  width: 140px;
-}
-
 .course-to-copy {
   color: $ocean-blue;
-  letter-spacing: 1px;
-  margin-left: 5px;
+  margin-left: .125rem;
 }
 
 .create-clone-button {
   @extend .green-button;
-}
-
-.create-clone-button {
-  margin: 12px 0 10px 0;
 }
 
 @media only screen and (min-width: 681px) {

@@ -1,5 +1,102 @@
 @import '@/styles/colors.scss';
 
+// Organization ---------------------------------------------------------------
+
+.legend {
+    color: $ocean-blue;
+    font-size: 1.125rem;
+}
+
+.fieldset {
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    border-width: 2px;
+}
+
+// Provides even spacing for form elements
+.form-field-wrapper {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+// Provides padding and alignment for buttons at the bottom of a form or modal
+.button-footer, .button-footer-right {
+    display: flex;
+    margin-top: .75rem;
+}
+
+// Like form-button-footer, but right-justifies the buttons
+.button-footer-right {
+    justify-content: space-around;
+
+    .button:first-child {
+        margin-left: auto;
+    }
+}
+
+
+.input-tooltip {
+    color: mediumvioletred;
+    font-size: 15px;
+    margin-left: 8px;
+}
+
+.text-label {
+    color: lighten(black, 10);
+    display: inline-block;
+    font-size: .875rem;
+    font-weight: bold;
+    margin: 0 0 .25rem 0;
+}
+
+// TODO: replace with .form-field-wrapper
+.input-spacing {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.last-saved-timestamp {
+    color: lighten(#495057, 40);
+    font-size: 15px;
+}
+
+.save-button {
+    @import '@/styles/button_styles.scss';
+
+    @extend .green-button;
+    display: block;
+    margin: 0 10px 10px 0;
+}
+
+// Danger Zone -----------------------------------
+
+.danger-zone-container {
+    margin: 50px 10px 20px;
+    border-radius: 5px;
+    border: 1px solid red;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .danger-text {
+        color: black;
+        font-size: 24px;
+        word-break: break-word;
+        word-wrap: break-word;
+    }
+
+    .delete-button {
+        @extend .red-button;
+        font-size: 14px;
+    }
+
+ }
+
+// Inputs, selects, radios ----------------------------------------------------
+
 $input-border-color: #ced4da;
 $input-text-color: #495057;
 
@@ -29,80 +126,7 @@ $input-text-color: #495057;
     }
 }
 
-// Organization -----------------------------------
-
-.legend {
-    color: $ocean-blue;
-    font-size: 1.125rem;
-}
-
-.fieldset {
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-    border-color: rgba(255, 255, 255, 0.3);
-    border-width: 2px;
-}
-
-.input-tooltip {
-    color: mediumvioletred;
-    font-size: 15px;
-    margin-left: 8px;
-}
-
-.text-label {
-    color: lighten(black, 10);
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    text-align: right;
-}
-
-.input-spacing {
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-.last-saved-timestamp {
-    color: lighten(#495057, 40);
-    font-size: 15px;
-}
-
-.save-button {
-    @import '@/styles/button_styles.scss';
-
-    @extend .green-button;
-    display: block;
-    margin: 0 10px 10px 0;
-}
-
-// Danger Zone -----------------------------------
- 
-.danger-zone-container {
-    margin: 50px 10px 20px;
-    border-radius: 5px;
-    border: 1px solid red;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-   
-    .danger-text {
-        color: black;
-        font-size: 24px;
-        word-break: break-word;
-        word-wrap: break-word;
-    }
- 
-    .delete-button {
-        @extend .red-button;
-        font-size: 14px;
-    }
- 
- }
-
-// Checkbox ---------------------------------------
+// Checkbox -------------------------------------------------------------------
 
 $checkbox-background-light: hsl(200, 100%, 99%);
 $checkbox-background-dark: hsl(220, 30%, 90%);
@@ -181,7 +205,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
     }
 }
 
-// Dropdown ---------------------------------------
+// Dropdown -------------------------------------------------------------------
 
 .dropdown-header-wrapper {
     display: inline-block;

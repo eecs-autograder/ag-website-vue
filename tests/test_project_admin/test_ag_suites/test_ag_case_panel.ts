@@ -428,8 +428,7 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.d_cloned_case_name).toEqual("Fall");
 
-        // clicking closing_x to close the modal
-        wrapper.find('#close-button').trigger('click');
+        wrapper.find({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
@@ -444,8 +443,7 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.d_cloned_case_name).toEqual("Winter");
 
-        // clicking outside the modal to close the modal
-        wrapper.find('#modal-mask').trigger('click');
+        wrapper.find({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);

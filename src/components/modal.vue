@@ -1,16 +1,16 @@
 <template>
   <transition name="modal">
-    <div id="modal-mask"
+    <div class="modal-mask"
          @click.self="() => {click_outside_to_close ? $emit('close') : null}">
       <div class="modal-container"
            :class="size"
            :style="custom_width ? {width: custom_width} : ''">
         <slot></slot>
-        <button v-if="include_closing_x"
+        <div v-if="include_closing_x"
                 class="close-button"
                 @click="$emit('close')">
           &#10005;
-        </button>
+        </div>
       </div>
     </div>
   </transition>
@@ -41,9 +41,11 @@ export default class Modal extends Vue {
 
 * {
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-#modal-mask {
+.modal-mask {
   position: fixed;
   z-index: 9998;
   top: 0;
@@ -110,14 +112,14 @@ export default class Modal extends Vue {
 }
 
 .close-button {
-  font-size: 1.25rem;
   cursor: pointer;
-  border: none;
-  position: absolute;
-  top: 6px;
-  right: 6px;
 
-  background-color: white;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+
+  font-size: 1.25rem;
+  line-height: 1;
 
   &:hover {
     color: darken($stormy-gray-dark, 15%);
