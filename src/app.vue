@@ -148,12 +148,7 @@ export default class App extends Vue {
   white-space: nowrap;
   overflow-x: auto;
 
-  #home-logo {
-    text-decoration: none;
-  }
-
   .breadcrumb-link {
-    text-decoration: none;
     color: $ocean-blue;
   }
 
@@ -165,6 +160,12 @@ export default class App extends Vue {
 </style>
 
 <style lang="scss">
+@import '@/styles/colors.scss';
+
+html {
+  height: 100%;
+}
+
 body, #app {
   margin: 0;
   padding: 0;
@@ -172,11 +173,12 @@ body, #app {
   width: 100%;
 }
 
-html {
-  height: 100%;
+
+body, input, textarea {
+  font-family: "Helvetica Neue", Helvetica;
 }
 
-body, input {
-  font-family: "Helvetica Neue", Helvetica;
+a {
+  text-decoration: none;
 }
 </style>

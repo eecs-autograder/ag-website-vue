@@ -7,9 +7,9 @@
            :style="custom_width ? {width: custom_width} : ''">
         <slot></slot>
         <button v-if="include_closing_x"
-                id="close-button"
+                class="close-button"
                 @click="$emit('close')">
-          <strong>&#10005;</strong>
+          &#10005;
         </button>
       </div>
     </div>
@@ -37,6 +37,12 @@ export default class Modal extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import '@/styles/colors.scss';
+
+* {
+  box-sizing: border-box;
+}
+
 #modal-mask {
   position: fixed;
   z-index: 9998;
@@ -57,8 +63,7 @@ export default class Modal extends Vue {
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 
-  width: 25%;
-  padding: 20px 30px;
+  padding: 1rem;
   background-color: #fff;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
@@ -69,24 +74,54 @@ export default class Modal extends Vue {
 }
 
 .small {
-  width: 15%;
+  width: 35%;
+
+  @media only screen and (min-width: 700px) {
+    width: 25%;
+  }
+
+  @media only screen and (min-width: 900px) {
+    width: 15%;
+  }
 }
 
 .medium {
-  width: 35%;
+  width: 55%;
+
+  @media only screen and (min-width: 700px) {
+    width: 45%;
+  }
+
+  @media only screen and (min-width: 900px) {
+    width: 35%;
+  }
 }
 
 .large {
-  width: 60%;
+  width: 90%;
+
+  @media only screen and (min-width: 700px) {
+    width: 70%;
+  }
+
+  @media only screen and (min-width: 900px) {
+    width: 60%;
+  }
 }
 
-#close-button {
-  font-size: 0.8em;
+.close-button {
+  font-size: 1.25rem;
   cursor: pointer;
   border: none;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 6px;
+  right: 6px;
+
+  background-color: white;
+
+  &:hover {
+    color: darken($stormy-gray-dark, 15%);
+  }
 }
 
 /* Transition styles */

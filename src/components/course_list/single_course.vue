@@ -165,11 +165,6 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
 $border-radius: 3px;
 
 .course {
@@ -218,6 +213,7 @@ $border-radius: 3px;
   cursor: pointer;
   padding: .375rem .5rem;
 
+  color: black;
   &:hover {
     color: darken($stormy-gray-dark, 15%);
   }
