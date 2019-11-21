@@ -37,7 +37,7 @@
       <div class="nav-link"
             :class="{'active': d_current_tab === 'download_grades'}"
             @click="set_current_tab('download_grades')">
-        Grades
+        Grades & Files
       </div>
       <div class="nav-link"
             :class="{'active': d_current_tab === 'rerun_tests'}"
@@ -61,16 +61,19 @@
       <expected-student-files v-show="d_current_tab === 'expected_student_files'"
                               v-if="d_loaded_tabs.has('expected_student_files')"
                               :project="project"></expected-student-files>
-      <ag-suites ref="suitey" v-show="d_current_tab === 'test_cases'"
-                      v-if="d_loaded_tabs.has('test_cases')"
-                      :project="project"></ag-suites>
+      <ag-suites v-show="d_current_tab === 'test_cases'"
+                 v-if="d_loaded_tabs.has('test_cases')"
+                 :project="project"></ag-suites>
       <mutation-suites v-show="d_current_tab === 'mutation_testing'"
                        v-if="d_loaded_tabs.has('mutation_testing')"
                        :project="project"></mutation-suites>
       <edit-groups v-show="d_current_tab === 'edit_groups'"
                    v-if="d_loaded_tabs.has('edit_groups')"
                    :project="project"></edit-groups>
-      <div v-show="d_current_tab === 'download_grades'">DOWNLOAD GRADES - TODO</div>
+      <download-grades v-show="d_current_tab === 'download_grades'"
+                       v-if="d_loaded_tabs.has('download_grades')"
+                       :project="project">
+      </download-grades>
       <div v-show="d_current_tab === 'rerun_tests'">RERUN TESTS - TODO</div>
       <handgrading-settings v-show="d_current_tab === 'handgrading'"
                             v-if="d_loaded_tabs.has('handgrading')"
@@ -93,6 +96,7 @@ import {
 import { GlobalData } from '@/app.vue';
 import { ArraySet } from '@/array_set';
 import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import DownloadGrades from "@/components/project_admin/download_grades.vue";
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import HandgradingSettings from '@/components/project_admin/handgrading_settings/handgrading_settings.vue';
@@ -108,6 +112,7 @@ import { array_remove_unique, get_query_param } from "@/utils";
 @Component({
   components: {
     'ag-suites': AGSuites,
+    DownloadGrades,
     EditGroups,
     ExpectedStudentFiles,
     HandgradingSettings,

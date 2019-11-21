@@ -47,7 +47,7 @@ import {
 import { GlobalData } from '@/app.vue';
 import { safe_assign } from "@/utils";
 
-function* counter() {
+export function* counter() {
     let count = 1;
     while (true) {
         yield count;
