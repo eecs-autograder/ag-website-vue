@@ -37,34 +37,34 @@
     </div>
 
     <div class="body">
-    <course-settings v-show="current_tab === 'settings'"
-                     v-if="loaded_tabs.has('settings')"
-                     :course="course"></course-settings>
+      <course-settings v-show="current_tab === 'settings'"
+                      v-if="loaded_tabs.has('settings')"
+                      :course="course"></course-settings>
 
-    <admin-roster v-show="current_tab === RosterChoice.admin + '_roster'"
-                  v-if="loaded_tabs.has(RosterChoice.admin + '_roster')"
-                  :course="course">
-    </admin-roster>
-
-    <staff-roster v-show="current_tab === RosterChoice.staff + '_roster'"
-                  v-if="loaded_tabs.has(RosterChoice.staff + '_roster')"
-                  :course="course">
-    </staff-roster>
-
-    <student-roster v-show="current_tab === RosterChoice.student + '_roster'"
-                    v-if="loaded_tabs.has(RosterChoice.student + '_roster')"
+      <admin-roster v-show="current_tab === RosterChoice.admin + '_roster'"
+                    v-if="loaded_tabs.has(RosterChoice.admin + '_roster')"
                     :course="course">
-    </student-roster>
+      </admin-roster>
 
-    <handgrader-roster v-show="current_tab === RosterChoice.handgrader + '_roster'"
-                       v-if="loaded_tabs.has(RosterChoice.handgrader + '_roster')"
-                       :course="course">
-    </handgrader-roster>
+      <staff-roster v-show="current_tab === RosterChoice.staff + '_roster'"
+                    v-if="loaded_tabs.has(RosterChoice.staff + '_roster')"
+                    :course="course">
+      </staff-roster>
 
-    <manage-projects v-show="current_tab === 'projects'"
-                     v-if="loaded_tabs.has('projects')"
-                     :course="course">
-    </manage-projects>
+      <student-roster v-show="current_tab === RosterChoice.student + '_roster'"
+                      v-if="loaded_tabs.has(RosterChoice.student + '_roster')"
+                      :course="course">
+      </student-roster>
+
+      <handgrader-roster v-show="current_tab === RosterChoice.handgrader + '_roster'"
+                        v-if="loaded_tabs.has(RosterChoice.handgrader + '_roster')"
+                        :course="course">
+      </handgrader-roster>
+
+      <manage-projects v-show="current_tab === 'projects'"
+                      v-if="loaded_tabs.has('projects')"
+                      :course="course">
+      </manage-projects>
     </div>
   </div>
 </template>
@@ -187,5 +187,6 @@ export enum RosterChoice {
 
 .body {
   overflow: hidden;
+  margin: 1rem;
 }
 </style>

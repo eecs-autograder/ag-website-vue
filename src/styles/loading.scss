@@ -2,6 +2,10 @@
     color: $stormy-gray-light;
 }
 
+.loading-wrapper {
+    position: relative;
+}
+
 .loading-centered, .loading-large {
     position: absolute;
     display: flex;

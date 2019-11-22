@@ -248,9 +248,7 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
           }
         }
       );
-      console.log('haij;');
       FileSaver.saveAs(new File([response.data], this.get_filename(download_task)));
-      console.log('eh');
       this.d_downloading_result_progress = null;
     });
   }

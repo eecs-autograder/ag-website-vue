@@ -17,14 +17,22 @@
 
 // Provides even spacing for form elements
 .form-field-wrapper {
-    margin-top: .5rem;
+    // margin-top: .5rem;
     margin-bottom: .5rem;
 }
 
 // Provides padding and alignment for buttons at the bottom of a form or modal
 .button-footer, .button-footer-right {
     display: flex;
+    flex-wrap: wrap;
     margin-top: .75rem;
+    margin-bottom: .75rem;
+
+    .last-saved-timestamp {
+        padding-top: .5rem;
+        font-size: 1rem;
+        width: 100%;
+    }
 }
 
 // Like form-button-footer, but right-justifies the buttons
@@ -36,6 +44,17 @@
     }
 }
 
+.last-saved-timestamp {
+    color: darken($stormy-gray-dark, 10%);
+    font-size: 1rem;
+}
+
+.save-button {
+    @import '@/styles/button_styles.scss';
+
+    @extend .green-button;
+    display: block;
+}
 
 .input-tooltip {
     color: mediumvioletred;
@@ -55,19 +74,6 @@
 .input-spacing {
     margin-top: 15px;
     margin-bottom: 15px;
-}
-
-.last-saved-timestamp {
-    color: lighten(#495057, 40);
-    font-size: 15px;
-}
-
-.save-button {
-    @import '@/styles/button_styles.scss';
-
-    @extend .green-button;
-    display: block;
-    margin: 0 10px 10px 0;
 }
 
 // Danger Zone -----------------------------------

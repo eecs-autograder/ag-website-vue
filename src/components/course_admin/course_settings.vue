@@ -7,7 +7,7 @@
                      @submit="save_course_settings"
                      @form_validity_changed="settings_form_is_valid = $event">
 
-        <div class="input-container">
+        <div class="form-field-wrapper">
           <label class="text-label"> Course name </label>
           <ValidatedInput ref="course_name_input"
                           v-model="d_course.name"
@@ -17,7 +17,7 @@
           </ValidatedInput>
         </div>
 
-        <div class="input-container">
+        <div class="form-field-wrapper">
           <label class="text-label" for="semester"> Semester </label>
           <div>
             <select id="semester" v-model="d_course.semester" class="select">
@@ -26,7 +26,7 @@
           </div>
         </div>
 
-        <div class="input-container">
+        <div class="form-field-wrapper">
           <label class="text-label"> Year </label>
           <ValidatedInput ref="course_year_input"
                           v-model="d_course.year"
@@ -36,7 +36,7 @@
           </ValidatedInput>
         </div>
 
-        <div class="input-container">
+        <div class="form-field-wrapper">
           <label class="text-label"> Late days per student </label>
           <ValidatedInput ref="course_late_days_input"
                           v-model="d_course.num_late_days"
@@ -50,7 +50,7 @@
           </ValidatedInput>
         </div>
 
-        <div class="input-container">
+        <div class="form-field-wrapper">
           <label class="text-label">
             Guest usernames must end with
             <i class="fas fa-question-circle input-tooltip">
@@ -70,21 +70,23 @@
           </ValidatedInput>
         </div>
 
-        <APIErrors ref="api_errors"></APIErrors>
-
-        <button id="save-button"
-                type="submit"
-                :disabled="!settings_form_is_valid || saving">Save</button>
-
-        <div v-if="!saving"
-             class="last-saved-timestamp">
-          <span> Last Saved: </span>
-          {{format_datetime(d_course.last_modified)}}
-        </div>
-        <div v-else class="last-saved-spinner">
-          <i class="fa fa-spinner fa-pulse"></i>
+        <div class="api-errors-container">
+          <APIErrors ref="api_errors"></APIErrors>
         </div>
 
+        <div class="button-footer">
+          <button id="save-button"
+                  class="save-button"
+                  type="submit"
+                  :disabled="!settings_form_is_valid || saving">Save</button>
+
+          <div class="last-saved-timestamp">
+            <template v-if="!saving">
+              <span> Saved at: </span> {{format_datetime_short(d_course.last_modified)}}
+            </template>
+            <i v-else class="loading fa fa-spinner fa-pulse"></i>
+          </div>
+        </div>
       </ValidatedForm>
     </div>
   </div>
@@ -100,7 +102,7 @@ import Dropdown from '@/components/dropdown.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
+import { deep_copy, format_datetime_short, handle_api_errors_async } from '@/utils';
 import {
   is_integer,
   is_non_negative,
@@ -148,7 +150,7 @@ export default class CourseSettings extends Vue {
   readonly is_valid_course_year = make_min_value_validator(2000);
   readonly string_to_num = string_to_num;
 
-  readonly format_datetime = format_datetime;
+  readonly format_datetime_short = format_datetime_short;
 
   created() {
     this.d_course = deep_copy(this.course, Course);
@@ -175,58 +177,13 @@ function handle_save_course_settings_error(component: CourseSettings, error: unk
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
-
-#settings-container {
-  padding-top: 5px;
-  margin: 0 5%;
-}
-
-.api-error-container {
-  max-width: 500px;
-}
-
-#save-button {
-  @extend .green-button;
-}
-
-#save-button {
-  display: block;
-  margin: 15px 0 15px 0;
-}
-
-.input-container {
-  display: block;
-  max-width: 500px;
-  padding-bottom: 16px;
-}
-
-#input-course-semester {
-  width: 140px;
-  height: 39px;
-}
-
-.semester-item {
-  font-size: 16px;
-}
-
-.last-saved-timestamp {
-  color: lighten(#495057, 40);
-  font-size: 15px;
-}
-
-.last-saved-spinner {
-  color: $ocean-blue;
-  display: inline-block;
-  font-size: 18px;
-}
+@import '@/styles/loading.scss';
 
 .suffix-element {
-  padding-left: 10px;
+  padding-left: .625rem;
 }
 
-@media only screen and (min-width: 481px) {
-  #settings-container {
-    margin: 0 2.5%;
-  }
+.api-errors-container {
+  max-width: 500px;
 }
 </style>

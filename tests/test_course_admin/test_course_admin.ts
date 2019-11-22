@@ -8,6 +8,7 @@ import * as sinon from 'sinon';
 import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -28,11 +29,8 @@ beforeEach(() => {
         Promise.resolve(data_ut.make_user_roles()));
 });
 
+
 describe('Changing Tabs', ()  => {
-    let wrapper: Wrapper<CourseAdmin>;
-    let component: CourseAdmin;
-    let roster: User[];
-    let original_match_media: (query: string) => MediaQueryList;
     // tslint:disable-next-line naming-convention
     const localVue = createLocalVue();
     localVue.use(VueRouter);
@@ -46,158 +44,91 @@ describe('Changing Tabs', ()  => {
         mode: 'history'
     });
 
+    let wrapper: Wrapper<CourseAdmin>;
+    let component: CourseAdmin;
+    let roster: User[];
+
     beforeEach(() => {
         roster = [user];
         sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
 
-        config.logModifiedComponents = false;
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        wrapper = mount(CourseAdmin, {
+        wrapper = managed_mount(CourseAdmin, {
             localVue,
             router
         });
         component = wrapper.vm;
     });
 
-    afterEach(() => {
-        sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-    test('Clicking on roster tab with role selected = "Admin"', async () => {
+    test('Select admin roster', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
         sinon.stub(course, 'get_admins').returns(Promise.resolve(roster));
 
-        wrapper.find('.roster-tab-header').trigger('click');
+        wrapper.find('.roster-tab-header').trigger('mouseenter');
         await component.$nextTick();
 
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain("Admin");
-        highlighted_item.trigger('click');
+        wrapper.findAll('.dropdown .menu-item').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Admin_roster');
         expect(component.role_selected).toEqual(RosterChoice.admin);
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'admin_roster'}}
+            { query: { current_tab: 'Admin_roster'}}
         )).toBe(true);
     });
 
-    test('Clicking on roster tab with role selected = "Staff"', async () => {
+    test('Select staff roster', async () => {
         let router_replace = sinon.stub(router, 'replace');
         sinon.stub(course, 'get_staff').returns(Promise.resolve(roster));
 
         await component.$nextTick();
-        wrapper.find('.roster-tab-header').trigger('click');
+        wrapper.find('.roster-tab-header').trigger('mouseenter');
         await component.$nextTick();
 
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        wrapper.findAll('.dropdown .menu-item').at(1).trigger('click');
         await component.$nextTick();
 
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain("Staff");
-        highlighted_item.trigger('click');
-        await component.$nextTick();
-
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Staff_roster');
         expect(component.role_selected).toEqual(RosterChoice.staff);
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'staff_roster'}})
+            { query: { current_tab: 'Staff_roster'}})
         ).toBe(true);
     });
 
-    test('Clicking on roster tab with role selected = "Student"', async () => {
+    test('Select student roster', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
         sinon.stub(course, 'get_students').returns(Promise.resolve(roster));
 
-        wrapper.find('.roster-tab-header').trigger('click');
+        wrapper.find('.roster-tab-header').trigger('mouseenter');
         await component.$nextTick();
 
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        wrapper.findAll('.dropdown .menu-item').at(2).trigger('click');
         await component.$nextTick();
 
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain("Student");
-        highlighted_item.trigger('click');
-        await component.$nextTick();
-
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Student_roster');
         expect(component.role_selected).toEqual(RosterChoice.student);
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'student_roster'}}
+            { query: { current_tab: 'Student_roster'}}
         )).toBe(true);
     });
 
-    test('Clicking on roster tab with role selected = "Handgrader"', async () => {
+    test('Select handgrader roster', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
         sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
 
-        wrapper.find('.roster-tab-header').trigger('click');
+        wrapper.find('.roster-tab-header').trigger('mouseenter');
         await component.$nextTick();
 
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
+        wrapper.findAll('.dropdown .menu-item').at(3).trigger('click');
         await component.$nextTick();
 
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain("Handgrader");
-        highlighted_item.trigger('click');
-        await component.$nextTick();
-
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Handgrader_roster');
         expect(component.role_selected).toEqual(RosterChoice.handgrader);
         expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'handgrader_roster'}}
+            { query: { current_tab: 'Handgrader_roster'}}
         )).toBe(true);
-    });
-
-    test('Pressing enter on roster tab with role selected = "Handgrader"', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
-
-        wrapper.find('.roster-tab-header').trigger('click');
-        await component.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain("Handgrader");
-        highlighted_item.trigger("keydown", {code: "Enter" });
-        await component.$nextTick();
-        await component.$nextTick();
-
-        expect(component.current_tab_index).toEqual(1);
-        expect(component.role_selected).toEqual(RosterChoice.handgrader);
-        expect(router_replace.calledOnce).toBe(true);
-        expect(router_replace.firstCall.calledWith(
-            { query: { current_tab: 'handgrader_roster'}})
-        ).toBe(true);
     });
 
     test('Clicking on manage_projects tab', async () => {
@@ -205,33 +136,30 @@ describe('Changing Tabs', ()  => {
         let router_replace = sinon.stub(router, 'replace');
         sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
 
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         expect(tabs.length).toEqual(3);
         tabs.at(2).trigger('click');
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
-        expect(component.role_selected).toEqual("");
+        expect(component.current_tab).toEqual('projects');
         expect(router_replace.calledOnce).toBe(true);
-        expect(router_replace.firstCall.calledWith({ query: { current_tab: 'manage_projects'}}));
+        expect(router_replace.firstCall.calledWith({ query: { current_tab: 'projects'}}));
     });
 
     test('Clicking on settings tab', async () => {
         await component.$nextTick();
         let router_replace = sinon.stub(router, 'replace');
 
-        let tabs = wrapper.findAll('.tab-label');
+        let tabs = wrapper.findAll('.nav-link');
         tabs.at(2).trigger('click');
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(2);
-        expect(component.role_selected).toEqual("");
+        expect(component.current_tab).toEqual('projects');
 
         tabs.at(0).trigger('click');
         await component.$nextTick();
 
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.role_selected).toEqual("");
+        expect(component.current_tab).toEqual('settings');
         expect(router_replace.calledTwice).toBe(true);
         expect(router_replace.secondCall.calledWith({ query: { current_tab: 'settings'}}));
     });
@@ -243,16 +171,21 @@ describe('select_tab function called with different values associated with "curr
          ()  => {
     let wrapper: Wrapper<CourseAdmin>;
     let component: CourseAdmin;
-    let roster: User[];
-    let original_match_media: (query: string) => MediaQueryList;
+    let router_replace: sinon.SinonStub;
 
-    const $route = {
-        path: '/web/course_admin/:course_id',
-        params: {
-            course_id: '2'
-        },
-        query: { }
-    };
+    function get_router_mocks(query = {}) {
+        return {
+            $route: {
+                params: {
+                    course_id: course.pk.toString()
+                },
+                query: query
+            },
+            $router: {
+                replace: router_replace
+            }
+        };
+    }
 
     beforeEach(() => {
         course = data_ut.make_course();
@@ -264,154 +197,86 @@ describe('select_tab function called with different values associated with "curr
         sinon.stub(course, 'get_handgraders').returns(Promise.resolve([]));
         sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
 
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return { matches: true };
-            })
-        });
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
+        router_replace = sinon.stub();
     });
 
     test('current_tab parameter value = settings', async () => {
-        $route.query = { current_tab: 'settings' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'settings'})
         });
         component = wrapper.vm;
         await component.$nextTick();
         await component.$nextTick();
 
         expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(0);
+        expect(component.current_tab).toEqual('settings');
         expect(component.role_selected).toEqual("");
         expect(component.loading).toEqual(false);
     });
 
     test('current_tab parameter value = admin_roster', async () => {
-        $route.query = { current_tab: 'admin_roster' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'Admin_roster'})
         });
         component = wrapper.vm;
         await component.$nextTick();
 
         expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Admin_roster');
         expect(component.role_selected).toEqual(RosterChoice.admin);
     });
 
     test('current_tab parameter value = staff_roster', async () => {
-        $route.query = { current_tab: 'staff_roster' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'Staff_roster'})
         });
         component = wrapper.vm;
         await component.$nextTick();
 
         expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Staff_roster');
         expect(component.role_selected).toEqual(RosterChoice.staff);
     });
 
     test('current_tab parameter value = student_roster', async () => {
-        $route.query = { current_tab: 'student_roster' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'Student_roster'})
         });
         component = wrapper.vm;
         await component.$nextTick();
 
         expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Student_roster');
         expect(component.role_selected).toEqual(RosterChoice.student);
     });
 
     test('current_tab parameter value = handgrader_roster', async () => {
-        $route.query = { current_tab: 'handgrader_roster' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'Handgrader_roster'})
         });
         component = wrapper.vm;
         await component.$nextTick();
 
         expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(1);
+        expect(component.current_tab).toEqual('Handgrader_roster');
         expect(component.role_selected).toEqual(RosterChoice.handgrader);
     });
 
-    test('current_tab parameter value = manage_projects', async () => {
-        $route.query = { current_tab: 'manage_projects' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+    test('current_tab parameter value = projects', async () => {
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'projects'})
         });
         component = wrapper.vm;
         await component.$nextTick();
 
         expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(2);
-        expect(component.role_selected).toEqual("");
-    });
-
-    test('current_tab parameter value = empty string', async () => {
-        $route.query = { current_tab: '' };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.role_selected).toEqual("");
-    });
-
-    test('current_tab parameter value = array of values', async () => {
-        $route.query = { current_tab: ['manage_projects', 'another_tab'] };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(2);
+        expect(component.current_tab).toEqual('projects');
         expect(component.role_selected).toEqual("");
     });
 
     test('current_tab parameter value = null', async () => {
-        $route.query = { };
-        wrapper = mount(CourseAdmin, {
-            mocks: {
-                $route
-            }
+        wrapper = managed_mount(CourseAdmin, {
+            mocks: get_router_mocks({})
         });
         component = wrapper.vm;
         await component.$nextTick();

@@ -18,11 +18,14 @@
                         :validators="[contains_valid_emails]"
                         :num_rows="7">
         </ValidatedInput>
-        <button type="submit"
-               id="add-users-button"
-               :disabled="!add_users_form_is_valid">
-          Add to Roster
-        </button>
+        <div class="button-footer">
+          <button type="submit"
+                id="add-users-button"
+                class="save-button"
+                :disabled="!add_users_form_is_valid">
+            Add to Roster
+          </button>
+        </div>
       </validated-form>
     </div>
 
@@ -151,9 +154,9 @@ export default class Roster extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/button_styles.scss';
 
 * {
   box-sizing: border-box;
@@ -161,47 +164,42 @@ export default class Roster extends Vue {
   margin: 0;
 }
 
-.roster-container {
-  margin: 0;
-}
-
-.adding-container {
-  margin: 0 5%;
-}
-
-.enrolled-container {
-  margin: 15px 5% 0 5%;
-  padding: 0 0 50px 0;
-}
-
-#add-users-button {
-  @extend .green-button;
-}
-
-#add-users-button {
-  margin: 15px 0 15px 0;
-}
-
 .enrollment-add-label {
   color: black;
-  display: block;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-  padding: 10px 0 8px 1px;
-  position: relative;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.user-table-wrapper {
+  overflow: auto;
 }
 
 .user-table {
   border-collapse: collapse;
-  margin-top: 15px;
 }
 
-.user-table th {
-  border-bottom: 2px solid hsl(210, 20%, 92%);
-  color: black;
-  font-size: 16px;
-  padding: 10px 15px 10px 15px;
+.user-table {
+  th {
+    border-bottom: 2px solid hsl(210, 20%, 92%);
+    color: black;
+  }
+
+  th, td {
+    padding: .625rem .872rem;
+    font-size: 1rem;
+  }
+
+  tr td {
+    border-bottom: 1px solid hsl(210, 20%, 94%);
+  }
+}
+
+.odd-row {
+  background-color: white;
+}
+
+.even-row {
+  background-color: $white-gray;
 }
 
 .email-column {
@@ -216,7 +214,6 @@ export default class Roster extends Vue {
 .name-column {
   text-align: left;
   width: 50%;
-  word-spacing: 4px;
 }
 
 .name {
@@ -228,55 +225,13 @@ export default class Roster extends Vue {
   width: 5%;
 }
 
-.user-table td {
-  margin-bottom: 10px;
-  padding: 10px 15px 10px 15px;
-  position: relative;
-}
-
-.user-table tr td {
-  border-bottom: 1px solid hsl(210, 20%, 94%);
-}
-
-.odd-row {
-  background-color: white;
-}
-
-.even-row {
-  background-color: $white-gray;
-}
-
-.user-table-wrapper {
-  overflow: scroll;
-}
-
 .remove-user {
   color: hsl(212, 10%, 47%);
   cursor: pointer;
-}
 
-.remove-user:hover {
-  color: $navy-blue;
-}
-
-::-webkit-scrollbar {
-  background: transparent;
-  width: 0;
-}
-
-@media only screen and (min-width: 481px) {
-  .adding-container, .enrolled-container {
-    margin: 0 2.5%;
-  }
-
-  .user-table {
-    width: 100%;
+  &:hover {
+    color: $navy-blue;
   }
 }
 
-@media only screen and (min-width: 768px) {
-  .user-table-wrapper {
-    overflow: visible;
-  }
-}
 </style>
