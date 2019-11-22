@@ -1,97 +1,70 @@
 <template>
-  <div class="course-admin-component"
-       ref="course_admin_component">
-    <div v-if="!loading">
-      <tabs ref="course_admin_tabs"
-            tab_active_class="gray-theme-active-no-padding"
-            tab_inactive_class="gray-theme-inactive-no-padding"
-            v-model="current_tab_index"
-            @input="on_tab_changed"
-            v-if="!loading">
+  <div v-if="loading" class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+  </div>
+  <div v-else class="course-admin-component" ref="course_admin_component">
+    <div class="navbar default-navbar">
+      <div class="nav-link"
+           ref="settings_tab"
+           :class="{'active': current_tab === 'settings'}"
+           @click="set_current_tab('settings')">
+        Settings
+      </div>
 
-        <!--SETTINGS TAB-->
-        <tab>
-          <tab-header ref="settings_tab">
-            <div class="tab-label">
-              <p class="tab-header"> Settings </p>
+      <div class="nav-link dropdown-link"
+           ref="roster_tab"
+           :class="{'active': current_tab.endsWith('roster')}">
+        <div class="dropdown">
+          <div class="roster-tab-header">
+            Roster {{role_selected === "" ? '' : `(${role_selected})`}}
+          </div>
+          <div class="menu">
+            <div class="menu-item"
+                 v-for="role of roles" :key="role"
+                 @click="role_selected = role; set_current_tab(role + '_roster')">
+              {{role}}
             </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-              <course-settings v-if="course !== null" :course="course"> </course-settings>
-            </div>
-          </template>
-        </tab>
+          </div>
+        </div>
+      </div>
 
-        <!--ROSTER TAB-->
-        <tab>
-          <tab-header ref="roster_tab"
-                      id="roster-tab">
-
-            <dropdown ref="roster_dropdown"
-                      :items="roles"
-                      @update_item_selected="role_selected = $event;
-                                             current_tab_index = 1;
-                                             on_tab_changed(1);">
-              <template slot="header">
-                <div class="tab-label" tabindex="0">
-                  <p class="roster-tab-header tab-header"
-                     ref="roster_tab_header"
-                     @click="show_roster_tab_dropdown_menu">
-                    Roster {{role_selected === "" ? '' : `(${role_selected})`}}
-                  </p>
-                </div>
-              </template>
-              <div slot-scope="{item}">
-                <div class="roster-dropdown-row">
-                  <span>{{item}}</span>
-                </div>
-              </div>
-            </dropdown>
-
-          </tab-header>
-
-          <template slot="body">
-            <div class="tab-body">
-              <admin-roster v-if="role_selected === RosterChoice.admin && course !== null"
-                            :course="course">
-              </admin-roster>
-
-              <staff-roster v-if="role_selected === RosterChoice.staff && course !== null"
-                            :course="course">
-              </staff-roster>
-
-              <student-roster v-if="role_selected === RosterChoice.student && course !== null"
-                              :course="course">
-              </student-roster>
-
-              <handgrader-roster v-if="role_selected === RosterChoice.handgrader
-                                       && course !== null"
-                                 :course="course">
-              </handgrader-roster>
-            </div>
-          </template>
-        </tab>
-
-        <!--PROJECTS TAB-->
-        <tab>
-          <tab-header ref="projects_tab">
-            <div class="tab-label">
-              <p class="tab-header"> Projects </p>
-            </div>
-          </tab-header>
-          <template slot="body">
-            <div class="tab-body">
-              <manage-projects v-if="course !== null"
-                               :course="course">
-              </manage-projects>
-            </div>
-          </template>
-        </tab>
-      </tabs>
+      <div class="nav-link"
+          ref="projects_tab"
+          :class="{'active': current_tab === 'projects'}"
+          @click="set_current_tab('projects')">
+        Projects
+      </div>
     </div>
-    <div v-else class="loading-spinner">
-        <i class="fa fa-spinner fa-pulse"></i>
+
+    <div class="body">
+    <course-settings v-show="current_tab === 'settings'"
+                     v-if="loaded_tabs.has('settings')"
+                     :course="course"></course-settings>
+
+    <admin-roster v-show="current_tab === RosterChoice.admin + '_roster'"
+                  v-if="loaded_tabs.has(RosterChoice.admin + '_roster')"
+                  :course="course">
+    </admin-roster>
+
+    <staff-roster v-show="current_tab === RosterChoice.staff + '_roster'"
+                  v-if="loaded_tabs.has(RosterChoice.staff + '_roster')"
+                  :course="course">
+    </staff-roster>
+
+    <student-roster v-show="current_tab === RosterChoice.student + '_roster'"
+                    v-if="loaded_tabs.has(RosterChoice.student + '_roster')"
+                    :course="course">
+    </student-roster>
+
+    <handgrader-roster v-show="current_tab === RosterChoice.handgrader + '_roster'"
+                       v-if="loaded_tabs.has(RosterChoice.handgrader + '_roster')"
+                       :course="course">
+    </handgrader-roster>
+
+    <manage-projects v-show="current_tab === 'projects'"
+                     v-if="loaded_tabs.has('projects')"
+                     :course="course">
+    </manage-projects>
     </div>
   </div>
 </template>
@@ -112,6 +85,7 @@ import Dropdown from '@/components/dropdown.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
+import { CurrentTabMixin } from '@/current_tab_mixin';
 import { get_query_param } from "@/utils";
 
 @Component({
@@ -128,7 +102,7 @@ import { get_query_param } from "@/utils";
     Tabs,
   }
 })
-export default class CourseAdmin extends Vue {
+export default class CourseAdmin extends CurrentTabMixin {
   @Inject({from: 'globals'})
   globals!: GlobalData;
 
@@ -150,69 +124,23 @@ export default class CourseAdmin extends Vue {
   }
 
   mounted() {
-    this.select_tab(get_query_param(this.$route.query, "current_tab"));
-  }
+    this.initialize_current_tab('settings');
 
-  show_roster_tab_dropdown_menu(event: Event) {
-    let roster_dropdown = <Dropdown> this.$refs.roster_dropdown;
-    roster_dropdown.show();
-    event.stopPropagation();
-  }
-
-  on_tab_changed(index: number) {
-    if (this.current_tab_index !== 1) {
-      this.role_selected = "";
+    let query_val = get_query_param(this.$route.query, 'current_tab');
+    if (query_val === RosterChoice.admin + '_roster') {
+      this.role_selected = RosterChoice.admin;
     }
-    switch (index) {
-      case 0:
-        this.$router.replace({query: {current_tab: "settings"}});
-        break;
-      case 1:
-        if (this.role_selected === RosterChoice.admin) {
-          this.$router.replace({query: {current_tab: "admin_roster"}});
-        }
-        else if (this.role_selected === RosterChoice.staff) {
-          this.$router.replace({query: {current_tab: "staff_roster"}});
-        }
-        else if (this.role_selected === RosterChoice.student) {
-          this.$router.replace({query: {current_tab: "student_roster"}});
-        }
-        else {
-          this.$router.replace({query: {current_tab: "handgrader_roster"}});
-        }
-        break;
-      case 2:
-        this.$router.replace(({query: {current_tab: "manage_projects"}}));
+    else if (query_val === RosterChoice.staff + '_roster') {
+      this.role_selected = RosterChoice.staff;
+    }
+    else if (query_val === RosterChoice.student + '_roster') {
+      this.role_selected = RosterChoice.student;
+    }
+    else if (query_val === RosterChoice.handgrader + '_roster') {
+      this.role_selected = RosterChoice.handgrader;
     }
   }
 
-  select_tab(tab_name: string | null) {
-    switch (tab_name) {
-      case "settings":
-        break;
-      case "admin_roster":
-        this.current_tab_index = 1;
-        this.role_selected = RosterChoice.admin;
-        break;
-      case "staff_roster":
-        this.current_tab_index = 1;
-        this.role_selected = RosterChoice.staff;
-        break;
-      case "student_roster":
-        this.current_tab_index = 1;
-        this.role_selected = RosterChoice.student;
-        break;
-      case "handgrader_roster":
-        this.current_tab_index = 1;
-        this.role_selected = RosterChoice.handgrader;
-        break;
-      case "manage_projects":
-        this.current_tab_index = 2;
-        break;
-      default:
-        this.current_tab_index = 0;
-    }
-  }
   readonly RosterChoice = RosterChoice;
 }
 
@@ -226,50 +154,38 @@ export enum RosterChoice {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
+@import '@/styles/navbar.scss';
+@import '@/styles/static_dropdown.scss';
 
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  left: 46vw;
-  position: absolute;
-  text-align: center;
-  top: 40vh;
+@include navbar(
+  $background-color: $pebble-light,
+  $hover-color: lighten($pebble-dark, 5%),
+  $active-color: $pebble-dark,
+  $border-color: lighten($pebble-dark, 5%)
+);
+
+.dropdown {
+  @include static-dropdown($open-on-hover: true);
+
+  .menu-item {
+    padding: .375rem;
+  }
 }
 
-.course-admin-component {
-  position: relative;
+.roster-tab-header {
+  padding: $default-nav-link-padding;
 }
 
-.tab-header {
-  margin: 0;
-  font-size: 18px;
-  padding: 10px 25px 12px 25px;
-  font-weight: 600;
-}
-
-.tab-body {
-  text-align: left;
-  position: relative;
-  padding-top: 10px;
-}
-
-.tab-label {
-  outline: none;
-  cursor: pointer;
+.nav-link.dropdown-link {
+  padding: 0;
 }
 
 .roster-dropdown-row {
   font-size: 16px;
 }
 
-
-@media only screen and (min-width: 481px) {
-  .tab-body {
-    border-top: 2px solid $pebble-dark;
-  }
-
-  .tab-header {
-    padding: 10px 15px 10px 15px;
-  }
+.body {
+  overflow: hidden;
 }
 </style>

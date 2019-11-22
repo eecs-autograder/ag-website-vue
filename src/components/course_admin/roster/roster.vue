@@ -27,31 +27,29 @@
     </div>
 
     <div class="enrolled-container">
-      <div>
-        <div  v-if="d_roster.length !== 0"
-              class="user-table-wrapper">
-          <table class="user-table">
-            <tr>
-              <th class="email-column"> Username </th>
-              <th class="name-column"> Name </th>
-              <th class="remove-user-column"> Remove </th>
-            </tr>
-            <tr v-for="(person, index) in d_roster"
-                :class="index % 2 ? 'odd-row' : 'even-row'">
-              <td class="email-column email">{{person.username}}</td>
-              <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
-              <td class="remove-user-column">
-                <i class="fas fa-user-times remove-user"
-                   :title="'Delete ' + person.username"
-                   @click="remove_person_from_roster([person], index)">
-                </i>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div v-else class="empty-roster-message">
-          The {{role}} roster for this course is currently empty!
-        </div>
+      <div v-if="d_roster.length !== 0"
+            class="user-table-wrapper">
+        <table class="user-table">
+          <tr>
+            <th class="email-column"> Username </th>
+            <th class="name-column"> Name </th>
+            <th class="remove-user-column"> Remove </th>
+          </tr>
+          <tr v-for="(person, index) in d_roster"
+              :class="index % 2 ? 'odd-row' : 'even-row'">
+            <td class="email-column email">{{person.username}}</td>
+            <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
+            <td class="remove-user-column">
+              <i class="fas fa-user-times remove-user"
+                  :title="'Delete ' + person.username"
+                  @click="remove_person_from_roster([person], index)">
+              </i>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div v-else class="empty-roster-message">
+        The {{role}} roster for this course is currently empty!
       </div>
     </div>
   </div>
@@ -156,6 +154,12 @@ export default class Roster extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/button_styles.scss';
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
 
 .roster-container {
   margin: 0;

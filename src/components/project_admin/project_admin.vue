@@ -3,7 +3,7 @@
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="project-admin">
-    <div class="navbar">
+    <div class="navbar default-navbar">
       <div class="nav-link"
             :class="{'active': d_current_tab === 'settings'}"
             @click="set_current_tab('settings')">
@@ -280,12 +280,5 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   $active-color: $pebble-dark,
   $border-color: lighten($pebble-dark, 5%)
 );
-
-.navbar {
-  .nav-link {
-    font-size: 14px;
-    padding: 10px 10px;
-  }
-}
 
 </style>

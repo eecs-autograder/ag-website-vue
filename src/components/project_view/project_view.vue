@@ -4,7 +4,7 @@
   </div>
 
   <div v-else id="project-view">
-    <div class="navbar">
+    <div class="navbar default-navbar">
       <div class="nav-link"
            ref="submit_tab"
            :class="{'active': d_current_tab === 'submit'}"
@@ -273,17 +273,6 @@ export default class ProjectView extends Vue implements GroupObserver {
   $active-color: $pebble-dark,
   $border-color: lighten($pebble-dark, 5%)
 );
-
-.navbar {
-  .nav-link {
-    font-size: 14px;
-    padding: 10px 10px;
-  }
-
-  .disabled {
-    color: $stormy-gray-dark;
-  }
-}
 
 #edit-handgrading-link {
   margin-left: 6px;

@@ -379,7 +379,7 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 
 .dropdown {
   color: black;  // For when the case panel is active
-  @include static-dropdown($open-on-hover: true, $orient-left: true);
+  @include static-dropdown($open-on-hover: true, $orient-right: true);
 
   .menu-item {
     padding: 6px 6px;
