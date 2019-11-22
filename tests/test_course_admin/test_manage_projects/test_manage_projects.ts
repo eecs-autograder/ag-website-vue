@@ -92,9 +92,10 @@ describe('Manage projects tests', () => {
 
         expect(validated_input.is_valid).toBe(true);
 
-        let create_project_stub = sinon.stub(Project, 'create').returns(
-            Promise.resolve(new_project)
-        );
+        let create_project_stub = sinon.stub(Project, 'create').callsFake(() => {
+            Project.notify_project_created(new_project);
+            return Promise.resolve(new_project);
+        });
         wrapper.find({ref: 'new_project_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 

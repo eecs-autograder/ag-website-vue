@@ -3,20 +3,19 @@
     <div id="new-project-label"> Create a New Project </div>
 
     <div class="new-project-validation-wrapper">
-      <ValidatedForm ref="new_project_form"
+      <validated-form ref="new_project_form"
                       autocomplete="off"
                       spellcheck="false"
                       @submit="add_project">
-        <ValidatedInput ref="new_project_name"
-                        v-model="new_project_name"
-                        :validators="[is_not_empty]"
-                        :num_rows="1"
-                        input_style="width: 100%;
+        <validated-input ref="new_project_name"
+                         v-model="new_project_name"
+                         :validators="[is_not_empty]"
+                         :num_rows="1"
+                         input_style="width: 100%;
                                       max-width: 500px;
                                       border: 1px solid #ced4da;"
-                        @input_validity_changed="new_project_name_is_valid = $event"
-                        :show_warnings_on_blur="true">
-        </ValidatedInput>
+                         @input_validity_changed="new_project_name_is_valid = $event">
+        </validated-input>
 
         <APIErrors ref="api_errors"></APIErrors>
 
@@ -27,7 +26,7 @@
             Add Project
           </button>
         </div>
-      </ValidatedForm>
+      </validated-form>
     </div>
 
     <div v-if="loading" class="loading-wrapper loading-medium">
@@ -40,9 +39,9 @@
     <single-project v-else v-for="(project, index) of projects"
                     :key="project.pk"
                     ref="single_project"
+                    class="project"
                     :course="course"
-                    :project="project"
-                    :odd_index="index % 2 !== 0">
+                    :project="project">
     </single-project>
   </div>
 </template>
@@ -106,10 +105,10 @@ export default class ManageProjects extends Vue implements ProjectObserver,
       let new_project: Project = await Project.create(
         this.course.pk, {name: this.new_project_name}
       );
-      this.projects.push(new_project);
-      this.sort_projects();
       this.new_project_name = "";
-      (<ValidatedInput> this.$refs.new_project_name).reset_warning_state();
+      this.$nextTick(() => {
+        (<ValidatedForm> this.$refs.new_project_form).reset_warning_state();
+      });
     });
   }
 
@@ -125,7 +124,6 @@ export default class ManageProjects extends Vue implements ProjectObserver,
 }
 
 export function handle_add_project_error(component: ManageProjects, error: unknown) {
-  console.log('WAAAA');
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 
@@ -152,7 +150,7 @@ export function handle_add_project_error(component: ManageProjects, error: unkno
 }
 
 #manage-projects-component {
-  max-width: 500px;
+  max-width: 350px;
 }
 
 #new-project-label {
@@ -160,4 +158,9 @@ export function handle_add_project_error(component: ManageProjects, error: unkno
   font-weight: bold;
   margin-bottom: .5rem;
 }
+
+.project {
+  margin-bottom: .75rem;
+}
+
 </style>

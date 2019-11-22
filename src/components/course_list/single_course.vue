@@ -33,7 +33,7 @@
         Clone <span class="course-to-copy">"{{format_course_name(course)}}"</span>
       </div>
       <ValidatedForm ref="clone_course_form" autocomplete="off" @submit="make_copy_of_course">
-        <div class="form-field-wrapper">
+        <div class="cloned-course-name form-field-wrapper">
           <label class="text-label"> Name </label>
           <ValidatedInput ref="copy_of_course_name"
                           v-model="new_course_name"
@@ -171,7 +171,6 @@ $border-radius: 3px;
   background-color: $gray-blue-1;
   border-top-left-radius: $border-radius;
   border-top-right-radius: $border-radius;
-  border-bottom: none;
 }
 
 .course-name {
@@ -199,7 +198,7 @@ $border-radius: 3px;
   display: flex;
   justify-content: space-around;
 
-  font-size: 1rem;
+  font-size: 1.125rem;
 }
 
 .clone-course {
@@ -221,6 +220,10 @@ $border-radius: 3px;
 .course-to-copy {
   color: $ocean-blue;
   margin-left: .125rem;
+}
+
+.cloned-course-name {
+  margin-top: .5rem;
 }
 
 .create-clone-button {

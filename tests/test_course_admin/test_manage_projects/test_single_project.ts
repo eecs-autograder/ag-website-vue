@@ -8,6 +8,7 @@ import SingleProject from '@/components/course_admin/manage_projects/single_proj
 import ValidatedInput from '@/components/validated_input.vue';
 
 import { set_global_current_user } from '@/tests/data_utils';
+import { set_select_object_value, set_validated_input_text } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -27,7 +28,6 @@ describe('SingleProject.vue', () => {
     let project_1: Project;
     let project_2: Project;
     let projects: Project[];
-    let courses: Course[];
     let user: User;
 
     beforeEach(() => {
@@ -48,9 +48,7 @@ describe('SingleProject.vue', () => {
             num_late_days: 0, allowed_guest_domain: '', last_modified: ''
         });
 
-        courses = [course_1];
-
-        sinon.stub(user, "courses_is_admin_for").returns(Promise.resolve(courses));
+        sinon.stub(user, "courses_is_admin_for").resolves([course_1, course_2]);
 
         project_1 = new Project({
             pk: 10,
@@ -180,7 +178,6 @@ describe('SingleProject.vue', () => {
 
         expect(single_project.course).toEqual(course_1);
         expect(single_project.project).toEqual(project_1);
-        expect(single_project.odd_index).toEqual(false);
         expect(single_project.course_to_clone_to).toEqual(course_1);
     });
 
@@ -197,7 +194,7 @@ describe('SingleProject.vue', () => {
         single_project = wrapper.vm;
         await single_project.$nextTick();
 
-        wrapper.find('.copier').trigger('click');
+        wrapper.find('.copy-project').trigger('click');
         await single_project.$nextTick();
 
         let validated_input = <ValidatedInput> wrapper.find({ref: "cloned_project_name"}).vm;
@@ -206,9 +203,7 @@ describe('SingleProject.vue', () => {
         expect(wrapper.vm.d_show_clone_project_modal).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
-        let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
-        (<HTMLInputElement> clone_name.element).value = "   ";
-        clone_name.trigger('input');
+        set_validated_input_text(wrapper.find({ref: 'cloned_project_name'}), '   ');
         await single_project.$nextTick();
 
         expect(validated_input.is_valid).toBe(false);
@@ -233,7 +228,7 @@ describe('SingleProject.vue', () => {
         single_project = wrapper.vm;
         await single_project.$nextTick();
 
-        wrapper.find('.copier').trigger('click');
+        wrapper.find('.copy-project').trigger('click');
         await single_project.$nextTick();
 
         let validated_input = <ValidatedInput> wrapper.find(
@@ -243,9 +238,8 @@ describe('SingleProject.vue', () => {
         expect(wrapper.vm.d_show_clone_project_modal).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
-        let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
-        (<HTMLInputElement> clone_name.element).value = newly_cloned_project_1.name;
-        clone_name.trigger('input');
+        set_validated_input_text(
+            wrapper.find({ref: 'cloned_project_name'}), newly_cloned_project_1.name);
         await single_project.$nextTick();
 
         expect(single_project.course_to_clone_to).toBe(course_1);
@@ -259,11 +253,9 @@ describe('SingleProject.vue', () => {
 
         expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_project_modal).toBe(false);
-        expect(wrapper.emitted().add_cloned_project.length).toEqual(1);
     });
 
-    test('Clone project to other course',
-         async () => {
+    test('Clone project to other course', async () => {
         wrapper = mount(SingleProject, {
             propsData: {
                 course: course_1,
@@ -273,13 +265,10 @@ describe('SingleProject.vue', () => {
             stubs: ['router-link']
         });
 
-        single_project = wrapper.vm;
-        await single_project.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        courses = [course_1, course_2];
-
-        wrapper.find('.copier').trigger('click');
-        await single_project.$nextTick();
+        wrapper.find('.copy-project').trigger('click');
+        await wrapper.vm.$nextTick();
 
         let validated_input = <ValidatedInput> wrapper.find(
             {ref: "cloned_project_name"}
@@ -288,24 +277,27 @@ describe('SingleProject.vue', () => {
         expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
-        let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
-        (<HTMLInputElement> clone_name.element).value = newly_cloned_project_2.name;
-        clone_name.trigger('input');
-        await single_project.$nextTick();
+        set_validated_input_text(
+            wrapper.find({ref: 'cloned_project_name'}), newly_cloned_project_2.name);
+        await wrapper.vm.$nextTick();
 
-        single_project.course_to_clone_to = course_2;
+        set_select_object_value(wrapper.find({ref: 'cloning_destinations_dropdown'}), course_2.pk);
+        await wrapper.vm.$nextTick();
 
-        expect(single_project.course_to_clone_to).toBe(course_2);
+        expect(wrapper.vm.course_to_clone_to).toBe(course_2);
         expect(validated_input.is_valid).toBe(true);
         expect(wrapper.find('.clone-project-button').is('[disabled]')).toBe(false);
 
-        sinon.stub(project_1, 'copy_to_course').returns(Promise.resolve(newly_cloned_project_2));
+        let copy_to_course_stub = sinon.stub(project_1, 'copy_to_course').resolves(
+            newly_cloned_project_2);
 
         wrapper.find('.clone-project-button').trigger('click');
-        await single_project.$nextTick();
+        await wrapper.vm.$nextTick();
 
+        expect(
+            copy_to_course_stub.calledOnceWith(course_2.pk, newly_cloned_project_2.name)
+        ).toEqual(true);
         expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(false);
-        expect(wrapper.emitted().add_cloned_project).toBeFalsy();
     });
 
     test('Error cloned project name must be unique within course', async () => {
@@ -313,7 +305,6 @@ describe('SingleProject.vue', () => {
             propsData: {
                 course: course_1,
                 project: project_1,
-                existing_projects: projects
             },
             stubs: ['router-link']
         });
@@ -321,9 +312,7 @@ describe('SingleProject.vue', () => {
         single_project = wrapper.vm;
         await single_project.$nextTick();
 
-        courses = [course_1, course_2];
-
-        wrapper.find('.copier').trigger('click');
+        wrapper.find('.copy-project').trigger('click');
         await single_project.$nextTick();
 
         let validated_input = <ValidatedInput> wrapper.find(
@@ -333,9 +322,7 @@ describe('SingleProject.vue', () => {
         expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);
         expect(validated_input.is_valid).toBe(false);
 
-        let clone_name = wrapper.find({ref: 'cloned_project_name'}).find('#input');
-        (<HTMLInputElement> clone_name.element).value = project_1.name;
-        clone_name.trigger('input');
+        set_validated_input_text(wrapper.find({ref: 'cloned_project_name'}), project_1.name);
         await single_project.$nextTick();
 
         expect(single_project.course_to_clone_to).toBe(course_1);
