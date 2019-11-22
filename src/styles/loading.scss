@@ -4,6 +4,7 @@
 
 .loading-wrapper {
     position: relative;
+    overflow: hidden;
 }
 
 .loading-centered, .loading-large {
@@ -18,6 +19,17 @@
     right: 0;
 }
 
+.loading-small {
+    font-size: 1rem;
+    min-height: 1rem;
+}
+
+.loading-medium {
+    font-size: 2.25rem;
+    min-height: 2.25rem;
+}
+
 .loading-large {
     font-size: 3.5em;
+    min-height: 3.5em;
 }

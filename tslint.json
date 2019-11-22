@@ -189,7 +189,7 @@
             // Static readonly members can be upper case.
             {"type": "member", "modifiers": ["static", "readonly"], "format": ["UPPER_CASE"]},
 
-            {"type": "member", "leadingUnderscore": "forbid", "trailingUnderscore": "forbid"},
+            {"type": "member", "trailingUnderscore": "forbid"},
 
             // Whitelist for inherited methods.
             {"type": "method", "filter": "^(toJSON|toString)$", "format": null},
