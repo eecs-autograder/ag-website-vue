@@ -52,7 +52,7 @@
         </table>
       </div>
       <div v-else class="empty-roster-message">
-        The {{role}} roster for this course is currently empty!
+        The {{role}} roster is currently empty
       </div>
     </div>
   </div>
@@ -162,6 +162,10 @@ export default class Roster extends Vue {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+.empty-roster-message {
+  color: darken($stormy-gray-dark, 10%);
 }
 
 .enrollment-add-label {
