@@ -378,15 +378,15 @@ function num_glob_matches(names: string[], pattern: string): number {
 }
 
 #submit-component {
-  padding: 15px;
+  padding: .875rem;
 }
 
 #deadline-container {
-  margin: 15px 0;
+  margin: .875rem 0;
 
   #deadline-text {
-    font-size: 1.4rem;
-    margin-bottom: 7px;
+    font-size: 1.375rem;
+    margin-bottom: .375rem;
   }
 
   #deadline {

@@ -350,7 +350,7 @@ $border-color: $pebble-medium;
 }
 
 .no-submissions {
-  padding: .325rem .5rem;
+  padding: .375rem .5rem;
   color: darken($stormy-gray-dark, 15%);
 }
 
