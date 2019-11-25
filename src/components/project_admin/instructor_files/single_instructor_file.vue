@@ -6,12 +6,12 @@
                       ref="rename_form"
                       @submit=rename_file>
         <validated-input ref='file_name'
-                          v-model="new_file_name"
-                          :validators="[is_not_empty]"
-                          input_style="width: 200px;
-                                      padding: 3px 5px;
-                                      margin-right: 10px;"
-                          @input_validity_changed="new_name_is_valid = $event">
+                         v-model="new_file_name"
+                         :validators="[is_not_empty]"
+                         input_style="width: 200px;
+                                     padding: 3px 5px;
+                                     margin-right: 10px;"
+                         @input_validity_changed="new_name_is_valid = $event">
         </validated-input>
         <div class="edit-name-buttons">
           <button class="update-file-name-button"
@@ -30,30 +30,31 @@
     <div v-else class="not-editing">
       <div class="file-name">{{file.name}}</div>
       <i class="fas fa-pencil-alt edit-file-name"
-          @click.stop="new_file_name = file.name; editing = true;"></i>
+         @click.stop="new_file_name = file.name; editing = true;"></i>
       <i class="fas fa-file-download download-file"
-          @click.stop="download_file"></i>
+         @click.stop="download_file"></i>
       <i class="far fa-trash-alt delete-file"
-          @click.stop="d_show_delete_instructor_file_modal = true"></i>
+         @click.stop="d_show_delete_instructor_file_modal = true"></i>
     </div>
     <div class="display-timestamp">
       {{format_datetime(file.last_modified)}}
     </div>
     <div @click.stop>
       <modal v-if="d_show_delete_instructor_file_modal"
-            @close="d_show_delete_instructor_file_modal = false"
-            ref="delete_instructor_file_modal"
-            size="large"
-            click_outside_to_close>
-        <div id="modal-header">Confirm Delete</div>
+             @close="d_show_delete_instructor_file_modal = false"
+             ref="delete_instructor_file_modal"
+             size="large"
+             click_outside_to_close>
+        <div class="modal-header">Confirm Delete</div>
         <hr>
-        <div id="modal-body"> Are you sure you want to delete the file
-          <span class="file-to-delete">{{file.name}}</span>?
-          This action cannot be undone, and any test cases that rely on this file may have
+        <div> Are you sure you want to delete
+          <span class="file-to-delete">{{file.name}}</span>? <br><br>
+          <b>This action cannot be undone</b>. <br>
+          Any test cases that rely on this file may have
           to be updated before they'll run correctly again.
         </div>
 
-        <div id="modal-button-container">
+        <div class="button-footer-right modal-button-footer">
           <button class="modal-delete-button"
                   :disabled="d_delete_pending"
                   @click="delete_file_permanently"> Delete </button>
@@ -150,9 +151,10 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/global.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
@@ -161,13 +163,13 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 .single-instructor-file-component {
   cursor: pointer;
 
-  padding: 9px 11px 7px 11px;
+  padding: .5rem .75rem;
   word-wrap: break-word;
   word-break: break-word;
 }
 
 .icon-holder {
-  padding-top: 2px;
+  padding-top: .125rem;
 }
 
 .not-editing {
@@ -175,11 +177,11 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 
   .file-name {
     font-size: 16px;
-    padding-bottom: 2px;
+    padding-bottom: .125rem;
   }
 
   .edit-file-name, .download-file, .delete-file {
-    margin: 0 5px;
+    margin: 0 .375rem;
   }
 
   .edit-file-name {
@@ -210,7 +212,7 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 
 .edit-name-buttons {
   display: flex;
-  padding: 9px 0 7px 0;
+  padding: .5rem 0;
 }
 
 .update-file-name-button {
@@ -219,51 +221,31 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 
 .update-file-name-cancel-button {
   @extend .flat-white-button;
-  margin-left: 10px;
+  margin-left: .625rem;
 }
 
 .update-file-name-button, .update-file-name-cancel-button {
-  padding: 4px 6px 5px 6px;
+  padding: .25rem .375rem;
 }
 
 .display-timestamp {
   display: block;
   color: hsl(220, 20%, 65%);
-  font-size: 15px;
+  font-size: .875rem;
 }
 
 /* ---------------- MODAL ---------------- */
 
-#modal-header {
-  padding: 5px 10px;
-}
-
-#modal-body {
-  padding: 10px 10px 20px 10px;
-}
-
 .file-to-delete {
-  color: $ocean-blue;
-  letter-spacing: 1px;
-}
-
-#modal-button-container {
-  text-align: right;
-  padding: 10px;
-}
-
-.modal-cancel-button, .modal-delete-button {
-  border-radius: 2px;
-  font-size: 15px;
+  color: darken($ocean-blue, 5%);
   font-weight: bold;
 }
 
 .modal-cancel-button {
-  @extend .gray-button;
+  @extend .white-button;
 }
 
 .modal-delete-button {
-  @extend .orange-button;
-  margin-right: 20px;
+  @extend .red-button;
 }
 </style>

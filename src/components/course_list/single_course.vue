@@ -9,7 +9,7 @@
       </router-link>
 
       <div class="toolbox" v-if="is_admin">
-        <div class="clone-course tool-icon first-tool-icon"
+        <div class="clone-course tool-icon"
              @click="d_show_clone_course_modal = true"
              :title="'Clone ' + course.name">
           <i class="fas fa-copy"> </i>
@@ -67,7 +67,7 @@
 
         <APIErrors ref="api_errors"></APIErrors>
 
-        <div class="button-footer">
+        <div class="button-footer modal-button-footer">
           <button type="submit"
                   class="create-clone-button"
                   :disabled="!clone_course_form_is_valid || clone_course_pending">

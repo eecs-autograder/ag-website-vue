@@ -1,5 +1,5 @@
 <template>
-  <div id="single-expected-student-file">
+  <div class="single-expected-student-file">
 
     <div :class="[editing ? 'editing-file' : 'file']">
       <div class="special">
@@ -33,8 +33,7 @@
       </span>
     </div>
 
-    <div v-if="editing"
-         :class="(editing) ? 'form-editing' : 'form-not-editing'">
+    <div v-if="editing" :class="(editing) ? 'form-editing' : 'form-not-editing'">
       <expected-student-file-form ref="form"
                                   @on_submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
@@ -42,7 +41,7 @@
         <template slot="form_footer">
           <APIErrors ref="api_errors"> </APIErrors>
 
-          <div class="button-container">
+          <div class="button-footer">
             <button class="save-button"
                     type="submit"
                     :disabled="!pattern_is_valid"> Save
@@ -60,15 +59,17 @@
            @close="d_show_delete_expected_student_file_modal = false"
            ref="delete_expected_student_file_modal"
            size="large"
-           :include_closing_x="false">
-      <div id="modal-header">Confirm Deletion</div>
+           :include_closing_x="true"
+           click_outside_to_close>
+      <div class="modal-header">Confirm Delete</div>
       <hr>
-      <div id="modal-body"> Are you sure you want to delete the pattern
-        <b class="file-to-delete">{{expected_student_file.pattern}}</b>?
-        This action cannot be undone, and any test cases that rely on this file may have
+      <div> Are you sure you want to delete
+        <b class="file-to-delete">{{expected_student_file.pattern}}</b>? <br><br>
+        This action cannot be undone. <br>
+        Any test cases that rely on this file may have
         to be updated before they run correctly again.
       </div>
-      <div id="modal-button-container">
+      <div class="button-footer-right modal-button-footer">
         <button class="modal-delete-button"
                 type="button"
                 :disabled="d_delete_pending"
@@ -176,10 +177,12 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
-#single-expected-student-file {
+.single-expected-student-file {
   border-radius: 2px;
   box-sizing: border-box;
   width: 100%;
@@ -192,12 +195,12 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .matches-label {
-  padding: 1px 0 5px 0;
+  margin: .25rem 0;
   color: lighten(black, 20);
 }
 
 .editing-file, .file {
-  padding: 5px 5px 5px 10px;
+  padding: .25rem .25rem .25rem .625rem;
 }
 
 .editing-file {
@@ -210,13 +213,12 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
   align-items: center;
   display: flex;
   justify-content: space-between;
-  min-height: 32px;
 }
 
 .file {
   border: 2px solid hsl(210, 20%, 96%);
-  border-radius: 4px;
-  margin-bottom: 5px;
+  border-radius: 3px;
+  margin-bottom: .25rem;
 }
 
 .file:hover {
@@ -228,15 +230,16 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
   border: 2px solid hsl(212, 50%, 90%);
   border-top: none;
   border-radius: 0 0 3px 3px;
-  margin-bottom: 5px;
-  padding: 15px 25px 25px 25px;
+  margin-bottom: .25rem;
+  padding: 0 .5rem;
 }
 
 .pattern {
   display: inline-block;
-  font-size: 17px;
+  font-size: 1rem;
   font-weight: bold;
   word-wrap: break-word;
+  word-break: break-word;
 }
 
 .icon-holder {
@@ -245,19 +248,19 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .edit-file, .delete-file {
-  border-radius: 4px;
+  border-radius: 3px;
   border: 2px solid transparent;
   color: hsl(212, 50%, 27%);
   display: inline-block;
-  padding: 5px;
+  padding: .25rem;
 }
 
 .delete-file {
-  margin-right: 5px;
+  margin-right: .25rem;
 }
 
 .edit-file-icon, .delete-file-icon {
-  font-size: 15px;
+  font-size: .875rem;
 }
 
 .file:hover {
@@ -268,13 +271,8 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
   }
 }
 
-.button-container {
-  padding: 18px 0 0 0;
-}
-
 .save-button {
   @extend .green-button;
-  font-size: 15px;
 }
 
 .save-button:disabled, .save-button:disabled:hover {
@@ -282,38 +280,21 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .cancel-save-button {
-  @extend .light-gray-button;
-  color: hsl(220, 30%, 25%);
-  margin-left: 10px;
+  @extend .white-button;
 }
 
 /* ---------------- MODAL ---------------- */
 
-#modal-header {
-  padding: 5px 10px;
-}
-
-#modal-body {
-  padding: 10px 10px 20px 10px;
-}
-
 .file-to-delete {
-  color: $ocean-blue;
-  letter-spacing: 1px;
-}
-
-#modal-button-container {
-  padding: 10px;
-  text-align: right;
+  color: darken($ocean-blue, 5%);
 }
 
 .modal-cancel-button {
-  @extend .gray-button;
+  @extend .white-button;
 }
 
 .modal-delete-button {
   @extend .red-button;
-  margin-right: 20px;
 }
 
 </style>

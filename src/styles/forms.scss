@@ -41,14 +41,25 @@
         font-size: 1rem;
         width: 100%;
     }
+
+    .button {
+        margin-right: .75rem;
+    }
+}
+
+// Removes the bottom margin from .button-footer(-right)
+.modal-button-footer {
+    margin-bottom: 0;
 }
 
 // Like form-button-footer, but right-justifies the buttons
 .button-footer-right {
-    justify-content: space-around;
-
     .button:first-child {
         margin-left: auto;
+    }
+
+    .button:last-child {
+        margin-right: 0;
     }
 }
 
@@ -66,8 +77,8 @@
 
 .input-tooltip {
     color: mediumvioletred;
-    font-size: 15px;
-    margin-left: 8px;
+    font-size: .875rem;
+    margin-left: .5rem;
 }
 
 // TODO: rename to inline-label
@@ -119,7 +130,7 @@ $input-text-color: #495057;
 
 .input {
     font-size: 1rem;
-    padding: 6px 7px;
+    padding: .375rem;
     border-radius: 2px;
     color: $input-text-color;
     background-color: white;
@@ -133,13 +144,13 @@ $input-text-color: #495057;
     box-sizing: border-box;
     color: $input-text-color;
     font-size: 1rem;
-    padding: 6px 4px;
+    padding: .375rem .25rem;
 }
 
 .radio-container {
-    padding: 2px 4px;
+    padding: .125rem .25rem;
     .label {
-        padding-left: 3px;
+        padding-left: .25rem;
     }
 }
 

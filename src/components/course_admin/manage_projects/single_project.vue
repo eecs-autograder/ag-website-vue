@@ -6,7 +6,7 @@
       </router-link>
 
       <div class="toolbox">
-        <div class="copy-project tool-icon first-tool-icon" @click="clone_project">
+        <div class="copy-project tool-icon" @click="clone_project">
           <i class="fas fa-copy"></i>
         </div>
 
@@ -50,7 +50,7 @@
 
         <APIErrors ref="api_errors"></APIErrors>
 
-        <div class="button-footer clone-button-footer">
+        <div class="button-footer modal-button-footer">
           <button @click="add_cloned_project"
                   class="clone-project-button"
                   :disabled="!cloned_project_name_is_valid">Clone Project</button>
@@ -157,10 +157,6 @@ export function handle_add_cloned_project_error(component: SingleProject, error:
 .cloned-project-name {
   max-width: 500px;
   margin-top: .5rem;
-}
-
-.clone-button-footer {
-  margin-bottom: 0;
 }
 
 .clone-project-button {

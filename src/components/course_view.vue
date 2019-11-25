@@ -16,7 +16,7 @@
         </router-link>
         <div class="toolbox" v-if="d_globals.user_roles.is_admin">
           <router-link :to="`/web/project_admin/${project.pk}`"
-                        class="edit-project tool-icon first-tool-icon"
+                        class="edit-project tool-icon"
                         :title="'Edit ' + project.name"
                         v-if="d_globals.user_roles.is_admin">
             <i class="fas fa-cog cog"></i>
