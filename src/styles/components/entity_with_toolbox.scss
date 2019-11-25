@@ -1,0 +1,60 @@
+// Common styling for links to courses and projects together with
+// edit, clone, or other "toolbox" links.
+
+$border-radius: 3px;
+
+.entity {
+    .info {
+        display: block;
+        padding: .5rem;
+        background-color: $gray-blue-1;
+        border-top-left-radius: $border-radius;
+        border-top-right-radius: $border-radius;
+
+        &:hover .name {
+            font-weight: bold;
+        }
+    }
+
+    .round-bottom-corners {
+        border-bottom-left-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+    }
+
+    .name {
+        color: black;
+        font-size: 1.25rem;
+
+        &:hover {
+            font-weight: bold;
+        }
+    }
+
+    .toolbox {
+        background-color: hsl(212, 60%, 94%);
+        border-bottom-left-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+        border-top: none;
+        padding: 0 .25rem;
+
+        display: flex;
+        justify-content: space-around;
+
+        font-size: 1.125rem;
+
+        .tool-icon {
+            cursor: pointer;
+            padding: .375rem .5rem;
+
+            color: black;
+            &:hover {
+                color: darken($stormy-gray-dark, 15%);
+            }
+        }
+
+        .first-tool-icon {
+            margin-left: auto;
+        }
+    }
+
+}

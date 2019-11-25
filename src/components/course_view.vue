@@ -1,40 +1,29 @@
 <template>
-  <div id="project-list-component">
-
-    <div v-if="d_loading" class="loading-spinner">
-      <div> <i class="fa fa-spinner fa-pulse"></i> </div>
+  <div v-if="d_loading" class="loading-large">
+    <div> <i class="fa fa-spinner fa-pulse"></i> </div>
+  </div>
+  <div v-else id="project-list-component">
+    <div v-if="projects.length === 0" id="no-projects-message">
+      No projects have been published yet.
     </div>
 
-    <div v-if="!d_loading">
-      <div id="project-list-title"
-           :style="[{paddingLeft: projects.length === 0 ? '0' : '10px'}]">
-        Projects
-      </div>
-
-      <div v-if="projects.length === 0"
-           id="no-projects-message">
-        No projects have been published yet.
-      </div>
-
-      <table id="list-of-projects" v-else>
-        <tr class="project" v-for="(project, index) of projects">
-          <router-link tag="td"
-                       :to="`/web/project/${project.pk}`"
-                       :class="['project-name',
-                                (index % 2 === 0) ? 'even-project' : 'odd-project']">
-            {{project.name}}
-          </router-link>
-
-          <router-link tag="td"
-                       :to="`/web/project_admin/${project.pk}`"
-                       :title="'Edit ' + project.name"
-                       class="edit-project"
-                       v-if="d_globals.user_roles.is_admin">
+    <template v-else>
+      <div class="project entity" v-for="project of projects" :key="project.pk">
+        <router-link class="project-name info name"
+                      :class="{'round-bottom-corners': !d_globals.user_roles.is_admin}"
+                      :to="`/web/project/${project.pk}`">
+          {{project.name}}
+        </router-link>
+        <div class="toolbox" v-if="d_globals.user_roles.is_admin">
+          <router-link :to="`/web/project_admin/${project.pk}`"
+                        class="edit-project tool-icon first-tool-icon"
+                        :title="'Edit ' + project.name"
+                        v-if="d_globals.user_roles.is_admin">
             <i class="fas fa-cog cog"></i>
           </router-link>
-        </tr>
-      </table>
-    </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -73,80 +62,114 @@ export default class CourseView extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/components/entity_with_toolbox.scss';
+@import '@/styles/loading.scss';
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
 
 #project-list-component {
-  margin: 0 10px;
+  margin: 0 .5rem;
+  max-width: 350px;
 }
 
-.loading-spinner {
-  align-items: center;
-  color: $ocean-blue;
-  display: flex;
-  font-size: 55px;
-  height: 60vh;
-  justify-content: center;
+#no-projects-message {
+  padding: 1rem 0;
 }
 
-#project-list-title {
-  color: lighten(black, 25);
-  font-size: 22px;
-  font-weight: bold;
-  margin: 0;
-  padding: 20px 10px 15px 0;
+.entity {
+  margin: .75rem 0;
 }
 
-#list-of-projects {
-  border-spacing: 10px;
-}
+// #project-list-title {
+//   color: lighten(black, 25);
+//   font-size: 22px;
+//   font-weight: bold;
+//   margin: 0;
+//   padding: 20px 10px 15px 0;
+// }
 
-.project {
-  box-sizing: border-box;
-}
+// #list-of-projects {
+  // border-spacing: 10px;
+  // border-spacing: 0;
+  // border-collapse: collapse;
+// }
 
-.project-name {
-  border: 2px solid lighten(lavender, 1);
-  border-radius: 4px;
-  box-sizing: border-box;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 10px 40px 10px 10px;
-}
+// .project-row {
+//   // box-sizing: border-box;
+//   font-size: 1.25rem;
+// }
 
-.edit-project {
-  background-color: hsl(220, 30%, 95%);
-  border: 2px solid hsl(212, 20%, 93%);
-  border-radius: 4px;
-  cursor: pointer;
-  display: inline-block;
-  padding: 10.5px 12px;
-  vertical-align: top;
-  color: hsl(212, 50%, 27%);
-}
+// .project-cell {
+//   padding: .125rem;
 
-.even-project {
-  background-image: linear-gradient(to bottom right, lighten(lavender, 1), lavender);
-}
+//   &:hover {
+//     font-weight: bold;
+//   }
+// }
 
-.odd-project {
-  background-image: linear-gradient(to bottom right, lighten(lavender, 1), lighten(lavender, 1));
-}
+// $border-radius: 3px;
 
-.project-name:hover {
-  border: 2px solid darken(lavender, 6);
-}
+// .name-cell {
+//   background-color: $gray-blue-1;
 
-.edit-project:hover {
-  border: 2px solid darken(lavender, 6);
-}
+//   // border: 2px solid lighten(lavender, 1);
+//   border-top-left-radius: $border-radius;
+//   border-bottom-left-radius: $border-radius;
 
-.cog {
-  font-size: 18px;
-}
+// }
 
-@media only screen and (min-width: 481px) {
-  #project-list-component {
-    margin: 0 2.5%;
-  }
-}
+
+// .project-name {
+//   color: $dark-blue;
+
+//   // padding: 10px 40px 10px 10px;
+// }
+
+// .edit-project {
+//   background-color: hsl(212, 60%, 94%);
+
+//   // background-color: hsl(220, 30%, 95%);
+//   // border: 2px solid hsl(212, 20%, 93%);
+//   // border-radius: 4px;
+//   border-top-right-radius: $border-radius;
+//   border-bottom-right-radius: $border-radius;
+
+//   // cursor: pointer;
+//   // display: inline-block;
+//   // padding: 10.5px 12px;
+//   // vertical-align: top;
+//   color: hsl(212, 50%, 27%);
+// }
+
+// .even-project {
+//   background-image: linear-gradient(to bottom right, lighten(lavender, 1), lavender);
+// }
+
+// .odd-project {
+//   background-image: linear-gradient(to bottom right, lighten(lavender, 1), lighten(lavender, 1));
+// }
+
+// .project-name:hover {
+//   border: 2px solid darken(lavender, 6);
+// }
+
+// .edit-project:hover {
+//   border: 2px solid darken(lavender, 6);
+// }
+
+// .cog {
+//   font-size: 1.125rem;
+//   // font-size: 18px;
+// }
+
+// @media only screen and (min-width: 481px) {
+//   #project-list-component {
+//     margin: 0 2.5%;
+//   }
+// }
 
 </style>

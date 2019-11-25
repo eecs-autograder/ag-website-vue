@@ -181,8 +181,7 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 }
 
 #course-list {
-  margin: 0 5%;
-  width: 90%;
+  margin: 0 .5rem;
 }
 
 .semester-name {
@@ -206,7 +205,6 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 
 #not-enrolled-message {
   padding: 1rem 0;
-  text-align: center;
 }
 
 </style>

@@ -1,23 +1,22 @@
 <template>
   <div ref="single-course-component" class="single-course-component">
-    <div class="course">
+    <div class="entity">
       <router-link :to="`/web/course/${course.pk}`"
-                   class="course-info">
-        <div class="course-name">{{course.name}} </div>
+                   class="info course-info"
+                   :class="{'round-bottom-corners': !is_admin}">
+        <div class="course-name name">{{course.name}} </div>
         <div class="course-subtitle">{{course.subtitle}}</div>
       </router-link>
 
-      <div class="toolbox">
-        <div class="clone-course"
+      <div class="toolbox" v-if="is_admin">
+        <div class="clone-course tool-icon first-tool-icon"
              @click="d_show_clone_course_modal = true"
-             :title="'Clone ' + course.name"
-             v-if="is_admin">
+             :title="'Clone ' + course.name">
           <i class="fas fa-copy"> </i>
         </div>
         <router-link :to="`/web/course_admin/${course.pk}`"
-                     :title="'Edit ' + course.name"
-                     v-if="is_admin">
-          <div class="edit-course-settings">
+                     :title="'Edit ' + course.name">
+          <div class="edit-course-settings tool-icon">
             <i class="fas fa-cog"></i>
           </div>
         </router-link>
@@ -155,27 +154,13 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/components/entity_with_toolbox.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
-}
-
-$border-radius: 3px;
-
-.course-info {
-  display: block;
-  padding: .5rem;
-  background-color: $gray-blue-1;
-  border-top-left-radius: $border-radius;
-  border-top-right-radius: $border-radius;
-}
-
-.course-name {
-  color: $dark-blue;
-  font-size: 1.25rem;
 }
 
 .course-subtitle {
@@ -186,33 +171,6 @@ $border-radius: 3px;
   min-height: 1.25rem;
 
   line-height: 1;
-}
-
-.toolbox {
-  background-color: hsl(212, 60%, 94%);
-  border-bottom-left-radius: $border-radius;
-  border-bottom-right-radius: $border-radius;
-  border-top: none;
-  padding: 0 .25rem;
-
-  display: flex;
-  justify-content: space-around;
-
-  font-size: 1.125rem;
-}
-
-.clone-course {
-  margin-left: auto;
-}
-
-.edit-course-settings, .clone-course {
-  cursor: pointer;
-  padding: .375rem .5rem;
-
-  color: black;
-  &:hover {
-    color: darken($stormy-gray-dark, 15%);
-  }
 }
 
 /**** Modal *******************************************************************/

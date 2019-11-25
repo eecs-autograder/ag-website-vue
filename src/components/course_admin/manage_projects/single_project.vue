@@ -1,16 +1,16 @@
 <template>
   <div id="single-project-component">
-    <div class="project-wrapper">
-      <router-link :to="`/web/project/${project.pk}`" class="project-name">
+    <div class="project-wrapper entity">
+      <router-link :to="`/web/project/${project.pk}`" class="project-name name info">
         {{project.name}}
       </router-link>
 
       <div class="toolbox">
-        <div class="copy-project" @click="clone_project">
+        <div class="copy-project tool-icon first-tool-icon" @click="clone_project">
           <i class="fas fa-copy"></i>
         </div>
 
-        <router-link :to="`/web/project_admin/${project.pk}`" class="edit-project">
+        <router-link :to="`/web/project_admin/${project.pk}`" class="edit-project tool-icon">
           <i class="fas fa-cog"></i>
         </router-link>
       </div>
@@ -28,11 +28,11 @@
         <div class="cloned-project-name form-field-wrapper">
           <label class="text-label"> Name </label>
           <validated-input ref="cloned_project_name"
-                            v-model="cloned_project_name"
-                            :validators="[is_not_empty]"
-                            :num_rows="1"
-                            input_style="width: 100%"
-                            @input_validity_changed="cloned_project_name_is_valid = $event">
+                           v-model="cloned_project_name"
+                           :validators="[is_not_empty]"
+                           :num_rows="1"
+                           input_style="width: 100%"
+                           @input_validity_changed="cloned_project_name_is_valid = $event">
           </validated-input>
         </div>
 
@@ -137,6 +137,7 @@ export function handle_add_cloned_project_error(component: SingleProject, error:
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
+@import '@/styles/components/entity_with_toolbox.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
@@ -145,50 +146,6 @@ export function handle_add_cloned_project_error(component: SingleProject, error:
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-$border-radius: 3px;
-
-.project-name {
-  display: block;
-
-  color: $dark-blue;
-  font-size: 1.25rem;
-  padding: .5rem;
-  background-color: $gray-blue-1;
-  border-top-left-radius: $border-radius;
-  border-top-right-radius: $border-radius;
-
-  &:hover {
-    font-weight: bold;
-  }
-}
-
-.toolbox {
-  display: flex;
-  justify-content: space-around;
-
-  background-color: hsl(212, 60%, 94%);
-  border-bottom-left-radius: $border-radius;
-  border-bottom-right-radius: $border-radius;
-  border-top: none;
-
-  padding: 0 .25rem;
-  font-size: 1.125rem;
-}
-
-.copy-project {
-  margin-left: auto;
-}
-
-.copy-project, .edit-project {
-  cursor: pointer;
-  padding: .375rem .5rem;
-
-  color: black;
-  &:hover {
-    color: darken($stormy-gray-dark, 15%);
-  }
 }
 
 /* ---------------- MODAL ---------------- */
