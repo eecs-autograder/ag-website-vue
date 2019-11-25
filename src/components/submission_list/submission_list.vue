@@ -22,7 +22,7 @@
       </div>
 
       <div class="sidebar-content" v-if="!d_collapsed">
-        <div id="list-loading-container" class="loading-wrapper" v-if="d_loading">
+        <div class="list-loading-container loading-wrapper" v-if="d_loading">
           <i class="loading-horiz-centered loading-medium fa fa-spinner fa-pulse"></i>
         </div>
         <template v-else>
@@ -49,8 +49,7 @@
         Your screen may be too small to display this content properly.
       </div>
 
-      <div v-if="d_selected_submission !== null"
-           id="submission-detail-container">
+      <div v-if="d_selected_submission !== null">
         <submission-detail ref="submission_detail"
                            :submission_with_results="d_selected_submission"
                            :is_ultimate_submission="is_ultimate_submission"
@@ -281,7 +280,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
   margin: 0;
 }
 
-#list-loading-container{
+.list-loading-container{
   margin-top: 1rem;
 }
 
@@ -305,7 +304,7 @@ $border-color: $pebble-medium;
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 40px,
+  $sidebar-header-height: 2.5rem,
   $border-color: $border-color,
   $background-color: white,
   $active-color: $active-color,
@@ -342,7 +341,7 @@ $border-color: $pebble-medium;
 }
 
 .header {
-  @include header(19px, 10px);
+  @include header(1.125rem, .625rem);
 }
 
 .active {

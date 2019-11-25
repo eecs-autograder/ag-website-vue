@@ -109,7 +109,7 @@
     <modal v-if="d_show_send_group_invitation_modal"
            @close="d_show_send_group_invitation_modal = false"
            ref="send_group_invitation_modal"
-           size="medium"
+           size="large"
            click_outside_to_close>
       <div class="modal-header"> Send Invitation </div>
       <div class="modal-divider"></div>
@@ -340,40 +340,44 @@ $teal: hsl(180, 100%, 24%);
 
 #registration-header {
   text-align: left;
-  font-size: 24px;
-  margin-top: 15px;
+  font-size: 1.5rem;
+  margin-top: .875rem;
+  margin-left: .5rem;
 }
 
 #registration-buttons {
-  margin: 10px 0;
+  margin: .625rem 0;
   display: flex;
   flex-direction: column;
-  justify-items: center;
+  justify-content: center;
   align-items: center;
 
-  max-width: 300px;
+  @media only screen and (min-width: 500px) {
+    max-width: 300px;
+  }
+  padding: 0 .5rem;
 
   .button {
-    width: 300px;
-    margin: 5px 0;
+    width: 100%;
+    margin: .25rem 0;
   }
 }
 
 #registration-closed {
-  padding: 15px 20px;
+  padding: .875rem 1.25rem;
 }
 
 #resolve-invitation-message {
-  padding: 15px 20px 2px 20px;
+  padding: .875rem 1.25rem .125rem;
 }
 
 #resolve-invitation-square {
   color: $purple;
-  margin: 0 5px;
+  margin: 0 .25rem;
 }
 
 .single-invitation-received {
-  margin-top: 15px;
+  margin-top: .875rem;
 }
 
 #invitation-sent {
@@ -390,7 +394,7 @@ $border-teal: darken($lighter-teal, 1%);
 }
 
 #invitation-sent-title {
-  font-size: 20px;
+  font-size: 1.5rem;
 }
 
 #invitation-sent-body {
@@ -416,11 +420,11 @@ $border-teal: darken($lighter-teal, 1%);
 #cancel-confirm-working-alone-button,
 #confirm-keep-sent-invitation-button,
 #cancel-send-invitation-button {
-  margin-right: 10px;
+  margin-right: .625rem;
 }
 
 .send-group-invitation-modal-title {
-  padding: 10px 0;
+  padding: .625 0;
   margin: 0;
 }
 

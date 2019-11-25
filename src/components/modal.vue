@@ -108,6 +108,7 @@ export default class Modal extends Vue {
 
   @media only screen and (min-width: 900px) {
     width: 60%;
+    max-width: 700px;
   }
 }
 
