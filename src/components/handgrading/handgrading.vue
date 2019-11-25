@@ -1,5 +1,5 @@
 <template>
-  <div id="handgrading">
+  <div class="handgrading">
     <div class="files">
       <file-panel v-for="filename of d_handgrading_result.submitted_filenames"
                   :key="filename"
@@ -52,7 +52,8 @@
             <div class="criterion"
                  :class="{
                    'loading-cursor': saving,
-                   'criterion-hover': !readonly_handgrading_results
+                   'criterion-hover': !readonly_handgrading_results,
+                   'grayed-out': readonly_handgrading_results && !result.selected,
                  }"
                  :key="result.pk"
                  @click="toggle_criterion(result)">
@@ -474,7 +475,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   margin: 0;
 }
 
-#handgrading {
+.handgrading {
   display: flex;
 }
 
@@ -485,24 +486,24 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
 .grading-sidebar {
   $sidebar-width: 275px;
-  $header-height: 30px;
-  $footer-height: 28px;
+  $header-height: 1.875rem;
+  $footer-height: 1.75rem;
 
   min-width: $sidebar-width;
   max-width: $sidebar-width;
   background-color: lighten($pebble-dark, 10%);
 
   // Don't pad the top, or it will mess up the sticky caclulations.
-  padding: 0 5px;
+  padding: 0 .25rem;
 
   .grading-sidebar-header {
     position: sticky;
     top: 0;
     height: $header-height;
 
-    padding: 6px 0;
+    padding: .375rem 0;
 
-    font-size: 18px;
+    font-size: 1.125rem;
     text-align: center;
 
     .score {
@@ -522,15 +523,15 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
     &.readonly-mode {
       height: calc(100vh - #{$header-height});
-      margin-bottom: 5px;
+      margin-bottom: .25rem;
     }
 
-    font-size: 14px;
+    font-size: .875rem;
 
     .collapsible-section-header {
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: bold;
-      margin: 4px;
+      margin: .25rem;
       @include section-header($with-left-divider: false);
 
       &:hover {
@@ -538,7 +539,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
       }
 
       .fa-caret-right, .fa-caret-down {
-        margin-right: 2px;
+        margin-right: .125rem;
       }
     }
 
@@ -566,7 +567,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     }
 
     .checkbox-input-container {
-      padding: 5px 15px;
+      padding: .25rem .875rem;
       display: flex;
       justify-content: center;
 
@@ -579,13 +580,13 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
     .footer-button {
       flex-grow: 1;
-      padding: 3px 6px;
+      padding: .25rem .375rem;
       background-color: white;
 
       border: none;
 
       height: $footer-height;
-      font-size: 16px;
+      font-size: 1rem;
     }
 
     .green {
@@ -598,12 +599,16 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 }
 
 #adjust-points-container {
-  padding: 4px;
+  padding: .25rem;
 }
 
 #save-adjust-points {
-  padding: 4px 6px;
-  margin-left: 4px;
+  padding: .25rem .375rem;
+  margin-left: .25rem;
+}
+
+.criterion.grayed-out {
+  opacity: .5;
 }
 
 .criterion-hover:not(.loading-cursor):hover {
@@ -616,30 +621,30 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 }
 
 .criterion-checkbox {
-  width: 15px;
-  min-width: 15px;
-  height: 15px;
-  min-height: 15px;
+  width: 1rem;
+  min-width: 1rem;
+  height: 1rem;
+  min-height: 1rem;
   background-color: $pebble-light;
   border: 1px solid $gray-blue-2;
 
-  margin-right: 8px;
+  margin-right: .5rem;
 }
 
 .criterion, .annotation, .comment {
   background-color: white;
-  padding: 8px;
+  padding: .5rem;
 
   .row {
     display: flex;
   }
 
   .short-description {
-    padding-right: 8px;
+    padding-right: .5rem;
   }
 
   .long-description {
-    font-size: 13px;
+    font-size: .75rem;
     color: darken($stormy-gray-dark, 15%);
   }
 }
@@ -651,47 +656,47 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 
   .long-description {
-    padding: 3px 5px 0;
+    padding: .125rem .25rem 0;
   }
 }
 
 .annotation {
   .max-deduction {
-    padding-top: 3px;
-    font-size: 13px;
+    padding-top: .125rem;
+    font-size: .875rem;
     font-weight: bold;
   }
 }
 
 #new-comment {
-  margin-bottom: 5px;
+  margin-bottom: .375rem;
 
   .input {
     width: 100%;
-    font-size: 14px;
+    font-size: .875rem;
   }
 
   .blue-button {
-    padding: 5px 8px;
+    padding: .375rem .5rem;
   }
 }
 
 // Can be used for comments proper and applied annotations
 .comment {
   .location {
-    margin-top: 3px;
+    margin-top: .25rem;
     font-weight: bold;
-    font-size: 13px;
+    font-size: .875rem;
   }
 
   .deduction {
-    padding-left: 3px;
+    padding-left: .25rem;
     color: darken($ocean-blue, 0%);
     font-weight: bold;
   }
 
   .long-description {
-    margin-top: 3px;
+    margin-top: .25rem;
   }
 
   .delete {

@@ -757,8 +757,19 @@ test('Read-only mode', async () => {
             points: 4
         }
     );
-    result.handgrading_rubric.criteria = [criterion];
-    result.criterion_results = [data_ut.make_criterion_result(result, criterion, true)];
+    let unselected_criterion = data_ut.make_criterion(
+        result.handgrading_rubric.pk,
+        {
+            short_description: "Unselected",
+            long_description: "",
+            points: -1,
+        }
+    );
+    result.handgrading_rubric.criteria = [criterion, unselected_criterion];
+    result.criterion_results = [
+        data_ut.make_criterion_result(result, criterion, true),
+        data_ut.make_criterion_result(result, unselected_criterion, false),
+    ];
 
     let annotation = data_ut.make_annotation(
         result.handgrading_rubric.pk,
@@ -800,6 +811,11 @@ test('Read-only mode', async () => {
     checkbox.trigger('click');
     await wrapper.vm.$nextTick();
     expect(save_criterion_result_stub.callCount).toEqual(0);
+
+    // Unselected checkbox is grayed out
+    let unselected_checkbox = wrapper.findAll('.criterion').at(1);
+    expect(unselected_checkbox.classes().includes('grayed-out')).toBe(true);
+    expect(checkbox.classes().includes('grayed-out')).toBe(false);
 
     // Checkbox is still shown
     expect(checkbox.find('.criterion-checkbox .fa-check').exists()).toBe(true);
