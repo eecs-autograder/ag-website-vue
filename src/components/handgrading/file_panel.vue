@@ -85,7 +85,7 @@ export default class FilePanel extends Vue {
 }
 
 .file-panel {
-  $margin: 6px;
+  $margin: .375rem;
 
   margin: $margin;
   $border-color: $pebble-dark;
@@ -95,7 +95,7 @@ export default class FilePanel extends Vue {
     top: 0;
 
     display: flex;
-    padding: 8px;
+    padding: .5rem;
     cursor: pointer;
 
     background-color: $white-gray;
@@ -105,7 +105,7 @@ export default class FilePanel extends Vue {
 
     .filename {
       font-weight: bold;
-      padding-left: 5px;
+      padding-left: .375rem;
     }
   }
 

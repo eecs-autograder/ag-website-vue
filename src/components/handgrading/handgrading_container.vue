@@ -299,7 +299,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 @import '@/styles/colors.scss';
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/static_dropdown.scss';
 
 * {
@@ -316,13 +316,13 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
 $sidebar-width: 275px;
 $border-color: $gray-blue-1;
-$sidebar-footer-height: 42px;
+$sidebar-footer-height: 2.625rem;
 
 $active-color: $light-blue;
 
 @include collapsible_sidebar(
   $sidebar-width: $sidebar-width,
-  $sidebar-header-height: 40px,
+  $sidebar-header-height: 2.5rem,
   $border-color: $border-color,
   $background-color: white,
   $hover-color: lighten($active-color, 5%),
@@ -334,7 +334,7 @@ $active-color: $light-blue;
 .sidebar-container {
   .sidebar-menu {
     .sidebar-header {
-      padding: 5px 8px;
+      padding: .25rem .5rem;
       display: flex;
       align-items: center;
 
@@ -347,13 +347,13 @@ $active-color: $light-blue;
       }
 
       .header-text {
-        font-size: 18px;
-        margin: 0 8px;
+        font-size: 1.125rem;
+        margin: 0 .5rem;
       }
 
       .progress {
         margin-left: auto;
-        font-size: 14px;
+        font-size: .875rem;
         color: $navy-blue;
       }
     }
@@ -373,7 +373,7 @@ $active-color: $light-blue;
       height: $sidebar-footer-height;
       width: $sidebar-width;
       background-color: $white-gray;
-      padding: 5px;
+      padding: .375rem;
     }
   }
 }
@@ -383,10 +383,10 @@ $active-color: $light-blue;
 }
 
 #select-status {
-  padding-left: 3px;
+  padding-left: .25rem;
 
   .header {
-    font-size: 15px;
+    font-size: 1rem;
     font-weight: bold;
   }
 }
