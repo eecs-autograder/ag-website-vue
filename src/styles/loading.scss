@@ -1,10 +1,18 @@
-.loading, .loading-centered, .loading-large {
+.loading {
     color: $stormy-gray-light;
 }
 
 .loading-wrapper {
     position: relative;
     overflow: hidden;
+}
+
+.loading-centered {
+    @extend .loading;
+}
+
+.loading-large {
+    @extend .loading;
 }
 
 .loading-centered, .loading-large {
@@ -17,6 +25,15 @@
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+.loading-horiz-centered {
+    @extend .loading;
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .loading-small {

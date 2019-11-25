@@ -1,5 +1,5 @@
 <template>
-  <div id="submission-list" class="sidebar-container">
+  <div class="sidebar-container">
     <div class="sidebar-menu">
       <template v-if="d_ultimate_submission !== null && !d_collapsed && !d_loading">
         <div class="header">Final Graded Submission</div>
@@ -22,8 +22,8 @@
       </div>
 
       <div class="sidebar-content" v-if="!d_collapsed">
-        <div id="list-loading-container" v-if="d_loading">
-          <i class="loading fa fa-spinner fa-pulse"></i>
+        <div id="list-loading-container" class="loading-wrapper" v-if="d_loading">
+          <i class="loading-horiz-centered loading-medium fa fa-spinner fa-pulse"></i>
         </div>
         <template v-else>
           <div class="no-submissions" v-if="d_submissions.length === 0">No submissions</div>
@@ -42,7 +42,13 @@
       </div>
     </div>
 
+
     <div :class="['body', {'body-closed': d_collapsed}]">
+      <div class="screen-too-small-msg">
+        <i class="fas fa-exclamation-triangle"></i>
+        Your screen may be too small to display this content properly.
+      </div>
+
       <div v-if="d_selected_submission !== null"
            id="submission-detail-container">
         <submission-detail ref="submission_detail"
@@ -266,8 +272,8 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
-@import '@/styles/global.scss';
 @import '@/styles/collapsible_sidebar.scss';
+@import '@/styles/loading.scss';
 
 * {
   box-sizing: border-box;
@@ -275,11 +281,8 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
   margin: 0;
 }
 
-#list-loading-container {
-  .fa-spinner {
-    @include fully-center();
-    font-size: 1.3em;
-  }
+#list-loading-container{
+  margin-top: 1rem;
 }
 
 @mixin header(
@@ -318,13 +321,13 @@ $border-color: $pebble-medium;
   }
 
   .sidebar-header {
-    @include header(18px, 8px);
+    @include header(1.125rem, .5rem);
 
     display: flex;
     align-items: center;
 
     .header-text {
-      padding-left: 8px;
+      padding-left: .5rem;
     }
 
     .collapse-sidebar-button .fa-bars:hover {
@@ -335,10 +338,6 @@ $border-color: $pebble-medium;
 
   .sidebar-header-closed {
     border-bottom: 1px solid $border-color;
-  }
-
-  .body {
-    min-width: 500px;
   }
 }
 
@@ -351,8 +350,21 @@ $border-color: $pebble-medium;
 }
 
 .no-submissions {
-  padding: 5px 8px;
+  padding: .325rem .5rem;
   color: darken($stormy-gray-dark, 15%);
+}
+
+.screen-too-small-msg {
+  margin-top: .25rem;
+  margin-left: .5rem;
+  font-size: 1.125rem;
+  .fa-exclamation-triangle {
+    color: darken($light-yellow, 20%);
+  }
+
+  @media only screen and (min-width: 500px) {
+    display: none;
+  }
 }
 
 </style>

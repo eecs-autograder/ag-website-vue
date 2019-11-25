@@ -1,5 +1,5 @@
 <template>
-  <div v-if="d_loading" class="loading-spinner">
+  <div v-if="d_loading" class="loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
 
@@ -256,16 +256,8 @@ export default class ProjectView extends Vue implements GroupObserver {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/navbar.scss';
-
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
 
 @include navbar(
   $background-color: $pebble-light,
