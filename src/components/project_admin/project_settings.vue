@@ -1,13 +1,12 @@
 <template>
   <div id="project-settings-component">
-
     <validated-form ref="project_settings_form"
                     autocomplete="off"
                     spellcheck="false"
                     @submit="save_project_settings"
                     @form_validity_changed="settings_form_is_valid = $event">
-      <div id="project-name-container">
-        <label class="text-label"> Project Name </label>
+      <div id="project-name-container" class="form-field-wrapper">
+        <label class="label"> Project Name </label>
         <validated-input ref="project_name_input"
                          v-model="d_project.name"
                          :validators="[is_not_empty]"
@@ -15,65 +14,59 @@
         </validated-input>
       </div>
 
-      <div>
-        <fieldset class="fieldset">
-          <legend class="legend"> Project Deadline </legend>
-          <div class="project-input-container">
-
-            <div class="clearable-datetime-picker soft-deadline">
-              <div class="label">
-                Soft Deadline
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="medium" placement="right">
-                    The deadline shown to students.
-                  </tooltip>
-                </i>
-              </div>
-              <div class="datetime-input"
-                   @click="$refs.soft_closing_time.toggle_visibility()">
-                {{format_datetime(d_project.soft_closing_time)}}
-                <i class="far fa-calendar-alt"></i>
-              </div>
-              <button type="button" class="clear-button" ref="clear_soft_closing_time"
-                      @click.stop="d_project.soft_closing_time = null"
-                      :disabled="d_project.soft_closing_time === null">
-                <i class="fas fa-times"></i>
-                <span class="clear-text">Clear</span>
-              </button>
-
-              <datetime-picker v-model="d_project.soft_closing_time"
-                               ref="soft_closing_time"></datetime-picker>
-            </div>
-
-            <div class="clearable-datetime-picker hard-deadline">
-              <div class="label">
-                Hard Deadline
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="medium" placement="right">
-                    The actual deadline. Submissions will not be accepted after this time
-                    unless late days are allowed. This date is NOT shown to students.
-                  </tooltip>
-                </i>
-              </div>
-              <div class="datetime-input"
-                   @click="$refs.closing_time.toggle_visibility()">
-                {{format_datetime(d_project.closing_time)}}
-                <i class="far fa-calendar-alt"></i>
-              </div>
-              <button type="button" class="clear-button" ref="clear_closing_time"
-                      @click.stop="d_project.closing_time = null"
-                      :disabled="d_project.closing_time === null">
-                <i class="fas fa-times"></i>
-                <span class="clear-text">Clear</span>
-              </button>
-
-              <datetime-picker v-model="d_project.closing_time"
-                               ref="closing_time"></datetime-picker>
-            </div>
-
+      <fieldset class="fieldset">
+        <legend class="legend"> Project Deadline </legend>
+        <div class="clearable-datetime-picker soft-deadline">
+          <div class="label">
+            Soft Deadline
+            <i class="fas fa-question-circle input-tooltip">
+              <tooltip width="medium" placement="right">
+                The deadline shown to students.
+              </tooltip>
+            </i>
           </div>
-        </fieldset>
-      </div>
+          <div class="datetime-input"
+                @click="$refs.soft_closing_time.toggle_visibility()">
+            {{format_datetime(d_project.soft_closing_time)}}
+            <i class="far fa-calendar-alt"></i>
+          </div>
+          <button type="button" class="clear-button" ref="clear_soft_closing_time"
+                  @click.stop="d_project.soft_closing_time = null"
+                  :disabled="d_project.soft_closing_time === null">
+            <i class="fas fa-times"></i>
+            <span class="clear-text">Clear</span>
+          </button>
+
+          <datetime-picker v-model="d_project.soft_closing_time"
+                            ref="soft_closing_time"></datetime-picker>
+        </div>
+
+        <div class="clearable-datetime-picker hard-deadline">
+          <div class="label">
+            Hard Deadline
+            <i class="fas fa-question-circle input-tooltip">
+              <tooltip width="medium" placement="right">
+                The actual deadline. Submissions will not be accepted after this time
+                unless late days are allowed. This date is NOT shown to students.
+              </tooltip>
+            </i>
+          </div>
+          <div class="datetime-input"
+                @click="$refs.closing_time.toggle_visibility()">
+            {{format_datetime(d_project.closing_time)}}
+            <i class="far fa-calendar-alt"></i>
+          </div>
+          <button type="button" class="clear-button" ref="clear_closing_time"
+                  @click.stop="d_project.closing_time = null"
+                  :disabled="d_project.closing_time === null">
+            <i class="fas fa-times"></i>
+            <span class="clear-text">Clear</span>
+          </button>
+
+          <datetime-picker v-model="d_project.closing_time"
+                            ref="closing_time"></datetime-picker>
+        </div>
+      </fieldset>
 
       <div class="section-container">
         <fieldset class="fieldset">
@@ -148,9 +141,9 @@
         <fieldset class="fieldset">
           <legend class="legend"> Groups </legend>
 
-          <div class="project-input-container">
+          <div class="form-field-wrapper">
             <div class="group-size-container">
-              <label class="text-label"> Min group size </label>
+              <label class="label"> Min group size </label>
               <validated-input id="min-group-size"
                                v-model="d_project.min_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
@@ -161,7 +154,7 @@
             </div>
 
             <div class="group-size-container">
-              <label class="text-label"> Max group size </label>
+              <label class="label"> Max group size </label>
               <i class="fas fa-question-circle input-tooltip">
                 <tooltip width="large" placement="right">
                   When this is > 1, users will be prompted to register their group
@@ -202,8 +195,8 @@
       <div class="section-container">
         <fieldset class="fieldset">
           <legend class="legend"> Grading Policy </legend>
-          <div class="project-input-container">
-            <label class="text-label"
+          <div class="form-field-wrapper">
+            <label class="label"
                    for="ultimate-submission-policy"> Final graded submission policy </label>
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="large" placement="right">
@@ -235,8 +228,8 @@
       <div class="section-container">
         <fieldset class="fieldset">
           <legend class="legend"> Submission Limits </legend>
-          <div class="project-input-container">
-              <label class="text-label"> Submissions per day </label>
+          <div class="form-field-wrapper">
+              <label class="label"> Submissions per day </label>
               <validated-input id="submission-limit-per-day"
 
                                v-model="d_project.submission_limit_per_day"
@@ -261,8 +254,8 @@
             </label>
           </div>
 
-          <div class="project-input-container">
-            <label class="text-label">
+          <div class="form-field-wrapper extra-space">
+            <label class="label">
               Reset submissions per day at:
             </label>
             <div id="reset-time-picker-container">
@@ -309,8 +302,8 @@
             </i>
           </div>
 
-          <div class="project-input-container">
-            <label class="text-label"> Bonus submissions per group </label>
+          <div class="form-field-wrapper extra-space">
+            <label class="label"> Bonus submissions per group </label>
             <validated-input ref="bonus_submissions_input"
                              v-model="d_project.num_bonus_submissions"
                              :validators="[is_integer, is_not_empty, is_non_negative]"
@@ -334,9 +327,9 @@
             </i>
           </div>
 
-          <div class="project-input-container">
+          <div class="form-field-wrapper extra-space">
             <label for="total-submission-limit"
-                   class="text-label"> Total submission limit (Ever!) </label>
+                   class="label"> Total submission limit (Ever!) </label>
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="medium" placement="right">
                 A hard limit on how many times students can submit ever.
@@ -357,15 +350,17 @@
         </fieldset>
       </div>
 
-      <div class="footer">
+      <div class="button-footer">
         <APIErrors ref="api_errors"></APIErrors>
 
         <button id="save-button"
+                class="save-button"
                 type="submit"
                 :disabled="!settings_form_is_valid || d_saving">Save</button>
-        <span v-show="d_saving" class="saving-spinner">
-          <i class="fa fa-spinner fa-pulse"></i>
-        </span>
+        <div class="last-saved-timestamp">
+          <i v-if="d_saving" class=" loading fa fa-spinner fa-pulse"></i>
+          <template v-else>Saved at {{format_datetime_short(project.last_modified)}}</template>
+        </div>
       </div>
     </validated-form>
   </div>
@@ -383,7 +378,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, format_datetime, format_time, handle_api_errors_async } from "@/utils";
+import { deep_copy, format_datetime, format_datetime_short, format_time, handle_api_errors_async } from "@/utils";
 import {
   is_integer,
   is_non_negative,
@@ -439,6 +434,7 @@ export default class ProjectSettings extends Vue {
   readonly UltimateSubmissionPolicy = UltimateSubmissionPolicy;
 
   readonly format_datetime = format_datetime;
+  readonly format_datetime_short = format_datetime_short;
   readonly format_time = format_time;
 
   async created() {
@@ -509,19 +505,21 @@ function make_empty_project(): Project {
 @import '@/styles/button_styles.scss';
 @import '@/styles/components/datetime.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/loading.scss';
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
 
 #project-settings-component {
-  padding: 10px;
-  min-width: 100%;
-  box-sizing: border-box;
+  padding: .625rem;
+  overflow: hidden;
 }
 
 .section-container {
-  padding: 0 0 10px 0;
-}
-
-#project-name-container {
-  padding: 10px 12px 22px 12px;
+  margin-bottom: .625rem;
 }
 
 .group-size-container {
@@ -531,94 +529,14 @@ function make_empty_project(): Project {
   vertical-align: top;
 }
 
-.soft-deadline, .hard-deadline {
-  display: inline-block;
-  min-width: 450px;
-  vertical-align: top;
-}
-
 .soft-deadline {
-  padding-bottom: 20px;
+  padding-bottom: 1rem;
 }
-
-.hard-deadline {
-  padding-bottom: 10px;
-}
-
-.footer {
-  padding: 0 12px 22px 15px;
-}
-
-.project-settings-input {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .25rem;
-  box-sizing: border-box;
-  color: #495057;
-  display: block;
-  font-size: 1rem;
-  line-height: 1.5;
-  position: relative;
-  padding: .375rem .75rem;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  width: 80px;
-}
-
-.project-input-container {
-  padding: 10px 0 10px 3px;
-}
-
-.toggle-container {
-  font-size: 14px;
-  margin: 3px 5px 3px 0;
-  padding-bottom: 10px;
-}
-
-#save-button {
-  @extend .green-button;
-  margin-top: 5px;
-}
-
-.saving-spinner {
-  color: $ocean-blue;
-  display: inline-block;
-  padding-left: 10px;
-  font-size: 18px;
-}
-
-// Dropdown related ************************************************************
-#final-graded-submission-policy {
-  max-width: 400px;
-}
-
-#submission-limit-reset-timezone {
-  width: 200px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-
-// Datetime related ************************************************************
 
 #reset-time-picker-container {
-  border-radius: 5px;
-
   .clearable-datetime-picker {
     display: flex;
     align-items: center;
-
-    .datetime-input {
-      padding: 10px 20px;
-      margin-right: 4px;
-
-      i {
-        margin-left: 5px;
-      }
-    }
-
-    .clear-button {
-      padding-top: 10px;
-      padding-bottom: 10px;
-    }
   }
 }
 

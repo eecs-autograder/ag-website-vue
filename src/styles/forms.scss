@@ -2,23 +2,31 @@
 
 // Organization ---------------------------------------------------------------
 
-.legend {
-    color: $ocean-blue;
-    font-size: 1.125rem;
-}
-
 .fieldset {
     border-bottom: none;
     border-left: none;
     border-right: none;
     border-color: rgba(255, 255, 255, 0.3);
     border-width: 2px;
+
+    margin: .75rem 0;
+    padding: 0;
+}
+
+.legend {
+    color: darken($ocean-blue, 5%);
+    font-size: 1.125rem;
+    margin: .5rem 0;
 }
 
 // Provides even spacing for form elements
-.form-field-wrapper {
-    // margin-top: .5rem;
+.form-field-wrapper, .input-spacing {
     margin-bottom: .5rem;
+}
+
+.extra-space {
+    margin-top: .875rem;
+    margin-bottom: .875rem;
 }
 
 // Provides padding and alignment for buttons at the bottom of a form or modal
@@ -62,9 +70,12 @@
     margin-left: 8px;
 }
 
+// TODO: rename to inline-label
 .text-label {
-    color: lighten(black, 10);
     display: inline-block;
+}
+
+.label, .text-label {
     font-size: .875rem;
     font-weight: bold;
     margin: 0 0 .25rem 0;
@@ -139,13 +150,13 @@ $checkbox-background-dark: hsl(220, 30%, 90%);
 $check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
-    padding: 10px 0 10px 5px;
+    margin: .625rem 0;
     position: relative;
 
     .checkbox-label {
         color: lighten(black, 10);
         display: inline-block;
-        font-size: 15px;
+        font-size: .875rem;
         font-weight: 700;
     }
 
@@ -158,7 +169,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         color: transparent;
         content: '\f0c8';
         font-family: "Font Awesome 5 Free";
-        font-size: 10px;
+        font-size: .625rem;
         font-weight: 900;
         background-color: $checkbox-background-dark;
         background-image: linear-gradient(lighten($checkbox-background-dark, 8),
@@ -170,8 +181,8 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         box-shadow: 0 0.5px 0.5px $pebble-dark;
         display: inline-block;
         padding: 2px 2px 2px 2px;
-        margin-right: 4px;
-        min-width: 10px;
+        margin-right: .25rem;
+        min-width: .625rem;
         position: relative;
         bottom: 2px;
     }

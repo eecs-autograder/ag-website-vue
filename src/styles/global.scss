@@ -3,24 +3,24 @@
 
 @import '@/styles/colors.scss';
 
-.loading {
-    color: $stormy-gray-light;
-}
+// .loading {
+//     color: $stormy-gray-light;
+// }
 
-@mixin fully-center() {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
+// @mixin fully-center() {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     width: 100%;
+//     height: 100%;
+// }
 
-.loading-large {
-    @extend .loading;
-    font-size: 55px;
-    @include fully-center();
-}
+// .loading-large {
+//     @extend .loading;
+//     font-size: 55px;
+//     @include fully-center();
+// }
 
-$breakpoint-1: 500px;
-$breakpoint-2: 700px;
-$breakpoint-3: 900px;
+// $breakpoint-1: 500px;
+// $breakpoint-2: 700px;
+// $breakpoint-3: 900px;
