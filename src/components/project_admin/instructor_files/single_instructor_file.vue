@@ -46,7 +46,6 @@
              size="large"
              click_outside_to_close>
         <div class="modal-header">Confirm Delete</div>
-        <hr>
         <div> Are you sure you want to delete
           <span class="file-to-delete">{{file.name}}</span>? <br><br>
           <b>This action cannot be undone</b>. <br>

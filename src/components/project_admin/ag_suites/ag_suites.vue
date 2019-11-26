@@ -73,29 +73,28 @@
              click_outside_to_close
              size="medium">
         <div class="modal-header"> New Suite </div>
-        <hr>
-        <div class="modal-body">
-          <validated-form id="add-ag-test-suite-form"
-                          autocomplete="off"
-                          spellcheck="false"
-                          @submit="add_ag_test_suite"
-                          @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
-            <div class="ag-test-suite-name-container">
-              <label class="text-label"> Suite name </label>
-              <validated-input ref="new_ag_test_suite_name"
-                               v-model="d_new_ag_test_suite_name"
-                               :show_warnings_on_blur="true"
-                               :validators="[is_not_empty]">
-              </validated-input>
-            </div>
+        <validated-form id="add-ag-test-suite-form"
+                        autocomplete="off"
+                        spellcheck="false"
+                        @submit="add_ag_test_suite"
+                        @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
+          <div class="ag-test-suite-name-container">
+            <label class="text-label"> Suite name </label>
+            <validated-input ref="new_ag_test_suite_name"
+                              v-model="d_new_ag_test_suite_name"
+                              :show_warnings_on_blur="true"
+                              :validators="[is_not_empty]">
+            </validated-input>
+          </div>
 
-            <APIErrors ref="api_errors"></APIErrors>
+          <APIErrors ref="api_errors"></APIErrors>
 
+          <div class="modal-button-footer">
             <button class="modal-create-button"
                     :disabled="!d_add_ag_test_suite_form_is_valid || d_adding_suite"> Add Suite
             </button>
-          </validated-form>
-        </div>
+          </div>
+        </validated-form>
       </modal>
     </template>
     <template v-else>
@@ -522,7 +521,8 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 @import '@/styles/button_styles.scss';
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
+@import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 
 @import './ag_tests.scss';
 
@@ -536,7 +536,7 @@ $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 50px,
+  $sidebar-header-height: 3.125rem,
   $background-color: white,
   $border-color: $border-color,
   $page-footer-height: $footer-height,
@@ -551,7 +551,7 @@ $border-color: $gray-blue-1;
   }
 
   .sidebar-header {
-    padding: 5px 8px;
+    padding: .25rem .5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -562,7 +562,7 @@ $border-color: $gray-blue-1;
   }
 
   .sidebar-content {
-    padding-top: 3px;
+    padding-top: .125rem;
   }
 }
 
@@ -573,7 +573,7 @@ $border-color: $gray-blue-1;
 
 #ag-test-suites-title {
   font-size: 1.125rem;
-  margin: 0 8px;
+  margin: 0 .5rem;
 }
 
 #add-ag-test-suite-button {
@@ -583,7 +583,7 @@ $border-color: $gray-blue-1;
 }
 
 .plus {
-  padding-right: 5px;
+  padding-right: .25rem;
 }
 
 #button-footer {
@@ -599,26 +599,22 @@ $border-color: $gray-blue-1;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  padding: 5px;
+  align-items: center;
+  padding: .25rem;
 }
 
 #next-ag-test-case-button, #prev-ag-test-case-button {
   @extend .white-button;
-  margin-left: 15px;
-  font-size: 14px;
+  margin-left: .875rem;
+  font-size: .875rem;
 }
 
 #next {
-  padding-left: 5px;
+  padding-left: .25rem;
 }
 
 #prev {
-  padding-right: 5px;
-}
-
-// Modal **************************************************************
-.ag-test-suite-name-container {
-  padding: 0 0 22px 0;
+  padding-right: .25rem;
 }
 
 </style>

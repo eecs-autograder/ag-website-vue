@@ -62,7 +62,6 @@
            :include_closing_x="true"
            click_outside_to_close>
       <div class="modal-header">Confirm Delete</div>
-      <hr>
       <div> Are you sure you want to delete
         <b class="file-to-delete">{{expected_student_file.pattern}}</b>? <br><br>
         This action cannot be undone. <br>

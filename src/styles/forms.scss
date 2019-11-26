@@ -30,7 +30,7 @@
 }
 
 // Provides padding and alignment for buttons at the bottom of a form or modal
-.button-footer, .button-footer-right {
+.button-footer, .button-footer-right, .modal-button-footer {
     display: flex;
     flex-wrap: wrap;
     margin-top: .75rem;

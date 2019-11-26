@@ -1,5 +1,5 @@
-$footer-height: 45px;
-$panel-indentation: 20px;
+$footer-height: 2.875rem;
+$panel-indentation: 1.25rem;
 
 .loading-spinner {
     color: $ocean-blue;
@@ -9,33 +9,33 @@ $panel-indentation: 20px;
 }
 
 .bottom-of-form {
-    padding: 0 10px 10px 14px;
+    // padding: 0 10px 10px 14px;
 }
 
 .save-button {
-    @extend .green-button;
-    display: block;
-    margin: 0 10px 10px 0;
+    // @extend .green-button;
+    // display: block;
+    // margin: 0 10px 10px 0;
 }
 
 .last-saved-timestamp {
-    color: lighten(#495057, 40);
-    font-size: 15px;
+    // color: lighten(#495057, 40);
+    // font-size: 15px;
 }
 
 .last-saved-spinner {
-    color: $ocean-blue;
-    display: inline-block;
-    font-size: 18px;
+    // color: $ocean-blue;
+    // display: inline-block;
+    // font-size: 18px;
 }
 
 .delete-level-button {
     @extend .red-button;
-    font-size: 14px;
+    // font-size: 14px;
 }
 
 .delete-level-button span {
-    margin-left: 5px;
+    // margin-left: 5px;
 }
 
 // Modal Related ***********************************************************
@@ -46,22 +46,22 @@ $panel-indentation: 20px;
 }
 
 .modal-header {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
-    padding: 5px 0;
+    // font-size: 24px;
+    // font-weight: bold;
+    // margin: 0;
+    // padding: 5px 0;
 }
 
 .modal-create-button {
     @extend .green-button;
-    float: right;
+    // float: right;
 }
 
 .deletion-modal-button-footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    padding-top: 5px;
+    // display: flex;
+    // flex-direction: row;
+    // justify-content: flex-end;
+    // padding-top: 5px;
 }
 
 .modal-cancel-button {
@@ -70,5 +70,5 @@ $panel-indentation: 20px;
 
 .modal-delete-button {
     @extend .red-button;
-    margin-right: 15px;
+    // margin-right: 15px;
 }
