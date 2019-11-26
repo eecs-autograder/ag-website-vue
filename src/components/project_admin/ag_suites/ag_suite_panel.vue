@@ -37,109 +37,93 @@
            click_outside_to_close
            size="large">
       <div class="modal-header"> New Test Case </div>
-      <hr>
-      <div class="modal-body">
-        <div class="name-container">
-          <validated-form ref="create_ag_test_case_form"
-                          autocomplete="off"
-                          spellcheck="false"
-                          @submit="create_ag_test_case"
-                          @form_validity_changed="d_add_case_form_is_valid = $event">
+      <validated-form ref="create_ag_test_case_form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit="create_ag_test_case"
+                      @form_validity_changed="d_add_case_form_is_valid = $event">
 
-            <div class="case-name-container">
-              <label class="text-label"> Test name </label>
-              <validated-input ref="new_case_name"
-                               v-model="d_new_case_name"
-                               :validators="[is_not_empty]"
-                               :show_warnings_on_blur="true">
-              </validated-input>
-            </div>
-
-            <div class="new-ag-test-command-container"
-                 v-for="(new_command, index) of d_new_commands">
-
-              <div class="new-ag-test-command-inputs">
-                <fieldset class="ag-test-case-modal-fieldset">
-                  <legend v-if="d_new_commands.length > 1"
-                          class="legend">{{format_ordinal_num(index)}}</legend>
-
-                  <div class="ag-test-command-name" v-if="d_new_commands.length > 1">
-                    <label class="text-label"> Command name </label>
-                    <validated-input ref="command_name"
-                                     v-model="new_command.name"
-                                     :validators="[is_not_empty]"
-                                     :show_warnings_on_blur="true"
-                                     input_style="width: 100%;
-                                                  min-width: 200px;
-                                                  max-width: 700px;">
-                      <div slot="suffix" class="remove-ag-test-command-suffix">
-                        <button class="remove-ag-test-command-button"
-                                type="button"
-                                @click="remove_command(index)">
-                          <i class="fas fa-times remove-ag-test-command-icon"></i>
-                        </button>
-                      </div>
-                    </validated-input>
-                  </div>
-
-                  <div class="ag-test-command">
-                    <label class="text-label">
-                      Command
-                      <i class="fas fa-question-circle input-tooltip">
-                        <tooltip width="large" placement="right">
-                          Can be any valid bash command. <br>
-                          Note that if it includes sequencing or piping,
-                          you will have to increase the process limit.
-                        </tooltip>
-                      </i>
-                    </label>
-                    <validated-input ref="command"
-                                     v-model="new_command.cmd"
-                                     :validators="[is_not_empty]"
-                                     :show_warnings_on_blur="true"
-                                     input_style="width: 100%;
-                                                  min-width: 200px;
-                                                  max-width: 700px;">
-                    </validated-input>
-
-                    <div>
-                      <div v-if="d_duplicate_command_name_in_case
-                                 && new_command.name === duplicate_command_name"
-                           class="duplicate-ag-test-command-msg">
-                        Duplicate command name
-                      </div>
-                    </div>
-
-                  </div>
-                </fieldset>
-              </div>
-            </div>
-
-            <APIErrors ref="new_ag_test_case_api_errors"></APIErrors>
-
-            <div class="modal-button-footer">
-              <div class="add-ag-test-command-button-container">
-                <button class="add-ag-test-command-button"
-                        type="button"
-                        :disabled="d_new_commands.length === 3"
-                        @click="add_command">
-                  <i class="fas fa-plus"></i>
-                  <span> Add Another Command </span>
-                </button>
-              </div>
-
-              <div class="create-ag-test-case-button">
-                <button class="modal-create-button"
-                        type="submit"
-                        :disabled="!d_add_case_form_is_valid || d_creating_case">
-                  Create Case
-                </button>
-              </div>
-            </div>
-
-          </validated-form>
+        <div class="form-field-wrapper">
+          <label class="label"> Test name </label>
+          <validated-input ref="new_case_name"
+                           v-model="d_new_case_name"
+                           :validators="[is_not_empty]"
+                           :show_warnings_on_blur="true">
+          </validated-input>
         </div>
-      </div>
+
+        <fieldset class="fieldset" v-for="(new_command, index) of d_new_commands">
+          <legend v-if="d_new_commands.length > 1"
+                  class="legend">{{format_ordinal_num(index)}}</legend>
+
+          <div class="form-field-wrapper" v-if="d_new_commands.length > 1">
+            <label class="label"> Command name </label>
+            <validated-input ref="command_name"
+                             v-model="new_command.name"
+                             :validators="[is_not_empty]"
+                             :show_warnings_on_blur="true"
+                             input_style="width: 100%;
+                                          min-width: 200px;
+                                          max-width: 700px;">
+              <div slot="suffix" class="remove-ag-test-command-suffix">
+                <button class="remove-ag-test-command-button"
+                        type="button"
+                        @click="remove_command(index)">
+                  <i class="fas fa-times remove-ag-test-command-icon"></i>
+                </button>
+              </div>
+            </validated-input>
+          </div>
+
+          <div class="form-field-wrapper">
+            <label class="label">
+              Command
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  Can be any valid bash command. <br>
+                  Note that if it includes sequencing or piping,
+                  you will have to increase the process limit.
+                </tooltip>
+              </i>
+            </label>
+            <validated-input ref="command"
+                              v-model="new_command.cmd"
+                              :validators="[is_not_empty]"
+                              :show_warnings_on_blur="true"
+                              input_style="width: 100%;
+                                           min-width: 200px;
+                                           max-width: 700px;">
+            </validated-input>
+
+            <div>
+              <div v-if="d_duplicate_command_name_in_case
+                          && new_command.name === duplicate_command_name"
+                    class="duplicate-ag-test-command-msg">
+                Duplicate command name
+              </div>
+            </div>
+
+          </div>
+        </fieldset>
+
+        <APIErrors ref="new_ag_test_case_api_errors"></APIErrors>
+
+        <div class="modal-button-footer">
+          <button class="modal-create-button"
+                  type="submit"
+                  :disabled="!d_add_case_form_is_valid || d_creating_case">
+            Create Case
+          </button>
+
+          <button class="add-ag-test-command-button"
+                  type="button"
+                  :disabled="d_new_commands.length === 3"
+                  @click="add_command">
+            <i class="fas fa-plus"></i>
+            <span> Add Another Command </span>
+          </button>
+        </div>
+      </validated-form>
     </modal>
 
   </div>
@@ -340,62 +324,38 @@ function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknow
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/list_panels.scss';
+@import '@/styles/modal.scss';
 
 @import './ag_tests.scss';
 
 @include list-panels($indentation: $panel-indentation);
 
-// Modal **************************************************************
-
-.ag-test-case-name-container {
+* {
+  box-sizing: border-box;
   padding: 0;
-}
-
-.new-ag-test-command-inputs {
-  width: 100%;
-  padding-top: 14px;
+  margin: 0;
 }
 
 .remove-ag-test-command-suffix {
-  margin-left: 10px;
-  display: flex;
-  align-self: stretch;
+  margin-left: .375rem;
 }
 
 .remove-ag-test-command-button {
-  @extend .light-gray-button;
+  @extend .flat-white-button;
+  padding: .375rem .5rem;
 }
 
 .remove-ag-test-command-icon {
-  display: flex;
-  align-self: center;
-  padding: 1px 4px 0 4px;
-}
-
-.ag-test-command-name {
-  padding: 0 0 3px 0;
-  width: 100%;
-}
-
-.ag-test-command {
-  padding: 0;
-  width: 100%;
+  padding: 0 .25rem;
 }
 
 .add-ag-test-command-button {
   @extend .white-button;
-  margin-right: 20px;
+  margin-left: auto;
 }
 
-.add-ag-test-command-button span {
-  padding-left: 5px;
-}
-
-.modal-button-footer {
-  padding: 25px 0 5px 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.add-ag-test-command-button .fa-plus {
+  padding-right: .25rem;
 }
 
 .duplicate-ag-test-command-msg {
@@ -407,15 +367,6 @@ function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknow
   padding: 2px 10px;
   border-radius: .25rem;
   margin-top: 11px;
-}
-
-.ag-test-case-modal-fieldset {
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  border-width: 2px;
-  padding: 0;
 }
 
 </style>

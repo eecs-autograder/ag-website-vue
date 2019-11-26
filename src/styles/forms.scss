@@ -45,6 +45,10 @@
     .button {
         margin-right: .75rem;
     }
+
+    .button:last-child {
+        margin-right: 0;
+    }
 }
 
 // Removes the bottom margin from .button-footer(-right)
@@ -56,10 +60,6 @@
 .button-footer-right {
     .button:first-child {
         margin-left: auto;
-    }
-
-    .button:last-child {
-        margin-right: 0;
     }
 }
 
