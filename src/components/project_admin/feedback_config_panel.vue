@@ -133,7 +133,10 @@ export default class FeedbackConfigPanel extends Vue {
 }
 
 .config-panel {
-    margin-bottom: 10px;
+    width: 100%;
+    max-width: 600px;
+
+    margin-bottom: .625rem;
     box-shadow: 0 1px 1px $white-gray;
     border-radius: 3px;
 }
@@ -143,17 +146,28 @@ export default class FeedbackConfigPanel extends Vue {
     border: 2px solid hsl(220, 30%, 92%);
     border-bottom: none;
     border-radius: 3px 3px 0 0;
+
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    min-height: 33px;
-    padding: 4px 4px 5px 10px;
+
+    padding: .25rem .25rem .25rem .625rem;
+}
+
+.setting-selection-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .preset-label {
-    display: inline-block;
-    margin-right: 6px;
+  margin-right: .375rem;
+
+  display: none;
+  @media only screen and (min-width: 500px) {
+    display: block;
+  }
 }
 
 .footer {
@@ -161,6 +175,6 @@ export default class FeedbackConfigPanel extends Vue {
     border-top: none;
     border-radius: 0 0 3px 3px;
     background-color: white;
-    padding: 5px;
+    padding: .375rem;
 }
 </style>

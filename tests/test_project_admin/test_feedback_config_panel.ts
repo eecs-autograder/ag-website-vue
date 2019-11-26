@@ -94,7 +94,7 @@ describe('FeedbackConfigPanel tests', () => {
             'Pass/Fail Setup',
             'Private Setup'
         ]);
-        let config_preset_select_input = wrapper.find('#config-preset-select');
+        let config_preset_select_input = wrapper.find('.select');
 
         config_preset_select_input.setValue(component.preset_names[0]);
         await component.$nextTick();
@@ -128,7 +128,7 @@ describe('FeedbackConfigPanel tests', () => {
             'Private Setup'
         ]);
 
-        let config_preset_select_input = wrapper.find('#config-preset-select');
+        let config_preset_select_input = wrapper.find('.select');
 
         config_preset_select_input.setValue(component.preset_names[2]);
         expect(
@@ -215,13 +215,13 @@ describe('FeedbackConfigPanel tests', () => {
         component = wrapper.vm;
 
         expect(component.d_configuration).toEqual(ag_test_suite_normal_feedback_config);
-        expect(wrapper.findAll('#config-preset-select').length).toEqual(1);
+        expect(wrapper.findAll('.select').length).toEqual(1);
 
         wrapper.setProps({value: null});
         await component.$nextTick();
 
         expect(component.d_configuration).toEqual(null);
-        expect(wrapper.findAll('#config-preset-select').length).toEqual(0);
+        expect(wrapper.findAll('.select').length).toEqual(0);
     });
 
     test('Presets not provided, no preset dropdown', async () => {
@@ -233,6 +233,6 @@ describe('FeedbackConfigPanel tests', () => {
         });
 
         expect(wrapper.exists()).toBe(true);
-        expect(wrapper.find('#config-preset-select').exists()).toBe(false);
+        expect(wrapper.find('.select').exists()).toBe(false);
     });
 });

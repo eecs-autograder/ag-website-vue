@@ -26,8 +26,11 @@ import {
 } from '@/tests/data_utils';
 import {
     checkbox_is_checked,
+    expect_html_element_has_value,
     get_validated_input_text,
-    set_validated_input_text, validated_input_is_valid, set_select_object_value, expect_html_element_has_value
+    set_select_object_value,
+    set_validated_input_text,
+    validated_input_is_valid,
 } from '@/tests/utils';
 
 beforeAll(() => {
