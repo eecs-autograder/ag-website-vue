@@ -9,7 +9,7 @@
                       @submit="save_ag_test_suite_settings"
                       @form_validity_changed="d_settings_form_is_valid = $event">
 
-        <div id="ag-test-suite-name-container">
+        <div class="form-field-wrapper">
           <label class="text-label"> Suite name </label>
           <validated-input ref="suite_name"
                             id="input-name"
@@ -32,33 +32,21 @@
 
         <fieldset class="fieldset">
           <legend class="legend"> Grading Environment </legend>
-          <div class="sandbox-container">
+
+          <div class="form-field-wrapper">
             <label class="text-label"> Sandbox environment </label>
-            <div class="dropdown">
-              <dropdown id="sandbox-docker-image"
-                        :items="d_docker_images"
-                        dropdown_height="250px"
-                        @update_item_selected="
-                          d_ag_test_suite.sandbox_docker_image = $event">
-                <template slot="header">
-                  <div tabindex="0" class="dropdown-header-wrapper">
-                    <div class="dropdown-header sandbox-docker-image-dropdown">
-                      {{d_ag_test_suite.sandbox_docker_image === null ? ' '
-                      : d_ag_test_suite.sandbox_docker_image.display_name}}
-                      <i class="fas fa-caret-down dropdown-caret"></i>
-                    </div>
-                  </div>
-                </template>
-                <div slot-scope="{item}">
-                <span>
-                  {{item.display_name}}
-                </span>
-                </div>
-              </dropdown>
-            </div>
+
+            <select-object :items="d_docker_images"
+                           id_field="pk"
+                           v-model="d_ag_test_suite.sandbox_docker_image"
+                           ref="sandbox_docker_image">
+              <template v-slot:option-text="{item}">
+                {{item.display_name}}
+              </template>
+            </select-object>
           </div>
 
-          <div class="toggle-container">
+          <div class="toggle-container form-field-wrapper">
             <toggle v-model="d_ag_test_suite.allow_network_access"
                     ref="allow_network_access">
               <div slot="on">
@@ -143,19 +131,19 @@
         <fieldset class="fieldset">
           <legend class="legend"> Setup </legend>
 
-          <div id="setup-command-label-container">
+          <div class="form-field-wrapper">
             <label class="text-label"> Setup command label </label>
             <validated-input ref="setup_suite_cmd_name"
-                              v-model="d_ag_test_suite.setup_suite_cmd_name"
-                              :validators="[]">
+                             v-model="d_ag_test_suite.setup_suite_cmd_name"
+                             :validators="[]">
             </validated-input>
           </div>
 
-          <div id="setup-command-container">
+          <div class="form-field-wrapper">
             <label class="text-label"> Setup command </label>
             <validated-input ref="setup_suite_cmd"
-                              v-model="d_ag_test_suite.setup_suite_cmd"
-                              :validators="[]">
+                             v-model="d_ag_test_suite.setup_suite_cmd"
+                             :validators="[]">
             </validated-input>
           </div>
 
@@ -255,7 +243,7 @@
 
         </fieldset>
 
-        <div class="bottom-of-form">
+        <div class="button-footer">
           <APIErrors ref="api_errors"></APIErrors>
 
           <button type="submit"
@@ -293,18 +281,17 @@
           <div class="modal-header">
             Confirm Delete
           </div>
-          <hr>
           <div class="modal-body">
-            <p> Are you sure you want to delete the suite
-              <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
-              This will delete all associated test cases and run results.
-              THIS ACTION CANNOT BE UNDONE. </p>
-            <div class="deletion-modal-button-footer">
-              <button class="modal-delete-button"
+            Are you sure you want to delete the suite
+            <span class="item-to-delete">{{d_ag_test_suite.name}}</span>? <br><br>
+            This will delete all associated test cases and run results. <br>
+            <b>THIS ACTION CANNOT BE UNDONE.</b>
+            <div class="modal-button-footer">
+              <button class="modal-delete-button red-button"
                       :disabled="d_deleting"
-                      @click="delete_ag_test_suite()"> Delete </button>
+                      @click="delete_ag_test_suite"> Delete </button>
 
-              <button class="modal-cancel-button"
+              <button class="modal-cancel-button white-button"
                       @click="d_show_delete_ag_test_suite_modal = false"> Cancel </button>
             </div>
           </div>
@@ -333,6 +320,7 @@ import Modal from '@/components/modal.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_utils';
+import SelectObject from '@/components/select_object.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
@@ -348,10 +336,10 @@ import { is_not_empty } from '@/validators';
   components: {
     APIErrors,
     FeedbackConfigPanel,
-    Dropdown,
     DropdownTypeahead,
     AGTestSuiteAdvancedFdbkSettings,
     Modal,
+    SelectObject,
     Tab,
     TabHeader,
     Tabs,
@@ -483,55 +471,34 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 @import './ag_tests.scss';
 
-.tab-body {
-  padding: 15px;
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-#setup-command-container {
-  margin: 15px 0 10px 0;
-}
-
-#ag-test-suite-name-container {
-  padding: 10px 14px;
-
-  .checkbox-input-container {
-    padding: 15px 0 5px;
-  }
-}
-
-.checkbox-input-container {
-  // padding: 0 14px 22px 14px;
-  padding-top: 0;
-  padding-left: 0;
-}
-
-.sandbox-container {
-  padding: 10px 0 10px 0;
-}
-
-.sandbox-docker-image-dropdown {
-  min-width: 400px;
-  width: 100%;
+#ag-test-suite-settings-component {
+  padding: .625rem .875rem;
+  overflow: hidden;
 }
 
 .toggle-container {
-  font-size: 14px;
-  margin: 12px 5px 3px 0;
-  padding-bottom: 10px;
-  min-width: 500px;
+  font-size: .875rem;
+  margin: 1rem 0;
 }
 
 .instructor-files, .student-files {
-  margin: 10px 0;
+  margin: .625rem 0;
   border: 1px solid hsl(210, 20%, 90%);
   display: inline-block;
 }
 
 .file {
-  padding: 5px 6px 5px 10px;
+  padding: .25rem .375rem .25rem .625rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -540,7 +507,7 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 
 .file-name {
   color: lighten(black, 40);
-  padding-right: 30px;
+  padding-right: 1.875rem;
 }
 
 .remove-file {
@@ -549,7 +516,7 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 
 .remove-file-icon-container {
   display: inline-block;
-  padding: 0 4px;
+  padding: 0 .25rem;
 }
 
 .remove-file-icon-container:hover {

@@ -27,7 +27,7 @@ import {
 import {
     checkbox_is_checked,
     get_validated_input_text,
-    set_validated_input_text, validated_input_is_valid
+    set_validated_input_text, validated_input_is_valid, set_select_object_value, expect_html_element_has_value
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -218,63 +218,19 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('sandbox_docker_image binding', async () => {
-        let sandbox_docker_image_input = wrapper.find(
-            '#sandbox-docker-image'
-        );
-        sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        let sandbox_docker_image_input = wrapper.find({ref: 'sandbox_docker_image'});
+        set_select_object_value(sandbox_docker_image_input, sandbox_docker_image_2.pk);
+        await wrapper.vm.$nextTick();
 
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(sandbox_docker_image_2.display_name);
-        highlighted_item.trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.sandbox_docker_image).toEqual(
+        expect(wrapper.vm.d_ag_test_suite!.sandbox_docker_image).toEqual(
             sandbox_docker_image_2
         );
-        expect(sandbox_docker_image_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(sandbox_docker_image_2.display_name);
 
-        sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
+        wrapper.vm.d_ag_test_suite!.sandbox_docker_image = sandbox_docker_image_3;
+        await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await component.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(sandbox_docker_image_3.display_name);
-        highlighted_item.trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.sandbox_docker_image).toEqual(
-            sandbox_docker_image_3
-        );
-        expect(sandbox_docker_image_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(sandbox_docker_image_3.display_name);
-
-        sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await component.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(sandbox_docker_image_1.display_name);
-        highlighted_item.trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.sandbox_docker_image).toEqual(
-            sandbox_docker_image_1
-        );
-        expect(sandbox_docker_image_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(sandbox_docker_image_1.display_name);
+        expect_html_element_has_value(
+            sandbox_docker_image_input.find('.select'), sandbox_docker_image_3.pk.toString());
     });
 
     test('Toggle allow_network_access', async () => {

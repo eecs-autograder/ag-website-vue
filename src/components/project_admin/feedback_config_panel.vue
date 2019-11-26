@@ -1,16 +1,15 @@
 <template>
-  <div id="config-panel">
+  <div class="config-panel">
 
-    <div id="header">
+    <div class="header">
       <slot name="header"></slot>
 
       <div v-if="d_configuration !== null && preset_names.length"
            class="setting-selection-container">
-        <span id="preset-label">Preset:</span>
-        <select id="config-preset-select"
+        <span class="preset-label">Preset:</span>
+        <select class="select"
                 v-model="d_selected_preset_name"
-                @change="change_preset"
-                class="select">
+                @change="change_preset">
           <option hidden>Custom</option>
           <option v-for="preset_name of preset_names"
                   :value="preset_name">
@@ -20,7 +19,7 @@
       </div>
     </div>
 
-    <div id="footer">
+    <div class="footer">
       <slot name="settings"> </slot>
     </div>
   </div>
@@ -127,14 +126,19 @@ export default class FeedbackConfigPanel extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 
-#config-panel {
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.config-panel {
     margin-bottom: 10px;
     box-shadow: 0 1px 1px $white-gray;
     border-radius: 3px;
-    min-width: 600px;
 }
 
-#header {
+.header {
     background-color: hsl(220, 30%, 94%);
     border: 2px solid hsl(220, 30%, 92%);
     border-bottom: none;
@@ -147,12 +151,12 @@ export default class FeedbackConfigPanel extends Vue {
     padding: 4px 4px 5px 10px;
 }
 
-#preset-label {
+.preset-label {
     display: inline-block;
     margin-right: 6px;
 }
 
-#footer {
+.footer {
     border: 2px solid hsl(210, 20%, 92%);
     border-top: none;
     border-radius: 0 0 3px 3px;
