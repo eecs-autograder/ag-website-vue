@@ -569,7 +569,7 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
    border: 1px solid red;
    padding: 10px;
   
-  .danger-text {
+  #danger-text {
     color: black;
     font-size: 24px;
     display: inline-block;
