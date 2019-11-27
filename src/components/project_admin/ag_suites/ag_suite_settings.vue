@@ -277,11 +277,13 @@
 
       <div id="danger-zone-container">
         <fieldset class="fieldset">
-          <legend class="legend">Danger Zone</legend>
+          <div class="legend">
+            Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
+          </div>
           <button class="delete-ag-test-suite-button"
                   type="button"
                   @click="d_show_delete_ag_test_suite_modal = true">
-            Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
+            Delete
           </button>
 
           <modal v-if="d_show_delete_ag_test_suite_modal"
@@ -564,16 +566,24 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 }
 
 #danger-zone-container {
-   margin-top: 40px;
-
+   margin: 60px 10px 10px;
+   border-radius: 5px;
+   border: 1px solid red;
+   padding: 10px;
+  
   .legend {
     color: black;
     font-size: 24px;
+    display: inline-block;
+  }
+
+  .fieldset {
+    border: none;
   }
 
   .delete-ag-test-suite-button {
     @extend .delete-level-button;
-    margin-top: 10px;
+    float: right;
   }
 
   .delete-ag-test-suite-button span {
