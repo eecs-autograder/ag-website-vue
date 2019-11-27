@@ -132,6 +132,7 @@
         <APIErrors ref="clone_case_api_errors"></APIErrors>
         <div class="modal-button-footer">
           <button class="save-button"
+                  ref="modal_clone_ag_test_case_button"
                   type="submit"
                   :disabled="d_cloning || !d_clone_case_form_is_valid">
             Clone Test Case

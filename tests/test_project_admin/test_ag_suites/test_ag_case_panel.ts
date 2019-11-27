@@ -399,7 +399,7 @@ describe('AGCasePanel tests', () => {
         let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
         set_validated_input_text(ag_test_case_clone_name, 'Water');
 
-        expect(wrapper.find('#modal-clone-ag-test-case-button').is(
+        expect(wrapper.find({ref: 'modal_clone_ag_test_case_button'}).is(
             '[disabled]'
         )).toBe(false);
 
@@ -483,7 +483,7 @@ describe('AGCasePanel tests', () => {
         let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
         set_validated_input_text(ag_test_case_clone_name, 'Purple Case');
 
-        expect(wrapper.find('#modal-clone-ag-test-case-button').is(
+        expect(wrapper.find({ref: 'modal_clone_ag_test_case_button'}).is(
             '[disabled]'
         )).toBe(false);
 
