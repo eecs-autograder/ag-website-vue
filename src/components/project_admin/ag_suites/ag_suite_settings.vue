@@ -575,6 +575,8 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
     color: black;
     font-size: 24px;
     display: inline-block;
+    word-break: break-word;
+    word-wrap: break-word;
   }
 
   .fieldset {
