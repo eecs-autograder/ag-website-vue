@@ -276,41 +276,39 @@
       <!--------------------------- Danger Zone --------------------------------------->
 
       <div id="danger-zone-container">
-        <fieldset class="fieldset">
-          <div class="legend">
-            Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
+        <div id="danger-text">
+          Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
+        </div>
+        <button class="delete-ag-test-suite-button"
+                type="button"
+                @click="d_show_delete_ag_test_suite_modal = true">
+          Delete
+        </button>
+
+        <modal v-if="d_show_delete_ag_test_suite_modal"
+                @close="d_show_delete_ag_test_suite_modal = false"
+                ref="delete_ag_test_suite_modal"
+                size="large"
+                click_outside_to_close>
+          <div class="modal-header">
+            Confirm Delete
           </div>
-          <button class="delete-ag-test-suite-button"
-                  type="button"
-                  @click="d_show_delete_ag_test_suite_modal = true">
-            Delete
-          </button>
+          <hr>
+          <div class="modal-body">
+            <p> Are you sure you want to delete the suite
+              <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
+              This will delete all associated test cases and run results.
+              THIS ACTION CANNOT BE UNDONE. </p>
+            <div class="deletion-modal-button-footer">
+              <button class="modal-delete-button"
+                      :disabled="d_deleting"
+                      @click="delete_ag_test_suite()"> Delete </button>
 
-          <modal v-if="d_show_delete_ag_test_suite_modal"
-                 @close="d_show_delete_ag_test_suite_modal = false"
-                 ref="delete_ag_test_suite_modal"
-                 size="large"
-                 click_outside_to_close>
-            <div class="modal-header">
-              Confirm Delete
+              <button class="modal-cancel-button"
+                      @click="d_show_delete_ag_test_suite_modal = false"> Cancel </button>
             </div>
-            <hr>
-            <div class="modal-body">
-              <p> Are you sure you want to delete the suite
-                <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
-                This will delete all associated test cases and run results.
-                THIS ACTION CANNOT BE UNDONE. </p>
-              <div class="deletion-modal-button-footer">
-                <button class="modal-delete-button"
-                        :disabled="d_deleting"
-                        @click="delete_ag_test_suite()"> Delete </button>
-
-                <button class="modal-cancel-button"
-                        @click="d_show_delete_ag_test_suite_modal = false"> Cancel </button>
-              </div>
-            </div>
-          </modal>
-        </fieldset>
+          </div>
+        </modal>
       </div>
     </div>
   </div>
@@ -571,16 +569,12 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
    border: 1px solid red;
    padding: 10px;
   
-  .legend {
+  .danger-text {
     color: black;
     font-size: 24px;
     display: inline-block;
     word-break: break-word;
     word-wrap: break-word;
-  }
-
-  .fieldset {
-    border: none;
   }
 
   .delete-ag-test-suite-button {
