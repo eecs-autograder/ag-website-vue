@@ -582,9 +582,6 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
     float: right;
   }
 
-  .delete-ag-test-suite-button span {
-    margin-left: 5px;
-  }
 }
 
 </style>
