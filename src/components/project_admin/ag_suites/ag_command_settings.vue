@@ -8,7 +8,7 @@
                     @submit="save_ag_test_command_settings"
                     @form_validity_changed="d_settings_form_is_valid = $event">
       <div id="ag-test-command-name-container" v-if="!case_has_exactly_one_command">
-        <label class="text-label"> Name </label>
+        <label class="text-label"> Command Name </label>
         <validated-input ref="command_name"
                          id="input-name"
                          v-model="d_ag_test_command.name"

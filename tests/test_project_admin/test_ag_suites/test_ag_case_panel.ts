@@ -294,7 +294,7 @@ describe('AGCasePanel tests', () => {
         wrapper.vm.d_new_command_name = "New command name";
         wrapper.vm.d_new_command = "New command";
 
-        wrapper.find('#add-ag-test-command-form').trigger('submit');
+        wrapper.find({ref: 'add_ag_test_command_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -326,7 +326,7 @@ describe('AGCasePanel tests', () => {
         wrapper.vm.d_new_command_name = "New command name";
         wrapper.vm.d_new_command = "New command";
 
-        wrapper.find('#add-ag-test-command-form').trigger('submit');
+        wrapper.find({ref: 'add_ag_test_command_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -403,7 +403,7 @@ describe('AGCasePanel tests', () => {
             '[disabled]'
         )).toBe(false);
 
-        wrapper.find('#clone-ag-test-case-form').trigger('submit');
+        wrapper.find({ref: 'clone_ag_test_case_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(clone_case_stub.calledOnce).toBe(true);
@@ -487,7 +487,7 @@ describe('AGCasePanel tests', () => {
             '[disabled]'
         )).toBe(false);
 
-        wrapper.find('#clone-ag-test-case-form').trigger('submit');
+        wrapper.find({ref: 'clone_ag_test_case_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(clone_case_stub.calledOnce).toBe(true);
