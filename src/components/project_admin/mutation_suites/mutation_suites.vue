@@ -193,7 +193,7 @@
               <div id="danger-text">
                 Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
               </div>
-              <button class="danger-zone-delete-button"
+              <button class="delete-mutation-test-suite-button"
                       type="button"
                       @click="d_show_delete_mutation_test_suite_modal = true">
                 Delete
