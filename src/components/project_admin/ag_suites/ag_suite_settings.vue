@@ -279,7 +279,7 @@
         <div id="danger-text">
           Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
         </div>
-        <button class="delete-ag-test-suite-button"
+        <button class="danger-zone-delete-button"
                 type="button"
                 @click="d_show_delete_ag_test_suite_modal = true">
           Delete
@@ -561,27 +561,6 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 
 .odd-index {
   background-color: hsl(210, 20%, 96%);
-}
-
-#danger-zone-container {
-   margin: 60px 10px 10px;
-   border-radius: 5px;
-   border: 1px solid red;
-   padding: 10px;
-  
-  #danger-text {
-    color: black;
-    font-size: 24px;
-    display: inline-block;
-    word-break: break-word;
-    word-wrap: break-word;
-  }
-
-  .delete-ag-test-suite-button {
-    @extend .delete-level-button;
-    float: right;
-  }
-
 }
 
 </style>

@@ -187,16 +187,18 @@
               </fieldset>
             </validated-form>
 
-            <fieldset class="fieldset">
-              <legend class="legend danger-zone"> Danger Zone </legend>
-              <div id="delete-mutation-suite-button-container">
-                <button class="delete-mutation-test-suite-button"
-                        type="button"
-                        @click="d_show_delete_mutation_test_suite_modal = true">
-                  Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
-                </button>
+      <!--------------------------- Danger Zone --------------------------------------->
+  
+            <div id="danger-zone-container">
+              <div id="danger-text">
+                Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
               </div>
-            </fieldset>
+              <button class="danger-zone-delete-button"
+                      type="button"
+                      @click="d_show_delete_mutation_test_suite_modal = true">
+                Delete
+              </button>
+            </div>
 
           </div>
         </div>
@@ -663,15 +665,6 @@ $border-color: $gray-blue-1;
 
 .last-saved-spinner {
   padding: 10px 0;
-}
-
-.danger-zone {
-  color: black;
-}
-
-.delete-mutation-test-suite-button {
-  @extend .red-button;
-  margin: 8px 0 0 2px
 }
 
 // MODAL stuff ----------------------------------------------------
