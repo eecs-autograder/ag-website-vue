@@ -77,6 +77,31 @@ $input-text-color: #495057;
     margin: 0 10px 10px 0;
 }
 
+// Danger Zone -----------------------------------
+ 
+#danger-zone-container {
+    margin: 50px 10px 20px;
+    border-radius: 5px;
+    border: 1px solid red;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   
+    #danger-text {
+        color: black;
+        font-size: 24px;
+        word-break: break-word;
+        word-wrap: break-word;
+    }
+ 
+    .danger-zone-delete-button {
+        @extend .red-button;
+        font-size: 14px;
+    }
+ 
+ }
+
 // Checkbox ---------------------------------------
 
 $checkbox-background-light: hsl(200, 100%, 99%);
