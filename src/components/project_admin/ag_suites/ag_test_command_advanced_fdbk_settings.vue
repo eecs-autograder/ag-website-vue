@@ -4,12 +4,12 @@
     <div id="edit-feedback-toggle-zone" v-if="d_feedback_config !== null">
       <div class="checkbox-input-container" v-if="ag_test_case.ag_test_commands.length > 1
                                                   || !d_feedback_config.visible">
-        <input :id="`${hyphenate(config_name)}-visible`"
+        <input :id="`${hyphenate(config_name)}-cmd-visible`"
                type="checkbox"
                @change="$emit('input', d_feedback_config)"
                class="checkbox"
                v-model="d_feedback_config.visible">
-        <label :for="`${hyphenate(config_name)}-visible`"> Command is Visible </label>
+        <label :for="`${hyphenate(config_name)}-cmd-visible`"> Command is Visible </label>
       </div>
 
       <div class="advanced-settings-label" @click="toggle_is_open">

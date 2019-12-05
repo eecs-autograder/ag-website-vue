@@ -6,12 +6,12 @@
 
     <template v-slot:settings>
       <div class="checkbox-input-container">
-        <input :id="`${hyphenate(config_name)}-visible`"
+        <input :id="`${hyphenate(config_name)}-case-visible`"
               type="checkbox"
               @change="$emit('input', d_feedback_config)"
               class="checkbox"
               v-model="d_feedback_config.visible">
-        <label :for="`${hyphenate(config_name)}-visible`"> Case is Visible </label>
+        <label :for="`${hyphenate(config_name)}-case-visible`"> Case is Visible </label>
       </div>
 
       <div class="checkbox-input-container">

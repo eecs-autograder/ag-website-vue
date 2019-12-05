@@ -36,7 +36,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('visible binding', async () => {
-        let visible_input = wrapper.find('#normal-visible');
+        let visible_input = wrapper.find('#normal-mutation-suite-visible');
 
         visible_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);

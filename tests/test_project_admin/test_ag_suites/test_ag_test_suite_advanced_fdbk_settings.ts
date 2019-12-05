@@ -38,7 +38,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('visible binding', async () => {
-        let visible_input = wrapper.find('#normal-visible');
+        let visible_input = wrapper.find('#normal-suite-visible');
 
         visible_input.setChecked(true);
         expect(component.d_feedback_config!.visible).toEqual(true);

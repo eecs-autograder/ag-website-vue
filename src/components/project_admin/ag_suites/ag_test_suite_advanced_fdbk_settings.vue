@@ -4,12 +4,12 @@
 
       <div class="non-advanced">
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-visible`"
+          <input :id="`${hyphenate(config_name)}-suite-visible`"
                  type="checkbox"
                  @change="$emit('input', d_feedback_config)"
                  class="checkbox"
                  v-model="d_feedback_config.visible">
-          <label :for="`${hyphenate(config_name)}-visible`"> Suite is Visible </label>
+          <label :for="`${hyphenate(config_name)}-suite-visible`"> Suite is Visible </label>
         </div>
       </div>
 

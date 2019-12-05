@@ -132,20 +132,22 @@ export default class FeedbackConfigPanel extends Vue {
   margin: 0;
 }
 
+$border-radius: 3px;
+
 .config-panel {
     width: 100%;
     max-width: 600px;
 
     margin-bottom: .625rem;
     box-shadow: 0 1px 1px $white-gray;
-    border-radius: 3px;
+    border-radius: $border-radius;
 }
 
 .header {
     background-color: hsl(220, 30%, 94%);
     border: 2px solid hsl(220, 30%, 92%);
     border-bottom: none;
-    border-radius: 3px 3px 0 0;
+    border-radius: $border-radius $border-radius 0 0;
 
     display: flex;
     flex-direction: row;
@@ -173,7 +175,7 @@ export default class FeedbackConfigPanel extends Vue {
 .footer {
     border: 2px solid hsl(210, 20%, 92%);
     border-top: none;
-    border-radius: 0 0 3px 3px;
+    border-radius: 0 0 $border-radius $border-radius;
     background-color: white;
     padding: .375rem;
 }

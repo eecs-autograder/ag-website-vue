@@ -1,96 +1,92 @@
 <template>
-  <div v-if="d_ag_test_case !== null">
-    <div id="ag-test-case-settings-component">
-      <validated-form ref="ag_test_case_settings_form"
-                      autocomplete="off"
-                      spellcheck="false"
-                      @submit="save_ag_test_case_settings"
-                      @form_validity_changed="d_settings_form_is_valid = $event">
+  <validated-form ref="ag_test_case_settings_form"
+                  autocomplete="off"
+                  spellcheck="false"
+                  @submit="save_ag_test_case_settings"
+                  @form_validity_changed="d_settings_form_is_valid = $event">
 
-          <div id="name-container">
-            <label class="text-label"> Test name </label>
-            <validated-input ref="name"
-                             v-model="d_ag_test_case.name"
-                             :validators="[is_not_empty]">
-            </validated-input>
-          </div>
+      <div class="form-field-wrapper">
+        <label class="text-label"> Test name </label>
+        <validated-input ref="name"
+                         v-model="d_ag_test_case.name"
+                         :validators="[is_not_empty]">
+        </validated-input>
+      </div>
 
-          <div v-if="d_ag_test_case.ag_test_commands.length > 1"
-               class="ag-case-feedback-panels">
-            <AGTestCaseFdbkConfigPanel ref="normal"
-                                       v-model="d_ag_test_case.normal_fdbk_config"
-                                       :config_name="FeedbackConfigLabel.normal">
-              <template slot="header">
-                <div class="config-name">
-                  {{FeedbackConfigLabel.normal}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.normal}}
-                    </tooltip>
-                  </i>
-                </div>
-              </template>
-            </AGTestCaseFdbkConfigPanel>
+      <div v-if="d_ag_test_case.ag_test_commands.length > 1"
+           ref="fdbk_panels">
+        <AGTestCaseFdbkConfigPanel ref="normal"
+                                   v-model="d_ag_test_case.normal_fdbk_config"
+                                   :config_name="FeedbackConfigLabel.normal">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.normal}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.normal}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+        </AGTestCaseFdbkConfigPanel>
 
-            <AGTestCaseFdbkConfigPanel ref="final_graded"
-                                       v-model="d_ag_test_case.ultimate_submission_fdbk_config"
-                                       :config_name="FeedbackConfigLabel.ultimate_submission">
-              <template slot="header">
-                <div class="config-name">
-                  {{FeedbackConfigLabel.ultimate_submission}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.ultimate_submission}}
-                    </tooltip>
-                  </i>
-                </div>
-              </template>
-            </AGTestCaseFdbkConfigPanel>
+        <AGTestCaseFdbkConfigPanel ref="final_graded"
+                                    v-model="d_ag_test_case.ultimate_submission_fdbk_config"
+                                    :config_name="FeedbackConfigLabel.ultimate_submission">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.ultimate_submission}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.ultimate_submission}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+        </AGTestCaseFdbkConfigPanel>
 
-            <AGTestCaseFdbkConfigPanel ref="past_limit"
-                                       v-model="d_ag_test_case.past_limit_submission_fdbk_config"
-                                       :config_name="FeedbackConfigLabel.past_limit">
-              <template slot="header">
-                <div class="config-name">
-                  {{FeedbackConfigLabel.past_limit}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.past_limit}}
-                    </tooltip>
-                  </i>
-                </div>
-              </template>
-            </AGTestCaseFdbkConfigPanel>
+        <AGTestCaseFdbkConfigPanel ref="past_limit"
+                                    v-model="d_ag_test_case.past_limit_submission_fdbk_config"
+                                    :config_name="FeedbackConfigLabel.past_limit">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.past_limit}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.past_limit}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+        </AGTestCaseFdbkConfigPanel>
 
-            <AGTestCaseFdbkConfigPanel ref="student_lookup"
-                                       v-model="d_ag_test_case.staff_viewer_fdbk_config"
-                                       :config_name="FeedbackConfigLabel.staff_viewer">
-              <template slot="header">
-                <div class="config-name">
-                  {{FeedbackConfigLabel.staff_viewer}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.staff_viewer}}
-                    </tooltip>
-                  </i>
-                </div>
-              </template>
-            </AGTestCaseFdbkConfigPanel>
-          </div>
+        <AGTestCaseFdbkConfigPanel ref="student_lookup"
+                                    v-model="d_ag_test_case.staff_viewer_fdbk_config"
+                                    :config_name="FeedbackConfigLabel.staff_viewer">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.staff_viewer}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.staff_viewer}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+        </AGTestCaseFdbkConfigPanel>
+      </div>
 
-        <div id="button-footer">
-          <APIErrors ref="api_errors"></APIErrors>
+    <div class="button-footer">
+      <APIErrors ref="api_errors"></APIErrors>
 
-          <button id="save-button"
-                  type="submit"
-                  :disabled="!d_settings_form_is_valid || d_saving">
-            Save
-          </button>
-        </div>
-      </validated-form>
+      <button ref="save_button"
+              class="save-button"
+              type="submit"
+              :disabled="!d_settings_form_is_valid || d_saving">
+        Save
+      </button>
     </div>
-
-  </div>
+  </validated-form>
 </template>
 
 <script lang="ts">
@@ -159,22 +155,6 @@ function handle_save_ag_test_case_settings_error(component: AGCaseSettings, erro
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
-@import '@/styles/forms.scss';
 @import '@/styles/components/feedback_config.scss';
-
-#button-footer {
-  margin: 12px 0 0 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-}
-
-#save-button {
-  @extend .green-button;
-}
-
-.ag-case-feedback-panels {
-  padding-top: 15px;
-}
-
+@import '@/styles/forms.scss';
 </style>

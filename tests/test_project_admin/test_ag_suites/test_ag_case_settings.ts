@@ -11,7 +11,6 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import {
@@ -68,22 +67,15 @@ describe('AG test case settings form tests', () => {
     });
 
     test('error - case name is blank', async () => {
-        let name_input = wrapper.find({ref: "name"}).find('#input');
-        let name_validator = <ValidatedInput> wrapper.find({ref: "name"}).vm;
-
-        (<HTMLInputElement> name_input.element).value = "Rain";
-        name_input.trigger('input');
+        set_validated_input_text(wrapper.find({ref: "name"}), 'Rain');
         await component.$nextTick();
 
-        expect(name_validator.is_valid).toBe(true);
-        expect(wrapper.find('#save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
 
-        (<HTMLInputElement> name_input.element).value = " ";
-        name_input.trigger('input');
+        set_validated_input_text(wrapper.find({ref: "name"}), ' ');
         await component.$nextTick();
 
-        expect(name_validator.is_valid).toBe(false);
-        expect(wrapper.find('#save-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(true);
     });
 
     test('save d_ag_case - successful', async () => {
@@ -117,13 +109,13 @@ describe('AG test case settings form tests', () => {
          'one command',
          async () => {
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(0);
-        expect(wrapper.findAll('.ag-case-feedback-panels').length).toEqual(0);
+        expect(wrapper.find({ref: 'fdbk_panels'}).exists()).toBe(false);
 
         wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
         await component.$nextTick();
 
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(2);
-        expect(wrapper.findAll('.ag-case-feedback-panels').length).toEqual(1);
+        expect(wrapper.find({ref: 'fdbk_panels'}).exists()).toBe(true);
 
         let case_3 = data_ut.make_ag_test_case(ag_test_suite.pk);
         case_3.ag_test_commands = [
@@ -134,7 +126,7 @@ describe('AG test case settings form tests', () => {
         await component.$nextTick();
 
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(1);
-        expect(wrapper.findAll('.ag-case-feedback-panels').length).toEqual(0);
+        expect(wrapper.find({ref: 'fdbk_panels'}).exists()).toBe(false);
     });
 
     test('update config settings in ag_case_config_panel - changes reflected in ' +
@@ -150,7 +142,7 @@ describe('AG test case settings form tests', () => {
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(false);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);
 
-        wrapper.find('#past-limit-visible').setChecked(true);
+        wrapper.find('#past-limit-case-visible').setChecked(true);
 
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(true);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(true);

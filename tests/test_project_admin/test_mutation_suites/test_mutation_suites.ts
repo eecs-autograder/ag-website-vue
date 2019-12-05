@@ -708,7 +708,7 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.visible
         ).toBe(false);
 
-        wrapper.find('#past-limit-visible').setChecked(true);
+        wrapper.find('#past-limit-mutation-suite-visible').setChecked(true);
         await wrapper.vm.$nextTick();
 
         expect(
