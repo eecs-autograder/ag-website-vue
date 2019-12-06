@@ -654,7 +654,7 @@
           {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
         </span>
       </div>
-      <button class="delete-ag-test-command-button"
+      <button class="delete-ag-test-command-button delete-button"
               type="button"
               @click="d_show_delete_ag_test_command_modal = true">
         Delete

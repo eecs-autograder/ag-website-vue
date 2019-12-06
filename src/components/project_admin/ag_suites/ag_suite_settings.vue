@@ -279,7 +279,7 @@
         <div id="danger-text">
           Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
         </div>
-        <button class="delete-ag-test-suite-button"
+        <button class="delete-ag-test-suite-button delete-button"
                 type="button"
                 @click="d_show_delete_ag_test_suite_modal = true">
           Delete
