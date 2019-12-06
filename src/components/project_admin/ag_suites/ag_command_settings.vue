@@ -647,55 +647,55 @@
 
 <!--------------------------- Danger Zone --------------------------------------->
 
-    <div id="danger-zone-container">
-      <fieldset class="fieldset">
-        <legend class="legend">Danger Zone</legend>
-        <button class="delete-ag-test-command-button"
-                type="button"
-                @click="d_show_delete_ag_test_command_modal = true">
-          {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
-          <span>
-            {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
+    <div class="danger-zone-container">
+      <div class="danger-text">
+        {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
+        <span>
+          {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
+        </span>
+      </div>
+      <button class="delete-ag-test-command-button delete-button"
+              type="button"
+              @click="d_show_delete_ag_test_command_modal = true">
+        Delete
+      </button>
+
+      <modal v-if="d_show_delete_ag_test_command_modal"
+              @close="d_show_delete_ag_test_command_modal = false"
+              ref="delete_ag_test_command_modal"
+              size="large"
+              click_outside_to_close>
+        <div class="modal-header">
+          Confirm Delete
+        </div>
+        <hr>
+        <div class="modal-body">
+          <p>
+          Are you sure you want to delete the
+          {{case_has_exactly_one_command ? 'test case' : 'command'}}:
+          <span class="item-to-delete">
+            "{{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}"
+          </span>? <br>
+
+          <span v-if="case_has_exactly_one_command">
+            This will delete all associated run results. <br>
+            THIS ACTION CANNOT BE UNDONE.
           </span>
-        </button>
 
-        <modal v-if="d_show_delete_ag_test_command_modal"
-               @close="d_show_delete_ag_test_command_modal = false"
-               ref="delete_ag_test_command_modal"
-               size="large"
-               click_outside_to_close>
-          <div class="modal-header">
-            Confirm Delete
+          <span v-if="!case_has_exactly_one_command">
+            This will delete all associated run results. <br>
+            THIS ACTION CANNOT BE UNDONE. </span>
+          </p>
+          <div class="deletion-modal-button-footer">
+            <button class="modal-delete-button"
+                    :disabled="d_deleting"
+                    @click="delete_ag_test_command()"> Delete </button>
+
+            <button class="modal-cancel-button"
+                    @click="d_show_delete_ag_test_command_modal = false"> Cancel </button>
           </div>
-          <hr>
-          <div class="modal-body">
-            <p>
-            Are you sure you want to delete the
-            {{case_has_exactly_one_command ? 'test case' : 'command'}}:
-            <span class="item-to-delete">
-              "{{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}"
-            </span>? <br>
-
-            <span v-if="case_has_exactly_one_command">
-              This will delete all associated run results. <br>
-              THIS ACTION CANNOT BE UNDONE.
-            </span>
-
-            <span v-if="!case_has_exactly_one_command">
-              This will delete all associated run results. <br>
-              THIS ACTION CANNOT BE UNDONE. </span>
-            </p>
-            <div class="deletion-modal-button-footer">
-              <button class="modal-delete-button"
-                      :disabled="d_deleting"
-                      @click="delete_ag_test_command()"> Delete </button>
-
-              <button class="modal-cancel-button"
-                      @click="d_show_delete_ag_test_command_modal = false"> Cancel </button>
-            </div>
-          </div>
-        </modal>
-      </fieldset>
+        </div>
+      </modal>
     </div>
   </div>
 </template>
@@ -1062,20 +1062,6 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
   color: white;
 
   border-radius: 1px;
-}
-
-#danger-zone-container {
-  margin-top: 40px;
-
-  .legend {
-    color: black;
-    font-size: 24px;
-  }
-
-  .delete-ag-test-command-button {
-    @extend .delete-level-button;
-    margin-top: 10px;
-  }
 }
 
 @media only screen and (min-width: 481px) {
