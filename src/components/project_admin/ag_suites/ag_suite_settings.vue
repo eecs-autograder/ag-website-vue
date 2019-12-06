@@ -275,8 +275,8 @@
 
       <!--------------------------- Danger Zone --------------------------------------->
 
-      <div id="danger-zone-container">
-        <div id="danger-text">
+      <div class="danger-zone-container">
+        <div class="danger-text">
           Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
         </div>
         <button class="delete-ag-test-suite-button delete-button"

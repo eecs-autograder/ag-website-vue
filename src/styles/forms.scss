@@ -79,7 +79,7 @@ $input-text-color: #495057;
 
 // Danger Zone -----------------------------------
  
-#danger-zone-container {
+.danger-zone-container {
     margin: 50px 10px 20px;
     border-radius: 5px;
     border: 1px solid red;
@@ -88,16 +88,14 @@ $input-text-color: #495057;
     justify-content: space-between;
     align-items: center;
    
-    #danger-text {
+    .danger-text {
         color: black;
         font-size: 24px;
         word-break: break-word;
         word-wrap: break-word;
     }
  
-    .delete-mutation-test-suite-button, 
-    .delete-ag-test-suite-button,
-    .delete-ag-test-command-button {
+    .delete-button {
         @extend .red-button;
         font-size: 14px;
     }

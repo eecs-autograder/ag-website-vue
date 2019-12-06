@@ -647,8 +647,8 @@
 
 <!--------------------------- Danger Zone --------------------------------------->
 
-    <div id="danger-zone-container">
-      <div id="danger-text">
+    <div class="danger-zone-container">
+      <div class="danger-text">
         {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
         <span>
           {{case_has_exactly_one_command ? d_ag_test_case.name : d_ag_test_command.name}}
