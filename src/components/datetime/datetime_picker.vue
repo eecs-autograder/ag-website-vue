@@ -1,8 +1,8 @@
 <template>
-  <div id="datetime-picker" v-if="d_is_open">
+  <div class="datetime-picker" v-if="d_is_open">
 
-    <div id="calender">
-      <div class="calender-header">
+    <div class="calendar">
+      <div class="calendar-header">
         <button type="button" @click="go_to_prev_month" class="prev-month-button">
           <i class="fas fa-chevron-left"></i>
         </button>
@@ -13,13 +13,13 @@
           <i class="fas fa-chevron-right"></i>
         </button>
       </div>
-      <div class="calender-body">
-        <table>
+      <div class="calendar-body">
+        <table class="calendar-table">
           <tr class="days-of-the-week">
-            <th v-for="day of days_of_the_week">{{day}}</th>
+            <th class="day-of-week" v-for="day of days_of_the_week">{{day}}</th>
           </tr>
           <tr class="week" v-for="(row, row_num) of num_rows">
-            <td v-for="(col, col_num) of num_cols"
+            <td class="date-cell" v-for="(col, col_num) of num_cols"
                 :class="{'unavailable-day': calendar[row_num][col_num] === 0}">
               <div v-if="calendar[row_num][col_num] !== 0"
                    :class="['available-day',
@@ -38,7 +38,7 @@
     <time-picker v-model="d_time"
                  @input="update_time_selected"
                  ref="time_picker"
-                 id="time-picker"></time-picker>
+                 class="time-picker"></time-picker>
   </div>
 </template>
 
@@ -237,24 +237,36 @@ export class InvalidDatetimeStrError extends Error {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 // DATETIMEPICKER *******************************************************
 
-#datetime-picker {
+.datetime-picker {
   display: flex;
+  flex-wrap: wrap;
+}
+
+.calendar, .time-picker {
+  border: 1px solid $pebble-dark;
+  border-radius: 2px;
 }
 
 // DATEPICKER ***********************************************************
 
-#calender {
+.calendar {
   background-color: white;
-  box-sizing: border-box;
-  box-shadow: 0 0 2px 1px $pebble-dark;
-  border-radius: 2px;
-  display: inline-block;
-  width: 350px;
+
+  width: 100%;
+  max-width: 300px;
+
+  margin-right: .5rem;
 }
 
-.calender-header {
+.calendar-header {
   align-items: center;
   background-color: teal;
   border-radius: 2px 2px 0 0;
@@ -262,15 +274,9 @@ export class InvalidDatetimeStrError extends Error {
   display: flex;
   flex-wrap: nowrap;
   font-weight: bold;
-  justify-content: space-between;
-  padding: 15px 20px;
-}
-
-.calender-body {
-  border-radius: 0 0 2px 2px;
-  border-top: none;
-  box-sizing: border-box;
-  padding: 10px;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: .5rem .75rem;
 }
 
 .prev-month-button, .next-month-button {
@@ -278,10 +284,8 @@ export class InvalidDatetimeStrError extends Error {
   border: none;
   color: $pebble-light;
   cursor: pointer;
-  font-size: 18px;
-  padding: 5px 10px 5px 8px;
-  text-align: center;
-  vertical-align: middle;
+  font-size: 1.125rem;
+  padding: .25rem;
 }
 
 .prev-month-button:focus, .next-month-button:focus {
@@ -293,28 +297,31 @@ export class InvalidDatetimeStrError extends Error {
 }
 
 .display-month-and-year {
-  font-size: 19px;
+  font-size: 1.125rem;
   vertical-align: middle;
 }
 
-.display-month-and-year span {
-  padding-left: 4px;
+.calendar-body {
+  border-radius: 0 0 2px 2px;
+  border-top: none;
+  box-sizing: border-box;
+  padding: .625rem;
 }
 
-table {
+.calendar-table {
   width: 100%;
 }
 
-th {
+.day-of-week {
   border: 1px solid transparent;
   color: lighten(black, 32);
   font-weight: normal;
-  padding-bottom: 8px;
+  padding-bottom: .5rem;
 }
 
-td {
+.date-cell {
   border: 1px solid transparent;
-  padding: 4px;
+  padding: .25rem;
   text-align: center;
 }
 
@@ -340,16 +347,13 @@ td {
 
 // TIMEPICKER ***********************************************************
 
-#time-picker {
-  border: 1px solid white;
-  border-radius: 2px;
-  box-sizing: border-box;
-  box-shadow: 0 0 2px 1px $pebble-dark;
+.time-picker {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-left: 5px;
-  width: 210px;
+
+  width: 100%;
+  max-width: 210px;
 }
 
 </style>

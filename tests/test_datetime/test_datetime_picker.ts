@@ -200,20 +200,20 @@ describe('DatetimePicker tests', () => {
         let component = wrapper.vm;
 
         expect(component.is_visible).toBe(false);
-        expect(wrapper.find('#datetime-picker').exists()).toEqual(false);
+        expect(wrapper.find('.datetime-picker').exists()).toEqual(false);
 
         component.toggle_visibility();
 
         expect(component.is_visible).toBe(true);
-        expect(wrapper.find('#datetime-picker').exists()).toEqual(true);
+        expect(wrapper.find('.datetime-picker').exists()).toEqual(true);
 
         component.hide();
         expect(component.is_visible).toBe(false);
-        expect(wrapper.find('#datetime-picker').exists()).toEqual(false);
+        expect(wrapper.find('.datetime-picker').exists()).toEqual(false);
 
         component.show();
         expect(component.is_visible).toBe(true);
-        expect(wrapper.find('#datetime-picker').exists()).toEqual(true);
+        expect(wrapper.find('.datetime-picker').exists()).toEqual(true);
     });
 });
 
