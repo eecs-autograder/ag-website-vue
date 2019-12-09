@@ -331,7 +331,8 @@
 
       <fieldset v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none
                       || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
-                class="fieldset">
+                class="fieldset"
+                ref="diff_options">
         <legend class="legend"> Diff Options </legend>
         <div class="checkbox-input-container">
           <input id="ignore-case"

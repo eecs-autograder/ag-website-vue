@@ -205,7 +205,7 @@ describe('FeedbackConfigPanel tests', () => {
         expect(component.selected_preset_name).toEqual("Private Setup");
     });
 
-    test('Value prop changed to a configuration that is null', async () => {
+    test('Preset selector hidden when input value is null', async () => {
         wrapper = mount(FeedbackConfigPanel, {
             propsData: {
                 preset_options: ag_test_suite_fdbk_presets,
@@ -215,24 +215,22 @@ describe('FeedbackConfigPanel tests', () => {
         component = wrapper.vm;
 
         expect(component.d_configuration).toEqual(ag_test_suite_normal_feedback_config);
-        expect(wrapper.findAll('.select').length).toEqual(1);
+        expect(wrapper.find({ref: 'preset_selection'}).isVisible()).toBe(true);
 
         wrapper.setProps({value: null});
         await component.$nextTick();
 
         expect(component.d_configuration).toEqual(null);
-        expect(wrapper.findAll('.select').length).toEqual(0);
+        expect(wrapper.find({ref: 'preset_selection'}).isVisible()).toBe(false);
     });
 
     test('Presets not provided, no preset dropdown', async () => {
         wrapper = mount(FeedbackConfigPanel, {
             propsData: {
-                preset_options: new SafeMap([]),
                 value: ag_test_suite_normal_feedback_config
             }
         });
 
-        expect(wrapper.exists()).toBe(true);
-        expect(wrapper.find('.select').exists()).toBe(false);
+        expect(wrapper.find({ref: 'preset_selection'}).isVisible()).toBe(false);
     });
 });

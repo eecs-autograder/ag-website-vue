@@ -183,7 +183,6 @@ describe('Course_List.vue', () => {
         wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
-        console.log(wrapper.html());
         component = wrapper.vm;
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();

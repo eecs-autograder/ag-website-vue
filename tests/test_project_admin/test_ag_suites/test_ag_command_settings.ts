@@ -663,47 +663,47 @@ describe('AGTestCommandSettings tests', () => {
         wrapper.vm.d_ag_test_command!.expected_stdout_source
             = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source
             = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source
             = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source
             = ExpectedOutputSource.instructor_file;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         wrapper.vm.d_ag_test_command!.expected_stderr_source
             = ExpectedOutputSource.instructor_file;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(0);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(false);
     });
 
     test('ignore_case binding', async () => {

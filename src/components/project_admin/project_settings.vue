@@ -25,8 +25,7 @@
               </tooltip>
             </i>
           </div>
-          <div class="datetime-input"
-                @click="$refs.soft_closing_time.toggle_visibility()">
+          <div class="datetime-input" @click="$refs.soft_closing_time.toggle_visibility()">
             {{format_datetime(d_project.soft_closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>

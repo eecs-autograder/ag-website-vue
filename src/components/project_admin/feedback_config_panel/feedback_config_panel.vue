@@ -7,7 +7,8 @@
       </div>
 
       <div :style="{'visibility': is_enabled ? 'visible' : 'hidden'}"
-           class="setting-selection-container">
+           class="preset-selection-container"
+           ref="preset_selection">
         <span class="preset-label">Preset:</span>
         <select class="select"
                 v-model="d_selected_preset_name"
@@ -84,7 +85,7 @@ export default class FeedbackConfigPanel extends Vue {
   }
 
   private set_d_configuration(feedback_config: FeedbackConfigType) {
-    this.d_configuration = this.value === null ? null : JSON.parse(JSON.stringify(this.value));
+    this.d_configuration = JSON.parse(JSON.stringify(feedback_config));
     this.d_selected_preset_name = this.detect_current_preset();
   }
 
@@ -167,7 +168,7 @@ $border-radius: 3px;
   font-size: 1rem;
 }
 
-.setting-selection-container {
+.preset-selection-container {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
