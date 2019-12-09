@@ -586,6 +586,11 @@ $border-color: $gray-blue-1;
   padding-right: .25rem;
 }
 
+.body {
+  padding: .625rem .875rem;
+  overflow-x: hidden;
+}
+
 #fixed-button-footer {
   position: fixed;
   bottom: 0;

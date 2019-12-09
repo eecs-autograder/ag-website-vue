@@ -913,11 +913,6 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
   margin: 0;
 }
 
-#ag-test-command-settings-component {
-  padding: .875rem;
-  overflow-x: hidden;
-}
-
 .test-name-wrapper {
   display: flex;
   flex-wrap: wrap;

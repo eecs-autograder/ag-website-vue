@@ -8,125 +8,10 @@
                       spellcheck="false"
                       @submit="save_ag_test_suite_settings"
                       @form_validity_changed="d_settings_form_is_valid = $event">
-
-        <div class="form-field-wrapper">
-          <label class="text-label"> Suite name </label>
-          <validated-input ref="suite_name"
-                            id="input-name"
-                            v-model="d_ag_test_suite.name"
-                            :validators="[is_not_empty]">
-          </validated-input>
-
-          <div class="checkbox-input-container">
-            <input id="synchronous-or-deferred"
-                  type="checkbox"
-                  class="checkbox"
-                  :checked="!d_ag_test_suite.deferred"
-                  @change="d_ag_test_suite.deferred = !$event.target.checked"/>
-            <label class="checkbox-label"
-                    for="synchronous-or-deferred">
-              Suite must finish before students can submit again
-            </label>
-          </div>
-        </div>
-
-        <fieldset class="fieldset">
-          <legend class="legend"> Grading Environment </legend>
-
-          <div class="form-field-wrapper">
-            <label class="text-label"> Sandbox environment </label>
-
-            <select-object :items="d_docker_images"
-                           id_field="pk"
-                           v-model="d_ag_test_suite.sandbox_docker_image"
-                           ref="sandbox_docker_image">
-              <template v-slot:option-text="{item}">
-                {{item.display_name}}
-              </template>
-            </select-object>
-          </div>
-
-          <div class="toggle-container form-field-wrapper">
-            <toggle v-model="d_ag_test_suite.allow_network_access"
-                    ref="allow_network_access">
-              <div slot="on">
-                Allow network access
-              </div>
-              <div slot="off">
-                Block network access
-              </div>
-            </toggle>
-          </div>
-
-          <div class="checkbox-input-container">
-            <input id="read-only-instructor-files"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_ag_test_suite.read_only_instructor_files"/>
-            <label class="checkbox-label"
-                   for="read-only-instructor-files">
-              Instructor files are read-only
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="fieldset">
-          <legend class="legend"> Instructor Files </legend>
-          <div class="typeahead-search-bar">
-            <dropdown-typeahead ref="instructor_files_typeahead"
-                                placeholder_text="Enter a filename"
-                                :choices="instructor_files_available"
-                                :filter_fn="instructor_file_filter_fn"
-                                @update_item_chosen="add_instructor_file($event)">
-              <template slot-scope="{item}">
-                <span class="typeahead-row">
-                  {{item.name}}
-                </span>
-              </template>
-            </dropdown-typeahead>
-          </div>
-
-          <div class="instructor-files">
-            <div v-for="(file, index) of d_ag_test_suite.instructor_files_needed"
-                  :class="['file', {'odd-index': index % 2 !== 0}]">
-              <span class="file-name"> {{file.name}} </span>
-              <div class="remove-file-icon-container"
-                    @click="d_ag_test_suite.instructor_files_needed.splice(index, 1)">
-                <span><i class="fas fa-times remove-file"></i></span>
-              </div>
-            </div>
-          </div>
-
-        </fieldset>
-
-        <fieldset class="fieldset">
-          <legend class="legend"> Student Files </legend>
-          <div class="typeahead-search-bar">
-            <dropdown-typeahead ref="student_files_typeahead"
-                                placeholder_text="Enter a filename"
-                                :choices="expected_student_files_available"
-                                :filter_fn="expected_student_file_filter_fn"
-                                @update_item_chosen="add_student_file($event)">
-              <template slot-scope="{item}">
-                <span class="typeahead-row">
-                  {{item.pattern}}
-                </span>
-              </template>
-            </dropdown-typeahead>
-          </div>
-
-          <div class="student-files">
-            <div v-for="(file, index) of d_ag_test_suite.student_files_needed"
-                  :class="['file', {'odd-index': index % 2 !== 0}]">
-              <span class="file-name"> {{file.pattern}} </span>
-              <div class="remove-file-icon-container"
-                    @click="d_ag_test_suite.student_files_needed.splice(index, 1)">
-                <span><i class="fas fa-times remove-file"></i></span>
-              </div>
-            </div>
-          </div>
-
-        </fieldset>
+        <suite-settings :suite="d_ag_test_suite"
+                        :project="project"
+                        :docker_images="d_docker_images"
+                        @field_change="Object.assign(d_ag_test_suite, $event)"></suite-settings>
 
         <fieldset class="fieldset">
           <legend class="legend"> Setup </legend>
@@ -318,11 +203,9 @@ import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
+import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import SelectObject from '@/components/select_object.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -341,13 +224,11 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     AGTestSuiteAdvancedFdbkSettings,
     Modal,
     SelectObject,
-    Tab,
-    TabHeader,
-    Tabs,
+    SuiteSettings,
     Toggle,
     Tooltip,
     ValidatedForm,
-    ValidatedInput
+    ValidatedInput,
   }
 })
 export default class AGSuiteSettings extends Vue {
@@ -382,29 +263,29 @@ export default class AGSuiteSettings extends Vue {
     this.d_loading = false;
   }
 
-  get instructor_files_available() {
-    return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
-      return this.d_ag_test_suite!.instructor_files_needed.findIndex(
-        (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
-    });
-  }
+  // get instructor_files_available() {
+  //   return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
+  //     return this.d_ag_test_suite!.instructor_files_needed.findIndex(
+  //       (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
+  //   });
+  // }
 
-  get expected_student_files_available() {
-    return this.project.expected_student_files.filter(
-      (expected_student_file: ExpectedStudentFile) => {
-        return this.d_ag_test_suite!.student_files_needed.findIndex(
-          (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
-      }
-    );
-  }
+  // get expected_student_files_available() {
+  //   return this.project.expected_student_files.filter(
+  //     (expected_student_file: ExpectedStudentFile) => {
+  //       return this.d_ag_test_suite!.student_files_needed.findIndex(
+  //         (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
+  //     }
+  //   );
+  // }
 
-  add_instructor_file(instructor_file: InstructorFile) {
-    this.d_ag_test_suite!.instructor_files_needed.push(instructor_file);
-  }
+  // add_instructor_file(instructor_file: InstructorFile) {
+  //   this.d_ag_test_suite!.instructor_files_needed.push(instructor_file);
+  // }
 
-  add_student_file(student_file: ExpectedStudentFile) {
-    this.d_ag_test_suite!.student_files_needed.push(student_file);
-  }
+  // add_student_file(student_file: ExpectedStudentFile) {
+  //   this.d_ag_test_suite!.student_files_needed.push(student_file);
+  // }
 
   delete_ag_test_suite() {
     return toggle(this, 'd_deleting', async () => {
@@ -413,13 +294,13 @@ export default class AGSuiteSettings extends Vue {
     });
   }
 
-  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-    return file.name.indexOf(filter_text) >= 0;
-  }
+  // instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
+  //   return file.name.indexOf(filter_text) >= 0;
+  // }
 
-  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-    return file.pattern.indexOf(filter_text) >= 0;
-  }
+  // expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
+  //   return file.pattern.indexOf(filter_text) >= 0;
+  // }
 
   @handle_api_errors_async(handle_save_ag_suite_settings_error)
   save_ag_test_suite_settings() {
@@ -475,60 +356,4 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/modal.scss';
 
 @import './ag_tests.scss';
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-#ag-test-suite-settings-component {
-  padding: .625rem .875rem;
-  overflow: hidden;
-}
-
-.toggle-container {
-  font-size: .875rem;
-  margin: 1rem 0;
-}
-
-.instructor-files, .student-files {
-  margin: .625rem 0;
-  border: 1px solid hsl(210, 20%, 90%);
-  display: inline-block;
-}
-
-.file {
-  padding: .25rem .375rem .25rem .625rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.file-name {
-  color: lighten(black, 40);
-  padding-right: 1.875rem;
-}
-
-.remove-file {
-  color: hsl(220, 20%, 85%);
-}
-
-.remove-file-icon-container {
-  display: inline-block;
-  padding: 0 .25rem;
-}
-
-.remove-file-icon-container:hover {
-  cursor: pointer;
-  .remove-file {
-    color: hsl(220, 20%, 55%);
-  }
-}
-
-.odd-index {
-  background-color: hsl(210, 20%, 96%);
-}
-
 </style>

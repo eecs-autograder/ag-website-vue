@@ -177,279 +177,283 @@ describe('AGSuiteSettings tests', () => {
         }
     });
 
-    test('suite name binding', async () => {
-        let suite_name_input = wrapper.find({ref: 'suite_name'});
-        set_validated_input_text(suite_name_input, 'Sweet Name');
-
-        expect(component.d_ag_test_suite!.name).toEqual("Sweet Name");
-        expect(validated_input_is_valid(suite_name_input)).toEqual(true);
-
-        component.d_ag_test_suite!.name = "Thanks";
-        expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
+    test('Suite settings binding', async () => {
+        // suite, project, images input, event output
+        fail();
     });
+    // test('suite name binding', async () => {
+    //     let suite_name_input = wrapper.find({name: 'SuiteSettings'}).find({ref: 'suite_name'});
+    //     set_validated_input_text(suite_name_input, 'Sweet Name');
 
-    test('Suite name cannot be empty - violates condition', async () => {
-        expect(component.d_settings_form_is_valid).toBe(true);
+    //     expect(component.d_ag_test_suite!.name).toEqual("Sweet Name");
+    //     expect(validated_input_is_valid(suite_name_input)).toEqual(true);
 
-        let suite_name_input = wrapper.find({ref: 'suite_name'});
-        set_validated_input_text(suite_name_input, '');
+    //     component.d_ag_test_suite!.name = "Thanks";
+    //     expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
+    // });
 
-        expect(validated_input_is_valid(suite_name_input)).toBe(false);
-        expect(component.d_settings_form_is_valid).toBe(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
-    });
+    // test('Suite name cannot be empty - violates condition', async () => {
+    //     expect(component.d_settings_form_is_valid).toBe(true);
 
-    test('deferred binding', () => {
-        let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
+    //     let suite_name_input = wrapper.find({ref: 'suite_name'});
+    //     set_validated_input_text(suite_name_input, '');
 
-        synchronous_checkbox.setChecked(true);
-        expect(component.d_ag_test_suite!.deferred).toEqual(false);
+    //     expect(validated_input_is_valid(suite_name_input)).toBe(false);
+    //     expect(component.d_settings_form_is_valid).toBe(false);
+    //     expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+    // });
 
-        synchronous_checkbox.setChecked(false);
-        expect(component.d_ag_test_suite!.deferred).toEqual(true);
+    // test('deferred binding', () => {
+    //     let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
 
-        synchronous_checkbox.setChecked(true);
-        expect(component.d_ag_test_suite!.deferred).toEqual(false);
+    //     synchronous_checkbox.setChecked(true);
+    //     expect(component.d_ag_test_suite!.deferred).toEqual(false);
 
-        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
+    //     synchronous_checkbox.setChecked(false);
+    //     expect(component.d_ag_test_suite!.deferred).toEqual(true);
 
-        component.d_ag_test_suite!.deferred = true;
-        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
+    //     synchronous_checkbox.setChecked(true);
+    //     expect(component.d_ag_test_suite!.deferred).toEqual(false);
 
-        component.d_ag_test_suite!.deferred = false;
-        expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
-    });
+    //     expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
 
-    test('sandbox_docker_image binding', async () => {
-        let sandbox_docker_image_input = wrapper.find({ref: 'sandbox_docker_image'});
-        set_select_object_value(sandbox_docker_image_input, sandbox_docker_image_2.pk);
-        await wrapper.vm.$nextTick();
+    //     component.d_ag_test_suite!.deferred = true;
+    //     expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
 
-        expect(wrapper.vm.d_ag_test_suite!.sandbox_docker_image).toEqual(
-            sandbox_docker_image_2
-        );
+    //     component.d_ag_test_suite!.deferred = false;
+    //     expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
+    // });
 
-        wrapper.vm.d_ag_test_suite!.sandbox_docker_image = sandbox_docker_image_3;
-        await wrapper.vm.$nextTick();
+    // test('sandbox_docker_image binding', async () => {
+    //     let sandbox_docker_image_input = wrapper.find({ref: 'sandbox_docker_image'});
+    //     set_select_object_value(sandbox_docker_image_input, sandbox_docker_image_2.pk);
+    //     await wrapper.vm.$nextTick();
 
-        expect_html_element_has_value(
-            sandbox_docker_image_input.find('.select'), sandbox_docker_image_3.pk.toString());
-    });
+    //     expect(wrapper.vm.d_ag_test_suite!.sandbox_docker_image).toEqual(
+    //         sandbox_docker_image_2
+    //     );
 
-    test('Toggle allow_network_access', async () => {
-        let allow_network_access_toggle = wrapper.find({ref: 'allow_network_access'});
+    //     wrapper.vm.d_ag_test_suite!.sandbox_docker_image = sandbox_docker_image_3;
+    //     await wrapper.vm.$nextTick();
 
-        component.d_ag_test_suite!.allow_network_access = true;
-        await component.$nextTick();
+    //     expect_html_element_has_value(
+    //         sandbox_docker_image_input.find('.select'), sandbox_docker_image_3.pk.toString());
+    // });
 
-        expect(component.d_ag_test_suite!.allow_network_access).toEqual(true);
+    // test('Toggle allow_network_access', async () => {
+    //     let allow_network_access_toggle = wrapper.find({ref: 'allow_network_access'});
 
-        allow_network_access_toggle.find('.off-border').trigger('click');
-        await component.$nextTick();
+    //     component.d_ag_test_suite!.allow_network_access = true;
+    //     await component.$nextTick();
 
-        expect(component.d_ag_test_suite!.allow_network_access).toEqual(false);
+    //     expect(component.d_ag_test_suite!.allow_network_access).toEqual(true);
 
-        allow_network_access_toggle.find('.on-border').trigger('click');
-        await component.$nextTick();
+    //     allow_network_access_toggle.find('.off-border').trigger('click');
+    //     await component.$nextTick();
 
-        expect(component.d_ag_test_suite!.allow_network_access).toEqual(true);
-    });
+    //     expect(component.d_ag_test_suite!.allow_network_access).toEqual(false);
 
-    test('Read-only instructor files binding', () => {
-        let read_only_checkbox = wrapper.find('#read-only-instructor-files');
-        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(true);
+    //     allow_network_access_toggle.find('.on-border').trigger('click');
+    //     await component.$nextTick();
 
-        read_only_checkbox.setChecked(false);
-        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(false);
+    //     expect(component.d_ag_test_suite!.allow_network_access).toEqual(true);
+    // });
 
-        read_only_checkbox.setChecked(true);
-        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(true);
+    // test('Read-only instructor files binding', () => {
+    //     let read_only_checkbox = wrapper.find('#read-only-instructor-files');
+    //     expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(true);
 
-        read_only_checkbox.setChecked(false);
-        expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(false);
+    //     read_only_checkbox.setChecked(false);
+    //     expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(false);
 
-        expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
+    //     read_only_checkbox.setChecked(true);
+    //     expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(true);
 
-        component.d_ag_test_suite!.read_only_instructor_files = true;
-        expect(checkbox_is_checked(read_only_checkbox)).toEqual(true);
+    //     read_only_checkbox.setChecked(false);
+    //     expect(component.d_ag_test_suite!.read_only_instructor_files).toEqual(false);
 
-        component.d_ag_test_suite!.read_only_instructor_files = false;
-        expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
-    });
+    //     expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
 
-    test('Adding an instructor file', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
+    //     component.d_ag_test_suite!.read_only_instructor_files = true;
+    //     expect(checkbox_is_checked(read_only_checkbox)).toEqual(true);
 
-        let search_bar = wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).find('input');
-        search_bar.trigger("click");
+    //     component.d_ag_test_suite!.read_only_instructor_files = false;
+    //     expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
+    // });
 
-        dropdown_typeahead.filter_text = "a";
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
-        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(3);
-        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-        expect(component.d_ag_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
-    });
-
-    test('Removing an instructor file', async () => {
-        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-
-        let instructor_files_section = wrapper.find('.instructor-files');
-        instructor_files_section.findAll('.file').at(1).find(
-            '.remove-file-icon-container'
-        ).trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(1);
-        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-    });
-
-    test('InstructorFile filter function on dropdown typeahead', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
-
-        dropdown_typeahead.filter_text = "a";
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
-
-        let instructor_files_section = wrapper.find('.instructor-files');
-        instructor_files_section.findAll('.file').at(0).find(
-            '.remove-file-icon-container'
-        ).trigger('click');
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_1, instructor_file_3]);
-
-        dropdown_typeahead.filter_text = "ui";
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
-    });
-
-    test('instructor_files_available', async () => {
-        expect(component.instructor_files_available).toEqual([instructor_file_3]);
-
-        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
-        expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-
-        let instructor_file_section = wrapper.find('.instructor-files');
-        instructor_file_section.findAll('.file').at(1).find(
-            '.remove-file-icon-container'
-        ).trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(1);
-        expect(component.instructor_files_available).toEqual(
-            [instructor_file_2, instructor_file_3]
-        );
-    });
-
-    test('Adding a student file', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([student_file_3]);
-
-        let search_bar = wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "a";
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
-
-        search_bar.trigger('keydown', {code: 'Enter'});
-        await dropdown_typeahead.$nextTick();
-
-        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(3);
-        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
-        expect(component.d_ag_test_suite!.student_files_needed[2]).toEqual(student_file_3);
-    });
-
-    test('Removing a student file', async () => {
-        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
-        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
-
-        let student_files_section = wrapper.find('.student-files');
-        student_files_section.findAll('.file').at(1).find(
-            '.remove-file-icon-container'
-        ).trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(1);
-        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-    });
-
-    test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([student_file_3]);
-
-        dropdown_typeahead.filter_text = "e";
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
-
-        let student_files_section = wrapper.find('.student-files');
-        student_files_section.findAll('.file').at(0).find(
-            '.remove-file-icon-container'
-        ).trigger('click');
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.choices).toEqual([student_file_1, student_file_3]);
-
-        dropdown_typeahead.filter_text = "ep";
-        await component.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_1);
-    });
-
-    test('expected_student_files_available', async () => {
-        expect(component.expected_student_files_available).toEqual([student_file_3]);
-
-        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
-        expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
-        expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
-
-        let student_files_section = wrapper.find('.student-files');
-        student_files_section.findAll('.file').at(1).find(
-            '.remove-file-icon-container'
-        ).trigger('click');
-        await component.$nextTick();
-
-        expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(1);
-        expect(component.expected_student_files_available).toEqual(
-            [student_file_2, student_file_3]
-        );
-    });
+    // test('Adding an instructor file', async () => {
+    //     let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
+    //         {ref: 'instructor_files_typeahead'}
+    //     ).vm;
+    //     expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
+
+    //     let search_bar = wrapper.find(
+    //         {ref: 'instructor_files_typeahead'}
+    //     ).find('input');
+    //     search_bar.trigger("click");
+
+    //     dropdown_typeahead.filter_text = "a";
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+    //     expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
+
+    //     search_bar.trigger('keydown', { code: 'Enter' });
+    //     await dropdown_typeahead.$nextTick();
+
+    //     expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(3);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
+    // });
+
+    // test('Removing an instructor file', async () => {
+    //     expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+
+    //     let instructor_files_section = wrapper.find('.instructor-files');
+    //     instructor_files_section.findAll('.file').at(1).find(
+    //         '.remove-file-icon-container'
+    //     ).trigger('click');
+    //     await component.$nextTick();
+
+    //     expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(1);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+    // });
+
+    // test('InstructorFile filter function on dropdown typeahead', async () => {
+    //     let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
+    //         {ref: 'instructor_files_typeahead'}
+    //     ).vm;
+    //     expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
+
+    //     dropdown_typeahead.filter_text = "a";
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+    //     expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
+
+    //     let instructor_files_section = wrapper.find('.instructor-files');
+    //     instructor_files_section.findAll('.file').at(0).find(
+    //         '.remove-file-icon-container'
+    //     ).trigger('click');
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.choices).toEqual([instructor_file_1, instructor_file_3]);
+
+    //     dropdown_typeahead.filter_text = "ui";
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+    //     expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
+    // });
+
+    // test('instructor_files_available', async () => {
+    //     expect(component.instructor_files_available).toEqual([instructor_file_3]);
+
+    //     expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(2);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
+    //     expect(component.d_ag_test_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
+
+    //     let instructor_file_section = wrapper.find('.instructor-files');
+    //     instructor_file_section.findAll('.file').at(1).find(
+    //         '.remove-file-icon-container'
+    //     ).trigger('click');
+    //     await component.$nextTick();
+
+    //     expect(component.d_ag_test_suite!.instructor_files_needed.length).toEqual(1);
+    //     expect(component.instructor_files_available).toEqual(
+    //         [instructor_file_2, instructor_file_3]
+    //     );
+    // });
+
+    // test('Adding a student file', async () => {
+    //     let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
+    //         {ref: 'student_files_typeahead'}
+    //     ).vm;
+    //     expect(dropdown_typeahead.choices).toEqual([student_file_3]);
+
+    //     let search_bar = wrapper.find(
+    //         {ref: 'student_files_typeahead'}
+    //     ).find('input');
+    //     search_bar.trigger("click");
+
+    //     dropdown_typeahead.filter_text = "a";
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+    //     expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
+
+    //     search_bar.trigger('keydown', {code: 'Enter'});
+    //     await dropdown_typeahead.$nextTick();
+
+    //     expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(3);
+    //     expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+    //     expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+    //     expect(component.d_ag_test_suite!.student_files_needed[2]).toEqual(student_file_3);
+    // });
+
+    // test('Removing a student file', async () => {
+    //     expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
+    //     expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+    //     expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+
+    //     let student_files_section = wrapper.find('.student-files');
+    //     student_files_section.findAll('.file').at(1).find(
+    //         '.remove-file-icon-container'
+    //     ).trigger('click');
+    //     await component.$nextTick();
+
+    //     expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(1);
+    //     expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+    // });
+
+    // test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
+    //     let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
+    //         {ref: 'student_files_typeahead'}
+    //     ).vm;
+    //     expect(dropdown_typeahead.choices).toEqual([student_file_3]);
+
+    //     dropdown_typeahead.filter_text = "e";
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+    //     expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
+
+    //     let student_files_section = wrapper.find('.student-files');
+    //     student_files_section.findAll('.file').at(0).find(
+    //         '.remove-file-icon-container'
+    //     ).trigger('click');
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.choices).toEqual([student_file_1, student_file_3]);
+
+    //     dropdown_typeahead.filter_text = "ep";
+    //     await component.$nextTick();
+
+    //     expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+    //     expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_1);
+    // });
+
+    // test('expected_student_files_available', async () => {
+    //     expect(component.expected_student_files_available).toEqual([student_file_3]);
+
+    //     expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(2);
+    //     expect(component.d_ag_test_suite!.student_files_needed[0]).toEqual(student_file_1);
+    //     expect(component.d_ag_test_suite!.student_files_needed[1]).toEqual(student_file_2);
+
+    //     let student_files_section = wrapper.find('.student-files');
+    //     student_files_section.findAll('.file').at(1).find(
+    //         '.remove-file-icon-container'
+    //     ).trigger('click');
+    //     await component.$nextTick();
+
+    //     expect(component.d_ag_test_suite!.student_files_needed.length).toEqual(1);
+    //     expect(component.expected_student_files_available).toEqual(
+    //         [student_file_2, student_file_3]
+    //     );
+    // });
 
     test('setup_suite_cmd_name binding', async () => {
         let setup_suite_cmd_name_input = wrapper.find({ref: 'setup_suite_cmd_name'});
