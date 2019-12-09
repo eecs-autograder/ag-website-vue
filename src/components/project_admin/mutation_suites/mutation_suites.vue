@@ -188,7 +188,7 @@
             </validated-form>
 
       <!--------------------------- Danger Zone --------------------------------------->
-  
+
             <div class="danger-zone-container">
               <div class="danger-text">
                 Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
@@ -286,12 +286,11 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import FeedbackConfigPanel from "@/components/project_admin/feedback_config_panel.vue";
 import {
     FeedbackConfigLabel,
     FeedbackDescriptions,
     MutationTestSuiteFeedbackPreset
-} from '@/components/project_admin/feedback_config_utils';
+} from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import BuggyImplementations from "@/components/project_admin/mutation_suites/buggy_implementations.vue";
 import MutationCommand from "@/components/project_admin/mutation_suites/mutation_command.vue";
 import MutationCommands from "@/components/project_admin/mutation_suites/mutation_commands.vue";
@@ -303,6 +302,8 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
+
+import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
 
 @Component({
   components: {

@@ -16,8 +16,7 @@
       <div class="advanced-settings-label" @click="toggle_is_open">
         <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
         <i v-else class="fas fa-caret-right caret-right"></i>
-        <span> Advanced Settings </span>
-        <div class="advanced-settings-divider" v-if="d_is_open"> </div>
+        <div class="advanced-settings-text"> Advanced Settings </div>
       </div>
 
       <div v-if="d_is_open"
@@ -81,7 +80,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript/dist/src/ag_test_suite';
 
-import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
+import { hyphenate } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import Toggle from '@/components/toggle.vue';
 
 @Component({
@@ -117,12 +116,13 @@ export default class AGTestSuiteAdvancedFdbkSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/components/feedback_config.scss';
+@import '@/styles/forms.scss';
 
-.divider {
-  border-top: 1px solid darken($white-gray, 10);
-  width: 100%;
-  margin: 2px 0;
+@import '../feedback_config_panel/feedback_config_panel.scss';
+
+.non-advanced .checkbox-input-container {
+  margin: 0;
+  padding: .25rem 0 .625rem;
 }
 
 </style>

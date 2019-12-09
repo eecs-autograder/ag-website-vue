@@ -19,7 +19,7 @@ import * as sinon from "sinon";
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
 
 import {
     make_ag_test_case,
@@ -33,10 +33,12 @@ import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked, do_input_blank_or_not_integer_test, do_invalid_text_input_test,
     expect_html_element_has_value,
+    expect_select_object_has_value,
     get_validated_input_text,
+    set_select_object_value,
     set_validated_input_text,
     validated_input_is_valid,
-    wait_until
+    wait_until,
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -283,55 +285,16 @@ describe('AGTestCommandSettings tests', () => {
         wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
         await wrapper.vm.$nextTick();
 
-        let stdin_instructor_file_input = wrapper.find('#stdin-instructor-file');
-        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_2.name);
-        highlighted_item.trigger('click');
+        let stdin_instructor_file = wrapper.find({ref: 'stdin_instructor_file'});
+        set_select_object_value(stdin_instructor_file, instructor_file_2.pk);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_2);
-        expect(stdin_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_2.name);
 
-        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        wrapper.vm.d_ag_test_command!.stdin_instructor_file = instructor_file_3;
         await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_3.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_3);
-        expect(stdin_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_3.name);
-
-        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_1.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_1);
-        expect(stdin_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_1.name);
+        expect_select_object_has_value(stdin_instructor_file, instructor_file_3.pk.toString());
     });
 
     test('expected_return_code binding', async () => {
@@ -484,63 +447,19 @@ describe('AGTestCommandSettings tests', () => {
             = ExpectedOutputSource.instructor_file;
         await wrapper.vm.$nextTick();
 
-        let expected_stdout_instructor_file_input = wrapper.find(
-            '#expected-stdout-instructor-file'
-        );
-        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_2.name);
-        highlighted_item.trigger('click');
+        let expected_stdout_instructor_file = wrapper.find(
+            {ref: 'expected_stdout_instructor_file'});
+        set_select_object_value(expected_stdout_instructor_file, instructor_file_2.pk);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
-            instructor_file_2
-        );
-        expect(expected_stdout_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_2.name);
+            instructor_file_2);
 
-        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file = instructor_file_3;
         await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_3.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
-            instructor_file_3
-        );
-        expect(expected_stdout_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_3.name);
-
-        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_1.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
-            instructor_file_1
-        );
-        expect(expected_stdout_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_1.name);
+        expect_select_object_has_value(
+            expected_stdout_instructor_file, instructor_file_3.pk.toString());
     });
 
     test('points_for_correct_stdout binding', async () => {
@@ -659,63 +578,19 @@ describe('AGTestCommandSettings tests', () => {
             = ExpectedOutputSource.instructor_file;
         await wrapper.vm.$nextTick();
 
-        let expected_stderr_instructor_file_input = wrapper.find(
-            '#expected-stderr-instructor-file'
-        );
-        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_2.name);
-        highlighted_item.trigger('click');
+        let expected_stderr_instructor_file = wrapper.find(
+            {ref: 'expected_stderr_instructor_file'});
+        set_select_object_value(expected_stderr_instructor_file, instructor_file_2.pk);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
-            instructor_file_2
-        );
-        expect(expected_stderr_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_2.name);
+            instructor_file_2);
 
-        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file = instructor_file_3;
         await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_3.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
-            instructor_file_3
-        );
-        expect(expected_stderr_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_3.name);
-
-        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_1.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
-            instructor_file_1
-        );
-        expect(expected_stderr_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_1.name);
+        expect_select_object_has_value(
+            expected_stderr_instructor_file, instructor_file_3.pk.toString());
     });
 
     test('points_for_correct_stderr binding', async () => {

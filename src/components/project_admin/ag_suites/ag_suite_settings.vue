@@ -318,8 +318,7 @@ import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import Modal from '@/components/modal.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
-import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_utils';
+import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import SelectObject from '@/components/select_object.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
@@ -331,6 +330,8 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
+
+import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
 
 @Component({
   components: {

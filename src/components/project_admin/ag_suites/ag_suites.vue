@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <div id="button-footer">
+      <div id="fixed-button-footer">
         <span v-if="active_level_is_command">
           <button type="button"
                   @click="go_to_prev_ag_test_case"
@@ -586,7 +586,7 @@ $border-color: $gray-blue-1;
   padding-right: .25rem;
 }
 
-#button-footer {
+#fixed-button-footer {
   position: fixed;
   bottom: 0;
   left: 0;

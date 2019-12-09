@@ -16,7 +16,7 @@ import APIErrors from '@/components/api_errors.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
 
 import {
     make_ag_test_suite,

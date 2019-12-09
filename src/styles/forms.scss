@@ -101,26 +101,25 @@
 // Danger Zone -----------------------------------
 
 .danger-zone-container {
-    margin: 50px 10px 20px;
-    border-radius: 5px;
+    margin: 3.125rem 0 0 0;
+    border-radius: 2px;
     border: 1px solid red;
-    padding: 10px;
+    padding: .625rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
 
     .danger-text {
         color: black;
-        font-size: 24px;
+        font-size: 1.25rem;
         word-break: break-word;
         word-wrap: break-word;
     }
 
     .delete-button {
         @extend .red-button;
-        font-size: 14px;
     }
-
  }
 
 // Inputs, selects, radios ----------------------------------------------------
@@ -168,7 +167,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         color: lighten(black, 10);
         display: inline-block;
         font-size: .875rem;
-        font-weight: 700;
+        font-weight: bold;
     }
 
     .checkbox  {

@@ -188,7 +188,7 @@ import {
   MutationTestSuiteFeedbackConfig
 } from 'ag-client-typescript';
 
-import { hyphenate } from '@/components/project_admin/feedback_config_utils';
+import { hyphenate } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 
 @Component
 export default class EditFeedbackSettingsMutationSuite extends Vue {
@@ -220,7 +220,7 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/components/feedback_config.scss';
+@import '../feedback_config_panel/feedback_config_panel.scss';
 
 .advanced-settings-divider {
   border-top: 1px solid darken($white-gray, 10);

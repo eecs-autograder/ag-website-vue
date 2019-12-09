@@ -76,7 +76,7 @@
         </AGTestCaseFdbkConfigPanel>
       </div>
 
-    <div class="button-footer">
+    <div class="modal-button-footer">
       <APIErrors ref="api_errors"></APIErrors>
 
       <button ref="save_button"
@@ -97,7 +97,7 @@ import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
-import { FeedbackConfigLabel, FeedbackDescriptions } from "@/components/project_admin/feedback_config_utils";
+import { FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -155,6 +155,5 @@ function handle_save_ag_test_case_settings_error(component: AGCaseSettings, erro
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/feedback_config.scss';
 @import '@/styles/forms.scss';
 </style>

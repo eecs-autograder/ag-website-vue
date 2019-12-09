@@ -47,7 +47,7 @@
         </validated-input>
       </div>
 
-      <div id="ag-test-command-container">
+      <div class="form-field-wrapper">
         <label class="label">
           Command
           <i class="fas fa-question-circle input-tooltip">
@@ -68,33 +68,27 @@
 
       <fieldset class="fieldset">
         <legend class="legend"> Stdin </legend>
-        <div class="ag-test-command-input-container file-dropdown-adjacent">
-          <label class="label"> Stdin source: </label>
-
-          <div class="dropdown">
-            <select id="stdin-source"
-                    v-model="d_ag_test_command.stdin_source"
-                    class="select">
-
-              <option :value="StdinSource.none">
-                No input
-              </option>
-
-              <option :value="StdinSource.text">
-                Text
-              </option>
-
-              <option :value="StdinSource.instructor_file">
-                Instructor file content
-              </option>
-            </select>
-          </div>
-
+        <div class="form-field-wrapper">
+          <label class="label"> Stdin source </label>
+          <br>
+          <select id="stdin-source"
+                  v-model="d_ag_test_command.stdin_source"
+                  class="select">
+            <option :value="StdinSource.none">
+              No input
+            </option>
+            <option :value="StdinSource.text">
+              Text
+            </option>
+            <option :value="StdinSource.instructor_file">
+              Instructor file content
+            </option>
+          </select>
         </div>
 
         <div v-if="d_ag_test_command.stdin_source === StdinSource.text"
-              class="text-container">
-          <label class="label"> Stdin source text: </label>
+             class="form-field-wrapper">
+          <label class="label"> Stdin text </label>
           <validated-input ref="stdin_text"
                            placeholder="Enter the stdin input here."
                            :num_rows="5"
@@ -104,38 +98,24 @@
         </div>
 
         <div v-if="d_ag_test_command.stdin_source === StdinSource.instructor_file"
-              class="file-dropdown-container">
-          <label class="label"> File name: </label>
-
-          <div>
-            <dropdown id="stdin-instructor-file"
-                      :items="project.instructor_files"
-                      dropdown_height="250px"
-                      @update_item_selected="d_ag_test_command.stdin_instructor_file
-                                              = $event">
-              <template slot="header">
-                <div tabindex="0" class="dropdown-header-wrapper">
-                  <div class="dropdown-header instructor-file-dropdown">
-                    {{d_ag_test_command.stdin_instructor_file === null ? ' '
-                      : d_ag_test_command.stdin_instructor_file.name}}
-                    <i class="fas fa-caret-down dropdown-caret"></i>
-                  </div>
-                </div>
-              </template>
-              <div slot-scope="{item}">
-                <span>
-                  {{item.name}}
-                </span>
-              </div>
-            </dropdown>
-          </div>
+             class="form-field-wrapper">
+          <label class="label"> File </label>
+          <select-object ref="stdin_instructor_file"
+                         :items="project.instructor_files"
+                         v-model="d_ag_test_command.stdin_instructor_file"
+                         id_field="pk">
+            <option selected disabled :value="null">-- Select a File --</option>
+            <template v-slot:option-text="{item}">
+              {{item.name}}
+            </template>
+          </select-object>
         </div>
       </fieldset>
 
       <fieldset class="fieldset">
         <legend class="legend"> Return Code </legend>
-        <div class="ag-test-command-input-container">
-          <label class="label"> Expected Return Code: </label>
+        <div class="form-field-wrapper">
+          <label class="label"> Expected Return Code </label>
           <div class="dropdown">
             <select id="expected-return-code"
                     v-model="d_ag_test_command.expected_return_code"
@@ -154,68 +134,62 @@
         </div>
 
         <div v-if="d_ag_test_command.expected_return_code !== ExpectedReturnCode.none"
-              class="point-assignment-container">
-          <div class="add-points-container">
+             class="form-field-wrapper correct-incorrect-points-wrapper">
+          <div class="form-field-wrapper">
             <label class="label"> Correct return code </label>
-            <div>
-              <validated-input ref="points_for_correct_return_code"
-                               v-model="d_ag_test_command.points_for_correct_return_code"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_zero
-                               ]"
-                               input_style="width: 80px;"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> points </div>
-              </validated-input>
-            </div>
+            <validated-input ref="points_for_correct_return_code"
+                              v-model="d_ag_test_command.points_for_correct_return_code"
+                              :validators="[
+                                is_not_empty,
+                                is_integer,
+                                is_greater_than_or_equal_to_zero
+                              ]"
+                              input_style="width: 80px;"
+                              :from_string_fn="string_to_num">
+              <div slot="suffix" class="unit-of-measurement"> points </div>
+            </validated-input>
           </div>
 
-          <div class="subtract-points-container">
+          <div class="form-field-wrapper">
             <label class="label"> Wrong return code </label>
-            <div>
-              <validated-input ref="deduction_for_wrong_return_code"
-                               v-model="
-                               d_ag_test_command.deduction_for_wrong_return_code"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_less_than_or_equal_to_zero
-                               ]"
-                               input_style="width: 80px;"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> points </div>
-              </validated-input>
-            </div>
+            <validated-input ref="deduction_for_wrong_return_code"
+                              v-model="
+                              d_ag_test_command.deduction_for_wrong_return_code"
+                              :validators="[
+                                is_not_empty,
+                                is_integer,
+                                is_less_than_or_equal_to_zero
+                              ]"
+                              input_style="width: 80px;"
+                              :from_string_fn="string_to_num">
+              <div slot="suffix" class="unit-of-measurement"> points </div>
+            </validated-input>
           </div>
         </div>
       </fieldset>
 
       <fieldset class="fieldset">
         <legend class="legend"> Stdout </legend>
-        <div class="ag-test-command-input-container file-dropdown-adjacent">
+        <div class="form-field-wrapper">
           <label class="label"> Check stdout against: </label>
-          <div class="dropdown">
-            <select id="expected-stdout-source"
-                    v-model="d_ag_test_command.expected_stdout_source"
-                    class="select">
-              <option :value="ExpectedOutputSource.none">
-                Don't Check
-              </option>
-              <option :value="ExpectedOutputSource.text">
-                Text
-              </option>
-              <option :value="ExpectedOutputSource.instructor_file">
-                Instructor file content
-              </option>
-            </select>
-          </div>
+          <br>
+          <select id="expected-stdout-source"
+                  v-model="d_ag_test_command.expected_stdout_source"
+                  class="select">
+            <option :value="ExpectedOutputSource.none">
+              Don't Check
+            </option>
+            <option :value="ExpectedOutputSource.text">
+              Text
+            </option>
+            <option :value="ExpectedOutputSource.instructor_file">
+              Instructor file content
+            </option>
+          </select>
         </div>
 
-        <div v-if="d_ag_test_command.expected_stdout_source
-                    === ExpectedOutputSource.text"
-              class="text-container">
+        <div v-if="d_ag_test_command.expected_stdout_source === ExpectedOutputSource.text"
+              class="form-field-wrapper">
           <label class="label"> Expected stdout text: </label>
           <validated-input ref="expected_stdout_text"
                            placeholder="Enter the expected stdout output here."
@@ -226,99 +200,77 @@
         </div>
 
         <div v-if="d_ag_test_command.expected_stdout_source
-                    === ExpectedOutputSource.instructor_file"
-              class="file-dropdown-container">
-          <label class="label"> File name: </label>
-
-          <div>
-            <dropdown id="expected-stdout-instructor-file"
-                      :items="project.instructor_files"
-                      dropdown_height="250px"
-                      @update_item_selected="
-                          d_ag_test_command.expected_stdout_instructor_file = $event">
-              <template slot="header">
-                <div tabindex="0" class="dropdown-header-wrapper">
-                  <div class="dropdown-header instructor-file-dropdown">
-                    {{d_ag_test_command.expected_stdout_instructor_file === null ? ' '
-                    : d_ag_test_command.expected_stdout_instructor_file.name}}
-                    <i class="fas fa-caret-down dropdown-caret"></i>
-                  </div>
-                </div>
-              </template>
-              <div slot-scope="{item}">
-                <span>
-                  {{item.name}}
-                </span>
-              </div>
-            </dropdown>
-          </div>
+                   === ExpectedOutputSource.instructor_file"
+             class="form-field-wrapper">
+          <label class="label"> File </label>
+          <select-object ref="expected_stdout_instructor_file"
+                        :items="project.instructor_files"
+                        v-model="d_ag_test_command.expected_stdout_instructor_file"
+                        id_field="pk">
+            <option selected disabled :value="null">-- Select a File --</option>
+            <template v-slot:option-text="{item}">
+              {{item.name}}
+            </template>
+          </select-object>
         </div>
 
-        <div v-if="d_ag_test_command.expected_stdout_source
-                    !== ExpectedOutputSource.none"
-              class="point-assignment-container">
-          <div class="add-points-container">
+        <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
+              class="form-field-wrapper correct-incorrect-points-wrapper">
+          <div class="form-field-wrapper">
             <label class="label"> Correct stdout </label>
-            <div>
-              <validated-input ref="points_for_correct_stdout"
-                               v-model="d_ag_test_command.points_for_correct_stdout"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_zero
-                               ]"
-                               input_style="width: 80px;"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> points </div>
-              </validated-input>
-            </div>
+            <validated-input ref="points_for_correct_stdout"
+                              v-model="d_ag_test_command.points_for_correct_stdout"
+                              :validators="[
+                                is_not_empty,
+                                is_integer,
+                                is_greater_than_or_equal_to_zero
+                              ]"
+                              input_style="width: 80px;"
+                              :from_string_fn="string_to_num">
+              <div slot="suffix" class="unit-of-measurement"> points </div>
+            </validated-input>
           </div>
 
-          <div class="subtract-points-container">
+          <div class="form-field-wrapper">
             <label class="label"> Wrong stdout</label>
-
-            <div>
-              <validated-input ref="deduction_for_wrong_stdout"
-                               v-model="d_ag_test_command.deduction_for_wrong_stdout"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_less_than_or_equal_to_zero
-                               ]"
-                               input_style="width: 80px;"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> points </div>
-              </validated-input>
-            </div>
+            <validated-input ref="deduction_for_wrong_stdout"
+                              v-model="d_ag_test_command.deduction_for_wrong_stdout"
+                              :validators="[
+                                is_not_empty,
+                                is_integer,
+                                is_less_than_or_equal_to_zero
+                              ]"
+                              input_style="width: 80px;"
+                              :from_string_fn="string_to_num">
+              <div slot="suffix" class="unit-of-measurement"> points </div>
+            </validated-input>
           </div>
         </div>
       </fieldset>
 
       <fieldset class="fieldset">
         <legend class="legend"> Stderr </legend>
-        <div class="ag-test-command-input-container file-dropdown-adjacent">
+        <div class="form-field-wrapper">
           <label class="label"> Check stderr against: </label>
-          <div class="dropdown">
-            <select id="expected-stderr-source"
-                    v-model="d_ag_test_command.expected_stderr_source"
-                    class="select">
-              <option :value="ExpectedOutputSource.none">
-                Don't Check
-              </option>
-              <option :value="ExpectedOutputSource.text">
-                Text
-              </option>
-              <option :value="ExpectedOutputSource.instructor_file">
-                Instructor file content
-              </option>
-            </select>
-          </div>
+          <br>
+          <select id="expected-stderr-source"
+                  v-model="d_ag_test_command.expected_stderr_source"
+                  class="select">
+            <option :value="ExpectedOutputSource.none">
+              Don't Check
+            </option>
+            <option :value="ExpectedOutputSource.text">
+              Text
+            </option>
+            <option :value="ExpectedOutputSource.instructor_file">
+              Instructor file content
+            </option>
+          </select>
         </div>
 
-        <div v-if="d_ag_test_command.expected_stderr_source
-                    === ExpectedOutputSource.text"
-              class="text-container">
-          <label class="label"> Expected stderr text: </label>
+        <div v-if="d_ag_test_command.expected_stderr_source === ExpectedOutputSource.text"
+             class="form-field-wrapper">
+          <label class="label"> Expected stderr text </label>
           <validated-input ref="expected_stderr_text"
                            placeholder="Enter the expected stderr output here."
                            v-model="d_ag_test_command.expected_stderr_text"
@@ -328,82 +280,64 @@
         </div>
 
         <div v-if="d_ag_test_command.expected_stderr_source
-                    === ExpectedOutputSource.instructor_file"
-              class="file-dropdown-container">
-          <label class="label"> File name: </label>
-
-          <div>
-            <dropdown id="expected-stderr-instructor-file"
-                      :items="project.instructor_files"
-                      dropdown_height="250px"
-                      @update_item_selected="
-                          d_ag_test_command.expected_stderr_instructor_file = $event">
-              <template slot="header">
-                <div tabindex="0" class="dropdown-header-wrapper">
-                  <div class="dropdown-header instructor-file-dropdown">
-                    {{d_ag_test_command.expected_stderr_instructor_file === null ? ' '
-                    : d_ag_test_command.expected_stderr_instructor_file.name}}
-                    <i class="fas fa-caret-down dropdown-caret"></i>
-                  </div>
-                </div>
-              </template>
-              <div slot-scope="{item}">
-                <span>
-                  {{item.name}}
-                </span>
-              </div>
-            </dropdown>
-          </div>
+                   === ExpectedOutputSource.instructor_file"
+             class="form-field-wrapper">
+          <label class="label"> File </label>
+          <select-object ref="expected_stderr_instructor_file"
+                        :items="project.instructor_files"
+                        v-model="d_ag_test_command.expected_stderr_instructor_file"
+                        id_field="pk">
+            <option selected disabled :value="null">-- Select a File --</option>
+            <template v-slot:option-text="{item}">
+              {{item.name}}
+            </template>
+          </select-object>
         </div>
 
         <div v-if="d_ag_test_command.expected_stderr_source
                     !== ExpectedOutputSource.none"
-              class="point-assignment-container">
-          <div class="add-points-container">
+              class="form-field-wrapper correct-incorrect-points-wrapper">
+          <div class="form-field-wrapper">
             <label class="label"> Correct stderr </label>
-            <div>
-              <validated-input ref="points_for_correct_stderr"
-                               v-model="d_ag_test_command.points_for_correct_stderr"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_zero
-                               ]"
-                               input_style="width: 80px;"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> points </div>
-              </validated-input>
-            </div>
+            <validated-input ref="points_for_correct_stderr"
+                             v-model="d_ag_test_command.points_for_correct_stderr"
+                             :validators="[
+                               is_not_empty,
+                               is_integer,
+                               is_greater_than_or_equal_to_zero
+                             ]"
+                             input_style="width: 80px;"
+                             :from_string_fn="string_to_num">
+              <div slot="suffix" class="unit-of-measurement"> points </div>
+            </validated-input>
           </div>
 
-          <div class="subtract-points-container">
+          <div class="form-field-wrapper">
             <label class="label">  Wrong stderr </label>
-            <div>
-              <validated-input ref="deduction_for_wrong_stderr"
-                               v-model="d_ag_test_command.deduction_for_wrong_stderr"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_less_than_or_equal_to_zero
-                               ]"
-                               input_style="width: 80px;"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> points </div>
-              </validated-input>
-            </div>
+            <validated-input ref="deduction_for_wrong_stderr"
+                             v-model="d_ag_test_command.deduction_for_wrong_stderr"
+                             :validators="[
+                               is_not_empty,
+                               is_integer,
+                               is_less_than_or_equal_to_zero
+                             ]"
+                             input_style="width: 80px;"
+                             :from_string_fn="string_to_num">
+              <div slot="suffix" class="unit-of-measurement"> points </div>
+            </validated-input>
           </div>
         </div>
       </fieldset>
 
       <fieldset v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none
-                || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
-                class="fieldset diff-options">
+                      || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+                class="fieldset">
         <legend class="legend"> Diff Options </legend>
         <div class="checkbox-input-container">
           <input id="ignore-case"
-                  type="checkbox"
-                  class="checkbox"
-                  v-model="d_ag_test_command.ignore_case">
+                 type="checkbox"
+                 class="checkbox"
+                 v-model="d_ag_test_command.ignore_case">
           <label class="checkbox-label"
                   for="ignore-case"> Ignore case sensitivity
           </label>
@@ -411,9 +345,9 @@
 
         <div class="checkbox-input-container">
           <input id="ignore-whitespace"
-                  type="checkbox"
-                  class="checkbox"
-                  v-model="d_ag_test_command.ignore_whitespace">
+                 type="checkbox"
+                 class="checkbox"
+                 v-model="d_ag_test_command.ignore_whitespace">
           <label class="checkbox-label"
                   for="ignore-whitespace"> Ignore whitespace
           </label>
@@ -421,9 +355,9 @@
 
         <div class="checkbox-input-container">
           <input id="ignore-whitespace-changes"
-                  type="checkbox"
-                  class="checkbox"
-                  v-model="d_ag_test_command.ignore_whitespace_changes">
+                 type="checkbox"
+                 class="checkbox"
+                 v-model="d_ag_test_command.ignore_whitespace_changes">
           <label class="checkbox-label"
                   for="ignore-whitespace-changes"> Ignore whitespace changes
           </label>
@@ -431,9 +365,9 @@
 
         <div class="checkbox-input-container">
           <input id="ignore-blank-lines"
-                  type="checkbox"
-                  class="checkbox"
-                  v-model="d_ag_test_command.ignore_blank_lines">
+                 type="checkbox"
+                 class="checkbox"
+                 v-model="d_ag_test_command.ignore_blank_lines">
           <label class="checkbox-label"
                   for="ignore-blank-lines"> Ignore blank lines
           </label>
@@ -442,8 +376,8 @@
 
       <fieldset class="fieldset">
         <legend class="legend"> Resource Limits </legend>
-        <div id="time-and-virtual">
-          <div id="time-limit-container">
+        <div class="resource-limit-wrapper">
+          <div class="resource-limit form-field-wrapper">
             <label class="label"> Time limit </label>
             <div class="resource-input">
               <validated-input ref="time_limit"
@@ -461,46 +395,7 @@
             </div>
           </div>
 
-          <div id="virtual-memory-container">
-            <label class="label"> Virtual memory limit </label>
-            <div class="resource-input">
-              <validated-input ref="virtual_memory_limit"
-                               id="input-virtual-memory-limit"
-                               v-model="d_ag_test_command.virtual_memory_limit"
-                               input_style="width: 150px;"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_one
-                               ]"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> bytes </div>
-              </validated-input>
-            </div>
-          </div>
-        </div>
-
-        <div id="stack-and-process">
-
-          <div id="stack-size-container">
-            <label class="label"> Stack size limit </label>
-            <div class="resource-input">
-              <validated-input ref="stack_size_limit"
-                               id="input-stack-size-limit"
-                               v-model="d_ag_test_command.stack_size_limit"
-                               input_style="width: 150px;"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_one
-                               ]"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> bytes </div>
-              </validated-input>
-            </div>
-          </div>
-
-          <div id="process-spawn-container">
+          <div class="resource-limit form-field-wrapper">
             <label class="label"> Process spawn limit </label>
             <div class="resource-input">
               <validated-input ref="process_spawn_limit"
@@ -517,143 +412,176 @@
               </validated-input>
             </div>
           </div>
+        </div>
 
+        <div class="resource-limit-wrapper">
+          <div class="resource-limit form-field-wrapper">
+            <label class="label"> Virtual memory limit </label>
+            <div class="resource-input">
+              <validated-input ref="virtual_memory_limit"
+                               id="input-virtual-memory-limit"
+                               v-model="d_ag_test_command.virtual_memory_limit"
+                               input_style="width: 150px;"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_one
+                               ]"
+                               :from_string_fn="string_to_num">
+                <div slot="suffix" class="unit-of-measurement"> bytes </div>
+              </validated-input>
+            </div>
+          </div>
+
+          <div class="resource-limit form-field-wrapper">
+            <label class="label"> Stack size limit </label>
+            <div class="resource-input">
+              <validated-input ref="stack_size_limit"
+                               id="input-stack-size-limit"
+                               v-model="d_ag_test_command.stack_size_limit"
+                               input_style="width: 150px;"
+                               :validators="[
+                                 is_not_empty,
+                                 is_integer,
+                                 is_greater_than_or_equal_to_one
+                               ]"
+                               :from_string_fn="string_to_num">
+                <div slot="suffix" class="unit-of-measurement"> bytes </div>
+              </validated-input>
+            </div>
+          </div>
         </div>
       </fieldset>
 
       <!------------------------ Feedback ------------------------------------->
       <fieldset class="fieldset">
         <legend class="legend"> Feedback </legend>
-        <div class="config-panels-container">
-          <feedback-config-panel ref="normal_config_panel"
-                                 v-model="d_ag_test_command.normal_fdbk_config"
-                                 :preset_options="fdbk_presets">
-            <template slot="header">
-              <div class="config-name">
-                {{FeedbackConfigLabel.normal}}
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="large" placement="right">
-                    {{FeedbackDescriptions.normal}}
-                  </tooltip>
-                </i>
-              </div>
-            </template>
-            <template slot="settings">
-              <AGTestCommandAdvancedFdbkSettings ref="normal_edit_feedback_settings"
-                                             v-model="d_ag_test_command.normal_fdbk_config"
-                                             :ag_test_case="ag_test_case"
-                                             :config_name="FeedbackConfigLabel.normal">
-              </AGTestCommandAdvancedFdbkSettings>
-            </template>
-          </feedback-config-panel>
+        <feedback-config-panel ref="normal_config_panel"
+                               v-model="d_ag_test_command.normal_fdbk_config"
+                               :preset_options="fdbk_presets">
+          <template slot="header">
+            {{FeedbackConfigLabel.normal}}
+            <i class="fas fa-question-circle input-tooltip">
+              <tooltip width="large" placement="right">
+                {{FeedbackDescriptions.normal}}
+              </tooltip>
+            </i>
+          </template>
+          <template slot="settings">
+            <AGTestCommandAdvancedFdbkSettings
+              ref="normal_edit_feedback_settings"
+              v-model="d_ag_test_command.normal_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.normal">
+            </AGTestCommandAdvancedFdbkSettings>
+          </template>
+        </feedback-config-panel>
 
-          <feedback-config-panel ref="first_failure_config_panel"
-                                 v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                                 :preset_options="fdbk_presets">
-            <template slot="header">
-              <div class="config-name">
-                {{FeedbackConfigLabel.first_failure}}
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="large" placement="right">
-                    {{FeedbackDescriptions.first_failure}}
-                  </tooltip>
-                </i>
-              </div>
-            </template>
-            <template slot="settings">
-              <div class="checkbox-input-container">
-                <input id="first-failure-config-enabled"
-                       type="checkbox"
-                       @change="toggle_first_failure_feedback"
-                       class="checkbox"
-                       v-model="d_first_failed_config_is_enabled">
-                <label for="first-failure-config-enabled">
-                  Enabled
-                </label>
-              </div>
-              <AGTestCommandAdvancedFdbkSettings
-                ref="first_failure_edit_feedback_settings"
-                v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
-                :ag_test_case="ag_test_case"
-                :config_name="FeedbackConfigLabel.first_failure">
-              </AGTestCommandAdvancedFdbkSettings>
-            </template>
-          </feedback-config-panel>
+        <feedback-config-panel ref="first_failure_config_panel"
+                               v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+                               :preset_options="fdbk_presets">
+          <template slot="header">
+            {{FeedbackConfigLabel.first_failure}}
+            <i class="fas fa-question-circle input-tooltip">
+              <tooltip width="large" placement="right">
+                {{FeedbackDescriptions.first_failure}}
+              </tooltip>
+            </i>
+          </template>
+          <template slot="settings">
+            <div id="first-failure-checkbox-wrapper" class="checkbox-input-container">
+              <input id="first-failure-config-enabled"
+                     type="checkbox"
+                     @change="toggle_first_failure_feedback"
+                     class="checkbox"
+                     :checked="d_ag_test_command.first_failed_test_normal_fdbk_config !== null">
+              <label for="first-failure-config-enabled">
+                Enabled
+              </label>
+            </div>
+            <AGTestCommandAdvancedFdbkSettings
+              ref="first_failure_edit_feedback_settings"
+              id="first-failure-settings"
+              v-model="d_ag_test_command.first_failed_test_normal_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.first_failure">
+            </AGTestCommandAdvancedFdbkSettings>
+          </template>
+        </feedback-config-panel>
 
-          <feedback-config-panel ref="final_graded_config_panel"
-                                 v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-                                 :preset_options="fdbk_presets">
-            <template slot="header">
-              <div class="config-name">
-                {{FeedbackConfigLabel.ultimate_submission}}
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="large" placement="right">
-                    {{FeedbackDescriptions.ultimate_submission}}
-                  </tooltip>
-                </i>
-              </div>
-            </template>
-            <template slot="settings">
-              <AGTestCommandAdvancedFdbkSettings
-                ref="final_graded_edit_feedback_settings"
-                v-model="d_ag_test_command.ultimate_submission_fdbk_config"
-                :ag_test_case="ag_test_case"
-                :config_name="FeedbackConfigLabel.ultimate_submission">
-              </AGTestCommandAdvancedFdbkSettings>
-            </template>
-          </feedback-config-panel>
+        <feedback-config-panel ref="final_graded_config_panel"
+                               v-model="d_ag_test_command.ultimate_submission_fdbk_config"
+                               :preset_options="fdbk_presets">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.ultimate_submission}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.ultimate_submission}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+          <template slot="settings">
+            <AGTestCommandAdvancedFdbkSettings
+              ref="final_graded_edit_feedback_settings"
+              v-model="d_ag_test_command.ultimate_submission_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.ultimate_submission">
+            </AGTestCommandAdvancedFdbkSettings>
+          </template>
+        </feedback-config-panel>
 
-          <feedback-config-panel ref="past_limit_config_panel"
-                                 v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                                 :preset_options="fdbk_presets">
-            <template slot="header">
-              <div class="config-name">
-                {{FeedbackConfigLabel.past_limit}}
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="large" placement="right">
-                    {{FeedbackDescriptions.past_limit}}
-                  </tooltip>
-                </i>
-              </div>
-            </template>
-            <template slot="settings">
-              <AGTestCommandAdvancedFdbkSettings
-                ref="past_limit_edit_feedback_settings"
-                  v-model="d_ag_test_command.past_limit_submission_fdbk_config"
-                :ag_test_case="ag_test_case"
-                :config_name="FeedbackConfigLabel.past_limit">
-              </AGTestCommandAdvancedFdbkSettings>
-            </template>
-          </feedback-config-panel>
+        <feedback-config-panel ref="past_limit_config_panel"
+                                v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+                                :preset_options="fdbk_presets">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.past_limit}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.past_limit}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+          <template slot="settings">
+            <AGTestCommandAdvancedFdbkSettings
+              ref="past_limit_edit_feedback_settings"
+              v-model="d_ag_test_command.past_limit_submission_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.past_limit">
+            </AGTestCommandAdvancedFdbkSettings>
+          </template>
+        </feedback-config-panel>
 
-          <feedback-config-panel ref="student_lookup_config_panel"
-                                 v-model="d_ag_test_command.staff_viewer_fdbk_config"
-                                 :preset_options="fdbk_presets">
-            <template slot="header">
-              <div class="config-name">
-                {{FeedbackConfigLabel.staff_viewer}}
-                <i class="fas fa-question-circle input-tooltip">
-                  <tooltip width="large" placement="right">
-                    {{FeedbackDescriptions.staff_viewer}}
-                  </tooltip>
-                </i>
-              </div>
-            </template>
-            <template slot="settings">
-              <AGTestCommandAdvancedFdbkSettings ref="student_lookup_edit_feedback_settings"
-                                             v-model="d_ag_test_command.staff_viewer_fdbk_config"
-                                             :ag_test_case="ag_test_case"
-                                             :config_name="FeedbackConfigLabel.staff_viewer">
-              </AGTestCommandAdvancedFdbkSettings>
-            </template>
-          </feedback-config-panel>
-        </div>
-
+        <feedback-config-panel ref="student_lookup_config_panel"
+                                v-model="d_ag_test_command.staff_viewer_fdbk_config"
+                                :preset_options="fdbk_presets">
+          <template slot="header">
+            <div class="config-name">
+              {{FeedbackConfigLabel.staff_viewer}}
+              <i class="fas fa-question-circle input-tooltip">
+                <tooltip width="large" placement="right">
+                  {{FeedbackDescriptions.staff_viewer}}
+                </tooltip>
+              </i>
+            </div>
+          </template>
+          <template slot="settings">
+            <AGTestCommandAdvancedFdbkSettings
+              ref="student_lookup_edit_feedback_settings"
+              v-model="d_ag_test_command.staff_viewer_fdbk_config"
+              :ag_test_case="ag_test_case"
+              :config_name="FeedbackConfigLabel.staff_viewer">
+            </AGTestCommandAdvancedFdbkSettings>
+          </template>
+        </feedback-config-panel>
       </fieldset>
 
-      <div class="bottom-of-form">
-        <APIErrors ref="api_errors" @num_errors_changed="d_num_api_errors = $event"></APIErrors>
+      <APIErrors ref="api_errors" @num_errors_changed="d_num_api_errors = $event"></APIErrors>
 
+      <div class="button-footer">
         <button type="submit"
                 class="save-button"
                 :disabled="!d_settings_form_is_valid || d_saving">Save</button>
@@ -666,9 +594,8 @@
         </button>
 
         <div v-if="!d_saving" class="last-saved-timestamp">
-          <span> Last Saved: </span> {{format_datetime(d_ag_test_command.last_modified)}}
+          Last Saved: {{format_datetime(d_ag_test_command.last_modified)}}
         </div>
-
         <div v-else class="last-saved-spinner">
           <i class="fa fa-spinner fa-pulse"></i>
         </div>
@@ -676,7 +603,7 @@
 
     </validated-form>
 
-<!--------------------------- Danger Zone --------------------------------------->
+    <!--------------------------- Danger Zone --------------------------------------->
 
     <div class="danger-zone-container">
       <div class="danger-text">
@@ -742,13 +669,13 @@ import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
 import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
   FeedbackDescriptions,
   hyphenate
-} from '@/components/project_admin/feedback_config_utils.ts';
+} from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
+import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -762,6 +689,8 @@ import {
   string_to_num,
 } from '@/validators';
 
+import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
+
 @Component({
   components: {
     APIErrors,
@@ -769,6 +698,7 @@ import {
     Dropdown,
     AGTestCommandAdvancedFdbkSettings,
     Modal,
+    SelectObject,
     Tooltip,
     ValidatedForm,
     ValidatedInput
@@ -796,9 +726,6 @@ export default class AGTestCommandSettings extends Vue {
   d_settings_form_is_valid = true;
   d_deleting = false;
   d_show_delete_ag_test_command_modal = false;
-
-  d_first_failed_config_is_enabled = false;
-  d_latest_first_failed_config_value: AGTestCommandFeedbackConfig | null = null;
 
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
@@ -857,7 +784,7 @@ export default class AGTestCommandSettings extends Vue {
   }
 
   toggle_first_failure_feedback() {
-    if (this.d_first_failed_config_is_enabled) {
+    if (this.d_ag_test_command!.first_failed_test_normal_fdbk_config === null) {
       this.d_ag_test_command!.first_failed_test_normal_fdbk_config = {
         visible: true,
         return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual,
@@ -974,7 +901,6 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
-@import '@/styles/components/feedback_config.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
 
@@ -988,6 +914,7 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 
 #ag-test-command-settings-component {
   padding: .875rem;
+  overflow-x: hidden;
 }
 
 .test-name-wrapper {
@@ -1024,109 +951,34 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
   }
 }
 
-// .ag-test-command-input-container {
-//   padding: 10px 0 10px 0;
-// }
-
-// #ag-test-command-name-container {
-//   padding: 10px 14px 12px 14px;
-// }
-
-// #ag-test-command-container {
-//   padding: 10px 14px 22px 14px;
-// }
-
-.file-dropdown-container {
-  display: inline-block;
-  vertical-align: top;
-  margin-top: 10px;
-}
-
-.file-dropdown-adjacent {
-  display: inline-block;
-  width: 200px;
-  margin-right: 5px;
-  vertical-align: top;
-}
-
-.instructor-file-dropdown {
-  min-width: 400px;
-  width: 100%;
-}
-
-.add-points-container div, .subtract-points-container div {
+.correct-incorrect-points-wrapper {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.plus-sign, .minus-sign {
-  display: flex;
-  padding-right: 10px;
-  flex-direction: row;
-  justify-content: flex-start;
-}
-
-.plus-sign {
-  color: $ocean-blue;
-}
-
-.minus-sign {
-  color: $orange;
-}
-
-.text-container {
-  margin-top: 10px;
-}
-
-.point-assignment-container {
-  padding: 10px 0 0 0;
-}
-
-.add-points-container {
-  display: block;
-  box-sizing: border-box;
-  width: 200px;
-  margin-right: 5px;
-}
-
-.subtract-points-container {
-  display: block;
+  flex-wrap: wrap;
 }
 
 .unit-of-measurement {
-  padding-left: 10px;
-  font-size: 14px;
+  padding-left: .625rem;
+  font-size: .875rem;
 }
 
-#time-limit-container {
-  display: inline-block;
-  margin-right: 50px;
-  padding-bottom: 20px;
-  vertical-align: top;
+.resource-limit-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+
+  @media only screen and (min-width: 700px) {
+    .resource-limit {
+      width: 50%;
+      max-width: 330px;
+    }
+  }
 }
 
-#virtual-memory-container {
-  display: inline-block;
-  padding-bottom: 20px;
-  vertical-align: top;
+#first-failure-checkbox-wrapper {
+  margin: .25rem 0;
 }
 
-#stack-size-container {
-  display: inline-block;
-  margin-right: 50px;
-  padding-bottom: 20px;
-  vertical-align: top;
-}
-
-#process-spawn-container {
-  display: inline-block;
-  padding-bottom: 25px;
-  vertical-align: top;
-}
-
-#time-limit-and-stack-size {
-  padding: 0;
+#first-failure-settings {
+  padding-top: .375rem;
 }
 
 .sticky-save-button {
@@ -1135,38 +987,19 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
   bottom: $footer-height;
   right: 0;
 
-  font-size: 20px;
-  padding: 5px 10px;
+  font-size: 1.25rem;
+  padding: .375rem .625rem;
+  margin: 0!important;
 
   color: white;
 
   border-radius: 1px;
 }
 
-@media only screen and (min-width: 481px) {
-  .point-assignment-container {
-    padding: 10px 0 0 0;
-    min-width: 500px;
-  }
-
-  .add-points-container, .subtract-points-container {
-    display: inline-block;
-  }
-
-  #time-limit-container {
-    width: 300px;
-  }
-
-  #virtual-memory-container {
-    width: 300px;
-  }
-
-  #stack-size-container {
-    width: 300px;
-  }
-
-  #process-spawn-container {
-    width: 300px;
-  }
+.danger-zone-container {
+  // We want to have ample space between the delete button and the
+  // sticky save button
+  max-width: 75%;
 }
+
 </style>

@@ -1,18 +1,19 @@
 <template>
-  <div class="config-panel">
+  <div class="feedback-config-panel">
 
     <div class="header">
-      <slot name="header"></slot>
+      <div class="header-text">
+        <slot name="header"></slot>
+      </div>
 
-      <div v-if="d_configuration !== null && preset_names.length"
+      <div :style="{'visibility': is_enabled ? 'visible' : 'hidden'}"
            class="setting-selection-container">
         <span class="preset-label">Preset:</span>
         <select class="select"
                 v-model="d_selected_preset_name"
                 @change="change_preset">
           <option hidden>Custom</option>
-          <option v-for="preset_name of preset_names"
-                  :value="preset_name">
+          <option v-for="preset_name of preset_names" :value="preset_name">
             {{preset_name}}
           </option>
         </select>
@@ -37,7 +38,7 @@ import {
   AGTestCommandFeedbackPreset,
   AGTestSuiteFeedbackPreset,
   MutationTestSuiteFeedbackPreset
-} from '@/components/project_admin/feedback_config_utils';
+} from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
 import { safe_assign } from "@/utils";
 
@@ -76,6 +77,10 @@ export default class FeedbackConfigPanel extends Vue {
       }
     }
     this.set_d_configuration(this.value);
+  }
+
+  private get is_enabled() {
+    return this.d_configuration !== null && this.preset_names.length !== 0;
   }
 
   private set_d_configuration(feedback_config: FeedbackConfigType) {
@@ -134,27 +139,32 @@ export default class FeedbackConfigPanel extends Vue {
 
 $border-radius: 3px;
 
-.config-panel {
-    width: 100%;
-    max-width: 600px;
+.feedback-config-panel {
+  width: 100%;
+  max-width: 600px;
 
-    margin-bottom: .625rem;
-    box-shadow: 0 1px 1px $white-gray;
-    border-radius: $border-radius;
+  margin-bottom: .625rem;
+  box-shadow: 0 1px 1px $white-gray;
+  border-radius: $border-radius;
 }
 
 .header {
-    background-color: hsl(220, 30%, 94%);
-    border: 2px solid hsl(220, 30%, 92%);
-    border-bottom: none;
-    border-radius: $border-radius $border-radius 0 0;
+  background-color: hsl(220, 30%, 94%);
+  border: 2px solid hsl(220, 30%, 92%);
+  border-bottom: none;
+  border-radius: $border-radius $border-radius 0 0;
 
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: .25rem .25rem .25rem .5rem;
+}
 
-    padding: .25rem .25rem .25rem .625rem;
+.header-text {
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 .setting-selection-container {
@@ -173,10 +183,11 @@ $border-radius: 3px;
 }
 
 .footer {
-    border: 2px solid hsl(210, 20%, 92%);
-    border-top: none;
-    border-radius: 0 0 $border-radius $border-radius;
-    background-color: white;
-    padding: .375rem;
+  border: 2px solid hsl(210, 20%, 92%);
+  border-top: none;
+  border-radius: 0 0 $border-radius $border-radius;
+  background-color: white;
+
+  padding: .375rem;
 }
 </style>

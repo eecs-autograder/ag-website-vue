@@ -2,10 +2,10 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
 import {
     AGTestSuiteFeedbackPreset,
-} from '@/components/project_admin/feedback_config_utils';
+} from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
 
 import {
