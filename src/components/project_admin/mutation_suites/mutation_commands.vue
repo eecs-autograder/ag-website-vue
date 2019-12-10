@@ -1,7 +1,6 @@
 <template>
   <div id="mutation-commands-component">
-    <div id="use-setup-command-container"
-         class="checkbox-input-container">
+    <div class="checkbox-input-container">
       <input id="use-setup-command"
              type="checkbox"
              class="checkbox"
@@ -135,19 +134,19 @@ export default class MutationCommands extends Vue {
 <style scoped lang="scss">
 @import '@/styles/forms.scss';
 
-#mutation-commands-component {
-  padding: 6px 12px 14px 2px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .mutation-command-container {
-  margin-bottom: 30px;
-  min-width: 600px;
-  width: 50%;
-  max-width: 100%;
+  margin-bottom: 1.25rem;
+  max-width: 600px;
+  width: 100%;
 }
 
-#use-setup-command-container {
-  padding: 5px 5px 14px 0;
-  position: relative;
+.mutation-command-container:last-child {
+  margin-bottom: 0;
 }
 </style>

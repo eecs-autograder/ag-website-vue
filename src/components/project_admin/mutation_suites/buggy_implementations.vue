@@ -201,6 +201,12 @@ export default class BuggyImplementations extends Vue {
 
 $periwinkle: hsl(220, 30%, 56%);
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .buggy-implementation-names-input-container {
   .input {
     width: 100%;
