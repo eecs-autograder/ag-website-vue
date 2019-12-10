@@ -21,11 +21,11 @@ import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked,
     expect_html_element_has_value,
+    find_by_name,
     get_validated_input_text,
     set_select_object_value,
     set_validated_input_text,
     validated_input_is_valid,
-    find_by_name,
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -127,7 +127,7 @@ test('Input property initialization and change', async () => {
     outer_wrapper.vm.change_suite_field();
 
     expect(inner_wrapper.vm.d_suite).not.toBe(original);
-    expect(inner_wrapper.vm.d_suite.name).toEqual(new_name);
+    expect(inner_wrapper.vm.d_suite!.name).toEqual(new_name);
 });
 
 describe('Field binding tests', () => {

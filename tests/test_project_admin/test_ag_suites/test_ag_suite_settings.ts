@@ -16,6 +16,7 @@ import APIErrors from '@/components/api_errors.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
+import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
 import {
     make_ag_test_suite,
@@ -25,6 +26,7 @@ import {
 } from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    find_by_name,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid,
@@ -170,7 +172,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Suite settings binding', async () => {
-        let suite_settings = wrapper.find({name: 'SuiteSettings'});
+        let suite_settings = find_by_name<SuiteSettings>(wrapper, 'SuiteSettings');
         expect(suite_settings.vm.suite).toEqual(ag_suite);
         expect(suite_settings.vm.project).toEqual(project);
         expect(suite_settings.vm.docker_images).toEqual([

@@ -14,14 +14,15 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
+import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import {
+    find_by_name,
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -475,7 +476,8 @@ describe('MutationSuites tests', () => {
         wrapper.vm.d_active_mutation_test_suite = mutation_test_suite_1;
         await wrapper.vm.$nextTick();
 
-        let suite_settings = wrapper.find({name: 'SuiteSettings'});
+
+        let suite_settings = find_by_name<SuiteSettings>(wrapper, 'SuiteSettings');
         expect(suite_settings.vm.suite).toEqual(mutation_test_suite_1);
         expect(suite_settings.vm.project).toEqual(project);
         expect(suite_settings.vm.docker_images).toEqual([
