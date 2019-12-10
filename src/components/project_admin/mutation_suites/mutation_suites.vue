@@ -49,17 +49,12 @@
                             spellcheck="false"
                             @submit="save_mutation_test_suite"
                             @form_validity_changed="d_settings_form_is_valid = $event">
-
-              <fieldset class="fieldset">
-                <legend class="legend"> Settings and Environment </legend>
-
-                <suite-settings
-                  :suite="d_active_mutation_test_suite"
-                  :project="project"
-                  :docker_images="d_docker_images"
-                  @field_change="Object.assign(d_active_mutation_test_suite, $event)">
-                </suite-settings>
-              </fieldset>
+              <suite-settings
+                :suite="d_active_mutation_test_suite"
+                :project="project"
+                :docker_images="d_docker_images"
+                @field_change="Object.assign(d_active_mutation_test_suite, $event)">
+              </suite-settings>
 
               <fieldset class="fieldset">
                 <legend class="legend"> Buggy Implementations </legend>
@@ -190,8 +185,7 @@
               </fieldset>
             </validated-form>
 
-      <!--------------------------- Danger Zone --------------------------------------->
-
+            <!-------------------- Danger Zone --------------------------->
             <div class="danger-zone-container">
               <div class="danger-text">
                 Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>

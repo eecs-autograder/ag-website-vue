@@ -1,9 +1,8 @@
 <template>
   <div id="buggy-implementations-component"
        v-if="d_mutation_test_suite !== null">
-
-    <div class="input-container">
-      <label class="text-label"> Points per exposed bug </label>
+    <div class="form-field-wrapper">
+      <label class="label"> Points per exposed bug </label>
       <validated-input ref="points_per_exposed_bug"
                        id="points-per-exposed-bug"
                        v-model="d_mutation_test_suite.points_per_exposed_bug"
@@ -19,7 +18,7 @@
       </validated-input>
     </div>
 
-    <div class="checkbox-input-container override-max-points-container">
+    <div class="checkbox-input-container">
       <input id="override-max-points"
              type="checkbox"
              class="checkbox"
@@ -33,8 +32,8 @@
     </div>
 
     <div v-if="d_override_max_points"
-         class="input-container">
-      <label class="text-label"> Max points </label>
+         class="form-field-wrapper">
+      <label class="label"> Max points </label>
       <validated-input ref="max_points"
                        id="max-points"
                        v-model="d_mutation_test_suite.max_points"
@@ -49,8 +48,8 @@
       </validated-input>
     </div>
 
-    <div class="input-container">
-      <label class="text-label"> Max num student tests </label>
+    <div class="form-field-wrapper">
+      <label class="label"> Max num student tests </label>
       <validated-input ref="max_num_student_tests"
                        id="max-num-student-tests"
                        v-model="d_mutation_test_suite.max_num_student_tests"
@@ -65,18 +64,21 @@
       </validated-input>
     </div>
 
-    <div class="input-container">
-      <label class="text-label"> Buggy Implementation Names </label>
+    <div class="form-field-wrapper">
+      <label class="label"> Buggy Implementation Names </label>
       <div class="buggy-implementation-names-input-container">
-          <textarea ref="buggy_implementation_names"
-                    id="buggy-implementation-names-input"
-                    @keyup.enter="add_buggy_implementation_names"
-                    v-model="d_buggy_impl_names_text">
-          </textarea>
-        <button id="add-buggy-impl-names-button"
-                @click="add_buggy_implementation_names">
-          Add Names
-        </button>
+        <textarea ref="buggy_impl_names_input"
+                  class="input"
+                  @keyup.enter="add_buggy_implementation_names"
+                  v-model="d_buggy_impl_names_text">
+        </textarea>
+        <div>
+          <button id="add-buggy-impl-names-button"
+                  class="periwinkle-button"
+                  @click="add_buggy_implementation_names">
+            Add Names
+          </button>
+        </div>
       </div>
     </div>
 
@@ -93,7 +95,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -197,46 +198,14 @@ export default class BuggyImplementations extends Vue {
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
+
 $periwinkle: hsl(220, 30%, 56%);
 
-#buggy-implementations-component {
-  padding: 6px 12px 14px 2px;
-}
-
-.override-max-points-container {
-  padding: 6px 12px 6px 0;
-}
-
-.input-container {
-  margin: 5px 0 10px 0;
-}
-
-.toggle-container {
-  font-size: 14px;
-  margin: 13px 5px 3px 0;
-  padding-bottom: 5px;
-  min-width: 500px;
-}
-
 .buggy-implementation-names-input-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-content: flex-start;
-}
-
-#buggy-implementation-names-input {
-  background-color: #fff;
-  border-radius: .25rem;
-  border: 1px solid #ced4da;
-  box-sizing: border-box;
-  color: #495057;
-  font-size: 1rem;
-  line-height: 1;
-  padding: 5px;
-  min-height: 80px;
-  max-width: 500px;
-  width: 100%;
+  .input {
+    width: 100%;
+    max-width: 300px;
+  }
 }
 
 #all-buggy-implementation-names {
@@ -245,7 +214,7 @@ $periwinkle: hsl(220, 30%, 56%);
 }
 
 .buggy-implementation-row {
-  padding: 5px 6px 5px 10px;
+  padding: .25rem .375rem .25rem .625rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -253,7 +222,7 @@ $periwinkle: hsl(220, 30%, 56%);
 
   .remove-buggy-impl-name-container {
     cursor: pointer;
-    padding: 0 5px;
+    padding: 0 .25rem;
   }
 
   .remove-buggy-impl-name-icon {
@@ -267,13 +236,7 @@ $periwinkle: hsl(220, 30%, 56%);
 
 .buggy-implementation-name {
   color: lighten(black, 40);
-  padding-right: 30px;
-  cursor: default;
+  padding-right: 1.875rem;
 }
 
-#add-buggy-impl-names-button {
-  @extend .periwinkle-button;
-  margin-left: 10px;
-  align-self: flex-start;
-}
 </style>

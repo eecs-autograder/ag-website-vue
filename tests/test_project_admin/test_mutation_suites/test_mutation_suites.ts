@@ -14,6 +14,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
+import BuggyImplementations from '@/components/project_admin/mutation_suites/buggy_implementations.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
@@ -491,54 +492,18 @@ describe('MutationSuites tests', () => {
     });
 
     test('Buggy Implementations - d_active_mutation_test_suite binding', async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.vm.d_active_mutation_test_suite = mutation_test_suite_2;
         await wrapper.vm.$nextTick();
 
-        // Points per exposed bug
-        expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).not.toEqual(905.5);
+        let buggy_impl_form = find_by_name<BuggyImplementations>(wrapper, 'BuggyImplementations');
+        expect(buggy_impl_form.vm.value).toEqual(mutation_test_suite_2);
 
-        set_validated_input_text(wrapper.find('#points-per-exposed-bug'), '905.5');
-        expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).toEqual("905.5");
+        let to_emit = new MutationTestSuite(mutation_test_suite_2);
+        let new_name = 'yet a new name';
+        to_emit.name = new_name;
 
-        // override max points
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toBeNull();
-
-        let override_max_points_checkbox = wrapper.find('#override-max-points');
-        override_max_points_checkbox.setChecked(true);
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(0);
-
-        // max points
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(0);
-
-        set_validated_input_text(wrapper.find('#max-points'), '3');
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(3);
-
-        // max num student tests
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_num_student_tests).not.toEqual(100);
-
-        set_validated_input_text(wrapper.find('#max-num-student-tests'), '100');
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_num_student_tests).toEqual(100);
-
-        // buggy implementation names
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toEqual([]);
-
-        wrapper.find('#buggy-implementation-names-input').setValue('Bug_41 Bug_23 Bug_3');
-
-        wrapper.find('#add-buggy-impl-names-button').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names.length).toEqual(3);
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_3");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_23");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_41");
-
-        wrapper.findAll('.remove-buggy-impl-name-container').at(2).trigger('click');
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names.length).toEqual(2);
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_3");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_23");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).not.toContain("Bug_41");
+        buggy_impl_form.vm.$emit('input', to_emit);
+        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(to_emit);
     });
 
     test('Commands - d_active_mutation_test_suite binding',  async () => {
