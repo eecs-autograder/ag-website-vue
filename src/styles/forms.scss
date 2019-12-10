@@ -33,6 +33,12 @@
     margin-bottom: .875rem;
 }
 
+%last-saved-timestamp {
+    padding-top: .5rem;
+    font-size: 1rem;
+    width: 100%;
+}
+
 // Provides padding and alignment for buttons at the bottom of a form or modal
 .button-footer, .button-footer-right, .modal-button-footer {
     display: flex;
@@ -41,9 +47,7 @@
     margin-bottom: .75rem;
 
     .last-saved-timestamp {
-        padding-top: .5rem;
-        font-size: 1rem;
-        width: 100%;
+        @extend %last-saved-timestamp;
     }
 
     .button {

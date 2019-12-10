@@ -358,7 +358,7 @@
                 :disabled="!settings_form_is_valid || d_saving">Save</button>
         <div class="last-saved-timestamp">
           <i v-if="d_saving" class=" loading fa fa-spinner fa-pulse"></i>
-          <template v-else>Saved at {{format_datetime_short(project.last_modified)}}</template>
+          <template v-else>Last saved: {{format_datetime_short(project.last_modified)}}</template>
         </div>
       </div>
     </validated-form>

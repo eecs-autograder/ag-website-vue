@@ -1,8 +1,8 @@
 <template>
   <div v-show="d_feedback_config !== null" class="ag-test-command-advanced-fdbk">
     <template v-if="d_feedback_config !== null">
-      <div class="checkbox-input-container" v-if="ag_test_case.ag_test_commands.length > 1
-                                                  || !d_feedback_config.visible">
+      <div class="checkbox-input-container"
+           v-if="ag_test_case.ag_test_commands.length > 1 || !d_feedback_config.visible">
         <input :id="`${hyphenate(config_name)}-cmd-visible`"
                 type="checkbox"
                 @change="$emit('input', d_feedback_config)"

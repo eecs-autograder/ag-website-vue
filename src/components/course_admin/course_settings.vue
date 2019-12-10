@@ -82,7 +82,7 @@
 
           <div class="last-saved-timestamp">
             <template v-if="!saving">
-              <span> Saved at: </span> {{format_datetime_short(d_course.last_modified)}}
+              Last saved: {{format_datetime_short(d_course.last_modified)}}
             </template>
             <i v-else class="loading fa fa-spinner fa-pulse"></i>
           </div>

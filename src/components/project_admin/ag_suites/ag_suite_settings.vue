@@ -135,15 +135,11 @@
                   class="save-button"
                   :disabled="!d_settings_form_is_valid || d_saving">Save</button>
 
-          <div v-show="!d_saving" class="last-saved-timestamp">
-            <span> Last Saved: </span> {{format_datetime(d_ag_test_suite.last_modified)}}
-          </div>
-
-          <div v-show="d_saving" class="last-saved-spinner">
-            <i class="fa fa-spinner fa-pulse"></i>
-          </div>
+          <last-saved
+            :last_modified="d_ag_test_suite.last_modified"
+            :saving="d_saving">
+          </last-saved>
         </div>
-
       </validated-form>
 
       <!--------------------------- Danger Zone --------------------------------------->
@@ -201,6 +197,7 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import LastSaved from "@/components/last_saved.vue";
 import Modal from '@/components/modal.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
 import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
@@ -218,10 +215,11 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
 
 @Component({
   components: {
-    APIErrors,
-    FeedbackConfigPanel,
-    DropdownTypeahead,
     AGTestSuiteAdvancedFdbkSettings,
+    APIErrors,
+    DropdownTypeahead,
+    FeedbackConfigPanel,
+    LastSaved,
     Modal,
     SelectObject,
     SuiteSettings,

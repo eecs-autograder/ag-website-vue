@@ -100,14 +100,12 @@
                     v-model="d_active_mutation_test_suite.ultimate_submission_fdbk_config"
                     :preset_options="fdbk_presets">
                     <template slot="header">
-                      <div class="config-name">
-                        {{FeedbackConfigLabel.ultimate_submission}}
-                        <i class="fas fa-question-circle input-tooltip">
-                          <tooltip width="large" placement="right">
-                            {{FeedbackDescriptions.ultimate_submission}}
-                          </tooltip>
-                        </i>
-                      </div>
+                      {{FeedbackConfigLabel.ultimate_submission}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.ultimate_submission}}
+                        </tooltip>
+                      </i>
                     </template>
                     <template slot="settings">
                       <MutationTestSuiteAdvancedFdbkSettings
@@ -123,14 +121,12 @@
                     v-model="d_active_mutation_test_suite.past_limit_submission_fdbk_config"
                     :preset_options="fdbk_presets">
                     <template slot="header">
-                      <div class="config-name">
-                        {{FeedbackConfigLabel.past_limit}}
-                        <i class="fas fa-question-circle input-tooltip">
-                          <tooltip width="large" placement="right">
-                            {{FeedbackDescriptions.past_limit}}
-                          </tooltip>
-                        </i>
-                      </div>
+                      {{FeedbackConfigLabel.past_limit}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.past_limit}}
+                        </tooltip>
+                      </i>
                     </template>
                     <template slot="settings">
                       <MutationTestSuiteAdvancedFdbkSettings
@@ -146,14 +142,12 @@
                     v-model="d_active_mutation_test_suite.staff_viewer_fdbk_config"
                     :preset_options="fdbk_presets">
                     <template slot="header">
-                      <div class="config-name">
-                        {{FeedbackConfigLabel.staff_viewer}}
-                        <i class="fas fa-question-circle input-tooltip">
-                          <tooltip width="large" placement="right">
-                            {{FeedbackDescriptions.staff_viewer}}
-                          </tooltip>
-                        </i>
-                      </div>
+                      {{FeedbackConfigLabel.staff_viewer}}
+                      <i class="fas fa-question-circle input-tooltip">
+                        <tooltip width="large" placement="right">
+                          {{FeedbackDescriptions.staff_viewer}}
+                        </tooltip>
+                      </i>
                     </template>
                     <template slot="settings">
                       <MutationTestSuiteAdvancedFdbkSettings
@@ -165,22 +159,18 @@
                   </feedback-config-panel>
                 </div>
 
-                <div id="bottom-of-form">
-                  <APIErrors ref="api_errors"></APIErrors>
+                <APIErrors ref="api_errors"></APIErrors>
+                <div class="button-footer">
 
                   <button type="submit"
                           class="save-button"
                           id="save-mutation-test-suite-button"
                           :disabled="!d_settings_form_is_valid || d_saving">Save</button>
 
-                  <div v-show="!d_saving" class="last-saved-timestamp">
-                    <span> Last Saved: </span>
-                    {{format_datetime(d_active_mutation_test_suite.last_modified)}}
-                  </div>
-
-                  <div v-show="d_saving" class="last-saved-spinner">
-                    <i class="fa fa-spinner fa-pulse"></i>
-                  </div>
+                  <last-saved
+                    :last_modified="d_active_mutation_test_suite.last_modified"
+                    :saving="d_saving">
+                  </last-saved>
                 </div>
               </fieldset>
             </validated-form>
@@ -284,6 +274,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import LastSaved from "@/components/last_saved.vue";
 import Modal from '@/components/modal.vue';
 import {
     FeedbackConfigLabel,
@@ -310,6 +301,7 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     BuggyImplementations,
     Draggable,
     FeedbackConfigPanel,
+    LastSaved,
     Modal,
     MutationCommand,
     MutationCommands,

@@ -147,4 +147,9 @@ export default class MutationCommands extends Vue {
 .mutation-command-container:last-child {
   margin-bottom: 0;
 }
+
+#use-setup-command-label {
+  font-size: 1rem;
+  margin-bottom: .75rem;
+}
 </style>
