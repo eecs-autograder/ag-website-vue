@@ -471,108 +471,21 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
     });
 
-    test('General Settings - d_active_mutation_test_suite binding', async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+    test('Suite settings binding', async () => {
+        wrapper.vm.d_active_mutation_test_suite = mutation_test_suite_1;
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
+        let suite_settings = wrapper.find({name: 'SuiteSettings'});
+        expect(suite_settings.vm.suite).toEqual(mutation_test_suite_1);
+        expect(suite_settings.vm.project).toEqual(project);
+        expect(suite_settings.vm.docker_images).toEqual([
+            sandbox_docker_image_1, sandbox_docker_image_2, sandbox_docker_image_3
+        ]);
 
-        // Name
-        expect(wrapper.vm.d_active_mutation_test_suite!.name).not.toBe("Suite 22");
+        let new_name = 'this is very new name';
+        suite_settings.vm.$emit('field_change', {name: new_name});
 
-        set_validated_input_text(wrapper.find('#input-name'), "Suite 22");
-        expect(wrapper.vm.d_active_mutation_test_suite!.name).toEqual("Suite 22");
-
-        // Deferred
-        expect(wrapper.vm.d_active_mutation_test_suite!.deferred).toBe(false);
-
-        wrapper.find('#synchronous-or-deferred').setChecked(false);
-        expect(wrapper.vm.d_active_mutation_test_suite!.deferred).toBe(true);
-
-        // Sandbox
-        expect(wrapper.vm.d_active_mutation_test_suite!.sandbox_docker_image).not.toEqual(
-            sandbox_docker_image_2
-        );
-
-        let sandbox_docker_image_input = wrapper.find(
-            '#sandbox-docker-image'
-        );
-        sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = sandbox_docker_image_input.find(".highlight");
-        expect(highlighted_item.text()).toContain(sandbox_docker_image_2.display_name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.sandbox_docker_image).toEqual(
-            sandbox_docker_image_2
-        );
-
-        // Network access
-        expect(wrapper.vm.d_active_mutation_test_suite!.allow_network_access).toBe(false);
-
-        let allow_network_access_toggle = wrapper.find('#allow-network-access');
-        allow_network_access_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.allow_network_access).toBe(true);
-
-        // Instructor files
-        expect(wrapper.vm.d_active_mutation_test_suite!.instructor_files_needed.length).toEqual(0);
-
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find('#instructor-files-typeahead').vm;
-        let search_bar = wrapper.find('#instructor-files-typeahead').find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "pen";
-        await wrapper.vm.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.instructor_files_needed[0]).toEqual(
-            instructor_file_1
-        );
-
-        wrapper.find('#instructor-files').findAll('.file').at(0).find(
-            '.delete-file-icon-container'
-        ).trigger('click');
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed.length).toEqual(0);
-
-        // Student Files
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed.length).toEqual(0);
-
-        dropdown_typeahead = <DropdownTypeahead> wrapper.find('#student-files-typeahead').vm;
-        search_bar = wrapper.find('#student-files-typeahead').find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "mon";
-        await wrapper.vm.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_2);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed[0]).toEqual(
-            student_file_2
-        );
-
-        wrapper.find('#student-files').findAll('.file').at(0).find(
-            '.delete-file-icon-container'
-        ).trigger('click');
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed.length).toEqual(0);
+        expect(wrapper.vm.d_active_mutation_test_suite!.name).toEqual(new_name);
     });
 
     test('Buggy Implementations - d_active_mutation_test_suite binding', async () => {

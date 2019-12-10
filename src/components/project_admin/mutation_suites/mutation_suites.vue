@@ -52,10 +52,13 @@
 
               <fieldset class="fieldset">
                 <legend class="legend"> Settings and Environment </legend>
-                <mutation-suite-general-settings ref="mutation_suite_general_settings"
-                                                 v-model="d_active_mutation_test_suite"
-                                                 :project="project">
-                </mutation-suite-general-settings>
+
+                <suite-settings
+                  :suite="d_active_mutation_test_suite"
+                  :project="project"
+                  :docker_images="d_docker_images"
+                  @field_change="Object.assign(d_active_mutation_test_suite, $event)">
+                </suite-settings>
               </fieldset>
 
               <fieldset class="fieldset">
@@ -281,7 +284,9 @@ import {
     BugsExposedFeedbackLevel,
     MutationTestSuite,
     MutationTestSuiteObserver,
-    Project
+    Project,
+    get_sandbox_docker_images,
+    SandboxDockerImageData
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -294,8 +299,8 @@ import {
 import BuggyImplementations from "@/components/project_admin/mutation_suites/buggy_implementations.vue";
 import MutationCommand from "@/components/project_admin/mutation_suites/mutation_command.vue";
 import MutationCommands from "@/components/project_admin/mutation_suites/mutation_commands.vue";
-import MutationSuiteGeneralSettings from "@/components/project_admin/mutation_suites/mutation_suite_general_settings.vue";
 import MutationTestSuiteAdvancedFdbkSettings from '@/components/project_admin/mutation_suites/mutation_test_suite_advanced_fdbk_settings.vue';
+import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
@@ -314,15 +319,14 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     Modal,
     MutationCommand,
     MutationCommands,
-    MutationSuiteGeneralSettings,
     MutationTestSuiteAdvancedFdbkSettings,
+    SuiteSettings,
     Tooltip,
     ValidatedForm,
     ValidatedInput
   }
 })
 export default class MutationSuites extends Vue implements MutationTestSuiteObserver {
-
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -330,6 +334,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   readonly FeedbackDescriptions = FeedbackDescriptions;
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
+
+  d_docker_images: SandboxDockerImageData[] = [];
 
   d_active_mutation_test_suite: MutationTestSuite | null = null;
   d_add_mutation_test_suite_form_is_valid = true;
@@ -348,6 +354,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async created() {
     MutationTestSuite.subscribe(this);
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
+    this.d_docker_images = await get_sandbox_docker_images();
     this.d_loading = false;
   }
 
@@ -581,16 +588,21 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/list_panels.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
+}
+
+#mutation-test-suites-component {
+  overflow-x: hidden;
 }
 
 $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 50px,
+  $sidebar-header-height: 3.125rem,
   $background-color: white,
   $border-color: $border-color,
   $stretch: true,
@@ -604,7 +616,7 @@ $border-color: $gray-blue-1;
   }
 
   .sidebar-header {
-    padding: 5px 8px;
+    padding: .25rem .5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -615,8 +627,8 @@ $border-color: $gray-blue-1;
   }
 
   .body {
-    padding-top: 15px;
-    padding-right: 10px;
+    padding: .625rem .875rem;
+    overflow-x: hidden;
   }
 }
 
@@ -637,75 +649,70 @@ $border-color: $gray-blue-1;
 }
 
 .plus {
-  font-size: 13px;
-  margin-right: 3px;
+  font-size: .75rem;
+  margin-right: .25rem;
 }
 
 @include list-panels();
 
-#config-panels-container {
-  padding: 6px 0 14px 2px;
-  max-width: 50%;
-}
+// #bottom-of-form {
+//   padding: 12px 0 15px 2px;
+// }
 
-#bottom-of-form {
-  padding: 12px 0 15px 2px;
-}
+// .save-button {
+//   @extend .green-button;
+//   display: block;
+//   margin-top: 10px;
+// }
 
-.save-button {
-  @extend .green-button;
-  display: block;
-  margin-top: 10px;
-}
+// .last-saved-timestamp {
+//   font-size: 14px;
+//   padding: 10px 0;
+//   color: lighten(black, 30);
+// }
 
-.last-saved-timestamp {
-  font-size: 14px;
-  padding: 10px 0;
-  color: lighten(black, 30);
-}
-
-.last-saved-spinner {
-  padding: 10px 0;
-}
+// .last-saved-spinner {
+//   padding: 10px 0;
+// }
 
 // MODAL stuff ----------------------------------------------------
-.modal-header {
-  font-size: 20px;
-  padding: 10px 0 5px 0;
-}
+// .modal-header {
+//   font-size: 20px;
+//   padding: 10px 0 5px 0;
+// }
 
-.modal-divider {
-  background-color: darken($white-gray, 3);
-  height: 2px;
-  margin: 9px 0;
-}
+// .modal-divider {
+//   background-color: darken($white-gray, 3);
+//   height: 2px;
+//   margin: 9px 0;
+// }
 
-.modal-message {
-  line-height: 22px;
-  padding: 5px 0;
-}
+// .modal-message {
+//   line-height: 22px;
+//   padding: 5px 0;
+// }
 
-.modal-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  padding: 10px 0 0 0;
-}
+// .modal-button-container {
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: flex-end;
+//   padding: 10px 0 0 0;
+// }
 
 // create modal -----------------------------------------
-.modal-create-suite-button {
-  @extend .green-button;
-  float: right;
-}
+// .modal-create-suite-button {
+//   @extend .green-button;
+//   float: right;
+// }
 
-// delete modal -----------------------------------------
-.modal-delete-button {
-  margin-right: 10px;
-}
+// // delete modal -----------------------------------------
+// .modal-delete-button {
+//   margin-right: 10px;
+// }
 
-.item-to-delete {
-  color: $ocean-blue;
-  margin-left: 3px;
-}
+// .item-to-delete {
+//   color: $ocean-blue;
+//   margin-left: 3px;
+// }
 
 </style>

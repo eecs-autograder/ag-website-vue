@@ -263,44 +263,12 @@ export default class AGSuiteSettings extends Vue {
     this.d_loading = false;
   }
 
-  // get instructor_files_available() {
-  //   return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
-  //     return this.d_ag_test_suite!.instructor_files_needed.findIndex(
-  //       (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
-  //   });
-  // }
-
-  // get expected_student_files_available() {
-  //   return this.project.expected_student_files.filter(
-  //     (expected_student_file: ExpectedStudentFile) => {
-  //       return this.d_ag_test_suite!.student_files_needed.findIndex(
-  //         (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
-  //     }
-  //   );
-  // }
-
-  // add_instructor_file(instructor_file: InstructorFile) {
-  //   this.d_ag_test_suite!.instructor_files_needed.push(instructor_file);
-  // }
-
-  // add_student_file(student_file: ExpectedStudentFile) {
-  //   this.d_ag_test_suite!.student_files_needed.push(student_file);
-  // }
-
   delete_ag_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_ag_test_suite!.delete();
       this.d_show_delete_ag_test_suite_modal = false;
     });
   }
-
-  // instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-  //   return file.name.indexOf(filter_text) >= 0;
-  // }
-
-  // expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-  //   return file.pattern.indexOf(filter_text) >= 0;
-  // }
 
   @handle_api_errors_async(handle_save_ag_suite_settings_error)
   save_ag_test_suite_settings() {
