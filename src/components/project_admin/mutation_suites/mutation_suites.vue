@@ -588,10 +588,6 @@ function handle_add_mutation_test_suite_error(component: MutationSuites, error: 
   box-sizing: border-box;
 }
 
-#mutation-test-suites-component {
-  overflow-x: hidden;
-}
-
 $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(

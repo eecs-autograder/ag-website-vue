@@ -3,6 +3,8 @@
 // Organization ---------------------------------------------------------------
 
 .fieldset {
+    box-sizing: border-box;
+
     border-bottom: none;
     border-left: none;
     border-right: none;
@@ -14,6 +16,8 @@
 }
 
 .legend {
+    box-sizing: border-box;
+
     color: darken($ocean-blue, 5%);
     font-size: 1.125rem;
     margin: .5rem 0;
@@ -101,6 +105,7 @@
 // Danger Zone -----------------------------------
 
 .danger-zone-container {
+    box-sizing: border-box;
     margin: 3.125rem 0 0 0;
     border-radius: 2px;
     border: 1px solid red;
@@ -128,6 +133,7 @@ $input-border-color: #ced4da;
 $input-text-color: #495057;
 
 .input {
+    box-sizing: border-box;
     font-size: 1rem;
     padding: .375rem;
     border-radius: 2px;
@@ -137,6 +143,7 @@ $input-text-color: #495057;
 }
 
 .select {
+    box-sizing: border-box;
     background-color: white;
     border: 1px solid $input-border-color;
     border-radius: 2px;
@@ -147,6 +154,7 @@ $input-text-color: #495057;
 }
 
 .radio-container {
+    box-sizing: border-box;
     padding: .125rem .25rem;
     .label {
         padding-left: .25rem;
@@ -160,6 +168,7 @@ $checkbox-background-dark: hsl(220, 30%, 90%);
 $check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
+    box-sizing: border-box;
     margin: .625rem 0;
     position: relative;
 

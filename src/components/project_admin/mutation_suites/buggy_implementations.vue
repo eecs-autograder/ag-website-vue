@@ -13,7 +13,7 @@
                            has_less_than_or_equal_to_four_digits,
                            has_less_than_or_equal_to_two_decimal_places
                          ]"
-                       input_style="max-width: 500px; width: 100%"
+                       input_style="max-width: 300px; width: 100%"
                        @input="$emit('input', d_mutation_test_suite)">
       </validated-input>
     </div>
@@ -43,7 +43,7 @@
                            is_non_negative
                          ]"
                        :from_string_fn="string_to_num"
-                       input_style="max-width: 500px; width: 100%"
+                       input_style="max-width: 300px; width: 100%"
                        @input="$emit('input', d_mutation_test_suite)">
       </validated-input>
     </div>
@@ -59,7 +59,7 @@
                            is_non_negative
                          ]"
                        :from_string_fn="string_to_num"
-                       input_style="max-width: 500px; width: 100%"
+                       input_style="max-width: 300px; width: 100%"
                        @input="$emit('input', d_mutation_test_suite)">
       </validated-input>
     </div>

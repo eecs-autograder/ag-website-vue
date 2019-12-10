@@ -1,28 +1,27 @@
 <template>
-  <div id="mutation-command-component">
+  <div class="mutation-command-component">
     <div class="command-label">
       <slot name="command-label"></slot>
     </div>
     <div class="command-content">
-      <div class="input-container"
-           v-if="include_command_name_input">
-        <label class="text-label"> Name </label>
+      <div class="form-field-wrapper" v-if="include_command_name_input">
+        <label class="label"> Name </label>
         <validated-input ref="name"
                          id="name"
                          v-model="d_ag_command.name"
                          :validators="[is_not_empty]"
-                         input_style="max-width: 500px; width: 100%"
+                         input_style="width: 100%"
                          @input="$emit('input', d_ag_command)">
         </validated-input>
       </div>
 
-      <div class="input-container">
-        <label class="text-label"> Command </label>
+      <div class="form-field-wrapper">
+        <label class="label"> Command </label>
         <validated-input ref="cmd"
                          id="cmd"
                          v-model="d_ag_command.cmd"
                          :validators="[is_not_empty]"
-                         input_style="max-width: 500px; width: 100%"
+                         input_style="width: 100%"
                          @input="$emit('input', d_ag_command)">
         </validated-input>
       </div>
@@ -30,12 +29,12 @@
       <div class="resource-limits-label" @click="toggle_is_open">
         <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
         <i v-else class="fas fa-caret-right caret-right"></i>
-        <span> Resource Limits </span>
+        <span class="header-text"> Resource Limits </span>
       </div>
 
       <div v-if="d_is_open">
-        <div class="input-container">
-          <label class="text-label"> Time limit </label>
+        <div class="form-field-wrapper">
+          <label class="label"> Time limit </label>
           <validated-input ref="time_limit"
                            id="time-limit"
                            v-model="d_ag_command.time_limit"
@@ -51,8 +50,8 @@
           </validated-input>
         </div>
 
-        <div class="input-container">
-          <label class="text-label"> Stack size limit </label>
+        <div class="form-field-wrapper">
+          <label class="label"> Stack size limit </label>
           <validated-input ref="stack_size_limit"
                            id="stack-size-limit"
                            v-model="d_ag_command.stack_size_limit"
@@ -68,8 +67,8 @@
           </validated-input>
         </div>
 
-        <div class="input-container">
-          <label class="text-label"> Virtual memory limit </label>
+        <div class="form-field-wrapper">
+          <label class="label"> Virtual memory limit </label>
           <validated-input ref="virtual_memory_limit"
                            id="virtual-memory-limit"
                            v-model="d_ag_command.virtual_memory_limit"
@@ -85,8 +84,8 @@
           </validated-input>
         </div>
 
-        <div class="input-container">
-          <label class="text-label"> Process spawn limit </label>
+        <div class="form-field-wrapper">
+          <label class="label"> Process spawn limit </label>
           <validated-input ref="process_spawn_limit"
                            id="process-spawn-limit"
                            v-model="d_ag_command.process_spawn_limit"
@@ -159,45 +158,35 @@ export default class MutationCommand extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/forms.scss';
+@import '@/styles/section_header.scss';
 
-#mutation-command-component {
-  width: 100%;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .caret-down, .caret-right {
-  font-size: 15px;
-  width: 20px;
+  font-size: .875rem;
 }
 
 .command-label {
   align-items: center;
-  border-radius: 3px 3px 0 0;
   display: flex;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: bold;
 }
 
 .resource-limits-label {
+  @include section-header($with-left-divider: false, $pad-text: true);
+
+  margin-bottom: .5rem;
   cursor: pointer;
-  display: flex;
-  font-size: 15px;
-  flex-direction: row;
-  justify-content: stretch;
-  align-items: center;
-  padding: 0 8px;
-}
-
-.command-content {
-  border-radius: 0 0 3px 3px;
-  padding: 0 0 2px 0;
-}
-
-.input-container {
-  margin: 10px 0;
+  font-size: .875rem;
 }
 
 .unit-of-measurement {
-  font-size: 14px;
-  padding-left: 10px;
+  font-size: .875rem;
+  padding-left: .625rem;
 }
 </style>
