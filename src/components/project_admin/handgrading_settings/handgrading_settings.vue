@@ -138,19 +138,16 @@
                      class="checkbox-label">Handgraders can adjust_points</label>
             </div>
 
-            <div class="footer">
-              <APIErrors ref="settings_form_errors"></APIErrors>
-
+            <APIErrors ref="settings_form_errors"></APIErrors>
+            <div class="button-footer">
               <button class="save-button"
                       ref="save_rubric_button"
                       type="submit"
                       :disabled="!d_settings_form_is_valid || d_saving">Save</button>
-              <span v-if="d_saving" class="saving-spinner">
-                <i class="fa fa-spinner fa-pulse"></i>
-              </span>
-              <div v-else class="last-saved-timestamp">
-                <span> Last Saved: </span> {{format_datetime(d_handgrading_rubric.last_modified)}}
-              </div>
+              <last-saved
+                :last_modified="d_handgrading_rubric.last_modified"
+                :saving="d_saving">
+              </last-saved>
             </div>
           </validated-form>
         </div>
@@ -255,6 +252,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
+import LastSaved from "@/components/last_saved.vue";
 import Modal from "@/components/modal.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
@@ -284,6 +282,7 @@ import CriterionForm from './criterion_form.vue';
     APIErrors,
     CriterionForm,
     Draggable,
+    LastSaved,
     Modal,
     SelectObject,
     SingleAnnotation,
@@ -571,7 +570,7 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
+@import '@/styles/loading.scss';
 
 * {
   margin: 0;
