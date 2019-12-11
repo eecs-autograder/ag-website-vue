@@ -1,5 +1,5 @@
 <template>
-  <div v-if="d_loading" class="loading-spinner">
+  <div v-if="d_loading" class="loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="project-admin">
@@ -252,6 +252,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/navbar.scss';
 
 * {
@@ -263,15 +264,6 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
 #project-admin {
   height: 100%;
   width: 100%;
-}
-
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
 }
 
 @include navbar(
