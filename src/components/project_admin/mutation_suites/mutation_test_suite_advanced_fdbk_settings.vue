@@ -1,49 +1,41 @@
 <template>
   <div class="edit-feedback">
     <div id="edit-feedback-toggle-zone" v-if="d_feedback_config !== null">
-
-      <div class="non-advanced">
-        <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-mutation-suite-visible`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.visible">
-          <label :for="`${hyphenate(config_name)}-mutation-suite-visible`">
-            Suite is Visible
-          </label>
-        </div>
+      <div class="non-advanced checkbox-input-container">
+        <input :id="`${hyphenate(config_name)}-mutation-suite-visible`"
+                type="checkbox"
+                @change="$emit('input', d_feedback_config)"
+                class="checkbox"
+                v-model="d_feedback_config.visible">
+        <label :for="`${hyphenate(config_name)}-mutation-suite-visible`">
+          Suite is Visible
+        </label>
       </div>
 
       <div class="advanced-settings-label" @click="toggle_is_open">
         <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
         <i v-else class="fas fa-caret-right caret-right"></i>
-        <span> Advanced Settings </span>
-        <div class="advanced-settings-divider" v-if="d_is_open"> </div>
+        <span class="advanced-settings-text"> Advanced Settings </span>
       </div>
-
-      <div v-if="d_is_open"
-           class="advanced-settings">
-
-        <div class="select-row">
-          <label class="setting-title"> Bugs Exposed </label>
-          <div>
-            <select ref="bugs_exposed_fdbk_level_select"
-                    :id="`${hyphenate(config_name)}-bugs-exposed-fdbk-level`"
-                    v-model="d_feedback_config.bugs_exposed_fdbk_level"
-                    @change="$emit('input', d_feedback_config)"
-                    class="select">
-              <option :value="BugsExposedFeedbackLevel.no_feedback">
-                Hide
-              </option>
-              <option :value="BugsExposedFeedbackLevel.num_bugs_exposed">
-                Num bugs exposed
-              </option>
-              <option :value="BugsExposedFeedbackLevel.exposed_bug_names">
-                Exposed bug names
-              </option>
-            </select>
-          </div>
+      <div v-if="d_is_open" class="advanced-settings">
+        <div class="form-field-wrapper">
+          <label> Bugs Exposed </label>
+          <br>
+          <select ref="bugs_exposed_fdbk_level_select"
+                  :id="`${hyphenate(config_name)}-bugs-exposed-fdbk-level`"
+                  v-model="d_feedback_config.bugs_exposed_fdbk_level"
+                  @change="$emit('input', d_feedback_config)"
+                  class="select">
+            <option :value="BugsExposedFeedbackLevel.no_feedback">
+              Hide
+            </option>
+            <option :value="BugsExposedFeedbackLevel.num_bugs_exposed">
+              Num bugs exposed
+            </option>
+            <option :value="BugsExposedFeedbackLevel.exposed_bug_names">
+              Exposed bug names
+            </option>
+          </select>
         </div>
 
         <div class="checkbox-input-container">
@@ -220,12 +212,15 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/forms.scss';
+
 @import '../feedback_config_panel/feedback_config_panel.scss';
 
-.advanced-settings-divider {
-  border-top: 1px solid darken($white-gray, 10);
-  width: 100%;
-  margin: 2px 0;
+.non-advanced.checkbox-input-container {
+  margin-top: .25rem;
 }
 
+.advanced-settings {
+  margin-top: .5rem;
+}
 </style>

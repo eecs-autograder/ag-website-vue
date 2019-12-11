@@ -637,26 +637,6 @@ $border-color: $gray-blue-1;
 
 @include list-panels();
 
-// #bottom-of-form {
-//   padding: 12px 0 15px 2px;
-// }
-
-// .save-button {
-//   @extend .green-button;
-//   display: block;
-//   margin-top: 10px;
-// }
-
-// .last-saved-timestamp {
-//   font-size: 14px;
-//   padding: 10px 0;
-//   color: lighten(black, 30);
-// }
-
-// .last-saved-spinner {
-//   padding: 10px 0;
-// }
-
 // MODAL stuff ----------------------------------------------------
 // .modal-header {
 //   font-size: 20px;

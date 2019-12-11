@@ -16,7 +16,6 @@
         <i v-else class="fas fa-caret-right caret-right"></i>
         <div class="advanced-settings-text"> Advanced Settings </div>
       </div>
-
       <div v-if="d_is_open" class="advanced-settings">
         <div class="form-field-wrapper">
           <label class="label"> Return Code Correctness </label>
