@@ -135,6 +135,9 @@ export default class Tooltip extends Vue {
 <style scoped lang="scss">
   @import '@/styles/colors.scss';
 
+  // Using px in this component is acceptable due to the placement calculations
+  // required.
+
   #tooltip {
     background-color: $stormy-gray-dark;
     border-radius: 6px;
