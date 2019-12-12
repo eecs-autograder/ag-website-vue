@@ -98,7 +98,7 @@
       </modal>
     </template>
     <template v-else>
-      <div class="loading-large"><i class="fa fa-spinner fa-pulse"></i></div>
+      <div class="loading-centered loading-large"><i class="fa fa-spinner fa-pulse"></i></div>
     </template>
   </div>
 </template>

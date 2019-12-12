@@ -15,7 +15,7 @@
     @extend .loading;
 }
 
-.loading-centered, .loading-large {
+.loading-centered {
     position: absolute;
     display: flex;
     align-items: center;

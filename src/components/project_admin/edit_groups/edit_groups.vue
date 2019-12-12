@@ -1,5 +1,8 @@
 <template>
-  <div id="edit-groups-component" v-if="!d_loading">
+  <div v-if="d_loading" class="loading-centered loading-large">
+    <i class="fa fa-spinner fa-pulse"></i>
+  </div>
+  <div v-else id="edit-groups-component">
     <div class="edit-group-container">
       <div class="section-title"> Edit Group </div>
       <group-lookup ref="group_lookup"
@@ -102,9 +105,10 @@ export default class EditGroups extends Vue implements GroupObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  d_loading = true;
-
+  @Prop({required: true, type: Course})
   course!: Course;
+
+  d_loading = true;
 
   groups_by_members = new ArraySet<Group, HasMemberNames>([], {less_func: member_names_less});
   groups_by_pk = new ArraySet<Group, HasPK>([], {less_func: pk_less});
@@ -116,8 +120,6 @@ export default class EditGroups extends Vue implements GroupObserver {
   readonly format_datetime = format_datetime;
 
   async created() {
-    this.course = await Course.get_by_pk(this.project.course);
-
     let groups = await Group.get_all_from_project(this.project.pk);
 
     this.groups_by_members = new ArraySet<Group, HasMemberNames>(
@@ -207,6 +209,7 @@ export default class EditGroups extends Vue implements GroupObserver {
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/fixed_footer.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/modal.scss';
 
 * {

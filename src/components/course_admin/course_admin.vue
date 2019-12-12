@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="loading-large">
+  <div v-if="loading" class="loading-centered loading-large">
       <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else class="course-admin-component" ref="course_admin_component">

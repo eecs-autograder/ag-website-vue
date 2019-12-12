@@ -102,6 +102,7 @@
         </div>
       </div>
 
+      <!-- Note: Do NOT put loading-wrapper (or any other position: relative) on this tag -->
       <div class="body" :class="{'body-closed': d_group_sidebar_collapsed}">
         <handgrading v-if="d_currently_grading !== null && !d_loading_result"
                      :readonly_handgrading_results="false"
@@ -110,7 +111,7 @@
                      :handgrading_result="d_currently_grading"
                      @prev_group="select_for_grading(previous)"
                      @next_group="select_for_grading(next)"></handgrading>
-        <div v-else-if="d_loading_result" class="loading-large">
+        <div v-else-if="d_loading_result" class="loading-large loading-horiz-centered">
           <i class="fa fa-spinner fa-pulse"></i>
         </div>
       </div>
