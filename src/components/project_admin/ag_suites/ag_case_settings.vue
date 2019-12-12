@@ -76,9 +76,9 @@
         </AGTestCaseFdbkConfigPanel>
       </div>
 
-    <div class="modal-button-footer">
-      <APIErrors ref="api_errors"></APIErrors>
+    <APIErrors ref="api_errors"></APIErrors>
 
+    <div class="modal-button-footer">
       <button ref="save_button"
               class="save-button"
               type="submit"

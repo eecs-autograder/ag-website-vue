@@ -128,9 +128,9 @@
 
         </fieldset>
 
-        <div class="button-footer">
-          <APIErrors ref="api_errors"></APIErrors>
+        <APIErrors ref="api_errors"></APIErrors>
 
+        <div class="button-footer">
           <button type="submit"
                   class="save-button"
                   :disabled="!d_settings_form_is_valid || d_saving">Save</button>

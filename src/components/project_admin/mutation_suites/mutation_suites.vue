@@ -163,7 +163,6 @@
 
               <APIErrors ref="api_errors"></APIErrors>
               <div class="button-footer">
-
                 <button type="submit"
                         class="save-button"
                         id="save-mutation-test-suite-button"
