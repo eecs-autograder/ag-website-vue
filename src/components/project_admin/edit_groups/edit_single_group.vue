@@ -1,5 +1,10 @@
 <template>
-  <div id="edit-single-group-component" v-if="d_group !== null">
+  <div id="edit-single-group-component">
+    <div class="created-at">
+      <span class="timestamp-label">Created: </span>
+      <span class="timestamp">{{format_datetime(d_group.created_at)}}</span>
+    </div>
+
     <group-members-form v-model="d_group.member_names"
                         ref="edit_group_form"
                         :project="project"
@@ -150,6 +155,15 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 
 #edit-single-group-component {
   padding-top: 1rem;
+}
+
+.created-at {
+  margin-bottom: .5rem;
+
+  .timestamp-label {
+    font-weight: bold;
+
+  }
 }
 
 #datetime-picker-container {
