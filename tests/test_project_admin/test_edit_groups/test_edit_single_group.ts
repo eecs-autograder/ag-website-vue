@@ -31,10 +31,12 @@ describe('EditSingleGroup tests', () => {
 
     beforeEach(() => {
         course = data_ut.make_course({allowed_guest_domain: '@cornell.edu'});
+        project = data_ut.make_project(course.pk, {
+            min_group_size: 2,
+            max_group_size: 3,
+        });
 
-        group = new Group({
-            pk: 1,
-            project: 2,
+        group = data_ut.make_group(project.pk, 2, {
             extended_due_date: "2019-04-18T15:26:06.965696Z",
             member_names: [
                 "kevin@cornell.edu",
@@ -42,16 +44,8 @@ describe('EditSingleGroup tests', () => {
             ],
             bonus_submissions_remaining: 0,
             late_days_used: {"oscar@cornell.edu": 2},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
-        project = data_ut.make_project(course.pk, {
-            min_group_size: 2,
-            max_group_size: 3,
-        });
 
         wrapper = mount(EditSingleGroup, {
             propsData: {
@@ -158,20 +152,12 @@ describe('EditSingleGroup tests', () => {
     });
 
     test("When the prop 'group' changes in the parent component, d_group is updated", async () => {
-        let different_group = new Group({
-            pk: 2,
-            project: 2,
-            extended_due_date: null,
+        let different_group = data_ut.make_group(project.pk, 2, {
             member_names: [
                 "kelly@cornell.edu",
                 "erin@cornell.edu"
             ],
             bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "11am"
          });
 
         await component.$nextTick();

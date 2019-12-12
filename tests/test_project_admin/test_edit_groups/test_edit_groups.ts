@@ -4,14 +4,14 @@ import {
     Course,
     Group,
     Project,
-    Semester,
-    UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import MergeGroups from "@/components/project_admin/edit_groups/merge_groups.vue";
+import { deep_copy } from '@/utils';
 
+import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
 
 beforeAll(() => {
@@ -30,105 +30,46 @@ describe('EditGroups tests', () => {
     let project: Project;
 
     beforeEach(() => {
+        course = data_ut.make_course({allowed_guest_domain: '@cornell.edu'});
 
-        course = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '@cornell.edu', last_modified: ''
+        project = data_ut.make_project(course.pk, {
+            name: "Project 1 - Statistics",
+            min_group_size: 2,
+            max_group_size: 3,
         });
 
-        group_1 = new Group({
-            pk: 1,
-            project: 2,
-            extended_due_date: null,
+        group_1 = data_ut.make_group(project.pk, 2, {
             member_names: [
                 "andy@cornell.edu",
                 "roy@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
-        group_2 = new Group({
-            pk: 2,
-            project: 2,
+        group_2 = data_ut.make_group(project.pk, 2, {
             extended_due_date: "2019-08-18T15:25:06.965696Z",
             member_names: [
                 "kelly@cornell.edu",
                 "meredith@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
-        group_3 = new Group({
-            pk: 3,
-            project: 2,
+        group_3 = data_ut.make_group(project.pk, 2, {
             extended_due_date: "2019-08-18T15:25:06.965696Z",
             member_names: [
                 "kevin@cornell.edu",
                 "oscar@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
-        group_4 = new Group({
-            pk: 4,
-            project: 2,
+        group_4 = data_ut.make_group(project.pk, 2, {
             extended_due_date: "2019-08-18T15:24:06.965696Z",
             member_names: [
                 "phyllis@cornell.edu",
                 "stanley@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
         groups = [group_1, group_2, group_3, group_4];
-
-        project = new Project({
-            pk: 2,
-            name: "Project 1 - Statistics",
-            last_modified: "today",
-            course: 1,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 2,
-            max_group_size: 3,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false,
-        });
 
         let get_all_groups_stub = sinon.stub(Group, 'get_all_from_project');
         get_all_groups_stub.returns(Promise.resolve(groups));
@@ -138,7 +79,8 @@ describe('EditGroups tests', () => {
 
         wrapper = managed_shallow_mount(EditGroups, {
             propsData: {
-                project: project
+                project: project,
+                course: course,
             }
         });
         component = wrapper.vm;
@@ -163,20 +105,12 @@ describe('EditGroups tests', () => {
     test('selected_group set to new group on successful creation and new group inserted ' +
          'at an index < groups.length',
          async () => {
-        let new_group = new Group({
-            pk: 5,
-            project: 2,
+        let new_group = data_ut.make_group(project.pk, 2, {
             extended_due_date: null,
             member_names: [
                 "angela@cornell.edu",
                 "creed@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
         expect(component.groups_by_members.size()).toEqual(4);
@@ -191,19 +125,10 @@ describe('EditGroups tests', () => {
     test('selected_group set to new group on successful creation and new group inserted ' +
          'at an index === groups.length',
          async () => {
-        let new_group = new Group({
-            pk: 5,
-            project: 2,
-            extended_due_date: null,
+        let new_group = data_ut.make_group(project.pk, 1, {
             member_names: [
                 "toby@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
         expect(component.groups_by_members.size()).toEqual(4);
@@ -277,36 +202,24 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions[2]).toEqual(group_3);
     });
 
-    test('Change the member(s) of a group with an extension - extension list gets updated',
+    test('Change the members of a group with an extension - extension list gets updated',
          async () => {
         expect(component.groups_with_extensions.length).toEqual(3);
 
-        group_3.member_names[0] = "creed@cornell.edu";
-        Group.notify_group_changed(group_3);
+        let changed_group = deep_copy(group_3, Group);
+        changed_group.member_names[0] = "creed@cornell.edu";
+        Group.notify_group_changed(changed_group);
         await component.$nextTick();
 
         expect(component.groups_with_extensions.length).toEqual(3);
         expect(component.groups_with_extensions[0]).toEqual(group_4);
-        expect(component.groups_with_extensions[1]).toEqual(group_3);
+        expect(component.groups_with_extensions[1]).toEqual(changed_group);
         expect(component.groups_with_extensions[2]).toEqual(group_2);
     });
 
     test('Remove an extension from a group - extension list gets updated', async () => {
-        let group_2_without_extension = new Group({
-            pk: 2,
-            project: 2,
-            extended_due_date: null,
-            member_names: [
-                "kelly@cornell.edu",
-                "meredith@cornell.edu"
-            ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
-        });
+        let group_2_without_extension = deep_copy(group_2, Group);
+        group_2_without_extension.extended_due_date = null;
 
         expect(component.groups_with_extensions.length).toEqual(3);
 
@@ -351,9 +264,7 @@ describe('EditGroups tests', () => {
     });
 
     test('merge groups - one group has an extension', async () => {
-        let new_group_from_merge = new Group({
-            pk: 5,
-            project: 2,
+        let new_group_from_merge = data_ut.make_group(project.pk, 4, {
             extended_due_date: group_3.extended_due_date,
             member_names: [
                 "andy@cornell.edu",
@@ -361,12 +272,6 @@ describe('EditGroups tests', () => {
                 "oscar@cornell.edu",
                 "roy@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
         expect(component.groups_by_pk.size()).toEqual(4);
@@ -388,9 +293,7 @@ describe('EditGroups tests', () => {
     });
 
     test('merge groups - both groups have an extension', async () => {
-        let new_group_from_merge = new Group({
-            pk: 5,
-            project: 2,
+        let new_group_from_merge = data_ut.make_group(project.pk, 4, {
             extended_due_date: group_4.extended_due_date,
             member_names: [
                 "kevin@cornell.edu",
@@ -398,12 +301,6 @@ describe('EditGroups tests', () => {
                 "phyllis@cornell.edu",
                 "stanley@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
         expect(component.groups_by_pk.size()).toEqual(4);
@@ -427,36 +324,20 @@ describe('EditGroups tests', () => {
     });
 
     test('merge groups - neither group has an extension', async () => {
-        let group_without_an_extension = new Group({
-            pk: 5,
-            project: 2,
+        let group_without_an_extension = data_ut.make_group(project.pk, 1, {
             extended_due_date: null,
             member_names: [
                 "toby@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
-        let new_group_from_merge = new Group({
-            pk: 6,
-            project: 2,
+        let new_group_from_merge = data_ut.make_group(project.pk, 3, {
             extended_due_date: null,
             member_names: [
                 "andy@cornell.edu",
                 "roy@cornell.edu",
                 "toby@cornell.edu"
             ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
         });
 
         Group.notify_group_created(group_without_an_extension);

@@ -35,6 +35,7 @@ module.exports = {
             statements: 100
         }
     },
+    cache: false,
 
     setupTestFrameworkScriptFile: "./tests/setup.ts"
 };
