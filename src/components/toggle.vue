@@ -52,30 +52,27 @@ export default class Toggle extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.active-option-style, .inactive-option-style {
+  display: inline-block;
+  padding: .5rem .75rem;
+}
+
 .active-option-style {
   box-shadow: 0 1px 1px $dark-gray;
   color: white;
-  display: inline-block;
-  font-weight: normal;
-  opacity: 1;
-  z-index: 4;
-  padding: 8px 12px 7.5px 12px;
 }
 
 .inactive-option-style {
   box-shadow: inset 1px 1px 3px $dark-gray;
   color: black;
   cursor: pointer;
-  display: inline-block;
-  font-weight: normal;
-  opacity: 1;
-  z-index: 3;
-  padding: 8px 12px 7.5px 12px;
   background-color: white;
-}
-
-.active-option-style p, .inactive-option-style p {
-  margin: 0;
 }
 
 .off-border {
@@ -84,12 +81,6 @@ export default class Toggle extends Vue {
 
 .on-border {
   border-radius: 3px 0 0 3px;
-}
-
-#toggle-button-space {
-  border-radius: 3px;
-  display: inline-block;
-  z-index: 4;
 }
 
 </style>
