@@ -323,7 +323,6 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/edit_groups.scss';
 @import '@/styles/components/group_registration.scss';
 
 $purple: hsl(275, 48%, 56%);

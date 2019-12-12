@@ -28,24 +28,24 @@
           </datetime-picker>
         </div>
 
-        <div id="bonus-submissions-container">
-          <div id="bonus-submissions-label"> Bonus Submissions </div>
+        <div id="bonus-submissions-container" class="form-field-wrapper extra-space">
+          <label id="bonus-submissions-label" class="label"> Bonus Submissions </label>
           <validated-input ref="bonus_submissions_remaining_input"
                           v-model="d_group.bonus_submissions_remaining"
                           :validators="[is_integer, is_non_negative, is_not_empty]"
                           :num_rows="1"
-                          input_style="width: 80px;
-                                        border: 1px solid #ced4da;"
+                          input_style="width: 80px"
                           :from_string_fn="string_to_num">
           </validated-input>
         </div>
         <APIErrors ref="api_errors"></APIErrors>
 
-        <button class="update-group-button"
-                type="submit"
-                :disabled="d_saving"> Update Group </button>
-        <div v-show="d_saving" class="saving-spinner">
-          <i class="fa fa-spinner fa-pulse"></i>
+        <div class="button-footer">
+          <button class="update-group-button"
+                  type="submit"
+                  :disabled="d_saving"> Update Group </button>
+
+          <last-saved :saving="d_saving" :last_modified="group.last_modified"></last-saved>
         </div>
       </template>
     </group-members-form>
@@ -60,6 +60,7 @@ import { Course, Group, Project } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from '@/components/group_members_form.vue';
+import LastSaved from '@/components/last_saved.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -71,6 +72,7 @@ import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/vali
     APIErrors,
     DatetimePicker,
     GroupMembersForm,
+    LastSaved,
     Toggle,
     ValidatedForm,
     ValidatedInput,
@@ -141,38 +143,20 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/edit_groups.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 @import '@/styles/components/datetime.scss';
 
 #edit-single-group-component {
-  font-size: 15px;
-  padding-top: 16px;
+  padding-top: 1rem;
 }
 
 #datetime-picker-container {
-  padding: 16px 0 0 0;
-}
-
-#bonus-submissions-container {
-  padding: 16px 0 5px 0;
-}
-
-#bonus-submissions-label {
-  padding-bottom: 6px;
-}
-
-.saving-spinner {
-  color: $ocean-blue;
-  display: inline-block;
-  padding-left: 10px;
-  font-size: 18px;
+  padding-top: 1rem;
 }
 
 .update-group-button {
   @extend .green-button;
-  margin-top: 15px;
 }
-
 </style>

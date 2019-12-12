@@ -79,13 +79,26 @@ describe('GroupLookup tests', () => {
 test('Group selected initially from query param', () => {
     let wrapper = managed_mount(GroupLookup, {
         propsData: {
-            groups: groups
+            groups: groups,
+            initialize_from_url: true,
         },
         mocks: get_router_mocks(groups[2].pk),
     });
     expect(wrapper.emitted().update_group_selected.length).toEqual(1);
     expect(wrapper.emitted().update_group_selected[0][0]).toEqual(groups[2]);
     check_replace_call(groups[2].pk);
+});
+
+test('Group not selected from query param by default', async () => {
+    let wrapper = managed_mount(GroupLookup, {
+        propsData: {
+            groups: groups,
+            initialize_from_url: false,
+        },
+        mocks: get_router_mocks(groups[2].pk),
+    });
+    expect(wrapper.emitted().update_group_selected).toBeUndefined();
+    expect(router_replace.notCalled).toBe(true);
 });
 
 function get_router_mocks(group_pk?: number) {

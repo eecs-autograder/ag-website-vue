@@ -520,6 +520,7 @@ function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/collapsible_sidebar.scss';
+@import '@/styles/fixed_footer.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
 @import '@/styles/modal.scss';
@@ -592,20 +593,7 @@ $border-color: $gray-blue-1;
 }
 
 #fixed-button-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-
-  height: $footer-height;
-  background-color: $white-gray;
-  border-top: 1px solid hsl(210, 20%, 94%);
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  padding: .25rem;
+  @include fixed-footer($footer-height);
 }
 
 #next-ag-test-case-button, #prev-ag-test-case-button {
