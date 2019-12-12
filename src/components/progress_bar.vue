@@ -66,7 +66,7 @@ $border-radius: 4px;
 
 .progress-text {
   z-index: 1;
-  padding: 4px;
+  padding: .25rem;
 }
 
 </style>
