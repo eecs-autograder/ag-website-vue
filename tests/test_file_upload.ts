@@ -105,7 +105,7 @@ describe('File Upload tests not involving the empty files modal', () => {
     test('Dragging a file over the drag and drop area causes the area to become ' +
         'highlighted',
          () => {
-        let drag_drop_zone = wrapper.find('#drag-and-drop');
+        let drag_drop_zone = wrapper.find('.drag-and-drop');
 
         drag_drop_zone.trigger('dragenter');
 
@@ -119,7 +119,7 @@ describe('File Upload tests not involving the empty files modal', () => {
     });
 
     test('Dragging and dropping file over drop area uploads the file', () => {
-        let drag_drop_zone = wrapper.find('#drag-and-drop');
+        let drag_drop_zone = wrapper.find('.drag-and-drop');
         // tslint:disable-next-line:no-object-literal-type-assertion
         let mock_datatransfer: DataTransfer = <DataTransfer> <unknown> {
             files: new MockFileList([file_1, empty_file])

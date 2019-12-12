@@ -1,22 +1,21 @@
 <template>
-  <div id="file-upload-container">
+  <div class="file-upload-container">
     <input ref="file_input"
-           id="file-input"
+           class="file-input"
            type="file"
            @change="add_files_from_button($event)"
            multiple>
-    <div id="drag-and-drop"
+    <div class="drag-and-drop"
          :class="{'drag-and-drop-hover': files_dragged_over}"
          @dragenter="d_files_dragged_over_counter += 1"
          @dragleave="d_files_dragged_over_counter -= 1"
          @dragover="on_file_hover($event)"
          @drop="add_dropped_files($event)">
-      <div id="drag-and-drop-body">
+      <div class="drag-and-drop-body">
 
-        <div id="drop-here">Drop files here</div>
-        <div id="or">- or -</div>
-        <button id="add-files"
-                class="gray-button"
+        <div class="drop-here">Drop files here</div>
+        <div class="or">- or -</div>
+        <button class="add-files gray-button"
                 @click="$refs.file_input.click()">
           <div>Upload from your computer</div>
         </button>
@@ -32,7 +31,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(file, index) of d_files.data" :class="table_row_styling(file, index)"
+        <tr v-for="(file, index) of d_files.data"
+            :class="table_row_styling(file, index)"
             :key="file.name">
           <td class="name-of-file">{{file.name}}</td>
           <td class="size-of-file">{{file.size}} Bytes</td>
@@ -57,25 +57,24 @@
            ref="empty_file_found_in_upload_attempt_modal"
            size="large"
            :include_closing_x="false">
-      <h2>Empty Files detected</h2>
-      <hr>
+      <div class="modal-header">Empty Files detected</div>
       <div class="modal-body">
-        <p class="empty-file-list-label">
+        <div class="empty-file-list-label">
           The following files are empty:
-        </p>
+        </div>
         <ul class="list-of-empty-file-names">
-          <li v-for="empty_file of d_empty_filenames.data">
+          <li class="list-item" v-for="empty_file of d_empty_filenames.data">
             <i class="fas fa-exclamation-triangle empty-warning-symbol"></i>
             {{empty_file}}
           </li>
         </ul>
       </div>
-      <div class="modal-footer">
-        <button class="upload-despite-empty-files-button gray-button"
+      <div class="modal-button-footer">
+        <button class="upload-despite-empty-files-button orange-button"
                 @click="continue_with_upload_despite_empty_files()">
-          Upload Anyway
+          <slot name="upload_button_text">Upload</slot> Anyway
         </button>
-        <button class="cancel-upload-process-button red-button"
+        <button class="cancel-upload-process-button white-button"
                 @click="d_show_empty_files_found_in_upload_attempt_modal = false">
           Cancel
         </button>
@@ -202,21 +201,27 @@ export default class FileUpload extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-#file-input {
+.file-input {
   display: none;
 }
 
-#drag-and-drop {
+.drag-and-drop {
   align-items: center;
   border-radius: 5px;
   border: 2px solid $ocean-blue;
   display: flex;
-  height: 250px;
+  min-height: 250px;
+  max-height: 500px;
+  height: 50vh;
   justify-content: center;
   position: relative;
   text-align: center;
@@ -227,16 +232,16 @@ export default class FileUpload extends Vue {
   background-color: $pebble-light;
 }
 
-#drop-here {
+.drop-here {
   font-size: x-large;
 }
 
-#or {
+.or {
   font-size: medium;
-  padding: 0 0 5px 0;
+  padding-bottom: .375rem;
 }
 
-#add-files {
+.add-files {
   border: none;
   font-size: large;
   color: white;
@@ -244,26 +249,26 @@ export default class FileUpload extends Vue {
 
 .student-files-uploaded-table {
   border-collapse: collapse;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: .625rem;
+  margin-bottom: .625rem;
   width: 100%;
 }
 
 .student-files-uploaded-table td {
-  padding: 10px;
+  padding: .625rem;
   border-right: 0;
   border-left: 0;
 }
 
 .name-of-file, .size-of-file {
-  padding-top: 15px;
+  padding-top: 1rem;
 }
 
 .name-of-file-label, .size-of-file-label {
   border-bottom: none;
-  font-size: 18px;
+  font-size: 1.125rem;
   text-align: left;
-  padding: 10px;
+  padding: .625rem;
 }
 
 .file-empty-row, .file-not-empty-row-even, .file-not-empty-row-odd {
@@ -274,7 +279,6 @@ export default class FileUpload extends Vue {
 .file-empty-row {
   background-color: $warning-red;
   color: white;
-  border-radius: 10px;
 }
 
 .file-not-empty-row-odd {
@@ -282,11 +286,7 @@ export default class FileUpload extends Vue {
 }
 
 .file-not-empty-row-even {
-  background-color: $pebble-medium;
-}
-
-table tbody tr td {
-  border-top: 0;
+  background-color: darken($pebble-medium, 5%);
 }
 
 .remove-button-icon-empty-file, .remove-button-icon-non-empty-file {
@@ -302,43 +302,20 @@ table tbody tr td {
   color: white;
 }
 
-.modal-title {
-  text-align: left;
-}
-
-.upload-despite-empty-files-button {
-  margin-right: 15px;
-}
-
-.upload-despite-empty-files-button, .cancel-upload-process-button, .upload-files-button {
-  padding: 10px 15px;
-  border: 0;
-}
-
-.list-of-empty-file-names {
-  padding: 0;
-  margin-bottom: 0;
+.empty-file-list-label {
+  margin-bottom: .25rem;
 }
 
 .empty-warning-symbol {
   color: orange;
-  padding-right: 10px;
+  padding-right: .25rem;
 }
 
-.list-of-empty-file-names li {
-  padding-bottom: 5px;
+.list-of-empty-file-names .list-item {
+  padding-bottom: .25rem;
   list-style-type: none;
-  margin-bottom: 2px;
-  margin-left: 17px;
+  margin-left: 1rem;
   color: black;
-}
-
-.list-of-empty-file-names li:last-child {
-  margin-bottom: 15px;
-}
-
-.empty-file-list-label {
-  margin-bottom: 15px;
 }
 
 </style>
