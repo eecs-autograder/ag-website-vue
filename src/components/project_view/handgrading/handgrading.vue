@@ -192,6 +192,7 @@
           Prev
         </button>
         <div
+          id="finished-grading-container"
           class="checkbox-input-container footer-item"
           @click="d_handgrading_result.finished_grading = !d_handgrading_result.finished_grading;
                   save_handgrading_result()"
@@ -566,10 +567,9 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
       }
     }
 
-    .checkbox-input-container {
+    #finished-grading-container {
+      margin: 0;
       padding: .25rem .875rem;
-      display: flex;
-      justify-content: center;
 
       background-color: white;
 
