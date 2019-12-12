@@ -5,8 +5,8 @@ import { Wrapper, WrapperArray } from '@vue/test-utils';
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import FilePanel from '@/components/handgrading/file_panel.vue';
-import Handgrading from '@/components/handgrading/handgrading.vue';
+import FilePanel from '@/components/project_view/handgrading/file_panel.vue';
+import Handgrading from '@/components/project_view/handgrading/handgrading.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';

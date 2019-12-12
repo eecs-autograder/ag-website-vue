@@ -100,9 +100,9 @@ import {
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
-import Handgrading from '@/components/handgrading/handgrading.vue';
-import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
+import Handgrading from '@/components/project_view/handgrading/handgrading.vue';
+import HandgradingContainer from '@/components/project_view/handgrading/handgrading_container.vue';
 import StudentLookup from '@/components/project_view/student_lookup.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';

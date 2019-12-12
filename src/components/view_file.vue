@@ -123,7 +123,7 @@ import { chain, toggle } from '@/utils';
 import {
   handgrading_comment_factory,
   HandgradingComment,
-} from './handgrading/handgrading_comment';
+} from './project_view/handgrading/handgrading_comment';
 
 @Component({
   components: {

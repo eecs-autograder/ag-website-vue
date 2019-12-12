@@ -1,6 +1,6 @@
 import * as ag_cli from 'ag-client-typescript';
 
-import GroupSummaryPanel from '@/components/handgrading/group_summary_panel.vue';
+import GroupSummaryPanel from '@/components/project_view/handgrading/group_summary_panel.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
