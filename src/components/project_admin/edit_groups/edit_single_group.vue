@@ -158,7 +158,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 }
 
 .created-at {
-  margin-bottom: .5rem;
+  margin-bottom: .375rem;
 
   .timestamp-label {
     font-weight: bold;

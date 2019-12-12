@@ -5,6 +5,7 @@
   <div v-else id="student-lookup-component">
     <group-lookup class="lookup-container"
                   :groups="d_groups.data"
+                  :initialize_from_url="true"
                   @update_group_selected="d_selected_group = $event"></group-lookup>
     <template v-if="d_selected_group !== null">
       <group-members class="group-members" :group="d_selected_group"></group-members>

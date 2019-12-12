@@ -4,6 +4,7 @@
       <div class="section-title"> Edit Group </div>
       <group-lookup ref="group_lookup"
                     :groups="groups_by_members.data"
+                    :initialize_from_url="true"
                     @update_group_selected="selected_group = $event"> </group-lookup>
       <edit-single-group v-if="selected_group !== null"
                           :course="course"
