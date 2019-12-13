@@ -50,7 +50,7 @@ describe('DropdownTypeahead.vue', () => {
         search_bar.trigger("click");
         await dropdown_typeahead.$nextTick();
 
-        let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+        let dropdown_no_matches_message = wrapper.find('.no-matching-results');
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
@@ -188,7 +188,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('#dropdown-content');
+        let dropdown_menu_content = wrapper.find('.dropdown-content');
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(8);
         expect(dropdown_menu_content.text()).toContain("Missouri");
@@ -292,7 +292,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('#dropdown-content');
+        let dropdown_menu_content = wrapper.find('.dropdown-content');
 
         dropdown_typeahead.filter_text = "an";
         await dropdown_typeahead.$nextTick();
@@ -361,7 +361,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('#dropdown-content');
+        let dropdown_menu_content = wrapper.find('.dropdown-content');
 
         dropdown_typeahead.filter_text = "y";
         await dropdown_typeahead.$nextTick();
@@ -454,7 +454,7 @@ describe('DropdownTypeahead.vue', () => {
 
         search_bar.trigger("click");
 
-        let dropdown_menu_content = wrapper.find('#dropdown-content');
+        let dropdown_menu_content = wrapper.find('.dropdown-content');
 
         dropdown_typeahead.filter_text = "y";
         await dropdown_typeahead.$nextTick();
@@ -533,7 +533,7 @@ describe('DropdownTypeahead.vue', () => {
         dropdown_typeahead.filter_text = "J";
         await dropdown_typeahead.$nextTick();
 
-        let dropdown_menu_content = wrapper.find('#dropdown-content');
+        let dropdown_menu_content = wrapper.find('.dropdown-content');
         let dropdown_entries = dropdown_menu_content.findAll('.dropdown-row');
 
         expect(dropdown_typeahead.filtered_choices.length).toEqual(3);
@@ -595,7 +595,7 @@ describe('DropdownTypeahead.vue', () => {
         dropdown_typeahead.filter_text = "q";
         await dropdown_typeahead.$nextTick();
 
-        let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+        let dropdown_no_matches_message = wrapper.find('.no-matching-results');
         expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "We couldn't find any results containing: 'q'"
@@ -647,7 +647,7 @@ describe('DropdownTypeahead.vue', () => {
         dropdown_typeahead.filter_text = "y";
         await dropdown_typeahead.$nextTick();
 
-        let dropdown_no_matches_message = wrapper.find('#no-matching-results');
+        let dropdown_no_matches_message = wrapper.find('.no-matching-results');
         expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "No Matching Results"

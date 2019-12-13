@@ -1,13 +1,13 @@
 <template>
-  <div id="outermost-dropdown-container">
-    <div id="dropdown-container"
+  <div class="outermost-dropdown-container">
+    <div class="dropdown-container"
          @keydown="move_highlighted($event)">
 
-      <div id="header-container">
+      <div class="header-container">
         <slot name="header"> </slot>
       </div>
 
-      <div id="dropdown-content"
+      <div class="dropdown-content"
            :style="[{display: is_open ? 'block' : 'none'}, {height: dropdown_height},
                     {overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none'}]">
         <div :class="['dropdown-row', {'highlight': index === d_highlighted_index}]"
@@ -127,12 +127,12 @@ export default class Dropdown extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/components/dropdown_styles.scss';
 
-#dropdown-container {
+.dropdown-container {
   display: block;
   position: relative;
 }
 
-#dropdown-content {
+.dropdown-content {
   @extend %dropdown-content;
 }
 

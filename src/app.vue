@@ -161,6 +161,7 @@ export default class App extends Vue {
 
 <style lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/global.scss';
 
 html {
   height: 100%;
@@ -175,7 +176,7 @@ body, #app {
 
 
 body, input, textarea {
-  font-family: "Helvetica Neue", Helvetica;
+  font-family: $font-family;
 }
 
 a {

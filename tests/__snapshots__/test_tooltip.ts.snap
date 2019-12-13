@@ -1,0 +1,221 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tooltip.vue Non-default placement and width 1`] = `
+<div>
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-small position-top"
+    >
+      Small top
+    </div>
+     
+    <div
+      class="caret position-top"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-small position-bottom"
+    >
+      Small bottom
+    </div>
+     
+    <div
+      class="caret position-bottom"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-small position-left"
+    >
+      Small left
+    </div>
+     
+    <div
+      class="caret position-left"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-small position-right"
+    >
+      Small right
+    </div>
+     
+    <div
+      class="caret position-right"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-medium position-top"
+    >
+      Medium top
+    </div>
+     
+    <div
+      class="caret position-top"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-medium position-bottom"
+    >
+      Medium bottom
+    </div>
+     
+    <div
+      class="caret position-bottom"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-medium position-left"
+    >
+      Medium left
+    </div>
+     
+    <div
+      class="caret position-left"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-medium position-right"
+    >
+      Medium right
+    </div>
+     
+    <div
+      class="caret position-right"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-large position-top"
+    >
+      Large top
+    </div>
+     
+    <div
+      class="caret position-top"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-large position-bottom"
+    >
+      Large bottom
+    </div>
+     
+    <div
+      class="caret position-bottom"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-large position-left"
+    >
+      Large left
+    </div>
+     
+    <div
+      class="caret position-left"
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+    />
+     
+    <div
+      class="text width-large position-right"
+    >
+      Large right
+    </div>
+     
+    <div
+      class="caret position-right"
+    />
+  </span>
+</div>
+`;

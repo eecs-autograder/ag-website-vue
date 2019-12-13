@@ -29,7 +29,7 @@
 
 .context-menu-option {
   color: black;
-  padding: 6px 15px;
+  padding: .375rem .75rem;
 }
 
 .hoverable-item:hover {

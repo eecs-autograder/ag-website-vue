@@ -1,5 +1,5 @@
 <template>
-  <div id="toggle-button-space">
+  <div class="toggle-button-space">
     <div v-if="is_on" class="active-option-style on-border"
          :style="[{backgroundColor: active_background_color}]">
       <slot name="on"> </slot>

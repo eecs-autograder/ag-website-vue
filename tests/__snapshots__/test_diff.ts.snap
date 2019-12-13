@@ -552,7 +552,7 @@ exports[`Diff tests Diff rendering no whitespace 1`] = `
     class="toggle-container"
   >
     <div
-      id="toggle-button-space"
+      class="toggle-button-space"
     >
       <div
         class="inactive-option-style on-border cursor-pointer"
@@ -1129,7 +1129,7 @@ exports[`Diff tests Diff rendering with whitespace snapshot 1`] = `
     class="toggle-container"
   >
     <div
-      id="toggle-button-space"
+      class="toggle-button-space"
     >
       <div
         class="active-option-style on-border"
