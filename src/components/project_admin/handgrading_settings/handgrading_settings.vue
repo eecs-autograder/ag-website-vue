@@ -8,7 +8,7 @@
     <div v-if="d_handgrading_rubric === null"
          id="create-rubric">
       <div id="new-rubric-button-container" class="create-rubric-column">
-        <h3>Start from scratch</h3>
+        <h3 class="header">Start from scratch</h3>
         <button type="button"
                 class="green-button"
                 id="new-rubric-button"
@@ -19,14 +19,14 @@
         </button>
       </div>
       <div id="import-rubric-container" class="create-rubric-column">
-        <h3>Import a rubric</h3>
+        <h3 class="header">Import a rubric</h3>
         <div id="import-flow-container">
-          <div id="select-import-from-course" class="select-container">
+          <div id="select-import-from-course" class="select-container form-field-wrapper">
             <div v-if="d_courses_is_admin_for === null" class="loading">
               <i class="fa fa-spinner fa-pulse"></i>
             </div>
             <template v-else>
-              <div><label class="text-label">Course</label></div>
+              <div><label class="label">Course</label></div>
               <select-object :items="d_courses_is_admin_for"
                              ref="course_to_import_from"
                              v-model="d_course_to_import_from"
@@ -38,9 +38,9 @@
               </select-object>
             </template>
           </div>
-          <div id="select-import-from-project" class="select-container">
+          <div id="select-import-from-project" class="select-container form-field-wrapper">
             <div v-if="d_course_to_import_from !== null">
-              <label class="text-label">Project</label>
+              <label class="label">Project</label>
             </div>
             <div v-if="d_loading_projects" class="loading">
               <i class="fa fa-spinner fa-pulse"></i>
@@ -57,7 +57,7 @@
               </select-object>
             </template>
           </div>
-          <div id="import-button-container">
+          <div id="import-button-container" class="button-footer">
             <button type="button"
                     class="green-button"
                     :disabled="d_project_to_import_from === null"
@@ -89,7 +89,7 @@
               <label for="publish-grades" class="checkbox-label">Publish grades and rubric</label>
             </div>
 
-            <div class="form-spacing">
+            <div class="form-field-wrapper extra-space">
               <label for="points-style" class="text-label">Points style</label> <br>
               <select v-model="d_handgrading_rubric.points_style"
                       id="points-style"
@@ -103,7 +103,7 @@
               </select>
             </div>
 
-            <div id="max-points-container" class="form-spacing">
+            <div id="max-points-container" class="form-field-wrapper extra-space">
               <label class="text-label">
                 {{d_handgrading_rubric.points_style === PointsStyle.start_at_max_and_subtract
                     ? 'Max points' : 'Override max points'}}
@@ -197,12 +197,12 @@
     <modal ref="create_criterion_modal" size="large" click_outside_to_close
            v-if="d_create_criterion_modal_is_open"
            @close="d_create_criterion_modal_is_open = false">
-      <h2>New Checkbox</h2>
+      <div class="modal-header">New Checkbox</div>
       <criterion-form @submit="create_criterion"
                       @form_validity_changed="d_create_criterion_form_is_valid = $event"
                       ref="create_criterion_form">
         <APIErrors ref="create_criterion_errors"></APIErrors>
-        <div class="multi-button-form-footer">
+        <div class="modal-button-footer">
           <button type="submit" class="save-button"
                   ref="create_criterion_button"
                   :disabled="d_creating_criterion
@@ -216,12 +216,12 @@
     <modal ref="create_annotation_modal" size="large" click_outside_to_close
            v-if="d_create_annotation_modal_is_open"
            @close="d_create_annotation_modal_is_open = false">
-      <h2>New Annotation</h2>
+      <div class="modal-header">New Annotation</div>
       <annotation-form @submit="create_annotation"
                        @form_validity_changed="d_create_annotation_form_is_valid = $event"
                        ref="create_annotation_form">
         <APIErrors ref="create_annotation_errors"></APIErrors>
-        <div class="multi-button-form-footer">
+        <div class="modal-button-footer">
           <button type="submit" class="save-button"
                   ref="create_annotation_button"
                   :disabled="d_creating_annotation
@@ -571,6 +571,7 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 
 * {
   margin: 0;
@@ -578,47 +579,40 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
   box-sizing: border-box;
 }
 
-#handgrading-settings-component {
-  height: 100%;
-}
-
 #create-rubric {
   display: flex;
-  height: 100%;
-  min-width: 460px;
+  flex-wrap: wrap;
   max-width: 750px;
 }
 
 .create-rubric-column {
-  height: 100%;
   flex-grow: 1;
-  padding-top: 25px;
-  padding-left: 25px;
+  padding-top: 1.5rem;
+  padding-left: 1.5rem;
 
-  h3 {
-    margin-bottom: 15px;
+  .header {
+    margin-bottom: .875rem;
   }
 }
 
 #select-import-from-project .loading {
-  margin-top: 10px;
+  margin-top: .625rem;
 }
 
 .select-container {
-  margin: 10px 0;
-  max-width: 200px;
+  max-width: 250px;
 }
 
 // ------------------------------------------------------------------------------------------------
 
 #rubric-columns-container {
   display: flex;
-  padding: 0 10px;
+  padding: 0 .625rem;
   flex-wrap: wrap;
 }
 
 .edit-rubric-column {
-  padding: 20px 10px;
+  padding: .625rem .625rem;
   width: 100%;
   max-width: 600px;
 }
@@ -631,18 +625,14 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
   .header-text {
     margin: 0;
     display: inline-block;
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: bold;
-    padding: 10px 0;
+    padding: .625rem 0;
   }
 }
 
 #criteria-column {
-  padding-right: 15px;
-}
-
-.form-spacing {
-  margin: 15px 0;
+  padding-right: .875rem;
 }
 
 .divider, .criterion-border {
@@ -667,10 +657,6 @@ export function handle_create_annotation_error(component: HandgradingSettings, e
     border-left: 1px solid $pebble-dark;
     border-right: 1px solid $pebble-dark;
   }
-}
-
-.multi-button-form-footer button {
-  display: inline-block;
 }
 
 .ghost {
