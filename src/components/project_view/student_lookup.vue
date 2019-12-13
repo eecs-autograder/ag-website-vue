@@ -78,7 +78,7 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/global.scss';
+@import '@/styles/colors.scss';
 
 .lookup-container {
   margin: .5rem;

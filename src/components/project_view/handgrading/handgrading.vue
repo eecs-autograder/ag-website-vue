@@ -467,7 +467,6 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
 @import '@/styles/section_header.scss';
 
 * {
