@@ -6,7 +6,7 @@
                   @form_validity_changed="d_settings_form_is_valid = $event">
 
       <div class="form-field-wrapper">
-        <label class="text-label"> Test name </label>
+        <label class="label"> Test name </label>
         <validated-input ref="name"
                          v-model="d_ag_test_case.name"
                          :validators="[is_not_empty]">

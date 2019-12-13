@@ -81,11 +81,11 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 @import '@/styles/global.scss';
 
 .lookup-container {
-  margin: 8px;
+  margin: .5rem;
 }
 
 .group-members {
-  margin: 8px;
+  margin: .5rem;
 }
 
 .student-lookup-submission-list {

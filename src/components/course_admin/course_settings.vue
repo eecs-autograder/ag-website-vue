@@ -8,7 +8,7 @@
                      @form_validity_changed="settings_form_is_valid = $event">
 
         <div class="form-field-wrapper">
-          <label class="text-label"> Course name </label>
+          <label class="label"> Course name </label>
           <ValidatedInput ref="course_name_input"
                           v-model="d_course.name"
                           input_style="width: 100%;
@@ -18,7 +18,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label" for="semester"> Semester </label>
+          <label class="label" for="semester"> Semester </label>
           <div>
             <select id="semester" v-model="d_course.semester" class="select">
               <option v-for="semester of semesters" :value="semester">{{semester}}</option>
@@ -27,7 +27,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label"> Year </label>
+          <label class="label"> Year </label>
           <ValidatedInput ref="course_year_input"
                           v-model="d_course.year"
                           input_style="width: 65px;"
@@ -37,7 +37,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label"> Late days per student </label>
+          <label class="label"> Late days per student </label>
           <ValidatedInput ref="course_late_days_input"
                           v-model="d_course.num_late_days"
                           input_style="width: 50px;"
@@ -51,7 +51,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label">
+          <label class="label">
             Guest usernames must end with
             <i class="fas fa-question-circle input-tooltip">
               <tooltip width="large" placement="right">

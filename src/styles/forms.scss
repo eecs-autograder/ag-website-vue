@@ -89,21 +89,10 @@
     margin-left: .5rem;
 }
 
-// TODO: rename to inline-label
-.text-label {
-    display: inline-block;
-}
-
-.label, .text-label {
+.label {
     font-size: .875rem;
     font-weight: bold;
     margin: 0 0 .25rem 0;
-}
-
-// TODO: replace with .form-field-wrapper
-.input-spacing {
-    margin-top: 15px;
-    margin-bottom: 15px;
 }
 
 // Danger Zone -----------------------------------
@@ -246,40 +235,4 @@ $check-mark-disabled: hsl(220, 12%, 20%);
     .checkbox:disabled + label {
         color: rgba($check-mark-disabled, 0.6);
     }
-}
-
-// Dropdown -------------------------------------------------------------------
-
-.dropdown-header-wrapper {
-    display: inline-block;
-    margin: 0;
-    position: relative;
-}
-
-.dropdown-header {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    box-sizing: border-box;
-    color: #495057;
-    cursor: default;
-    display: block;
-    font-size: 1rem;
-    line-height: 1.5;
-    min-height: 38px;
-    padding: .375rem 55px .375rem .75rem;
-    position: relative;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.dropdown-header:focus {
-    border-color: $ocean-blue;
-}
-
-.dropdown-caret {
-    cursor: pointer;
-    font-size: 30px;
-    position: absolute;
-    right: 18px;
-    top: 3px;
 }

@@ -90,7 +90,7 @@
             </div>
 
             <div class="form-field-wrapper extra-space">
-              <label for="points-style" class="text-label">Points style</label> <br>
+              <label for="points-style" class="label">Points style</label> <br>
               <select v-model="d_handgrading_rubric.points_style"
                       id="points-style"
                       class="select">
@@ -104,7 +104,7 @@
             </div>
 
             <div id="max-points-container" class="form-field-wrapper extra-space">
-              <label class="text-label">
+              <label class="label">
                 {{d_handgrading_rubric.points_style === PointsStyle.start_at_max_and_subtract
                     ? 'Max points' : 'Override max points'}}
               </label>

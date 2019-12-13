@@ -79,7 +79,7 @@
                         @submit="add_ag_test_suite"
                         @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
           <div class="ag-test-suite-name-container">
-            <label class="text-label"> Suite name </label>
+            <label class="label"> Suite name </label>
             <validated-input ref="new_ag_test_suite_name"
                               v-model="d_new_ag_test_suite_name"
                               :show_warnings_on_blur="true"

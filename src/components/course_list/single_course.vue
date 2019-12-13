@@ -33,7 +33,7 @@
       </div>
       <ValidatedForm ref="clone_course_form" autocomplete="off" @submit="make_copy_of_course">
         <div class="cloned-course-name form-field-wrapper">
-          <label class="text-label"> Name </label>
+          <label class="label"> Name </label>
           <ValidatedInput ref="copy_of_course_name"
                           v-model="new_course_name"
                           input_style="width: 100%; max-width: 500px;"
@@ -44,7 +44,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label"> Semester </label>
+          <label class="label"> Semester </label>
           <div class="dropdown">
             <select id="semester"
                     v-model="new_course_semester"
@@ -55,7 +55,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label"> Year </label>
+          <label class="label"> Year </label>
           <ValidatedInput ref="copy_of_course_year"
                           v-model="new_course_year"
                           :num_rows="1"

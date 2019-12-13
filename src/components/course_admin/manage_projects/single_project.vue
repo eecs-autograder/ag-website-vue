@@ -26,7 +26,7 @@
       </div>
       <div>
         <div class="cloned-project-name form-field-wrapper">
-          <label class="text-label"> Name </label>
+          <label class="label"> Name </label>
           <validated-input ref="cloned_project_name"
                            v-model="cloned_project_name"
                            :validators="[is_not_empty]"
@@ -37,7 +37,7 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="text-label"> Add to course: </label>
+          <label class="label"> Add to course: </label>
           <select-object ref="cloning_destinations_dropdown"
                          :items="cloning_destinations"
                          v-model="course_to_clone_to"

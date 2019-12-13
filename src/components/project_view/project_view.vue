@@ -266,7 +266,7 @@ export default class ProjectView extends Vue implements GroupObserver {
 );
 
 #edit-handgrading-link {
-  margin-left: 6px;
+  margin-left: .375rem;
   color: $ocean-blue;
   font-size: 1.1em;
 }

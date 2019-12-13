@@ -22,7 +22,7 @@
       <div class="grading-sidebar-content"
            :class="{'readonly-mode': readonly_handgrading_results}">
         <div id="adjust-points-container" v-if="can_adjust_points">
-          <label class="text-label" for="adjust-points">Adjust Points</label>
+          <label class="label" for="adjust-points">Adjust Points</label>
           <validated-input @input_validity_changed="d_adjust_points_is_valid = $event"
                            ref="adjust_points"
                            :validators="[is_not_empty, is_integer]"

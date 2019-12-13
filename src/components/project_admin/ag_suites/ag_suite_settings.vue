@@ -17,7 +17,7 @@
           <legend class="legend"> Setup </legend>
 
           <div class="form-field-wrapper">
-            <label class="text-label"> Setup command label </label>
+            <label class="label"> Setup command label </label>
             <validated-input ref="setup_suite_cmd_name"
                              v-model="d_ag_test_suite.setup_suite_cmd_name"
                              :validators="[]">
@@ -25,7 +25,7 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="text-label"> Setup command </label>
+            <label class="label"> Setup command </label>
             <validated-input ref="setup_suite_cmd"
                              v-model="d_ag_test_suite.setup_suite_cmd"
                              :validators="[]">

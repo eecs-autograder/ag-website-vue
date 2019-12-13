@@ -15,7 +15,7 @@
 
   <div class="suite-settings">
     <div class="form-field-wrapper">
-      <label class="text-label"> Suite name </label>
+      <label class="label"> Suite name </label>
       <validated-input ref="suite_name"
                        id="input-name"
                        v-model="d_suite.name"
@@ -41,7 +41,7 @@
       <legend class="legend"> Grading Environment </legend>
 
       <div class="form-field-wrapper">
-        <label class="text-label"> Sandbox environment </label>
+        <label class="label"> Sandbox environment </label>
 
         <select-object :items="docker_images"
                         id_field="pk"

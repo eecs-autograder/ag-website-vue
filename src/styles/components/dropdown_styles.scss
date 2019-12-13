@@ -4,7 +4,6 @@
     background-color: white;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
     display: block;
-    margin-top: 0.5px;
     position: absolute;
     z-index: 10;
 }
@@ -14,7 +13,7 @@
     color: black;
     display: block;
     margin: 0;
-    min-height: 13px;
-    padding: 10px 15px;
+    min-height: .75rem;
+    padding: .625rem .875rem;
     text-decoration: none;
 }
