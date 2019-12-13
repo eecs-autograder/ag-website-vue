@@ -1,8 +1,7 @@
 <template>
-    <div v-if="d_loading" class="loading-centered loading-large">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
-
   <div v-else id="project-view">
     <div class="navbar default-navbar">
       <div class="nav-link"
