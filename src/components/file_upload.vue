@@ -17,7 +17,7 @@
         <div class="or">- or -</div>
         <button class="add-files gray-button"
                 @click="$refs.file_input.click()">
-          <div>Upload from your computer</div>
+          <div>Choose files to upload</div>
         </button>
 
       </div>
