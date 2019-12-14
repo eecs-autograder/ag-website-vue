@@ -1,9 +1,18 @@
 <template>
+  <span class="tooltip">
+    <!-- The content (text or otherwise) that the user must hover over -->
+    <slot name="trigger">
+      <i class="default-icon fas fa-question-circle"></i>
+    </slot>
 
-  <div ref="tooltip" id="tooltip">
-    <slot></slot>
-  </div>
-
+    <!-- The tooltip text -->
+    <div ref="tooltip_text"
+         class="text"
+         :class="['width-' + width, 'position-' + placement]">
+      <slot></slot>
+    </div>
+    <div class="caret" :class="['position-' + placement]"></div>
+  </span>
 </template>
 
 <script lang="ts">
@@ -12,204 +21,163 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class Tooltip extends Vue {
+  @Prop({
+    default: "top",
+    type: String,
+    validator: value => ['top', 'bottom', 'left', 'right'].includes(value)
+  })
+  placement!: 'top' | 'bottom' | 'left' | 'right';
 
-  @Prop({default: "top", type: String})
-  placement!: string;
-
-  @Prop({default: "small", type: String})
-  width!: string;
-
-  d_width = "";
-  d_placement = "";
-
-  created() {
-    this.d_width = this.width;
-    this.d_placement = this.placement;
-  }
+  @Prop({
+    default: "small",
+    type: String,
+    validator: value => ['small', 'medium', 'large'].includes(value)
+  })
+  width!: 'small' | 'medium' | 'large';
 
   mounted() {
-    let parent = <HTMLElement> this.$el.parentElement;
-    let tooltip = <HTMLElement> this.$refs['tooltip'];
-    tooltip.style.visibility = "hidden";
-    tooltip.style.opacity = "0";
+    if (this.placement === 'top' || this.placement === 'bottom') {
+      let tooltip_text = (<HTMLElement> this.$refs.tooltip_text);
+      let right = tooltip_text.getBoundingClientRect().right;
 
-    if (parent === null) {
-      throw new Error('Tooltips must have a parent element.');
-    }
-
-    parent.style.position = "relative";
-    parent.style.display = "inline-block";
-
-    parent.addEventListener("mouseenter", () => {
-      tooltip.style.visibility = "visible";
-      tooltip.style.opacity = "1";
-    });
-
-    parent.addEventListener("mouseout", () => {
-      tooltip.style.visibility = "hidden";
-      tooltip.style.opacity = "0";
-    });
-
-    this.set_tooltip_width(tooltip);
-    this.set_tooltip_placement(tooltip);
-  }
-
-  set_tooltip_width(tooltip: HTMLElement) {
-    if (this.d_width === "small") {
-      tooltip.classList.add('small-text-area');
-    }
-    else if (this.d_width === "medium") {
-      tooltip.classList.add('medium-text-area');
-    }
-    else if (this.d_width === "large") {
-      tooltip.classList.add('large-text-area');
-    }
-    else {
-      throw new Error(`Invalid tooltip width: "${this.d_width}"`);
-    }
-  }
-
-  set_tooltip_placement(tooltip: HTMLElement) {
-    let height_of_tooltip = tooltip.clientHeight;
-
-    if (this.d_placement === "left" || this.d_placement === "right") {
-      let half_height_of_tooltip = (height_of_tooltip - 20) / 2;
-      half_height_of_tooltip = -half_height_of_tooltip;
-      half_height_of_tooltip -= 1;
-      let top_num = half_height_of_tooltip.toString();
-      top_num += "px";
-      tooltip.style.top = top_num;
-
-      if (this.d_placement === "left") {
-        tooltip.className += " placement-left";
-        if (this.d_width === "medium") {
-          tooltip.style.marginLeft = "-120px";
-        }
-        else if (this.d_width === "large") {
-          tooltip.style.marginLeft = "-220px";
-        }
+      // Adjust the horizontal positioning if needed to prevent overflow.
+      // istanbul ignore next
+      if (right > document.body.clientWidth) {
+        let correction = right - document.body.clientWidth;
+        // !! IMPORTANT !! The "8" in this calculation
+        // has to match the $padding SCSS variable defined
+        // in this component's <style> tag.
+        tooltip_text.style.left = `-${correction + 8}px`;
       }
-      else {
-        tooltip.className += " placement-right";
-        if (this.d_width === "medium") {
-          tooltip.style.marginRight = "-120px";
-        }
-        else if (this.d_width === "large") {
-          tooltip.style.marginRight = "-220px";
-        }
-      }
-    }
-    else if (this.d_placement === "top" || this.d_placement === "bottom") {
-
-      let space_away_from_parent = height_of_tooltip + 15;
-      space_away_from_parent = -space_away_from_parent;
-      let positioning_to_apply = space_away_from_parent.toString();
-      positioning_to_apply += "px";
-
-      if (this.d_placement === "bottom") {
-        tooltip.className += " placement-bottom";
-        tooltip.style.bottom = positioning_to_apply;
-      }
-      else {
-        tooltip.className += " placement-top";
-        tooltip.style.top = positioning_to_apply;
-      }
-
-      if (this.d_width === "small") {
-        tooltip.style.marginLeft = "-60px";
-      }
-      else if (this.d_width === "medium") {
-        tooltip.style.marginLeft = "-120px";
-      }
-      else if (this.d_width === "large") {
-        tooltip.style.marginLeft = "-170px";
-      }
-    }
-    else {
-      throw new Error(`Invalid tooltip placement: "${this.d_placement}"`);
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
-  @import '@/styles/colors.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/global.scss';
 
-  // Using px in this component is acceptable due to the placement calculations
-  // required.
+// Using px in this component is acceptable due to the placement calculations
+// required.
 
-  #tooltip {
-    background-color: $stormy-gray-dark;
-    border-radius: 6px;
-    color: white;
-    display: inline-block;
-    line-height: 16px;
-    padding: 10px;
+$background-color: darken($stormy-gray-dark, 3%);
+
+$padding: 8px;
+$caret-size: 5px;
+$font-size: .875rem;
+$line-height: 1.2;
+
+* {
+  box-sizing: border-box;
+}
+
+// Helps position the text such that there is room for
+// the caret.
+$text-position: calc(100% + #{$caret-size});
+
+.default-icon {
+  color: darken($ocean-blue, 10%);
+}
+
+.tooltip {
+  position: relative;
+  margin: 0 .25rem;
+
+  .text, .caret {
+    visibility: hidden;
+  }
+
+  &:hover .text, &:hover .caret {
+    visibility: visible;
+  }
+
+  .text {
     position: absolute;
-    text-align: center;
-    transition: opacity 0.3s;
-    word-wrap: break-word;
     z-index: 1;
-    line-height: 1.4;
+
+    border-radius: 4px;
+    padding: $padding;
+
+    background-color: $background-color;
+    color: white;
+    font-family: $font-family;
+    font-size: $font-size;
+    line-height: $line-height;
+    font-weight: normal;
+
+    word-wrap: break-word;
+
+    transition: opacity 0.3s;
+  }
+}
+
+.text {
+  &.position-top {
+    bottom: $text-position();
+    left: -$padding;
   }
 
-  .placement-left {
-    left: -140px;
+  &.position-bottom {
+    top: $text-position();
+    left: -$padding;
   }
 
-  .placement-right {
-    right: -140px;
+  &.position-left {
+    right: $text-position();
+    top: -$padding;
   }
 
-  .placement-bottom, .placement-top {
-    left: 50%;
+  &.position-right {
+    left: $text-position();
+    top: -$padding;
+  }
+}
+
+.caret {
+  border-style: solid;
+  border-width: $caret-size;
+  position: absolute;
+
+  &.position-top {
+    border-color: $background-color transparent transparent transparent;
+    top: -$caret-size;
+    margin-right: -($caret-size / 2);
+    right: $caret-size;
   }
 
-  .small-text-area {
-    width: 100px;
+  &.position-bottom  {
+    border-color: transparent transparent $background-color transparent;
+    bottom: -$caret-size;
+    margin-left: -($caret-size / 2);
+    left: $caret-size;
   }
 
-  .medium-text-area {
-    width: 220px;
+  &.position-left {
+    border-color: transparent transparent transparent $background-color;
+    left: -$caret-size;
+    margin-top: -($caret-size / 2);
+    top: $caret-size;
   }
 
-  .large-text-area {
-    width: 320px;
+  &.position-right {
+    border-color: transparent $background-color transparent transparent;
+    right: -$caret-size;
+    margin-top: -($caret-size / 2);
+    top: $caret-size;
   }
+}
 
-  #tooltip::after {
-    border-style: solid;
-    border-width: 5px;
-    content: "";
-    position: absolute;
-  }
+.width-small {
+  width: 100px;
+}
 
-  .placement-left::after {
-    border-color: transparent transparent transparent $stormy-gray-dark;
-    left: 100%;
-    margin-top: -5px;
-    top: 50%;
-  }
+.width-medium {
+  width: 200px;
+}
 
-  .placement-right::after {
-    border-color: transparent $stormy-gray-dark transparent transparent;
-    margin-top: -5px;
-    right: 100%;
-    top: 50%;
-  }
-
-  .placement-top::after {
-    border-color: $stormy-gray-dark transparent transparent transparent;
-    left: 50%;
-    margin-left: -5px;
-    top: 100%;
-  }
-
-  .placement-bottom::after {
-    border-color: transparent transparent $stormy-gray-dark transparent;
-    left: 50%;
-    margin-left: -5px;
-    bottom: 100%;
-  }
+.width-large {
+  width: 300px;
+}
 
 </style>

@@ -19,11 +19,9 @@
         <div class="clearable-datetime-picker soft-deadline">
           <div class="label">
             Soft Deadline
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="medium" placement="right">
-                The deadline shown to students.
-              </tooltip>
-            </i>
+            <tooltip width="medium" placement="top">
+              The deadline shown to students.
+            </tooltip>
           </div>
           <div class="datetime-input" @click="$refs.soft_closing_time.toggle_visibility()">
             {{format_datetime(d_project.soft_closing_time)}}
@@ -43,12 +41,10 @@
         <div class="clearable-datetime-picker hard-deadline">
           <div class="label">
             Hard Deadline
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="medium" placement="right">
-                The actual deadline. Submissions will not be accepted after this time
-                unless late days are allowed. This date is NOT shown to students.
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              The actual deadline. Submissions will not be accepted after this time
+              unless late days are allowed. This date is NOT shown to students.
+            </tooltip>
           </div>
           <div class="datetime-input"
                 @click="$refs.closing_time.toggle_visibility()">
@@ -91,12 +87,10 @@
                    for="guests-can-submit">
               Anyone with the link can submit
             </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                This can be restricted to users with a specific email domain
-                in the course settings.
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              This can be restricted to users with a specific email domain
+              in the course settings.
+            </tooltip>
           </div>
 
           <div class="checkbox-input-container">
@@ -108,12 +102,10 @@
                    for="disallow-student-submissions">
               Disable submitting
             </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                Temporarily prevent students from submitting (they can still see their
-                previous submissions).
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              Temporarily prevent students from submitting (they can still see their
+              previous submissions).
+            </tooltip>
           </div>
 
           <div class="checkbox-input-container">
@@ -125,13 +117,11 @@
             <label class="checkbox-label"
                    for="publish-final-grades">
               Publish final grades
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="medium" placement="right">
-                  When the hard deadline has passed and scores are published,
-                  students will see their final grade for the project on the submit page.
-                </tooltip>
-              </i>
             </label>
+            <tooltip width="large" placement="top">
+              When the hard deadline has passed and scores are published,
+              students will see their final grade for the project on the submit page.
+            </tooltip>
           </div>
         </fieldset>
       </div>
@@ -154,12 +144,10 @@
 
             <div class="group-size-container">
               <label class="label"> Max group size </label>
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  When this is > 1, users will be prompted to register their group
-                  members the first time they visit the project page.
-                </tooltip>
-              </i>
+              <tooltip width="large" placement="top">
+                When this is > 1, users will be prompted to register their group
+                members the first time they visit the project page.
+              </tooltip>
               <validated-input id="max-group-size"
                                v-model="d_project.max_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
@@ -179,14 +167,12 @@
                    for="disallow-group-registration">
               Disable group registration
             </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                Temporarily prevent students registering new groups.
-                Groups already registered will be unaffected. <br>
-                NOTE: This will effectively prevent unregistered students
-                from submitting.
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              Temporarily prevent students registering new groups.
+              Groups already registered will be unaffected. <br>
+              NOTE: This will effectively prevent unregistered students
+              from submitting.
+            </tooltip>
           </div>
         </fieldset>
       </div>
@@ -197,11 +183,9 @@
           <div class="form-field-wrapper">
             <label class="label"
                    for="ultimate-submission-policy"> Final graded submission policy </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                Use students' most recent or best submission for their final score.
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              Use students' most recent or best submission for their final score.
+            </tooltip>
             <div>
               <select id="ultimate-submission-policy"
                       v-model="d_project.ultimate_submission_policy"
@@ -290,15 +274,13 @@
                    for="groups-combine-daily-submissions">
               Groups get more submissions than individuals
             </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                When unchecked, individuals and groups receive the same number of
-                submissions per day. When checked, the daily limit for a group
-                is multiplied by the number of users in that group.
-                For example, if the daily limit is 2, a group with 3 members would
-                receive 6 submissions per day with this box checked.
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              When unchecked, individuals and groups receive the same number of
+              submissions per day. When checked, the daily limit for a group
+              is multiplied by the number of users in that group.
+              For example, if the daily limit is 2, a group with 3 members would
+              receive 6 submissions per day with this box checked.
+            </tooltip>
           </div>
 
           <div class="form-field-wrapper extra-space">
@@ -319,21 +301,17 @@
                    for="allow-late-days">
               Allow late days
             </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                Whether students can use late days for this project.
-              </tooltip>
-            </i>
+            <tooltip width="medium" placement="top">
+              Whether students can use late days for this project.
+            </tooltip>
           </div>
 
           <div class="form-field-wrapper extra-space">
             <label for="total-submission-limit"
                    class="label"> Total submission limit (Ever!) </label>
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="medium" placement="right">
-                A hard limit on how many times students can submit ever.
-              </tooltip>
-            </i>
+            <tooltip width="medium" placement="top">
+              A hard limit on how many times students can submit ever.
+            </tooltip>
             <validated-input ref="total_submissions_input"
                              id="total-submission-limit"
 
