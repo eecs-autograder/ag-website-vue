@@ -438,11 +438,7 @@ describe('ProjectSettings tests', () => {
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
 
-        let project_name_input = wrapper.find({ref: 'project_name_input'}).find('#input');
-        (<HTMLInputElement> project_name_input.element).value = "AlreadyExists.cpp";
-        project_name_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(wrapper.find({ref: 'project_name_input'}), "AlreadyExists.cpp");
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
 
         wrapper.find({ref: 'project_settings_form'}).trigger('submit');
@@ -458,15 +454,10 @@ describe('ProjectSettings tests', () => {
 
 describe('Invalid input tests', () => {
     test('Error project name is blank', async () => {
-        let project_name_input = wrapper.find({ref: "project_name_input"}).find('#input');
         let project_name_validator = <ValidatedInput> wrapper.find({ref: "project_name_input"}).vm;
-
         expect(project_name_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> project_name_input.element).value = "   ";
-        project_name_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(wrapper.find({ref: "project_name_input"}), '   ');
         expect(project_name_validator.is_valid).toBe(false);
     });
 
@@ -538,22 +529,20 @@ describe('Invalid input tests', () => {
     });
 
     test('num_bonus_submissions is empty or not a number', async () => {
-        let bonus_submissions_input = wrapper.find(
-            {ref: "bonus_submissions_input"}
-        ).find('#input');
+        let bonus_submissions_input = wrapper.find({ref: "bonus_submissions_input"});
         let bonus_submissions_validator = <ValidatedInput> wrapper.find(
             {ref: "bonus_submissions_input"}
         ).vm;
 
         expect(bonus_submissions_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> bonus_submissions_input.element).value = "   ";
+        set_validated_input_text(bonus_submissions_input, "   ");
         bonus_submissions_input.trigger('input');
         await wrapper.vm.$nextTick();
 
         expect(bonus_submissions_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> bonus_submissions_input.element).value = "King's Landing";
+        set_validated_input_text(bonus_submissions_input, "King's Landing");
         bonus_submissions_input.trigger('input');
         await wrapper.vm.$nextTick();
 
@@ -561,19 +550,13 @@ describe('Invalid input tests', () => {
     });
 
     test('num_bonus_submissions is negative', async () => {
-        let bonus_submissions_input = wrapper.find(
-            {ref: "bonus_submissions_input"}
-        ).find('#input');
         let bonus_submissions_validator = <ValidatedInput> wrapper.find(
             {ref: "bonus_submissions_input"}
         ).vm;
 
         expect(bonus_submissions_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> bonus_submissions_input.element).value = "-18";
-        bonus_submissions_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(wrapper.find({ref: "bonus_submissions_input"}), "-18");
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 

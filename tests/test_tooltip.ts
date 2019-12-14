@@ -8,16 +8,9 @@ beforeAll(() => {
 
 describe('Tooltip.vue', () => {
     test('Default placement and width', () => {
-        const component = {
-            template: `<div><tooltip ref="tooltip"></tooltip></div>`,
-            components: {
-                'tooltip': Tooltip,
-            }
-        };
-        const wrapper = mount(component);
-        let tooltip = wrapper.find({ref: 'tooltip'});
-        expect(tooltip.vm.width).toBe('small');
-        expect(tooltip.vm.placement).toBe('top');
+        const wrapper = mount(Tooltip);
+        expect(wrapper.vm.width).toBe('small');
+        expect(wrapper.vm.placement).toBe('top');
     });
 
     test('Non-default placement and width', () => {

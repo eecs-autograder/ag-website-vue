@@ -5,6 +5,8 @@ import { ExpectedStudentFile } from 'ag-client-typescript';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { set_validated_input_text } from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -186,19 +188,13 @@ describe('Invalid input tests', () => {
     });
 
     test('Error pattern is blank', async () => {
-        let pattern_input = wrapper.find({ref: "pattern"}).find('#input');
+        let pattern_input = wrapper.find({ref: "pattern"});
         let pattern_validator = <ValidatedInput> wrapper.find({ref: "pattern" }).vm;
 
-        (<HTMLInputElement> pattern_input.element).value = "hello*";
-        pattern_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(pattern_input, "hello*");
         expect(pattern_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> pattern_input.element).value = " ";
-        pattern_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(pattern_input, " ");
         expect(pattern_validator.is_valid).toBe(false);
     });
 
@@ -206,21 +202,15 @@ describe('Invalid input tests', () => {
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let min_num_matches_input = wrapper.find({ref: "min_num_matches"}).find('#input');
+        let min_num_matches_input = wrapper.find({ref: "min_num_matches"});
         let min_num_matches_validator = <ValidatedInput> wrapper.find(
             {ref: "min_num_matches" }
         ).vm;
 
-        (<HTMLInputElement> min_num_matches_input.element).value = "  ";
-        min_num_matches_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(min_num_matches_input, "  ");
         expect(min_num_matches_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> min_num_matches_input.element).value = "carrot";
-        min_num_matches_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(min_num_matches_input, "carrot");
         expect(min_num_matches_validator.is_valid).toBe(false);
     });
 
@@ -228,15 +218,11 @@ describe('Invalid input tests', () => {
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let min_num_matches_input = wrapper.find({ref: "min_num_matches"}).find('#input');
         let min_num_matches_validator = <ValidatedInput> wrapper.find(
             {ref: "min_num_matches" }
         ).vm;
 
-        (<HTMLInputElement> min_num_matches_input.element).value = "-2";
-        min_num_matches_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(wrapper.find({ref: "min_num_matches"}), "-2");
         expect(min_num_matches_validator.is_valid).toBe(false);
     });
 
@@ -244,18 +230,18 @@ describe('Invalid input tests', () => {
         component.d_exact_match = false;
         await component.$nextTick();
 
-        let max_num_matches_input = wrapper.find({ref: "max_num_matches"}).find('#input');
+        let max_num_matches_input = wrapper.find({ref: "max_num_matches"});
         let max_num_matches_validator = <ValidatedInput> wrapper.find(
             {ref: "max_num_matches" }
         ).vm;
 
-        (<HTMLInputElement> max_num_matches_input.element).value = "  ";
+        set_validated_input_text(max_num_matches_input, "  ");
         max_num_matches_input.trigger('input');
         await component.$nextTick();
 
         expect(max_num_matches_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> max_num_matches_input.element).value = "zero";
+        set_validated_input_text(max_num_matches_input, "zero");
         max_num_matches_input.trigger('input');
         await component.$nextTick();
 

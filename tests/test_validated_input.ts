@@ -27,7 +27,7 @@ describe('ValidatedInput.vue', () => {
         });
 
         await wrapper.vm.$nextTick();
-        const input: HTMLInputElement = <HTMLInputElement> wrapper.find('#input').element;
+        const input: HTMLInputElement = <HTMLInputElement> wrapper.find('input').element;
         expect(input.value).toBe("1");
     });
 
@@ -43,7 +43,7 @@ describe('ValidatedInput.vue', () => {
 
         expect(wrapper.vm.is_valid).toBe(true);
 
-        let input = wrapper.find('#input');
+        let input = wrapper.find('input');
         (<HTMLInputElement> input.element).value = '';
         input.trigger('input');
 
@@ -80,8 +80,8 @@ describe('ValidatedInput.vue', () => {
 
         // Changing input in child component should update variable in parent component
         // (this time, using default from_string_fn)
-        (<HTMLInputElement> validated_input.find('#input').element).value = "yo";
-        validated_input.find('#input').trigger('input');
+        (<HTMLInputElement> validated_input.find('input').element).value = "yo";
+        validated_input.find('input').trigger('input');
 
         expect(validated_input_vm.d_input_value).toEqual("yo");
         expect(wrapper.vm.$data.my_input).toEqual("yo");
@@ -115,8 +115,8 @@ describe('ValidatedInput.vue', () => {
         expect(validated_input_vm.d_input_value).toEqual("hello");
 
         // Change input to an invalid value (should trigger validator error)
-        (<HTMLInputElement> validated_input.find('#input').element).value = "yo";
-        validated_input.find('#input').trigger('input');
+        (<HTMLInputElement> validated_input.find('input').element).value = "yo";
+        validated_input.find('input').trigger('input');
 
         // Local input should change, but variable should NOT be updated
         expect(validated_input_vm.d_input_value).toEqual("yo");
@@ -155,23 +155,23 @@ describe('ValidatedInput.vue', () => {
         const validated_input = wrapper.find({ref: 'validated_input_1'});
 
         // Make a change in the input so that error messages are initially displayed
-        (<HTMLInputElement> wrapper.find('#input').element).value = "hello";
-        wrapper.find('#input').trigger('input');
+        (<HTMLInputElement> wrapper.find('input').element).value = "hello";
+        wrapper.find('input').trigger('input');
         await wrapper.vm.$nextTick();
 
         // Make sure second error message is displayed after delay
         await sleep(0.75);
         await wrapper.vm.$nextTick();
-        let error_msg = validated_input.find('#error-text').text();
+        let error_msg = validated_input.find('.error-text').text();
         let expected_error_msg = 'should always be displayed';
         expect(error_msg).toEqual(expected_error_msg);
 
         // Change input to fail first validator
-        (<HTMLInputElement> validated_input.find('#input').element).value = "yo";
-        validated_input.find('#input').trigger('input');
+        (<HTMLInputElement> validated_input.find('input').element).value = "yo";
+        validated_input.find('input').trigger('input');
 
         // Even though both validators fail, only FIRST error should be displayed
-        error_msg = validated_input.find('#error-text').text();
+        error_msg = validated_input.find('.error-text').text();
         expected_error_msg = 'is not hello';
         expect(error_msg).toEqual(expected_error_msg);
     });
@@ -217,15 +217,15 @@ describe('ValidatedInput.vue', () => {
         const wrapper = mount(component);
 
         const v_input = wrapper.find({ref: 'v1'});
-        expect(v_input.find('#error-text').exists()).toBe(false);
+        expect(v_input.find('.error-text').exists()).toBe(false);
 
         // Change input to pass validator
         const new_obj = {
             new_key: "new_value"
         };
 
-        (<HTMLInputElement> v_input.find('#input').element).value = JSON.stringify(new_obj);
-        v_input.find('#input').trigger('input');
+        (<HTMLInputElement> v_input.find('input').element).value = JSON.stringify(new_obj);
+        v_input.find('input').trigger('input');
 
         const v_input_vm = <ValidatedInput> v_input.vm;
         expect(v_input_vm.d_input_value).toEqual(JSON.stringify(new_obj));
@@ -243,7 +243,7 @@ describe('ValidatedInput.vue', () => {
 
         expect(wrapper.vm.is_valid).toBe(true);
 
-        let input = wrapper.find('#input');
+        let input = wrapper.find('input');
         (<HTMLInputElement> input.element).value = '25';
         input.trigger('input');
 
@@ -270,8 +270,8 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        expect(wrapper.find('#input').exists()).toBe(true);
-        expect(wrapper.find('#textarea').exists()).toBe(false);
+        expect(wrapper.find('input').exists()).toBe(true);
+        expect(wrapper.find('textarea').exists()).toBe(false);
     });
 
     test('ValidatedInput displays textarea if num_rows prop > 1', () => {
@@ -284,8 +284,8 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        expect(wrapper.find('#input').exists()).toBe(false);
-        expect(wrapper.find('#textarea').exists()).toBe(true);
+        expect(wrapper.find('input').exists()).toBe(false);
+        expect(wrapper.find('textarea').exists()).toBe(true);
     });
 
     test('input_style prop modifies the style of input', () => {
@@ -298,8 +298,8 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        expect(wrapper.find('#input').exists()).toBe(true);
-        expect(wrapper.find('#input').element.style.backgroundColor).toBe('yellow');
+        expect(wrapper.find('input').exists()).toBe(true);
+        expect(wrapper.find('input').element.style.backgroundColor).toBe('yellow');
     });
 
     test('input_style prop modifies the style of textarea', () => {
@@ -313,8 +313,8 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        expect(wrapper.find('#textarea').exists()).toBe(true);
-        expect(wrapper.find('#textarea').element.style.backgroundColor).toBe('yellow');
+        expect(wrapper.find('textarea').exists()).toBe(true);
+        expect(wrapper.find('textarea').element.style.backgroundColor).toBe('yellow');
     });
 
     test('input_style accepts object as prop', () => {
@@ -330,8 +330,8 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        expect(wrapper.find('#textarea').exists()).toBe(true);
-        expect(wrapper.find('#textarea').element.style.backgroundColor).toBe('yellow');
+        expect(wrapper.find('textarea').exists()).toBe(true);
+        expect(wrapper.find('textarea').element.style.backgroundColor).toBe('yellow');
     });
 
     test('Props required values are correct', () => {
@@ -405,22 +405,22 @@ describe('ValidatedInput.vue', () => {
         expect(vinput_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.input_is_valid).toBe(true);
 
-        (<HTMLInputElement> vinput.find('#input').element).value = "42";
-        vinput.find('#input').trigger('input');
+        (<HTMLInputElement> vinput.find('input').element).value = "42";
+        vinput.find('input').trigger('input');
 
         expect(vinput_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.input_is_valid).toBe(true);
 
-        (<HTMLInputElement> vinput.find('#input').element).value = "invalid";
-        vinput.find('#input').trigger('input');
+        (<HTMLInputElement> vinput.find('input').element).value = "invalid";
+        vinput.find('input').trigger('input');
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(false);
         expect(wrapper.vm.$data.input_is_valid).toBe(false);
 
         // Back to valid
-        (<HTMLInputElement> vinput.find('#input').element).value = "3";
-        vinput.find('#input').trigger('input');
+        (<HTMLInputElement> vinput.find('input').element).value = "3";
+        vinput.find('input').trigger('input');
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(true);
@@ -441,16 +441,16 @@ describe('ValidatedInput.vue', () => {
 
         expect(vinput_vm.is_valid).toBe(false);
         expect(vinput_vm.d_show_warnings).toBe(false);
-        expect(wrapper.find('#error-text').exists()).toBe(false);
+        expect(wrapper.find('.error-text').exists()).toBe(false);
 
-        (<HTMLInputElement> wrapper.find('#input').element).value = "heyoo";
-        wrapper.find('#input').trigger('input');
+        (<HTMLInputElement> wrapper.find('input').element).value = "heyoo";
+        wrapper.find('input').trigger('input');
         await sleep(0.75);
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(false);
         expect(vinput_vm.d_show_warnings).toBe(true);
-        expect(wrapper.find('#error-text').exists()).toBe(true);
+        expect(wrapper.find('.error-text').exists()).toBe(true);
     });
 
     test('enable_warnings shows warnings immediately', async () => {
@@ -468,7 +468,7 @@ describe('ValidatedInput.vue', () => {
 
         expect(wrapper.vm.is_valid).toBe(false);
         expect(wrapper.vm.d_show_warnings).toBe(false);
-        expect(wrapper.find('#error-text').exists()).toBe(false);
+        expect(wrapper.find('.error-text').exists()).toBe(false);
 
         wrapper.vm.enable_warnings();
 
@@ -476,7 +476,7 @@ describe('ValidatedInput.vue', () => {
 
         expect(wrapper.vm.is_valid).toBe(false);
         expect(wrapper.vm.d_show_warnings).toBe(true);
-        expect(wrapper.find('#error-text').exists()).toBe(true);
+        expect(wrapper.find('.error-text').exists()).toBe(true);
     });
 
     test('reset_warning_state hides warnings', async () => {
@@ -491,14 +491,14 @@ describe('ValidatedInput.vue', () => {
         await wrapper.vm.$nextTick();
         const vinput_vm = <ValidatedInput> wrapper.vm;
 
-        (<HTMLInputElement> wrapper.find('#input').element).value = "invalid value here!";
-        wrapper.find('#input').trigger('input');
+        (<HTMLInputElement> wrapper.find('input').element).value = "invalid value here!";
+        wrapper.find('input').trigger('input');
         await sleep(0.75);
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(false);
         expect(vinput_vm.d_show_warnings).toBe(true);
-        expect(wrapper.find('#error-text').exists()).toBe(true);
+        expect(wrapper.find('.error-text').exists()).toBe(true);
 
         vinput_vm.reset_warning_state();
         await wrapper.vm.$nextTick();
@@ -506,9 +506,9 @@ describe('ValidatedInput.vue', () => {
         // Clear method should set input to be empty and not display error messages
         expect(vinput_vm.is_valid).toBe(false);
         expect(vinput_vm.d_show_warnings).toBe(false);
-        expect(wrapper.find('#error-text').exists()).toBe(false);
+        expect(wrapper.find('.error-text').exists()).toBe(false);
         expect(
-            (<HTMLInputElement> wrapper.find('#input').element).value
+            (<HTMLInputElement> wrapper.find('input').element).value
         ).toBe("invalid value here!");
     });
 
@@ -522,14 +522,14 @@ describe('ValidatedInput.vue', () => {
             }
         });
 
-        let input_wrapper = wrapper.find('.input');
+        let input_wrapper = wrapper.find('input');
 
         await sleep(0.75);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_valid).toBe(false);
         expect(wrapper.vm.d_show_warnings).toBe(false);
-        expect(wrapper.find('#error-text').exists()).toBe(false);
+        expect(wrapper.find('.error-text').exists()).toBe(false);
 
         input_wrapper.trigger('click');
 
@@ -538,7 +538,7 @@ describe('ValidatedInput.vue', () => {
 
         expect(wrapper.vm.is_valid).toBe(false);
         expect(wrapper.vm.d_show_warnings).toBe(false);
-        expect(wrapper.find('#error-text').exists()).toBe(false);
+        expect(wrapper.find('.error-text').exists()).toBe(false);
 
         input_wrapper.trigger('blur');
 
@@ -547,7 +547,7 @@ describe('ValidatedInput.vue', () => {
 
         expect(wrapper.vm.is_valid).toBe(false);
         expect(wrapper.vm.d_show_warnings).toBe(true);
-        expect(wrapper.find('#error-text').exists()).toBe(true);
+        expect(wrapper.find('.error-text').exists()).toBe(true);
     });
 });
 
@@ -583,7 +583,7 @@ describe('Custom from_string_fn and to_string_fn allow null tests', () => {
     });
 
     test('null converted to empty string', () => {
-        expect_html_element_has_value(wrapper.find('#input'), '42');
+        expect_html_element_has_value(wrapper.find('input'), '42');
         wrapper.setProps({value: null});
         expect(wrapper.vm.is_valid).toEqual(true);
         expect(wrapper.text()).toEqual('');

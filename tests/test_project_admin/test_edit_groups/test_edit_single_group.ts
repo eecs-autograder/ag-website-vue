@@ -17,6 +17,7 @@ import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_
 import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { set_validated_input_text } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -71,36 +72,25 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('bonus_submissions_remaining cannot be a negative number', async () => {
-        let bonus_submissions_input = wrapper.find(
-            {ref: 'bonus_submissions_remaining_input'}
-        ).find("#input");
         let bonus_submissions_validator = <ValidatedInput> wrapper.find(
             {ref: 'bonus_submissions_remaining_input'}
         ).vm;
-        (<HTMLInputElement> bonus_submissions_input.element).value = "-4";
-        bonus_submissions_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(wrapper.find({ref: 'bonus_submissions_remaining_input'}), "-4");
 
         expect(component.edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
     test('bonus_submissions_remaining cannot be empty or not a number', async () => {
-        let bonus_submissions_input = wrapper.find(
-            {ref: 'bonus_submissions_remaining_input'}
-        ).find("#input");
+        let bonus_submissions_input = wrapper.find({ref: 'bonus_submissions_remaining_input'});
         let bonus_submissions_validator = <ValidatedInput> wrapper.find(
             {ref: 'bonus_submissions_remaining_input'}
         ).vm;
-        (<HTMLInputElement> bonus_submissions_input.element).value = "";
-        bonus_submissions_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(bonus_submissions_input, "");
 
         expect(bonus_submissions_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> bonus_submissions_input.element).value = "scranton";
-        bonus_submissions_input.trigger('input');
-        await component.$nextTick();
+        set_validated_input_text(bonus_submissions_input, "spam");
 
         expect(component.edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);

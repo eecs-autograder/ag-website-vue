@@ -8,7 +8,7 @@ import APIErrors from '@/components/api_errors.vue';
 import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { set_validated_input_text } from '@/tests/utils';
+import { set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -78,13 +78,8 @@ describe('SingleInstructorFile tests', () => {
         expect(component.new_file_name).toEqual(component.file.name);
         expect(component.editing).toBe(true);
 
-        let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
-        (<HTMLInputElement> file_name_input.element).value = "Jane.cpp";
-        file_name_input.trigger('input');
-        validated_input = <ValidatedInput> wrapper.find({ref: 'file_name'}).vm;
-        await component.$nextTick();
-
-        expect(validated_input.is_valid).toBe(true);
+        set_validated_input_text(wrapper.find({ref: 'file_name'}), "Jane.cpp");
+        expect(validated_input_is_valid(wrapper.find({ref: 'file_name'}))).toBe(true);
         expect(component.new_file_name).toEqual("Jane.cpp");
 
         wrapper.find('.update-file-name-cancel-button').trigger('click');
@@ -102,9 +97,7 @@ describe('SingleInstructorFile tests', () => {
         expect(component.new_file_name).toEqual(component.file.name);
         expect(component.editing).toBe(true);
 
-        let file_name_input = wrapper.find({ref: 'file_name'}).find('#input');
-        (<HTMLInputElement> file_name_input.element).value = "       ";
-        file_name_input.trigger('input');
+        set_validated_input_text(wrapper.find({ref: 'file_name'}), "     ");
         validated_input = <ValidatedInput> wrapper.find({ref: 'file_name'}).vm;
         await component.$nextTick();
 

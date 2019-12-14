@@ -70,12 +70,10 @@ describe('Manage projects tests', () => {
         let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
         expect(validated_input.is_valid).toBe(false);
 
-        let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-        (<HTMLInputElement> new_project_name.element).value = "   ";
-        new_project_name.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(wrapper.find({ref: 'new_project_name'}), "   ");
         expect(validated_input.is_valid).toBe(false);
+
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.add-project-button').is('[disabled]')).toBe(true);
     });
 
@@ -85,11 +83,7 @@ describe('Manage projects tests', () => {
         let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
         expect(validated_input.is_valid).toBe(false);
 
-        let new_project_name = wrapper.find({ref: 'new_project_name'}).find('#input');
-        (<HTMLInputElement> new_project_name.element).value = new_project.name;
-        new_project_name.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(wrapper.find({ref: 'new_project_name'}), new_project.name);
         expect(validated_input.is_valid).toBe(true);
 
         let create_project_stub = sinon.stub(Project, 'create').callsFake(() => {

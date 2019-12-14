@@ -6,6 +6,8 @@ import Roster from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
+import { set_validated_input_text } from '@/tests/utils';
+
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
@@ -13,7 +15,6 @@ beforeAll(() => {
 describe('Roster tests', () => {
     let wrapper: Wrapper<Roster>;
     let roster: Roster;
-    let original_match_media: (query: string) => MediaQueryList;
     let user_1: User;
     let user_2: User;
     let user_3: User;
@@ -75,13 +76,6 @@ describe('Roster tests', () => {
             is_superuser: true
         });
 
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
         wrapper = mount(Roster, {
             propsData: {
                 role: "admin",
@@ -96,14 +90,10 @@ describe('Roster tests', () => {
         validated_input_component = <ValidatedInput> wrapper.find('#add-users-input').vm;
         roster_form_component = <ValidatedForm> wrapper.find('#add-users-form').vm;
         roster_form_wrapper = <Wrapper<ValidatedForm>> wrapper.find('#add-users-form');
-        validated_input.find('#textarea').trigger('input');
+        // validated_input.find('#textarea').trigger('input');
     });
 
     afterEach(() => {
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
         if (wrapper.exists()) {
             wrapper.destroy();
         }
@@ -162,39 +152,31 @@ describe('Roster tests', () => {
     });
 
     test('Usernames that adhere to the valid email regex are valid', async () => {
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(
+            validated_input, "ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu");
         expect(roster_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe(
         'ch%cken.n00dle.s0up+soda-on_the-side@2007-WebstarAndYoungB.edu'
         );
 
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "sk8gr8m8@umich.edu";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "sk8gr8m8@umich.edu");
         expect(roster_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe('sk8gr8m8@umich.edu');
 
-        (<HTMLInputElement> validated_input.find('#textarea').element).value = "a_B-C@d-e-f-g.hi";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "a_B-C@d-e-f-g.hi");
         expect(roster_form_component.is_valid).toBe(true);
         expect(validated_input_component.d_input_value).toBe('a_B-C@d-e-f-g.hi');
     });
 
     test('Emails whose local-part (before the @ symbol) is empty are invalid',
          async () => {
-        (<HTMLInputElement> validated_input.find('#textarea').element).value = "@e.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "@e.iou");
         expect(roster_form_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('@e.iou');
     });
 
     test("Empty string cannot be added to a roster", async () => {
-        (<HTMLInputElement> validated_input.find('#textarea').element).value = "         ";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "         ");
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe("         ");
 
@@ -207,10 +189,7 @@ describe('Roster tests', () => {
     // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     test('emails that contain disallowed characters in the local-part are invalid',
          async () => {
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "a*@e.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "a*@e.iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -225,10 +204,7 @@ describe('Roster tests', () => {
         expect(roster_form_component.is_valid).toBe(false);
         expect(roster.add_users_form_is_valid).toBe(false);
 
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "a?@e.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "a?@e.iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -237,10 +213,7 @@ describe('Roster tests', () => {
         expect(roster_form_component.is_valid).toBe(false);
         expect(roster.add_users_form_is_valid).toBe(false);
 
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "a(@e.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "a(@e.iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -252,10 +225,7 @@ describe('Roster tests', () => {
 
     test('Emails missing the @ character after the local part are invalid',
          async () => {
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "iceberg.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg.iou");
         await roster.$nextTick();
 
         expect(roster_form_component.is_valid).toBe(false);
@@ -266,28 +236,19 @@ describe('Roster tests', () => {
     test('Emails containing invalid characters in the mail server portion are invalid',
          async () => {
 
-        (<HTMLInputElement> validated_input.find(
-         '#textarea'
-        ).element).value = "iceberg@.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@.iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@.iou');
 
-        (<HTMLInputElement> validated_input.find(
-         '#textarea'
-        ).element).value = "iceberg@hello_world.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@hello_world.iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@hello_world.iou');
 
-        (<HTMLInputElement> validated_input.find(
-         '#textarea'
-        ).element).value = "iceberg@@hello.iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@@hello.iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -296,10 +257,7 @@ describe('Roster tests', () => {
 
     test('Emails that do not contain the . before the top-level-domain are invalid',
          async () => {
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "iceberg@iou";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@iou");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -310,19 +268,13 @@ describe('Roster tests', () => {
 
     test('Emails where the top-level-domain is less than 2 characters are invalid',
          async () => {
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "iceberg@ae.";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@ae.");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@ae.');
 
-        (<HTMLInputElement> validated_input.find(
-        '#textarea'
-        ).element).value = "iceberg@ae.i";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@ae.i");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -332,19 +284,13 @@ describe('Roster tests', () => {
     test('Emails featuring invalid characters in the top-level domain are invalid',
          async () => {
 
-        (<HTMLInputElement> validated_input.find(
-         '#textarea'
-        ).element).value = "iceberg@umich.sk8";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@umich.sk8");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@umich.sk8');
 
-        (<HTMLInputElement> validated_input.find(
-         '#textarea'
-        ).element).value = "iceberg@umich.edu?";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(validated_input, "iceberg@umich.edu?");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(false);
@@ -353,10 +299,7 @@ describe('Roster tests', () => {
 
     test('When a user is added, the parent component is notified',
          async () => {
-         (<HTMLInputElement> validated_input.find(
-             '#textarea'
-         ).element).value = "letitsnow@umich.edu  sevenEleven@umich.edu";
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(validated_input, "letitsnow@umich.edu  sevenEleven@umich.edu");
          await roster.$nextTick();
 
          expect(roster_form_component.is_valid).toBe(true);
@@ -374,8 +317,7 @@ describe('Roster tests', () => {
     test('Validator function exposes addresses that do not adhere to the format specified ' +
          'in the valid email addresses regex',
          async () => {
-         (<HTMLInputElement> validated_input.find('#textarea').element).value = " angela";
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(validated_input, " angela");
          await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
@@ -383,20 +325,14 @@ describe('Roster tests', () => {
          expect(roster_form_component.is_valid).toBe(false);
          expect(roster.add_users_form_is_valid).toBe(false);
 
-         (<HTMLInputElement> validated_input.find(
-             '#textarea'
-         ).element).value = " angela@umich";
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(validated_input, " angela@umich");
 
          await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(' angela@umich');
 
-         (<HTMLInputElement> validated_input.find(
-             '#textarea'
-         ).element).value = " angela@umich.edu";
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(validated_input, " angela@umich.edu");
          await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(true);
@@ -404,10 +340,8 @@ describe('Roster tests', () => {
     });
 
     test('valid emails can be separated by colons, whitespace, or newlines', async () => {
-        (<HTMLInputElement> validated_input.find(
-            '#textarea'
-        ).element).value = " roy@anderson.net\nclark@aol.com,pete@nd.edu     meredith@cmu.edu";
-        validated_input.find('#textarea').trigger('input');
+        set_validated_input_text(
+            validated_input, " roy@anderson.net\nclark@aol.com,pete@nd.edu     meredith@cmu.edu");
         await roster.$nextTick();
 
         expect(validated_input_component.is_valid).toBe(true);
@@ -421,11 +355,9 @@ describe('Roster tests', () => {
     test('Validator function exposes the first invalid email address even when there' +
          ' may be many',
          async () => {
-         (<HTMLInputElement> validated_input.find(
-             '#textarea'
-         ).element).value = " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu" +
-                            "\nryan@msuedu\ngabe";
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(
+             validated_input,
+             " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu\nryan@msuedu\ngabe");
          await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
@@ -442,10 +374,7 @@ describe('Roster tests', () => {
                               "kevin@umich.edu,stanley@umich.edu " +
                               "kelly@umich.edu,\nryan@umich.edu,\n";
 
-         (<HTMLInputElement> validated_input.find(
-             '#textarea'
-         ).element).value = username_input;
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(validated_input, username_input);
          await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(false);
@@ -474,8 +403,7 @@ describe('Roster tests', () => {
                               "kevin@umich.edu,stanley@umich.edu " +
                               "kelly@umich.edu,\nryan@umich.edu,";
 
-         (<HTMLInputElement> validated_input.find('#textarea').element).value = username_input;
-         validated_input.find('#textarea').trigger('input');
+         set_validated_input_text(validated_input, username_input);
          await roster.$nextTick();
 
          expect(validated_input_component.is_valid).toBe(true);

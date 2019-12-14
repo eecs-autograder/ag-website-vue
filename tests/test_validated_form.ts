@@ -8,7 +8,7 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { is_number } from "@/validators";
 
-import { sleep } from './utils';
+import { get_validated_input_text, set_validated_input_text, sleep } from './utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -116,16 +116,10 @@ describe('ValidatedForm.vue', () => {
         expect(form_vm.is_valid).toBe(true);
 
         const validated_input = wrapper.find({ref: 'validated_input_1'});
-        (<HTMLInputElement> validated_input.find('#input').element).value = "invalid";
-        validated_input.find('#input').trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(validated_input, "invalid");
         expect(form_vm.is_valid).toBe(false);
 
-        (<HTMLInputElement> validated_input.find('#input').element).value = "2001";
-        validated_input.find('#input').trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(validated_input, "2001");
         expect(form_vm.is_valid).toBe(true);
     });
 
@@ -251,25 +245,16 @@ describe('ValidatedForm.vue', () => {
         expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
 
-        (<HTMLInputElement> validated_input.find('#input').element).value = "42";
-        validated_input.find('#input').trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(validated_input, "42");
         expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
 
-        (<HTMLInputElement> validated_input.find('#input').element).value = "invalid";
-        validated_input.find('#input').trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(validated_input, "invalid");
         expect(form_vm.is_valid).toBe(false);
         expect(wrapper.vm.$data.form_is_valid).toBe(false);
 
         // Back to valid
-        (<HTMLInputElement> validated_input.find('#input').element).value = "3";
-        validated_input.find('#input').trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(validated_input, "3");
         expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
     });
@@ -357,10 +342,8 @@ describe('ValidatedForm.vue', () => {
         expect(vinput2_vm.d_show_warnings).toBe(false);
 
         // Change the inputs so that error messages are displayed
-        (<HTMLInputElement> vinput1.find('#input').element).value = "invalid value 1";
-        vinput1.find('#input').trigger('input');
-        (<HTMLInputElement> vinput2.find('#input').element).value = "invalid value 2";
-        vinput2.find('#input').trigger('input');
+        set_validated_input_text(vinput1, "invalid value 1");
+        set_validated_input_text(vinput2, "invalid value 2");
         await sleep(0.75);
         await wrapper.vm.$nextTick();
 
@@ -370,10 +353,10 @@ describe('ValidatedForm.vue', () => {
         await vinput1_vm.$nextTick();
         await vinput2_vm.$nextTick();
         await form_vm.$nextTick();
-        expect(vinput1.find('#error-text').exists()).toBe(true);
-        expect(vinput2.find('#error-text').exists()).toBe(true);
-        expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
-        expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("invalid value 2");
+        expect(vinput1.find('.error-text').exists()).toBe(true);
+        expect(vinput2.find('.error-text').exists()).toBe(true);
+        expect(get_validated_input_text(vinput1)).toBe("invalid value 1");
+        expect(get_validated_input_text(vinput2)).toBe("invalid value 2");
 
         // Clear
         form_vm.reset_warning_state();
@@ -382,10 +365,10 @@ describe('ValidatedForm.vue', () => {
         // Make sure error messages are no longer displayed, and that inputs are cleared
         expect(vinput1_vm.d_show_warnings).toBe(false);
         expect(vinput2_vm.d_show_warnings).toBe(false);
-        expect(vinput1.find('#error-text').exists()).toBe(false);
-        expect(vinput2.find('#error-text').exists()).toBe(false);
-        expect((<HTMLInputElement> vinput1.find('#input').element).value).toBe("invalid value 1");
-        expect((<HTMLInputElement> vinput2.find('#input').element).value).toBe("invalid value 2");
+        expect(vinput1.find('.error-text').exists()).toBe(false);
+        expect(vinput2.find('.error-text').exists()).toBe(false);
+        expect(get_validated_input_text(vinput1)).toBe("invalid value 1");
+        expect(get_validated_input_text(vinput2)).toBe("invalid value 2");
     });
 
     test('Validated inputs unregister with their form when destroyed', async () => {

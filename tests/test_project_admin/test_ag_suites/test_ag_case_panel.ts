@@ -577,25 +577,17 @@ describe('AGCasePanel tests', () => {
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let new_command_name_input = wrapper.find(
-            {ref: 'new_ag_test_command_name'}
-        ).find('#input');
+        let new_command_name_input = wrapper.find({ref: 'new_ag_test_command_name'});
         let new_command_name_validator = <ValidatedInput> wrapper.find(
             {ref: 'new_ag_test_command_name'}
         ).vm;
 
         expect(new_command_name_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_command_name_input.element).value = "Great";
-        new_command_name_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_name_input, "Great");
         expect(new_command_name_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_command_name_input.element).value = " ";
-        new_command_name_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_name_input, " ");
         expect(new_command_name_validator.is_valid).toBe(false);
     });
 
@@ -623,21 +615,15 @@ describe('AGCasePanel tests', () => {
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let new_command_input = wrapper.find({ref: 'new_ag_test_command'}).find('#input');
+        let new_command_input = wrapper.find({ref: 'new_ag_test_command'});
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_ag_test_command'}).vm;
 
         expect(new_command_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_command_input.element).value = "Splenda";
-        new_command_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_input, "Splenda");
         expect(new_command_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_command_input.element).value = " ";
-        new_command_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_input, " ");
         expect(new_command_validator.is_valid).toBe(false);
     });
 
