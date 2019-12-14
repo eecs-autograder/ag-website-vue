@@ -6,11 +6,9 @@
                       @submit="add_users"
                       @form_validity_changed="add_users_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
-          <i class="fas fa-question-circle input-tooltip">
-            <tooltip width="large" placement="right">
-              Enter a comma-separated list of email addresses.
-            </tooltip>
-          </i>
+          <tooltip width="medium" placement="bottom">
+            Enter a comma-separated list of email addresses.
+          </tooltip>
         </label>
         <ValidatedInput ref="add_users_textarea"
                         id="add-users-input"

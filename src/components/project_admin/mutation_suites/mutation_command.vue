@@ -175,6 +175,7 @@ export default class MutationCommand extends Vue {
   display: flex;
   font-size: 1.125rem;
   font-weight: bold;
+  margin-bottom: .25rem;
 }
 
 .resource-limits-label {

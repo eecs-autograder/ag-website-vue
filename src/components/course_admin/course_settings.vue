@@ -53,15 +53,13 @@
         <div class="form-field-wrapper">
           <label class="label">
             Guest usernames must end with
-            <i class="fas fa-question-circle input-tooltip">
-              <tooltip width="large" placement="right">
-                If "Anyone with the link can submit" is checked in a project's settings,
-                users not in the roster (guests) can only submit if their username ends with
-                the string here. <br>
-                For example, specifying "@umich.edu" here would only allow guests from
-                that domain.
-              </tooltip>
-            </i>
+            <tooltip width="large" placement="top">
+              If "Anyone with the link can submit" is checked in a project's settings,
+              users not in the roster (guests) can only submit if their username ends with
+              the string here. <br>
+              For example, specifying "@umich.edu" here would only allow guests from
+              that domain.
+            </tooltip>
           </label>
           <ValidatedInput id="allowed-guest-domain"
                           v-model="d_course.allowed_guest_domain"

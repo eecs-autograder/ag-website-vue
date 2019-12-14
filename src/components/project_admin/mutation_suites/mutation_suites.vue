@@ -81,11 +81,9 @@
                   <template slot="header">
                     <div class="config-name">
                       {{FeedbackConfigLabel.normal}}
-                      <i class="fas fa-question-circle input-tooltip">
-                        <tooltip width="large" placement="right">
-                          {{FeedbackDescriptions.normal}}
-                        </tooltip>
-                      </i>
+                      <tooltip width="large" placement="top">
+                        {{FeedbackDescriptions.normal}}
+                      </tooltip>
                     </div>
                   </template>
                   <template slot="settings">
@@ -103,11 +101,9 @@
                   :preset_options="fdbk_presets">
                   <template slot="header">
                     {{FeedbackConfigLabel.ultimate_submission}}
-                    <i class="fas fa-question-circle input-tooltip">
-                      <tooltip width="large" placement="right">
-                        {{FeedbackDescriptions.ultimate_submission}}
-                      </tooltip>
-                    </i>
+                    <tooltip width="large" placement="top">
+                      {{FeedbackDescriptions.ultimate_submission}}
+                    </tooltip>
                   </template>
                   <template slot="settings">
                     <MutationTestSuiteAdvancedFdbkSettings
@@ -124,11 +120,9 @@
                   :preset_options="fdbk_presets">
                   <template slot="header">
                     {{FeedbackConfigLabel.past_limit}}
-                    <i class="fas fa-question-circle input-tooltip">
-                      <tooltip width="large" placement="right">
-                        {{FeedbackDescriptions.past_limit}}
-                      </tooltip>
-                    </i>
+                    <tooltip width="large" placement="top">
+                      {{FeedbackDescriptions.past_limit}}
+                    </tooltip>
                   </template>
                   <template slot="settings">
                     <MutationTestSuiteAdvancedFdbkSettings
@@ -145,11 +139,9 @@
                   :preset_options="fdbk_presets">
                   <template slot="header">
                     {{FeedbackConfigLabel.staff_viewer}}
-                    <i class="fas fa-question-circle input-tooltip">
-                      <tooltip width="large" placement="right">
-                        {{FeedbackDescriptions.staff_viewer}}
-                      </tooltip>
-                    </i>
+                    <tooltip width="large" placement="top">
+                      {{FeedbackDescriptions.staff_viewer}}
+                    </tooltip>
                   </template>
                   <template slot="settings">
                     <MutationTestSuiteAdvancedFdbkSettings
@@ -231,7 +223,7 @@
           @submit="add_mutation_test_suite"
           @form_validity_changed="d_add_mutation_test_suite_form_is_valid = $event">
           <div class="mutation-test-suite-name-container">
-            <label class="text-label"> Suite name </label>
+            <label class="label"> Suite name </label>
             <validated-input ref="new_mutation_test_suite_name"
                               v-model="d_new_mutation_test_suite_name"
                               :show_warnings_on_blur="true"

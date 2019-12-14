@@ -78,13 +78,9 @@
           <div class="form-field-wrapper">
             <label class="label">
               Command
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  Can be any valid bash command. <br>
-                  Note that if it includes sequencing or piping,
-                  you will have to increase the process limit.
-                </tooltip>
-              </i>
+              <tooltip width="medium" placement="top">
+                Can be any valid bash command.
+              </tooltip>
             </label>
             <validated-input ref="command"
                               v-model="new_command.cmd"

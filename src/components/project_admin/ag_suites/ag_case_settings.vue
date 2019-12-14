@@ -21,11 +21,9 @@
           <template slot="header">
             <div class="config-name">
               {{FeedbackConfigLabel.normal}}
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  {{FeedbackDescriptions.normal}}
-                </tooltip>
-              </i>
+              <tooltip width="large" placement="top">
+                {{FeedbackDescriptions.normal}}
+              </tooltip>
             </div>
           </template>
         </AGTestCaseFdbkConfigPanel>
@@ -36,11 +34,9 @@
           <template slot="header">
             <div class="config-name">
               {{FeedbackConfigLabel.ultimate_submission}}
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  {{FeedbackDescriptions.ultimate_submission}}
-                </tooltip>
-              </i>
+              <tooltip width="large" placement="top">
+                {{FeedbackDescriptions.ultimate_submission}}
+              </tooltip>
             </div>
           </template>
         </AGTestCaseFdbkConfigPanel>
@@ -51,11 +47,9 @@
           <template slot="header">
             <div class="config-name">
               {{FeedbackConfigLabel.past_limit}}
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  {{FeedbackDescriptions.past_limit}}
-                </tooltip>
-              </i>
+              <tooltip width="large" placement="top">
+                {{FeedbackDescriptions.past_limit}}
+              </tooltip>
             </div>
           </template>
         </AGTestCaseFdbkConfigPanel>
@@ -66,11 +60,9 @@
           <template slot="header">
             <div class="config-name">
               {{FeedbackConfigLabel.staff_viewer}}
-              <i class="fas fa-question-circle input-tooltip">
-                <tooltip width="large" placement="right">
-                  {{FeedbackDescriptions.staff_viewer}}
-                </tooltip>
-              </i>
+              <tooltip width="large" placement="top">
+                {{FeedbackDescriptions.staff_viewer}}
+              </tooltip>
             </div>
           </template>
         </AGTestCaseFdbkConfigPanel>

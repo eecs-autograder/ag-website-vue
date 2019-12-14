@@ -186,7 +186,6 @@ export enum RosterChoice {
 }
 
 .body {
-  overflow: hidden;
-  margin: 1rem;
+  padding: 1rem;
 }
 </style>

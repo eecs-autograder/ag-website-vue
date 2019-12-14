@@ -86,6 +86,7 @@ $text-position: calc(100% + #{$caret-size});
 
   .text, .caret {
     visibility: hidden;
+    z-index: 1;
   }
 
   &:hover .text, &:hover .caret {
@@ -94,7 +95,6 @@ $text-position: calc(100% + #{$caret-size});
 
   .text {
     position: absolute;
-    z-index: 1;
 
     border-radius: 4px;
     padding: $padding;
@@ -105,8 +105,6 @@ $text-position: calc(100% + #{$caret-size});
     font-size: $font-size;
     line-height: $line-height;
     font-weight: normal;
-
-    word-wrap: break-word;
 
     transition: opacity 0.3s;
   }
@@ -178,6 +176,12 @@ $text-position: calc(100% + #{$caret-size});
 
 .width-large {
   width: 300px;
+
+  // Occasionally, the tooltips will overflow on small screens
+  // despite the correction applied. This helps mitigate that case.
+  @media only screen and (max-width: 350px) {
+    width: 250px;
+  }
 }
 
 </style>

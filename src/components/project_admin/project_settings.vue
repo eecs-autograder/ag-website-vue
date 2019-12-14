@@ -492,7 +492,6 @@ function make_empty_project(): Project {
 
 #project-settings-component {
   padding: .625rem;
-  overflow: hidden;
 }
 
 .section-container {
