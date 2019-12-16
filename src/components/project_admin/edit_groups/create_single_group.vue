@@ -6,7 +6,7 @@
                         @submit="create_group"
                         :ignore_group_size_limits="true">
       <template v-slot:header>
-        <p class="group-members-label"> Group members: </p>
+        <div class="label">Group members</div>
       </template>
       <template v-slot:footer>
         <APIErrors ref="api_errors"> </APIErrors>
@@ -73,28 +73,14 @@ function handle_create_group_error(component: CreateSingleGroup, error: unknown)
 <style scoped lang="scss">
 @import "@/styles/button_styles.scss";
 @import '@/styles/colors.scss';
-@import '@/styles/components/edit_groups.scss';
+@import '@/styles/forms.scss';
 
-#create-group-component {
-  padding: 0 0 10px 0;
+.label {
+  margin-top: .625rem;
 }
 
 .create-group-button {
   @extend .teal-button;
-  margin-top: 15px;
+  margin-top: .875rem;
 }
-
-.create-group-button:disabled {
-  @extend .gray-button;
-}
-
-.member-name-input {
-  min-width: 200px;
-  max-width: 300px;
-}
-
-.username-container {
-  min-width: 300px;
-}
-
 </style>

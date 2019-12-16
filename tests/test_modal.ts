@@ -51,22 +51,22 @@ describe('Modal.vue', () => {
         const wrapper = mount(component);
 
         expect(wrapper.find({ref: 'modal'}).exists()).toBe(false);
-        expect(wrapper.find('#modal-mask').exists()).toBe(false);
+        expect(wrapper.find('.modal-mask').exists()).toBe(false);
         expect(wrapper.find('.modal-container').exists()).toBe(false);
-        expect(wrapper.find('#close-button').exists()).toBe(false);
+        expect(wrapper.find('.close-button').exists()).toBe(false);
 
         wrapper.setData({show_modal: true});
         expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
-        expect(wrapper.find('#modal-mask').isVisible()).toBe(true);
+        expect(wrapper.find('.modal-mask').isVisible()).toBe(true);
         expect(wrapper.find('.modal-container').isVisible()).toBe(true);
-        expect(wrapper.find('#close-button').isVisible()).toBe(true);
+        expect(wrapper.find('.close-button').isVisible()).toBe(true);
     });
 
     test('Modal emits "close" on click of x when include_closing_x is true', () => {
         const wrapper = mount(Modal);
         expect(wrapper.emitted().close).toBeUndefined();
 
-        let close_button = wrapper.find('#close-button');
+        let close_button = wrapper.find('.close-button');
         close_button.trigger('click');
 
         expect(wrapper.emitted('close').length).toBe(1);
@@ -76,7 +76,7 @@ describe('Modal.vue', () => {
          'click_outside_to_close is true',
          () => {
         const wrapper = mount(Modal);
-        const outside_modal = wrapper.find('#modal-mask');
+        const outside_modal = wrapper.find('.modal-mask');
         const inside_modal = wrapper.find('.modal-container');
 
         expect(wrapper.vm.click_outside_to_close).toBe(false);
@@ -149,7 +149,7 @@ describe('Modal.vue', () => {
             }
         });
 
-        expect(wrapper.find('#close-button').exists()).toBe(false);
+        expect(wrapper.find('.close-button').exists()).toBe(false);
     });
 
     test('Using the emitted "close" event handler to toggle the external boolean ' +
@@ -175,14 +175,14 @@ describe('Modal.vue', () => {
 
         expect(wrapper.vm.$data.show_modal).toBe(true);
 
-        let close_button = wrapper.find('#close-button');
+        let close_button = wrapper.find('.close-button');
         close_button.trigger('click');
 
         expect(wrapper.vm.$data.show_modal).toBe(false);
 
         wrapper.setData({show_modal: true});
 
-        const outside_modal = wrapper.find('#modal-mask');
+        const outside_modal = wrapper.find('.modal-mask');
         const inside_modal = wrapper.find('.modal-container');
         expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
         expect(wrapper.vm.$data.show_modal).toBe(true);

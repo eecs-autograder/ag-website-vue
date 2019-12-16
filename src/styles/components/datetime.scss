@@ -1,15 +1,6 @@
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 
-/* TODO: Move into button_styles.scss */
-.flat-white-button {
-    @extend .button;
-
-    box-shadow: none;
-    color: black;
-    background: white;
-}
-
 .flat-white-button:hover:enabled {
     @include hover_state($pebble-medium, $pebble-medium);
 }
@@ -42,27 +33,23 @@
 
 .clearable-datetime-picker {
     .label {
-        color: lighten(black, 25);
-        font-size: 16px;
         font-weight: bold;
-        margin: 0;
-        padding: 0;
         vertical-align: top;
     }
 
     .datetime-input {
-        margin: 10px 0 10px 0;
+        margin: 0 .25rem .25rem 0;
         background-color: $white-gray;
         border: 1px solid darken($white-gray, 2);
-        border-radius: 4px;
-        padding: 8px;
+        border-radius: 2px;
+        padding: .5rem;
         display: inline-block;
 
         i {
-            padding: 0 4px;
+            padding: 0 .25rem;
         }
     }
-    
+
     .datetime-input:hover {
         cursor: pointer;
     }
@@ -70,13 +57,11 @@
     .clear-button {
         @extend .flat-white-button;
 
-        padding-top: 8px;
-        padding-bottom: 8px;
-
-        margin-left: 4px;
+        padding-top: .5rem;
+        padding-bottom: .5rem;
 
         .clear-text {
-            margin-left: 5px;
+            margin-left: .375rem;
         }
     }
 }

@@ -68,10 +68,10 @@ describe('Dropdown tests', () => {
 
         dropdown = wrapper.vm;
 
-        dropdown_container_wrapper = wrapper.find('#dropdown-container');
+        dropdown_container_wrapper = wrapper.find('.dropdown-container');
 
         header_wrapper = wrapper.find('#dropdown-header');
-        menu_wrapper = wrapper.find("#dropdown-content");
+        menu_wrapper = wrapper.find(".dropdown-content");
 
         expect(header_wrapper.exists()).toBe(true);
         expect(menu_wrapper.exists()).toBe(true);
@@ -86,7 +86,7 @@ describe('Dropdown tests', () => {
 
     test('The height of the dropdown can be customized', () => {
         expect(dropdown.dropdown_height).toEqual("100px");
-        let dropdown_container = wrapper.find('#dropdown-content');
+        let dropdown_container = wrapper.find('.dropdown-content');
         expect(dropdown_container.element.style.height).toEqual("100px");
         expect(dropdown_container.element.style.overflowY).toEqual('scroll');
     });

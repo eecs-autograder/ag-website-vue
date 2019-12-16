@@ -36,10 +36,17 @@ export default class GroupLookup extends Vue implements Created {
   @Prop({required: true, type: Array})
   groups!: Group[];
 
+  // When true, emits an update_group_selected event containing
+  // the group specified by the "current_student_lookup" query param.
+  @Prop({default: false, type: Boolean})
+  initialize_from_url!: boolean;
+
   created() {
-    let requested_group_pk = get_query_param(this.$route.query, "current_student_lookup");
-    if (requested_group_pk !== null) {
-      this.on_group_selected(this.groups.find(group => group.pk === Number(requested_group_pk))!);
+    if (this.initialize_from_url) {
+      let requested_group_pk = get_query_param(this.$route.query, "current_student_lookup");
+      if (requested_group_pk !== null) {
+        this.on_group_selected(this.groups.find(group => group.pk === Number(requested_group_pk))!);
+      }
     }
   }
 
@@ -64,8 +71,7 @@ export default class GroupLookup extends Vue implements Created {
 @import '@/styles/colors.scss';
 
 .typeahead-row {
-  font-size: 15px;
-  padding-right: 5px;
+  font-size: .875rem;
+  padding-right: .25rem;
 }
-
 </style>

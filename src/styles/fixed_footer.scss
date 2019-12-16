@@ -1,0 +1,18 @@
+@mixin fixed-footer($height, $background-color: $white-gray, $border-color: hsl(210, 20%, 94%)) {
+    box-sizing: border-box;
+
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+
+    height: $height;
+    background-color: $background-color;
+    border-top: 1px solid $border-color;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: .25rem;
+}

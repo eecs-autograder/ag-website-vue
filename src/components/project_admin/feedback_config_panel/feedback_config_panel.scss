@@ -1,0 +1,17 @@
+@import '@/styles/colors.scss';
+@import '@/styles/section_header.scss';
+
+.advanced-settings-label {
+    @include section-header($line-color: $navy-blue, $with-left-divider: false);
+
+    box-sizing: border-box;
+
+    font-size: 1rem;
+    color: $navy-blue;
+    cursor: pointer;
+
+    .advanced-settings-text {
+        padding: 0 .125rem;
+        box-sizing: border-box;
+    }
+}

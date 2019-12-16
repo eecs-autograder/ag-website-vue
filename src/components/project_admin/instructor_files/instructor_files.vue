@@ -164,32 +164,32 @@ function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
 }
 
 #instructor-files-component {
-  margin-top: 10px;
+  margin-top: .625rem;
 }
 
 .progress-wrapper {
-  padding-top: 10px;
+  padding-top: .625rem;
 }
 
 $border-color: hsl(220, 40%, 94%);
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 35px,
+  $sidebar-header-height: 2.25rem,
   $border-color: $border-color,
   $background-color: white,
   $active-color: $pebble-light
 );
 
 .sidebar-container {
-  margin-top: 15px;
+  margin-top: .875rem;
 }
 
 .sidebar-header {
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
   font-weight: bold;
-  font-size: 17px;
+  font-size: 1.125rem;
 }
 
 .collapse-show-button {
@@ -198,8 +198,8 @@ $border-color: hsl(220, 40%, 94%);
   border: none;
   color: $ocean-blue;
   outline: none;
-  padding: 0 8px;
-  font-size: 16px;
+  padding: 0 .5rem;
+  font-size: 1rem;
 }
 
 .collapse-show-button:hover {
@@ -207,7 +207,7 @@ $border-color: hsl(220, 40%, 94%);
 }
 
 .header-text {
-  padding-right: 8px;
+  padding-right: .5rem;
 }
 
 .sidebar-item {

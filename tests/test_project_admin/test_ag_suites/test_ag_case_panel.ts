@@ -294,7 +294,7 @@ describe('AGCasePanel tests', () => {
         wrapper.vm.d_new_command_name = "New command name";
         wrapper.vm.d_new_command = "New command";
 
-        wrapper.find('#add-ag-test-command-form').trigger('submit');
+        wrapper.find({ref: 'add_ag_test_command_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -326,7 +326,7 @@ describe('AGCasePanel tests', () => {
         wrapper.vm.d_new_command_name = "New command name";
         wrapper.vm.d_new_command = "New command";
 
-        wrapper.find('#add-ag-test-command-form').trigger('submit');
+        wrapper.find({ref: 'add_ag_test_command_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -399,11 +399,11 @@ describe('AGCasePanel tests', () => {
         let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
         set_validated_input_text(ag_test_case_clone_name, 'Water');
 
-        expect(wrapper.find('#modal-clone-ag-test-case-button').is(
+        expect(wrapper.find({ref: 'modal_clone_ag_test_case_button'}).is(
             '[disabled]'
         )).toBe(false);
 
-        wrapper.find('#clone-ag-test-case-form').trigger('submit');
+        wrapper.find({ref: 'clone_ag_test_case_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(clone_case_stub.calledOnce).toBe(true);
@@ -428,8 +428,7 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.d_cloned_case_name).toEqual("Fall");
 
-        // clicking closing_x to close the modal
-        wrapper.find('#close-button').trigger('click');
+        wrapper.find({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
@@ -444,8 +443,7 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.d_cloned_case_name).toEqual("Winter");
 
-        // clicking outside the modal to close the modal
-        wrapper.find('#modal-mask').trigger('click');
+        wrapper.find({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
@@ -485,11 +483,11 @@ describe('AGCasePanel tests', () => {
         let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
         set_validated_input_text(ag_test_case_clone_name, 'Purple Case');
 
-        expect(wrapper.find('#modal-clone-ag-test-case-button').is(
+        expect(wrapper.find({ref: 'modal_clone_ag_test_case_button'}).is(
             '[disabled]'
         )).toBe(false);
 
-        wrapper.find('#clone-ag-test-case-form').trigger('submit');
+        wrapper.find({ref: 'clone_ag_test_case_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(clone_case_stub.calledOnce).toBe(true);
@@ -579,25 +577,17 @@ describe('AGCasePanel tests', () => {
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let new_command_name_input = wrapper.find(
-            {ref: 'new_ag_test_command_name'}
-        ).find('#input');
+        let new_command_name_input = wrapper.find({ref: 'new_ag_test_command_name'});
         let new_command_name_validator = <ValidatedInput> wrapper.find(
             {ref: 'new_ag_test_command_name'}
         ).vm;
 
         expect(new_command_name_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_command_name_input.element).value = "Great";
-        new_command_name_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_name_input, "Great");
         expect(new_command_name_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_command_name_input.element).value = " ";
-        new_command_name_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_name_input, " ");
         expect(new_command_name_validator.is_valid).toBe(false);
     });
 
@@ -625,21 +615,15 @@ describe('AGCasePanel tests', () => {
         wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let new_command_input = wrapper.find({ref: 'new_ag_test_command'}).find('#input');
+        let new_command_input = wrapper.find({ref: 'new_ag_test_command'});
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_ag_test_command'}).vm;
 
         expect(new_command_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_command_input.element).value = "Splenda";
-        new_command_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_input, "Splenda");
         expect(new_command_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_command_input.element).value = " ";
-        new_command_input.trigger('input');
-        await wrapper.vm.$nextTick();
-
+        set_validated_input_text(new_command_input, " ");
         expect(new_command_validator.is_valid).toBe(false);
     });
 

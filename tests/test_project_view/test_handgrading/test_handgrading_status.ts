@@ -1,6 +1,6 @@
 import * as ag_cli from 'ag-client-typescript';
 
-import { get_handgrading_status, HandgradingStatus } from '@/components/handgrading/handgrading_status';
+import { get_handgrading_status, HandgradingStatus } from '@/components/project_view/handgrading/handgrading_status';
 
 import * as data_ut from '@/tests/data_utils';
 

@@ -52,20 +52,20 @@ describe('app.vue tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(compress_whitespace(wrapper.text())).toEqual(
-            `Autograder ${course.name} ${course.semester} ${course.year}`
+            `Autograder - ${course.name} ${course.semester} ${course.year}`
         );
 
         wrapper.vm.globals.current_course!.year = null;
         await wrapper.vm.$nextTick();
 
         expect(compress_whitespace(wrapper.text())).toEqual(
-            `Autograder ${course.name} ${course.semester}`
+            `Autograder - ${course.name} ${course.semester}`
         );
 
         wrapper.vm.globals.current_course!.semester = null;
         await wrapper.vm.$nextTick();
 
-        expect(compress_whitespace(wrapper.text())).toEqual(`Autograder ${course.name}`);
+        expect(compress_whitespace(wrapper.text())).toEqual(`Autograder - ${course.name}`);
     });
 
     test('Navigation breadcrumbs for non-admin', async () => {
@@ -79,7 +79,7 @@ describe('app.vue tests', () => {
 
         expect(wrapper.findAll('.fa-cog').length).toEqual(0);
         expect(compress_whitespace(wrapper.text())).toEqual(
-            `Autograder ${course.name} ${course.semester} ${course.year} - ${project.name}`
+            `Autograder - ${course.name} ${course.semester} ${course.year} - ${project.name}`
         );
     });
 

@@ -6,11 +6,9 @@
                       @submit="add_users"
                       @form_validity_changed="add_users_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
-          <i class="fas fa-question-circle input-tooltip">
-            <tooltip width="large" placement="right">
-              Enter a comma-separated list of email addresses.
-            </tooltip>
-          </i>
+          <tooltip width="medium" placement="bottom">
+            Enter a comma-separated list of email addresses.
+          </tooltip>
         </label>
         <ValidatedInput ref="add_users_textarea"
                         id="add-users-input"
@@ -18,40 +16,41 @@
                         :validators="[contains_valid_emails]"
                         :num_rows="7">
         </ValidatedInput>
-        <button type="submit"
-               id="add-users-button"
-               :disabled="!add_users_form_is_valid">
-          Add to Roster
-        </button>
+        <div class="button-footer">
+          <button type="submit"
+                id="add-users-button"
+                class="save-button"
+                :disabled="!add_users_form_is_valid">
+            Add to Roster
+          </button>
+        </div>
       </validated-form>
     </div>
 
     <div class="enrolled-container">
-      <div>
-        <div  v-if="d_roster.length !== 0"
-              class="user-table-wrapper">
-          <table class="user-table">
-            <tr>
-              <th class="email-column"> Username </th>
-              <th class="name-column"> Name </th>
-              <th class="remove-user-column"> Remove </th>
-            </tr>
-            <tr v-for="(person, index) in d_roster"
-                :class="index % 2 ? 'odd-row' : 'even-row'">
-              <td class="email-column email">{{person.username}}</td>
-              <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
-              <td class="remove-user-column">
-                <i class="fas fa-user-times remove-user"
-                   :title="'Delete ' + person.username"
-                   @click="remove_person_from_roster([person], index)">
-                </i>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div v-else class="empty-roster-message">
-          The {{role}} roster for this course is currently empty!
-        </div>
+      <div v-if="d_roster.length !== 0"
+            class="user-table-wrapper">
+        <table class="user-table">
+          <tr>
+            <th class="email-column"> Username </th>
+            <th class="name-column"> Name </th>
+            <th class="remove-user-column"> Remove </th>
+          </tr>
+          <tr v-for="(person, index) in d_roster"
+              :class="index % 2 ? 'odd-row' : 'even-row'">
+            <td class="email-column email">{{person.username}}</td>
+            <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
+            <td class="remove-user-column">
+              <i class="fas fa-user-times remove-user"
+                  :title="'Delete ' + person.username"
+                  @click="remove_person_from_roster([person], index)">
+              </i>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div v-else class="empty-roster-message">
+        The {{role}} roster is currently empty
       </div>
     </div>
   </div>
@@ -153,51 +152,56 @@ export default class Roster extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/button_styles.scss';
 
-.roster-container {
+* {
+  box-sizing: border-box;
+  padding: 0;
   margin: 0;
 }
 
-.adding-container {
-  margin: 0 5%;
-}
-
-.enrolled-container {
-  margin: 15px 5% 0 5%;
-  padding: 0 0 50px 0;
-}
-
-#add-users-button {
-  @extend .green-button;
-}
-
-#add-users-button {
-  margin: 15px 0 15px 0;
+.empty-roster-message {
+  color: darken($stormy-gray-dark, 10%);
 }
 
 .enrollment-add-label {
   color: black;
-  display: block;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-  padding: 10px 0 8px 1px;
-  position: relative;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.user-table-wrapper {
+  overflow: auto;
 }
 
 .user-table {
   border-collapse: collapse;
-  margin-top: 15px;
 }
 
-.user-table th {
-  border-bottom: 2px solid hsl(210, 20%, 92%);
-  color: black;
-  font-size: 16px;
-  padding: 10px 15px 10px 15px;
+.user-table {
+  th {
+    border-bottom: 2px solid hsl(210, 20%, 92%);
+    color: black;
+  }
+
+  th, td {
+    padding: .625rem .872rem;
+    font-size: 1rem;
+  }
+
+  tr td {
+    border-bottom: 1px solid hsl(210, 20%, 94%);
+  }
+}
+
+.odd-row {
+  background-color: white;
+}
+
+.even-row {
+  background-color: $white-gray;
 }
 
 .email-column {
@@ -212,7 +216,6 @@ export default class Roster extends Vue {
 .name-column {
   text-align: left;
   width: 50%;
-  word-spacing: 4px;
 }
 
 .name {
@@ -224,55 +227,13 @@ export default class Roster extends Vue {
   width: 5%;
 }
 
-.user-table td {
-  margin-bottom: 10px;
-  padding: 10px 15px 10px 15px;
-  position: relative;
-}
-
-.user-table tr td {
-  border-bottom: 1px solid hsl(210, 20%, 94%);
-}
-
-.odd-row {
-  background-color: white;
-}
-
-.even-row {
-  background-color: $white-gray;
-}
-
-.user-table-wrapper {
-  overflow: scroll;
-}
-
 .remove-user {
   color: hsl(212, 10%, 47%);
   cursor: pointer;
-}
 
-.remove-user:hover {
-  color: $navy-blue;
-}
-
-::-webkit-scrollbar {
-  background: transparent;
-  width: 0;
-}
-
-@media only screen and (min-width: 481px) {
-  .adding-container, .enrolled-container {
-    margin: 0 2.5%;
-  }
-
-  .user-table {
-    width: 100%;
+  &:hover {
+    color: $navy-blue;
   }
 }
 
-@media only screen and (min-width: 768px) {
-  .user-table-wrapper {
-    overflow: visible;
-  }
-}
 </style>

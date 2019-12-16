@@ -68,5 +68,4 @@ export default class SelectObject extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/forms.scss';
-
 </style>

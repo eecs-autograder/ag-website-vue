@@ -2,23 +2,23 @@
   <validated-form ref="form"
                   @submit="submit"
                   @form_validity_changed="$emit('form_validity_changed', $event)">
-    <div class="input-spacing">
-      <label class="text-label">Name</label>
+    <div class="form-field-wrapper">
+      <label class="label">Name</label>
       <validated-input v-model="d_form_data.short_description"
                        ref="short_description"
                        :validators="[is_not_empty]"></validated-input>
     </div>
 
-    <div class="input-spacing">
-      <label class="text-label">Points</label>
+    <div class="form-field-wrapper">
+      <label class="label">Points</label>
       <validated-input v-model="d_form_data.points"
                        ref="points"
                        :validators="[is_not_empty, is_integer]"
                        :from_string_fn="string_to_num"></validated-input>
     </div>
 
-    <div class="input-spacing">
-      <label class="text-label">Description</label>
+    <div class="form-field-wrapper">
+      <label class="label">Description</label>
       <validated-input v-model="d_form_data.long_description"
                        ref="long_description"
                        :num_rows="3"
@@ -97,6 +97,4 @@ export default class CriterionForm extends Vue implements Created {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
-
 </style>

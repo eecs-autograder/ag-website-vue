@@ -1,9 +1,9 @@
 <template>
-  <div v-if="d_loading" class="loading-spinner">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="project-admin">
-    <div class="navbar">
+    <div class="navbar default-navbar">
       <div class="nav-link"
             :class="{'active': d_current_tab === 'settings'}"
             @click="set_current_tab('settings')">
@@ -69,6 +69,7 @@
                        :project="project"></mutation-suites>
       <edit-groups v-show="d_current_tab === 'edit_groups'"
                    v-if="d_loaded_tabs.has('edit_groups')"
+                   :course="d_globals.current_course"
                    :project="project"></edit-groups>
       <download-grades v-show="d_current_tab === 'download_grades'"
                        v-if="d_loaded_tabs.has('download_grades')"
@@ -131,6 +132,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
                                                          Destroyed {
   @Inject({from: 'globals'})
   globals!: GlobalData;
+  d_globals = this.globals;
 
   d_loading = true;
   project: Project | null = null;
@@ -143,7 +145,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
 
-    await this.globals.set_current_project(this.project);
+    await this.d_globals.set_current_project(this.project);
     InstructorFile.subscribe(this);
     ExpectedStudentFile.subscribe(this);
     this.d_loading = false;
@@ -252,6 +254,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/navbar.scss';
 
 * {
@@ -265,27 +268,11 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   width: 100%;
 }
 
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
 @include navbar(
   $background-color: $pebble-light,
   $hover-color: lighten($pebble-dark, 5%),
   $active-color: $pebble-dark,
   $border-color: lighten($pebble-dark, 5%)
 );
-
-.navbar {
-  .nav-link {
-    font-size: 14px;
-    padding: 10px 10px;
-  }
-}
 
 </style>

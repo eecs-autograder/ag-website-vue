@@ -77,29 +77,36 @@ export default class APIErrors extends Vue {
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 
-.error-msg-container {
+* {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.error-msg-container {
   width: 100%;
-  position: relative;
-  color: #721c24;
+  max-width: 700px;
+  display: flex;
+  align-items: center;
+
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
-  padding: 10px 90px 10px 10px;
-  border-radius: .25rem;
-  margin: 8px 0;
+
+  padding: .5rem;
+  border-radius: 2px;
+  margin: .25rem 0;
+}
+
+.error-msg {
+  margin-right: 1rem;
 }
 
 .dismiss-error-button {
-  font-size: 15px;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  padding: 4px 10px;
-  background-color: white;
-  border-radius: .25rem;
-  color: black; // text is not visible without this
-  cursor: pointer;
-  color: black;
+  @extend .flat-white-button;
+  font-size: .875rem;
+  padding: .25rem .625rem;
+
+  margin-left: auto;
   border: 1px solid #f5c6cb;
 }
 </style>

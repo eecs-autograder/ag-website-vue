@@ -180,6 +180,7 @@ export function format_course_name(course: Course) {
 // the key, returns the first of those values.
 export function get_query_param(query_params: Dictionary<string | string[]>, key: string) {
     let query_value = query_params[key];
+    // istanbul ignore next
     if (Array.isArray(query_value)) {
         console.assert(query_value.length !== 0);
         return query_value[0];

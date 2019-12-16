@@ -153,43 +153,6 @@ describe('ContextMenu tests', () => {
     });
 
     test("Position adjusted when too near right edge", async () => {
-        // @Component({
-        //     template: `<div>
-        //                  <div class="too-far-right-square"
-        //                       @click="$refs.context_menu.show_context_menu($event)">
-        //                  </div>
-        //                 <context-menu ref="context_menu">
-        //                   <template slot="context_menu_items">
-        //                       <context-menu-item ref="item_1"
-        //                         @click="change_greeting_color('red')">
-        //                         <template slot="label">
-        //                          One
-        //                         </template>
-        //                       </context-menu-item>
-        //                       <context-menu-item ref="item_2"
-        //                         @click="change_greeting_color('blue')">
-        //                         <template slot="label">
-        //                           Two
-        //                         </template>
-        //                       </context-menu-item>
-        //                   </template>
-        //                 </context-menu>
-        //               </div>`,
-        //     components: {
-        //         'context-menu': ContextMenu,
-        //         'context-menu-item': ContextMenuItem
-        //     }
-        // })
-        // class WrapperComponent2 extends Vue {
-
-        //     change_greeting_color(color_in: string) {
-        //         let greeting = <HTMLElement> this.$el.getElementsByClassName(
-        //             'greeting'
-        //         )[0];
-        //         greeting.style.color = color_in;
-        //     }
-        // }
-
         let wrapper = mount(WrapperComponent);
         let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
 
@@ -256,7 +219,7 @@ describe('ContextMenu tests', () => {
     test("Pressing esc closes the context menu", async () => {
         let wrapper = mount(WrapperComponent);
         let context_menu_area = wrapper.find('.context-menu-area');
-        let context_menu_wrapper = wrapper.find('#context-menu-container');
+        let context_menu_wrapper = wrapper.find('.context-menu-container');
 
         context_menu_area.trigger('click');
         await wrapper.vm.$nextTick();

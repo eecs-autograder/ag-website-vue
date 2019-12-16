@@ -25,59 +25,46 @@
 
       <div id="resolve-invitation-message"
            v-if="invitations_received.length > 0 || invitation_sent !== null">
-        <i class="fas fa-square"
+        <i class="fas fa-info-circle"
            id="resolve-invitation-square">
         </i>
         You must resolve pending invitations before sending a new one.
       </div>
 
-      <div id="registration-open-shared-space">
-        <div v-if="invitation_sent !== null"
-             id="invitation-sent-container">
-          <div id="invitation-sent">
-            <div id="invitation-sent-header">
-              <div id="invitation-sent-title"> Invitation Sent </div>
-            </div>
-            <div id="invitation-sent-body">
-              <table class="invitation-table">
-                <tr class="invitation-sent-table-row">
-                  <th> Member Name </th>
-                  <th> Status </th>
-                </tr>
-                <tr v-for="(username, index) of invitation_sent.invited_usernames"
-                    :class="['invitation-sent-table-row',
-                            {'last-username': index
-                                              === invitation_sent.invited_usernames.length - 1}]">
-                  <td>
-                    <div class="member-name-td">{{username}}</div>
-                  </td>
-                  <td class="acceptance-status-td">
-                    {{invitee_acceptance_status(username)}}
-                  </td>
-                </tr>
-              </table>
-            </div>
-            <div id="invitation-sent-footer">
-              <button id="delete-invitation-button"
-                      class="white-button"
-                      @click="d_show_delete_invitation_modal = true">
-                Delete Invitation
-              </button>
-            </div>
+      <div v-if="invitation_sent !== null"
+           id="invitation-sent-container" class="invitation-sent">
+          <div class="invitation-header">Invitation Sent</div>
+          <div class="invitation-body">
+            <table class="member-table">
+              <tr class="table-header">
+                <th class="table-cell"> Member Name </th>
+                <th class="table-cell"> Status </th>
+              </tr>
+              <tr v-for="(username, index) of invitation_sent.invited_usernames">
+                <td class="table-cell">{{username}}</td>
+                <td class="table-cell">{{invitee_acceptance_status(username)}}</td>
+              </tr>
+            </table>
           </div>
-        </div>
+          <div class="invitation-footer">
+            <button id="delete-invitation-button"
+                    class="orange-button"
+                    @click="d_show_delete_invitation_modal = true">
+              Delete Invitation
+            </button>
+          </div>
+      </div>
 
-        <div v-if="invitations_received.length > 0"
-             id="invitations-received-container">
-          <div v-for="(invitation, index) of invitations_received"
-               :key="invitation.pk"
-               class="single-invitation-received">
-            <invitation-received ref="invitation_received"
-                                 v-model="invitations_received[index]"
-                                 :project="project"
-                                 @invitation_rejected="invitations_received.splice(index, 1)">
-            </invitation-received>
-          </div>
+      <div v-if="invitations_received.length > 0"
+            id="invitations-received-container">
+        <div v-for="(invitation, index) of invitations_received"
+              :key="invitation.pk"
+              class="single-invitation-received">
+          <invitation-received ref="invitation_received"
+                                v-model="invitations_received[index]"
+                                :project="project"
+                                @invitation_rejected="invitations_received.splice(index, 1)">
+          </invitation-received>
         </div>
       </div>
     </div>
@@ -87,100 +74,75 @@
            ref="confirm_working_alone_modal"
            size="medium"
            click_outside_to_close>
-      <div class="modal-header"> Are you sure you want to <b>work alone</b>? </div>
-      <div class="modal-body">
-        <div class="modal-footer">
-          <div>
-            <APIErrors ref="work_alone_api_errors"> </APIErrors>
-          </div>
-          <div class="modal-button-container">
-            <button id="cancel-confirm-working-alone-button"
-                    class="white-button"
-                    @click="d_show_confirm_working_alone_modal = false"> Cancel </button>
-            <button id="confirm-working-alone-button"
-                    class="teal-button"
-                    @click="work_alone"
-                    :disabled="d_awaiting_action"> Work Alone </button>
-          </div>
-        </div>
+      <div class="modal-header"> Confirm Working Alone </div>
+      <APIErrors ref="work_alone_api_errors"> </APIErrors>
+      <div class="modal-button-footer">
+        <button id="confirm-working-alone-button"
+                class="teal-button"
+                @click="work_alone"
+                :disabled="d_awaiting_action"> Work Alone </button>
+        <button id="cancel-confirm-working-alone-button"
+                class="white-button"
+                @click="d_show_confirm_working_alone_modal = false"> Cancel </button>
       </div>
     </modal>
 
     <modal v-if="d_show_send_group_invitation_modal"
            @close="d_show_send_group_invitation_modal = false"
            ref="send_group_invitation_modal"
-           size="medium"
+           size="large"
            click_outside_to_close>
       <div class="modal-header"> Send Invitation </div>
-      <div class="modal-divider"></div>
-      <div class="modal-body">
-        <group-members-form ref="send_invitation_form"
-                            :project="project"
-                            :course="course"
-                            :max_num_members="project.max_group_size - 1"
-                            @submit="send_invitation">
-          <template v-slot:header>
-            <p class="send-group-invitation-modal-title"> Users to Invite: </p>
-          </template>
-          <template v-slot:footer>
-            <div class="modal-footer">
-              <div class="modal-divider"></div>
-              <div>
-                <APIErrors ref="send_invitation_api_errors"> </APIErrors>
-              </div>
-
-              <div class="modal-button-container">
-                <button id="cancel-send-invitation-button"
-                        class="white-button"
-                        type="button"
-                        @click="d_show_send_group_invitation_modal = false">
-                  Cancel
-                </button>
-                <button id="confirm-send-invitation-button"
-                        class="purple-button"
-                        type="submit"
-                        :disabled="d_sending_invitation">
-                  Send Invitation
-                </button>
-              </div>
-            </div>
-          </template>
-        </group-members-form>
-      </div>
+      <group-members-form ref="send_invitation_form"
+                          :project="project"
+                          :course="course"
+                          :max_num_members="project.max_group_size - 1"
+                          @submit="send_invitation">
+        <template v-slot:header>
+          <div class="users-to-invite-label"> Users to Invite: </div>
+        </template>
+        <template v-slot:footer>
+          <APIErrors ref="send_invitation_api_errors"> </APIErrors>
+          <div class="modal-button-footer">
+            <button id="confirm-send-invitation-button"
+                    class="green-button"
+                    type="submit"
+                    :disabled="d_sending_invitation">
+              Send Invitation
+            </button>
+            <button id="cancel-send-invitation-button"
+                    class="white-button"
+                    type="button"
+                    @click="d_show_send_group_invitation_modal = false">
+              Cancel
+            </button>
+          </div>
+        </template>
+      </group-members-form>
     </modal>
 
     <modal v-if="d_show_delete_invitation_modal"
            @close="d_show_delete_invitation_modal = false"
            ref="delete_invitation_modal"
-           size="large">
+           size="large"
+           click_outside_to_close>
       <div class="modal-header"> Delete Invitation </div>
-      <div class="modal-divider"></div>
-      <div class="modal-body">
-        <div class="modal-message">
-          Are you sure you want to <b>delete</b> your invitation to:
-          <ul v-if="invitation_sent !== null" class="list-of-usernames">
-            <li v-for="(username, index) of invitation_sent.invited_usernames"
-                :class="['username',
-                  {'last-username': index === invitation_sent.invited_usernames.length - 1}]">
-              {{username}}
-            </li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <div class="modal-divider"></div>
-          <div>
-            <APIErrors ref="delete_invitation_api_errors"> </APIErrors>
-          </div>
-          <div class="modal-button-container">
-            <button id="confirm-keep-sent-invitation-button"
-                    class="white-button"
-                    @click="d_show_delete_invitation_modal = false"> Keep Invitation </button>
-            <button id="confirm-delete-invitation-button"
-                    class="orange-button"
-                    @click="delete_invitation"
-                    :disabled="d_deleting_invitation"> Delete Invitation </button>
-          </div>
-        </div>
+      Are you sure you want to <b>delete</b> your invitation to:
+      <ul v-if="invitation_sent !== null" class="list-of-usernames">
+        <li v-for="(username, index) of invitation_sent.invited_usernames"
+            class="username">
+          {{username}}
+        </li>
+      </ul>
+      <APIErrors ref="delete_invitation_api_errors"> </APIErrors>
+      <div class="modal-button-footer">
+        <button id="confirm-delete-invitation-button"
+                class="orange-button"
+                @click="delete_invitation"
+                :disabled="d_deleting_invitation"> Delete Invitation </button>
+        <button id="confirm-keep-sent-invitation-button"
+                class="white-button"
+                @click="d_show_delete_invitation_modal = false"> Keep Invitation </button>
       </div>
     </modal>
 
@@ -323,15 +285,16 @@ function handle_send_invitation_error(component: GroupRegistration, error: unkno
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-@import '@/styles/components/edit_groups.scss';
-@import '@/styles/components/group_registration.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
+
+@import './group_registration.scss';
 
 $purple: hsl(275, 48%, 56%);
 $teal: hsl(180, 100%, 24%);
 
 * {
   box-sizing: border-box;
-  padding: 0;
 }
 
 #group-registration {
@@ -340,69 +303,52 @@ $teal: hsl(180, 100%, 24%);
 
 #registration-header {
   text-align: left;
-  font-size: 24px;
-  margin-top: 15px;
+  font-size: 1.5rem;
+  margin-top: .875rem;
+  margin-left: .5rem;
 }
 
 #registration-buttons {
-  margin: 10px 0;
+  margin: .625rem 0;
   display: flex;
   flex-direction: column;
-  justify-items: center;
+  justify-content: center;
   align-items: center;
 
-  max-width: 300px;
+  @media only screen and (min-width: 500px) {
+    max-width: 300px;
+  }
+  padding: 0 .5rem;
 
   .button {
-    width: 300px;
-    margin: 5px 0;
+    width: 100%;
+    margin: .25rem 0;
   }
 }
 
 #registration-closed {
-  padding: 15px 20px;
+  padding: .875rem 1.25rem;
 }
 
 #resolve-invitation-message {
-  padding: 15px 20px 2px 20px;
+  padding: .875rem 1.25rem .125rem;
 }
 
 #resolve-invitation-square {
   color: $purple;
-  margin: 0 5px;
+  margin: 0 .25rem;
 }
 
 .single-invitation-received {
-  margin-top: 15px;
+  margin-top: .875rem;
 }
 
-#invitation-sent {
-  @extend .invitation-container;
-  margin-bottom: 0;
-}
+.invitation-sent {
+  @include invitation(lighten($gray-blue-1, 5%), lighten($gray-blue-1, 5%));
 
-$lighter-teal: lighten($teal, 20%);
-$border-teal: darken($lighter-teal, 1%);
-
-#invitation-sent-header {
-  @include invitation_container_header($lighter-teal, $border-teal);
-  font-weight: bold;
-}
-
-#invitation-sent-title {
-  font-size: 20px;
-}
-
-#invitation-sent-body {
-  @include invitation_container_body($border-teal);
-}
-
-.invitation-sent-table-row {
-  @extend .invitation-table-row;
-}
-
-#invitation-sent-footer {
-  @include invitation_container_footer($lighter-teal, $border-teal);
+  .invitation-footer {
+    justify-content: flex-end;
+  }
 }
 
 #work-alone-button {
@@ -413,15 +359,13 @@ $border-teal: darken($lighter-teal, 1%);
   box-shadow: none;
 }
 
-#cancel-confirm-working-alone-button,
-#confirm-keep-sent-invitation-button,
-#cancel-send-invitation-button {
-  margin-right: 10px;
+.users-to-invite-label {
+  padding: .625 0;
+  font-weight: bold;
 }
 
-.send-group-invitation-modal-title {
-  padding: 10px 0;
-  margin: 0;
+.modal-button-footer {
+  margin-top: 1.25rem;
 }
 
 </style>

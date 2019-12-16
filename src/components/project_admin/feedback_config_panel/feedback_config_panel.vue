@@ -1,26 +1,27 @@
 <template>
-  <div id="config-panel">
+  <div class="feedback-config-panel">
 
-    <div id="header">
-      <slot name="header"></slot>
+    <div class="header">
+      <div class="header-text">
+        <slot name="header"></slot>
+      </div>
 
-      <div v-if="d_configuration !== null && preset_names.length"
-           class="setting-selection-container">
-        <span id="preset-label">Preset:</span>
-        <select id="config-preset-select"
+      <div :style="{'visibility': is_enabled ? 'visible' : 'hidden'}"
+           class="preset-selection-container"
+           ref="preset_selection">
+        <span class="preset-label">Preset:</span>
+        <select class="select"
                 v-model="d_selected_preset_name"
-                @change="change_preset"
-                class="select">
+                @change="change_preset">
           <option hidden>Custom</option>
-          <option v-for="preset_name of preset_names"
-                  :value="preset_name">
+          <option v-for="preset_name of preset_names" :value="preset_name">
             {{preset_name}}
           </option>
         </select>
       </div>
     </div>
 
-    <div id="footer">
+    <div class="footer">
       <slot name="settings"> </slot>
     </div>
   </div>
@@ -38,7 +39,7 @@ import {
   AGTestCommandFeedbackPreset,
   AGTestSuiteFeedbackPreset,
   MutationTestSuiteFeedbackPreset
-} from '@/components/project_admin/feedback_config_utils';
+} from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import { SafeMap } from '@/safe_map';
 import { safe_assign } from "@/utils";
 
@@ -79,8 +80,12 @@ export default class FeedbackConfigPanel extends Vue {
     this.set_d_configuration(this.value);
   }
 
+  private get is_enabled() {
+    return this.d_configuration !== null && this.preset_names.length !== 0;
+  }
+
   private set_d_configuration(feedback_config: FeedbackConfigType) {
-    this.d_configuration = this.value === null ? null : JSON.parse(JSON.stringify(this.value));
+    this.d_configuration = JSON.parse(JSON.stringify(feedback_config));
     this.d_selected_preset_name = this.detect_current_preset();
   }
 
@@ -127,36 +132,63 @@ export default class FeedbackConfigPanel extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 
-#config-panel {
-    margin-bottom: 10px;
-    box-shadow: 0 1px 1px $white-gray;
-    border-radius: 3px;
-    min-width: 600px;
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-#header {
-    background-color: hsl(220, 30%, 94%);
-    border: 2px solid hsl(220, 30%, 92%);
-    border-bottom: none;
-    border-radius: 3px 3px 0 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 33px;
-    padding: 4px 4px 5px 10px;
+$border-radius: 3px;
+
+.feedback-config-panel {
+  width: 100%;
+  max-width: 600px;
+
+  margin-bottom: .625rem;
+  box-shadow: 0 1px 1px $white-gray;
+  border-radius: $border-radius;
 }
 
-#preset-label {
-    display: inline-block;
-    margin-right: 6px;
+.header {
+  background-color: hsl(220, 30%, 94%);
+  border: 2px solid hsl(220, 30%, 92%);
+  border-bottom: none;
+  border-radius: $border-radius $border-radius 0 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: .25rem .25rem .25rem .5rem;
 }
 
-#footer {
-    border: 2px solid hsl(210, 20%, 92%);
-    border-top: none;
-    border-radius: 0 0 3px 3px;
-    background-color: white;
-    padding: 5px;
+.header-text {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.preset-selection-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.preset-label {
+  margin-right: .375rem;
+
+  display: none;
+  @media only screen and (min-width: 500px) {
+    display: block;
+  }
+}
+
+.footer {
+  border: 2px solid hsl(210, 20%, 92%);
+  border-top: none;
+  border-radius: 0 0 $border-radius $border-radius;
+  background-color: white;
+
+  padding: .375rem;
 }
 </style>

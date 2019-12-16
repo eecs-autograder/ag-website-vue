@@ -1,0 +1,49 @@
+@mixin invitation($background-color, $border-color) {
+    border: 1px solid $border-color;
+    border-radius: 2px;
+    margin: .875rem;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .invitation-header, .invitation-footer, .invitation-body {
+        padding: .75rem;
+    }
+
+    .invitation-header {
+        font-size: 1.125rem;
+        background-color: $background-color;
+    }
+
+    .member-table {
+        width: 100%;
+
+        .table-header {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .table-cell {
+            width: 50%;
+            padding-right: 1.25rem;
+        }
+    }
+
+    .invitation-footer {
+        display: flex;
+        align-items: center;
+
+        background-color: $background-color;
+
+        .button:last-child {
+            margin-left: 1rem;
+        }
+    }
+}
+
+.list-of-usernames {
+    margin-top: .75rem;
+    margin-bottom: .75rem;
+    font-weight: bold;
+}

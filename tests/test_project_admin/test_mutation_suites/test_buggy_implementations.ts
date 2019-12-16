@@ -184,7 +184,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('buggy_impl_names binding', async () => {
-        let buggy_implementation_names_input = wrapper.find('#buggy-implementation-names-input');
+        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
         buggy_implementation_names_input.setValue('cricket, mosquito, bee');
         buggy_implementation_names_input.trigger('input');
 
@@ -192,12 +192,12 @@ describe('BuggyImplementation tests', () => {
 
         wrapper.vm.d_buggy_impl_names_text = "ladybug ant";
         expect(
-            (<HTMLInputElement> wrapper.find('#buggy-implementation-names-input').element)
+            (<HTMLInputElement> wrapper.find({ref: 'buggy_impl_names_input'}).element)
                 .value).toEqual('ladybug ant');
     });
 
     test('adding buggy impl names by pressing the add-buggy-impl-names-button', async () => {
-        let buggy_implementation_names_input = wrapper.find('#buggy-implementation-names-input');
+        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -225,7 +225,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('adding buggy impl names by pressing enter', async () => {
-        let buggy_implementation_names_input = wrapper.find('#buggy-implementation-names-input');
+        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -240,7 +240,7 @@ describe('BuggyImplementation tests', () => {
         buggy_implementation_names_input.trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find('#buggy-implementation-names-input').trigger('keyup.enter');
+        wrapper.find({ref: 'buggy_impl_names_input'}).trigger('keyup.enter');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(7);
@@ -256,7 +256,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('adding buggy impl names - no duplicates allowed', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_implementation_names'});
+        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -280,7 +280,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('adding buggy impl names - empty strings cannot be added', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_implementation_names'});
+        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");

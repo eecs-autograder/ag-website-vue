@@ -1,72 +1,79 @@
 @import '@/styles/colors.scss';
 
-$input-border-color: #ced4da;
-$input-text-color: #495057;
-
-.input {
-    font-size: 1rem;
-    padding: 6px 7px;
-    border-radius: 2px;
-    color: $input-text-color;
-    background-color: white;
-    border: 1px solid $input-border-color;
-}
-
-.select {
-    background-color: white;
-    border: 1px solid $input-border-color;
-    border-radius: 2px;
-    box-sizing: border-box;
-    color: $input-text-color;
-    font-size: 1rem;
-    padding: 6px 4px;
-}
-
-.radio-container {
-    padding: 2px 4px;
-    .label {
-        padding-left: 3px;
-    }
-}
-
-// Organization -----------------------------------
-
-.legend {
-    color: $ocean-blue;
-    font-size: 1.125rem;
-}
+// Organization ---------------------------------------------------------------
 
 .fieldset {
+    box-sizing: border-box;
+
     border-bottom: none;
     border-left: none;
     border-right: none;
     border-color: rgba(255, 255, 255, 0.3);
     border-width: 2px;
+
+    margin: .75rem 0;
+    padding: 0;
 }
 
-.input-tooltip {
-    color: mediumvioletred;
-    font-size: 15px;
-    margin-left: 8px;
+.legend {
+    box-sizing: border-box;
+
+    color: darken($ocean-blue, 5%);
+    font-size: 1.125rem;
+    margin: .5rem 0;
 }
 
-.text-label {
-    color: lighten(black, 10);
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    text-align: right;
+// Provides even spacing for form elements
+.form-field-wrapper, .input-spacing {
+    margin-bottom: .5rem;
 }
 
-.input-spacing {
-    margin-top: 15px;
-    margin-bottom: 15px;
+.extra-space {
+    margin-top: .875rem;
+    margin-bottom: .875rem;
+}
+
+%last-saved-timestamp {
+    padding-top: .5rem;
+    font-size: 1rem;
+    width: 100%;
+}
+
+// Provides padding and alignment for buttons at the bottom of a form or modal
+.button-footer, .button-footer-right, .modal-button-footer {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: .75rem;
+    margin-bottom: .75rem;
+
+    .last-saved-timestamp {
+        @extend %last-saved-timestamp;
+    }
+
+    .button {
+        margin-right: .75rem;
+    }
+
+    .button:last-child {
+        margin-right: 0;
+    }
+}
+
+// Removes the bottom margin from .button-footer(-right)
+.modal-button-footer {
+    margin-bottom: 0;
+}
+
+// Like form-button-footer, but right-justifies the buttons
+.button-footer-right {
+    .button:first-child {
+        margin-left: auto;
+    }
 }
 
 .last-saved-timestamp {
-    color: lighten(#495057, 40);
-    font-size: 15px;
+    color: darken($stormy-gray-dark, 10%);
+    font-size: 1rem;
 }
 
 .save-button {
@@ -74,49 +81,98 @@ $input-text-color: #495057;
 
     @extend .green-button;
     display: block;
-    margin: 0 10px 10px 0;
+}
+
+.input-tooltip {
+    color: mediumvioletred;
+    font-size: .875rem;
+    margin-left: .5rem;
+}
+
+.label {
+    font-size: .875rem;
+    font-weight: bold;
+    margin: 0 0 .25rem 0;
 }
 
 // Danger Zone -----------------------------------
- 
+
 .danger-zone-container {
-    margin: 50px 10px 20px;
-    border-radius: 5px;
+    box-sizing: border-box;
+    margin: 3.125rem 0 0 0;
+    border-radius: 2px;
     border: 1px solid red;
-    padding: 10px;
+    padding: .625rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-   
+
     .danger-text {
         color: black;
-        font-size: 24px;
+        font-size: 1.25rem;
         word-break: break-word;
         word-wrap: break-word;
     }
- 
+
     .delete-button {
         @extend .red-button;
-        font-size: 14px;
     }
- 
  }
 
-// Checkbox ---------------------------------------
+// Inputs, selects, radios ----------------------------------------------------
+
+$input-border-color: #ced4da;
+$input-text-color: #495057;
+
+.input {
+    box-sizing: border-box;
+    font-size: 1rem;
+    padding: .375rem;
+    border-radius: 2px;
+    color: $input-text-color;
+    background-color: white;
+    border: 1px solid $input-border-color;
+}
+
+.select {
+    box-sizing: border-box;
+    background-color: white;
+    border: 1px solid $input-border-color;
+    border-radius: 2px;
+    box-sizing: border-box;
+    color: $input-text-color;
+    font-size: 1rem;
+    padding: .375rem .25rem;
+
+    // So that parent element width caps are respected.
+    max-width: 100%;
+}
+
+.radio-container {
+    box-sizing: border-box;
+    padding: .125rem .25rem;
+    .label {
+        padding-left: .25rem;
+    }
+}
+
+// Checkbox -------------------------------------------------------------------
 
 $checkbox-background-light: hsl(200, 100%, 99%);
 $checkbox-background-dark: hsl(220, 30%, 90%);
 $check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
-    padding: 10px 0 10px 5px;
+    box-sizing: border-box;
+    margin: .625rem 0;
     position: relative;
 
     .checkbox-label {
         color: lighten(black, 10);
         display: inline-block;
-        font-size: 15px;
-        font-weight: 700;
+        font-size: .875rem;
+        font-weight: bold;
     }
 
     .checkbox  {
@@ -128,7 +184,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         color: transparent;
         content: '\f0c8';
         font-family: "Font Awesome 5 Free";
-        font-size: 10px;
+        font-size: .625rem;
         font-weight: 900;
         background-color: $checkbox-background-dark;
         background-image: linear-gradient(lighten($checkbox-background-dark, 8),
@@ -140,8 +196,8 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         box-shadow: 0 0.5px 0.5px $pebble-dark;
         display: inline-block;
         padding: 2px 2px 2px 2px;
-        margin-right: 4px;
-        min-width: 10px;
+        margin-right: .25rem;
+        min-width: .625rem;
         position: relative;
         bottom: 2px;
     }
@@ -179,40 +235,4 @@ $check-mark-disabled: hsl(220, 12%, 20%);
     .checkbox:disabled + label {
         color: rgba($check-mark-disabled, 0.6);
     }
-}
-
-// Dropdown ---------------------------------------
-
-.dropdown-header-wrapper {
-    display: inline-block;
-    margin: 0;
-    position: relative;
-}
-
-.dropdown-header {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    box-sizing: border-box;
-    color: #495057;
-    cursor: default;
-    display: block;
-    font-size: 1rem;
-    line-height: 1.5;
-    min-height: 38px;
-    padding: .375rem 55px .375rem .75rem;
-    position: relative;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.dropdown-header:focus {
-    border-color: $ocean-blue;
-}
-
-.dropdown-caret {
-    cursor: pointer;
-    font-size: 30px;
-    position: absolute;
-    right: 18px;
-    top: 3px;
 }

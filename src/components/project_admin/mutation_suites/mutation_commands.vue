@@ -1,7 +1,6 @@
 <template>
   <div id="mutation-commands-component">
-    <div id="use-setup-command-container"
-         class="checkbox-input-container">
+    <div class="checkbox-input-container">
       <input id="use-setup-command"
              type="checkbox"
              class="checkbox"
@@ -37,13 +36,11 @@
           @form_validity_changed="d_get_student_test_names_command_is_valid = $event">
         <template v-slot:command-label>
           2. Discover student test names
-          <i class="fas fa-question-circle input-tooltip">
-            <tooltip width="large" placement="right">
-              This command should print a whitespace-separated list of student
-              test names to standard out. <br>
-              This is often as simple as "ls test*.cpp"
-            </tooltip>
-          </i>
+          <tooltip width="large" placement="top">
+            This command should print a whitespace-separated list of student
+            test names to standard out. <br>
+            This is often as simple as "ls test*.cpp"
+          </tooltip>
         </template>
       </mutation-command>
     </div>
@@ -56,14 +53,12 @@
                         @form_validity_changed="d_student_test_validity_check_is_valid = $event">
         <template v-slot:command-label>
           3. Check for false positives
-          <i class="fas fa-question-circle input-tooltip">
-            <tooltip width="large" placement="right">
-              This command will be run once for every discovered student test,
-              with the name of that test substituted for ${student_test_name}. <br>
-              If the command exits nonzero, that student test will be flagged as
-              a false positive.
-            </tooltip>
-          </i>
+          <tooltip width="large" placement="top">
+            This command will be run once for every discovered student test,
+            with the name of that test substituted for ${student_test_name}. <br>
+            If the command exits nonzero, that student test will be flagged as
+            a false positive.
+          </tooltip>
           </template>
       </mutation-command>
     </div>
@@ -76,16 +71,14 @@
                         @form_validity_changed="d_grade_buggy_impl_command_is_valid = $event">
         <template v-slot:command-label>
           4. Run student tests with buggy implementations
-          <i class="fas fa-question-circle input-tooltip">
-            <tooltip width="large" placement="right">
-              This command is run once for every buggy impl, student test pair,
-              with the test name substituted for ${student_test_name} and the
-              bug name substituted for ${buggy_impl_name}.<br>
-              Student tests with false positives are excluded. <br>
-              If the command exits nonzero, the buggy impl is marked as exposed,
-              and the process skips ahead to the next bug.
-            </tooltip>
-          </i>
+          <tooltip width="large" placement="top">
+            This command is run once for every buggy impl, student test pair,
+            with the test name substituted for ${student_test_name} and the
+            bug name substituted for ${buggy_impl_name}.<br>
+            Student tests with false positives are excluded. <br>
+            If the command exits nonzero, the buggy impl is marked as exposed,
+            and the process skips ahead to the next bug.
+          </tooltip>
         </template>
       </mutation-command>
     </div>
@@ -135,19 +128,22 @@ export default class MutationCommands extends Vue {
 <style scoped lang="scss">
 @import '@/styles/forms.scss';
 
-#mutation-commands-component {
-  padding: 6px 12px 14px 2px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .mutation-command-container {
-  margin-bottom: 30px;
-  min-width: 600px;
-  width: 50%;
-  max-width: 100%;
+  margin-bottom: 1.25rem;
 }
 
-#use-setup-command-container {
-  padding: 5px 5px 14px 0;
-  position: relative;
+.mutation-command-container:last-child {
+  margin-bottom: 0;
+}
+
+#use-setup-command-label {
+  font-size: 1rem;
+  margin-bottom: .75rem;
 }
 </style>

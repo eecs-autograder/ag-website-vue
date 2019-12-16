@@ -1,10 +1,9 @@
 <template>
-  <div v-if="d_loading" class="loading-spinner">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
-
   <div v-else id="project-view">
-    <div class="navbar">
+    <div class="navbar default-navbar">
       <div class="nav-link"
            ref="submit_tab"
            :class="{'active': d_current_tab === 'submit'}"
@@ -100,9 +99,9 @@ import {
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
-import Handgrading from '@/components/handgrading/handgrading.vue';
-import HandgradingContainer from '@/components/handgrading/handgrading_container.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
+import Handgrading from '@/components/project_view/handgrading/handgrading.vue';
+import HandgradingContainer from '@/components/project_view/handgrading/handgrading_container.vue';
 import StudentLookup from '@/components/project_view/student_lookup.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
@@ -256,16 +255,8 @@ export default class ProjectView extends Vue implements GroupObserver {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/navbar.scss';
-
-.loading-spinner {
-  color: $ocean-blue;
-  font-size: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
 
 @include navbar(
   $background-color: $pebble-light,
@@ -274,19 +265,8 @@ export default class ProjectView extends Vue implements GroupObserver {
   $border-color: lighten($pebble-dark, 5%)
 );
 
-.navbar {
-  .nav-link {
-    font-size: 14px;
-    padding: 10px 10px;
-  }
-
-  .disabled {
-    color: $stormy-gray-dark;
-  }
-}
-
 #edit-handgrading-link {
-  margin-left: 6px;
+  margin-left: .375rem;
   color: $ocean-blue;
   font-size: 1.1em;
 }

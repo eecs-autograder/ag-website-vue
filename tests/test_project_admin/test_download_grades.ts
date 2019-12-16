@@ -9,7 +9,7 @@ import { safe_assign } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, wait_for_load } from '@/tests/utils';
+import { wait_for_load } from '@/tests/utils';
 
 jest.mock('file-saver');
 
@@ -60,7 +60,6 @@ test('Download tasks fetched, sorted, and displayed', async () => {
     get_tasks_stub_resolves([download_1, download_2, with_error]);
     let wrapper = managed_mount(DownloadGrades, {propsData: {project: project}});
     expect(await wait_for_load(wrapper)).toBe(true);
-    console.log(wrapper.html());
     expect(wrapper.vm.project).toEqual(project);
 
     let download_rows = wrapper.findAll('.download-row');

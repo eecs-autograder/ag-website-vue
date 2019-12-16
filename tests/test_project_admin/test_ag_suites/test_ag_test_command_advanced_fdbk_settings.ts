@@ -46,16 +46,16 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('visible binding - case has only one command', async () => {
-        let visible_input = wrapper.find('#normal-visible');
+        let visible_input = wrapper.find('#normal-cmd-visible');
 
         expect(component.ag_test_case.ag_test_commands.length).toEqual(1);
         expect(component.d_feedback_config!.visible).toEqual(false);
-        expect(wrapper.findAll('#normal-visible').length).toEqual(1);
+        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(1);
 
         visible_input.setChecked(true);
 
         expect(component.d_feedback_config!.visible).toEqual(true);
-        expect(wrapper.findAll('#normal-visible').length).toEqual(0);
+        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(0);
     });
 
     test('visible binding - case has more than one command', async () => {
@@ -67,15 +67,15 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         wrapper.setProps({ag_test_case: case_with_more_than_one_command});
         await component.$nextTick();
 
-        let visible_input = wrapper.find('#normal-visible');
+        let visible_input = wrapper.find('#normal-cmd-visible');
 
         expect(component.d_feedback_config!.visible).toEqual(false);
-        expect(wrapper.findAll('#normal-visible').length).toEqual(1);
+        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(1);
 
         visible_input.setChecked(true);
 
         expect(component.d_feedback_config!.visible).toEqual(true);
-        expect(wrapper.findAll('#normal-visible').length).toEqual(1);
+        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(1);
 
         expect(checkbox_is_checked(visible_input)).toEqual(true);
 
@@ -89,7 +89,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         await component.$nextTick();
 
         expect(component.d_feedback_config!.visible).toEqual(true);
-        expect(wrapper.findAll('#normal-visible').length).toEqual(0);
+        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(0);
     });
 
     test('return_code_fdbk_level binding', async () => {

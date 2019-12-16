@@ -26,7 +26,7 @@
                      @form_validity_changed="d_annotation_form_is_valid = $event"
                      @submit="save">
       <APIErrors ref="save_annotation_errors"></APIErrors>
-      <div class="edit-annotation-form-footer">
+      <div class="button-footer">
         <button type="submit" class="save-button"
                 :disabled="d_saving || !d_annotation_form_is_valid">Save</button>
         <button type="button" class="white-button"
@@ -37,15 +37,14 @@
     <modal ref="delete_annotation_modal" size="large" click_outside_to_close
            v-if="d_delete_modal_is_open"
            @close="d_delete_modal_is_open = false">
-      <h2>Confirm Delete</h2>
-      <div class="confirm-delete-msg">
-        Are you sure you want to delete the annotation
-        <b>{{this.d_annotation.short_description}}</b>? <br>
-        This will delete all associated results. <br>
-        THIS ACTION CANNOT BE UNDONE.
-      </div>
+      <div class="modal-header">Confirm Delete</div>
+      Are you sure you want to delete the annotation
+      "<b>{{this.d_annotation.short_description}}</b>"? <br><br>
+      This will delete all associated results. <br>
+      <b>THIS ACTION CANNOT BE UNDONE.</b>
+
       <APIErrors ref="delete_annotation_errors"></APIErrors>
-      <div class="delete-modal-footer">
+      <div class="modal-button-footer button-footer-right">
         <button type="button" class="delete-button red-button"
                 @click="delete_annotation"
                 :disabled="d_deleting">Delete</button>
@@ -145,7 +144,7 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/global.scss';
+@import '@/styles/modal.scss';
 
 * {
   margin: 0;
@@ -154,7 +153,7 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 }
 
 .single-annotation {
-  padding: 10px 15px;
+  padding: .625rem .875rem;
 }
 
 .short-description {
@@ -173,7 +172,7 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
   }
 
   .handle, .edit-icon, .delete-icon {
-    padding: 0 4px;
+    padding: 0 .25rem;
   }
 
   .edit-icon:hover {
@@ -188,7 +187,7 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 }
 
 .deduction, .long-description {
-  font-size: 14px;
+  font-size: .875rem;
 }
 
 .deduction {
@@ -196,31 +195,14 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 }
 
 .long-description {
-  padding-top: 5px;
+  padding-top: .25rem;
   white-space: pre-wrap;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
-  margin: 4px 0;
+  margin: .25rem 0;
 }
-
-.confirm-delete-msg {
-  padding: 15px 0;
-}
-
-.delete-modal-footer {
-  float: right;
-}
-
-.delete-button {
-  margin-right: 8px;
-}
-
-.edit-annotation-form-footer .button {
-  display: inline-block;
-}
-
 </style>
 

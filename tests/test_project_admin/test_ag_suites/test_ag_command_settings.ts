@@ -6,7 +6,9 @@ import {
     AGTestSuite,
     ExpectedOutputSource,
     ExpectedReturnCode,
+    HttpClient,
     HttpError,
+    HttpResponse,
     InstructorFile,
     Project,
     StdinSource,
@@ -17,7 +19,7 @@ import * as sinon from "sinon";
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
+import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
 
 import {
     make_ag_test_case,
@@ -27,12 +29,16 @@ import {
     make_course,
     make_project,
 } from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked, do_input_blank_or_not_integer_test, do_invalid_text_input_test,
     expect_html_element_has_value,
+    expect_select_object_has_value,
     get_validated_input_text,
+    set_select_object_value,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_until,
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -46,6 +52,16 @@ let instructor_file_1: InstructorFile;
 let instructor_file_2: InstructorFile;
 let instructor_file_3: InstructorFile;
 let project: Project;
+
+function make_wrapper() {
+    return managed_mount(AGTestCommandSettings, {
+        propsData: {
+            ag_test_case: ag_test_case,
+            ag_test_command: ag_test_command,
+            project: project
+        }
+    });
+}
 
 beforeEach(() => {
     let course = make_course();
@@ -83,25 +99,94 @@ beforeEach(() => {
     ag_test_case.ag_test_commands = [ag_test_command];
 });
 
+describe('Test name editing tests', () => {
+    let wrapper: Wrapper<AGTestCommandSettings>;
+
+    beforeEach(() => {
+       wrapper = make_wrapper();
+    });
+
+    test('Toggle edit mode', async () => {
+        let original_name = ag_test_case.name;
+        expect(wrapper.find('.test-name').text()).toEqual(original_name);
+        expect(wrapper.find({ref: 'ag_test_case_name_form'}).exists()).toBe(false);
+
+        wrapper.find({ref: 'toggle_name_edit'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.test-name').exists()).toBe(false);
+        expect(wrapper.find({ref: 'ag_test_case_name_form'}).exists()).toBe(true);
+
+        // Change the text, cancel, then make sure that the test name is the same
+        set_validated_input_text(wrapper.find({ref: 'test_case_name'}), 'a new name');
+        expect(validated_input_is_valid(wrapper.find({ref: 'test_case_name'}))).toBe(true);
+        wrapper.find('.name-form-buttons .white-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.test-name').text()).toEqual(original_name);
+
+        // The new name input should have the current test name next time we
+        // go into edit mode
+        wrapper.find({ref: 'toggle_name_edit'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(
+            get_validated_input_text(wrapper.find({ref: 'test_case_name'}))
+        ).toEqual(original_name);
+    });
+
+    test('New name empty, form invalid', async () => {
+        wrapper.find({ref: 'toggle_name_edit'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        set_validated_input_text(wrapper.find({ref: 'test_case_name'}), ' ');
+        expect(validated_input_is_valid(wrapper.find({ref: 'test_case_name'}))).toBe(false);
+        expect(wrapper.find('.name-form-buttons .green-button').is('[disabled]')).toBe(true);
+    });
+
+    test('Save test name', async () => {
+        // This component should NOT change the test case name.
+        // That change will be handled by the ancestor that is subscribed to
+        // test case changes.
+        let original_name = ag_test_case.name;
+        let new_name = 'This new name';
+        wrapper.find({ref: 'toggle_name_edit'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        set_validated_input_text(wrapper.find({ref: 'test_case_name'}), new_name);
+        expect(validated_input_is_valid(wrapper.find({ref: 'test_case_name'}))).toBe(true);
+        let save_button = wrapper.find('.name-form-buttons .green-button');
+        expect(save_button.is('[disabled]')).toBe(false);
+
+        let http_stub = sinon.stub(HttpClient.get_instance(), 'patch').resolves(
+            new HttpResponse({status: 200, data: ag_test_case, headers: {}})
+        );
+        wrapper.find({ref: 'ag_test_case_name_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+
+        expect(http_stub.calledOnce).toBe(true);
+        expect(http_stub.firstCall.args[0]).toEqual(`/ag_test_cases/${ag_test_case.pk}/`);
+        expect((<{name: string}> http_stub.firstCall.args[1]).name).toEqual(new_name);
+        expect(wrapper.find('.test-name').text()).toEqual(original_name);
+    });
+
+    test('Handle API errors', async () => {
+        sinon.stub(HttpClient.get_instance(), 'patch').rejects(
+            new HttpError(400, 'U nub')
+        );
+
+        wrapper.find({ref: 'toggle_name_edit'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'ag_test_case_name_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'ag_test_case_api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
+    });
+});
+
 describe('AGTestCommandSettings tests', () => {
     let wrapper: Wrapper<AGTestCommandSettings>;
 
     beforeEach(() => {
-        wrapper = mount(AGTestCommandSettings, {
-            propsData: {
-                ag_test_case: ag_test_case,
-                ag_test_command: ag_test_command,
-                project: project
-            }
-        });
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
+        wrapper = make_wrapper();
     });
 
     test('command name binding', async () => {
@@ -200,55 +285,16 @@ describe('AGTestCommandSettings tests', () => {
         wrapper.vm.d_ag_test_command!.stdin_source = StdinSource.instructor_file;
         await wrapper.vm.$nextTick();
 
-        let stdin_instructor_file_input = wrapper.find('#stdin-instructor-file');
-        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_2.name);
-        highlighted_item.trigger('click');
+        let stdin_instructor_file = wrapper.find({ref: 'stdin_instructor_file'});
+        set_select_object_value(stdin_instructor_file, instructor_file_2.pk);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_2);
-        expect(stdin_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_2.name);
 
-        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        wrapper.vm.d_ag_test_command!.stdin_instructor_file = instructor_file_3;
         await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_3.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_3);
-        expect(stdin_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_3.name);
-
-        stdin_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_1.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.stdin_instructor_file).toEqual(instructor_file_1);
-        expect(stdin_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_1.name);
+        expect_select_object_has_value(stdin_instructor_file, instructor_file_3.pk.toString());
     });
 
     test('expected_return_code binding', async () => {
@@ -401,63 +447,19 @@ describe('AGTestCommandSettings tests', () => {
             = ExpectedOutputSource.instructor_file;
         await wrapper.vm.$nextTick();
 
-        let expected_stdout_instructor_file_input = wrapper.find(
-            '#expected-stdout-instructor-file'
-        );
-        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_2.name);
-        highlighted_item.trigger('click');
+        let expected_stdout_instructor_file = wrapper.find(
+            {ref: 'expected_stdout_instructor_file'});
+        set_select_object_value(expected_stdout_instructor_file, instructor_file_2.pk);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
-            instructor_file_2
-        );
-        expect(expected_stdout_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_2.name);
+            instructor_file_2);
 
-        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file = instructor_file_3;
         await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_3.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
-            instructor_file_3
-        );
-        expect(expected_stdout_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_3.name);
-
-        expected_stdout_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_1.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stdout_instructor_file).toEqual(
-            instructor_file_1
-        );
-        expect(expected_stdout_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_1.name);
+        expect_select_object_has_value(
+            expected_stdout_instructor_file, instructor_file_3.pk.toString());
     });
 
     test('points_for_correct_stdout binding', async () => {
@@ -576,63 +578,19 @@ describe('AGTestCommandSettings tests', () => {
             = ExpectedOutputSource.instructor_file;
         await wrapper.vm.$nextTick();
 
-        let expected_stderr_instructor_file_input = wrapper.find(
-            '#expected-stderr-instructor-file'
-        );
-        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_2.name);
-        highlighted_item.trigger('click');
+        let expected_stderr_instructor_file = wrapper.find(
+            {ref: 'expected_stderr_instructor_file'});
+        set_select_object_value(expected_stderr_instructor_file, instructor_file_2.pk);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
-            instructor_file_2
-        );
-        expect(expected_stderr_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_2.name);
+            instructor_file_2);
 
-        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
+        wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file = instructor_file_3;
         await wrapper.vm.$nextTick();
 
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_3.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
-            instructor_file_3
-        );
-        expect(expected_stderr_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_3.name);
-
-        expected_stderr_instructor_file_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-
-        highlighted_item = wrapper.find(".highlight");
-        expect(highlighted_item.text()).toContain(instructor_file_1.name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_ag_test_command!.expected_stderr_instructor_file).toEqual(
-            instructor_file_1
-        );
-        expect(expected_stderr_instructor_file_input.find(
-            '.dropdown-header-wrapper'
-        ).text()).toEqual(instructor_file_1.name);
+        expect_select_object_has_value(
+            expected_stderr_instructor_file, instructor_file_3.pk.toString());
     });
 
     test('points_for_correct_stderr binding', async () => {
@@ -705,47 +663,47 @@ describe('AGTestCommandSettings tests', () => {
         wrapper.vm.d_ag_test_command!.expected_stdout_source
             = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source
             = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source
             = ExpectedOutputSource.instructor_file;
         wrapper.vm.d_ag_test_command!.expected_stderr_source
             = ExpectedOutputSource.instructor_file;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.text;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.text;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         wrapper.vm.d_ag_test_command!.expected_stderr_source
             = ExpectedOutputSource.instructor_file;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(1);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(true);
 
         wrapper.vm.d_ag_test_command!.expected_stdout_source = ExpectedOutputSource.none;
         wrapper.vm.d_ag_test_command!.expected_stderr_source = ExpectedOutputSource.none;
-
-        expect(wrapper.findAll('.diff-options').length).toEqual(0);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({ref: 'diff_options'}).exists()).toBe(false);
     });
 
     test('ignore_case binding', async () => {
@@ -1009,7 +967,7 @@ describe('AGTestCommandSettings tests', () => {
     });
 
     test('Delete case with exactly one command', async () => {
-        let delete_case_stub = sinon.stub(wrapper.vm.d_ag_test_case!, 'delete');
+        let delete_case_stub = sinon.stub(wrapper.vm.ag_test_case, 'delete');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
@@ -1045,7 +1003,7 @@ describe('AGTestCommandSettings tests', () => {
     });
 
     test('Parent component changes the value supplied to the test_case prop', async () => {
-        expect(wrapper.vm.d_ag_test_case!.pk).toEqual(ag_test_case.pk);
+        expect(wrapper.vm.ag_test_case.pk).toEqual(ag_test_case.pk);
 
         let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
         two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
@@ -1053,7 +1011,7 @@ describe('AGTestCommandSettings tests', () => {
         wrapper.setProps({'ag_test_case': two_cmd_test});
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_ag_test_case!.pk).toEqual(two_cmd_test.pk);
+        expect(wrapper.vm.ag_test_case.pk).toEqual(two_cmd_test.pk);
 
         wrapper.setProps({'ag_test_case': ag_test_case});
         await wrapper.vm.$nextTick();

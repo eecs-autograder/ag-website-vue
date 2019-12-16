@@ -1,64 +1,63 @@
 <template>
-  <div v-if="d_loading" class="loading-large">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="download-grades-component">
     <div id="download-options">
-      <div id="download-grades-section">
-
-        <div class="option-container">
-          <div class="download-option-label">What do you want to download?</div>
-          <div class="radio-container">
-            <input type="radio" name="grades_or_files_choice"
-                   id="grades-choice"
-                   class="radio"
-                   v-model="d_download_grades"
-                   :value="true">
-            <label class="label" for="grades-choice">Grades</label>
-          </div>
-          <div class="radio-container">
-            <input type="radio" name="grades_or_files_choice"
-                   id="files-choice"
-                   class="radio"
-                   v-model="d_download_grades"
-                   :value="false">
-            <label class="label" for="files-choice">Submitted Files</label>
-          </div>
+      <div class="option-container">
+        <div class="download-option-label">What do you want to download?</div>
+        <div class="radio-container">
+          <input type="radio" name="grades_or_files_choice"
+                  id="grades-choice"
+                  class="radio"
+                  v-model="d_download_grades"
+                  :value="true">
+          <label class="label" for="grades-choice">Grades</label>
         </div>
-
-        <div class="option-container">
-          <div class="download-option-label">Which submissions?</div>
-          <div class="radio-container">
-            <input type="radio" name="submissions_choice"
-                   id="final-graded-choice"
-                   class="radio"
-                   v-model="d_final_graded_submissions_only"
-                   :value="true">
-            <label class="label" for="final-graded-choice">Final graded submissions</label>
-          </div>
-          <div class="radio-container">
-            <input type="radio" name="submissions_choice"
-                   id="all-choice"
-                   class="radio"
-                   v-model="d_final_graded_submissions_only"
-                   :value="false">
-            <label class="label" for="all-choice">All submissions</label>
-          </div>
+        <div class="radio-container">
+          <input type="radio" name="grades_or_files_choice"
+                  id="files-choice"
+                  class="radio"
+                  v-model="d_download_grades"
+                  :value="false">
+          <label class="label" for="files-choice">Submitted Files</label>
         </div>
+      </div>
 
-        <div class="option-container">
-          <div class="checkbox-input-container">
-            <input id="include-staff"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_include_staff"/>
-            <label class="checkbox-label"
-                   for="include-staff">
-              Include staff
-            </label>
-          </div>
+      <div class="option-container">
+        <div class="download-option-label">Which submissions?</div>
+        <div class="radio-container">
+          <input type="radio" name="submissions_choice"
+                  id="final-graded-choice"
+                  class="radio"
+                  v-model="d_final_graded_submissions_only"
+                  :value="true">
+          <label class="label" for="final-graded-choice">Final graded submissions</label>
         </div>
+        <div class="radio-container">
+          <input type="radio" name="submissions_choice"
+                  id="all-choice"
+                  class="radio"
+                  v-model="d_final_graded_submissions_only"
+                  :value="false">
+          <label class="label" for="all-choice">All submissions</label>
+        </div>
+      </div>
 
+      <div class="option-container">
+        <div class="checkbox-input-container">
+          <input id="include-staff"
+                  type="checkbox"
+                  class="checkbox"
+                  v-model="d_include_staff"/>
+          <label class="checkbox-label"
+                  for="include-staff">
+            Include staff
+          </label>
+        </div>
+      </div>
+
+      <div class="button-footer">
         <button class="download-button"
                 type="button"
                 :disabled="d_creating_download_task"
@@ -248,9 +247,7 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
           }
         }
       );
-      console.log('haij;');
       FileSaver.saveAs(new File([response.data], this.get_filename(download_task)));
-      console.log('eh');
       this.d_downloading_result_progress = null;
     });
   }
@@ -264,61 +261,37 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
 @import '@/styles/forms.scss';
 
 * {
-  font-size: 14px;
   box-sizing: border-box;
 }
 
 #download-grades-component {
-  padding: 15px 25px;
+  font-size: .875rem;
+  padding: .875rem .5rem;
 }
 
 #download-options {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0 10px 10px 10px;
-  width: 100%;
-}
-
-#download-grades-section {
-  padding: 10px 0 0;
-}
-
-.download-section-label {
-  font-weight: bold;
-  font-size: 20px;
-  margin-bottom: 10px;
+  padding: .625rem;
+  padding-top: 0;
 }
 
 .download-option-label {
   font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 3px;
+  font-size: 1rem;
+  margin-bottom: .25rem;
 }
 
 .download-button {
   @extend .green-button;
-  margin: 10px 0;
-  font-size: 14px;
 }
 
 .option-container {
-  margin: 0 0 10px;
-}
-
-.checkbox-input-container {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-#download-results {
-  margin: 0 0 20px 0;
+  margin-bottom: .625rem;
 }
 
 #download-results-label {
   font-weight: bold;
-  font-size: 20px;
-  padding: 10px 10px 10px 10px;
+  font-size: 1.25rem;
+  padding: .625rem;
 }
 
 #download-table-labels, .download-row {
@@ -338,35 +311,35 @@ $file-column-width: 50%;
 $progress-column-width: 20%;
 
 #started-at-header {
-  padding: 10px;
+  padding: .625rem;
   width: $started-at-column-width;
   font-weight: bold;
 }
 
 #file-header {
-  padding: 10px;
+  padding: .625rem;
   width: $file-column-width;
   font-weight: bold;
 }
 
 #progress-header {
-  padding: 10px;
+  padding: .625rem;
   width: $progress-column-width;
   font-weight: bold;
 }
 
 .started-at {
-  padding: 10px;
+  padding: .625rem;
   width: $started-at-column-width;
 }
 
 .file {
-  padding: 10px;
+  padding: .625rem;
   width: $file-column-width;
 }
 
 .progress {
-  padding: 10px;
+  padding: .625rem;
   width: $progress-column-width;
 }
 

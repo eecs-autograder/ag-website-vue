@@ -708,12 +708,12 @@ describe('GroupRegistration tests', () => {
 
         let invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(0);
         let invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('#reject-invitation-button').trigger('click');
+        invitation_to_reject.find({ref: 'reject_invitation_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('#confirm-reject-button').trigger('click');
+        invitation_to_reject.find({ref: 'confirm_reject_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.invitations_received.length).toEqual(3);
@@ -723,12 +723,12 @@ describe('GroupRegistration tests', () => {
 
         invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(1);
         invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('#reject-invitation-button').trigger('click');
+        invitation_to_reject.find({ref: 'reject_invitation_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('#confirm-reject-button').trigger('click');
+        invitation_to_reject.find({ref: 'confirm_reject_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.invitations_received.length).toEqual(2);
@@ -737,12 +737,12 @@ describe('GroupRegistration tests', () => {
 
         invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(1);
         invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('#reject-invitation-button').trigger('click');
+        invitation_to_reject.find({ref: 'reject_invitation_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('#confirm-reject-button').trigger('click');
+        invitation_to_reject.find({ref: 'confirm_reject_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.invitations_received.length).toEqual(1);
@@ -750,12 +750,12 @@ describe('GroupRegistration tests', () => {
 
         invitation_to_reject = wrapper.findAll({ref: 'invitation_received'}).at(0);
         invitation_received_component = <InvitationReceived> invitation_to_reject.vm;
-        invitation_to_reject.find('#reject-invitation-button').trigger('click');
+        invitation_to_reject.find({ref: 'reject_invitation_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
 
-        invitation_to_reject.find('#confirm-reject-button').trigger('click');
+        invitation_to_reject.find({ref: 'confirm_reject_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.invitations_received.length).toEqual(0);

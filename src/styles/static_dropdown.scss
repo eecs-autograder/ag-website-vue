@@ -1,4 +1,4 @@
-@mixin static-dropdown($open-on-hover, $orient-left: false) {
+@mixin static-dropdown($open-on-hover, $orient-right: false) {
     position: relative;
 
     * {
@@ -11,7 +11,7 @@
         z-index: 1;
         background-color: white;
 
-        @if $orient-left {
+        @if $orient-right {
             right: 0;
         }
 

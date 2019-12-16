@@ -8,7 +8,7 @@
         <div class="modeling"
              @click="$refs.datetime_picker_1.toggle_visibility()">
           {{(new Date(date_1)).toLocaleString('en-US', date_display_format)}}
-          <i class="far fa-calendar-alt calender-icon"></i>
+          <i class="far fa-calendar-alt calendar-icon"></i>
         </div>
         <datetime-picker v-model="date_1"
                          ref="datetime_picker_1">
@@ -22,7 +22,7 @@
           {{date_2 !== null
           ? new Date(date_2).toLocaleString('en-US', date_display_format)
           : '--- --, ----, --:-- --'}}
-          <i class="far fa-calendar-alt calender-icon"></i>
+          <i class="far fa-calendar-alt calendar-icon"></i>
         </div>
         <datetime-picker v-model="date_2"
                          ref="datetime_picker_2">
@@ -93,7 +93,7 @@ export default class DatetimePickerDemo extends Vue {
   display: inline-block;
 }
 
-.calender-icon {
+.calendar-icon {
   padding-left: 15px;
   color: $dark-blue;
   cursor: pointer;

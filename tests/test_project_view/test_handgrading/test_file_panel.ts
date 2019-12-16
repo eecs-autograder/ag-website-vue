@@ -3,7 +3,7 @@ import { Wrapper } from '@vue/test-utils';
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import FilePanel from '@/components/handgrading/file_panel.vue';
+import FilePanel from '@/components/project_view/handgrading/file_panel.vue';
 import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';

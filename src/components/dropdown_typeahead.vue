@@ -1,5 +1,5 @@
 <template>
-  <div id="dropdown-typeahead-container">
+  <div class="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :items="filtered_choices"
               @update_item_selected="$emit('update_item_chosen', $event)">
@@ -19,8 +19,8 @@
     </Dropdown>
     <div v-if="filtered_choices.length === 0
                && d_mounted_called && $refs.dropdown_component.is_open"
-         id="no-matching-results">
-      <div id="no-matching-results-row">
+         class="no-matching-results">
+      <div class="no-matching-results-row">
         <slot name="no_matching_results" v-bind:filter_text="filter_text">
           We couldn't find any results containing: '{{filter_text}}'
         </slot>
@@ -90,14 +90,14 @@ export default class DropdownTypeahead extends Vue {
 @import '@/styles/colors.scss';
 @import '@/styles/components/dropdown_styles.scss';
 
-#dropdown-typeahead-container {
+.dropdown-typeahead-container {
   position: relative;
 }
 
 .search-field {
   background-color: white;
   border: 1px solid #ced4da;
-  border-radius: .25rem;
+  border-radius: 4px;
   box-sizing: border-box;
   color: #495057;
   font-size: 1rem;
@@ -115,11 +115,11 @@ export default class DropdownTypeahead extends Vue {
   outline-color: $ocean-blue;
 }
 
-#no-matching-results {
+.no-matching-results {
   @extend %dropdown-content;
 }
 
-#no-matching-results-row {
+.no-matching-results-row {
   @extend %dropdown-row;
 }
 

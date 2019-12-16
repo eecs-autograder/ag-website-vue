@@ -122,7 +122,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing the up arrow while the hours input has focus', () => {
-        let hours_input = wrapper.find('#hour-input');
+        let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.d_time.hours).toEqual(13);
 
@@ -139,7 +139,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing the down arrow while the hours input has focus', () => {
-        let hours_input = wrapper.find('#hour-input');
+        let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.d_time.hours).toEqual(13);
 
@@ -159,7 +159,7 @@ describe('TimePicker Tests', () => {
 
 
     test('Pressing key besides digit, backspace, up arrow has no effect on hours', () => {
-        let hours_input = wrapper.find('#hour-input');
+        let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.d_time.hours).toEqual(13);
 
@@ -203,7 +203,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing the up arrow while the minutes input has focus', () => {
-        let minute_input = wrapper.find('#minute-input');
+        let minute_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
         expect(wrapper.vm.d_time.minutes).toEqual(58);
 
@@ -220,7 +220,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing the down arrow while the minutes input has focus', () => {
-        let minute_input = wrapper.find('#minute-input');
+        let minute_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
         expect(wrapper.vm.d_time.minutes).toEqual(58);
 
@@ -237,7 +237,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing key besides digit, backspace, up arrow has no effect on minutes', () => {
-        let minutes_input = wrapper.find('#minute-input');
+        let minutes_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
         expect(wrapper.vm.d_time.minutes).toEqual(58);
 
@@ -254,7 +254,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Clicking on the period input toggles the value of period_str', () => {
-        let period_input = wrapper.find('#period-input');
+        let period_input = wrapper.find('.period-input');
         expect(wrapper.vm.am_pm_str).toEqual("PM");
 
         period_input.trigger('click');
@@ -265,7 +265,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing backspace in the hours input sets the value to "12"', () => {
-        let hours_input = wrapper.find('#hour-input');
+        let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
 
         hours_input.trigger('click');
@@ -276,7 +276,7 @@ describe('TimePicker Tests', () => {
     });
 
     test('Pressing backspace in the minutes input sets the value to "00"', () => {
-        let minutes_input = wrapper.find('#minute-input');
+        let minutes_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
 
         minutes_input.trigger('click');

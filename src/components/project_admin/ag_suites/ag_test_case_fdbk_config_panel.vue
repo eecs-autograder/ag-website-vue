@@ -6,12 +6,12 @@
 
     <template v-slot:settings>
       <div class="checkbox-input-container">
-        <input :id="`${hyphenate(config_name)}-visible`"
+        <input :id="`${hyphenate(config_name)}-case-visible`"
               type="checkbox"
               @change="$emit('input', d_feedback_config)"
               class="checkbox"
               v-model="d_feedback_config.visible">
-        <label :for="`${hyphenate(config_name)}-visible`"> Case is Visible </label>
+        <label :for="`${hyphenate(config_name)}-case-visible`"> Case is Visible </label>
       </div>
 
       <div class="checkbox-input-container">
@@ -33,8 +33,9 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
-import { hyphenate } from "@/components/project_admin/feedback_config_utils.ts";
+import { hyphenate } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
+
+import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
 
 @Component({
   components: {FeedbackConfigPanel}
@@ -63,6 +64,22 @@ export default class AGTestCaseFdbkConfigPanel extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/components/feedback_config.scss';
+
+* {
+  box-sizing: border-box;
+}
+
+.checkbox-input-container {
+  margin: 0;
+  padding: .25rem 0;
+}
+
+.checkbox-input-container:first-child {
+  padding-top: 0;
+}
+
+.checkbox-input-container:last-child {
+  padding-bottom: 0;
+}
 
 </style>

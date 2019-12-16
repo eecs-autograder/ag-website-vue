@@ -1,10 +1,14 @@
 @mixin section-header(
     // The margin width on either side of the header text.
-    $line-spacing: 3px,
+    $line-spacing: .1875rem,  // 3/16
     $line-color: black,
+    $text-color: black,
     // When false, leaves out the divider on the left side.
     $with-left-divider: true,
+    // When true, adds some horizontal padding to the .header-text class
+    $pad-text: false,
 ) {
+    color: $text-color;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -26,5 +30,13 @@
 
         margin-left: $line-spacing;
         flex-grow: 1;
+    }
+
+    @if $pad-text {
+        .header-text {
+            box-sizing: border-box;
+            padding-left: .125rem;
+            padding-right: .125rem;;
+        }
     }
 }

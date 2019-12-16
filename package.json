@@ -10,7 +10,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.2.0",
     "@types/minimatch": "^3.0.3",
-    "ag-client-typescript": "0.0.0-dev.41",
+    "ag-client-typescript": "0.0.0-dev.42",
     "file-saver": "^2.0.1",
     "lodash": "^4.17.13",
     "minimatch": "^3.0.4",

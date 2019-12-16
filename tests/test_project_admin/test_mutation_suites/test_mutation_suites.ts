@@ -14,14 +14,16 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import BuggyImplementations from '@/components/project_admin/mutation_suites/buggy_implementations.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
+import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import {
+    find_by_name,
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -471,159 +473,37 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
     });
 
-    test('General Settings - d_active_mutation_test_suite binding', async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+    test('Suite settings binding', async () => {
+        wrapper.vm.d_active_mutation_test_suite = mutation_test_suite_1;
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
 
-        // Name
-        expect(wrapper.vm.d_active_mutation_test_suite!.name).not.toBe("Suite 22");
+        let suite_settings = find_by_name<SuiteSettings>(wrapper, 'SuiteSettings');
+        expect(suite_settings.vm.suite).toEqual(mutation_test_suite_1);
+        expect(suite_settings.vm.project).toEqual(project);
+        expect(suite_settings.vm.docker_images).toEqual([
+            sandbox_docker_image_1, sandbox_docker_image_2, sandbox_docker_image_3
+        ]);
 
-        set_validated_input_text(wrapper.find('#input-name'), "Suite 22");
-        expect(wrapper.vm.d_active_mutation_test_suite!.name).toEqual("Suite 22");
+        let new_name = 'this is very new name';
+        suite_settings.vm.$emit('field_change', {name: new_name});
 
-        // Deferred
-        expect(wrapper.vm.d_active_mutation_test_suite!.deferred).toBe(false);
-
-        wrapper.find('#synchronous-or-deferred').setChecked(false);
-        expect(wrapper.vm.d_active_mutation_test_suite!.deferred).toBe(true);
-
-        // Sandbox
-        expect(wrapper.vm.d_active_mutation_test_suite!.sandbox_docker_image).not.toEqual(
-            sandbox_docker_image_2
-        );
-
-        let sandbox_docker_image_input = wrapper.find(
-            '#sandbox-docker-image'
-        );
-        sandbox_docker_image_input.find('.dropdown-header-wrapper').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let dropdown_container_wrapper = wrapper.find('#dropdown-container');
-        dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        await wrapper.vm.$nextTick();
-
-        let highlighted_item = sandbox_docker_image_input.find(".highlight");
-        expect(highlighted_item.text()).toContain(sandbox_docker_image_2.display_name);
-        highlighted_item.trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.sandbox_docker_image).toEqual(
-            sandbox_docker_image_2
-        );
-
-        // Network access
-        expect(wrapper.vm.d_active_mutation_test_suite!.allow_network_access).toBe(false);
-
-        let allow_network_access_toggle = wrapper.find('#allow-network-access');
-        allow_network_access_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.allow_network_access).toBe(true);
-
-        // Instructor files
-        expect(wrapper.vm.d_active_mutation_test_suite!.instructor_files_needed.length).toEqual(0);
-
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find('#instructor-files-typeahead').vm;
-        let search_bar = wrapper.find('#instructor-files-typeahead').find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "pen";
-        await wrapper.vm.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.instructor_files_needed[0]).toEqual(
-            instructor_file_1
-        );
-
-        wrapper.find('#instructor-files').findAll('.file').at(0).find(
-            '.delete-file-icon-container'
-        ).trigger('click');
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed.length).toEqual(0);
-
-        // Student Files
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed.length).toEqual(0);
-
-        dropdown_typeahead = <DropdownTypeahead> wrapper.find('#student-files-typeahead').vm;
-        search_bar = wrapper.find('#student-files-typeahead').find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "mon";
-        await wrapper.vm.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_2);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed[0]).toEqual(
-            student_file_2
-        );
-
-        wrapper.find('#student-files').findAll('.file').at(0).find(
-            '.delete-file-icon-container'
-        ).trigger('click');
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.student_files_needed.length).toEqual(0);
+        expect(wrapper.vm.d_active_mutation_test_suite!.name).toEqual(new_name);
     });
 
     test('Buggy Implementations - d_active_mutation_test_suite binding', async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.vm.d_active_mutation_test_suite = mutation_test_suite_2;
         await wrapper.vm.$nextTick();
 
-        // Points per exposed bug
-        expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).not.toEqual(905.5);
+        let buggy_impl_form = find_by_name<BuggyImplementations>(wrapper, 'BuggyImplementations');
+        expect(buggy_impl_form.vm.value).toEqual(mutation_test_suite_2);
 
-        set_validated_input_text(wrapper.find('#points-per-exposed-bug'), '905.5');
-        expect(wrapper.vm.d_active_mutation_test_suite!.points_per_exposed_bug).toEqual("905.5");
+        let to_emit = new MutationTestSuite(mutation_test_suite_2);
+        let new_name = 'yet a new name';
+        to_emit.name = new_name;
 
-        // override max points
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toBeNull();
-
-        let override_max_points_checkbox = wrapper.find('#override-max-points');
-        override_max_points_checkbox.setChecked(true);
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(0);
-
-        // max points
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(0);
-
-        set_validated_input_text(wrapper.find('#max-points'), '3');
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_points).toEqual(3);
-
-        // max num student tests
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_num_student_tests).not.toEqual(100);
-
-        set_validated_input_text(wrapper.find('#max-num-student-tests'), '100');
-        expect(wrapper.vm.d_active_mutation_test_suite!.max_num_student_tests).toEqual(100);
-
-        // buggy implementation names
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toEqual([]);
-
-        wrapper.find('#buggy-implementation-names-input').setValue('Bug_41 Bug_23 Bug_3');
-
-        wrapper.find('#add-buggy-impl-names-button').trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names.length).toEqual(3);
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_3");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_23");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_41");
-
-        wrapper.findAll('.remove-buggy-impl-name-container').at(2).trigger('click');
-
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names.length).toEqual(2);
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_3");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).toContain("Bug_23");
-        expect(wrapper.vm.d_active_mutation_test_suite!.buggy_impl_names).not.toContain("Bug_41");
+        buggy_impl_form.vm.$emit('input', to_emit);
+        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(to_emit);
     });
 
     test('Commands - d_active_mutation_test_suite binding',  async () => {
@@ -708,7 +588,7 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.visible
         ).toBe(false);
 
-        wrapper.find('#past-limit-visible').setChecked(true);
+        wrapper.find('#past-limit-mutation-suite-visible').setChecked(true);
         await wrapper.vm.$nextTick();
 
         expect(

@@ -20,13 +20,15 @@
               <i class="fas fa-plus"></i>
               <span class="menu-item-text">Add command</span>
             </div>
-            <div class="menu-divider"> </div>
-            <div ref="edit_ag_test_case_menu_item"
-                @click="d_show_ag_test_case_settings_modal = true"
-                class="menu-item">
-              <i class="fas fa-pencil-alt"></i>
-              <span class="menu-item-text">Edit test case settings</span>
-            </div>
+            <template v-if="ag_test_case.ag_test_commands.length > 1">
+              <div class="menu-divider"> </div>
+              <div ref="edit_ag_test_case_menu_item"
+                  @click="d_show_ag_test_case_settings_modal = true"
+                  class="menu-item">
+                <i class="fas fa-pencil-alt"></i>
+                <span class="menu-item-text">Advanced test settings</span>
+              </div>
+            </template>
             <div class="menu-divider"> </div>
             <div ref="clone_ag_test_case_menu_item"
                 @click="open_clone_ag_test_case_modal"
@@ -73,41 +75,38 @@
            ref="new_ag_test_command_modal"
            click_outside_to_close
            size="medium">
-      <div class="modal-header"> New Test Command </div>
-      <hr>
-      <div class="modal-body">
-        <validated-form id="add-ag-test-command-form"
-                        autocomplete="off"
-                        spellcheck="false"
-                        @submit="add_ag_test_command"
-                        @form_validity_changed="d_add_command_form_is_valid = $event">
-          <div id="ag-test-name-and-command">
-            <div id="ag-test-command-name-container">
-              <label class="text-label"> Command name </label>
-              <validated-input ref="new_ag_test_command_name"
-                               v-model="d_new_command_name"
-                               :show_warnings_on_blur="true"
-                               :validators="[is_not_empty]">
-              </validated-input>
-            </div>
-            <div id="ag-test-command-container">
-              <label class="text-label">Command</label>
-              <validated-input ref="new_ag_test_command"
-                               v-model="d_new_command"
-                               :show_warnings_on_blur="true"
-                               :validators="[is_not_empty]">
-              </validated-input>
-            </div>
-          </div>
+      <div class="modal-header"> Add Command </div>
+      <validated-form ref="add_ag_test_command_form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit="add_ag_test_command"
+                      @form_validity_changed="d_add_command_form_is_valid = $event">
+        <div class="form-field-wrapper">
+          <label class="label"> Command name </label>
+          <validated-input ref="new_ag_test_command_name"
+                           v-model="d_new_command_name"
+                           :show_warnings_on_blur="true"
+                           :validators="[is_not_empty]">
+          </validated-input>
+        </div>
+        <div class="form-field-wrapper">
+          <label class="label">Command</label>
+          <validated-input ref="new_ag_test_command"
+                           v-model="d_new_command"
+                           :show_warnings_on_blur="true"
+                           :validators="[is_not_empty]">
+          </validated-input>
+        </div>
 
-          <APIErrors ref="new_command_api_errors"></APIErrors>
+        <APIErrors ref="new_command_api_errors"></APIErrors>
 
+        <div class="modal-button-footer">
           <button class="modal-create-button"
                   :disabled="!d_add_command_form_is_valid || d_adding_command">
             Add Command
           </button>
-        </validated-form>
-      </div>
+        </div>
+      </validated-form>
     </modal>
 
     <modal v-if="d_show_clone_ag_test_case_modal"
@@ -116,30 +115,30 @@
            size="large"
            click_outside_to_close
            include_closing_x>
-      <div class="modal-header">Clone AG Test Case</div>
-      <hr>
-      <div class="modal-body">
-        <validated-form id="clone-ag-test-case-form"
-                        autocomplete="off"
-                        spellcheck="false"
-                        @submit="clone_ag_test_case"
-                        @form_validity_changed="d_clone_case_form_is_valid = $event">
-          <label class="text-label">Case Name</label>
+      <div class="modal-header">Clone "{{ag_test_case.name}}"</div>
+      <validated-form ref="clone_ag_test_case_form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit="clone_ag_test_case"
+                      @form_validity_changed="d_clone_case_form_is_valid = $event">
+        <div class="form-field-wrapper">
+          <label class="label">Case Name</label>
           <validated-input ref="ag_test_case_clone_name"
                            v-model="d_cloned_case_name"
                            :show_warnings_on_blur="true"
                            :validators="[is_not_empty]">
           </validated-input>
-          <APIErrors ref="clone_case_api_errors"></APIErrors>
-          <div class="modal-button-container">
-            <button id="modal-clone-ag-test-case-button"
-                    type="submit"
-                    :disabled="d_cloning || !d_clone_case_form_is_valid">
-              Clone Case
-            </button>
-          </div>
-        </validated-form>
-      </div>
+        </div>
+        <APIErrors ref="clone_case_api_errors"></APIErrors>
+        <div class="modal-button-footer">
+          <button class="save-button"
+                  ref="modal_clone_ag_test_case_button"
+                  type="submit"
+                  :disabled="d_cloning || !d_clone_case_form_is_valid">
+            Clone Test Case
+          </button>
+        </div>
+      </validated-form>
     </modal>
 
     <modal v-if="d_show_delete_ag_test_case_modal"
@@ -150,22 +149,19 @@
       <div class="modal-header">
         Delete "{{ag_test_case.name}}"
       </div>
-      <hr>
-      <div class="modal-body">
-        <p>
-          Are you sure you want to delete the test case:
-          <span class="item-to-delete">{{ag_test_case.name}}</span>? <br>
-          This will delete all associated run results. <br>
-          THIS ACTION CANNOT BE UNDONE.
-        </p>
-        <div class="deletion-modal-button-footer">
-          <button class="modal-delete-button"
-                  :disabled="d_deleting"
-                  @click="delete_ag_test_case()"> Delete </button>
 
-          <button class="modal-cancel-button"
-                  @click="d_show_delete_ag_test_case_modal = false"> Cancel </button>
-        </div>
+      Are you sure you want to delete the test case:
+      <span class="item-to-delete">{{ag_test_case.name}}</span>? <br><br>
+      This will delete all associated run results. <br>
+      <b>THIS ACTION CANNOT BE UNDONE.</b>
+
+      <div class="modal-button-footer">
+        <button class="modal-delete-button"
+                :disabled="d_deleting"
+                @click="delete_ag_test_case()"> Delete </button>
+
+        <button class="modal-cancel-button"
+                @click="d_show_delete_ag_test_case_modal = false"> Cancel </button>
       </div>
     </modal>
 
@@ -175,12 +171,9 @@
            size="large"
            click_outside_to_close>
       <div class="modal-header">
-        Test Case Settings
+        Advanced Test Case Settings
       </div>
-      <hr>
-      <div class="modal-body">
-        <AGCaseSettings :ag_test_case="ag_test_case"></AGCaseSettings>
-      </div>
+      <AGCaseSettings :ag_test_case="ag_test_case"></AGCaseSettings>
     </modal>
 
   </div>
@@ -360,9 +353,11 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
 @import '@/styles/list_panels.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/static_dropdown.scss';
 
 @import './ag_tests.scss';
@@ -379,35 +374,15 @@ function handle_clone_ag_test_case_error(component: AGCasePanel, error: unknown)
 
 .dropdown {
   color: black;  // For when the case panel is active
-  @include static-dropdown($open-on-hover: true, $orient-left: true);
+  @include static-dropdown($open-on-hover: true, $orient-right: true);
 
   .menu-item {
-    padding: 6px 6px;
+    padding: .375rem;
   }
 }
 
 .menu-item-text {
-  margin-left: 10px;
+  margin-left: .625rem;
 }
 
-// Modal **************************************************************
-
-#ag-test-command-name-container, #ag-test-command-container {
-  padding: 0 0 22px 0;
-}
-
-#ag-test-command-name-and-command {
-  padding: 10px 0 10px 0;
-}
-
-#modal-clone-ag-test-case-button {
-  @extend .green-button;
-  margin-top: 10px;
-}
-
-.modal-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-}
 </style>

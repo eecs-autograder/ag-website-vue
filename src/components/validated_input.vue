@@ -1,11 +1,10 @@
 <template>
-  <div id="validated-input-component">
-    <div id="validated-input-wrapper">
+  <div class="validated-input-component">
+    <div class="validated-input-wrapper">
       <slot name="prefix"> </slot>
-      <input id="input"
+      <input class="input"
              v-if="num_rows === 1"
              :style="input_style"
-             class="input"
              :class="{
               'error-input' : input_style === '' && show_errors
              }"
@@ -15,8 +14,7 @@
              @blur="on_blur"
              @input="$e => change_input($e.target.value)"/>
 
-      <textarea id="textarea"
-                v-else
+      <textarea v-else
                 :rows="num_rows"
                 :style="input_style"
                 class="input"
@@ -32,7 +30,7 @@
     <transition name="fade">
       <slot :d_error_msg="d_error_msg" v-if="show_errors">
         <ul class="error-ul">
-            <li id="error-text" class="error-li">{{d_error_msg}}</li>
+            <li class="error-text error-li">{{d_error_msg}}</li>
         </ul>
       </slot>
     </transition>
@@ -223,7 +221,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   box-sizing: border-box;
 }
 
-#validated-input-wrapper {
+.validated-input-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -237,7 +235,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 }
 
 .error-li:first-child {
-  margin-top: -10px;
+  margin-top: -.625rem;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
@@ -250,8 +248,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
 .error-ul .error-li {
   word-wrap: break-word;
-  position: relative;
-  padding: 10px 15px;
+  padding: .625rem .875rem;
   margin-bottom: -1px;    /* Prevent double borders */
   color: #721c24;
   background-color: #f8d7da;
@@ -271,7 +268,6 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
 .input {
   display: inline-block;
-  position: relative;
   width: 100%;
 
   transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -281,8 +277,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   color: $stormy-gray-light;
 }
 
-#validated-input-component {
-  position: relative;
+.validated-input-component {
   display: inline-block;
   width: 100%;
 }

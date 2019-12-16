@@ -1,16 +1,16 @@
 <template>
   <transition name="modal">
-    <div id="modal-mask"
+    <div class="modal-mask"
          @click.self="() => {click_outside_to_close ? $emit('close') : null}">
       <div class="modal-container"
            :class="size"
            :style="custom_width ? {width: custom_width} : ''">
         <slot></slot>
-        <button v-if="include_closing_x"
-                id="close-button"
+        <div v-if="include_closing_x"
+                class="close-button"
                 @click="$emit('close')">
-          <strong>&#10005;</strong>
-        </button>
+          &#10005;
+        </div>
       </div>
     </div>
   </transition>
@@ -37,7 +37,15 @@ export default class Modal extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-#modal-mask {
+@import '@/styles/colors.scss';
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-mask {
   position: fixed;
   z-index: 9998;
   top: 0;
@@ -57,8 +65,7 @@ export default class Modal extends Vue {
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 
-  width: 25%;
-  padding: 20px 30px;
+  padding: 1rem;
   background-color: #fff;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
@@ -69,24 +76,55 @@ export default class Modal extends Vue {
 }
 
 .small {
-  width: 15%;
+  width: 35%;
+
+  @media only screen and (min-width: 700px) {
+    width: 25%;
+  }
+
+  @media only screen and (min-width: 900px) {
+    width: 15%;
+  }
 }
 
 .medium {
-  width: 35%;
+  width: 55%;
+
+  @media only screen and (min-width: 700px) {
+    width: 45%;
+  }
+
+  @media only screen and (min-width: 900px) {
+    width: 35%;
+  }
 }
 
 .large {
-  width: 60%;
+  width: 90%;
+
+  @media only screen and (min-width: 700px) {
+    width: 70%;
+  }
+
+  @media only screen and (min-width: 900px) {
+    width: 60%;
+    max-width: 700px;
+  }
 }
 
-#close-button {
-  font-size: 0.8em;
+.close-button {
   cursor: pointer;
-  border: none;
+
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 4px;
+  right: 4px;
+
+  font-size: 1.25rem;
+  line-height: 1;
+
+  &:hover {
+    color: darken($stormy-gray-dark, 15%);
+  }
 }
 
 /* Transition styles */

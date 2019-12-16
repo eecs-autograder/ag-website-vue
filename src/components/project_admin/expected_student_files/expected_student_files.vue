@@ -14,8 +14,7 @@
     <div class="existing-patterns">
       <div class="existing-patterns-title"> Existing Expected Student Files </div>
       <div class="list-of-patterns-container">
-        <div v-for="(file, index) of expected_student_files"
-             :key="file.pk">
+        <div v-for="file of expected_student_files" :key="file.pk">
           <single-expected-student-file :expected_student_file="file">
           </single-expected-student-file>
         </div>
@@ -56,15 +55,19 @@ export default class ExpectedStudentFiles extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+* {
+  box-sizing: border-box;
+}
+
 #expected-student-files-component {
   width: 95%;
-  margin: 20px 2.5%;
+  margin: .5rem 2.5%;
 }
 
 #new-expected-file-pattern {
   color: black;
-  padding: 10px 25px 10px 25px;
-  border-radius: 5px;
+  padding: .625rem 1.5rem;
+  border-radius: 3px;
   background-color: hsl(220, 30%, 95%);
   border: 2px solid hsl(220, 30%, 94%);
 }
@@ -74,16 +77,13 @@ export default class ExpectedStudentFiles extends Vue {
 }
 
 .new-pattern-title, .existing-patterns-title {
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: bold;
+  padding: .25rem;
 }
 
 .existing-patterns-title {
-  padding: 40px 0 10px 0;
-}
-
-.new-pattern-title {
-  padding: 5px 0 10px 0;
+  margin-top: .75rem;
 }
 
 @media only screen and (min-width: 800px) {
@@ -94,18 +94,16 @@ export default class ExpectedStudentFiles extends Vue {
 
   .new-pattern-side {
     width: 35%;
-    box-sizing: border-box;
   }
 
   .existing-patterns {
     width: 65%;
     box-sizing: border-box;
-    padding: 0 0 0 40px;
+    padding-left: 1.5rem;
   }
 
-  .new-pattern-title, .existing-patterns-title {
-    font-size: 18px;
-    padding: 5px 0 15px 0;
+  .existing-patterns-title {
+    margin-top: 0;
   }
 }
 </style>

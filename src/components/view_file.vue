@@ -2,8 +2,8 @@
   <div class="view-file-component"
        :style="{height: view_file_height, max_height: view_file_max_height}">
     <div v-if="d_loading" class="loading-container">
-      <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
-      <i v-else class="loading-spinner fa fa-spinner fa-pulse"></i>
+      <progress-bar v-if="progress !==  null" :progress="progress"></progress-bar>
+      <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
     </div>
     <div v-else-if="file_is_large && !d_show_anyway" class="large-file-message">
       <div class="text">This file is very large ({{d_file_contents.length}} bytes)</div>
@@ -83,9 +83,9 @@
            click_outside_to_close
            size="medium">
       <div class="modal">
-        <div class="header">Comment</div>
+        <div class="modal-header">Comment</div>
         <textarea class="input" v-model="d_comment_text" rows="4" ref="comment_text"></textarea>
-        <div class="button-footer">
+        <div class="modal-button-footer">
           <button class="green-button" :disabled="d_saving" @click="create_comment">
             Comment
           </button>
@@ -123,7 +123,7 @@ import { chain, toggle } from '@/utils';
 import {
   handgrading_comment_factory,
   HandgradingComment,
-} from './handgrading/handgrading_comment';
+} from './project_view/handgrading/handgrading_comment';
 
 @Component({
   components: {
@@ -355,6 +355,8 @@ export default class ViewFile extends Vue implements Created {
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 
 * {
   padding: 0;
@@ -372,7 +374,7 @@ table {
 
 .viewing-container {
   font-family: monospace;
-  padding: 5px 0;
+  padding: .25rem 0;
   width: 100%;
 }
 
@@ -380,14 +382,14 @@ table {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 15px;
+  margin: .875rem;
 
   .text {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
 
   .button {
-    margin-top: 8px;
+    margin-top: .5rem;
   }
 }
 
@@ -397,8 +399,8 @@ table {
 
 .line-number {
   color: $baking-pan;
-  font-size: 14px;
-  padding: 2px 10px;
+  font-size: .875rem;
+  padding: .125rem .625rem;
   text-align: center;
   user-select: none;
   vertical-align: top;
@@ -407,47 +409,36 @@ table {
 
 .line-of-file-content {
   color: black;
-  font-size: 14px;
+  font-size: .875rem;
   margin: 0;
-  padding: 1px 2px;
+  padding: .125rem;
   white-space: pre-wrap;
   word-break: break-word;
   word-wrap: break-word;
 }
 
+// Do NOT use loading-wrapper here
 .loading-container {
-  margin: 15px;
   overflow: hidden;
-}
-
-.loading-spinner {
-  color: $pebble-dark;
-  font-size: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 $light-green: hsl(97, 42%, 79%);
 
 .comment {
   border: 1px solid $gray-blue-2;
-  margin: 5px 0;
+  margin: .25rem 0;
   margin-right: 1%;
   border-radius: 2px;
   max-width: 600px;
 
   font-family: "Helvetica Neue", Helvetica;
-  font-size: 14px;
+  font-size: .875rem;
 
   .comment-header {
     display: flex;
 
     border-bottom: 1px solid $pebble-dark;
-    padding: 5px 5px 2px;
-    padding-top: 5px;
-    padding-bottom: 2px;
-    padding-left: 5px;
+    padding: .25rem .25rem .125rem;
     background-color: $pebble-light;
 
     .comment-line-range {
@@ -456,7 +447,8 @@ $light-green: hsl(97, 42%, 79%);
 
     .delete {
       margin-left: auto;
-      // padding: 1px;
+      padding: .125rem;
+      margin-top: -.125rem;
 
       &:hover {
         color: $stormy-gray-dark;
@@ -465,7 +457,7 @@ $light-green: hsl(97, 42%, 79%);
   }
 
   .comment-message {
-    padding: 10px;
+    padding: .875rem;
   }
 
   &:hover {
@@ -490,19 +482,8 @@ $light-green: hsl(97, 42%, 79%);
 }
 
 .modal {
-  .header {
-    font-weight: bold;
-  }
-
   .input {
     width: 100%;
-    margin-bottom: 5px;
-  }
-
-  .button-footer {
-    .button {
-      margin-right: 10px;
-    }
   }
 }
 

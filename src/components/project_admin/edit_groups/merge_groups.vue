@@ -1,8 +1,8 @@
 <template>
   <div id="merge-groups-component">
     <div class="merge-groups-container">
-      <div class="group-lookup-1">
-        <div class="group-lookup-label"> Group 1: </div>
+      <div class="form-field-wrapper">
+        <div class="label"> Group 1 </div>
         <group-lookup ref="group_lookup"
                       :groups="available_groups"
                       @update_group_selected="group_1 = $event;">
@@ -14,9 +14,9 @@
           </div>
         </div>
       </div>
-
-      <div class="group-lookup-2">
-        <div class="group-lookup-label"> Group 2: </div>
+      <div class="spacer"></div>
+      <div class="form-field-wrapper">
+        <div class="label"> Group 2 </div>
         <group-lookup ref="group_lookup"
                       :groups="available_groups"
                       @update_group_selected="group_2 = $event;">
@@ -31,12 +31,14 @@
     </div>
 
     <APIErrors ref="api_errors"> </APIErrors>
-    <button id="merge-groups-button"
-            @click="merge_groups"
-            type="button"
-            :disabled="group_1 === null || group_2 === null || d_merging">
-      Merge Groups
-    </button>
+    <div class="modal-button-footer">
+      <button id="merge-groups-button"
+              @click="merge_groups"
+              type="button"
+              :disabled="group_1 === null || group_2 === null || d_merging">
+        Merge Groups
+      </button>
+    </div>
   </div>
 </template>
 
@@ -101,45 +103,36 @@ function handle_merge_groups_error(component: MergeGroups, error: unknown) {
 
 <style scoped lang="scss">
 @import "@/styles/button_styles.scss";
+@import "@/styles/forms.scss";
 
-#merge-groups-button {
-  @extend .green-button;
+.merge-groups-container {
+  display: flex;
+  flex-wrap: wrap;
+
+  .form-field-wrapper {
+    flex-grow: 1;
+  }
 }
 
-.group-lookup-label {
-  margin-bottom: 7px;
+.spacer {
+  width: 2rem;
+  height: 0;
 }
 
 .group-members {
   border: 1px solid darken(lavender, 3);
   background-color: lavender;
-  display: inline-block;
-  margin: 10px 0;
-  padding: 8px 0 0 0;
-  border-radius: 4px;
+  margin: .625rem 0;
+  padding-top: .5rem;
+  border-radius: 2px;
 }
 
 .group-member {
-  padding: 0 10px 8px 10px;
-  font-size: 16px;
+  padding: 0 .625rem .5rem .625rem;
+  font-size: 1rem;
 }
 
-.group-lookup-1, .group-lookup-2 {
-  width: 50%;
-  display: inline-block;
-  box-sizing: border-box;
-  vertical-align: top;
-}
-
-.group-lookup-1 {
-  padding-right: 10px;
-}
-
-.group-lookup-2 {
-  padding-left: 10px;
-}
-
-.merge-groups-container {
-  padding: 0 0 24px 0;
+#merge-groups-button {
+  @extend .green-button;
 }
 </style>

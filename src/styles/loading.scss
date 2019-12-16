@@ -1,0 +1,52 @@
+.loading {
+    color: $stormy-gray-light;
+}
+
+.loading-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-centered {
+    @extend .loading;
+}
+
+.loading-large {
+    @extend .loading;
+}
+
+.loading-centered {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.loading-horiz-centered {
+    @extend .loading;
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-small {
+    font-size: 1rem;
+    min-height: 1rem;
+}
+
+.loading-medium {
+    font-size: 2.25rem;
+    min-height: 2.25rem;
+}
+
+.loading-large {
+    font-size: 3.5em;
+    min-height: 3.5em;
+}

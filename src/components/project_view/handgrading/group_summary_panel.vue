@@ -55,21 +55,15 @@ export default class GroupSummaryPanel extends Vue {
 .group-summary-panel {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: .875rem;
 }
 
 .member-names, .status {
-  padding: 3px 6px;
-}
-
-.member-names {
+  padding: .25rem .375rem;
 }
 
 .member-name {
-  padding: 2px 0;
-}
-
-.status {
+  padding: .125rem 0;
 }
 
 .graded {

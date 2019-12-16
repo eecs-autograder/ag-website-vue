@@ -1,7 +1,7 @@
 @import '@/styles/colors.scss';
 
 @mixin list-panels(
-    $text-padding: 5px,
+    $text-padding: .375rem,
     $active-color: $light-blue,
     $active-text-color: black,
     $icon-hover-color: darken($stormy-gray-dark, 20%),
@@ -45,21 +45,20 @@
         }
 
         .text {
-            padding: 5px;
+            padding: $text-padding;
             word-break: break-word;
             word-wrap: break-word;
         }
 
         .icons {
             display: flex;
-            // padding: 5px;
             @if $hide-icons {
                 visibility: hidden;
             }
         }
 
         .icon {
-            padding: 5px;
+            padding: .375rem;
 
             &:hover {
                 color: $icon-hover-color;

@@ -43,7 +43,7 @@ export default class  extends Vue {
 
   .fa-spinner {
     color: white;
-    font-size: 50px;
+    font-size: 3.125rem;
   }
 
   .progress {

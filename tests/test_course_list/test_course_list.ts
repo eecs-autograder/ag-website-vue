@@ -1,11 +1,11 @@
-import Vue from 'vue';
+import { config, Wrapper } from '@vue/test-utils';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
-
-import { AllCourses, Course, HttpError, Semester, User } from 'ag-client-typescript';
+import { AllCourses, Course, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import CourseList from '@/components/course_list/course_list.vue';
+
+import { managed_mount } from '@/tests/setup';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -14,7 +14,6 @@ beforeAll(() => {
 describe('Course_List.vue', () => {
     let wrapper: Wrapper<CourseList>;
     let component: CourseList;
-    let course_list_page: Wrapper<Vue>;
     let user: User;
     let all_courses: AllCourses;
     let fall18_eecs280: Course;
@@ -72,20 +71,6 @@ describe('Course_List.vue', () => {
         sinon.stub(User, 'get_current').returns(Promise.resolve(user));
     });
 
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-    async function call_notify_course_created(name_in: string, year_in: number) {
-        copy_of_course.name = name_in;
-        copy_of_course.year = year_in;
-        Course.notify_course_created(copy_of_course);
-    }
-
     test('Cloning a course - cloned course causes new term to be created', async () => {
         all_courses = {
             courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
@@ -93,15 +78,9 @@ describe('Course_List.vue', () => {
             courses_is_student_in: [],
             courses_is_handgrader_for: []
         };
-
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
-        sinon.stub(fall18_eecs280, 'copy').callsFake(
-            () => call_notify_course_created("EECS 280", 2019)
-        );
 
-        wrapper = mount(CourseList, {
-            stubs: ['router-link', 'router-view']
-        });
+        wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         component = wrapper.vm;
         await component.$nextTick();
         await component.$nextTick();
@@ -109,26 +88,9 @@ describe('Course_List.vue', () => {
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);
         expect(component.courses_by_term.length).toEqual(1);
 
-        let first_course = wrapper.findAll('.course').at(0);
-        first_course.find('.clone-course').trigger('click');
-        await component.$nextTick();
-
-        let clone_name_input = wrapper.findAll(
-            '#validated-input-component'
-        ).at(0).find('#input');
-        (<HTMLInputElement> clone_name_input.element).value = "EECS 280";
-        clone_name_input.trigger('input');
-        await component.$nextTick();
-
-        let clone_year_input = wrapper.findAll(
-            '#validated-input-component'
-        ).at(1).find('#input');
-        (<HTMLInputElement> clone_year_input.element).value = "2019";
-        clone_year_input.trigger('input');
-        await component.$nextTick();
-
-        wrapper.find('#clone-course-form').trigger('submit');
-        await component.$nextTick();
+        copy_of_course.name = "Clonedd course";
+        copy_of_course.year = 2042;
+        Course.notify_course_created(copy_of_course);
 
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
         expect(component.courses_by_term.length).toEqual(2);
@@ -144,102 +106,24 @@ describe('Course_List.vue', () => {
             courses_is_student_in: [],
             courses_is_handgrader_for: []
         };
-
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
-        sinon.stub(fall18_eecs280, 'copy').callsFake(
-            () => call_notify_course_created("EECS 281", 2018)
-        );
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
         await component.$nextTick();
         await component.$nextTick();
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);
-        expect(component.courses_by_term.length).toEqual(1);
-
-        let first_course = wrapper.findAll('.course').at(0);
-        first_course.find('.clone-course').trigger('click');
-        await component.$nextTick();
-
-        let clone_name_input = wrapper.findAll(
-            '#validated-input-component'
-        ).at(0).find('#input');
-        (<HTMLInputElement> clone_name_input.element).value = "EECS 281";
-        clone_name_input.trigger('input');
-        await component.$nextTick();
-
-        let clone_year_input = wrapper.findAll(
-            '#validated-input-component'
-        ).at(1).find('#input');
-        (<HTMLInputElement> clone_year_input.element).value = "2018";
-        clone_year_input.trigger('input');
-        await component.$nextTick();
-
-        wrapper.find('#clone-course-form').trigger('submit');
-        await component.$nextTick();
+        copy_of_course.name = "EECS 281";
+        copy_of_course.year = 2018;
+        Course.notify_course_created(copy_of_course);
 
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
         expect(component.courses_by_term.length).toEqual(1);
         expect(component.courses_by_term[0].course_list[0]).toEqual(fall18_eecs280);
         expect(component.courses_by_term[0].course_list[1]).toEqual(copy_of_course);
         expect(component.courses_by_term[0].course_list[2]).toEqual(fall18_eecs370);
-    });
-
-    test('If attempt to clone a course is unsuccessful, a course is not added', async () => {
-        all_courses = {
-            courses_is_admin_for: [fall18_eecs280, fall18_eecs370],
-            courses_is_staff_for: [],
-            courses_is_student_in: [],
-            courses_is_handgrader_for: []
-        };
-
-        sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
-        sinon.stub(fall18_eecs280, 'copy').returns(
-            Promise.reject(
-                new HttpError(
-                    400,
-                    {__all__: "A course with this name, semester, and year already exists."}
-                )
-            )
-        );
-
-        wrapper = mount(CourseList, {
-            stubs: ['router-link', 'router-view']
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await wrapper.vm.$nextTick();
-
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);
-        expect(component.courses_by_term.length).toEqual(1);
-
-        let first_course = wrapper.findAll('.course').at(0);
-        first_course.find('.clone-course').trigger('click');
-        await component.$nextTick();
-
-        let clone_name_input = wrapper.findAll(
-            '#validated-input-component'
-        ).at(0).find('#input');
-        (<HTMLInputElement> clone_name_input.element).value = "EECS 280";
-        clone_name_input.trigger('input');
-        await component.$nextTick();
-
-        let clone_year_input = wrapper.findAll(
-            '#validated-input-component'
-        ).at(1).find('#input');
-        (<HTMLInputElement> clone_year_input.element).value = "2018";
-        clone_year_input.trigger('input');
-        await component.$nextTick();
-
-        wrapper.find('#clone-course-form').trigger('submit');
-        await component.$nextTick();
-
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);
-        expect(component.courses_by_term.length).toEqual(1);
-
     });
 
     test("The name and subtitle of a course get displayed", async () => {
@@ -252,16 +136,14 @@ describe('Course_List.vue', () => {
 
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
         await component.$nextTick();
         await component.$nextTick();
 
-        course_list_page = wrapper.find({ref: 'course_list_component'});
-
-        let course_displayed = course_list_page.find('.course');
+        let course_displayed = wrapper.find('.course');
         expect(course_displayed.html()).toContain(fall18_eecs280.name);
         expect(course_displayed.html()).toContain(fall18_eecs280.subtitle);
     });
@@ -276,7 +158,7 @@ describe('Course_List.vue', () => {
 
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
          stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
@@ -298,20 +180,19 @@ describe('Course_List.vue', () => {
 
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        course_list_page = wrapper.find({ref: 'course_list_component'});
         expect(component.all_courses!.courses_is_admin_for.length).toEqual(1);
         expect(component.all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
 
-        let all_displayed_courses = course_list_page.findAll('.course');
+        let all_displayed_courses = wrapper.findAll({name: 'SingleCourse'});
         expect(all_displayed_courses.length).toEqual(3);
-        expect(course_list_page.findAll('.edit-course-settings').length).toEqual(1);
+        expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
 
         expect(all_displayed_courses.at(0).html()).toContain(fall18_eecs280.name);
         expect(all_displayed_courses.at(0).findAll(
@@ -339,17 +220,15 @@ describe('Course_List.vue', () => {
         };
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        course_list_page = wrapper.find({ref: 'course_list_component'});
-
         expect(component.courses_by_term.length).toBe(0);
-        expect(course_list_page.text()).toContain("You are not enrolled in any courses.");
+        expect(wrapper.text()).toContain("You are not enrolled in any courses.");
     });
 
     test('Terms appear in the correct order (year DESC, semester DESC)', async () => {
@@ -361,15 +240,14 @@ describe('Course_List.vue', () => {
         };
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        course_list_page = wrapper.find({ref: 'course_list_component'});
-        let all_terms = course_list_page.findAll('.semester-name');
+        let all_terms = wrapper.findAll('.semester-name');
 
         expect(all_terms.length).toEqual(6);
         expect(all_terms.at(0).html()).toContain("Fall 2018");
@@ -389,16 +267,15 @@ describe('Course_List.vue', () => {
         };
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        course_list_page = wrapper.find({ref: 'course_list_component'});
-        let fall_2018_term = course_list_page.find('.single-semester-container');
-        let fall_2018_courses = fall_2018_term.findAll('.course');
+        let fall_2018_term = wrapper.find('.single-semester-container');
+        let fall_2018_courses = fall_2018_term.findAll({name: 'SingleCourse'});
 
         expect(fall_2018_courses.length).toEqual(3);
         expect(fall_2018_courses.at(0).html()).toContain("EECS 280");
@@ -415,7 +292,7 @@ describe('Course_List.vue', () => {
         };
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
@@ -449,7 +326,7 @@ describe('Course_List.vue', () => {
         };
         sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
 
-        wrapper = mount(CourseList, {
+        wrapper = managed_mount(CourseList, {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;

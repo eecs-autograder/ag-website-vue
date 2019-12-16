@@ -94,6 +94,14 @@ export function expect_html_element_has_value(wrapper: Wrapper<Vue>, expected: u
     expect(wrapper.element.value).toEqual(expected);
 }
 
+// Like expect_html_element_has_value, but works only on SelectObject components.
+export function expect_select_object_has_value(wrapper: Wrapper<Vue>, expected: unknown) {
+    if (wrapper.name() !== 'SelectObject') {
+        throw new TypeError(`Expected a SelectObject element, but got "${wrapper.name()}"`);
+    }
+    expect_html_element_has_value(wrapper.find('.select'), expected);
+}
+
 type InputOrSelect = Wrapper<Vue>
                      & {element: HTMLInputElement & HTMLSelectElement & HTMLOptionElement};
 function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelect {

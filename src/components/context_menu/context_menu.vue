@@ -1,7 +1,7 @@
 <template>
   <div tabindex="-1"
        ref="context_menu"
-       id="context-menu-container"
+       class="context-menu-container"
        @blur="hide_context_menu"
        @keyup.esc="hide_context_menu"
        v-show="is_open">
@@ -66,7 +66,7 @@ export default class ContextMenu extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
-#context-menu-container {
+.context-menu-container {
   background-color: white;
   border: 1px solid lighten($baking-pan, 50%);
   border-radius: 2px;
@@ -78,7 +78,7 @@ export default class ContextMenu extends Vue {
   min-height: 20px;
 }
 
-#context-menu-container:focus {
+.context-menu-container:focus {
   outline: none;
 }
 

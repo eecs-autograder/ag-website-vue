@@ -1,30 +1,23 @@
 <template>
   <div ref="single-course-component" class="single-course-component">
-    <div class="course">
+    <div class="entity">
       <router-link :to="`/web/course/${course.pk}`"
-                   class="course-info">
-        <div class="course-name">{{course.name}} </div>
+                   class="info course-info"
+                   :class="{'round-bottom-corners': !is_admin}">
+        <div class="course-name name">{{course.name}} </div>
         <div class="course-subtitle">{{course.subtitle}}</div>
       </router-link>
 
-      <div class="toolbox">
-        <div class="clone-course"
+      <div class="toolbox" v-if="is_admin">
+        <div class="clone-course tool-icon"
              @click="d_show_clone_course_modal = true"
-             :title="'Clone ' + course.name"
-             v-if="is_admin">
-          <div class="clone-course-label">
-            <i class="fas fa-copy copier"> </i>
-          </div>
+             :title="'Clone ' + course.name">
+          <i class="fas fa-copy"> </i>
         </div>
-        <router-link
-                     :to="`/web/course_admin/${course.pk}`"
-                     style="display: inline-block"
-                     :title="'Edit ' + course.name"
-                     v-if="is_admin">
-          <div class="edit-course-settings">
-            <div class="edit-settings-label">
-              <i class="fas fa-cog cog"></i>
-            </div>
+        <router-link :to="`/web/course_admin/${course.pk}`"
+                     :title="'Edit ' + course.name">
+          <div class="edit-course-settings tool-icon">
+            <i class="fas fa-cog"></i>
           </div>
         </router-link>
       </div>
@@ -35,60 +28,53 @@
            ref="clone_course_modal"
            click_outside_to_close
            size="large">
-      <span class="modal-container">
-        <p class="modal-header"> Cloning course:
-          <span class="course-to-copy">{{format_course_name(course)}}</span>
-        </p>
-        <hr>
-        <div id="clone-course-modal">
-          <ValidatedForm ref="clone_course_form"
-                         id="clone-course-form"
-                         autocomplete="off"
-                         @submit="make_copy_of_course">
-
-            <div class="name-container">
-              <label class="text-label"> Course name: </label>
-              <ValidatedInput ref="copy_of_course_name"
-                              v-model="new_course_name"
-                              input_style="width: 100%; max-width: 500px;"
-                              :validators="[is_not_empty]"
-                              :num_rows="1"
-                              @input_validity_changed="clone_course_form_is_valid = $event">
-              </ValidatedInput>
-            </div>
-
-            <div class="semester-container">
-              <label class="text-label"> Semester: </label>
-              <div class="dropdown">
-                <select id="semester"
-                        v-model="new_course_semester"
-                        class="select">
-                  <option v-for="semester of semesters" :value="semester">{{semester}}</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="year-container">
-              <label class="text-label"> Year: </label>
-              <ValidatedInput ref="copy_of_course_year"
-                              v-model="new_course_year"
-                              :num_rows="1"
-                              input_style="width: 65px;"
-                              :validators="[is_not_empty, is_number, is_valid_course_year]"
-                              @input_validity_changed="clone_course_form_is_valid = $event">
-              </ValidatedInput>
-            </div>
-
-            <APIErrors ref="api_errors"></APIErrors>
-
-            <button type="submit"
-                   class="create-clone-button"
-                   :disabled="!clone_course_form_is_valid || clone_course_pending">
-              Clone Course
-            </button>
-          </ValidatedForm>
+      <div class="modal-header">
+        Clone <span class="course-to-copy">"{{format_course_name(course)}}"</span>
+      </div>
+      <ValidatedForm ref="clone_course_form" autocomplete="off" @submit="make_copy_of_course">
+        <div class="cloned-course-name form-field-wrapper">
+          <label class="label"> Name </label>
+          <ValidatedInput ref="copy_of_course_name"
+                          v-model="new_course_name"
+                          input_style="width: 100%; max-width: 500px;"
+                          :validators="[is_not_empty]"
+                          :num_rows="1"
+                          @input_validity_changed="clone_course_form_is_valid = $event">
+          </ValidatedInput>
         </div>
-      </span>
+
+        <div class="form-field-wrapper">
+          <label class="label"> Semester </label>
+          <div class="dropdown">
+            <select id="semester"
+                    v-model="new_course_semester"
+                    class="select">
+              <option v-for="semester of semesters" :value="semester">{{semester}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field-wrapper">
+          <label class="label"> Year </label>
+          <ValidatedInput ref="copy_of_course_year"
+                          v-model="new_course_year"
+                          :num_rows="1"
+                          input_style="width: 65px;"
+                          :validators="[is_not_empty, is_number, is_valid_course_year]"
+                          @input_validity_changed="clone_course_form_is_valid = $event">
+          </ValidatedInput>
+        </div>
+
+        <APIErrors ref="api_errors"></APIErrors>
+
+        <div class="button-footer modal-button-footer">
+          <button type="submit"
+                  class="create-clone-button"
+                  :disabled="!clone_course_form_is_valid || clone_course_pending">
+            Clone Course
+          </button>
+        </div>
+      </ValidatedForm>
     </modal>
   </div>
 </template>
@@ -168,148 +154,38 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/components/entity_with_toolbox.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
-.toolbox {
-  background-color: hsl(212, 60%, 94%);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-top: none;
+* {
   box-sizing: border-box;
-  padding: 1px 10px;
-  min-height: 37px;
-  text-align: right;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.edit-settings-label, .clone-course-label {
-  font-size: 16px;
-  margin: 0;
-}
-
-.cog {
-  font-size: 18px;
-}
-
-.copier {
-  font-size: 18px;
-}
-
-.edit-course-settings, .clone-course {
-  color: $dark-blue;
-  cursor: pointer;
-  display: inline-block;
-  padding: 8px 10px;
-}
-
-.clone-course {
-  margin-right: 5px;
-}
-
-.edit-course-settings:hover .cog  {
-  color: mediumvioletred;
-}
-
-.clone-course:hover .copier {
-  color: mediumvioletred;
-}
-
-.course {
-  box-sizing: border-box;
-  font-size: 23px;
-  margin: 0 15px 15px 0;
-  min-height: 75px;
-  position: relative;
-}
-
-.course-info {
-  display: block;
-  padding: 15px;
-  background-image: linear-gradient(to bottom right, $gray-blue-1, $gray-blue-2);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom: none;
-}
-
-.course-name {
-  color: $dark-blue;
-  font-size: 26px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 0;
 }
 
 .course-subtitle {
-  color: $dark-blue;
-  font-size: 14px;
-  margin: 0;
-  min-height: 21px;
-  padding-top: 2px;
+  color: darken($stormy-gray-dark, 15%);
+
+  font-size: 1rem;
+  padding-top: .25rem;
+  min-height: 1.25rem;
+
+  line-height: 1;
 }
 
 /**** Modal *******************************************************************/
 
-.modal-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-  padding: 5px 0;
-}
-
-.name-container, .year-container,
-.semester-container {
-  display: block;
-  max-width: 500px;
-  padding-bottom: 16px;
-}
-
-.name-container {
-  padding-top: 10px;
-}
-
-#all-semesters {
-  margin-top: 40px;
-}
-
-.semester-dropdown-header {
-  height: 39px;
-  width: 140px;
-}
-
 .course-to-copy {
   color: $ocean-blue;
-  letter-spacing: 1px;
-  margin-left: 5px;
+  margin-left: .125rem;
+}
+
+.cloned-course-name {
+  margin-top: .5rem;
 }
 
 .create-clone-button {
   @extend .green-button;
-}
-
-.create-clone-button {
-  margin: 12px 0 10px 0;
-}
-
-@media only screen and (min-width: 681px) {
-  .single-course-component {
-    display: inline-block;
-    vertical-align: top;
-    width: 50%;
-  }
-}
-
-@media only screen and (min-width: 1081px) {
-  .single-course-component {
-    display: inline-block;
-    min-width: 400px;
-    max-width: 450px;
-    width: 40%;
-  }
 }
 
 </style>

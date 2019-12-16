@@ -69,56 +69,51 @@
            @close="d_show_confirm_submit_modal = false"
            size="large"
            :include_closing_x="false">
-      <div class="modal-header">
-        Submit
-      </div>
-      <hr>
-      <div class="modal-body">
-        <div class="file-list-header">Files to submit</div>
+      <div class="modal-header">Submit</div>
+      <div class="file-list-header">Files to submit</div>
+      <ul class="file-list">
+        <li v-for="filename of submitted_filenames" class="list-item">{{filename}}</li>
+      </ul>
+
+      <template v-if="missing_files.length !== 0 || patterns_with_too_few_matches.length !== 0">
+        <div class="file-list-header">
+          <i class="fas fa-exclamation-triangle"></i>
+          Missing files detected
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
         <ul class="file-list">
-          <li v-for="filename of submitted_filenames" class="list-item">{{filename}}</li>
+          <li v-for="filename of missing_files" class="list-item">
+            <div class="filename">{{filename}}</div>
+          </li>
+          <li v-for="mismatch of patterns_with_too_few_matches" class="list-item">
+            Expected at least
+            <span class="num-files">{{mismatch.num_expected}}</span>
+            file(s) matching the pattern
+            <span class="filename">{{mismatch.pattern}}</span> but got
+            <span class="num-files">{{mismatch.actual_num}}</span>
+          </li>
         </ul>
+      </template>
 
-        <template v-if="missing_files.length !== 0 || patterns_with_too_few_matches.length !== 0">
-          <div class="file-list-header">
-            <i class="fas fa-exclamation-triangle"></i>
-            Missing files detected
-            <i class="fas fa-exclamation-triangle"></i>
-          </div>
-          <ul class="file-list">
-            <li v-for="filename of missing_files" class="list-item">
-              <div class="filename">{{filename}}</div>
-            </li>
-            <li v-for="mismatch of patterns_with_too_few_matches" class="list-item">
-              Expected at least
-              <span class="num-files">{{mismatch.num_expected}}</span>
-              file(s) matching the pattern
-              <span class="filename">{{mismatch.pattern}}</span> but got
-              <span class="num-files">{{mismatch.actual_num}}</span>
-            </li>
-          </ul>
-        </template>
-
-        <template v-if="unexpected_files.length !== 0
-                        || patterns_with_too_many_matches.length !== 0">
-          <div class="file-list-header">
-            <i class="fas fa-exclamation-triangle"></i>
-            Extra files detected (these will be discarded arbitrarily)
-            <i class="fas fa-exclamation-triangle"></i>
-          </div>
-          <ul class="file-list">
-            <li v-for="filename of unexpected_files" class="list-item filename">{{filename}}</li>
-            <li v-for="mismatch of patterns_with_too_many_matches" class="list-item">
-              Expected no more than
-              <span class="num-files">{{mismatch.num_expected}}</span>
-              file(s) matching the pattern
-              <span class="filename">{{mismatch.pattern}}</span> but got
-              <span class="num-files">{{mismatch.actual_num}}</span>
-            </li>
-          </ul>
-        </template>
-      </div>
-      <div class="modal-footer">
+      <template v-if="unexpected_files.length !== 0
+                      || patterns_with_too_many_matches.length !== 0">
+        <div class="file-list-header">
+          <i class="fas fa-exclamation-triangle"></i>
+          Extra files detected (these will be discarded arbitrarily)
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <ul class="file-list">
+          <li v-for="filename of unexpected_files" class="list-item filename">{{filename}}</li>
+          <li v-for="mismatch of patterns_with_too_many_matches" class="list-item">
+            Expected no more than
+            <span class="num-files">{{mismatch.num_expected}}</span>
+            file(s) matching the pattern
+            <span class="filename">{{mismatch.pattern}}</span> but got
+            <span class="num-files">{{mismatch.actual_num}}</span>
+          </li>
+        </ul>
+      </template>
+      <div class="modal-button-footer">
         <button type="button"
                 ref="submit_button"
                 :class="file_mismatches_present ? 'orange-button' : 'green-button'"
@@ -369,7 +364,9 @@ function num_glob_matches(names: string[], pattern: string): number {
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
-@import '@/styles/global.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
@@ -378,15 +375,15 @@ function num_glob_matches(names: string[], pattern: string): number {
 }
 
 #submit-component {
-  padding: 15px;
+  padding: .875rem;
 }
 
 #deadline-container {
-  margin: 15px 0;
+  margin-bottom: .875rem;
 
   #deadline-text {
-    font-size: 1.4rem;
-    margin-bottom: 7px;
+    font-size: 1.375rem;
+    margin-bottom: .375rem;
   }
 
   #deadline {
@@ -407,12 +404,12 @@ function num_glob_matches(names: string[], pattern: string): number {
 }
 
 #all-limits-container {
-  margin: 15px 0;
+  margin: .875rem 0;
   font-size: 1.2rem;
 }
 
 .limit-container {
-  margin: 5px 0;
+  margin: .25rem 0;
 }
 
 .allotment {
@@ -421,8 +418,8 @@ function num_glob_matches(names: string[], pattern: string): number {
 }
 
 .file-list-header {
-  margin-top: 15px;
-  margin-bottom: 5px;
+  margin-top: .875rem;
+  margin-bottom: .25rem;
   font-weight: bold;
 
   .fa-exclamation-triangle {
@@ -431,10 +428,10 @@ function num_glob_matches(names: string[], pattern: string): number {
 }
 
 .file-list {
-  margin-left: 15px;
+  margin-left: .875rem;
 
   .list-item {
-    margin: 5px 15px;
+    margin: .25rem .875rem;
   }
 
   .filename {
@@ -449,19 +446,11 @@ function num_glob_matches(names: string[], pattern: string): number {
 
 .modal-header {
   font-size: 1.4rem;
-  font-weight: bold;
-  padding: 5px 0;
 }
 
-.modal-footer {
-  margin-top: 15px;
-  .button {
-    margin-right: 9px;
-  }
-}
 
 #submit-progress {
-  margin-top: 10px;
+  margin-top: .625rem;
 }
 
 </style>

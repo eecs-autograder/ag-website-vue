@@ -365,27 +365,11 @@ describe('AGSuitePanel tests', () => {
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
-        // clicking closing_x to close the modal
-        wrapper.find('#close-button').trigger('click');
+        wrapper.find({ref: 'new_ag_test_case_modal'}).vm.$emit('close');
         await component.$nextTick();
 
         expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
-
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
-
-        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
-
-        // clicking outside the modal to close the modal
-        wrapper.find('#modal-mask').trigger('click');
-        await component.$nextTick();
-
-        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
-        expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
-
         expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
     });
 
@@ -410,21 +394,15 @@ describe('AGSuitePanel tests', () => {
 
         wrapper.find('.icons .fa-plus').trigger('click');
 
-        let new_case_name_input = wrapper.find({ref: 'new_case_name'}).find('#input');
+        let new_case_name_input = wrapper.find({ref: 'new_case_name'});
         let new_case_name_validator = <ValidatedInput> wrapper.find({ref: 'new_case_name'}).vm;
 
         expect(new_case_name_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_case_name_input.element).value = "Paradise";
-        new_case_name_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(new_case_name_input, "Paradise");
         expect(new_case_name_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_case_name_input.element).value = " ";
-        new_case_name_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(new_case_name_input, " ");
         expect(new_case_name_validator.is_valid).toBe(false);
         expect(wrapper.find('.modal-create-button').is('[disabled]')).toBe(true);
     });
@@ -459,27 +437,20 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('.add-ag-test-command-button').trigger('click');
         await component.$nextTick();
 
-        let new_command_name_input = wrapper.findAll(
-            {ref: 'command_name'}
-        ).at(0).find('#input');
+        let new_command_name_input = wrapper.findAll({ref: 'command_name'}).at(0);
         let new_command_name_validator = <ValidatedInput> wrapper.findAll(
             {ref: 'command_name'}
         ).at(0).vm;
 
         expect(new_command_name_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_command_name_input.element).value = "Great";
-        new_command_name_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(new_command_name_input, "Great");
         expect(new_command_name_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_command_name_input.element).value = " ";
-        new_command_name_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(new_command_name_input, " ");
         expect(new_command_name_validator.is_valid).toBe(false);
 
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.modal-create-button').is(
             '[disabled]'
         )).toBe(true);
@@ -508,22 +479,18 @@ describe('AGSuitePanel tests', () => {
 
         wrapper.find('.icons .fa-plus').trigger('click');
 
-        let new_command_input = wrapper.find({ref: 'command'}).find('#input');
+        let new_command_input = wrapper.find({ref: 'command'});
         let new_command_validator = <ValidatedInput> wrapper.find({ref: 'command'}).vm;
 
         expect(new_command_validator.is_valid).toBe(false);
 
-        (<HTMLInputElement> new_command_input.element).value = "Splendid";
-        new_command_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(new_command_input, "Splendid");
         expect(new_command_validator.is_valid).toBe(true);
 
-        (<HTMLInputElement> new_command_input.element).value = " ";
-        new_command_input.trigger('input');
-        await component.$nextTick();
-
+        set_validated_input_text(new_command_input, " ");
         expect(new_command_validator.is_valid).toBe(false);
+
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.modal-create-button').is(
             '[disabled]'
         )).toBe(true);

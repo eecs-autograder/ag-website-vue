@@ -8,154 +8,27 @@
                       spellcheck="false"
                       @submit="save_ag_test_suite_settings"
                       @form_validity_changed="d_settings_form_is_valid = $event">
-
-        <div id="ag-test-suite-name-container">
-          <label class="text-label"> Suite name </label>
-          <validated-input ref="suite_name"
-                            id="input-name"
-                            v-model="d_ag_test_suite.name"
-                            :validators="[is_not_empty]">
-          </validated-input>
-
-          <div class="checkbox-input-container">
-            <input id="synchronous-or-deferred"
-                  type="checkbox"
-                  class="checkbox"
-                  :checked="!d_ag_test_suite.deferred"
-                  @change="d_ag_test_suite.deferred = !$event.target.checked"/>
-            <label class="checkbox-label"
-                    for="synchronous-or-deferred">
-              Suite must finish before students can submit again
-            </label>
-          </div>
-        </div>
-
-        <fieldset class="fieldset">
-          <legend class="legend"> Grading Environment </legend>
-          <div class="sandbox-container">
-            <label class="text-label"> Sandbox environment </label>
-            <div class="dropdown">
-              <dropdown id="sandbox-docker-image"
-                        :items="d_docker_images"
-                        dropdown_height="250px"
-                        @update_item_selected="
-                          d_ag_test_suite.sandbox_docker_image = $event">
-                <template slot="header">
-                  <div tabindex="0" class="dropdown-header-wrapper">
-                    <div class="dropdown-header sandbox-docker-image-dropdown">
-                      {{d_ag_test_suite.sandbox_docker_image === null ? ' '
-                      : d_ag_test_suite.sandbox_docker_image.display_name}}
-                      <i class="fas fa-caret-down dropdown-caret"></i>
-                    </div>
-                  </div>
-                </template>
-                <div slot-scope="{item}">
-                <span>
-                  {{item.display_name}}
-                </span>
-                </div>
-              </dropdown>
-            </div>
-          </div>
-
-          <div class="toggle-container">
-            <toggle v-model="d_ag_test_suite.allow_network_access"
-                    ref="allow_network_access">
-              <div slot="on">
-                Allow network access
-              </div>
-              <div slot="off">
-                Block network access
-              </div>
-            </toggle>
-          </div>
-
-          <div class="checkbox-input-container">
-            <input id="read-only-instructor-files"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_ag_test_suite.read_only_instructor_files"/>
-            <label class="checkbox-label"
-                   for="read-only-instructor-files">
-              Instructor files are read-only
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="fieldset">
-          <legend class="legend"> Instructor Files </legend>
-          <div class="typeahead-search-bar">
-            <dropdown-typeahead ref="instructor_files_typeahead"
-                                placeholder_text="Enter a filename"
-                                :choices="instructor_files_available"
-                                :filter_fn="instructor_file_filter_fn"
-                                @update_item_chosen="add_instructor_file($event)">
-              <template slot-scope="{item}">
-                <span class="typeahead-row">
-                  {{item.name}}
-                </span>
-              </template>
-            </dropdown-typeahead>
-          </div>
-
-          <div class="instructor-files">
-            <div v-for="(file, index) of d_ag_test_suite.instructor_files_needed"
-                  :class="['file', {'odd-index': index % 2 !== 0}]">
-              <span class="file-name"> {{file.name}} </span>
-              <div class="remove-file-icon-container"
-                    @click="d_ag_test_suite.instructor_files_needed.splice(index, 1)">
-                <span><i class="fas fa-times remove-file"></i></span>
-              </div>
-            </div>
-          </div>
-
-        </fieldset>
-
-        <fieldset class="fieldset">
-          <legend class="legend"> Student Files </legend>
-          <div class="typeahead-search-bar">
-            <dropdown-typeahead ref="student_files_typeahead"
-                                placeholder_text="Enter a filename"
-                                :choices="expected_student_files_available"
-                                :filter_fn="expected_student_file_filter_fn"
-                                @update_item_chosen="add_student_file($event)">
-              <template slot-scope="{item}">
-                <span class="typeahead-row">
-                  {{item.pattern}}
-                </span>
-              </template>
-            </dropdown-typeahead>
-          </div>
-
-          <div class="student-files">
-            <div v-for="(file, index) of d_ag_test_suite.student_files_needed"
-                  :class="['file', {'odd-index': index % 2 !== 0}]">
-              <span class="file-name"> {{file.pattern}} </span>
-              <div class="remove-file-icon-container"
-                    @click="d_ag_test_suite.student_files_needed.splice(index, 1)">
-                <span><i class="fas fa-times remove-file"></i></span>
-              </div>
-            </div>
-          </div>
-
-        </fieldset>
+        <suite-settings :suite="d_ag_test_suite"
+                        :project="project"
+                        :docker_images="d_docker_images"
+                        @field_change="Object.assign(d_ag_test_suite, $event)"></suite-settings>
 
         <fieldset class="fieldset">
           <legend class="legend"> Setup </legend>
 
-          <div id="setup-command-label-container">
-            <label class="text-label"> Setup command label </label>
+          <div class="form-field-wrapper">
+            <label class="label"> Setup command label </label>
             <validated-input ref="setup_suite_cmd_name"
-                              v-model="d_ag_test_suite.setup_suite_cmd_name"
-                              :validators="[]">
+                             v-model="d_ag_test_suite.setup_suite_cmd_name"
+                             :validators="[]">
             </validated-input>
           </div>
 
-          <div id="setup-command-container">
-            <label class="text-label"> Setup command </label>
+          <div class="form-field-wrapper">
+            <label class="label"> Setup command </label>
             <validated-input ref="setup_suite_cmd"
-                              v-model="d_ag_test_suite.setup_suite_cmd"
-                              :validators="[]">
+                             v-model="d_ag_test_suite.setup_suite_cmd"
+                             :validators="[]">
             </validated-input>
           </div>
 
@@ -172,11 +45,9 @@
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.normal}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.normal}}
-                    </tooltip>
-                  </i>
+                  <tooltip width="large" placement="top">
+                    {{FeedbackDescriptions.normal}}
+                  </tooltip>
                 </div>
               </template>
               <template slot="settings">
@@ -193,11 +64,9 @@
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.ultimate_submission}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.ultimate_submission}}
-                    </tooltip>
-                  </i>
+                  <tooltip width="large" placement="top">
+                    {{FeedbackDescriptions.ultimate_submission}}
+                  </tooltip>
                 </div>
               </template>
               <template slot="settings">
@@ -215,11 +84,9 @@
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.past_limit}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.past_limit}}
-                    </tooltip>
-                  </i>
+                  <tooltip width="large" placement="top">
+                    {{FeedbackDescriptions.past_limit}}
+                  </tooltip>
                 </div>
               </template>
               <template slot="settings">
@@ -237,11 +104,9 @@
               <template slot="header">
                 <div class="config-name">
                   {{FeedbackConfigLabel.staff_viewer}}
-                  <i class="fas fa-question-circle input-tooltip">
-                    <tooltip width="large" placement="right">
-                      {{FeedbackDescriptions.staff_viewer}}
-                    </tooltip>
-                  </i>
+                  <tooltip width="large" placement="top">
+                    {{FeedbackDescriptions.staff_viewer}}
+                  </tooltip>
                 </div>
               </template>
               <template slot="settings">
@@ -255,22 +120,18 @@
 
         </fieldset>
 
-        <div class="bottom-of-form">
-          <APIErrors ref="api_errors"></APIErrors>
+        <APIErrors ref="api_errors"></APIErrors>
 
+        <div class="button-footer">
           <button type="submit"
                   class="save-button"
                   :disabled="!d_settings_form_is_valid || d_saving">Save</button>
 
-          <div v-show="!d_saving" class="last-saved-timestamp">
-            <span> Last Saved: </span> {{format_datetime(d_ag_test_suite.last_modified)}}
-          </div>
-
-          <div v-show="d_saving" class="last-saved-spinner">
-            <i class="fa fa-spinner fa-pulse"></i>
-          </div>
+          <last-saved
+            :last_modified="d_ag_test_suite.last_modified"
+            :saving="d_saving">
+          </last-saved>
         </div>
-
       </validated-form>
 
       <!--------------------------- Danger Zone --------------------------------------->
@@ -293,18 +154,17 @@
           <div class="modal-header">
             Confirm Delete
           </div>
-          <hr>
           <div class="modal-body">
-            <p> Are you sure you want to delete the suite
-              <span class="item-to-delete">{{d_ag_test_suite.name}}</span>?
-              This will delete all associated test cases and run results.
-              THIS ACTION CANNOT BE UNDONE. </p>
-            <div class="deletion-modal-button-footer">
-              <button class="modal-delete-button"
+            Are you sure you want to delete the suite
+            <span class="item-to-delete">{{d_ag_test_suite.name}}</span>? <br><br>
+            This will delete all associated test cases and run results. <br>
+            <b>THIS ACTION CANNOT BE UNDONE.</b>
+            <div class="modal-button-footer">
+              <button class="modal-delete-button red-button"
                       :disabled="d_deleting"
-                      @click="delete_ag_test_suite()"> Delete </button>
+                      @click="delete_ag_test_suite"> Delete </button>
 
-              <button class="modal-cancel-button"
+              <button class="modal-cancel-button white-button"
                       @click="d_show_delete_ag_test_suite_modal = false"> Cancel </button>
             </div>
           </div>
@@ -329,13 +189,12 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import LastSaved from "@/components/last_saved.vue";
 import Modal from '@/components/modal.vue';
 import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
-import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel.vue';
-import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_utils';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
+import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
+import SuiteSettings from '@/components/project_admin/suite_settings.vue';
+import SelectObject from '@/components/select_object.vue';
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -344,21 +203,22 @@ import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
+import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
+
 @Component({
   components: {
-    APIErrors,
-    FeedbackConfigPanel,
-    Dropdown,
-    DropdownTypeahead,
     AGTestSuiteAdvancedFdbkSettings,
+    APIErrors,
+    DropdownTypeahead,
+    FeedbackConfigPanel,
+    LastSaved,
     Modal,
-    Tab,
-    TabHeader,
-    Tabs,
+    SelectObject,
+    SuiteSettings,
     Toggle,
     Tooltip,
     ValidatedForm,
-    ValidatedInput
+    ValidatedInput,
   }
 })
 export default class AGSuiteSettings extends Vue {
@@ -393,43 +253,11 @@ export default class AGSuiteSettings extends Vue {
     this.d_loading = false;
   }
 
-  get instructor_files_available() {
-    return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
-      return this.d_ag_test_suite!.instructor_files_needed.findIndex(
-        (file: InstructorFile) => file.pk === instructor_file.pk) === -1;
-    });
-  }
-
-  get expected_student_files_available() {
-    return this.project.expected_student_files.filter(
-      (expected_student_file: ExpectedStudentFile) => {
-        return this.d_ag_test_suite!.student_files_needed.findIndex(
-          (file: ExpectedStudentFile) => file.pk === expected_student_file.pk) === -1;
-      }
-    );
-  }
-
-  add_instructor_file(instructor_file: InstructorFile) {
-    this.d_ag_test_suite!.instructor_files_needed.push(instructor_file);
-  }
-
-  add_student_file(student_file: ExpectedStudentFile) {
-    this.d_ag_test_suite!.student_files_needed.push(student_file);
-  }
-
   delete_ag_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_ag_test_suite!.delete();
       this.d_show_delete_ag_test_suite_modal = false;
     });
-  }
-
-  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-    return file.name.indexOf(filter_text) >= 0;
-  }
-
-  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-    return file.pattern.indexOf(filter_text) >= 0;
   }
 
   @handle_api_errors_async(handle_save_ag_suite_settings_error)
@@ -483,84 +311,7 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 @import './ag_tests.scss';
-
-.tab-body {
-  padding: 15px;
-}
-
-#setup-command-container {
-  margin: 15px 0 10px 0;
-}
-
-#ag-test-suite-name-container {
-  padding: 10px 14px;
-
-  .checkbox-input-container {
-    padding: 15px 0 5px;
-  }
-}
-
-.checkbox-input-container {
-  // padding: 0 14px 22px 14px;
-  padding-top: 0;
-  padding-left: 0;
-}
-
-.sandbox-container {
-  padding: 10px 0 10px 0;
-}
-
-.sandbox-docker-image-dropdown {
-  min-width: 400px;
-  width: 100%;
-}
-
-.toggle-container {
-  font-size: 14px;
-  margin: 12px 5px 3px 0;
-  padding-bottom: 10px;
-  min-width: 500px;
-}
-
-.instructor-files, .student-files {
-  margin: 10px 0;
-  border: 1px solid hsl(210, 20%, 90%);
-  display: inline-block;
-}
-
-.file {
-  padding: 5px 6px 5px 10px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.file-name {
-  color: lighten(black, 40);
-  padding-right: 30px;
-}
-
-.remove-file {
-  color: hsl(220, 20%, 85%);
-}
-
-.remove-file-icon-container {
-  display: inline-block;
-  padding: 0 4px;
-}
-
-.remove-file-icon-container:hover {
-  cursor: pointer;
-  .remove-file {
-    color: hsl(220, 20%, 55%);
-  }
-}
-
-.odd-index {
-  background-color: hsl(210, 20%, 96%);
-}
-
 </style>

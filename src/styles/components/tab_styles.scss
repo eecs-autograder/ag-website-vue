@@ -1,5 +1,8 @@
 @import '@/styles/colors.scss';
 
+// DEPRECATED
+// Use navbar.scss and v-if/v-show "native" tabs instead
+
 @mixin inactive-tab-position($border-width: 2px) {
     position: relative;
     top: $border-width;

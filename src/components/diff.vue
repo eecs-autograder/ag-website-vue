@@ -205,7 +205,7 @@ export default class Diff extends Vue {
   display: flex;
   width: 100%;
   background-color: $pebble-light;
-  padding: 10px 0;
+  padding: .625rem 0;
 }
 
 .header {
@@ -214,8 +214,7 @@ export default class Diff extends Vue {
   justify-content: space-around;
   width: 50%;
 
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 1.25rem;
   margin: 0;
 }
 
@@ -233,7 +232,7 @@ export default class Diff extends Vue {
 
 .line-num, .prefix, .content {
   margin: 0;
-  padding: 5px 6px;
+  padding: .25rem .375rem;
   font-family: "Lucida Console", Consolas, "Courier New", Courier, monospace;
 }
 
@@ -279,7 +278,7 @@ $positive-color: hsl(120, 100%, 95%);
 .toggle-container {
   background-color: $pebble-light;
   display: block;
-  padding: 10px;
+  padding: .625rem;
   text-align: center;
 }
 

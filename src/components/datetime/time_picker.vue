@@ -1,5 +1,5 @@
 <template>
-  <div id="timepicker">
+  <div class="timepicker">
     <div class="timepicker-header">
 
       <div class="time-unit-col">
@@ -12,7 +12,7 @@
         <div>
           <input type="text"
                  ref="hour_input"
-                 id="hour-input"
+                 class="hour-input"
                  :value="hours_str"
                  @keydown="update_hours">
         </div>
@@ -36,7 +36,7 @@
         <div>
           <input type="text"
                  ref="minute_input"
-                 id="minute-input"
+                 class="minute-input"
                  :value="minutes_str"
                  @keydown="update_minutes"/>
         </div>
@@ -52,7 +52,7 @@
 
       <div class="time-unit-col">
         <div>
-          <input id="period-input"
+          <input class="period-input"
                  type="button"
                  v-model="am_pm_str"
                  @click="toggle_period_value"/>
@@ -64,8 +64,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-// @ts-ignore
 
+// @ts-ignore
 import moment from 'moment';
 
 export class Time {
@@ -273,7 +273,7 @@ export class InvalidTimeStrError extends Error {
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
 
-#timepicker {
+.timepicker {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -286,39 +286,39 @@ export class InvalidTimeStrError extends Error {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  padding: 15px;
+  padding: .875rem;
   text-align: center;
 }
 
-#hour-input, #minute-input {
+.hour-input, .minute-input {
   background-color: #fff;
-  border-radius: .25rem;
+  border-radius: 4px;
   border: 1px solid #ced4da;
   box-sizing: border-box;
   color: #495057;
   font-size: 1rem;
   line-height: 1;
-  padding: 5px;
+  padding: .25rem;
   text-align: center;
-  width: 40px;
-  height: 38px;
+  width: 2.5rem;
+  height: 2.125rem;
 }
 
-#hour-input:focus, #minute-input:focus, #period-input:focus {
+.hour-input:focus, .minute-input:focus, .period-input:focus {
   outline: none;
   box-shadow: 0 0 2px 1px teal;
 }
 
-#period-input {
+.period-input {
   @extend .teal-button;
   color: white;
-  /*font-size: 1rem;*/
-  width: 40px;
-  height: 38px;
+  font-size: 1rem;
+  width: 2.5rem;
+  height: 2.125rem;
   padding: 0;
 }
 
-#period-input:focus {
+.period-input:focus {
   box-shadow: none;
 }
 
@@ -328,17 +328,17 @@ export class InvalidTimeStrError extends Error {
   border-radius: 5px;
   box-sizing: border-box;
   cursor: pointer;
-  font-size: 18px;
-  padding: 5px 0;
+  font-size: 1.125rem;
+  padding: .375rem 0;
   width: 100%;
 }
 
 .up-button {
-  margin-bottom: 10px;
+  margin-bottom: .625rem;
 }
 
 .down-button {
-  margin-top: 10px;
+  margin-top: .625rem;
 }
 
 .up-button:focus, .down-button:focus {
@@ -346,14 +346,13 @@ export class InvalidTimeStrError extends Error {
 }
 
 .up-button:hover, .down-button:hover {
-  background-color: darken($white-gray, 1);
-  border: 1px solid darken($white-gray, 2);
+  background-color: darken($white-gray, 5%);
+  border: 1px solid darken($white-gray, 6%);
   border-radius: 5px;
 }
 
 .up-button:active, .down-button:active {
-  background-color: darken($white-gray, 5);
-  border: 1px solid darken($white-gray, 6);
+  background-color: darken($white-gray, 5%);
+  border: 1px solid darken($white-gray, 6%);
 }
-
 </style>

@@ -1,22 +1,4 @@
 // This file is for SCSS variables, mixins, etc. that need to be available globally.
 // It is NOT for global style rules. Those should go in app.vue
 
-@import '@/styles/colors.scss';
-
-.loading {
-    color: $stormy-gray-light;
-}
-
-@mixin fully-center() {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-.loading-large {
-    @extend .loading;
-    font-size: 55px;
-    @include fully-center();
-}
+$font-family: "Helvetica Neue", Helvetica;

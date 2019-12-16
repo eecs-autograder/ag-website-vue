@@ -1,14 +1,16 @@
 <template>
-  <div v-if="d_loading" class="loading-large">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="student-lookup-component">
     <group-lookup class="lookup-container"
                   :groups="d_groups.data"
+                  :initialize_from_url="true"
                   @update_group_selected="d_selected_group = $event"></group-lookup>
     <template v-if="d_selected_group !== null">
       <group-members class="group-members" :group="d_selected_group"></group-members>
-      <submission-list :course="course"
+      <submission-list class="student-lookup-submission-list"
+                       :course="course"
                        :project="project"
                        :group="d_selected_group"></submission-list>
     </template>
@@ -76,14 +78,17 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/global.scss';
+@import '@/styles/colors.scss';
 
 .lookup-container {
-  margin: 8px;
+  margin: .5rem;
 }
 
 .group-members {
-  margin: 8px;
+  margin: .5rem;
 }
 
+.student-lookup-submission-list {
+  border-top: 1px solid $pebble-medium;
+}
 </style>

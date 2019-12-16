@@ -5,24 +5,21 @@
                   @submit="submit"
                   @form_validity_changed="$emit('form_validity_changed', $event)">
     <slot name="header"></slot>
-    <div class="add-group-members-container">
-      <div v-for="(member, index) of d_usernames">
-        <div class="group-member-editing">
-          <div class="username-container">
-            <validated-input v-model="d_usernames[index]" :validators="[is_email]"
-                             ref="username_input"
-                             @input="$emit('input', d_usernames)">
-              <button slot="suffix"
-                      class="remove-member-button"
-                      :disabled="d_usernames.length <= min_num_inputs"
-                      :title="`Remove ${member} from group`"
-                      type="button"
-                      @click="d_usernames.splice(index, 1); $emit('input', d_usernames)">
-                <i class="fas fa-times"></i>
-              </button>
-            </validated-input>
-          </div>
-        </div>
+    <div class="group-members-container">
+      <div class="username-container"
+            v-for="(member, index) of d_usernames">
+        <validated-input v-model="d_usernames[index]" :validators="[is_email]"
+                          ref="username_input"
+                          @input="$emit('input', d_usernames)">
+          <button slot="suffix"
+                  class="remove-member-button"
+                  :disabled="d_usernames.length <= min_num_inputs"
+                  :title="`Remove ${member} from group`"
+                  type="button"
+                  @click="d_usernames.splice(index, 1); $emit('input', d_usernames)">
+            <i class="fas fa-times"></i>
+          </button>
+        </validated-input>
       </div>
       <div class="add-member-container">
         <button class="add-member-button"
@@ -131,7 +128,6 @@ export default class GroupMembersForm extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/button_styles.scss';
-// @import '@/styles/components/group_registration.scss';
 
 $purple: hsl(275, 48%, 56%);
 $teal: hsl(180, 100%, 24%);
@@ -142,94 +138,21 @@ $teal: hsl(180, 100%, 24%);
   margin: 0;
 }
 
-@import '@/styles/colors.scss';
-
-// group member input related ******************************************************
-.group-members-label {
-    color: lighten(black, 25);
-    display: inline-block;
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0;
-    padding: 0 10px 10px 0;
-    vertical-align: top;
+.group-members-container {
+  max-width: 500px;
 }
 
-.member-name-input {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    box-sizing: border-box;
-    color: #495057;
-    display: inline-block;
-    font-size: 1rem;
-    line-height: 1.5;
-    position: relative;
-    padding: .375rem .75rem;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.group-member-editing {
-    padding-bottom: 10px;
+.username-container {
+    padding-bottom: .625rem;
 }
 
 .remove-member-button {
     @extend .light-gray-button;
-    font-size: 16px;
-    cursor: pointer;
-    display: inline-block;
-    padding: 7px 12px;
-    border-radius: 6px;
-    margin-left: 8px;
-    color: hsl(220, 30%, 25%);
-}
-
-.remove-member-button:disabled {
-    color: hsl(220, 30%, 70%);
-}
-
-.add-member-container {
-    margin-bottom: 8px;
+    margin-left: .5rem;
 }
 
 .add-member-button {
-    @extend .white-button;
-    box-shadow: none;
-    margin-bottom: 15px;
+    @extend .flat-white-button;
 }
-
-.error-input {
-    outline: none;
-    box-shadow: 0 0 10px $warning-red;
-    border: 1px solid $warning-red;
-    border-radius: .25rem;
-}
-
-.error-input:focus, .error-input:active {
-    outline: none;
-    box-shadow: 0 0 10px $warning-red;
-    border: 1px solid $warning-red;
-    border-radius: .25rem;
-}
-
-.incomplete-input-msg {
-    box-sizing: border-box;
-    color: #721c24;
-    display: inline-block;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    border-radius: .25rem;
-    margin-top: 11px;
-}
-
-// section title related ***********************************************************
-.section-title {
-    color: lighten(black, 25);
-    font-size: 19px;
-    font-weight: bold;
-    margin: 0;
-}
-
 </style>
 }
