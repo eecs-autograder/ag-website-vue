@@ -41,7 +41,8 @@
         <!-- Checkboxes -->
         <div class="collapsible-section-header"
              @click="d_criteria_collapsed = !d_criteria_collapsed">
-          <i class="fas" :class="d_criteria_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
+          <i class="caret fas"
+             :class="d_criteria_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
           Checkboxes
         </div>
         <div class="sidebar-section"
@@ -78,7 +79,8 @@
         <!-- Comments (and applied annotations) -->
         <div class="collapsible-section-header"
              @click="d_comments_collapsed = !d_comments_collapsed">
-          <i class="fas" :class="d_comments_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
+          <i class="caret fas"
+             :class="d_comments_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
           Comments
         </div>
         <div v-show="!d_comments_collapsed">
@@ -153,7 +155,7 @@
         <div v-if="!readonly_handgrading_results" ref="annotation_reference">
           <div class="collapsible-section-header"
               @click="d_annotations_collapsed = !d_annotations_collapsed">
-            <i class="fas"
+            <i class="caret fas"
                :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
             Annotations
           </div>
@@ -532,15 +534,8 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
       font-size: 1rem;
       font-weight: bold;
       margin: .25rem;
-      @include section-header($with-left-divider: false);
 
-      &:hover {
-        cursor: pointer;
-      }
-
-      .fa-caret-right, .fa-caret-down {
-        margin-right: .125rem;
-      }
+      @include collapsible-section-header();
     }
 
     .sidebar-section {

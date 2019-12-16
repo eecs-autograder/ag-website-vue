@@ -179,10 +179,9 @@ export default class MutationCommand extends Vue {
 }
 
 .resource-limits-label {
-  @include section-header($with-left-divider: false, $pad-text: true);
+  @include collapsible-section-header($pad-text: true);
 
   margin-bottom: .5rem;
-  cursor: pointer;
   font-size: .875rem;
 }
 

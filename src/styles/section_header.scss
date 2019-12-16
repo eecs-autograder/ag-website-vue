@@ -40,3 +40,28 @@
         }
     }
 }
+
+@mixin collapsible-section-header(
+    // The margin width on either side of the header text.
+    $line-spacing: .1875rem,  // 3/16
+    $line-color: black,
+    $text-color: black,
+    // When true, adds some horizontal padding to the .header-text class
+    $pad-text: false,
+) {
+    @include section-header(
+        $line-spacing: $line-spacing,
+        $line-color: $line-color,
+        $text-color: $text-color,
+        $pad-text: $pad-text,
+        $with-left-divider: false,
+    );
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    .caret, .fa-caret-right, .fa-caret-down {
+        margin-right: $line-spacing;
+    }
+}
