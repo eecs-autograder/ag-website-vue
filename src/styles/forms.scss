@@ -164,8 +164,11 @@ $checkbox-background-dark: hsl(220, 30%, 90%);
 $check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
-    box-sizing: border-box;
     margin: .625rem 0;
+}
+
+.checkbox-input-container, .unpadded-checkbox-container {
+    box-sizing: border-box;
     position: relative;
 
     .checkbox-label {

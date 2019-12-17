@@ -182,3 +182,7 @@ export type HasMemberNames = {member_names: string[]};
 export function pk_less(first: HasPK, second: HasPK) {
   return first.pk < second.pk;
 }
+
+export function pk_more(first: HasPK, second: HasPK) {
+    return first.pk > second.pk;
+}
