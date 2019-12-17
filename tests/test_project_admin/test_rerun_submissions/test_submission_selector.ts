@@ -7,7 +7,7 @@ import SubmissionSelector from '@/components/project_admin/rerun_submissions/sub
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import {wait_for_load, checkbox_is_checked} from '@/tests/utils';
+import { checkbox_is_checked, wait_for_load } from '@/tests/utils';
 
 let group: ag_cli.Group;
 let submissions: ag_cli.Submission[];
