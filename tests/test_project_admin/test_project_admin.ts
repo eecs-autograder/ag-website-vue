@@ -267,9 +267,9 @@ test('Project observer', async () => {
 
     let updated = new Project(project);
     updated.name = 'A new name';
-    expect(wrapper.vm.project.name).not.toEqual(updated.name);
+    expect(wrapper.vm.project!.name).not.toEqual(updated.name);
     Project.notify_project_changed(updated);
-    expect(wrapper.vm.project.name).toEqual(updated.name);
+    expect(wrapper.vm.project!.name).toEqual(updated.name);
 
     let other_project = data_ut.make_project(course.pk);
     Project.notify_project_changed(other_project);
