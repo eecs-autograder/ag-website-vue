@@ -41,7 +41,7 @@
             type="checkbox"
             class="checkbox"
             :checked="d_selected_submissions.has(submission)"
-            @change="toggle_submission(submission)">
+            @change="toggle_submission(submission)"/>
           <label :for="`submission-${submission.pk}`">
             {{format_datetime(submission.timestamp)}}
           </label>

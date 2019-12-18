@@ -24,7 +24,7 @@
         id="rerun-all-submissions"
         type="checkbox"
         class="checkbox"
-        v-model="d_rerun_all_submissions">
+        v-model="d_rerun_all_submissions"/>
       <label for="rerun-all-submissions">Rerun All Submissions</label>
     </div>
     <div v-show="!d_rerun_all_submissions" class="choose-submissions-wrapper">
@@ -55,7 +55,7 @@
         id="rerun-all-ag-test-cases"
         type="checkbox"
         class="checkbox"
-        v-model="d_rerun_all_ag_test_cases">
+        v-model="d_rerun_all_ag_test_cases"/>
       <label for="rerun-all-ag-test-cases">Rerun All Tests</label>
     </div>
 
@@ -74,9 +74,10 @@
             <input
               type="checkbox"
               class="checkbox"
+              ref="ag_test_suite_checkbox"
               :checked="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
               @change="toggle_ag_test_suite_selected(ag_test_suite)"
-              :id="`ag-test-suite-${ag_test_suite.pk}`">
+              :id="`ag-test-suite-${ag_test_suite.pk}`"/>
             <label :for="`ag-test-suite-${ag_test_suite.pk}`">
               {{ag_test_suite.name}}
             </label>
@@ -87,9 +88,10 @@
           <input
             type="checkbox"
             class="checkbox"
+            ref="ag_test_case_checkbox"
             :checked="ag_test_case_is_checked(ag_test_case)"
             @change="toggle_ag_test_case_selected(ag_test_case)"
-            :id="`ag-test-case-${ag_test_case.pk}`">
+            :id="`ag-test-case-${ag_test_case.pk}`"/>
           <label :for="`ag-test-case-${ag_test_case.pk}`">
             {{ag_test_case.name}}
           </label>
@@ -97,14 +99,14 @@
       </collapsible>
     </div>
 
-    <template v-if="d_mutation_test_suites.length !== 0">
+    <template v-if="d_mutation_test_suites.length !== 0" ref="choose_mutation_test_suites">
       <div class="step-header">3. Choose mutation testing suites</div>
       <div class="checkbox-input-container">
         <input
           id="rerun-all-mutation-test-suites"
           type="checkbox"
           class="checkbox"
-          v-model="d_rerun_all_mutation_test_suites">
+          v-model="d_rerun_all_mutation_test_suites"/>
         <label for="rerun-all-mutation-test-suites">Rerun All Suites</label>
       </div>
 
@@ -117,8 +119,9 @@
           <input
             type="checkbox"
             class="checkbox"
+            ref="mutation_test_suite_checkbox"
             @change="toggle_mutation_test_suite_selected(mutation_test_suite)"
-            :id="`mutation-test-suite-${mutation_test_suite.pk}`">
+            :id="`mutation-test-suite-${mutation_test_suite.pk}`"/>
           <label :for="`mutation-test-suite-${mutation_test_suite.pk}`">
             {{mutation_test_suite.name}}
           </label>
@@ -126,7 +129,7 @@
       </div>
     </template>
 
-    <div class="step-header">4. Review and submit</div>
+    <div class="step-header">4. Review and start rerun</div>
     <div class="summary-line">
       <span class="emphasize">{{num_submissions_to_rerun}}</span> submission(s)
     </div>
@@ -134,7 +137,8 @@
       <span class="emphasize">{{num_tests_to_rerun}}</span> test case(s) from
       <span class="emphasize">{{num_ag_test_suites_to_rerun}}</span> suite(s)
     </div>
-    <div class="summary-line">
+    <div class="summary-line" v-if="d_mutation_test_suites.length !== 0"
+         ref="mutation_test_suite_summary">
       <span class="emphasize">{{num_mutation_test_suites_to_rerun}}</span> mutation test suite(s)
     </div>
     <APIErrors ref="api_errors"></APIErrors>
@@ -142,8 +146,40 @@
       <button
         type="button"
         class="green-button"
+        ref="start_rerun_button"
         @click="start_rerun"
         :disabled="d_starting_rerun">Rerun</button>
+    </div>
+
+    <div id="rerun-table">
+      <table class="rerun-table">
+        <thead>
+          <tr>
+            <th>Started At</th>
+            <th>Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ref="task_row" v-for="task of d_rerun_tasks">
+            <td class="started-at-cell">{{format_datetime(task.created_at)}}</td>
+            <td class="progress-cell">
+              <template v-if="task.has_error">
+                ERROR
+                <tooltip placement="top" width="large">
+                  An unexpected error occurred. Please contact <b>help@autograder.io</b>
+                  and include the information <b>"Rerun task ID: {{task.pk}}"</b> in your email.
+                </tooltip>
+              </template>
+              <template v-else>
+                {{task.progress}}%
+                <i v-if="task.progress !== 100"
+                   @click="refresh_task(task)"
+                   class="refresh-icon fas fa-sync-alt"></i>
+              </template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -158,14 +194,15 @@ import APIErrors from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
+import { BeforeDestroy, Created } from '@/lifecycle';
+import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, handle_api_errors_async, toggle } from '@/utils';
+import { deep_copy, format_datetime, handle_api_errors_async, safe_assign, toggle } from '@/utils';
 
 import {
   add_created_ag_test_command,
   find_parent_suite,
   find_parent_suite_and_test_case,
-  find_parent_suite_and_test_case_indices,
   sort_by_ordering,
   update_changed_ag_test_case,
   update_changed_ag_test_command,
@@ -190,14 +227,17 @@ interface GroupWithSubmissions {
 export default class RerunSubmissions extends Vue implements ag_cli.GroupObserver,
                                                              ag_cli.AGTestSuiteObserver,
                                                              ag_cli.AGTestCaseObserver,
-                                                             ag_cli.AGTestCommandObserver,
-                                                             ag_cli.MutationTestSuiteObserver {
+                                                             ag_cli.MutationTestSuiteObserver,
+                                                             Created,
+                                                             BeforeDestroy {
   @Prop({required: true, type: ag_cli.Project})
   project!: ag_cli.Project;
 
   d_rerun_tasks: ag_cli.RerunSubmissionTask[] = [];
 
   d_rerun_all_submissions = false;
+  task_poller: Poller | null = null;
+
   d_groups: ag_cli.Group[] = [];
   d_selected_groups = new ArraySet([], {less_func: member_names_less});
   d_selected_submissions = new ArraySet<ag_cli.Submission>([], {less_func: pk_less});
@@ -213,31 +253,62 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   d_starting_rerun = false;
   d_loading = true;
 
+  readonly format_datetime = format_datetime;
+
   async created() {
-    this.d_rerun_tasks = await ag_cli.RerunSubmissionTask.get_all_from_project(this.project.pk);
+    await this.load_rerun_tasks();
     this.d_groups = await ag_cli.Group.get_all_from_project(this.project.pk);
     this.d_ag_test_suites = await ag_cli.AGTestSuite.get_all_from_project(this.project.pk);
     this.d_mutation_test_suites = await ag_cli.MutationTestSuite.get_all_from_project(
       this.project.pk);
 
+    ag_cli.Group.subscribe(this);
+    ag_cli.AGTestSuite.subscribe(this);
+    ag_cli.AGTestCase.subscribe(this);
+    ag_cli.MutationTestSuite.subscribe(this);
+
+    this.task_poller = new Poller(() => this.load_rerun_tasks(), 30);
+    // tslint:disable-next-line no-floating-promises
+    this.task_poller.start_after_delay();
+
     this.d_loading = false;
+  }
+
+  beforeDestroy() {
+    ag_cli.Group.unsubscribe(this);
+    ag_cli.AGTestSuite.unsubscribe(this);
+    ag_cli.AGTestCase.unsubscribe(this);
+    ag_cli.MutationTestSuite.unsubscribe(this);
+
+    if (this.task_poller !== null) {
+      this.task_poller.stop();
+    }
+  }
+
+  async load_rerun_tasks() {
+    this.d_rerun_tasks = await ag_cli.RerunSubmissionTask.get_all_from_project(this.project.pk);
+  }
+
+  async refresh_task(task: ag_cli.RerunSubmissionTask) {
+    let refreshed = await ag_cli.RerunSubmissionTask.get_by_pk(task.pk);
+    safe_assign(task, refreshed);
   }
 
   @handle_api_errors_async(handle_start_rerun_error)
   start_rerun() {
     return toggle(this, 'd_starting_rerun', async () => {
-      let rerun = await ag_cli.RerunSubmissionTask.create(this.project.pk, {
-        rerun_all_submissions: this.d_rerun_all_submissions,
-        submission_pks: this.selected_submission_pks,
+        let rerun = await ag_cli.RerunSubmissionTask.create(this.project.pk, {
+            rerun_all_submissions: this.d_rerun_all_submissions,
+            submission_pks: this.selected_submission_pks,
 
-        rerun_all_ag_test_suites: this.d_rerun_all_ag_test_cases,
-        ag_test_suite_data: this.get_ag_test_suite_data_for_request(),
+            rerun_all_ag_test_suites: this.d_rerun_all_ag_test_cases,
+            ag_test_suite_data: this.get_ag_test_suite_data_for_request(),
 
-        rerun_all_student_test_suites: this.d_rerun_all_mutation_test_suites,
-        student_suite_pks: [...this.d_selected_mutation_test_suite_pks.values()]
-      });
+            rerun_all_student_test_suites: this.d_rerun_all_mutation_test_suites,
+            student_suite_pks: [...this.d_selected_mutation_test_suite_pks.values()]
+        });
 
-      this.d_rerun_tasks.unshift(rerun);
+        this.d_rerun_tasks.unshift(rerun);
     });
   }
 
@@ -254,7 +325,6 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   }
 
   select_submissions(submissions: ag_cli.Submission[]) {
-    console.log(submissions);
     for (let submission of submissions) {
       this.d_selected_submissions.insert(submission);
     }
@@ -367,7 +437,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
   update_group_created(group: ag_cli.Group): void {
     if (group.project === this.project.pk) {
-      this.d_groups.push(group);
+      this.d_groups.push(deep_copy(group, ag_cli.Group));
       this.sort_groups();
     }
   }
@@ -387,7 +457,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
     }
     this.d_groups.splice(this.d_groups.findIndex(group => group.pk === group1_pk), 1);
     this.d_groups.splice(this.d_groups.findIndex(group => group.pk === group2_pk), 1);
-    this.d_groups.push(new_group);
+    this.d_groups.push(deep_copy(new_group, ag_cli.Group));
 
     this.sort_groups();
   }
@@ -399,7 +469,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
   update_ag_test_suite_created(ag_test_suite: ag_cli.AGTestSuite): void {
     if (ag_test_suite.project === this.project.pk) {
-      this.d_ag_test_suites.push(ag_test_suite);
+      this.d_ag_test_suites.push(deep_copy(ag_test_suite, ag_cli.AGTestSuite));
     }
   }
 
@@ -428,7 +498,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   update_ag_test_case_created(ag_test_case: ag_cli.AGTestCase): void {
     let parent_suite = find_parent_suite(ag_test_case, this.d_ag_test_suites);
     if (parent_suite !== null) {
-      parent_suite.ag_test_cases.push(ag_test_case);
+      parent_suite.ag_test_cases.push(deep_copy(ag_test_case, ag_cli.AGTestCase));
     }
   }
 
@@ -459,48 +529,6 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
     if (suite !== undefined) {
       sort_by_ordering(suite.ag_test_cases, ag_test_case_order);
     }
-  }
-
-  update_ag_test_command_created(ag_test_command: ag_cli.AGTestCommand): void {
-    add_created_ag_test_command(ag_test_command, this.d_ag_test_suites);
-  }
-
-  update_ag_test_command_changed(ag_test_command: ag_cli.AGTestCommand): void {
-    update_changed_ag_test_command(
-      deep_copy(ag_test_command, ag_cli.AGTestCommand), this.d_ag_test_suites);
-  }
-
-  update_ag_test_command_deleted(ag_test_command: ag_cli.AGTestCommand): void {
-    let parents = find_parent_suite_and_test_case(ag_test_command, this.d_ag_test_suites);
-    if (parents === null) {
-      // istanbul ignore next
-      return;
-    }
-
-    let [parent_suite, parent_test_case] = parents;
-    let command_index = parent_test_case.ag_test_commands.findIndex(
-      (ag_command) => ag_command.pk === ag_test_command.pk);
-
-    parent_test_case.ag_test_commands.splice(command_index, 1);
-  }
-
-  update_ag_test_commands_order_changed(
-    ag_test_case_pk: number, ag_test_command_order: number[]
-  ): void {
-    let test_case = this.find_test_case(ag_test_case_pk);
-    if (test_case !== null) {
-      sort_by_ordering(test_case.ag_test_commands, ag_test_command_order);
-    }
-  }
-
-  private find_test_case(ag_test_case_pk: number) {
-    for (let suite of this.d_ag_test_suites) {
-      let test_case = suite.ag_test_cases.find(item => item.pk === ag_test_case_pk);
-      if (test_case !== undefined) {
-        return test_case;
-      }
-    }
-    return null;
   }
 
   update_mutation_test_suite_created(mutation_test_suite: ag_cli.MutationTestSuite): void {
@@ -618,6 +646,24 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 
 .button-footer {
   margin-top: 1.5rem;
+}
+
+#rerun-table {
+  margin-top: 1.5rem;
+}
+
+.rerun-table {
+  text-align: left;
+  width: 100%;
+  max-width: 500px;
+}
+
+.progress-cell {
+  margin-left: 1rem;
+}
+
+.refresh-icon {
+  cursor: pointer;
 }
 
 </style>
