@@ -250,6 +250,32 @@ describe('Changing tabs in project admin', () => {
     });
 });
 
+test('Project observer', async () => {
+    let project = data_ut.make_project(course.pk);
+    sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
+    let wrapper = managed_mount(ProjectAdmin, {
+        mocks: {
+            $route: {
+                params: {
+                    project_id: project.pk.toString()
+                },
+                query: {}
+            },
+        }
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    let updated = new Project(project);
+    updated.name = 'A new name';
+    expect(wrapper.vm.project.name).not.toEqual(updated.name);
+    Project.notify_project_changed(updated);
+    expect(wrapper.vm.project.name).toEqual(updated.name);
+
+    let other_project = data_ut.make_project(course.pk);
+    Project.notify_project_changed(other_project);
+    expect(wrapper.vm.project).toEqual(updated);
+});
+
 describe('InstructorFileObserver tests', () => {
     let project: Project;
     let instructor_files: InstructorFile[];
