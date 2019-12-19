@@ -2,7 +2,7 @@
 @import '@/styles/section_header.scss';
 
 .advanced-settings-label {
-    @include section-header($line-color: $navy-blue, $with-left-divider: false);
+    @include collapsible-section-header($line-color: $navy-blue);
 
     box-sizing: border-box;
 

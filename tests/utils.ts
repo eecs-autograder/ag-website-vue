@@ -105,7 +105,7 @@ export function expect_select_object_has_value(wrapper: Wrapper<Vue>, expected: 
 type InputOrSelect = Wrapper<Vue>
                      & {element: HTMLInputElement & HTMLSelectElement & HTMLOptionElement};
 function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelect {
-    return wrapper.name() === 'input'
+    return wrapper.name().toLowerCase() === 'input' // Why is name INPUT sometimes?
            || wrapper.name() === 'select'
            || wrapper.name() === 'option';
 }

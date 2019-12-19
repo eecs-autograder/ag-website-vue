@@ -155,6 +155,10 @@ export default class EditGroups extends Vue implements GroupObserver {
   }
 
   update_group_created(group: Group): void {
+    if (group.project !== this.project.pk) {
+      return;
+    }
+
     let copy = deep_copy(group, Group);
     this.groups_by_pk.insert(copy);
     this.groups_by_members.insert(copy);
@@ -166,6 +170,10 @@ export default class EditGroups extends Vue implements GroupObserver {
   }
 
   update_group_changed(group: Group): void {
+    if (group.project !== this.project.pk) {
+      return;
+    }
+
     let original = this.groups_by_pk.get(group);
     this.groups_by_members.remove(original);
     this.groups_by_pk.remove(original);
@@ -181,6 +189,10 @@ export default class EditGroups extends Vue implements GroupObserver {
   }
 
   update_group_merged(new_group: Group, group1_pk: number, group2_pk: number): void {
+    if (new_group.project !== this.project.pk) {
+      return;
+    }
+
     let original1 = this.groups_by_pk.get({pk: group1_pk});
     let original2 = this.groups_by_pk.get({pk: group2_pk});
 

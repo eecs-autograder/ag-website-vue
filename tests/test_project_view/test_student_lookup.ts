@@ -56,3 +56,12 @@ test('New group created', () => {
     let actual_names = wrapper.vm.d_groups.data.map(group => group.member_names[0]);
     expect(actual_names).toEqual(['user1', 'user2', 'user3', 'user4']);
 });
+
+test('New group from other project ignored', () => {
+    let other_project = data_ut.make_project(data_ut.make_course().pk);
+    let new_group = data_ut.make_group(other_project.pk, 1, {member_names: ['user3']});
+
+    ag_cli.Group.notify_group_created(new_group);
+    let actual_names = wrapper.vm.d_groups.data.map(group => group.member_names[0]);
+    expect(actual_names).toEqual(['user1', 'user2', 'user4']);
+});

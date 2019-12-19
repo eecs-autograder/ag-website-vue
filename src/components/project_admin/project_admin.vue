@@ -75,7 +75,9 @@
                        v-if="d_loaded_tabs.has('download_grades')"
                        :project="project">
       </download-grades>
-      <div v-show="d_current_tab === 'rerun_tests'">RERUN TESTS - TODO</div>
+      <rerun-submissions v-show="d_current_tab === 'rerun_tests'"
+                         v-if="d_loaded_tabs.has('rerun_tests')"
+                         :project="project"></rerun-submissions>
       <handgrading-settings v-show="d_current_tab === 'handgrading'"
                             v-if="d_loaded_tabs.has('handgrading')"
                             :project="project"></handgrading-settings>
@@ -92,6 +94,7 @@ import {
   InstructorFile,
   InstructorFileObserver,
   Project,
+  ProjectObserver,
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
@@ -104,11 +107,12 @@ import HandgradingSettings from '@/components/project_admin/handgrading_settings
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
+import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun_submissions.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
-import { Created, Destroyed, Mounted } from '@/lifecycle';
-import { array_remove_unique, get_query_param } from "@/utils";
+import { BeforeDestroy, Created, Destroyed, Mounted } from '@/lifecycle';
+import { array_remove_unique, deep_copy, get_query_param, safe_assign } from "@/utils";
 
 @Component({
   components: {
@@ -120,16 +124,18 @@ import { array_remove_unique, get_query_param } from "@/utils";
     InstructorFiles,
     MutationSuites,
     ProjectSettings,
+    RerunSubmissions,
     Tab,
     TabHeader,
     Tabs
   }
 })
-export default class ProjectAdmin extends Vue implements InstructorFileObserver,
+export default class ProjectAdmin extends Vue implements ProjectObserver,
+                                                         InstructorFileObserver,
                                                          ExpectedStudentFileObserver,
                                                          Created,
                                                          Mounted,
-                                                         Destroyed {
+                                                         BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
@@ -146,6 +152,7 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
 
     await this.d_globals.set_current_project(this.project);
+    Project.subscribe(this);
     InstructorFile.subscribe(this);
     ExpectedStudentFile.subscribe(this);
     this.d_loading = false;
@@ -155,7 +162,8 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
     this.initialize_current_tab();
   }
 
-  destroyed() {
+  beforeDestroy() {
+    Project.unsubscribe(this);
     InstructorFile.unsubscribe(this);
     ExpectedStudentFile.unsubscribe(this);
   }
@@ -184,39 +192,48 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
     }
   }
 
+  update_project_created(project: Project): void {
+  }
+
+  update_project_changed(project: Project): void {
+    if (project.pk === this.project!.pk) {
+      this.project = deep_copy(project, Project);
+    }
+  }
+
   update_instructor_file_created(instructor_file: InstructorFile) {
-    if (this.project !==  null) {
-      this.project.instructor_files!.push(instructor_file);
-      this.project.instructor_files!.sort(
+    if (instructor_file.project === this.project!.pk) {
+      this.project!.instructor_files!.push(instructor_file);
+      this.project!.instructor_files!.sort(
         (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
       );
     }
   }
 
   update_instructor_file_deleted(instructor_file: InstructorFile) {
-    if (this.project !==  null) {
+    if (instructor_file.project === this.project!.pk) {
       array_remove_unique(
-        this.project.instructor_files!, instructor_file.pk, (file, pk) => file.pk === pk);
+        this.project!.instructor_files!, instructor_file.pk, (file, pk) => file.pk === pk);
     }
   }
 
   update_instructor_file_renamed(instructor_file: InstructorFile) {
-    if (this.project !== null) {
-      let index = this.project.instructor_files!.findIndex(
+    if (instructor_file.project === this.project!.pk) {
+      let index = this.project!.instructor_files!.findIndex(
         (file) => file.pk === instructor_file.pk
       );
-      Vue.set(this.project.instructor_files!, index, instructor_file);
+      Vue.set(this.project!.instructor_files!, index, instructor_file);
 
-      this.project.instructor_files!.sort(
+      this.project!.instructor_files!.sort(
         (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
       );
     }
   }
 
   update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
-    if (this.project !== null) {
-      this.project.expected_student_files.push(expected_student_file);
-      this.project.expected_student_files.sort(
+    if (expected_student_file.project === this.project!.pk) {
+      this.project!.expected_student_files.push(expected_student_file);
+      this.project!.expected_student_files.sort(
         (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
           return first.pattern.localeCompare(second.pattern);
         }
@@ -225,12 +242,12 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   }
 
   update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
-    if (this.project !== null) {
-      let index = this.project.expected_student_files.findIndex(
+    if (expected_student_file.project === this.project!.pk) {
+      let index = this.project!.expected_student_files.findIndex(
         (file) => file.pk === expected_student_file.pk);
-      Vue.set(this.project.expected_student_files, index, expected_student_file);
+      Vue.set(this.project!.expected_student_files, index, expected_student_file);
 
-      this.project.expected_student_files.sort(
+      this.project!.expected_student_files.sort(
         (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
           return first.pattern.localeCompare(second.pattern);
         }
@@ -239,9 +256,9 @@ export default class ProjectAdmin extends Vue implements InstructorFileObserver,
   }
 
   update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
-    if (this.project !== null) {
+    if (expected_student_file.project === this.project!.pk) {
       array_remove_unique(
-        this.project.expected_student_files, expected_student_file.pk,
+        this.project!.expected_student_files, expected_student_file.pk,
         (file, pk) => file.pk === pk
       );
     }

@@ -17,6 +17,7 @@ import AnnotationForm from "@/components/project_admin/handgrading_settings/anno
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import HandgradingSettings from "@/components/project_admin/handgrading_settings/handgrading_settings.vue";
 import SelectObject from "@/components/select_object.vue";
+import { deep_copy } from '@/utils';
 
 import * as data_ut from "@/tests/data_utils";
 import { managed_mount } from '@/tests/setup';
@@ -616,5 +617,22 @@ describe('Criteria and annotation tests', () => {
         expect(
             order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk))
         ).toBe(true);
+    });
+
+    test('Observer updates from other rubric ignored', () => {
+        let original_rubric = deep_copy(wrapper.vm.d_handgrading_rubric!, HandgradingRubric);
+
+        let other_rubric = data_ut.make_handgrading_rubric(original_rubric.project);
+        let other_criterion = data_ut.make_criterion(other_rubric.pk);
+        let other_annotation = data_ut.make_annotation(other_rubric.pk);
+
+        Criterion.notify_criterion_created(other_criterion);
+        Criterion.notify_criterion_changed(other_criterion);
+        Criterion.notify_criterion_deleted(other_criterion);
+        Annotation.notify_annotation_created(other_annotation);
+        Annotation.notify_annotation_changed(other_annotation);
+        Annotation.notify_annotation_deleted(other_annotation);
+
+        expect(wrapper.vm.d_handgrading_rubric).toEqual(original_rubric);
     });
 });

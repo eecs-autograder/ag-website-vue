@@ -128,6 +128,12 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { deep_copy, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
+import {
+  find_parent_suite,
+  find_parent_suite_and_test_case,
+  update_changed_ag_test_case,
+} from '../suite_observer_utils';
+
 @Component({
   components: {
     AGCaseSettings,
@@ -164,14 +170,18 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
   get parent_ag_test_case() {
     if (this.d_active_ag_test_command !== null) {
-      return this.find_parent_suite_and_case(this.d_active_ag_test_command)[1];
+      let [parent_suite, parent_test_case] = find_parent_suite_and_test_case(
+        this.d_active_ag_test_command, this.d_ag_test_suites)!;
+      return parent_test_case;
     }
     return null;
   }
 
   get parent_ag_test_suite() {
     if (this.d_active_ag_test_command !== null) {
-      return this.find_parent_suite_and_case(this.d_active_ag_test_command)[0];
+      let [parent_suite, parent_test_case] = find_parent_suite_and_test_case(
+        this.d_active_ag_test_command, this.d_ag_test_suites)!;
+      return parent_suite;
     }
     return null;
   }
@@ -225,9 +235,9 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
       let prev_suite: AGTestSuite;
       let prev_case: AGTestCase;
 
-      let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-        this.d_active_ag_test_command!
-      );
+      let [parent_ag_test_suite, parent_ag_test_case] = find_parent_suite_and_test_case(
+        this.d_active_ag_test_command!, this.d_ag_test_suites
+      )!;
       let suite_index = this.d_ag_test_suites.findIndex(
         (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
       );
@@ -260,9 +270,9 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     if (this.d_active_ag_test_command !== null) {
       let next_suite: AGTestSuite;
       let next_case: AGTestCase;
-      let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-        this.d_active_ag_test_command!
-      );
+      let [parent_ag_test_suite, parent_ag_test_case] = find_parent_suite_and_test_case(
+        this.d_active_ag_test_command!, this.d_ag_test_suites
+      )!;
       let suite_index = this.d_ag_test_suites.findIndex(
         (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
       );
@@ -292,9 +302,9 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   go_to_next_ag_test_case() {
-    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-      this.d_active_ag_test_command!
-    );
+    let [parent_ag_test_suite, parent_ag_test_case] = find_parent_suite_and_test_case(
+      this.d_active_ag_test_command!, this.d_ag_test_suites
+    )!;
 
     let suite_index = this.d_ag_test_suites.findIndex(
       (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
@@ -317,9 +327,9 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   go_to_prev_ag_test_case() {
-    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-      this.d_active_ag_test_command!
-    );
+    let [parent_ag_test_suite, parent_ag_test_case] = find_parent_suite_and_test_case(
+      this.d_active_ag_test_command!, this.d_ag_test_suites
+    )!;
 
     let suite_index = this.d_ag_test_suites.findIndex(
       (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
@@ -366,23 +376,33 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   }
 
   // SuiteObserver -------------------------------------------------------------------------------
-  update_ag_test_suite_changed(ag_test_suite: AGTestSuite): void {
-    let index = this.d_ag_test_suites.findIndex(
-      (suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
-    Vue.set(this.d_ag_test_suites, index, deep_copy(ag_test_suite, AGTestSuite));
-  }
 
   update_ag_test_suite_created(ag_test_suite: AGTestSuite): void {
-    this.d_ag_test_suites.push(ag_test_suite);
-    this.update_active_item(ag_test_suite);
+    if (ag_test_suite.project === this.project.pk) {
+      this.d_ag_test_suites.push(ag_test_suite);
+      this.update_active_item(ag_test_suite);
+    }
+  }
+
+  update_ag_test_suite_changed(ag_test_suite: AGTestSuite): void {
+    if (ag_test_suite.project === this.project.pk) {
+      let index = this.d_ag_test_suites.findIndex(
+        (suite: AGTestSuite) => suite.pk === ag_test_suite.pk);
+      Vue.set(this.d_ag_test_suites, index, deep_copy(ag_test_suite, AGTestSuite));
+    }
   }
 
   update_ag_test_suite_deleted(ag_test_suite: AGTestSuite): void {
+    if (ag_test_suite.project !== this.project.pk) {
+      return;
+    }
+
     let index = this.d_ag_test_suites.findIndex(
       (suite: AGTestSuite) => ag_test_suite.pk === suite.pk);
-    let suite_was_active: boolean = (this.d_active_ag_test_suite !== null
-                                     && ag_test_suite.pk === this.d_active_ag_test_suite.pk);
     this.d_ag_test_suites.splice(index, 1);
+
+    let suite_was_active = (this.d_active_ag_test_suite !== null
+                            && ag_test_suite.pk === this.d_active_ag_test_suite.pk);
     if (suite_was_active) {
       if (this.d_ag_test_suites.length === 0) {
         this.update_active_item(null);
@@ -399,31 +419,28 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   update_ag_test_suites_order_changed(project_pk: number, ag_test_suite_order: number[]): void {}
 
   // CaseObserver --------------------------------------------------------------------------------
-  update_ag_test_case_changed(ag_test_case: AGTestCase): void {
-    let parent_suite = this.d_ag_test_suites[this.d_ag_test_suites.findIndex(
-      (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
-    )];
-    let case_index = parent_suite!.ag_test_cases.findIndex(
-      (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
-    );
-    Vue.set(
-      parent_suite.ag_test_cases,
-      case_index,
-      deep_copy(ag_test_case, AGTestCase)
-    );
-  }
 
   update_ag_test_case_created(ag_test_case: AGTestCase): void {
-    let parent_suite = this.d_ag_test_suites.find(
-      (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
-    );
-    parent_suite!.ag_test_cases.push(ag_test_case);
+    let parent_suite = find_parent_suite(ag_test_case, this.d_ag_test_suites);
+    if (parent_suite !== null) {
+      parent_suite.ag_test_cases.push(ag_test_case);
+    }
+  }
+
+  update_ag_test_case_changed(ag_test_case: AGTestCase): void {
+    update_changed_ag_test_case(deep_copy(ag_test_case, AGTestCase), this.d_ag_test_suites);
   }
 
   update_ag_test_case_deleted(ag_test_case: AGTestCase): void {
-    let parent_suite = this.d_ag_test_suites[this.d_ag_test_suites.findIndex(
-      (ag_suite: AGTestSuite) => ag_suite.pk === ag_test_case.ag_test_suite
-    )];
+    let parent_suite_index = this.d_ag_test_suites.findIndex(
+      (ag_suite) => ag_suite.pk === ag_test_case.ag_test_suite
+    );
+    if (parent_suite_index === -1) {
+      // Test case could belong to another project
+      return;
+    }
+
+    let parent_suite = this.d_ag_test_suites[parent_suite_index];
     let case_index = parent_suite!.ag_test_cases.findIndex(
       (test_case: AGTestCase) => test_case.pk === ag_test_case.pk
     );
@@ -448,33 +465,44 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   update_ag_test_cases_order_changed(ag_test_suite_pk: number, ag_test_case_order: number[]) { }
 
   // CommandObserver------------------------------------------------------------------------------
-  update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
-    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-      ag_test_command
-    );
+  update_ag_test_command_created(ag_test_command: AGTestCommand): void {
+    let parents = find_parent_suite_and_test_case(ag_test_command, this.d_ag_test_suites);
+    if (parents === null) {
+        // Command could belong to another project
+        return;
+    }
 
+    let [parent_ag_test_suite, parent_ag_test_case] = parents;
+    parent_ag_test_case.ag_test_commands.push(ag_test_command);
+
+    this.update_active_item(ag_test_command);
+  }
+
+  update_ag_test_command_changed(ag_test_command: AGTestCommand): void {
+    let parents = find_parent_suite_and_test_case(ag_test_command, this.d_ag_test_suites);
+    if (parents === null) {
+        // Command could belong to another project
+        return;
+    }
+
+    let [parent_ag_test_suite, parent_ag_test_case] = parents;
     let command_index = parent_ag_test_case.ag_test_commands.findIndex(
       (ag_command: AGTestCommand) => ag_command.pk === ag_test_command.pk);
 
     Vue.set(
       parent_ag_test_case.ag_test_commands,
       command_index,
-      deep_copy(ag_test_command, AGTestCommand)
+      deep_copy(ag_test_command, AGTestCommand),
     );
   }
 
-  update_ag_test_command_created(ag_test_command: AGTestCommand): void {
-    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-      ag_test_command
-    );
-    parent_ag_test_case!.ag_test_commands.push(ag_test_command);
-    this.update_active_item(ag_test_command);
-  }
 
   update_ag_test_command_deleted(ag_test_command: AGTestCommand): void {
-    let [parent_ag_test_suite, parent_ag_test_case] = this.find_parent_suite_and_case(
-      ag_test_command
-    );
+    let parents = find_parent_suite_and_test_case(ag_test_command, this.d_ag_test_suites);
+    if (parents === null) {
+      return;
+    }
+    let [parent_ag_test_suite, parent_ag_test_case] = parents;
 
     let command_index = parent_ag_test_case.ag_test_commands.findIndex(
       (ag_command: AGTestCommand) => ag_command.pk === ag_test_command.pk);
@@ -492,20 +520,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     }
   }
 
-  find_parent_suite_and_case(ag_test_command: AGTestCommand): [AGTestSuite, AGTestCase] {
-    let parent_ag_test_suite!: AGTestSuite;
-    let parent_ag_test_case!: AGTestCase;
-
-    for (let suite_index = 0; suite_index < this.d_ag_test_suites.length; ++suite_index) {
-      let case_index = this.d_ag_test_suites[suite_index].ag_test_cases.findIndex(
-        (ag_case: AGTestCase) => ag_case.pk === ag_test_command.ag_test_case);
-      if (case_index !== -1) {
-        parent_ag_test_suite = this.d_ag_test_suites[suite_index];
-        parent_ag_test_case = parent_ag_test_suite.ag_test_cases[case_index];
-      }
-    }
-    return [parent_ag_test_suite, parent_ag_test_case];
-  }
 
   update_ag_test_commands_order_changed(ag_test_case_pk: number,
                                         ag_test_command_order: number[]) { }

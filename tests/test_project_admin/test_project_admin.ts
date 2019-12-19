@@ -250,6 +250,32 @@ describe('Changing tabs in project admin', () => {
     });
 });
 
+test('Project observer', async () => {
+    let project = data_ut.make_project(course.pk);
+    sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
+    let wrapper = managed_mount(ProjectAdmin, {
+        mocks: {
+            $route: {
+                params: {
+                    project_id: project.pk.toString()
+                },
+                query: {}
+            },
+        }
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    let updated = new Project(project);
+    updated.name = 'A new name';
+    expect(wrapper.vm.project!.name).not.toEqual(updated.name);
+    Project.notify_project_changed(updated);
+    expect(wrapper.vm.project!.name).toEqual(updated.name);
+
+    let other_project = data_ut.make_project(course.pk);
+    Project.notify_project_changed(other_project);
+    expect(wrapper.vm.project).toEqual(updated);
+});
+
 describe('InstructorFileObserver tests', () => {
     let project: Project;
     let instructor_files: InstructorFile[];
@@ -361,4 +387,36 @@ describe('ExpectedStudentFileObserver tests', () => {
         expected_student_files.splice(1, 1);
         expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
     });
+});
+
+test('Observer updates from other project ignored', async () => {
+    let project = data_ut.make_project(course.pk);
+    let other_project = data_ut.make_project(course.pk);
+    let instructor_file = data_ut.make_instructor_file(other_project.pk, 'filey');
+    let expected_student_file = data_ut.make_expected_student_file(other_project.pk, 'files');
+
+    sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+    let wrapper = managed_mount(ProjectAdmin, {
+        mocks: {
+            $route: {
+                params: {
+                    project_id: project.pk.toString()
+                },
+                query: {}
+            },
+        }
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    Project.notify_project_changed(other_project);
+
+    InstructorFile.notify_instructor_file_created(instructor_file);
+    InstructorFile.notify_instructor_file_deleted(instructor_file);
+    InstructorFile.notify_instructor_file_renamed(instructor_file, 'name');
+
+    ExpectedStudentFile.notify_expected_student_file_created(expected_student_file);
+    ExpectedStudentFile.notify_expected_student_file_changed(expected_student_file);
+    ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_file);
+
+    expect(wrapper.vm.project).toEqual(project);
 });

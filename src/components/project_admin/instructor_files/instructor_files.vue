@@ -50,6 +50,7 @@ import FileUpload from '@/components/file_upload.vue';
 import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
+import { BeforeDestroy, Created } from '@/lifecycle';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
 import { array_get_unique, array_has_unique, array_remove_unique, handle_api_errors_async, toggle } from '@/utils';
@@ -66,7 +67,9 @@ import SingleInstructorFile from './single_instructor_file.vue';
     ViewFile,
   }
 })
-export default class InstructorFiles extends OpenFilesMixin implements InstructorFileObserver {
+export default class InstructorFiles extends OpenFilesMixin implements InstructorFileObserver,
+                                                                       Created,
+                                                                       BeforeDestroy {
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -85,7 +88,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     InstructorFile.subscribe(this);
   }
 
-  destroyed() {
+  beforeDestroy() {
     InstructorFile.unsubscribe(this);
   }
 
@@ -132,15 +135,21 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   }
 
   update_instructor_file_content_changed(instructor_file: InstructorFile, file_content: string) {
-    this.update_file(instructor_file.name, Promise.resolve(file_content));
+    if (instructor_file.project === this.project.pk) {
+      this.update_file(instructor_file.name, Promise.resolve(file_content));
+    }
   }
 
   update_instructor_file_deleted(instructor_file: InstructorFile) {
-    this.delete_file(instructor_file.name);
+    if (instructor_file.project === this.project.pk) {
+      this.delete_file(instructor_file.name);
+    }
   }
 
   update_instructor_file_renamed(instructor_file: InstructorFile, old_name: string) {
-    this.rename_file(old_name, instructor_file.name);
+    if (instructor_file.project === this.project.pk) {
+      this.rename_file(old_name, instructor_file.name);
+    }
   }
 
   update_instructor_file_created(instructor_file: InstructorFile) {}

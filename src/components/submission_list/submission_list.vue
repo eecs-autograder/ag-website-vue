@@ -242,6 +242,10 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
   }
 
   update_submission_created(submission: Submission): void {
+    if (submission.group !== this.group.pk) {
+      return;
+    }
+
     let submission_with_empty_results: SubmissionWithResults = {
       results: {
         pk: submission.pk,
@@ -261,6 +265,10 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
   }
 
   update_submission_changed(submission: Submission): void {
+    if (submission.group !== this.group.pk) {
+      return;
+    }
+
     let index = this.d_submissions.findIndex(s => s.pk === submission.pk);
     if (index !== -1) {
       safe_assign(this.d_submissions[index], new SubmissionData(submission));

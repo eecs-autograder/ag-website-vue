@@ -1,4 +1,4 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
@@ -12,7 +12,8 @@ import { managed_mount } from '@/tests/setup';
 import {
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_for_load,
 } from '@/tests/utils';
 
 
@@ -45,14 +46,6 @@ describe('Creating ag_test_suite', () => {
         get_all_suites_from_project.resolves([]);
 
         wrapper = make_wrapper();
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('d_new_ag_test_suite_name binding', async () => {
@@ -1151,4 +1144,40 @@ describe('AGSuites getter functions', () => {
 
         expect(wrapper.vm.parent_ag_test_suite).toEqual(suite_2);
     });
+});
+
+test('Observer updates from different project ignored', async () => {
+    get_all_suites_from_project.resolves([]);
+
+    let other_project = data_ut.make_project(data_ut.make_course().pk);
+    let new_suite = data_ut.make_ag_test_suite(other_project.pk);
+    let new_test = data_ut.make_ag_test_case(new_suite.pk);
+    new_suite.ag_test_cases = [new_test];
+    let new_command = data_ut.make_ag_test_command(new_test.pk);
+    new_test.ag_test_commands = [new_command];
+
+    let wrapper = make_wrapper();
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    ag_cli.AGTestSuite.notify_ag_test_suite_created(new_suite);
+    ag_cli.AGTestSuite.notify_ag_test_suite_changed(new_suite);
+    ag_cli.AGTestSuite.notify_ag_test_suite_order_updated(other_project.pk, [4, 5, 2]);
+
+    expect(wrapper.vm.d_ag_test_suites).toEqual([]);
+
+    ag_cli.AGTestCase.notify_ag_test_case_created(new_test);
+    ag_cli.AGTestCase.notify_ag_test_case_changed(new_test);
+    ag_cli.AGTestCase.notify_ag_test_case_order_updated(new_suite.pk, [1, 2, 3]);
+
+    ag_cli.AGTestCommand.notify_ag_test_command_created(new_command);
+    ag_cli.AGTestCommand.notify_ag_test_command_changed(new_command);
+    ag_cli.AGTestCommand.notify_ag_test_command_order_updated(new_test.pk, [1, 2, 3]);
+
+    expect(wrapper.vm.d_ag_test_suites).toEqual([]);
+
+    ag_cli.AGTestCommand.notify_ag_test_command_deleted(new_command);
+    ag_cli.AGTestCase.notify_ag_test_case_deleted(new_test);
+    ag_cli.AGTestSuite.notify_ag_test_suite_deleted(new_suite);
+
+    expect(wrapper.vm.d_ag_test_suites).toEqual([]);
 });

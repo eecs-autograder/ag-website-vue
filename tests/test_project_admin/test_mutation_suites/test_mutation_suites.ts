@@ -19,15 +19,50 @@ import MutationSuites from '@/components/project_admin/mutation_suites/mutation_
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import {
     find_by_name,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid,
+    wait_for_load,
 } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
+});
+
+let sandbox_docker_image_1: SandboxDockerImageData;
+let sandbox_docker_image_2: SandboxDockerImageData;
+let sandbox_docker_image_3: SandboxDockerImageData;
+
+beforeEach(() => {
+    sandbox_docker_image_1 = {
+        pk: 1,
+        name: "img1",
+        tag: "",
+        display_name: "Image 1"
+    };
+
+    sandbox_docker_image_2 = {
+        pk: 2,
+        name: "img2",
+        tag: "",
+        display_name: "Image 2"
+    };
+
+    sandbox_docker_image_3 = {
+        pk: 3,
+        name: "img3",
+        tag: "",
+        display_name: "Image 3"
+    };
+
+    sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([
+        sandbox_docker_image_1,
+        sandbox_docker_image_2,
+        sandbox_docker_image_3
+    ]));
 });
 
 describe('MutationSuites tests', () => {
@@ -36,9 +71,6 @@ describe('MutationSuites tests', () => {
     let mutation_test_suite_1: MutationTestSuite;
     let mutation_test_suite_2: MutationTestSuite;
     let mutation_test_suite_3: MutationTestSuite;
-    let sandbox_docker_image_1: SandboxDockerImageData;
-    let sandbox_docker_image_2: SandboxDockerImageData;
-    let sandbox_docker_image_3: SandboxDockerImageData;
     let student_file_1: ExpectedStudentFile;
     let student_file_2: ExpectedStudentFile;
     let student_file_3: ExpectedStudentFile;
@@ -97,33 +129,6 @@ describe('MutationSuites tests', () => {
             size: 2,
             last_modified: "now"
         });
-
-        sandbox_docker_image_1 = {
-            pk: 1,
-            name: "img1",
-            tag: "",
-            display_name: "Image 1"
-        };
-
-        sandbox_docker_image_2 = {
-            pk: 2,
-            name: "img2",
-            tag: "",
-            display_name: "Image 2"
-        };
-
-        sandbox_docker_image_3 = {
-            pk: 3,
-            name: "img3",
-            tag: "",
-            display_name: "Image 3"
-        };
-
-        sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([
-            sandbox_docker_image_1,
-            sandbox_docker_image_2,
-            sandbox_docker_image_3
-        ]));
 
         project = data_ut.make_project(
             data_ut.make_course().pk,
@@ -755,4 +760,27 @@ describe('MutationSuites tests', () => {
                 .show_validity_check_stderr
         ).toBe(true);
     });
+});
+
+test('Suite updates from other project ignored', async () => {
+    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([]);
+    let course = data_ut.make_course();
+    let project = data_ut.make_project(course.pk);
+    let other_project = data_ut.make_project(course.pk);
+    let new_suite = data_ut.make_mutation_test_suite(other_project.pk);
+    let wrapper = managed_mount(MutationSuites, {
+        propsData: {
+            project: project
+        }
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    expect(wrapper.vm.d_mutation_test_suites).toEqual([]);
+
+    ag_cli.MutationTestSuite.notify_mutation_test_suite_created(new_suite);
+    ag_cli.MutationTestSuite.notify_mutation_test_suite_changed(new_suite);
+    ag_cli.MutationTestSuite.notify_mutation_test_suite_order_updated(other_project.pk, [4, 5, 2]);
+    ag_cli.MutationTestSuite.notify_mutation_test_suite_deleted(new_suite);
+
+    expect(wrapper.vm.d_mutation_test_suites).toEqual([]);
 });
