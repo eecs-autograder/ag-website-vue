@@ -369,11 +369,17 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
-    this.d_mutation_test_suites.push(mutation_test_suite);
-    this.d_active_mutation_test_suite = mutation_test_suite;
+    if (mutation_test_suite.project === this.project.pk) {
+      this.d_mutation_test_suites.push(mutation_test_suite);
+      this.d_active_mutation_test_suite = mutation_test_suite;
+    }
   }
 
   update_mutation_test_suite_changed(mutation_test_suite: MutationTestSuite): void {
+    if (mutation_test_suite.project !== this.project.pk) {
+      return;
+    }
+
     let index = this.d_mutation_test_suites.findIndex(
       (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
     );
@@ -389,6 +395,10 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   }
 
   update_mutation_test_suite_deleted(mutation_test_suite: MutationTestSuite): void {
+    if (mutation_test_suite.project !== this.project.pk) {
+      return;
+    }
+
     let index = this.d_mutation_test_suites.findIndex(
       (mutation_suite: MutationTestSuite) => mutation_suite.pk === mutation_test_suite.pk
     );

@@ -66,7 +66,9 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
   // is created. This can happen in the ProjectView when the current user
   // completes the group registration process.
   update_group_created(group: Group): void {
-    this.d_groups.insert(group);
+    if (group.project === this.project.pk) {
+      this.d_groups.insert(group);
+    }
   }
 
   update_group_changed(group: Group): void {

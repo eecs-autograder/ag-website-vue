@@ -473,7 +473,8 @@ export default class HandgradingSettings extends Vue implements Created,
   }
 
   update_criterion_changed(criterion: Criterion): void {
-    if (this.d_handgrading_rubric !== null) {
+    if (this.d_handgrading_rubric !== null
+        && criterion.handgrading_rubric === this.d_handgrading_rubric.pk) {
       let index = this.d_handgrading_rubric.criteria.findIndex((item) => item.pk === criterion.pk);
       if (index !== -1) {
         Vue.set(this.d_handgrading_rubric.criteria, index, deep_copy(criterion, Criterion));
@@ -482,13 +483,15 @@ export default class HandgradingSettings extends Vue implements Created,
   }
 
   update_criterion_created(criterion: Criterion): void {
-    if (this.d_handgrading_rubric !== null) {
+    if (this.d_handgrading_rubric !== null
+        && criterion.handgrading_rubric === this.d_handgrading_rubric.pk) {
       this.d_handgrading_rubric.criteria.push(criterion);
     }
   }
 
   update_criterion_deleted(criterion: Criterion): void {
-    if (this.d_handgrading_rubric !== null) {
+    if (this.d_handgrading_rubric !== null
+        && criterion.handgrading_rubric === this.d_handgrading_rubric.pk) {
       let index = this.d_handgrading_rubric.criteria.findIndex((item) => item.pk === criterion.pk);
       if (index !== -1) {
         this.d_handgrading_rubric.criteria.splice(index, 1);
@@ -526,7 +529,8 @@ export default class HandgradingSettings extends Vue implements Created,
   }
 
   update_annotation_changed(annotation: Annotation): void {
-    if (this.d_handgrading_rubric !== null) {
+    if (this.d_handgrading_rubric !== null
+        && annotation.handgrading_rubric === this.d_handgrading_rubric.pk) {
       let index = this.d_handgrading_rubric.annotations.findIndex(
         (item) => item.pk === annotation.pk);
       if (index !== -1) {
@@ -536,13 +540,15 @@ export default class HandgradingSettings extends Vue implements Created,
   }
 
   update_annotation_created(annotation: Annotation): void {
-    if (this.d_handgrading_rubric !== null) {
+    if (this.d_handgrading_rubric !== null
+        && annotation.handgrading_rubric === this.d_handgrading_rubric.pk) {
       this.d_handgrading_rubric.annotations.push(annotation);
     }
   }
 
   update_annotation_deleted(annotation: Annotation): void {
-    if (this.d_handgrading_rubric !== null) {
+    if (this.d_handgrading_rubric !== null
+        && annotation.handgrading_rubric === this.d_handgrading_rubric.pk) {
       let index = this.d_handgrading_rubric.annotations.findIndex(
         (item) => item.pk === annotation.pk);
       if (index !== -1) {

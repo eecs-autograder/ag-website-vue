@@ -261,6 +261,28 @@ describe('Submission list tests', () => {
         expect(wrapper.vm.d_submissions[1].status).toEqual(
             ag_cli.GradingStatus.removed_from_queue);
     });
+
+    test('Submission updates from other group ignored', async () => {
+        get_submissions_with_results_stub.withArgs(group.pk).resolves([]);
+
+        let wrapper = mount(SubmissionList, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let other_group = data_ut.make_group(project.pk);
+        let other_submission = data_ut.make_submission(other_group);
+        ag_cli.Submission.notify_submission_created(other_submission);
+        ag_cli.Submission.notify_submission_changed(other_submission);
+
+        expect(wrapper.vm.d_submissions).toEqual([]);
+    });
 });
 
 describe('Ultimate submission tests', () => {

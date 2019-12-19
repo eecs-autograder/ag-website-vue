@@ -1,5 +1,3 @@
-import { Vue } from 'vue-property-decorator';
-
 import { Wrapper, WrapperArray } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
@@ -432,6 +430,25 @@ test('Handgrading result updated', async () => {
     });
 });
 
+test('New or updated handgrading result from other rubric ignored', async () => {
+    set_summaries([ungraded_group]);
+    let wrapper = await make_wrapper();
+    expect(wrapper.vm.d_result_summaries[0].handgrading_result).toBeNull();
+
+    let other_rubric = data_ut.make_handgrading_rubric(project.pk);
+    let ungraded_result = data_ut.make_handgrading_result(
+        other_rubric, ungraded_group.pk, 42,
+        {
+            total_points: 3,
+            total_points_possible: 8,
+            finished_grading: false
+        }
+    );
+    ag_cli.HandgradingResult.notify_handgrading_result_created(ungraded_result);
+    ag_cli.HandgradingResult.notify_handgrading_result_changed(ungraded_result);
+    expect(wrapper.vm.d_result_summaries[0].handgrading_result).toBeNull();
+});
+
 test('Header is "Students" or "Groups based on max group size"', async () => {
     project.max_group_size = 1;
     set_summaries([]);
@@ -458,7 +475,7 @@ async function make_wrapper() {
         propsData: {
             course: course,
             project: project,
-            handgrading_rubric: data_ut.make_handgrading_rubric(project.pk)
+            handgrading_rubric: rubric,
         }
     });
     await wait_until(wrapper, w => !w.vm.d_loading_result_summaries);

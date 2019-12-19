@@ -13,6 +13,7 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
+import { wait_for_load } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -360,4 +361,27 @@ describe('EditGroups tests', () => {
         expect(component.groups_with_extensions.length).toEqual(3);
         expect(component.groups_with_extensions).not.toContainEqual(new_group_from_merge);
     });
+});
+
+test('Observer updates from other project ignored', async () => {
+    let course = data_ut.make_course();
+    let project = data_ut.make_project(course.pk);
+    let other_project = data_ut.make_project(course.pk) ;
+    let other_group = data_ut.make_group(other_project.pk);
+    sinon.stub(Group, 'get_all_from_project').resolves([]);
+
+    let wrapper = managed_shallow_mount(EditGroups, {
+        propsData: {
+            project: project,
+            course: course,
+        }
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    Group.notify_group_created(other_group);
+    Group.notify_group_changed(other_group);
+    Group.notify_group_merged(other_group, 1, 2);
+
+    expect(wrapper.vm.groups_by_members.empty()).toBe(true);
+    expect(wrapper.vm.groups_by_pk.empty()).toBe(true);
 });

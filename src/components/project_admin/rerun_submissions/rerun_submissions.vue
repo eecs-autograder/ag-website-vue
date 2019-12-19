@@ -200,12 +200,10 @@ import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, safe_assign, toggle } from '@/utils';
 
 import {
-  add_created_ag_test_command,
   find_parent_suite,
   find_parent_suite_and_test_case,
   sort_by_ordering,
   update_changed_ag_test_case,
-  update_changed_ag_test_command,
 } from '../suite_observer_utils';
 
 import SubmissionSelector from './submission_selector.vue';
