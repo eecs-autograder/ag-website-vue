@@ -523,9 +523,9 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   }
 
   update_ag_test_cases_order_changed(ag_test_suite_pk: number, ag_test_case_order: number[]): void {
-    let suite = this.d_ag_test_suites.find(suite => suite.pk === ag_test_suite_pk);
-    if (suite !== undefined) {
-      sort_by_ordering(suite.ag_test_cases, ag_test_case_order);
+    let ag_test_suite = this.d_ag_test_suites.find(suite => suite.pk === ag_test_suite_pk);
+    if (ag_test_suite !== undefined) {
+      sort_by_ordering(ag_test_suite.ag_test_cases, ag_test_case_order);
     }
   }
 
