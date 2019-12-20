@@ -34,6 +34,7 @@ import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-ty
 
 import { GlobalData } from '@/app.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import {
   array_add_unique,
   array_get_unique,
@@ -64,7 +65,7 @@ export default class CourseList extends Vue implements CourseObserver {
   courses_by_term: TermCourses[] = [];
   loading = true;
 
-
+  @handle_global_errors_async
   async created() {
     Course.subscribe(this);
     await this.get_and_sort_courses();

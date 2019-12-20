@@ -22,12 +22,28 @@ import { HttpError } from 'ag-client-typescript';
 export default class APIErrors extends Vue {
   d_api_errors: string[] = [];
 
-  show_errors_from_response(error_response: unknown) {
-    if (!(error_response instanceof HttpError)) {
-      throw error_response;
+  show_errors_from_response(error_response: unknown, clear_current_errors = true) {
+    if (clear_current_errors) {
+      this.d_api_errors = [];
     }
-    this.d_api_errors = [];
-    if (error_response.status === 504) {
+
+    // There isn't a great way to detect network errors, but we know
+    // that the message will be "Network Error".
+    // https://github.com/axios/axios/issues/383
+    if ((<Error> error_response).message.includes('Network')) {
+      this.d_api_errors.push('Network error detected. Please check your connection and try again');
+      console.error(error_response);
+    }
+    else if (!(error_response instanceof HttpError)) {
+      this.d_api_errors.push(
+        'An unexpected error occurred. If the problem persists, please contact '
+        + 'help@autograder.io and include the version number of your browser and '
+        + 'output of the JavaScript console '
+        + '(https://webmasters.stackexchange.com/questions/8525/'
+        + 'how-do-i-open-the-javascript-console-in-different-browsers).');
+      console.error(error_response);
+    }
+    else if (error_response.status === 504) {
       this.d_api_errors.push('Error: The request timed out. Please try again later.');
     }
     else if (error_response.status === 413) {
@@ -39,7 +55,7 @@ export default class APIErrors extends Vue {
     }
     else {
       this.d_api_errors.push(
-        'An unexpected error occurred: '
+        `Error occurred requesting "${error_response.url}": `
         + `${error_response.status} ${JSON.stringify(error_response.data)}`);
     }
 
@@ -85,7 +101,6 @@ export default class APIErrors extends Vue {
 
 .error-msg-container {
   width: 100%;
-  max-width: 700px;
   display: flex;
   align-items: center;
 

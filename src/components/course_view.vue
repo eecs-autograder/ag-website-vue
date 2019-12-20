@@ -38,6 +38,7 @@ import {
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
+import { handle_global_errors_async } from '@/error_handling';
 
 @Component
 export default class CourseView extends Vue {
@@ -49,7 +50,7 @@ export default class CourseView extends Vue {
   d_loading = true;
   projects: Project[] = [];
 
-
+  @handle_global_errors_async
   async created() {
     this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
     this.projects = await Project.get_all_from_course(this.course.pk);

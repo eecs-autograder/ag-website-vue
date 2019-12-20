@@ -142,28 +142,8 @@ export function array_remove_unique<ItemType, SentinelType>(
 
 export class UniqueArrayError extends Error {}
 
-// tslint:disable-next-line:no-any
-type PropertyDescriptorType = TypedPropertyDescriptor<(...args: any[]) => any>;
-
-export function handle_api_errors_async(
-    // tslint:disable-next-line:no-any
-    error_handler_func: (self: any, response: unknown) => void) {
-    function decorator(target: object, property_key: string | symbol,
-                       property_descriptor: PropertyDescriptorType) {
-        return {
-            // tslint:disable-next-line:no-any
-            value: async function(...args: any[]) {
-                try {
-                    return await property_descriptor.value!.apply(this, args);
-                }
-                catch (e) {
-                    error_handler_func(this, e);
-                }
-            }
-        };
-    }
-    return decorator;
-}
+// FIXME: remove
+export { handle_api_errors_async } from '@/error_handling';
 
 export function format_course_name(course: Course) {
     let result = course.name;
