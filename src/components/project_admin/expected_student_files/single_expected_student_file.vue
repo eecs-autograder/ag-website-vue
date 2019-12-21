@@ -90,6 +90,7 @@ import { ExpectedStudentFile } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { handle_api_errors_async, safe_assign } from '@/utils';
 
 @Component({
@@ -157,6 +158,7 @@ export default class SingleExpectedStudentFile extends Vue {
     this.editing = false;
   }
 
+  @handle_global_errors_async
   async delete_expected_student_file() {
     try {
       this.d_delete_pending = true;
