@@ -111,6 +111,7 @@ import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Destroyed, Mounted } from '@/lifecycle';
 import { array_remove_unique, deep_copy, get_query_param, safe_assign } from "@/utils";
 
@@ -148,6 +149,7 @@ export default class ProjectAdmin extends Vue implements ProjectObserver,
   // have had there content loaded.
   d_loaded_tabs: Set<string> = new Set();
 
+  @handle_global_errors_async
   async created() {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
 

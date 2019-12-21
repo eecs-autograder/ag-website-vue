@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="loading-centered loading-large">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <div> <i class="fa fa-spinner fa-pulse"></i> </div>
   </div>
   <div v-else id="course-list">
@@ -34,6 +34,7 @@ import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-ty
 
 import { GlobalData } from '@/app.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import {
   array_add_unique,
   array_get_unique,
@@ -62,15 +63,15 @@ export default class CourseList extends Vue implements CourseObserver {
 
   all_courses: AllCourses | null = null;
   courses_by_term: TermCourses[] = [];
-  loading = true;
+  d_loading = true;
 
-
+  @handle_global_errors_async
   async created() {
-    Course.subscribe(this);
     await this.get_and_sort_courses();
     await this.d_globals.set_current_course(null);
-    this.loading = false;
-  }
+    Course.subscribe(this);
+    this.d_loading = false;
+}
 
   beforeDestroy() {
     Course.unsubscribe(this);
@@ -115,7 +116,7 @@ export default class CourseList extends Vue implements CourseObserver {
   }
 
   async get_and_sort_courses() {
-    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user);
+    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user!);
     for (let [role, courses] of Object.entries(this.all_courses)) {
       this.sort_into_terms(courses);
     }

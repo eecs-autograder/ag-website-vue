@@ -211,7 +211,7 @@ describe('select_tab function called with different values associated with "curr
         expect(component.course).toEqual(course);
         expect(component.current_tab).toEqual('settings');
         expect(component.role_selected).toEqual("");
-        expect(component.loading).toEqual(false);
+        expect(component.d_loading).toEqual(false);
     });
 
     test('current_tab parameter value = admin_roster', async () => {

@@ -263,6 +263,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Mounted } from "@/lifecycle";
 import { assert_not_null, deep_copy, format_datetime, handle_api_errors_async } from "@/utils";
 import {
@@ -299,6 +300,7 @@ export default class HandgradingSettings extends Vue implements Created,
                                                                 CriterionObserver {
   @Inject({from: 'globals'})
   globals!: GlobalData;
+  d_globals = this.globals;
 
   @Prop({required: true, type: Project})
   project!: Project;
@@ -361,6 +363,7 @@ export default class HandgradingSettings extends Vue implements Created,
 
   readonly PointsStyle = PointsStyle;
 
+  @handle_global_errors_async
   async created() {
     Criterion.subscribe(this);
     Annotation.subscribe(this);
@@ -369,7 +372,7 @@ export default class HandgradingSettings extends Vue implements Created,
       this.d_handgrading_rubric = await HandgradingRubric.get_from_project(this.project.pk);
     }
     else {
-      this.d_courses_is_admin_for = await this.globals.current_user.courses_is_admin_for();
+      this.d_courses_is_admin_for = await this.d_globals.current_user!.courses_is_admin_for();
       let current_course = this.d_courses_is_admin_for.find(
         course => course.pk === this.project.course);
       assert_not_null(current_course);
@@ -393,6 +396,7 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
+  @handle_global_errors_async
   async create_new_rubric() {
     try {
       this.d_new_rubric_request_pending = true;
@@ -403,6 +407,7 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
+  @handle_global_errors_async
   async load_projects_to_import_from(course: Course) {
     this.d_project_to_import_from = null;
     try {
@@ -416,6 +421,7 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
+  @handle_global_errors_async
   async import_rubric() {
     if (assert_not_null(this.d_project_to_import_from)) {
       try {
@@ -462,6 +468,7 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
+  @handle_global_errors_async
   set_criteria_order() {
     return Criterion.update_order(
       this.d_handgrading_rubric!.pk,
@@ -517,6 +524,7 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
+  @handle_global_errors_async
   set_annotations_order() {
     return Annotation.update_order(
       this.d_handgrading_rubric!.pk,

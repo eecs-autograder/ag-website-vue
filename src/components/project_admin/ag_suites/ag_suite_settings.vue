@@ -159,6 +159,7 @@
             <span class="item-to-delete">{{d_ag_test_suite.name}}</span>? <br><br>
             This will delete all associated test cases and run results. <br>
             <b>THIS ACTION CANNOT BE UNDONE.</b>
+            <APIErrors ref="delete_errors"></APIErrors>
             <div class="modal-button-footer">
               <button class="modal-delete-button red-button"
                       :disabled="d_deleting"
@@ -199,6 +200,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -247,12 +249,14 @@ export default class AGSuiteSettings extends Vue {
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
+  @handle_global_errors_async
   async created() {
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
     this.d_docker_images = await get_sandbox_docker_images();
     this.d_loading = false;
   }
 
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
   delete_ag_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_ag_test_suite!.delete();

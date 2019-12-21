@@ -424,6 +424,23 @@ describe('MutationSuites tests', () => {
         ).exists()).toBe(false);
     });
 
+    test('API errors handled on delete', async () => {
+        sinon.stub(mutation_test_suite_2, 'delete').rejects(new HttpError(403, 'errar'));
+
+        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.delete-mutation-test-suite-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        expect(errors.d_api_errors.length).toEqual(1);
+    });
+
     test('update_mutation_test_suite_changed and was the active mutation suite', async () => {
         let updated_mutation_test_suite_1 = data_ut.make_mutation_test_suite(
             project.pk,

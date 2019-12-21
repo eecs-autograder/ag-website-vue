@@ -57,6 +57,7 @@
         </div>
       </div>
 
+      <APIErrors ref="api_errors"></APIErrors>
       <div class="button-footer">
         <button class="download-button"
                 type="button"
@@ -104,8 +105,10 @@ import { HttpClient, Project } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
+import APIErrors from '@/components/api_errors.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
-import { Created, Destroyed } from '@/lifecycle';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
+import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { format_datetime_short, sleep, toggle, zip } from '@/utils';
 
@@ -130,10 +133,11 @@ export interface DownloadTask {
 
 @Component({
   components: {
+    APIErrors,
     ProgressOverlay,
   }
 })
-export default class DownloadGrades extends Vue implements Created, Destroyed {
+export default class DownloadGrades extends Vue implements Created, BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
@@ -156,6 +160,7 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
 
   readonly format_datetime_short = format_datetime_short;
 
+  @handle_global_errors_async
   async created() {
     await this.load_download_tasks();
     this.d_loading = false;
@@ -170,12 +175,13 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
     this.d_downloads = response.data.sort((first, second) => second.pk - first.pk);
   }
 
-  destroyed() {
+  beforeDestroy() {
     if (this.downloads_poller !== null) {
       this.downloads_poller.stop();
     }
   }
 
+  @handle_api_errors_async(make_error_handler_func())
   create_download_task() {
     return toggle(this, 'd_creating_download_task', async () => {
       let download_type: DownloadType;
@@ -235,6 +241,7 @@ export default class DownloadGrades extends Vue implements Created, Destroyed {
     return this.project.name + file_suffix;
   }
 
+  @handle_global_errors_async
   download_task_result(download_task: DownloadTask) {
     return toggle(this, 'd_downloading_result', async () => {
       let response = await HttpClient.get_instance().get<string>(

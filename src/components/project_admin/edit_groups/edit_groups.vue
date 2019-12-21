@@ -89,6 +89,7 @@ import Modal from '@/components/modal.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 import MergeGroups from '@/components/project_admin/edit_groups/merge_groups.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { deep_copy, format_datetime } from "@/utils";
 
 @Component({
@@ -119,6 +120,7 @@ export default class EditGroups extends Vue implements GroupObserver {
 
   readonly format_datetime = format_datetime;
 
+  @handle_global_errors_async
   async created() {
     let groups = await Group.get_all_from_project(this.project.pk);
 

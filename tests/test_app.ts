@@ -1,18 +1,18 @@
 import VueRouter from 'vue-router';
 
-import { createLocalVue, mount, Wrapper } from "@vue/test-utils";
+import { createLocalVue, Wrapper } from "@vue/test-utils";
 
-import { Course, User, UserRoles } from 'ag-client-typescript';
+import { Course, HttpError, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import App, { GlobalData } from '@/app.vue';
+import APIErrors from '@/components/api_errors.vue';
+import { GlobalErrorsSubject } from '@/error_handling';
 
 import { make_course, make_project, make_user, make_user_roles } from '@/tests/data_utils';
 import { compress_whitespace } from '@/tests/utils';
 
-afterEach(() => {
-    sinon.restore();
-});
+import { managed_mount } from './setup';
 
 describe('app.vue tests', () => {
     let wrapper: Wrapper<App>;
@@ -25,7 +25,7 @@ describe('app.vue tests', () => {
         const local_vue = createLocalVue();
         local_vue.use(VueRouter);
 
-        wrapper = mount(App, {
+        wrapper = managed_mount(App, {
             localVue: local_vue,
             router: new VueRouter ({
                 routes: [],
@@ -97,6 +97,35 @@ describe('app.vue tests', () => {
 
         expect(wrapper.findAll('.fa-cog').length).toEqual(2);
     });
+
+    test('Global errors displayed', async () => {
+        expect(wrapper.find({ref: 'global_errors'}).isVisible()).toBe(false);
+        GlobalErrorsSubject.get_instance().report_error(new HttpError(401, 'log in plz'));
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find({ref: 'global_errors'}).isVisible()).toBe(true);
+        expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
+    });
+});
+
+test('API error handled in create', async () => {
+    sinon.stub(console, 'error');
+    sinon.stub(User, 'get_current').rejects(new Error('Network Error'));
+
+    const local_vue = createLocalVue();
+    local_vue.use(VueRouter);
+
+    let wrapper = managed_mount(App, {
+        localVue: local_vue,
+        router: new VueRouter ({
+            routes: [],
+            mode: 'history'
+        })
+    });
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
 });
 
 describe('GlobalData tests', () => {

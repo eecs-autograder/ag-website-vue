@@ -26,6 +26,7 @@ import { ArraySet, member_names_less } from '@/array_set';
 import GroupLookup from '@/components/group_lookup.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { Created, Destroyed } from '@/lifecycle';
 import { safe_assign } from '@/utils';
 
@@ -50,6 +51,7 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 
   d_loading = true;
 
+  @handle_global_errors_async
   async created() {
     this.d_groups = new ArraySet<Group>(
       await Group.get_all_from_project(this.project.pk), {less_func: member_names_less});

@@ -125,6 +125,7 @@ import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 import * as ag_cli from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { assert_not_null, toggle } from '@/utils';
 
@@ -168,6 +169,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   d_loading_result = false;
 
+  @handle_global_errors_async
   async created() {
     this.d_staff =  new Set((await this.course.get_staff()).map(user => user.username));
     await this.load_result_summaries();
@@ -233,6 +235,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     ).length;
   }
 
+  @handle_global_errors_async
   async select_for_grading(group: ag_cli.GroupWithHandgradingResultSummary) {
     if (group.num_submissions !== 0) {
       await toggle(this, 'd_loading_result', async () => {

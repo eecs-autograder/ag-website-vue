@@ -966,6 +966,26 @@ describe('AGTestCommandSettings tests', () => {
         expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
     });
 
+    test('API errors handled on test command deletion', async () => {
+        let two_cmd_test = make_ag_test_case(ag_test_suite.pk);
+        two_cmd_test.ag_test_commands = [ag_test_command, make_ag_test_command(two_cmd_test.pk)];
+
+        wrapper.setProps({ag_test_case: two_cmd_test});
+
+        sinon.stub(wrapper.vm.d_ag_test_command!, 'delete').rejects(new HttpError(403, 'err'));
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.delete-ag-test-command-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toEqual(1);
+    });
+
     test('Delete case with exactly one command', async () => {
         let delete_case_stub = sinon.stub(wrapper.vm.ag_test_case, 'delete');
         await wrapper.vm.$nextTick();
@@ -985,6 +1005,21 @@ describe('AGTestCommandSettings tests', () => {
         expect(delete_case_stub.calledOnce).toBe(true);
         expect(wrapper.find({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
+    });
+
+    test('API errors handled on test case deletion', async () => {
+        sinon.stub(wrapper.vm.ag_test_case, 'delete').rejects(new HttpError(403, 'err'));
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.delete-ag-test-command-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toEqual(1);
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {

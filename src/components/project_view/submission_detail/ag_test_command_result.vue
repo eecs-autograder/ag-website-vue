@@ -205,6 +205,7 @@ import {
 
 import Diff from '@/components/diff.vue';
 import ViewFile from "@/components/view_file.vue";
+import { handle_global_errors_async } from '@/error_handling';
 
 @Component({
   components: {
@@ -245,6 +246,7 @@ export default class AGTestCommandResult extends Vue {
     await this.get_output();
   }
 
+  @handle_global_errors_async
   async get_output() {
     this.d_output_size = await ResultOutput.get_ag_test_cmd_result_output_size(
       this.submission.pk,
@@ -272,19 +274,10 @@ export default class AGTestCommandResult extends Vue {
 
   get show_stdout_diff() {
     return this.d_output_size!.stdout_diff_size !== null;
-
-    // this.ag_test_command_result.stdout_correct !== null
-    //        && !this.ag_test_command_result.stdout_correct!
-    //        && this.ag_test_command_result.fdbk_settings.stdout_fdbk_level
-    //        === ValueFeedbackLevel.expected_and_actual;
   }
 
   get show_stderr_diff() {
     return this.d_output_size!.stderr_diff_size !== null;
-    // this.ag_test_command_result.stderr_correct !== null
-    //        && !this.ag_test_command_result.stderr_correct!
-    //        && this.ag_test_command_result.fdbk_settings.stderr_fdbk_level
-    //        === ValueFeedbackLevel.expected_and_actual;
   }
 
   load_stdout_content() {

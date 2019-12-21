@@ -14,6 +14,7 @@ import APIErrors from '@/components/api_errors.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
 import { make_course, make_project } from '@/tests/data_utils';
+import { wait_for_load } from '@/tests/utils';
 
 describe('InvitationReceived tests', () => {
     let wrapper: Wrapper<InvitationReceived>;
@@ -21,7 +22,7 @@ describe('InvitationReceived tests', () => {
     let invitation: GroupInvitation;
     let project: Project;
 
-    beforeEach(() => {
+    beforeEach(async () => {
 
         project = make_project(make_course().pk);
 
@@ -62,7 +63,6 @@ describe('InvitationReceived tests', () => {
     test('reject an invitation - cancel action in modal', async () => {
         expect(wrapper.vm.d_invitation!).toEqual(invitation);
         expect(wrapper.vm.d_globals.current_user).toEqual(user);
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
 
@@ -279,7 +279,7 @@ describe('InvitationReceived tests', () => {
             "milo@umich.edu",
             "keiko@umich.edu"
         ]);
-        expect(wrapper.vm.d_globals.current_user.username).toEqual("alexis@umich.edu");
+        expect(wrapper.vm.d_globals.current_user!.username).toEqual("alexis@umich.edu");
         expect(wrapper.vm.d_invitation!.invitation_creator).toEqual("sean@umich.edu");
         expect(wrapper.vm.other_group_members).toEqual([
             invitation.invitation_creator,

@@ -194,6 +194,7 @@ import APIErrors from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map';
@@ -253,6 +254,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
   readonly format_datetime = format_datetime;
 
+  @handle_global_errors_async
   async created() {
     await this.load_rerun_tasks();
     this.d_groups = await ag_cli.Group.get_all_from_project(this.project.pk);
@@ -287,6 +289,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
     this.d_rerun_tasks = await ag_cli.RerunSubmissionTask.get_all_from_project(this.project.pk);
   }
 
+  @handle_global_errors_async
   async refresh_task(task: ag_cli.RerunSubmissionTask) {
     let refreshed = await ag_cli.RerunSubmissionTask.get_by_pk(task.pk);
     safe_assign(task, refreshed);

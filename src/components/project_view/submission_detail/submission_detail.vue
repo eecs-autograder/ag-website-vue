@@ -230,6 +230,7 @@ import { CorrectnessLevel } from '@/components/project_view/submission_detail/co
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 import ViewFile from '@/components/view_file.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 
@@ -328,6 +329,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
                 && this.submission.status === GradingStatus.waiting_for_deferred);
   }
 
+  @handle_global_errors_async
   private load_adjusted_fdbk(fdbk_category: FeedbackCategory) {
     return toggle(this, 'd_loading_results', async () => {
       this.d_submission_fdbk_override = await get_submission_result(
@@ -356,6 +358,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
     );
   }
 
+  @handle_global_errors_async
   private download_file(filename: string) {
     return toggle(this, 'd_downloading_file', async () => {
       let content = this.submission.get_file_content(filename, (event) => {

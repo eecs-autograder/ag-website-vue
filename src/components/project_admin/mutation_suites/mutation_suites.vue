@@ -198,6 +198,7 @@
           <b>THIS ACTION CANNOT BE UNDONE.</b>
         </div>
 
+        <APIErrors ref="delete_errors"></APIErrors>
         <div class="modal-button-footer">
           <button class="modal-delete-button red-button"
                   :disabled="d_deleting"
@@ -273,6 +274,7 @@ import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -321,6 +323,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
 
   d_collapsed = false;
 
+  @handle_global_errors_async
   async created() {
     MutationTestSuite.subscribe(this);
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
@@ -347,6 +350,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     }
   }
 
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
   async delete_mutation_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_active_mutation_test_suite!.delete();
@@ -355,6 +359,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     });
   }
 
+  @handle_global_errors_async
   set_mutation_test_suite_order() {
     return MutationTestSuite.update_order(
       this.project.pk, this.d_mutation_test_suites.map(suite => suite.pk));

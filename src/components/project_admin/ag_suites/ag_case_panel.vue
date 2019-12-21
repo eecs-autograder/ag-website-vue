@@ -155,6 +155,7 @@
       This will delete all associated run results. <br>
       <b>THIS ACTION CANNOT BE UNDONE.</b>
 
+      <APIErrors ref="delete_errors"></APIErrors>
       <div class="modal-button-footer">
         <button class="modal-delete-button"
                 :disabled="d_deleting"
@@ -192,6 +193,7 @@ import Modal from '@/components/modal.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -303,6 +305,7 @@ export default class AGCasePanel extends Vue {
     }
   }
 
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
   delete_ag_test_case() {
     return toggle(this, 'd_deleting', async () => {
       await this.ag_test_case.delete();
@@ -322,6 +325,7 @@ export default class AGCasePanel extends Vue {
     }
   }
 
+  @handle_global_errors_async
   set_ag_test_command_order() {
     return AGTestCommand.update_order(
       this.ag_test_case.pk, this.ag_test_case.ag_test_commands.map(cmd => cmd.pk));

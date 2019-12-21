@@ -121,7 +121,7 @@ export default class EditSingleGroup extends Vue {
     this.d_group = deep_copy(new_group, Group);
   }
 
-  async created() {
+  created() {
     this.d_group = deep_copy(this.group, Group);
   }
 

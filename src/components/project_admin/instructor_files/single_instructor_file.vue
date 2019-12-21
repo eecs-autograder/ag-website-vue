@@ -53,6 +53,7 @@
           to be updated before they'll run correctly again.
         </div>
 
+        <APIErrors ref="delete_errors"></APIErrors>
         <div class="button-footer-right modal-button-footer">
           <button class="modal-delete-button"
                   :disabled="d_delete_pending"
@@ -78,6 +79,7 @@ import Modal from '@/components/modal.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -119,6 +121,7 @@ export default class SingleInstructorFile extends Vue {
     this.editing = false;
   }
 
+  @handle_global_errors_async
   download_file() {
     return toggle(this, 'd_downloading', async () => {
       let file_content = this.file.get_content((event: ProgressEvent) => {
@@ -131,6 +134,7 @@ export default class SingleInstructorFile extends Vue {
     });
   }
 
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
   async delete_file_permanently() {
     try {
       this.d_delete_pending = true;

@@ -130,6 +130,18 @@ describe('SingleInstructorFile tests', () => {
         expect(delete_stub.callCount).toEqual(0);
     });
 
+    test('API errors handled on delete', async () => {
+        sinon.stub(file_1, 'delete').rejects(new HttpError(403, "nope"));
+        wrapper.find('.delete-file').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await component.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
+    });
+
     test('Users have the ability to download a file', async () => {
         let get_content_stub = sinon.stub(file_1, 'get_content');
         get_content_stub.callsFake((on_download_progress) => {

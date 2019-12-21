@@ -4,6 +4,13 @@
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>
+      <div id="global-error-banner" v-show="d_global_error_count !== 0">
+        <APIErrors
+          ref="global_errors"
+          id="global-api-errors"
+          @num_errors_changed="d_global_error_count = $event">
+        </APIErrors>
+      </div>
       <div id="breadcrumbs">
         <router-link to="/" id="home-logo">
           Autograder
@@ -43,7 +50,12 @@
           </span>
         </template>
       </div>
-      <router-view></router-view>
+      <template v-if="globals.current_user === null">
+        PLACEHOLDER - SIGN IN
+      </template>
+      <template v-else>
+        <router-view></router-view>
+      </template>
     </template>
   </div>
 </template>
@@ -53,7 +65,11 @@ import { Component, Provide, Vue } from 'vue-property-decorator';
 
 import { Course, Project, User, UserRoles } from 'ag-client-typescript';
 
+import APIErrors from '@/components/api_errors.vue';
+import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
+
 import UIDemos from './demos/ui_demos.vue';
+import { BeforeDestroy, Created } from './lifecycle';
 import { safe_assign } from './utils';
 
 
@@ -66,7 +82,7 @@ globals!: GlobalData;
 d_globals = this.globals;
 */
 export class GlobalData {
-  current_user!: User;
+  current_user: User | null = null;
   current_course: Course | null = null;
   current_project: Project | null = null;
 
@@ -109,8 +125,12 @@ export class GlobalData {
   }
 }
 
-@Component
-export default class App extends Vue {
+@Component({
+  components: {
+    APIErrors,
+  }
+})
+export default class App extends Vue implements GlobalErrorsObserver, Created, BeforeDestroy {
   /* IMPORTANT! How to use the provided globals:
   @Inject({from: 'globals'})
   globals!: GlobalData;
@@ -122,13 +142,31 @@ export default class App extends Vue {
   @Provide()
   globals: GlobalData = new GlobalData();
 
+  d_global_error_count = 0;
+
   d_loading = true;
 
+  @handle_global_errors_async
   async created() {
-    this.globals.current_user = await User.get_current();
-    this.d_loading = false;
+    try {
+      GlobalErrorsSubject.get_instance().subscribe(this);
+      this.globals.current_user = await User.get_current();
+    }
+    finally {
+      // If we encountered an error loading the current user, we want that to be displayed.
+      this.d_loading = false;
+    }
+  }
+
+  beforeDestroy() {
+    GlobalErrorsSubject.get_instance().unsubscribe(this);
+  }
+
+  handle_error(error: unknown): void {
+    (<APIErrors> this.$refs.global_errors).show_errors_from_response(error);
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
@@ -139,6 +177,33 @@ export default class App extends Vue {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+#global-error-banner {
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+
+  max-width: 700px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: .25rem .5rem;
+
+  background-color: lighten(desaturate($light-yellow, 20%), 10%);
+  border: 1px solid $pebble-dark;
+  border-top: none;
+}
+
+#global-api-errors {
+  width: 100%;
 }
 
 #breadcrumbs {

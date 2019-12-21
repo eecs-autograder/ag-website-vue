@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!d_loading">
+  <div>
     <div class="invitation-received">
       <div class="invitation-header">
         <b>{{d_invitation.invitation_creator}}</b> has invited you to work together!
@@ -128,9 +128,8 @@ export default class InvitationReceived extends Vue {
   d_show_confirm_accept_invitation_modal = false;
   d_show_confirm_reject_invitation_modal = false;
 
-  async created() {
+  created() {
     this.d_invitation = deep_copy(this.value, GroupInvitation);
-    this.d_loading = false;
   }
 
   member_acceptance_status(username: string) {
@@ -158,7 +157,7 @@ export default class InvitationReceived extends Vue {
 
   get already_accepted() {
     let index = this.d_invitation!.invitees_who_accepted.findIndex(
-      (invitee: string) => invitee === this.d_globals.current_user.username
+      (invitee: string) => invitee === this.d_globals.current_user!.username
     );
     return index !== -1;
   }
@@ -166,7 +165,7 @@ export default class InvitationReceived extends Vue {
   get other_group_members() {
     let other_invitees = [this.d_invitation!.invitation_creator];
     this.d_invitation!.invited_usernames.forEach((invitee: string) => {
-      if (invitee !== this.d_globals.current_user.username) {
+      if (invitee !== this.d_globals.current_user!.username) {
         other_invitees.push(invitee);
       }
     });

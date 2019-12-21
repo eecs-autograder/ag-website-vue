@@ -81,6 +81,7 @@ import {
 import { GlobalData } from '@/app.vue';
 import SubmissionDetail from "@/components/project_view/submission_detail/submission_detail.vue";
 import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { deep_copy, safe_assign, sleep, toggle, zip } from '@/utils';
@@ -134,6 +135,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     }
   }
 
+  @handle_global_errors_async
   private async initialize(group: Group) {
     this.d_loading = true;
 
@@ -259,7 +261,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     this.d_submissions.unshift(submission_with_empty_results);
     // Future proofing: we only want to switch to the new submission
     // if it was made by the current user.
-    if (submission.submitter === this.d_globals.current_user.username) {
+    if (submission.submitter === this.d_globals.current_user!.username) {
       this.d_selected_submission = submission_with_empty_results;
     }
   }

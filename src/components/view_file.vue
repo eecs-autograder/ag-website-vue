@@ -116,6 +116,7 @@ import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { Created } from '@/lifecycle';
 import { SafeMap } from '@/safe_map';
 import { chain, toggle } from '@/utils';
@@ -188,6 +189,7 @@ export default class ViewFile extends Vue implements Created {
   d_first_highlighted_line: number | null = null;
   d_last_highlighted_line: number | null = null;
 
+  @handle_global_errors_async
   async created() {
     this.d_handgrading_result = this.handgrading_result;
     this.d_file_contents = await this.file_contents;
@@ -303,6 +305,7 @@ export default class ViewFile extends Vue implements Created {
     this.$nextTick(() => (<HTMLElement> this.$refs.comment_text).focus());
   }
 
+  @handle_global_errors_async
   apply_annotation(annotation: Annotation) {
     return toggle(this, 'd_saving', async () => {
       await AppliedAnnotation.create(this.d_handgrading_result!.pk, {
@@ -317,6 +320,7 @@ export default class ViewFile extends Vue implements Created {
     });
   }
 
+  @handle_global_errors_async
   create_comment() {
     return toggle(this, 'd_saving', async () => {
       await Comment.create(this.d_handgrading_result!.pk, {
@@ -333,6 +337,7 @@ export default class ViewFile extends Vue implements Created {
     });
   }
 
+  @handle_global_errors_async
   async delete_handgrading_comment(handgrading_comment: HandgradingComment) {
     if (!this.d_saving) {
       await toggle(this, 'd_saving', async () => {

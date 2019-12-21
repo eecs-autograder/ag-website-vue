@@ -163,6 +163,7 @@ import { GroupMember } from "@/components/project_admin/edit_groups/create_singl
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { handle_api_errors_async } from '@/utils';
 
 @Component({
@@ -197,6 +198,7 @@ export default class GroupRegistration extends Vue {
   d_show_send_group_invitation_modal = false;
   d_show_delete_invitation_modal = false;
 
+  @handle_global_errors_async
   async created() {
     if (this.project.disallow_group_registration) {
       this.d_loading = false;
@@ -208,12 +210,12 @@ export default class GroupRegistration extends Vue {
       return;
     }
 
-    this.invitations_received = await this.d_globals.current_user.group_invitations_received();
+    this.invitations_received = await this.d_globals.current_user!.group_invitations_received();
     this.invitations_received = this.invitations_received.filter(
       (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
     );
 
-    let invitations_sent = await this.d_globals.current_user.group_invitations_sent();
+    let invitations_sent = await this.d_globals.current_user!.group_invitations_sent();
     invitations_sent = invitations_sent.filter(
       (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
     );

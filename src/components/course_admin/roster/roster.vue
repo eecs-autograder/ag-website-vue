@@ -16,11 +16,12 @@
                         :validators="[contains_valid_emails]"
                         :num_rows="7">
         </ValidatedInput>
+        <slot name="before_save_button"></slot>
         <div class="button-footer">
           <button type="submit"
-                id="add-users-button"
-                class="save-button"
-                :disabled="!add_users_form_is_valid">
+                  id="add-users-button"
+                  class="save-button"
+                  :disabled="!add_users_form_is_valid">
             Add to Roster
           </button>
         </div>
@@ -146,7 +147,6 @@ export default class Roster extends Vue {
 
   remove_person_from_roster(person_to_delete: User[], index: number) {
     this.$emit('remove_user', person_to_delete);
-    this.d_roster.splice(index, 1);
   }
 }
 </script>

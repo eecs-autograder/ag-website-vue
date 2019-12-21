@@ -150,6 +150,7 @@ import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
 
 interface ExpectedFilePatternMismatch {
@@ -196,8 +197,9 @@ export default class Submit extends Vue {
 
   late_days_remaining: number | null = null;
 
+  @handle_global_errors_async
   async created() {
-    let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user.pk);
+    let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user!.pk);
     this.late_days_remaining = late_days.late_days_remaining;
   }
 
@@ -234,7 +236,7 @@ export default class Submit extends Vue {
       deadline = moment(this.group.extended_due_date);
     }
 
-    let late_days_used = this.group.late_days_used[this.d_globals.current_user.username];
+    let late_days_used = this.group.late_days_used[this.d_globals.current_user!.username];
     if (late_days_used !== undefined) {
       deadline = deadline.add(late_days_used, 'd');
     }
