@@ -108,6 +108,7 @@ import SubmissionList from '@/components/submission_list/submission_list.vue';
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { assert_not_null, format_datetime, get_query_param } from '@/utils';
 
 @Component({
@@ -145,8 +146,8 @@ export default class ProjectView extends Vue implements GroupObserver {
 
   readonly format_datetime = format_datetime;
 
+  @handle_global_errors_async
   async mounted() {
-    Group.subscribe(this);
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
     this.course = await Course.get_by_pk(this.project.course);
 
@@ -160,6 +161,7 @@ export default class ProjectView extends Vue implements GroupObserver {
     await Promise.all([this.load_handgrading(), this.load_handgrading_result()]);
     this.initialize_current_tab();
 
+    Group.subscribe(this);
     this.d_loading = false;
   }
 
@@ -234,6 +236,7 @@ export default class ProjectView extends Vue implements GroupObserver {
            || this.d_globals.user_roles.is_staff;
   }
 
+  @handle_global_errors_async
   on_submit() {
     this.set_current_tab('my_submissions');
     return this.group!.refresh();

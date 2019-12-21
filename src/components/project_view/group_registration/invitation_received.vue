@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!d_loading">
+  <div>
     <div class="invitation-received">
       <div class="invitation-header">
         <b>{{d_invitation.invitation_creator}}</b> has invited you to work together!
@@ -128,9 +128,8 @@ export default class InvitationReceived extends Vue {
   d_show_confirm_accept_invitation_modal = false;
   d_show_confirm_reject_invitation_modal = false;
 
-  async created() {
+  created() {
     this.d_invitation = deep_copy(this.value, GroupInvitation);
-    this.d_loading = false;
   }
 
   member_acceptance_status(username: string) {

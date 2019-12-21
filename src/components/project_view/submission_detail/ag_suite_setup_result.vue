@@ -87,6 +87,7 @@ import {
 } from "ag-client-typescript";
 
 import ViewFile from "@/components/view_file.vue";
+import { handle_global_errors_async } from '@/error_handling';
 
 @Component({
   components: {
@@ -119,6 +120,7 @@ export default class AGSuiteSetupResult extends Vue {
     await this.get_output();
   }
 
+  @handle_global_errors_async
   async get_output() {
     this.d_output_size
         = await ResultOutput.get_ag_test_suite_result_output_size(

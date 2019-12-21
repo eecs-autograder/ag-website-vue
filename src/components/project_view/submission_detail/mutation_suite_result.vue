@@ -388,6 +388,7 @@ import {
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
 import ViewFile from "@/components/view_file.vue";
+import { handle_global_errors_async } from '@/error_handling';
 
 @Component({
   components: {
@@ -459,7 +460,7 @@ export default class MutationSuiteResult extends Vue {
            || this.mutation_test_suite_result!.num_bugs_exposed !== null;
   }
 
-  async toggle_d_show_buggy_implementations_output() {
+  toggle_d_show_buggy_implementations_output() {
     this.d_show_buggy_implementations_output = !this.d_show_buggy_implementations_output;
     if (this.d_show_buggy_implementations_output && !this.d_load_grade_buggy_output) {
       this.d_load_grade_buggy_output = true;
@@ -470,7 +471,7 @@ export default class MutationSuiteResult extends Vue {
     }
   }
 
-  async toggle_d_show_student_test_names_output() {
+  toggle_d_show_student_test_names_output() {
     this.d_show_student_test_names_output = !this.d_show_student_test_names_output;
     if (this.d_show_student_test_names_output && !this.d_load_student_test_names_output) {
       this.d_load_student_test_names_output = true;
@@ -481,7 +482,7 @@ export default class MutationSuiteResult extends Vue {
     }
   }
 
-  async toggle_d_show_validity_check_output() {
+  toggle_d_show_validity_check_output() {
     this.d_show_validity_check_output = !this.d_show_validity_check_output;
     if (this.d_show_validity_check_output && !this.d_load_validity_check_output) {
       this.d_load_validity_check_output = true;
@@ -492,6 +493,7 @@ export default class MutationSuiteResult extends Vue {
     }
   }
 
+  @handle_global_errors_async
   async get_output() {
     this.d_output_size = await ResultOutput.get_mutation_test_suite_result_output_size(
       this.submission!.pk,

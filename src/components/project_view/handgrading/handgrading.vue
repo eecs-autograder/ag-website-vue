@@ -239,6 +239,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { assert_not_null, deep_copy, toggle } from '@/utils';
 import {
@@ -348,6 +349,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     });
   }
 
+  @handle_global_errors_async
   add_comment() {
     return this.d_saving.process(async () => {
       let comment = await Comment.create(
@@ -381,6 +383,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
                || this.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments);
   }
 
+  @handle_global_errors_async
   save_handgrading_result() {
     return this.d_saving.process(() => {
       return this.d_handgrading_result!.save();
@@ -393,6 +396,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
                || this.d_handgrading_result!.handgrading_rubric.handgraders_can_adjust_points);
   }
 
+  @handle_global_errors_async
   delete_comment(comment: Comment | HandgradingComment) {
     if (this.saving) {
       // istanbul ignore next

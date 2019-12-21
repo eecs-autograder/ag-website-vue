@@ -116,7 +116,7 @@ import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
-  import { handle_global_errors_async } from '@/error_handling';
+import { handle_global_errors_async } from '@/error_handling';
 import { Created } from '@/lifecycle';
 import { SafeMap } from '@/safe_map';
 import { chain, toggle } from '@/utils';
