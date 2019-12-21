@@ -535,6 +535,21 @@ describe('AGCasePanel tests', () => {
         expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
     });
 
+    test('API errors handled on test case deletion', async () => {
+        sinon.stub(wrapper.vm.ag_test_case, 'delete').rejects(new HttpError(403, 'err'));
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toEqual(1);
+    });
+
     test('command in a different case changed', async () => {
         let updated_command_in_different_case = data_ut.make_ag_test_command(
             data_ut.make_ag_test_case(ag_suite_colors.pk).pk

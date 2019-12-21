@@ -270,6 +270,21 @@ describe('AGSuiteSettings tests', () => {
         expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
     });
 
+    test('API errors handled on suite deletion', async () => {
+        sinon.stub(component.d_ag_test_suite!, 'delete').rejects(new HttpError(403, 'err'));
+        await component.$nextTick();
+
+        wrapper.find('.delete-ag-test-suite-button').trigger('click');
+        await component.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await component.$nextTick();
+        await component.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toEqual(1);
+    });
+
     test('Parent component changes the value of the test_suite prop', async () => {
         let another_ag_suite = make_ag_test_suite(project.pk);
         another_ag_suite.instructor_files_needed = [instructor_file_2, instructor_file_1];

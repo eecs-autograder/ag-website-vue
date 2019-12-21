@@ -625,6 +625,7 @@
           This will delete all associated run results. <br>
           THIS ACTION CANNOT BE UNDONE.
 
+          <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">
             <button class="modal-delete-button delete-button"
                     :disabled="d_deleting"
@@ -668,7 +669,7 @@ import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import {
@@ -753,7 +754,7 @@ export default class AGTestCommandSettings extends Vue {
     });
   }
 
-  @handle_global_errors_async
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
   delete_ag_test_command() {
     return toggle(this, 'd_deleting', async () => {
       if (this.case_has_exactly_one_command) {
