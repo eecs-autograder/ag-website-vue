@@ -125,6 +125,7 @@ import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vu
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { deep_copy, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -186,6 +187,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     return null;
   }
 
+  @handle_global_errors_async
   async created() {
     AGTestSuite.subscribe(this);
     AGTestCase.subscribe(this);

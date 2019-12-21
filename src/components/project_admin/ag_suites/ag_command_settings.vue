@@ -668,6 +668,7 @@ import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import {
@@ -752,6 +753,7 @@ export default class AGTestCommandSettings extends Vue {
     });
   }
 
+  @handle_global_errors_async
   delete_ag_test_command() {
     return toggle(this, 'd_deleting', async () => {
       if (this.case_has_exactly_one_command) {

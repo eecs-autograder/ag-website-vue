@@ -58,7 +58,7 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
-import { handle_api_errors_async, on_off_toggle, toggle } from '@/utils';
+import { handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -85,11 +85,10 @@ export default class ManageProjects extends Vue implements ProjectObserver,
   d_adding_project = false;
 
   @handle_global_errors_async
-  created() {
-    return on_off_toggle(this, 'd_loading', async () => {
-      this.projects = await Project.get_all_from_course(this.course.pk);
-      Project.subscribe(this);
-    });
+  async created() {
+    this.projects = await Project.get_all_from_course(this.course.pk);
+    Project.subscribe(this);
+    this.d_loading = false;
   }
 
   beforeDestroy() {

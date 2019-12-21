@@ -22,7 +22,6 @@ import { Course, User } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import Roster from '@/components/course_admin/roster/roster.vue';
 import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
-import { on_off_toggle } from '@/utils';
 
 @Component({
   components: {
@@ -39,11 +38,10 @@ export default class AdminRoster extends Vue {
   d_loading = true;
 
   @handle_global_errors_async
-  created() {
-    return on_off_toggle(this, 'd_loading', async () => {
-      this.admins = await this.course.get_admins();
-    });
-  }
+  async created() {
+    this.admins = await this.course.get_admins();
+    this.d_loading = false;
+}
 
   @handle_api_errors_async(make_error_handler_func())
   async add_admins_to_roster(new_admins: string[]) {

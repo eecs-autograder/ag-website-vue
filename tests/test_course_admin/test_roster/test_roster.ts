@@ -122,7 +122,7 @@ describe('Roster tests', () => {
         expect(roster.d_roster.length).toEqual(4);
 
         expect(wrapper.emitted().remove_user.length).toBe(1);
-        expect(wrapper.emitted().remove_user[0][0]).toEqual(user_1);
+        expect(wrapper.emitted().remove_user[0][0]).toEqual([user_1]);
     });
 
     test('The d_roster is updated when the value of the roster prop changes in the parent',

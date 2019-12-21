@@ -57,24 +57,6 @@ export async function toggle<T, Key extends keyof T, ReturnType>(
     }
 }
 
-// Like toggle, but always initially sets the field to true
-// and then sets it to false after calling body.
-export async function on_off_toggle<T, Key extends keyof T, ReturnType>(
-    obj: T, key: Key, body: () => Promise<ReturnType>
-) {
-    if (typeof obj[key] !== 'boolean') {
-        // istanbul ignore next
-        throw new TypeError(`Expected a property of boolean type, but got "${typeof obj[key]}"`);
-    }
-    try {
-        (<boolean> <unknown> obj[key]) = true;
-        return await body();
-    }
-    finally {
-        (<boolean> <unknown> obj[key]) = false;
-    }
-}
-
 type IterableType<T> = Iterable<T> | IterableIterator<T>;
 
 // Given two iterables, returns an iterable iterator that produces

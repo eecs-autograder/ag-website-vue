@@ -87,7 +87,7 @@ import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
-import { get_query_param, on_off_toggle } from "@/utils";
+import { get_query_param } from "@/utils";
 
 @Component({
   components: {
@@ -119,11 +119,10 @@ export default class CourseAdmin extends CurrentTabMixin {
   course: Course | null = null;
 
   @handle_global_errors_async
-  created() {
-    return on_off_toggle(this, 'd_loading', async () => {
-      this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
-      await this.globals.set_current_course(this.course);
-    });
+  async created() {
+    this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
+    await this.globals.set_current_course(this.course);
+    this.d_loading = false;
   }
 
   mounted() {

@@ -199,6 +199,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -247,12 +248,14 @@ export default class AGSuiteSettings extends Vue {
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
+  @handle_global_errors_async
   async created() {
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
     this.d_docker_images = await get_sandbox_docker_images();
     this.d_loading = false;
   }
 
+  @handle_global_errors_async
   delete_ag_test_suite() {
     return toggle(this, 'd_deleting', async () => {
       await this.d_ag_test_suite!.delete();

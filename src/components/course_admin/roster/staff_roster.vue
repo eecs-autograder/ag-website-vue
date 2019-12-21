@@ -23,7 +23,6 @@ import { Course, User } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import Roster from '@/components/course_admin/roster/roster.vue';
 import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
-import { on_off_toggle } from '@/utils';
 
 @Component({
   components: {
@@ -39,10 +38,10 @@ export default class StaffRoster extends Vue {
 
   d_loading = true;
 
-  created() {
-    return on_off_toggle(this, 'd_loading', async () => {
-      this.staff = await this.course.get_staff();
-    });
+  @handle_global_errors_async
+  async created() {
+    this.staff = await this.course.get_staff();
+    this.d_loading = false;
   }
 
   @handle_api_errors_async(make_error_handler_func())

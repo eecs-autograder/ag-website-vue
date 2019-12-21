@@ -39,7 +39,6 @@ import {
   array_add_unique,
   array_get_unique,
   array_has_unique,
-  on_off_toggle,
 } from '@/utils';
 
 interface Term {
@@ -67,13 +66,12 @@ export default class CourseList extends Vue implements CourseObserver {
   d_loading = true;
 
   @handle_global_errors_async
-  created() {
-    return on_off_toggle(this, 'd_loading', async () => {
-      await this.get_and_sort_courses();
-      await this.d_globals.set_current_course(null);
-      Course.subscribe(this);
-    });
-  }
+  async created() {
+    await this.get_and_sort_courses();
+    await this.d_globals.set_current_course(null);
+    Course.subscribe(this);
+    this.d_loading = false;
+}
 
   beforeDestroy() {
     Course.unsubscribe(this);
