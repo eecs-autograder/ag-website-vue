@@ -62,6 +62,16 @@ describe('APIErrors component tests', () => {
         expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
+    test('401 error', () => {
+        component.show_errors_from_response(new HttpError(401, 'too big'));
+
+        let messages = wrapper.findAll('.error-msg');
+
+        expect(messages.length).toEqual(1);
+        expect(messages.at(0).text()).toContain('sign in');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
+    });
+
     test('400 error with __all__ string', () => {
         component.show_errors_from_response(new HttpError(400, {'__all__': 'Duplicate course'}));
 

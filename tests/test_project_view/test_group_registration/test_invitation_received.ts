@@ -279,7 +279,7 @@ describe('InvitationReceived tests', () => {
             "milo@umich.edu",
             "keiko@umich.edu"
         ]);
-        expect(wrapper.vm.d_globals.current_user.username).toEqual("alexis@umich.edu");
+        expect(wrapper.vm.d_globals.current_user!.username).toEqual("alexis@umich.edu");
         expect(wrapper.vm.d_invitation!.invitation_creator).toEqual("sean@umich.edu");
         expect(wrapper.vm.other_group_members).toEqual([
             invitation.invitation_creator,

@@ -157,7 +157,7 @@ export default class InvitationReceived extends Vue {
 
   get already_accepted() {
     let index = this.d_invitation!.invitees_who_accepted.findIndex(
-      (invitee: string) => invitee === this.d_globals.current_user.username
+      (invitee: string) => invitee === this.d_globals.current_user!.username
     );
     return index !== -1;
   }
@@ -165,7 +165,7 @@ export default class InvitationReceived extends Vue {
   get other_group_members() {
     let other_invitees = [this.d_invitation!.invitation_creator];
     this.d_invitation!.invited_usernames.forEach((invitee: string) => {
-      if (invitee !== this.d_globals.current_user.username) {
+      if (invitee !== this.d_globals.current_user!.username) {
         other_invitees.push(invitee);
       }
     });

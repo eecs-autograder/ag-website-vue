@@ -53,6 +53,9 @@ export default class APIErrors extends Vue {
     else if (error_response.status === 400) {
       this.show_400_error_data(error_response);
     }
+    else if (error_response.status === 401) {
+      this.d_api_errors.push('You are not signed in. Please sign in and try again.');
+    }
     else {
       this.d_api_errors.push(
         `Error occurred requesting "${error_response.url}": `

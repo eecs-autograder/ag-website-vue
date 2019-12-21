@@ -210,12 +210,12 @@ export default class GroupRegistration extends Vue {
       return;
     }
 
-    this.invitations_received = await this.d_globals.current_user.group_invitations_received();
+    this.invitations_received = await this.d_globals.current_user!.group_invitations_received();
     this.invitations_received = this.invitations_received.filter(
       (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
     );
 
-    let invitations_sent = await this.d_globals.current_user.group_invitations_sent();
+    let invitations_sent = await this.d_globals.current_user!.group_invitations_sent();
     invitations_sent = invitations_sent.filter(
       (group_invitation: GroupInvitation) => group_invitation.project === this.project.pk
     );

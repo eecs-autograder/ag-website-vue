@@ -50,7 +50,12 @@
           </span>
         </template>
       </div>
-      <router-view></router-view>
+      <template v-if="globals.current_user === null">
+        PLACEHOLDER - SIGN IN
+      </template>
+      <template v-else>
+        <router-view></router-view>
+      </template>
     </template>
   </div>
 </template>
@@ -61,7 +66,7 @@ import { Component, Provide, Vue } from 'vue-property-decorator';
 import { Course, Project, User, UserRoles } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import { GlobalErrorsObserver, GlobalErrorsSubject } from '@/error_handling';
+import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
 
 import UIDemos from './demos/ui_demos.vue';
 import { BeforeDestroy, Created } from './lifecycle';
@@ -77,7 +82,7 @@ globals!: GlobalData;
 d_globals = this.globals;
 */
 export class GlobalData {
-  current_user!: User;
+  current_user: User | null = null;
   current_course: Course | null = null;
   current_project: Project | null = null;
 
@@ -141,10 +146,16 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
 
   d_loading = true;
 
+  @handle_global_errors_async
   async created() {
-    this.globals.current_user = await User.get_current();
-    GlobalErrorsSubject.get_instance().subscribe(this);
-    this.d_loading = false;
+    try {
+      GlobalErrorsSubject.get_instance().subscribe(this);
+      this.globals.current_user = await User.get_current();
+    }
+    finally {
+      // If we encountered an error loading the current user, we want that to be displayed.
+      this.d_loading = false;
+    }
   }
 
   beforeDestroy() {

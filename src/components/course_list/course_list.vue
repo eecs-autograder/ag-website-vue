@@ -116,7 +116,7 @@ export default class CourseList extends Vue implements CourseObserver {
   }
 
   async get_and_sort_courses() {
-    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user);
+    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user!);
     for (let [role, courses] of Object.entries(this.all_courses)) {
       this.sort_into_terms(courses);
     }

@@ -300,6 +300,7 @@ export default class HandgradingSettings extends Vue implements Created,
                                                                 CriterionObserver {
   @Inject({from: 'globals'})
   globals!: GlobalData;
+  d_globals = this.globals;
 
   @Prop({required: true, type: Project})
   project!: Project;
@@ -371,7 +372,7 @@ export default class HandgradingSettings extends Vue implements Created,
       this.d_handgrading_rubric = await HandgradingRubric.get_from_project(this.project.pk);
     }
     else {
-      this.d_courses_is_admin_for = await this.globals.current_user.courses_is_admin_for();
+      this.d_courses_is_admin_for = await this.d_globals.current_user!.courses_is_admin_for();
       let current_course = this.d_courses_is_admin_for.find(
         course => course.pk === this.project.course);
       assert_not_null(current_course);

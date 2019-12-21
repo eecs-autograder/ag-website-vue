@@ -110,7 +110,7 @@ export default class SingleProject extends Vue {
   @handle_global_errors_async
   async created() {
     this.course_to_clone_to = this.course;
-    this.cloning_destinations = await this.d_globals.current_user.courses_is_admin_for();
+    this.cloning_destinations = await this.d_globals.current_user!.courses_is_admin_for();
     this.course_index = this.cloning_destinations.findIndex(
       course => course.pk === this.course.pk);
   }

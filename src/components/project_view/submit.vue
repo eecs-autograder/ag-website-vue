@@ -199,7 +199,7 @@ export default class Submit extends Vue {
 
   @handle_global_errors_async
   async created() {
-    let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user.pk);
+    let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user!.pk);
     this.late_days_remaining = late_days.late_days_remaining;
   }
 
@@ -236,7 +236,7 @@ export default class Submit extends Vue {
       deadline = moment(this.group.extended_due_date);
     }
 
-    let late_days_used = this.group.late_days_used[this.d_globals.current_user.username];
+    let late_days_used = this.group.late_days_used[this.d_globals.current_user!.username];
     if (late_days_used !== undefined) {
       deadline = deadline.add(late_days_used, 'd');
     }

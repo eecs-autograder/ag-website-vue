@@ -151,7 +151,7 @@ export default class ProjectView extends Vue implements GroupObserver {
     this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
     this.course = await Course.get_by_pk(this.project.course);
 
-    let groups_is_member_of = await this.d_globals.current_user.groups_is_member_of();
+    let groups_is_member_of = await this.d_globals.current_user!.groups_is_member_of();
     let result = groups_is_member_of.find(group => group.project === this.project!.pk);
     if (result !== undefined) {
       this.group = result;
@@ -246,7 +246,7 @@ export default class ProjectView extends Vue implements GroupObserver {
 
   update_group_created(group: Group): void {
     let has_current_user = group.member_names.find(
-      member => member === this.d_globals.current_user.username) !== undefined;
+      member => member === this.d_globals.current_user!.username) !== undefined;
     if (this.project !== null && group.project === this.project.pk && has_current_user) {
       this.group = group;
     }
