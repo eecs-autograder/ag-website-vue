@@ -141,6 +141,7 @@ import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue'
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -270,6 +271,7 @@ export default class AGSuitePanel extends Vue {
     return "";
   }
 
+  @handle_global_errors_async
   set_ag_test_case_order() {
     return AGTestCase.update_order(
       this.ag_test_suite.pk, this.ag_test_suite.ag_test_cases.map(test_case => test_case.pk));

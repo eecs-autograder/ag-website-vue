@@ -324,6 +324,7 @@ export default class AGCasePanel extends Vue {
     }
   }
 
+  @handle_global_errors_async
   set_ag_test_command_order() {
     return AGTestCommand.update_order(
       this.ag_test_case.pk, this.ag_test_case.ag_test_commands.map(cmd => cmd.pk));

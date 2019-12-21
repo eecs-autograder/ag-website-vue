@@ -228,6 +228,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     });
   }
 
+  @handle_global_errors_async
   set_ag_test_suite_order() {
     return AGTestSuite.update_order(this.project.pk, this.d_ag_test_suites.map(suite => suite.pk));
   }
