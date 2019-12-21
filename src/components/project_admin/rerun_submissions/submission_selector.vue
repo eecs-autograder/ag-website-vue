@@ -57,6 +57,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import * as ag_cli from 'ag-client-typescript';
 
 import { ArraySet, pk_more } from '@/array_set';
+import { handle_global_errors_async } from '@/error_handling';
 import { format_datetime } from '@/utils';
 
 @Component
@@ -72,6 +73,7 @@ export default class SubmissionSelector extends Vue {
 
   readonly format_datetime = format_datetime;
 
+  @handle_global_errors_async
   async created() {
     this.d_submissions = await ag_cli.Submission.get_all_from_group(this.group.pk);
     this.d_loading = false;
