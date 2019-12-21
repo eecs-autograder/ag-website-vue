@@ -4,6 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 import * as sinon from 'sinon';
 
+import APIErrors from '@/components/api_errors.vue';
 import DownloadGrades, { DownloadTask, DownloadType } from '@/components/project_admin/download_grades.vue';
 import { safe_assign } from '@/utils';
 
@@ -162,11 +163,19 @@ describe('Create task tests', () => {
         expect(http_post_stub.calledOnceWith(
             `/projects/${project.pk}/final_graded_submission_scores/?include_staff=true`));
     });
+
+    test('API errors handled', async () => {
+        http_post_stub.rejects(new ag_cli.HttpError(403, "forbid"));
+        wrapper.find('.download-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        let errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        expect(errors.d_api_errors.length).toEqual(1);
+    });
 });
 
 test('Download task result', async () => {
-    // let save_stub = sinon.stub(FileSaver, 'saveAs');
-
     let task = make_download_task(project.pk, DownloadType.all_scores, {progress: 100});
     get_tasks_stub_resolves([task]);
     http_get_stub.withArgs(`/download_tasks/${task.pk}/result/`).callsFake((url, args) => {
