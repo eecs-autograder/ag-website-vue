@@ -60,8 +60,8 @@ import { Component, Provide, Vue } from 'vue-property-decorator';
 
 import { Course, Project, User, UserRoles } from 'ag-client-typescript';
 
-import { GlobalErrorsObserver, GlobalErrorsSubject } from '@/error_handling';
 import APIErrors from '@/components/api_errors.vue';
+import { GlobalErrorsObserver, GlobalErrorsSubject } from '@/error_handling';
 
 import UIDemos from './demos/ui_demos.vue';
 import { BeforeDestroy, Created } from './lifecycle';
@@ -152,7 +152,7 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
   }
 
   handle_error(error: unknown): void {
-    this.$refs.global_errors.show_errors_from_response(error);
+    (<APIErrors> this.$refs.global_errors).show_errors_from_response(error);
   }
 }
 

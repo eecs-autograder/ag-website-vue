@@ -18,12 +18,26 @@ describe('APIErrors component tests', () => {
         component = wrapper.vm;
     });
 
-    test('Non-http error, exception re-thrown', () => {
+    test('Network error', async () => {
         sinon.stub(console, 'error');
-        expect(() => {
-            component.show_errors_from_response(new Error('Uncaught error'));
-        }).toThrowError('Uncaught error');
-        expect(wrapper.emitted().num_errors_changed).toBeUndefined();
+        component.show_errors_from_response(new Error('Network error'));
+
+        let messages = wrapper.findAll('.error-msg');
+
+        expect(messages.length).toEqual(1);
+        expect(messages.at(0).text()).toContain('Network error');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
+    });
+
+    test('Non-http error', () => {
+        sinon.stub(console, 'error');
+        component.show_errors_from_response(new Error('I am error'));
+
+        let messages = wrapper.findAll('.error-msg');
+
+        expect(messages.length).toEqual(1);
+        expect(messages.at(0).text()).toContain('unexpected error');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
     test('504 error',  () => {
@@ -98,13 +112,14 @@ describe('APIErrors component tests', () => {
     });
 
     test('General case API error', () => {
-        component.show_errors_from_response(new HttpError(403, 'forbidden'));
+        component.show_errors_from_response(new HttpError(403, 'forbidden', '/url/'));
 
         let messages = wrapper.findAll('.error-msg');
 
         expect(messages.length).toEqual(1);
-        expect(messages.at(0).text()).toEqual(
-            'An unexpected error occurred: 403 "forbidden"');
+        expect(messages.at(0).text()).toContain('/url/');
+        expect(messages.at(0).text()).toContain('403');
+        expect(messages.at(0).text()).toContain('forbidden');
         expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 

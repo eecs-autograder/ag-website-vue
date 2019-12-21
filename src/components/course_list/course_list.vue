@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading" class="loading-centered loading-large">
+  <div v-if="d_loading" class="loading-centered loading-large">
     <div> <i class="fa fa-spinner fa-pulse"></i> </div>
   </div>
   <div v-else id="course-list">
@@ -39,6 +39,7 @@ import {
   array_add_unique,
   array_get_unique,
   array_has_unique,
+  on_off_toggle,
 } from '@/utils';
 
 interface Term {
@@ -63,14 +64,15 @@ export default class CourseList extends Vue implements CourseObserver {
 
   all_courses: AllCourses | null = null;
   courses_by_term: TermCourses[] = [];
-  loading = true;
+  d_loading = true;
 
   @handle_global_errors_async
-  async created() {
-    Course.subscribe(this);
-    await this.get_and_sort_courses();
-    await this.d_globals.set_current_course(null);
-    this.loading = false;
+  created() {
+    return on_off_toggle(this, 'd_loading', async () => {
+      await this.get_and_sort_courses();
+      await this.d_globals.set_current_course(null);
+      Course.subscribe(this);
+    });
   }
 
   beforeDestroy() {

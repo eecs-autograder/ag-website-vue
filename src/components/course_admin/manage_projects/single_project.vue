@@ -72,6 +72,7 @@ import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { format_course_name, handle_api_errors_async } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -106,6 +107,7 @@ export default class SingleProject extends Vue {
   d_show_clone_project_modal = false;
   course_index: number = 0;
 
+  @handle_global_errors_async
   async created() {
     this.course_to_clone_to = this.course;
     this.cloning_destinations = await this.d_globals.current_user.courses_is_admin_for();

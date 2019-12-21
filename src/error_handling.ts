@@ -1,10 +1,15 @@
+import { Vue } from 'vue-property-decorator';
+
+import APIErrors from '@/components/api_errors.vue';
+
 // tslint:disable-next-line:no-any
 type PropertyDescriptorType = TypedPropertyDescriptor<(...args: any[]) => any>;
 
 export function handle_api_errors_async(
     // tslint:disable-next-line:no-any
     error_handler_func: (self: any, response: unknown) => void) {
-    function decorator(target: object, property_key: string | symbol,
+    // tslint:disable-next-line:no-any
+    function decorator(target: any, property_key: string | symbol,
                        property_descriptor: PropertyDescriptorType) {
         return {
             // tslint:disable-next-line:no-any
@@ -19,6 +24,13 @@ export function handle_api_errors_async(
         };
     }
     return decorator;
+}
+
+export function make_error_handler_func(api_errors_ref: string = 'api_errors') {
+    // tslint:disable-next-line:no-any
+    return function(component: Vue, response: unknown) {
+        (<APIErrors> component.$refs[api_errors_ref]).show_errors_from_response(response);
+    };
 }
 
 export class GlobalErrorsSubject {

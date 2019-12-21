@@ -114,19 +114,15 @@ describe('Roster tests', () => {
         expect(all_users.at(3).text()).toEqual(user_3.username);
     });
 
-    test('When a user is removed from roster, the parent component is notified',
-         async () => {
+    test('When a user is removed from roster, the parent component is notified', async () => {
         let remove_user_buttons = wrapper.findAll('.remove-user');
         remove_user_buttons.at(1).trigger('click');
         await roster.$nextTick();
 
-        expect(roster.d_roster.length).toEqual(3);
+        expect(roster.d_roster.length).toEqual(4);
 
-        let all_users = wrapper.findAll('.email');
-        expect(all_users.at(0).text()).toEqual(user_2.username);
-        expect(all_users.at(1).text()).toEqual(user_4.username);
-        expect(all_users.at(2).text()).toEqual(user_3.username);
         expect(wrapper.emitted().remove_user.length).toBe(1);
+        expect(wrapper.emitted().remove_user[0][0]).toEqual(user_1);
     });
 
     test('The d_roster is updated when the value of the roster prop changes in the parent',

@@ -29,10 +29,10 @@
       </validated-form>
     </div>
 
-    <div v-if="loading" class="loading-wrapper loading-medium">
+    <div v-if="d_loading" class="loading-wrapper loading-medium">
       <i class="loading-centered fa fa-spinner fa-pulse"></i>
     </div>
-    <div v-else-if="!loading && projects.length === 0"
+    <div v-else-if="!d_loading && projects.length === 0"
           class="no-projects-message">
       This course has no projects.
     </div>
@@ -56,8 +56,9 @@ import SingleProject from '@/components/course_admin/manage_projects/single_proj
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
-import { handle_api_errors_async, toggle } from '@/utils';
+import { handle_api_errors_async, on_off_toggle, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -76,17 +77,19 @@ export default class ManageProjects extends Vue implements ProjectObserver,
 
   readonly is_not_empty = is_not_empty;
 
-  loading = true;
+  d_loading = true;
   projects: Project[] = [];
   new_project_name = "";
   new_project_name_is_valid = false;
 
   d_adding_project = false;
 
-  async created() {
-    this.projects = await Project.get_all_from_course(this.course.pk);
-    this.loading = false;
-    Project.subscribe(this);
+  @handle_global_errors_async
+  created() {
+    return on_off_toggle(this, 'd_loading', async () => {
+      this.projects = await Project.get_all_from_course(this.course.pk);
+      Project.subscribe(this);
+    });
   }
 
   beforeDestroy() {
