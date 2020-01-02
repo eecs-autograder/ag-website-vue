@@ -11,48 +11,80 @@
           @num_errors_changed="d_global_error_count = $event">
         </APIErrors>
       </div>
-      <div id="breadcrumbs">
-        <router-link to="/" id="home-logo">
-          Autograder
-        </router-link>
-        <template v-if="globals.current_course !== null">
-          <router-link :to="`/web/course/${globals.current_course.pk}`"
-                        class="breadcrumb-link">
-            <span> - {{globals.current_course.name}}</span>
-            <span v-if="globals.current_course.semester !== null">
-              {{globals.current_course.semester}}
-            </span>
-            <span v-if="globals.current_course.year !== null">
-              {{globals.current_course.year}}
-            </span>
+      <div id="banner">
+        <div id="breadcrumbs">
+          <router-link to="/" id="home-logo">
+            Autograder
           </router-link>
-
-          <span v-if="globals.user_roles.is_admin">
-            <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
+          <template v-if="globals.current_course !== null">
+            <router-link :to="`/web/course/${globals.current_course.pk}`"
                           class="breadcrumb-link">
-              <i class="fas fa-cog cog"></i>
-            </router-link>
-          </span>
-
-          <span v-if="globals.current_project !== null">
-            -
-            <router-link :to="`/web/project/${globals.current_project.pk}`"
-                          class="breadcrumb-link">
-              {{globals.current_project.name}}
+              <span> - {{globals.current_course.name}}</span>
+              <span v-if="globals.current_course.semester !== null">
+                {{globals.current_course.semester}}
+              </span>
+              <span v-if="globals.current_course.year !== null">
+                {{globals.current_course.year}}
+              </span>
             </router-link>
 
             <span v-if="globals.user_roles.is_admin">
-              <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
+              <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
                             class="breadcrumb-link">
                 <i class="fas fa-cog cog"></i>
               </router-link>
             </span>
-          </span>
-        </template>
+
+            <span v-if="globals.current_project !== null">
+              -
+              <router-link :to="`/web/project/${globals.current_project.pk}`"
+                            class="breadcrumb-link">
+                {{globals.current_project.name}}
+              </router-link>
+
+              <span v-if="globals.user_roles.is_admin">
+                <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
+                              class="breadcrumb-link">
+                  <i class="fas fa-cog cog"></i>
+                </router-link>
+              </span>
+            </span>
+          </template>
+        </div>
+        <div id="current-user">
+          <button @click="login"
+                  type="button"
+                  ref="login_button"
+                  class="blue-button"
+                  v-if="globals.current_user === null">
+            Sign In
+          </button>
+          <div v-else class="current-user-dropdown">
+            <div class="dropdown-header">
+              <span class="hello-message">Hi, {{globals.current_user.first_name}}!</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="menu">
+              <div class="signed-in-as">Signed in as:</div>
+              <div class="username">{{globals.current_user.username}}</div>
+              <div class="sign-out-button-wrapper">
+                <button @click="logout"
+                        ref="logout_button"
+                        type="button"
+                        class="flat-white-button">
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <template v-if="globals.current_user === null">
-        PLACEHOLDER - SIGN IN
-      </template>
+      <div id="welcome" v-if="globals.current_user === null">
+        <div class="welcome-text">Welcome!</div>
+        <button type="button" ref="welcome_login_button" class="blue-button" @click="login">
+          Sign In
+        </button>
+      </div>
       <template v-else>
         <router-view></router-view>
       </template>
@@ -63,11 +95,19 @@
 <script lang="ts">
 import { Component, Provide, Vue } from 'vue-property-decorator';
 
-import { Course, Project, User, UserRoles } from 'ag-client-typescript';
+import {
+  Course,
+  HttpClient,
+  HttpError,
+  Project,
+  User,
+  UserRoles,
+} from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
 import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
 
+import { delete_all_cookies, get_cookie } from './cookie';
 import UIDemos from './demos/ui_demos.vue';
 import { BeforeDestroy, Created } from './lifecycle';
 import { safe_assign } from './utils';
@@ -148,18 +188,55 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
 
   @handle_global_errors_async
   async created() {
+    GlobalErrorsSubject.get_instance().subscribe(this);
     try {
-      GlobalErrorsSubject.get_instance().subscribe(this);
-      this.globals.current_user = await User.get_current();
+      // If no token is available, we want to just show the welcome
+      // page and let the user click the sign in button to avoid login loops.
+      if (get_cookie('token') !== null) {
+        await this.login();
+      }
     }
     finally {
-      // If we encountered an error loading the current user, we want that to be displayed.
+      // If we encountered an error loading the current user,
+      // we want that to be displayed.
       this.d_loading = false;
     }
   }
 
   beforeDestroy() {
     GlobalErrorsSubject.get_instance().unsubscribe(this);
+  }
+
+  @handle_global_errors_async
+  async login() {
+    let auth_token = get_cookie('token');
+    if (auth_token !== null) {
+      HttpClient.get_instance().authenticate(auth_token);
+    }
+
+    try {
+      this.globals.current_user = await User.get_current();
+    }
+    catch (e) {
+      if (!(e instanceof HttpError) || e.status !== 401) {
+        throw e;
+      }
+      // If logging in with the available token didn't work, delete
+      // the token so that the user can start a fresh auth flow.
+      // If no token is available, start the auth flow.
+      if (auth_token !== null) {
+        delete_all_cookies();
+      }
+      else {
+        let oauth_url = e.headers['www-authenticate'].split('Redirect_to: ')[1];
+        window.location.assign(oauth_url);
+      }
+    }
+  }
+
+  logout() {
+    delete_all_cookies();
+    this.globals.current_user = null;
   }
 
   handle_error(error: unknown): void {
@@ -170,13 +247,117 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
+@import '@/styles/global.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/static_dropdown.scss';
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+#banner {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  background-color: $banner-background-color;
+}
+
+$padding: .5rem;
+$breadcrumb-font-size: 1.5rem;
+
+#breadcrumbs {
+  padding: $padding;
+  font-size: $breadcrumb-font-size;
+  white-space: nowrap;
+  overflow-x: auto;
+
+  .breadcrumb-link {
+    color: $ocean-blue;
+  }
+
+  .breadcrumb-link.router-link-active {
+    color: black;
+    pointer-events: none;
+  }
+}
+
+#current-user {
+  display: flex;
+  align-items: center;
+  padding-right: .5rem;
+  padding-left: .5rem;
+
+  .button {
+    white-space: nowrap;
+  }
+}
+
+.current-user-dropdown {
+  @include static-dropdown($open-on-hover: true, $orient-right: true);
+
+  &:hover {
+    background-color: darken($banner-background-color, 5%);
+  }
+
+  .dropdown-header {
+    display: flex;
+    align-items: center;
+
+    padding: $padding;
+    font-size: 1.3rem;
+    height: $padding * 2 + ($breadcrumb-font-size * $line-height);
+
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  .hello-message {
+    display: none;
+
+    @media only screen and (min-width: 700px) {
+      display: inline-block;
+      padding-right: .375rem;
+    }
+  }
+
+  .menu {
+    padding: .5rem;
+    min-width: 250px;
+  }
+
+  .signed-in-as {
+    font-size: 1.1rem;
+  }
+
+  .username {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  .sign-out-button-wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+#welcome {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .welcome-text {
+    font-size: 1.75rem;
+    margin-bottom: .25rem;
+  }
 }
 
 #global-error-banner {
@@ -206,22 +387,6 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
   width: 100%;
 }
 
-#breadcrumbs {
-  padding: .25rem .5rem;
-  width: 100%;
-  font-size: 1.5rem;
-  white-space: nowrap;
-  overflow-x: auto;
-
-  .breadcrumb-link {
-    color: $ocean-blue;
-  }
-
-  .breadcrumb-link.router-link-active {
-    color: black;
-    pointer-events: none;
-  }
-}
 </style>
 
 <style lang="scss">
@@ -238,7 +403,7 @@ body, #app {
   height: 100%;
   width: 100%;
 }
-
+// TODO: define line height as variable
 
 body, input, textarea {
   font-family: $font-family;
