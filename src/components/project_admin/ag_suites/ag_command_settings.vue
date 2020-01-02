@@ -375,81 +375,9 @@
 
       <fieldset class="fieldset">
         <legend class="legend"> Resource Limits </legend>
-        <div class="resource-limit-wrapper">
-          <div class="resource-limit form-field-wrapper">
-            <label class="label"> Time limit </label>
-            <div class="resource-input">
-              <validated-input ref="time_limit"
-                               id="input-time-limit"
-                               v-model="d_ag_test_command.time_limit"
-                               input_style="width: 150px;"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_one
-                               ]"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> seconds </div>
-              </validated-input>
-            </div>
-          </div>
-
-          <div class="resource-limit form-field-wrapper">
-            <label class="label"> Process spawn limit </label>
-            <div class="resource-input">
-              <validated-input ref="process_spawn_limit"
-                               id="input-process-spawn-limit"
-                               v-model="d_ag_test_command.process_spawn_limit"
-                               input_style="width: 150px;"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_zero
-                               ]"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> child processes </div>
-              </validated-input>
-            </div>
-          </div>
-        </div>
-
-        <div class="resource-limit-wrapper">
-          <div class="resource-limit form-field-wrapper">
-            <label class="label"> Virtual memory limit </label>
-            <div class="resource-input">
-              <validated-input ref="virtual_memory_limit"
-                               id="input-virtual-memory-limit"
-                               v-model="d_ag_test_command.virtual_memory_limit"
-                               input_style="width: 150px;"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_one
-                               ]"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> bytes </div>
-              </validated-input>
-            </div>
-          </div>
-
-          <div class="resource-limit form-field-wrapper">
-            <label class="label"> Stack size limit </label>
-            <div class="resource-input">
-              <validated-input ref="stack_size_limit"
-                               id="input-stack-size-limit"
-                               v-model="d_ag_test_command.stack_size_limit"
-                               input_style="width: 150px;"
-                               :validators="[
-                                 is_not_empty,
-                                 is_integer,
-                                 is_greater_than_or_equal_to_one
-                               ]"
-                               :from_string_fn="string_to_num">
-                <div slot="suffix" class="unit-of-measurement"> bytes </div>
-              </validated-input>
-            </div>
-          </div>
-        </div>
+        <resource-limit-settings
+          :resource_limits="d_ag_test_command"
+          @field_change="Object.assign(d_ag_test_command, $event)"></resource-limit-settings>
       </fieldset>
 
       <!------------------------ Feedback ------------------------------------->
@@ -665,6 +593,7 @@ import {
   FeedbackDescriptions,
   hyphenate
 } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
+import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -689,6 +618,7 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     Dropdown,
     AGTestCommandAdvancedFdbkSettings,
     Modal,
+    ResourceLimitSettings,
     SelectObject,
     Tooltip,
     ValidatedForm,
@@ -946,18 +876,6 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
 .unit-of-measurement {
   padding-left: .625rem;
   font-size: .875rem;
-}
-
-.resource-limit-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-
-  @media only screen and (min-width: 700px) {
-    .resource-limit {
-      width: 50%;
-      max-width: 330px;
-    }
-  }
 }
 
 #first-failure-checkbox-wrapper {

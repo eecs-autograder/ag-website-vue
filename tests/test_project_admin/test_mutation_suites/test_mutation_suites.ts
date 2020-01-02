@@ -15,8 +15,10 @@ import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import BuggyImplementations from '@/components/project_admin/mutation_suites/buggy_implementations.vue';
+import MutationCommands from '@/components/project_admin/mutation_suites/mutation_commands.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
+import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
@@ -532,73 +534,15 @@ describe('MutationSuites tests', () => {
         wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
-        // setup command
-        expect(wrapper.vm.d_active_mutation_test_suite!.use_setup_command).toBe(false);
-        wrapper.find('#use-setup-command').setChecked(true);
-        wrapper.find('#setup-command').find('.resource-limits-label').trigger('click');
+        let mutation_commands = find_by_name<MutationCommands>(wrapper, 'MutationCommands');
+        expect(mutation_commands.vm.value).toBe(wrapper.vm.d_active_mutation_test_suite);
 
-        // name
-        expect(
-            wrapper.vm.d_active_mutation_test_suite!.setup_command.name
-        ).not.toEqual("Tim Hortons");
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        let to_emit = deep_copy(wrapper.vm.d_active_mutation_test_suite!, MutationTestSuite);
+        to_emit.setup_command.time_limit = 44;
+        to_emit.setup_command.process_spawn_limit = 14;
 
-        set_validated_input_text(
-            wrapper.find('#setup-command').find('#name'), 'Tim Hortons'
-        );
-        expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.name).toEqual("Tim Hortons");
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
-
-
-        // command
-        expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.cmd).not.toEqual("Bagel");
-
-        set_validated_input_text(
-            wrapper.find('#setup-command').find('#cmd'), 'Bagel'
-        );
-        expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.cmd).toEqual("Bagel");
-
-        // time limit
-        expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.time_limit).not.toEqual(20);
-
-        set_validated_input_text(
-            wrapper.find('#setup-command').find('#time-limit'), '20'
-        );
-        expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.time_limit).toEqual(20);
-
-        // stack size limit
-        expect(
-            wrapper.vm.d_active_mutation_test_suite!.setup_command.stack_size_limit
-        ).not.toEqual(11);
-
-        set_validated_input_text(
-            wrapper.find('#setup-command').find('#stack-size-limit'), '11'
-        );
-        expect(wrapper.vm.d_active_mutation_test_suite!.setup_command.stack_size_limit).toEqual(11);
-
-        // virtual memory limit
-        expect(
-            wrapper.vm.d_active_mutation_test_suite!.setup_command.virtual_memory_limit
-        ).not.toEqual(12);
-
-        set_validated_input_text(
-            wrapper.find('#setup-command').find('#virtual-memory-limit'), '12'
-        );
-        expect(
-            wrapper.vm.d_active_mutation_test_suite!.setup_command.virtual_memory_limit
-        ).toEqual(12);
-
-        // process spawn limit
-        expect(
-            wrapper.vm.d_active_mutation_test_suite!.setup_command.process_spawn_limit
-        ).not.toEqual(13);
-
-        set_validated_input_text(
-            wrapper.find('#setup-command').find('#process-spawn-limit'), '13'
-        );
-        expect(
-            wrapper.vm.d_active_mutation_test_suite!.setup_command.process_spawn_limit
-        ).toEqual(13);
+        mutation_commands.vm.$emit('input', to_emit);
+        expect(wrapper.vm.d_active_mutation_test_suite).toEqual(to_emit);
     });
 
     test('Edit Feedback Settings - d_active_mutation_test_suite binding', async () => {
