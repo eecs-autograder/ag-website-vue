@@ -10,8 +10,8 @@ import BuggyImplementations from '@/components/project_admin/mutation_suites/bug
 import { make_course, make_mutation_test_suite, make_project } from '@/tests/data_utils';
 import {
     checkbox_is_checked,
-    do_input_blank_or_not_integer_test_without_save_button,
-    do_invalid_text_input_test_without_save_button,
+    do_input_blank_or_not_integer_test,
+    do_invalid_text_input_test,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
@@ -66,28 +66,25 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: points_per_exposed_bug is blank or not a number', () => {
-        return do_input_blank_or_not_integer_test_without_save_button(
-            wrapper, {ref: 'points_per_exposed_bug'});
+        return do_input_blank_or_not_integer_test(wrapper, {ref: 'points_per_exposed_bug'}, null);
     });
 
     test('Error: points_per_exposed_bug must be >= 0', () => {
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'points_per_exposed_bug'}, '-1');
+        return do_invalid_text_input_test(wrapper, {ref: 'points_per_exposed_bug'}, '-1', null);
     });
 
     test('Error: points_per_exposed_bug must have <= four digits total', () => {
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'points_per_exposed_bug'}, '12345');
+        return do_invalid_text_input_test(wrapper, {ref: 'points_per_exposed_bug'}, '12345', null);
     });
 
     test('Error: points_per_exposed_bug must have <= four digits total with decimal', () => {
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'points_per_exposed_bug'}, '123.45');
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_per_exposed_bug'}, '123.45', null);
     });
 
     test('Error: points_per_exposed_bug must have <= two decimal places', () => {
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'points_per_exposed_bug'}, '12.345');
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'points_per_exposed_bug'}, '12.345', null);
     });
 
     test('d_override_max_points binding', async () => {
@@ -147,8 +144,7 @@ describe('BuggyImplementation tests', () => {
         let max_points_input = wrapper.find({ref: 'max_points'});
         set_validated_input_text(max_points_input, '0');
 
-        return do_input_blank_or_not_integer_test_without_save_button(
-            wrapper, {ref: 'max_points'});
+        return do_input_blank_or_not_integer_test(wrapper, {ref: 'max_points'}, null);
     });
 
     test('Error: max_points must be greater than or equal to zero', async () => {
@@ -158,8 +154,7 @@ describe('BuggyImplementation tests', () => {
         let max_points_input = wrapper.find({ref: 'max_points'});
         set_validated_input_text(max_points_input, '0');
 
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'max_points'}, '-1');
+        return do_invalid_text_input_test(wrapper, {ref: 'max_points'}, '-1', null);
     });
 
     test('max_num_student_tests binding', async () => {
@@ -179,8 +174,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('Error: max_num_student_tests must be greater than or equal to zero', async () => {
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'max_num_student_tests'}, '-1');
+        return do_invalid_text_input_test(wrapper, {ref: 'max_num_student_tests'}, '-1', null);
     });
 
     test('buggy_impl_names binding', async () => {

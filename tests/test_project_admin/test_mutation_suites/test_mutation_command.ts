@@ -1,16 +1,18 @@
 import { config, mount, Wrapper } from '@vue/test-utils';
 
-import { AGCommand } from 'ag-client-typescript/dist/src/ag_command';
+import { AGCommand } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import MutationCommand from '@/components/project_admin/mutation_suites/mutation_command.vue';
+import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 
 import {
-    do_input_blank_or_not_integer_test_without_save_button,
-    do_invalid_text_input_test_without_save_button,
+    do_input_blank_or_not_integer_test,
+    do_invalid_text_input_test,
+    find_by_name,
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
 } from '@/tests/utils';
 
 beforeAll(() => {
@@ -67,9 +69,7 @@ describe('MutationCommand tests', () => {
         wrapper.setProps({include_command_name_input: true});
         await wrapper.vm.$nextTick();
 
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: "name"}, ' '
-        );
+        return do_invalid_text_input_test(wrapper, {ref: "name"}, ' ', null);
     });
 
     test('cmd binding', async () => {
@@ -87,137 +87,22 @@ describe('MutationCommand tests', () => {
     });
 
     test('Error: cmd is blank', async () => {
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: "cmd"}, ' '
-        );
+        return do_invalid_text_input_test(wrapper, {ref: "cmd"}, ' ', null);
     });
 
-    test('time_limit binding', async () => {
+    test('Resource limit settings binding', async () => {
         wrapper.setData({d_is_open: true});
+        await wrapper.vm.$nextTick();
 
-        let time_limit_input = wrapper.find({ref: 'time_limit'});
+        let resource_limit_settings = find_by_name<ResourceLimitSettings>(
+            wrapper, 'ResourceLimitSettings');
+        expect(resource_limit_settings.vm.resource_limits).toEqual(ag_command);
 
-        set_validated_input_text(time_limit_input, '9');
+        let new_time_limit = 35;
+        resource_limit_settings.vm.$emit('field_change', {time_limit: new_time_limit});
 
-        expect(wrapper.vm.d_ag_command!.time_limit).toEqual(9);
-        expect(validated_input_is_valid(time_limit_input)).toEqual(true);
+        expect(wrapper.vm.d_ag_command!.time_limit).toEqual(new_time_limit);
         expect(wrapper.emitted().input.length).toEqual(1);
-
-        wrapper.vm.d_ag_command!.time_limit = 4;
-        expect(get_validated_input_text(time_limit_input)).toEqual('4');
-        expect(validated_input_is_valid(time_limit_input)).toEqual(true);
-    });
-
-    test('Error: time_limit is blank or not an integer', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_input_blank_or_not_integer_test_without_save_button(
-            wrapper, {ref: 'time_limit'}
-        );
-    });
-
-    test('Error: time_limit must be >= 1', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'time_limit'}, '0'
-        );
-    });
-
-    test('stack_size_limit binding', async () => {
-        wrapper.setData({d_is_open: true});
-
-        let stack_size_limit_input = wrapper.find({ref: 'stack_size_limit'});
-
-        set_validated_input_text(stack_size_limit_input, '9');
-
-        expect(wrapper.vm.d_ag_command!.stack_size_limit).toEqual(9);
-        expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
-
-        wrapper.vm.d_ag_command!.stack_size_limit = 4;
-        expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
-        expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
-    });
-
-    test('Error: stack_size_limit is blank or not an integer', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_input_blank_or_not_integer_test_without_save_button(
-            wrapper, {ref: 'stack_size_limit'}
-        );
-    });
-
-    test('Error: stack_size_limit must be >= 1', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'stack_size_limit'}, '0'
-        );
-    });
-
-    test('virtual_memory_limit binding', async () => {
-        wrapper.setData({d_is_open: true});
-
-        let virtual_memory_limit_input = wrapper.find({ref: 'virtual_memory_limit'});
-
-        set_validated_input_text(virtual_memory_limit_input, '9');
-
-        expect(wrapper.vm.d_ag_command!.virtual_memory_limit).toEqual(9);
-        expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
-
-        wrapper.vm.d_ag_command!.virtual_memory_limit = 4;
-        expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
-        expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
-    });
-
-    test('Error: virtual_memory_limit is blank or not an integer', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_input_blank_or_not_integer_test_without_save_button(
-            wrapper, {ref: 'virtual_memory_limit'}
-        );
-    });
-
-    test('Error: virtual_memory_limit must be >= 1', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'virtual_memory_limit'}, '0'
-        );
-    });
-
-    test('process_spawn_limit binding', async () => {
-        wrapper.setData({d_is_open: true});
-
-        let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
-
-        set_validated_input_text(process_spawn_limit_input, '9');
-
-        expect(wrapper.vm.d_ag_command!.process_spawn_limit).toEqual(9);
-        expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
-
-        wrapper.vm.d_ag_command!.process_spawn_limit = 4;
-        expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
-        expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
-    });
-
-    test('Error: process_spawn_limit is blank or not an integer', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_input_blank_or_not_integer_test_without_save_button(
-            wrapper, {ref: 'process_spawn_limit'}
-        );
-    });
-
-    test('Error: process_spawn_limit must be >= 0', async () => {
-        wrapper.setData({d_is_open: true});
-
-        return do_invalid_text_input_test_without_save_button(
-            wrapper, {ref: 'process_spawn_limit'}, '-1'
-        );
     });
 
     test('value Watcher', async () => {

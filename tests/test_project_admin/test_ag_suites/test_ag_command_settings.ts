@@ -20,6 +20,7 @@ import APIErrors from '@/components/api_errors.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
+import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 
 import {
     make_ag_test_case,
@@ -34,6 +35,7 @@ import {
     checkbox_is_checked, do_input_blank_or_not_integer_test, do_invalid_text_input_test,
     expect_html_element_has_value,
     expect_select_object_has_value,
+    find_by_name,
     get_validated_input_text,
     set_select_object_value,
     set_validated_input_text,
@@ -803,89 +805,15 @@ describe('AGTestCommandSettings tests', () => {
         expect(checkbox_is_checked(ignore_blank_lines)).toBe(true);
     });
 
-    test('time_limit binding', async () => {
-        let time_limit_input = wrapper.find({ref: 'time_limit'});
+    test('Resource limit settings binding', async () => {
+        let resource_limit_settings = find_by_name<ResourceLimitSettings>(
+            wrapper, 'ResourceLimitSettings');
+        expect(resource_limit_settings.vm.resource_limits).toEqual(ag_test_command);
 
-        set_validated_input_text(time_limit_input, '9');
+        let new_time_limit = 67;
+        resource_limit_settings.vm.$emit('field_change', {time_limit: new_time_limit});
 
-        expect(wrapper.vm.d_ag_test_command!.time_limit).toEqual(9);
-        expect(validated_input_is_valid(time_limit_input)).toEqual(true);
-
-        wrapper.vm.d_ag_test_command!.time_limit = 4;
-        expect(get_validated_input_text(time_limit_input)).toEqual('4');
-    });
-
-    test('error - time_limit is blank or not an integer', async () => {
-        return do_input_blank_or_not_integer_test(wrapper, {ref: 'time_limit'}, '.save-button');
-    });
-
-    test('error - time_limit must be >= 1', async () => {
-        return do_invalid_text_input_test(wrapper, {ref: 'time_limit'}, '0', '.save-button');
-    });
-
-    test('virtual_memory_limit binding', async () => {
-        let virtual_memory_limit_input = wrapper.find({ref: 'virtual_memory_limit'});
-
-        set_validated_input_text(virtual_memory_limit_input, '9');
-
-        expect(wrapper.vm.d_ag_test_command!.virtual_memory_limit).toEqual(9);
-        expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
-
-        wrapper.vm.d_ag_test_command!.virtual_memory_limit = 4;
-        expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
-    });
-
-    test('error - virtual_memory_limit is blank or not an integer', async () => {
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'virtual_memory_limit'}, '.save-button');
-    });
-
-    test('error - virtual_memory_limit must be >= 1', async () => {
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'virtual_memory_limit'}, '0', '.save-button');
-    });
-
-    test('stack_size_limit binding', async () => {
-        let stack_size_limit_input = wrapper.find({ref: 'stack_size_limit'});
-
-        set_validated_input_text(stack_size_limit_input, '9');
-
-        expect(wrapper.vm.d_ag_test_command!.stack_size_limit).toEqual(9);
-        expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
-
-        wrapper.vm.d_ag_test_command!.stack_size_limit = 4;
-        expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
-    });
-
-    test('error - stack_size_limit is blank or not an integer', async () => {
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'stack_size_limit'}, '.save-button');
-    });
-
-    test('error - stack_size_limit must be >= 1', async () => {
-        return do_invalid_text_input_test(wrapper, {ref: 'stack_size_limit'}, '0', '.save-button');
-    });
-
-    test('process_spawn_limit binding', async () => {
-        let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
-
-        set_validated_input_text(process_spawn_limit_input, '9');
-
-        expect(wrapper.vm.d_ag_test_command!.process_spawn_limit).toEqual(9);
-        expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
-
-        wrapper.vm.d_ag_test_command!.process_spawn_limit = 4;
-        expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
-    });
-
-    test('error - process_spawn_limit is blank or not an integer', async () => {
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'process_spawn_limit'}, '.save-button');
-    });
-
-    test('error - process_spawn_limit must be >= 0', async () => {
-        return do_invalid_text_input_test(
-            wrapper, {ref: 'process_spawn_limit'}, '-1', '.save-button');
+        expect(wrapper.vm.d_ag_test_command!.time_limit).toEqual(new_time_limit);
     });
 
     test('Save command settings - successful', async () => {
@@ -905,8 +833,8 @@ describe('AGTestCommandSettings tests', () => {
     });
 
     test('Sticky save button disabled when form invalid', () => {
-        return do_input_blank_or_not_integer_test(
-            wrapper, {ref: 'process_spawn_limit'}, '.sticky-save-button');
+        return do_invalid_text_input_test(
+            wrapper, {ref: 'cmd'}, '', '.sticky-save-button');
     });
 
     test('Sticky save button disabled while saving', async () => {

@@ -1,6 +1,6 @@
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { config, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestSuite,
@@ -9,9 +9,6 @@ import {
     Project,
     SandboxDockerImageData,
 } from 'ag-client-typescript';
-// tslint:disable-next-line:no-duplicate-imports
-import * as ag_cli from 'ag-client-typescript';
-import * as sinon from "sinon";
 
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';

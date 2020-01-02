@@ -32,75 +32,11 @@
         <span class="header-text"> Resource Limits </span>
       </div>
 
-      <div v-if="d_is_open">
-        <div class="form-field-wrapper">
-          <label class="label"> Time limit </label>
-          <validated-input ref="time_limit"
-                           id="time-limit"
-                           v-model="d_ag_command.time_limit"
-                           :validators="[
-                             is_not_empty,
-                             is_integer,
-                             is_greater_than_or_equal_to_one
-                           ]"
-                           input_style="width: 150px"
-                           @input="$emit('input', d_ag_command)"
-                           :from_string_fn="string_to_num">
-            <div slot="suffix" class="unit-of-measurement"> second(s) </div>
-          </validated-input>
-        </div>
-
-        <div class="form-field-wrapper">
-          <label class="label"> Stack size limit </label>
-          <validated-input ref="stack_size_limit"
-                           id="stack-size-limit"
-                           v-model="d_ag_command.stack_size_limit"
-                           :validators="[
-                             is_not_empty,
-                             is_integer,
-                             is_greater_than_or_equal_to_one
-                           ]"
-                           input_style="width: 150px"
-                           @input="$emit('input', d_ag_command)"
-                           :from_string_fn="string_to_num">
-            <div slot="suffix" class="unit-of-measurement"> bytes </div>
-          </validated-input>
-        </div>
-
-        <div class="form-field-wrapper">
-          <label class="label"> Virtual memory limit </label>
-          <validated-input ref="virtual_memory_limit"
-                           id="virtual-memory-limit"
-                           v-model="d_ag_command.virtual_memory_limit"
-                           :validators="[
-                             is_not_empty,
-                             is_integer,
-                             is_greater_than_or_equal_to_one
-                           ]"
-                           input_style="width: 150px"
-                           @input="$emit('input', d_ag_command)"
-                           :from_string_fn="string_to_num">
-            <div slot="suffix" class="unit-of-measurement"> bytes </div>
-          </validated-input>
-        </div>
-
-        <div class="form-field-wrapper">
-          <label class="label"> Process spawn limit </label>
-          <validated-input ref="process_spawn_limit"
-                           id="process-spawn-limit"
-                           v-model="d_ag_command.process_spawn_limit"
-                           :validators="[
-                             is_not_empty,
-                             is_integer,
-                             is_non_negative
-                           ]"
-                           input_style="width: 150px"
-                           @input="$emit('input', d_ag_command)"
-                           :from_string_fn="string_to_num">
-            <div slot="suffix" class="unit-of-measurement"> child processes </div>
-          </validated-input>
-        </div>
-      </div>
+      <resource-limit-settings
+        v-if="d_is_open"
+        :resource_limits="d_ag_command"
+        @field_change="Object.assign(d_ag_command, $event); $emit('input', d_ag_command)">
+      </resource-limit-settings>
     </div>
   </div>
 </template>
@@ -108,8 +44,9 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { AGCommand } from 'ag-client-typescript/dist/src/ag_command';
+import { AGCommand } from 'ag-client-typescript';
 
+import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
 import {
     is_integer,
@@ -121,6 +58,7 @@ import {
 
 @Component({
   components: {
+    ResourceLimitSettings,
     ValidatedInput
   }
 })
@@ -179,7 +117,7 @@ export default class MutationCommand extends Vue {
 }
 
 .resource-limits-label {
-  @include collapsible-section-header($pad-text: true);
+  @include collapsible-section-header($pad-text: true, $line-color: $stormy-gray-light);
 
   margin-bottom: .5rem;
   font-size: .875rem;
