@@ -258,14 +258,15 @@ export default class ProjectView extends Vue implements GroupObserver {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/global.scss';
 @import '@/styles/loading.scss';
 @import '@/styles/navbar.scss';
 
 @include navbar(
-  $background-color: $pebble-light,
-  $hover-color: lighten($pebble-dark, 5%),
-  $active-color: $pebble-dark,
-  $border-color: lighten($pebble-dark, 5%)
+  $background-color: $navbar-background-color,
+  $hover-color: $navbar-hover-color,
+  $active-color: $navbar-active-color,
+  $border-color: $navbar-hover-color
 );
 
 #edit-handgrading-link {

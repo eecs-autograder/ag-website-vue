@@ -3,3 +3,9 @@
 
 $font-family: "Helvetica Neue", Helvetica;
 $line-height: 1.2;
+
+$banner-background-color: lighten(desaturate($gray-blue-2, 50%), 5%);
+
+$navbar-background-color: lighten($banner-background-color, 4%);
+$navbar-active-color: darken($navbar-background-color, 15%);
+$navbar-hover-color: lighten($navbar-active-color, 5%);

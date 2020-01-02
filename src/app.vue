@@ -259,9 +259,6 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
   margin: 0;
 }
 
-// $banner-background-color: lighten(desaturate($green, 40%), 45%);
-$banner-background-color: lighten(desaturate($gray-blue-2, 50%), 5%);
-
 #banner {
   display: flex;
   justify-content: space-between;
