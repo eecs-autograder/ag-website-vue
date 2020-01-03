@@ -5,8 +5,6 @@ RUN mkdir -p /usr/src/app/src
 
 WORKDIR /usr/src/app
 
-RUN apt-get purge nodejs
-
 RUN apt-get install -y curl gnupg
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get install -y nodejs
