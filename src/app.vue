@@ -1,16 +1,16 @@
 <template>
   <div id="app">
+    <div id="global-error-banner" v-show="d_global_error_count !== 0">
+      <APIErrors
+        ref="global_errors"
+        id="global-api-errors"
+        @num_errors_changed="d_global_error_count = $event">
+      </APIErrors>
+    </div>
     <div v-if="d_loading" class="loading-centered loading-large">
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>
-      <div id="global-error-banner" v-show="d_global_error_count !== 0">
-        <APIErrors
-          ref="global_errors"
-          id="global-api-errors"
-          @num_errors_changed="d_global_error_count = $event">
-        </APIErrors>
-      </div>
       <div id="banner">
         <div id="breadcrumbs">
           <router-link to="/" id="home-logo">
@@ -200,6 +200,7 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
       // If we encountered an error loading the current user,
       // we want that to be displayed.
       this.d_loading = false;
+      await this.$nextTick();
     }
   }
 

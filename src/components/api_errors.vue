@@ -43,9 +43,6 @@ export default class APIErrors extends Vue {
         + 'how-do-i-open-the-javascript-console-in-different-browsers).');
       console.error(error_response);
     }
-    else if (error_response.status === 504) {
-      this.d_api_errors.push('Error: The request timed out. Please try again later.');
-    }
     else if (error_response.status === 413) {
       this.d_api_errors.push(
         'Error: Request too large. If you are uploading files, please reduce their size.');
@@ -57,9 +54,17 @@ export default class APIErrors extends Vue {
       this.d_api_errors.push('You are not signed in. Please sign in and try again.');
     }
     else {
+      let error_detail = JSON.stringify(error_response.data);
+      if (error_response.status === 504) {
+        error_detail = 'The request timed out. Please try again later.';
+      }
+      else if (error_response.status === 502) {
+        error_detail = 'Bad gateway';
+      }
+
       this.d_api_errors.push(
         `Error occurred requesting "${error_response.url}": `
-        + `${error_response.status} ${JSON.stringify(error_response.data)}`);
+        + `${error_response.status} ${error_detail}`);
     }
 
     this.$emit('num_errors_changed', this.d_api_errors.length);

@@ -51,6 +51,17 @@ describe('CourseSettings.vue', () => {
         expect(validated_name_input.is_valid).toBe(false);
     });
 
+    test('Subtitle binding', async () => {
+        let subtitle_input = wrapper.find({ref: 'subtitle'});
+
+        expect(get_validated_input_text(subtitle_input)).toEqual('');
+        expect(validated_input_is_valid(subtitle_input)).toBe(true);
+
+        let new_text = 'norisetanoreisat';
+        set_validated_input_text(subtitle_input, new_text);
+        expect(wrapper.vm.d_course.subtitle).toEqual(new_text);
+    });
+
     test('Semester binding', () => {
         let semester_select = wrapper.find('#semester');
 

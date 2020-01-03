@@ -299,10 +299,10 @@
                    v-model="d_project.allow_late_days"/>
             <label class="checkbox-label"
                    for="allow-late-days">
-              Allow late days
+              Allow late day tokens
             </label>
             <tooltip width="medium" placement="top">
-              Whether students can use late days for this project.
+              Whether students can use late day tokens for this project.
             </tooltip>
           </div>
 

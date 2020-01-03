@@ -18,6 +18,21 @@
         </div>
 
         <div class="form-field-wrapper">
+          <label class="label">
+            Course subtitle
+            <tooltip width="large" placement="top">
+              A more descriptive course title, such as "Programming and Intro Data Structures"
+            </tooltip>
+          </label>
+          <ValidatedInput ref="subtitle"
+                          v-model="d_course.subtitle"
+                          input_style="width: 100%;
+                                       max-width: 500px;"
+                          :validators="[]">
+          </ValidatedInput>
+        </div>
+
+        <div class="form-field-wrapper">
           <label class="label" for="semester"> Semester </label>
           <div>
             <select id="semester" v-model="d_course.semester" class="select">
@@ -37,16 +52,23 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="label"> Late days per student </label>
+          <label class="label">
+            Late day tokens per student
+            <tooltip width="large" placement="top">
+              When a project's hard deadline (and a student's extension, if any)
+              has passed, students with late day tokens can continue to submit
+              after the hard deadline. <br><br>
+              Tokens are used automatically the first time a student submits after  a project's
+              hard deadline. <br><br>
+              Using one token will allow a student to submit until 24 hours
+              after the hard deadline.
+            </tooltip>
+          </label>
           <ValidatedInput ref="course_late_days_input"
                           v-model="d_course.num_late_days"
                           input_style="width: 50px;"
                           :validators="[is_not_empty, is_number, is_integer, is_non_negative]"
                           :from_string_fn="string_to_num">
-            <div slot="suffix"
-                 class="suffix-element">
-              {{d_course.num_late_days === 1 ? 'day' : 'days'}}
-            </div>
           </ValidatedInput>
         </div>
 

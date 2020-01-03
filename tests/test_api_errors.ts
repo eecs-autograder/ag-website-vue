@@ -46,8 +46,17 @@ describe('APIErrors component tests', () => {
         let messages = wrapper.findAll('.error-msg');
 
         expect(messages.length).toEqual(1);
-        expect(messages.at(0).text()).toEqual(
-            'Error: The request timed out. Please try again later.');
+        expect(messages.at(0).text()).toContain('The request timed out. Please try again later.');
+        expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
+    });
+
+    test('502 error',  () => {
+        component.show_errors_from_response(new HttpError(502, 'Bad gateway'));
+
+        let messages = wrapper.findAll('.error-msg');
+
+        expect(messages.length).toEqual(1);
+        expect(messages.at(0).text()).toContain('Bad gateway');
         expect(wrapper.emitted().num_errors_changed[0][0]).toEqual(1);
     });
 
