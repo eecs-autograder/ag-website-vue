@@ -1,4 +1,0 @@
-[submodule "autograder-server"]
-	path = autograder-server
-	url = ../autograder-server.git
-	branch = develop
