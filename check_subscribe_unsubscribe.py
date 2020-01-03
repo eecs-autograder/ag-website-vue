@@ -69,14 +69,14 @@ def check_sub_unsub_calls(filename, verbose):
             error_free = False
             for subject in no_unsub:
                 line_num = sub_calls_by_subject[subject].line_num
-                print(f'{filename}:{line_num} "{subject}" has no unsubscribe call')
+                print('{}:{} "{}" has no unsubscribe call'.format(filename, line_num, subject))
 
         no_sub = unsubscribed_subjects - subscribed_subjects
         if no_sub:
             error_free = False
             for subject in no_sub:
                 line_num = unsub_calls_by_subject[subject].line_num
-                print(f'{filename}:{line_num} "{subject}" has no subscribe call')
+                print('{}:{} "{}" has no subscribe call'.format(filename, line_num, subject))
 
 
 if __name__ == '__main__':
