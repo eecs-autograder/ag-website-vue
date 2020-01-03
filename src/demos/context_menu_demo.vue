@@ -4,28 +4,29 @@
       <div class="area-of-focus-1 menu-parent"
            @click="menu_1_coordinates = {x: $event.pageX, y: $event.pageY};
                    menu_1_is_open = true">
-        As Harry and a severely weakened Dumbledore flee the cave where Dumbledore drank the
-        potion of despair to obtain what he thought was one of Voldemort’s Horcruxes, Harry
-        pleads for the headmaster to remain calm. His plea prompts this touching display of
-        faith. This moment — which takes place shortly before Dumbledore is killed by Severus
-        Snape — exemplifies the strong father-son bond that has formed over the years between
-        the two.
-        <br> <br>
-        The line inseparable from an unforgettable ending. Harry allows Voldemort to hit him with
-        a killing curse so that the piece of Voldemort’s soul inside him will be destroyed. Harry
-        then has an out-of-body experience, finding himself in King’s Cross Station talking to
-        Dumbledore. As Harry prepares to return to the scene of his “death,” he asks the late
-        headmaster about what has occurred and receives this answer. In many ways, this seems
-        to be a nod from Rowling to all the readers who helped bring the magic of her iconic
-        fantasy series to life.
-        <br> <br>
-        Even though it’s just one word, “always” is largely considered one of the most iconic
-        lines from the Potter series. Uttered by Snape to Dumbledore during a memory Harry
-        observes in the Pensieve of Snape casting a doe Patronus, the phrase embodies the
-        controversial potions professor’s most redemptive quality — his unconditional love
-        for Lily Potter. “Snape is all grey,” Rowling tweeted in 2015. “You can’t make him a
-        saint: he was vindictive & bullying. You can’t make him a devil: he died to save the
-        wizarding world.”
+        Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+        ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+        officia deserunt mollit anim id est laborum.
+
+        Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+        ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+        officia deserunt mollit anim id est laborum.
+
+        Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+        ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+        officia deserunt mollit anim id est laborum.
       </div>
     </div>
     <context-menu ref="context_menu_1"
@@ -55,36 +56,21 @@
       <div class="area-of-focus-2 menu-parent"
            @click="menu_2_coordinates = {x: $event.pageX, y: $event.pageY};
                    menu_2_is_open = true">
-        Today is Toby Flenderson's last day.
-        I couldn't sleep last night.
-        I came in extra early.
-        So much energy.
-        There are certain days that you know you'll remember the rest of your life.
-        And I just have a feeling that today is one of those days.
-         - Morning.
-         - Mornin'.
-        So here we go.
-        Just a matter of hours now until his horribleness has left the building.
-        I'm going to set my watch alarm And Good morning, Kelly.
-        I can't believe this is your last day.
-        How do you feel? Fine.
-        Good.
-        I feel weird.
-        First thing on the agenda.
-        Actually, the only thing on the agenda is that status of Toby's going away party.
-        We have a buttercream cake and a slide show of Toby.
-        But so far we only have two pictures of him.
-        Okay, well, this will not do.
-        Toby is going away forever, and we need to do something very, very special.
-        In some cultures, when somebody leaves, like New Orleans culture, they have a parade,
-        and they have a band.
-        And people party in the streets.
-        Do you mean leaves as in dies? You want us to throw Toby a New Orleans funeral? If
-        the devil were to explode, and evil were gone forever, what sort of party would you
-        have? - Michael - Like a beach blowout? - Or a toga - No, you know No! - Toga! -
-        You always do this.
-        We have a nice, modest party planned, and you come in and demand the world.
-        Let me be clear.
+        Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+        ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+        officia deserunt mollit anim id est laborum.
+
+        Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+        ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+        officia deserunt mollit anim id est laborum.
       </div>
     </div>
     <context-menu ref="context_menu_2"
