@@ -17,7 +17,14 @@
           <legend class="legend"> Setup </legend>
 
           <div class="form-field-wrapper">
-            <label class="label"> Setup command label </label>
+            <label class="label">
+              Setup command label
+              <tooltip width="large" placement="top">
+                What to call the setup command when displaying results.<br>
+                For example, if the setup command compiles the code, this value
+                could be "Compile".
+              </tooltip>
+            </label>
             <validated-input ref="setup_suite_cmd_name"
                              v-model="d_ag_test_suite.setup_suite_cmd_name"
                              :validators="[]">
@@ -25,7 +32,12 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label"> Setup command </label>
+            <label class="label">
+              Setup command
+              <tooltip width="large" placement="top">
+                Leave this field blank to specify no setup command.
+              </tooltip>
+            </label>
             <validated-input ref="setup_suite_cmd"
                              v-model="d_ag_test_suite.setup_suite_cmd"
                              :validators="[]">

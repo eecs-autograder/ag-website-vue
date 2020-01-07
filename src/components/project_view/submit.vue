@@ -2,7 +2,7 @@
   <div id="submit-component">
     <div id="deadline-container">
       <div id="deadline-text" v-if="project.soft_closing_time !== null">
-        Due at
+        Due on
         <span id="deadline" class="date">{{format_datetime(project.soft_closing_time)}}</span>
       </div>
       <div id="extension-text" v-if="group.extended_due_date !== null">
