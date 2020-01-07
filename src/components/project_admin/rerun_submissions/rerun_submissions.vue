@@ -3,6 +3,15 @@
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="rerun-submissions-component">
+    <div class="msg-spacing">
+      <i class="fas fa-exclamation-triangle"></i>
+      Do NOT delete any test cases (or suites or commands) while your rerun is in progress. <br>
+      Doing so may cause a retry loop. <br>
+      See <a href="https://github.com/eecs-autograder/autograder-server/issues/480"
+             target="_blank">this issue</a>
+      for progress updates.
+    </div>
+
     <div id="grades-can-change-header" class="step-header">0. Download Grades So Far</div>
     <div id="grades-can-change-msg">
       <div class="msg-spacing">
@@ -593,14 +602,14 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 #grades-can-change-msg {
   margin-left: .5rem;
   max-width: 550px;
+}
 
-  .fa-exclamation-triangle {
-    color: darken($light-yellow, 25%);
-  }
+.fa-exclamation-triangle {
+  color: darken($light-yellow, 25%);
+}
 
-  .msg-spacing {
-    margin: .375rem 0;
-  }
+.msg-spacing {
+  margin: .375rem 0;
 }
 
 .emphasize {

@@ -125,8 +125,14 @@
                      class="checkbox"
                      type="checkbox"
                      v-model="d_handgrading_rubric.handgraders_can_leave_comments"/>
-              <label for="handgraders-can-leave-comments"
-                     class="checkbox-label">Handgraders can leave comments</label>
+              <label for="handgraders-can-leave-comments" class="checkbox-label">
+                Handgraders can leave comments
+                <tooltip placement="top" width="large">
+                  Allow handgraders to leave custom comments.
+                  Handgraders can always apply pre-configured annotations. <br> <br>
+                  Staff can always leave custom comments.
+                </tooltip>
+              </label>
             </div>
 
             <div class="checkbox-input-container">
@@ -134,8 +140,14 @@
                      class="checkbox"
                      type="checkbox"
                      v-model="d_handgrading_rubric.handgraders_can_adjust_points"/>
-              <label for="handgraders-can-adjust-points"
-                     class="checkbox-label">Handgraders can adjust_points</label>
+              <label for="handgraders-can-adjust-points" class="checkbox-label">
+                Handgraders can adjust points
+                <tooltip placement="top" width="large">
+                  Allow handgraders to make arbitrary total handgrading score adjustments.
+                  <br><br>
+                  Staff can always make score adjustments.
+                </tooltip>
+              </label>
             </div>
 
             <APIErrors ref="settings_form_errors"></APIErrors>
@@ -174,7 +186,17 @@
 
         <div id="annotations-column" class="edit-rubric-column">
           <div class="column-header">
-            <div class="header-text">Annotations</div>
+            <div class="header-text">
+              Annotations
+              <tooltip placement="bottom" width="large">
+                Annotations are pre-configured comments to be applied to specific
+                lines of code. <br><br>
+                They can also carry an optional per-application
+                deduction with them. <br><br>
+                A cap can be placed on the total number of points
+                deducted for applications of the same annotation.
+              </tooltip>
+            </div>
             <button type="button" class="flat-white-button"
                     @click="d_create_annotation_modal_is_open = true">
               <i class="fas fa-plus"></i> New Annotation
