@@ -1,4 +1,4 @@
-import { config, mount, Wrapper, WrapperArray } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { HttpError, InstructorFile, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
@@ -248,7 +248,7 @@ describe('InstructorFiles.vue', () => {
         ).callsFake((callback) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             callback!(<ProgressEvent> {lengthComputable: true, loaded: 10, total: 20});
-            return Promise.resolve("File 1 Content");
+            return Promise.resolve(new Blob(["File 1 Content"]));
         });
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
