@@ -48,6 +48,7 @@ export default class StaffRoster extends Vue {
   async add_staff_to_roster(new_staff: string[]) {
     await this.course.add_staff(new_staff);
     this.staff = await this.course.get_staff();
+    (<Roster> this.$refs.staff_roster).reset_form();
   }
 
   @handle_global_errors_async

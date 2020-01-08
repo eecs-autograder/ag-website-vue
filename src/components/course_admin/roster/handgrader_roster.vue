@@ -47,6 +47,7 @@ export default class StudentRoster extends Vue {
   async add_handgraders_to_roster(new_handgraders: string[]) {
     await this.course.add_handgraders(new_handgraders);
     this.handgraders = await this.course.get_handgraders();
+    (<Roster> this.$refs.handgrader_roster).reset_form();
   }
 
   @handle_global_errors_async

@@ -47,6 +47,7 @@ export default class AdminRoster extends Vue {
   async add_admins_to_roster(new_admins: string[]) {
     await this.course.add_admins(new_admins);
     this.admins = await this.course.get_admins();
+    (<Roster> this.$refs.admin_roster).reset_form();
   }
 
   @handle_global_errors_async
