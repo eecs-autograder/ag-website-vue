@@ -218,7 +218,6 @@ import {
     Submission,
     SubmissionResultFeedback,
     SubmissionWithResults,
-    HttpClient
 } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 
