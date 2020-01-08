@@ -4,7 +4,7 @@
       <validated-form id="add-users-form"
                       autocomplete="off"
                       @submit="add_users"
-                      @form_validity_changed="add_users_form_is_valid = $event">
+                      @form_validity_changed="d_form_is_valid = $event">
         <label class="enrollment-add-label"> Add {{role}}
           <tooltip width="medium" placement="bottom">
             Enter a comma-separated list of email addresses.
@@ -12,17 +12,26 @@
         </label>
         <ValidatedInput ref="add_users_textarea"
                         id="add-users-input"
-                        v-model="users_to_add"
-                        :validators="[contains_valid_emails]"
+                        v-model="d_form_text"
+                        :validators="[email_list_validator]"
                         :num_rows="7">
         </ValidatedInput>
         <slot name="before_save_button"></slot>
         <div class="button-footer">
           <button type="submit"
-                  id="add-users-button"
+                  ref="add_users_button"
                   class="save-button"
-                  :disabled="!add_users_form_is_valid">
+                  :disabled="!d_form_is_valid">
             Add to Roster
+          </button>
+
+          <button v-if="include_replace_button"
+                  type="button"
+                  ref="replace_users_button"
+                  @click="replace_users"
+                  class="orange-button"
+                  :disabled="!d_form_is_valid">
+            Replace Roster
           </button>
         </div>
       </validated-form>
@@ -81,18 +90,19 @@ export default class Roster extends Vue {
   @Prop({required: true, type: Array})
   roster!: User[];
 
-  first_invalid_email: string | null = null;
-  add_users_form_is_valid = false;
+  @Prop({default: false, type: Boolean})
+  include_replace_button!: boolean;
+
+  d_form_is_valid = false;
+
+  d_form_text = '';
+  d_roster: User[] = [];
 
   @Watch('roster')
   on_roster_change(new_users_array: User[], old_users_array: User[]) {
     this.d_roster = new_users_array.slice(0);
     this.sort_users(this.d_roster);
   }
-
-  saving = false;
-  users_to_add = '';
-  d_roster: User[] = [];
 
   async created() {
     this.d_roster = this.roster.slice(0);
@@ -108,46 +118,58 @@ export default class Roster extends Vue {
     });
   }
 
-  contains_valid_emails(value: string): ValidatorResponse {
-    this.check_for_invalid_emails(value, []);
+  email_list_validator(value: string): ValidatorResponse {
+    let {valid_emails, invalid_emails} = parse_emails(value);
+
+    let is_valid = invalid_emails.length === 0;
+    let error_msg = is_valid ? '' : invalid_emails[0] + " is not a valid email.";
     return {
-      is_valid: this.first_invalid_email === null,
-      error_msg: this.first_invalid_email + " is not a valid email."
+      is_valid: is_valid,
+      error_msg: error_msg,
     };
   }
 
-  check_for_invalid_emails(string_of_emails: string, valid_usernames: string[]) {
-    this.first_invalid_email = null;
-    string_of_emails = string_of_emails.replace(/,+/g, " ");
-    let split_regex = /\s+/g;
-    let trimmed_input = string_of_emails.trim();
-    let usernames = trimmed_input.split(split_regex);
-    for (let username of usernames) {
-      if (is_email(username)) {
-        valid_usernames.push(username);
-      }
-      else {
-        this.first_invalid_email = username;
-        return;
-      }
-    }
+  add_users() {
+    let {valid_emails} = parse_emails(this.d_form_text);
+    this.$emit('add_users', valid_emails);
   }
 
-  add_users() {
-    let valid_usernames: string[] = [];
-    this.check_for_invalid_emails(this.users_to_add, valid_usernames);
-    if (this.first_invalid_email === null) {
-      this.$emit('add_users', valid_usernames);
-      this.users_to_add = "";
-      let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
-      validated_input.reset_warning_state();
-      this.add_users_form_is_valid = false;
-    }
+  replace_users() {
+    let {valid_emails} = parse_emails(this.d_form_text);
+    this.$emit('replace_users', valid_emails);
   }
 
   remove_person_from_roster(person_to_delete: User[], index: number) {
     this.$emit('remove_user', person_to_delete);
   }
+
+  reset_form() {
+    this.d_form_text = "";
+    let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
+    validated_input.reset_warning_state();
+    this.d_form_is_valid = false;
+  }
+}
+
+function parse_emails(to_parse: string): {valid_emails: string[], invalid_emails: string[]} {
+  let valid_emails = [];
+  let invalid_emails = [];
+
+  // Replace commas with spaces
+  to_parse = to_parse.replace(/,+/g, " ");
+  let trimmed_input = to_parse.trim();
+  // Split at whitespace
+  let usernames = trimmed_input.split(/\s+/g);
+  for (let username of usernames) {
+    if (is_email(username)) {
+      valid_emails.push(username);
+    }
+    else {
+      invalid_emails.push(username);
+    }
+  }
+
+  return {valid_emails: valid_emails, invalid_emails: invalid_emails};
 }
 </script>
 

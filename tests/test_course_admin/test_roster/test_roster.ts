@@ -6,7 +6,7 @@ import Roster from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { set_validated_input_text } from '@/tests/utils';
+import { get_validated_input_text, set_validated_input_text } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -179,7 +179,7 @@ describe('Roster tests', () => {
         roster_form_wrapper.trigger('submit');
         await roster.$nextTick();
 
-        expect(wrapper.emitted('add_users')).not.toBeTruthy();
+        expect(wrapper.emitted('add_users')).toBeUndefined();
     });
 
     // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -190,15 +190,9 @@ describe('Roster tests', () => {
 
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('a*@e.iou');
-        // console.log("Users to add: " + roster.users_to_add);
-        // Something about these tests makes it so that the following two assertions
-        // fail (only when the input is changed more than once in a test).
-        // This behavior has been independently tested as part of the validated form
-        // tests.
-        // UPDATE: The refactoring of validated form and input included in fixing #127
-        // appears to have fixed this issue.
+
         expect(roster_form_component.is_valid).toBe(false);
-        expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster.d_form_is_valid).toBe(false);
 
         set_validated_input_text(validated_input, "a?@e.iou");
         await roster.$nextTick();
@@ -207,7 +201,7 @@ describe('Roster tests', () => {
         expect(validated_input_component.d_input_value).toBe('a?@e.iou');
         // See above comment
         expect(roster_form_component.is_valid).toBe(false);
-        expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster.d_form_is_valid).toBe(false);
 
         set_validated_input_text(validated_input, "a(@e.iou");
         await roster.$nextTick();
@@ -216,7 +210,7 @@ describe('Roster tests', () => {
         expect(validated_input_component.d_input_value).toBe('a(@e.iou');
         // See above comment
         expect(roster_form_component.is_valid).toBe(false);
-        expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster.d_form_is_valid).toBe(false);
     });
 
     test('Emails missing the @ character after the local part are invalid',
@@ -225,7 +219,7 @@ describe('Roster tests', () => {
         await roster.$nextTick();
 
         expect(roster_form_component.is_valid).toBe(false);
-        expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster.d_form_is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg.iou');
     });
 
@@ -259,7 +253,7 @@ describe('Roster tests', () => {
         expect(validated_input_component.is_valid).toBe(false);
         expect(validated_input_component.d_input_value).toBe('iceberg@iou');
         expect(roster_form_component.is_valid).toBe(false);
-        expect(roster.add_users_form_is_valid).toBe(false);
+        expect(roster.d_form_is_valid).toBe(false);
     });
 
     test('Emails where the top-level-domain is less than 2 characters are invalid',
@@ -302,7 +296,7 @@ describe('Roster tests', () => {
          expect(validated_input_component.d_input_value).toBe(
              'letitsnow@umich.edu  sevenEleven@umich.edu'
          );
-         expect(roster.add_users_form_is_valid).toBe(true);
+         expect(roster.d_form_is_valid).toBe(true);
 
          roster_form_wrapper.trigger('submit');
          await roster.$nextTick();
@@ -319,7 +313,7 @@ describe('Roster tests', () => {
          expect(validated_input_component.is_valid).toBe(false);
          expect(validated_input_component.d_input_value).toBe(' angela');
          expect(roster_form_component.is_valid).toBe(false);
-         expect(roster.add_users_form_is_valid).toBe(false);
+         expect(roster.d_form_is_valid).toBe(false);
 
          set_validated_input_text(validated_input, " angela@umich");
 
@@ -345,70 +339,107 @@ describe('Roster tests', () => {
             ' roy@anderson.net\nclark@aol.com,pete@nd.edu     meredith@cmu.edu'
         );
         expect(roster_form_component.is_valid).toBe(true);
-        expect(roster.add_users_form_is_valid).toBe(true);
+        expect(roster.d_form_is_valid).toBe(true);
     });
 
-    test('Validator function exposes the first invalid email address even when there' +
-         ' may be many',
-         async () => {
-         set_validated_input_text(
-             validated_input,
-             " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu\nryan@msuedu\ngabe");
-         await roster.$nextTick();
+    test('Validator error msg shows first invalid email', async () => {
+        set_validated_input_text(
+            validated_input,
+            " angela@umich.edu,oscar@umich.edu\nphyllis@@umich.edu\nryan@msuedu\ngabe");
+        await roster.$nextTick();
 
-         expect(validated_input_component.is_valid).toBe(false);
-         expect(roster.first_invalid_email).toEqual("phyllis@@umich.edu");
+        expect(validated_input_component.is_valid).toBe(false);
+        expect(validated_input_component.d_error_msg).toContain("phyllis@@umich.edu");
     });
 
-    test('Invalid usernames prevent form submission',
-         async () => {
-         let username_input = "michael@umich.edu\nhollyflax\nDarryl@umich.edu Bearyl@umich.edu " +
-                              "erinH@umich.edu\ngabe@umich\nmeredith@umich.edu " +
-                              "dwight@umich.edu\nandy@umich.\nphyllis@umich.edu" +
-                              " pam@umich.edu jim@umich.edu " +
-                              "oscar@umich.edu\n angela@umich.edu\n" +
-                              "kevin@umich.edu,stanley@umich.edu " +
-                              "kelly@umich.edu,\nryan@umich.edu,\n";
+    test('Invalid usernames prevent form submission', async () => {
+        wrapper.setProps({include_replace_button: true});
+        let username_input = "michael@umich.edu\nhollyflax\nDarryl@umich.edu Bearyl@umich.edu " +
+                             "erinH@umich.edu\ngabe@umich\nmeredith@umich.edu " +
+                             "dwight@umich.edu\nandy@umich.\nphyllis@umich.edu" +
+                             " pam@umich.edu jim@umich.edu " +
+                             "oscar@umich.edu\n angela@umich.edu\n" +
+                             "kevin@umich.edu,stanley@umich.edu " +
+                             "kelly@umich.edu,\nryan@umich.edu,\n";
 
-         set_validated_input_text(validated_input, username_input);
-         await roster.$nextTick();
+        set_validated_input_text(validated_input, username_input);
+        await roster.$nextTick();
 
-         expect(validated_input_component.is_valid).toBe(false);
-         expect(validated_input_component.d_input_value).toBe(username_input);
-         expect(roster.first_invalid_email).toEqual("hollyflax");
+        expect(validated_input_component.is_valid).toBe(false);
+        expect(validated_input_component.d_input_value).toBe(username_input);
+        expect(validated_input_component.d_error_msg).toContain("hollyflax");
 
-         let add_users_button = wrapper.find('#add-users-button');
-         expect(add_users_button.is('[disabled]')).toBe(true);
-         expect(roster.add_users_form_is_valid).toEqual(false);
+        let add_users_button = wrapper.find({ref: 'add_users_button'});
+        expect(add_users_button.is('[disabled]')).toBe(true);
+        expect(wrapper.find({ref: 'replace_users_button'}).is('[disabled]')).toBe(true);
+        expect(roster.d_form_is_valid).toEqual(false);
 
-         roster_form_wrapper.trigger('submit');
-         await roster.$nextTick();
+        roster_form_wrapper.trigger('submit');
+        await roster.$nextTick();
 
-         expect(wrapper.emitted('add_users')).not.toBeTruthy();
+        expect(wrapper.emitted('add_users')).toBeUndefined();
     });
 
-    test('If the textarea contains all valid emails, the parent component is notified ' +
-         'when the add_users button is pressed.',
-         async () => {
+    test('Text input value and form submittend, add_users event emitted', async () => {
 
-         let username_input = "michael@umich.edu\n\nDarryl@umich.edu Bearyl@umich.edu " +
-                              "erinH@umich.edu\ngabe@umich.edu\nmeredith@umich.edu " +
-                              "dwight@umich.edu\nandy@umich.com\nphyllis@umich.edu" +
-                              " pam@umich.edu jim@umich.edu " +
-                              "oscar@umich.edu\n angela@umich.edu\n" +
-                              "kevin@umich.edu,stanley@umich.edu " +
-                              "kelly@umich.edu,\nryan@umich.edu,";
+        let username_input = "michael@umich.edu\n\nDarryl@umich.edu Bearyl@umich.edu " +
+                            "erinH@umich.edu\ngabe@umich.edu\nmeredith@umich.edu " +
+                            "dwight@umich.edu\nandy@umich.com\nphyllis@umich.edu" +
+                            " pam@umich.edu jim@umich.edu " +
+                            "oscar@umich.edu\n angela@umich.edu\n" +
+                            "kevin@umich.edu,stanley@umich.edu " +
+                            "kelly@umich.edu,\nryan@umich.edu,";
 
-         set_validated_input_text(validated_input, username_input);
-         await roster.$nextTick();
+        set_validated_input_text(validated_input, username_input);
+        await roster.$nextTick();
 
-         expect(validated_input_component.is_valid).toBe(true);
-         expect(validated_input_component.d_input_value).toBe(username_input);
-         expect(roster_form_component.is_valid).toBe(true);
+        expect(validated_input_component.is_valid).toBe(true);
+        expect(validated_input_component.d_input_value).toBe(username_input);
+        expect(roster_form_component.is_valid).toBe(true);
 
-         roster_form_wrapper.trigger('submit');
-         await roster.$nextTick();
+        roster_form_wrapper.trigger('submit');
+        await roster.$nextTick();
 
-         expect(wrapper.emitted().add_users.length).toBe(1);
+        let expected_usernames = username_input.split(/\s+|\,/g).filter(
+            username => username.trim() !== '');
+        expect(wrapper.emitted().add_users[0][0]).toEqual(expected_usernames);
+        expect(get_validated_input_text(validated_input)).toEqual(username_input);
+    });
+
+    test('Replace users button hidden by default', async () => {
+        expect(wrapper.find({ref: 'replace_users_button'}).exists()).toBe(false);
+    });
+
+    test('Clicking replace users button emits event', async () => {
+        wrapper.setProps({include_replace_button: true});
+        let usernames = [
+            'user1@email.com',
+            'user2@email.com',
+            'user3@email.com',
+            'user4@email.com',
+        ];
+        set_validated_input_text(validated_input, usernames.join('\n'));
+        await wrapper.vm.$nextTick();
+        expect(validated_input_component.is_valid).toBe(true);
+
+        expect(wrapper.find({ref: 'replace_users_button'}).is('[disabled]')).toBe(false);
+        wrapper.find({ref: 'replace_users_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.emitted().replace_users[0][0]).toEqual(usernames);
+
+        expect(get_validated_input_text(validated_input)).toEqual(usernames.join('\n'));
+    });
+
+    test('Reset form', async () => {
+        set_validated_input_text(validated_input, 'user@user.com');
+        await wrapper.vm.$nextTick();
+        let add_users_button = wrapper.find({ref: 'add_users_button'});
+        expect(add_users_button.is('[disabled]')).toBe(false);
+
+        wrapper.vm.reset_form();
+        await wrapper.vm.$nextTick();
+        expect(get_validated_input_text(validated_input)).toEqual('');
+        expect(add_users_button.is('[disabled]')).toBe(true);
     });
 });

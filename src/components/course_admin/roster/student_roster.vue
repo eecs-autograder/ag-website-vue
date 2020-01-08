@@ -6,7 +6,9 @@
     <roster ref="student_roster"
             role="students"
             :roster="students"
+            :include_replace_button="true"
             @add_users="add_students_to_roster($event)"
+            @replace_users="replace_roster($event)"
             @remove_user="remove_student_from_roster($event)">
       <template v-slot:before_save_button>
         <APIErrors ref="api_errors"></APIErrors>
@@ -47,6 +49,14 @@ export default class StudentRoster extends Vue {
   async add_students_to_roster(new_students: string[]) {
     await this.course.add_students(new_students);
     this.students = await this.course.get_students();
+    (<Roster> this.$refs.student_roster).reset_form();
+  }
+
+  @handle_api_errors_async(make_error_handler_func())
+  async replace_roster(new_students: string[]) {
+    await this.course.set_students(new_students);
+    this.students = await this.course.get_students();
+    (<Roster> this.$refs.student_roster).reset_form();
   }
 
   @handle_global_errors_async

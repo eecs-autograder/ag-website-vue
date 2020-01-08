@@ -61,12 +61,42 @@ describe('StudentRoster tests', () => {
 
         expect(add_students_stub.calledOnceWith(new_usernames)).toBe(true);
         expect(wrapper.vm.students).toEqual(updated_students);
+
+        expect(roster.vm.d_form_text).toEqual('');
     });
 
     test('Add students API error handled', async () => {
         sinon.stub(course, 'add_students').rejects(new HttpError(403, 'Nope'));
         let roster = find_by_name<Roster>(wrapper, 'Roster');
         roster.vm.$emit('add_users', []);
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(find_by_name<APIErrors>(wrapper, 'APIErrors').vm.d_api_errors.length).toBe(1);
+    });
+
+    test('Students replaced from replace_users event', async () => {
+        let new_users = [data_ut.make_user(), data_ut.make_user()];
+        let new_usernames = new_users.map(user => user.username);
+        get_students_stub.onSecondCall().resolves(new_users);
+
+        let set_students_stub = sinon.stub(course, 'set_students');
+
+        let roster = find_by_name<Roster>(wrapper, 'Roster');
+        roster.vm.$emit('replace_users', new_usernames);
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(set_students_stub.calledOnceWith(new_usernames)).toBe(true);
+        expect(wrapper.vm.students).toEqual(new_users);
+
+        expect(roster.vm.d_form_text).toEqual('');
+    });
+
+    test('Add students API error handled', async () => {
+        sinon.stub(course, 'set_students').rejects(new HttpError(403, 'Nope'));
+        let roster = find_by_name<Roster>(wrapper, 'Roster');
+        roster.vm.$emit('replace_users', []);
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
