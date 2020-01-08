@@ -36,6 +36,7 @@ let course: ag_cli.Course;
 let project: ag_cli.Project;
 
 let http_get_stub: sinon.SinonStub;
+let http_get_file_stub: sinon.SinonStub;
 let http_post_stub: sinon.SinonStub;
 
 beforeEach(() => {
@@ -43,6 +44,7 @@ beforeEach(() => {
     project = data_ut.make_project(course.pk);
 
     http_get_stub = sinon.stub(ag_cli.HttpClient.get_instance(), 'get');
+    http_get_file_stub = sinon.stub(ag_cli.HttpClient.get_instance(), 'get_file');
 });
 
 function get_tasks_stub_resolves(data: DownloadTask[]) {
@@ -178,10 +180,10 @@ describe('Create task tests', () => {
 test('Download task result', async () => {
     let task = make_download_task(project.pk, DownloadType.all_scores, {progress: 100});
     get_tasks_stub_resolves([task]);
-    http_get_stub.withArgs(`/download_tasks/${task.pk}/result/`).callsFake((url, args) => {
+    http_get_file_stub.withArgs(`/download_tasks/${task.pk}/result/`).callsFake((url, args) => {
         // tslint:disable-next-line: no-object-literal-type-assertion
         args.on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 4, total: 15});
-        return Promise.resolve('this is some csv data');
+        return Promise.resolve(new Blob(['this is some csv data']));
     });
 
     let wrapper = managed_mount(DownloadGrades, {propsData: {project: project}});

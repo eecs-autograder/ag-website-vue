@@ -1,4 +1,4 @@
-import { config, mount, Wrapper, WrapperArray } from '@vue/test-utils';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 import { HttpError, InstructorFile, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
@@ -118,14 +118,15 @@ describe('InstructorFiles.vue', () => {
     });
 
     test('Re-upload file being viewed, contents updated', async () => {
-        sinon.stub(instructor_file_1, 'get_content').resolves("Old Content");
+        sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Old Content"]));
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
         await wrapper.vm.$nextTick();
         expect(await view_file.vm.file_contents).toEqual('Old Content');
 
-        InstructorFile.notify_instructor_file_content_changed(instructor_file_1, "New Content");
+        InstructorFile.notify_instructor_file_content_changed(
+            instructor_file_1, new Blob(["New Content"]));
         await wrapper.vm.$nextTick();
         expect(await view_file.vm.file_contents).toEqual('New Content');
     });
@@ -176,7 +177,7 @@ describe('InstructorFiles.vue', () => {
             (on_upload_progress) => {
                 // tslint:disable-next-line: no-object-literal-type-assertion
                 on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
-                return Promise.resolve('Monday');
+                return Promise.resolve(new Blob(['Monday']));
             }
         );
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
@@ -186,7 +187,7 @@ describe('InstructorFiles.vue', () => {
         expect(view_file.vm.filename).toEqual(instructor_file_1.name);
         expect(await view_file.vm.file_contents).toEqual('Monday');
 
-        sinon.stub(instructor_file_2, 'get_content').resolves("Tuesday");
+        sinon.stub(instructor_file_2, 'get_content').resolves(new Blob(["Tuesday"]));
         wrapper.findAll({name: 'SingleInstructorFile'}).at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -206,7 +207,7 @@ describe('InstructorFiles.vue', () => {
 
     test('Rename opened file', async () => {
         let expected_content = 'I am contenttt';
-        sinon.stub(instructor_file_1, 'get_content').resolves(expected_content);
+        sinon.stub(instructor_file_1, 'get_content').resolves(new Blob([expected_content]));
         let renamed = new InstructorFile(instructor_file_1);
         renamed.name = 'Renamed';
 
@@ -247,7 +248,7 @@ describe('InstructorFiles.vue', () => {
         ).callsFake((callback) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             callback!(<ProgressEvent> {lengthComputable: true, loaded: 10, total: 20});
-            return Promise.resolve("File 1 Content");
+            return Promise.resolve(new Blob(["File 1 Content"]));
         });
 
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
@@ -283,7 +284,7 @@ describe('InstructorFiles.vue', () => {
         expect(sidebar_header.text().includes('Uploaded Files')).toBe(true);
 
         // Header text still shows up if we haven't selected a file
-        sinon.stub(instructor_file_1, 'get_content').resolves("Monday");
+        sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Monday"]));
         wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 

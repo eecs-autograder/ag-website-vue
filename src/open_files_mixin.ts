@@ -1,6 +1,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import { SafeMap } from './safe_map';
+import { blob_to_string } from './utils';
 
 export type ProgressCallback = (event: ProgressEvent) => void;
 
@@ -14,7 +15,7 @@ export class OpenFilesMixin extends Vue {
     // without calling get_content_func.
     // Otherwise, calls get_content_func, stores and returns the resulting Promise.
     open_file(filename: string,
-              get_content_func: (progress_callback: ProgressCallback) => Promise<string>) {
+              get_content_func: (progress_callback: ProgressCallback) => Promise<Blob>) {
         this.d_load_contents_progress = null;
         if (!this.d_open_files.has(filename)) {
             let content = get_content_func((event: ProgressEvent) => {
@@ -22,14 +23,14 @@ export class OpenFilesMixin extends Vue {
                     this.d_load_contents_progress = 100 * (1.0 * event.loaded / event.total);
                 }
             });
-            this.d_open_files.set(filename, content);
+            this.d_open_files.set(filename, blob_to_string(content));
         }
         this.d_current_filename = filename;
     }
 
-    update_file(filename: string, content: Promise<string>) {
+    update_file(filename: string, content: Promise<Blob>) {
         let new_open_files = new SafeMap(this.d_open_files);
-        new_open_files.set(filename, content);
+        new_open_files.set(filename, blob_to_string(content));
         this.d_open_files = new_open_files;
     }
 
