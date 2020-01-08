@@ -267,7 +267,7 @@ export default class ProjectAdmin extends Vue implements ProjectObserver,
   }
 
   update_instructor_file_content_changed(
-    instructor_file: InstructorFile, new_content: string): void {}
+    instructor_file: InstructorFile, new_content: Blob): void {}
 }
 </script>
 

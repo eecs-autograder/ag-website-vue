@@ -261,7 +261,7 @@ describe('Submitted files tests', () => {
         ).withArgs('file_b').callsFake((filename, on_download_progress) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
-            return Promise.resolve("File b contents");
+            return Promise.resolve(new Blob(["File b contents"]));
         });
 
         let middle_file = wrapper.findAll('.submitted-file').at(1);
@@ -282,7 +282,7 @@ describe('Submitted files tests', () => {
         ).callsFake((filename, callback) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             callback!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 15});
-            return Promise.resolve("File b contents");
+            return Promise.resolve(new Blob(["File b contents"]));
         });
         expect(wrapper.vm.current_filename).toBeNull();
 
@@ -419,7 +419,7 @@ describe('Adjust feedback tests', () => {
         let wrapper = make_wrapper();
         // We'll open a file to make sure it gets closed when the watched
         // submission changes.
-        sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(first_content);
+        sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(new Blob([first_content]));
         let submitted_files = wrapper.findAll('.submitted-file');
         submitted_files.at(0).find('.open-file-link').trigger('click');
         await wrapper.vm.$nextTick();
@@ -449,7 +449,7 @@ describe('Adjust feedback tests', () => {
         // The file contents should be re-requested, even though the file has
         // the same name. This will indicate that the stored file data was
         // cleared.
-        sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(second_content);
+        sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(new Blob([second_content]));
         submitted_files.at(0).find('.open-file-link').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.current_filename).toEqual(filename);

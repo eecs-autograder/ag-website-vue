@@ -250,3 +250,20 @@ export class NonNullAssertionError extends Error {
         this.__proto__ = actual_proto;
     }
 }
+
+export function blob_to_string(blob: Promise<Blob>): Promise<string> {
+    let reader = new FileReader();
+    return new Promise(async (resolve, reject) => {
+        reader.onload = () => {
+            resolve(<string> reader.result);
+        };
+
+        /* istanbul ignore next */
+        reader.onerror = () => {
+            reader.abort();
+            reject(new DOMException("Error converting blob to string."));
+        };
+
+        reader.readAsText(await blob);
+    });
+}

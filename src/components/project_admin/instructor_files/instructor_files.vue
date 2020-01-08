@@ -134,7 +134,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     });
   }
 
-  update_instructor_file_content_changed(instructor_file: InstructorFile, file_content: string) {
+  update_instructor_file_content_changed(instructor_file: InstructorFile, file_content: Blob) {
     if (instructor_file.project === this.project.pk) {
       this.update_file(instructor_file.name, Promise.resolve(file_content));
     }
