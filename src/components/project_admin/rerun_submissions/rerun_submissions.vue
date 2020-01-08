@@ -175,7 +175,7 @@
               <template v-if="task.has_error">
                 ERROR
                 <tooltip placement="top" width="large">
-                  An unexpected error occurred. Please contact <b>help@autograder.io</b>
+                  An unexpected error occurred. Please contact <b>{{SYSADMIN_CONTACT}}</b>
                   and include the information <b>"Rerun task ID: {{task.pk}}"</b> in your email.
                 </tooltip>
               </template>
@@ -203,6 +203,7 @@ import APIErrors from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
+import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
@@ -262,6 +263,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   d_loading = true;
 
   readonly format_datetime = format_datetime;
+  readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
 
   @handle_global_errors_async
   async created() {

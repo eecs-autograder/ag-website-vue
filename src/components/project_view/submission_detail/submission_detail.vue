@@ -48,7 +48,7 @@
         An unexpected error occurred while grading your submission.
         This submission will not count towards your daily limit.
         Please wait a few minutes and try your submission again.
-        If the problem persists, please contact <b>help@autograder.io</b> and include
+        If the problem persists, please contact <b>{{SYSADMIN_CONTACT}}</b> and include
         the information <b>"Submission ID: {{submission.pk}}"</b> in your email.
       </div>
     </div>
@@ -217,7 +217,8 @@ import {
     Group,
     Submission,
     SubmissionResultFeedback,
-    SubmissionWithResults
+    SubmissionWithResults,
+    HttpClient
 } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 
@@ -230,6 +231,7 @@ import { CorrectnessLevel } from '@/components/project_view/submission_detail/co
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 import ViewFile from '@/components/view_file.vue';
+import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_global_errors_async } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
@@ -283,6 +285,8 @@ export default class SubmissionDetail extends OpenFilesMixin {
   readonly FeedbackCategory = FeedbackCategory;
   readonly GradingStatus = GradingStatus;
   readonly format_datetime = format_datetime;
+
+  readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
 
   get submission() {
     return new Submission(this.submission_with_results);

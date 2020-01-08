@@ -18,6 +18,8 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { HttpError } from 'ag-client-typescript';
 
+import { SYSADMIN_CONTACT } from '@/constants';
+
 @Component
 export default class APIErrors extends Vue {
   d_api_errors: string[] = [];
@@ -37,7 +39,7 @@ export default class APIErrors extends Vue {
     else if (!(error_response instanceof HttpError)) {
       this.d_api_errors.push(
         'An unexpected error occurred. If the problem persists, please contact '
-        + 'help@autograder.io and include the version number of your browser and '
+        + SYSADMIN_CONTACT + ' and include the version number of your browser and '
         + 'output of the JavaScript console '
         + '(https://webmasters.stackexchange.com/questions/8525/'
         + 'how-do-i-open-the-javascript-console-in-different-browsers).');
