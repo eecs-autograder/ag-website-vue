@@ -126,12 +126,11 @@
                 ref="cancel_submit_button"
                 @click="d_show_confirm_submit_modal = false"
                 :disabled="d_submitting">Cancel</button>
-
-        <div id="submit-progress">
-          <progress-bar v-if="d_submitting" :progress="d_submit_progress"></progress-bar>
-        </div>
-        <APIErrors ref="api_errors"></APIErrors>
       </div>
+      <div id="submit-progress">
+        <progress-bar v-if="d_submitting" :progress="d_submit_progress"></progress-bar>
+      </div>
+      <APIErrors ref="api_errors"></APIErrors>
     </modal>
   </div>
 </template>
