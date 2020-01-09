@@ -579,7 +579,7 @@ describe('case_result_return_code_correctness tests', () => {
     });
 
     // Regression test for https://github.com/eecs-autograder/ag-website-vue/issues/376
-    test('Single-command test, only return code checked, all correct', async () => {
+    test('Single-command test, actual return code and correctness shown, all correct', async () => {
         let test_case = data_ut.make_ag_test_case(
             data_ut.make_ag_test_suite(group.project).pk
         );
