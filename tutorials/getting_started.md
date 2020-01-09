@@ -30,7 +30,9 @@ To add users to the roster you selected, paste a newline-separated list of email
 Guests are users who are allowed to submit an assignment but are not in the roster for the course.
 If your institution has a specific email domain (e.g. `@umich.edu`) we recommend setting the "Guest usernames must end with" field to that email domain.
 
-![alt text](./pics/allowed_guest_domain.png)
+<table style="border: 1px solid slategray">
+    <tr><td><img src="./pics/allowed_guest_domain.png"/></td></tr>
+</table>
 
 ### (Optional) Configure late day tokens
 _Note:_ Set this value __before__ publishing any projects.
@@ -84,6 +86,18 @@ Unless you override the default (by checking the "Groups get more submissions th
 Once you set a limit, you have two choices for how the limit is enforced:
 - __A hard cutoff__: Students will not be able to submit for the rest of the day once they hit the submission limit.
 - __A soft cutoff__: Students can continue to submit, but they will only see reduced feedback (as configured by admins) for those submissions.
+
+For soft cutoff, check the "Allow submissions past limit" box. For a hard cutoff, uncheck it.
+
+<table style="border: 1px solid slategray">
+    <tr><td><img src="./pics/allow_past_limit.png"/></td></tr>
+</table>
+
+#### Set the timezone for "Reset submissions per day at" to your local timezone.
+
+<table style="border: 1px solid slategray">
+    <tr><td><img src="./pics/submission_reset_timezone.png"/></td></tr>
+</table>
 
 #### Bonus submissions
 _Note:_ Groups and individuals are treated uniformly with respect to bonus submissions, so this section uses these terms interchangeably.
