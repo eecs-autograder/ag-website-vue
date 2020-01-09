@@ -161,10 +161,11 @@ export default class AGSuiteResult extends Vue {
     }
 
     let all_show_return_code_only = without_not_available.every(
-      (cmd_result) => cmd_result.actual_return_code !== null || cmd_result.timed_out!);
+      (cmd_result) => cmd_result.return_code_correct === null
+                      && (cmd_result.actual_return_code !== null || cmd_result.timed_out!));
 
     if (all_show_return_code_only) {
-        return CorrectnessLevel.info_only;
+      return CorrectnessLevel.info_only;
     }
 
     let all_correct = case_result.ag_test_command_results.every(

@@ -577,6 +577,33 @@ describe('case_result_return_code_correctness tests', () => {
             CorrectnessLevel.none_correct
         );
     });
+
+    // Regression test for https://github.com/eecs-autograder/ag-website-vue/issues/376
+    test('Single-command test, only return code checked, all correct', async () => {
+        let test_case = data_ut.make_ag_test_case(
+            data_ut.make_ag_test_suite(group.project).pk
+        );
+        let test_result = data_ut.make_ag_test_case_result_feedback(test_case.pk);
+
+        let return_code_correct_res = data_ut.make_ag_test_command_result_feedback(
+            data_ut.make_ag_test_command(test_case.pk).pk,
+            {
+                actual_return_code: 0,
+                return_code_correct: true,
+                return_code_points: 1,
+                return_code_points_possible: 1,
+            }
+        );
+
+        test_result.ag_test_command_results = [return_code_correct_res];
+
+        expect(wrapper.vm.case_result_return_code_correctness(test_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+        expect(wrapper.vm.case_result_correctness(test_result)).toEqual(
+            CorrectnessLevel.all_correct
+        );
+    });
 });
 
 describe('case_result_output_correctness tests', () => {
