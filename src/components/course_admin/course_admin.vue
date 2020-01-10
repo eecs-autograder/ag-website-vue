@@ -34,37 +34,52 @@
           @click="set_current_tab('projects')">
         Projects
       </div>
+
+      <div class="nav-link"
+          ref="late_days_tab"
+          v-if="d_course.num_late_days !== 0"
+          :class="{'active': current_tab === 'late_days'}"
+          @click="set_current_tab('late_days')">
+        Late Day Tokens
+      </div>
+
     </div>
 
     <div class="body">
       <course-settings v-show="current_tab === 'settings'"
                       v-if="loaded_tabs.has('settings')"
-                      :course="course"></course-settings>
+                      :course="d_course"></course-settings>
 
       <admin-roster v-show="current_tab === RosterChoice.admin + '_roster'"
                     v-if="loaded_tabs.has(RosterChoice.admin + '_roster')"
-                    :course="course">
+                    :course="d_course">
       </admin-roster>
 
       <staff-roster v-show="current_tab === RosterChoice.staff + '_roster'"
                     v-if="loaded_tabs.has(RosterChoice.staff + '_roster')"
-                    :course="course">
+                    :course="d_course">
       </staff-roster>
 
       <student-roster v-show="current_tab === RosterChoice.student + '_roster'"
                       v-if="loaded_tabs.has(RosterChoice.student + '_roster')"
-                      :course="course">
+                      :course="d_course">
       </student-roster>
 
       <handgrader-roster v-show="current_tab === RosterChoice.handgrader + '_roster'"
                         v-if="loaded_tabs.has(RosterChoice.handgrader + '_roster')"
-                        :course="course">
+                        :course="d_course">
       </handgrader-roster>
 
       <manage-projects v-show="current_tab === 'projects'"
                       v-if="loaded_tabs.has('projects')"
-                      :course="course">
+                      :course="d_course">
       </manage-projects>
+
+      <!-- Intentionally using v-if here because we don't have pub/sub for roster updates. -->
+      <edit-late-days
+        v-if="current_tab === 'late_days'"
+        :course="d_course">
+      </edit-late-days>
     </div>
   </div>
 </template>
@@ -72,10 +87,11 @@
 <script lang="ts">
 import { Component, Inject, Vue } from 'vue-property-decorator';
 
-import { Course } from 'ag-client-typescript';
+import { Course, CourseObserver } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
+import EditLateDays from '@/components/course_admin/edit_late_days.vue';
 import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 import AdminRoster from '@/components/course_admin/roster/admin_roster.vue';
 import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster.vue';
@@ -87,7 +103,8 @@ import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
-import { get_query_param } from "@/utils";
+import { BeforeDestroy, Mounted } from '@/lifecycle';
+import { get_query_param, safe_assign } from "@/utils";
 
 @Component({
   components: {
@@ -96,6 +113,7 @@ import { get_query_param } from "@/utils";
     StaffRoster,
     StudentRoster,
     ManageProjects,
+    EditLateDays,
     CourseSettings,
     Dropdown,
     Tab,
@@ -103,11 +121,12 @@ import { get_query_param } from "@/utils";
     Tabs,
   }
 })
-export default class CourseAdmin extends CurrentTabMixin {
+export default class CourseAdmin extends CurrentTabMixin implements CourseObserver,
+                                                                    Mounted,
+                                                                    BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
 
-  current_tab_index = 0;
   d_loading = true;
   role_selected = "";
   roles = [
@@ -116,17 +135,22 @@ export default class CourseAdmin extends CurrentTabMixin {
     RosterChoice.student,
     RosterChoice.handgrader
   ];
-  course: Course | null = null;
+  d_course: Course | null = null;
+
+  readonly RosterChoice = RosterChoice;
 
   @handle_global_errors_async
-  async created() {
-    this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
-    await this.globals.set_current_course(this.course);
-    this.d_loading = false;
-  }
+  async mounted() {
+    this.d_course = await Course.get_by_pk(Number(this.$route.params.course_id));
+    await this.globals.set_current_course(this.d_course);
 
-  mounted() {
-    this.initialize_current_tab('settings');
+    let requested_tab = get_query_param(this.$route.query, "current_tab");
+    if (requested_tab === 'late_days' && this.d_course!.num_late_days === 0) {
+      this.set_current_tab('settings');
+    }
+    else {
+      this.initialize_current_tab('settings');
+    }
 
     let query_val = get_query_param(this.$route.query, 'current_tab');
     if (query_val === RosterChoice.admin + '_roster') {
@@ -141,9 +165,23 @@ export default class CourseAdmin extends CurrentTabMixin {
     else if (query_val === RosterChoice.handgrader + '_roster') {
       this.role_selected = RosterChoice.handgrader;
     }
+
+    this.d_loading = false;
+    Course.subscribe(this);
   }
 
-  readonly RosterChoice = RosterChoice;
+  beforeDestroy() {
+    Course.unsubscribe(this);
+  }
+
+  update_course_created(course: Course): void {
+  }
+
+  update_course_changed(course: Course): void {
+    if (this.d_course !== null && course.pk === this.d_course.pk) {
+      safe_assign(this.d_course, course);
+    }
+  }
 }
 
 export enum RosterChoice {
@@ -185,7 +223,7 @@ export enum RosterChoice {
 }
 
 .roster-dropdown-row {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .body {

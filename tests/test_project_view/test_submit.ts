@@ -6,11 +6,12 @@ import moment from "moment";
 import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
+import GroupMembers from '@/components/project_view/group_members.vue';
 import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace } from '@/tests/utils';
+import { compress_whitespace, find_by_name } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -242,7 +243,32 @@ describe('Submit button text tests', () => {
 });
 
 describe('Group members tests', () => {
-    test('Group size 1, no group members shown', () => {
+    // test('Group size 1, no group members shown', () => {
+    //     const wrapper = mount(Submit, {
+    //         propsData: {
+    //             course: course,
+    //             project: project,
+    //             group: group,
+    //         }
+    //     });
+    //     expect(wrapper.find('#group-members-container').exists()).toBe(false);
+    // });
+
+    // test('Group size more than 1, group members shown', () => {
+    //     group.member_names = ['llama@llama.net', 'ninja@ninja.net'];
+
+    //     const wrapper = mount(Submit, {
+    //         propsData: {
+    //             course: course,
+    //             project: project,
+    //             group: group,
+    //         }
+    //     });
+
+    //     expect(wrapper.findAll('.group-member').length).toEqual(2);
+    // });
+
+    test('GroupMembers component values, late days not shown', async () => {
         const wrapper = mount(Submit, {
             propsData: {
                 course: course,
@@ -250,21 +276,9 @@ describe('Group members tests', () => {
                 group: group,
             }
         });
-        expect(wrapper.find('#group-members-container').exists()).toBe(false);
-    });
-
-    test('Group size more than 1, group members shown', () => {
-        group.member_names = ['llama@llama.net', 'ninja@ninja.net'];
-
-        const wrapper = mount(Submit, {
-            propsData: {
-                course: course,
-                project: project,
-                group: group,
-            }
-        });
-
-        expect(wrapper.findAll('.group-member').length).toEqual(2);
+        let group_members = find_by_name<GroupMembers>(wrapper, 'GroupMembers');
+        expect(group_members.vm.group).toBe(group);
+        expect(group_members.vm.include_late_day_totals).toBe(false);
     });
 });
 
@@ -422,7 +436,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
 
         expect(
             compress_whitespace(wrapper.find('#late-days-remaining').text())
-        ).toEqual('2 late days remaining.');
+        ).toEqual('2 late day tokens remaining.');
     });
 
     test("Course doesn't allot late days, user has late days", async () => {
@@ -439,7 +453,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
 
         expect(
             compress_whitespace(wrapper.find('#late-days-remaining').text())
-        ).toEqual('1 late day remaining.');
+        ).toEqual('1 late day token remaining.');
     });
 
     test("Course allots late days, project doesn't allow late days", async () => {

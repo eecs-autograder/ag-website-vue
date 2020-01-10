@@ -111,6 +111,7 @@ import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun
 import Tab from '@/components/tabs/tab.vue';
 import TabHeader from '@/components/tabs/tab_header.vue';
 import Tabs from '@/components/tabs/tabs.vue';
+import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Destroyed, Mounted } from '@/lifecycle';
 import { array_remove_unique, deep_copy, get_query_param, safe_assign } from "@/utils";
@@ -131,23 +132,18 @@ import { array_remove_unique, deep_copy, get_query_param, safe_assign } from "@/
     Tabs
   }
 })
-export default class ProjectAdmin extends Vue implements ProjectObserver,
-                                                         InstructorFileObserver,
-                                                         ExpectedStudentFileObserver,
-                                                         Created,
-                                                         Mounted,
-                                                         BeforeDestroy {
+export default class ProjectAdmin extends CurrentTabMixin implements ProjectObserver,
+                                                          InstructorFileObserver,
+                                                          ExpectedStudentFileObserver,
+                                                          Created,
+                                                          Mounted,
+                                                          BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
 
   d_loading = true;
   project: Project | null = null;
-  d_current_tab: string = 'settings';
-
-  // The identifiers for tabs that have been clicked on and therefore
-  // have had there content loaded.
-  d_loaded_tabs: Set<string> = new Set();
 
   @handle_global_errors_async
   async created() {
@@ -161,37 +157,13 @@ export default class ProjectAdmin extends Vue implements ProjectObserver,
   }
 
   mounted() {
-    this.initialize_current_tab();
+    this.initialize_current_tab('settings');
   }
 
   beforeDestroy() {
     Project.unsubscribe(this);
     InstructorFile.unsubscribe(this);
     ExpectedStudentFile.unsubscribe(this);
-  }
-
-  private initialize_current_tab() {
-    let requested_tab = get_query_param(this.$route.query, "current_tab");
-    if (requested_tab !== null) {
-      this.set_current_tab(requested_tab);
-    }
-    else {
-      this.mark_tab_as_loaded('settings');
-    }
-  }
-
-  private set_current_tab(tab_id: string) {
-    this.d_current_tab = tab_id;
-    this.$router.replace({query: {...this.$route.query, current_tab: tab_id}});
-    this.mark_tab_as_loaded(tab_id);
-  }
-
-  private mark_tab_as_loaded(tab_id: string) {
-    if (!this.d_loaded_tabs.has(tab_id)) {
-      let new_loaded_tabs = new Set(this.d_loaded_tabs);
-      new_loaded_tabs.add(tab_id);
-      this.d_loaded_tabs = new_loaded_tabs;
-    }
   }
 
   update_project_created(project: Project): void {

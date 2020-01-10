@@ -1,288 +1,302 @@
-import VueRouter from 'vue-router';
+import { config, Wrapper } from '@vue/test-utils';
 
-import { config, createLocalVue, mount, Wrapper } from '@vue/test-utils';
-
-import { Course, Project, User } from 'ag-client-typescript';
+import { Course, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import CourseAdmin, { RosterChoice } from '@/components/course_admin/course_admin.vue';
+import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { managed_mount } from '@/tests/setup';
+import { managed_shallow_mount } from '@/tests/setup';
+import { wait_for_load, wait_until } from '@/tests/utils';
+
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
 let course: Course;
-let user: User;
+let router_replace: sinon.SinonStub;
+
+function get_router_mocks(query = {}) {
+    return {
+        $route: {
+            params: {
+                course_id: course.pk.toString()
+            },
+            query: query
+        },
+        $router: {
+            replace: router_replace
+        }
+    };
+}
 
 beforeEach(() => {
     course = data_ut.make_course();
-
-    user = new User({
-        pk: 1, username: "amandaplease@umich.edu", first_name: "Amanda", last_name: "Bynes",
-        email: "amandaplease@umich.edu", is_superuser: true
-    });
-    data_ut.set_global_current_user(user);
-    sinon.stub(User, 'get_current_user_roles').returns(
-        Promise.resolve(data_ut.make_user_roles()));
+    router_replace = sinon.stub();
+    sinon.stub(User, 'get_current_user_roles').withArgs(course.pk).resolves(
+        data_ut.make_user_roles({is_admin: true}));
+    sinon.stub(Course, 'get_by_pk').withArgs(course.pk).resolves(course);
 });
 
-
 describe('Changing Tabs', ()  => {
-    // tslint:disable-next-line naming-convention
-    const localVue = createLocalVue();
-    localVue.use(VueRouter);
+    let wrapper: Wrapper<CourseAdmin>;
 
-    const routes = [
-        { path: '/web/course_admin/:course_id', name: "course_admin", component: CourseAdmin }
-    ];
-
-    const router = new VueRouter ({
-        routes: routes,
-        mode: 'history'
+    beforeEach(async () => {
+        wrapper = managed_shallow_mount(CourseAdmin, {mocks: get_router_mocks()});
+        expect(await wait_for_load(wrapper)).toBe(true);
     });
 
-    let wrapper: Wrapper<CourseAdmin>;
-    let component: CourseAdmin;
-    let roster: User[];
+    test('Settings loaded initially, select another tab and then settings again', async () => {
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).exists())
+        ).toBe(true);
+        expect(wrapper.find({name: 'CourseSettings'}).vm.$props.course).toEqual(course);
 
-    beforeEach(() => {
-        roster = [user];
-        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
+        let tabs = wrapper.findAll('.nav-link');
+        tabs.at(2).trigger('click');
 
-        wrapper = managed_mount(CourseAdmin, {
-            localVue,
-            router
-        });
-        component = wrapper.vm;
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'ManageProjects'}).exists())
+        ).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('projects');
+        expect(wrapper.find({name: 'ManageProjects'}).isVisible()).toBe(true);
+        expect(wrapper.find({name: 'CourseSettings'}).isVisible()).toBe(false);
+        expect(router_replace.calledOnce).toBe(true);
+
+        tabs.at(0).trigger('click');
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).isVisible())
+        ).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('settings');
+        expect(router_replace.secondCall.calledWith(
+            {query: {current_tab: 'settings'}})
+        ).toBe(true);
+        expect(wrapper.find({name: 'ManageProjects'}).isVisible()).toBe(false);
     });
 
     test('Select admin roster', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course, 'get_admins').returns(Promise.resolve(roster));
-
         wrapper.find('.roster-tab-header').trigger('mouseenter');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.findAll('.dropdown .menu-item').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab).toEqual('Admin_roster');
-        expect(component.role_selected).toEqual(RosterChoice.admin);
+        expect(wrapper.vm.current_tab).toEqual('Admin_roster');
+        expect(wrapper.vm.role_selected).toEqual(RosterChoice.admin);
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Admin_roster'}}
         )).toBe(true);
+        expect(wrapper.find({name: 'AdminRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select staff roster', async () => {
-        let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course, 'get_staff').returns(Promise.resolve(roster));
-
-        await component.$nextTick();
         wrapper.find('.roster-tab-header').trigger('mouseenter');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.findAll('.dropdown .menu-item').at(1).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab).toEqual('Staff_roster');
-        expect(component.role_selected).toEqual(RosterChoice.staff);
+        expect(wrapper.vm.current_tab).toEqual('Staff_roster');
+        expect(wrapper.vm.role_selected).toEqual(RosterChoice.staff);
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Staff_roster'}})
         ).toBe(true);
+        expect(wrapper.find({name: 'StaffRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select student roster', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course, 'get_students').returns(Promise.resolve(roster));
-
         wrapper.find('.roster-tab-header').trigger('mouseenter');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.findAll('.dropdown .menu-item').at(2).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab).toEqual('Student_roster');
-        expect(component.role_selected).toEqual(RosterChoice.student);
+        expect(wrapper.vm.current_tab).toEqual('Student_roster');
+        expect(wrapper.vm.role_selected).toEqual(RosterChoice.student);
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Student_roster'}}
         )).toBe(true);
+        expect(wrapper.find({name: 'StudentRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select handgrader roster', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(course, 'get_handgraders').returns(Promise.resolve(roster));
-
         wrapper.find('.roster-tab-header').trigger('mouseenter');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.findAll('.dropdown .menu-item').at(3).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab).toEqual('Handgrader_roster');
-        expect(component.role_selected).toEqual(RosterChoice.handgrader);
+        expect(wrapper.vm.current_tab).toEqual('Handgrader_roster');
+        expect(wrapper.vm.role_selected).toEqual(RosterChoice.handgrader);
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Handgrader_roster'}}
         )).toBe(true);
+        expect(wrapper.find({name: 'HandgraderRoster'}).vm.$props.course).toEqual(course);
     });
 
-    test('Clicking on manage_projects tab', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
-
+    test('Select manage projects', async () => {
         let tabs = wrapper.findAll('.nav-link');
         expect(tabs.length).toEqual(3);
         tabs.at(2).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.current_tab).toEqual('projects');
+        expect(wrapper.vm.current_tab).toEqual('projects');
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({ query: { current_tab: 'projects'}}));
+        expect(wrapper.find({name: 'ManageProjects'}).vm.$props.course).toEqual(course);
     });
 
-    test('Clicking on settings tab', async () => {
-        await component.$nextTick();
-        let router_replace = sinon.stub(router, 'replace');
-
+    test('Select late days', async () => {
         let tabs = wrapper.findAll('.nav-link');
-        tabs.at(2).trigger('click');
-        await component.$nextTick();
+        expect(tabs.length).toEqual(3);
 
-        expect(component.current_tab).toEqual('projects');
+        wrapper.vm.d_course!.num_late_days = 1;
+        await wrapper.vm.$nextTick();
 
-        tabs.at(0).trigger('click');
-        await component.$nextTick();
+        tabs = wrapper.findAll('.nav-link');
+        expect(tabs.length).toEqual(4);
 
-        expect(component.current_tab).toEqual('settings');
-        expect(router_replace.calledTwice).toBe(true);
-        expect(router_replace.secondCall.calledWith({ query: { current_tab: 'settings'}}));
+        tabs.at(3).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.current_tab).toEqual('late_days');
+        expect(router_replace.calledOnce).toBe(true);
+        expect(router_replace.firstCall.calledWith({ query: { current_tab: 'late_days'}}));
+        expect(wrapper.find({name: 'EditLateDays'}).vm.$props.course).toEqual(course);
     });
 });
 
 
-describe('select_tab function called with different values associated with "current_tab" ' +
-         'key on create',
-         ()  => {
-    let wrapper: Wrapper<CourseAdmin>;
-    let component: CourseAdmin;
-    let router_replace: sinon.SinonStub;
-
-    function get_router_mocks(query = {}) {
-        return {
-            $route: {
-                params: {
-                    course_id: course.pk.toString()
-                },
-                query: query
-            },
-            $router: {
-                replace: router_replace
-            }
-        };
-    }
-
-    beforeEach(() => {
-        course = data_ut.make_course();
-
-        sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
-        sinon.stub(course, 'get_admins').returns(Promise.resolve([]));
-        sinon.stub(course, 'get_staff').returns(Promise.resolve([]));
-        sinon.stub(course, 'get_students').returns(Promise.resolve([]));
-        sinon.stub(course, 'get_handgraders').returns(Promise.resolve([]));
-        sinon.stub(Project, 'get_all_from_course').returns(Promise.resolve([]));
-
-        router_replace = sinon.stub();
-    });
-
-    test('current_tab parameter value = settings', async () => {
-        wrapper = managed_mount(CourseAdmin, {
+describe('Initially selected tab requested in query param', ()  => {
+    test('Settings tab', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
             mocks: get_router_mocks({current_tab: 'settings'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab).toEqual('settings');
-        expect(component.role_selected).toEqual("");
-        expect(component.d_loading).toEqual(false);
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'CourseSettings'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('settings');
+        expect(wrapper.find({name: 'CourseSettings'}).vm.$props.course).toEqual(course);
     });
 
-    test('current_tab parameter value = admin_roster', async () => {
-        wrapper = managed_mount(CourseAdmin, {
+    test('Admin roster tab', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
             mocks: get_router_mocks({current_tab: 'Admin_roster'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab).toEqual('Admin_roster');
-        expect(component.role_selected).toEqual(RosterChoice.admin);
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'AdminRoster'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'AdminRoster'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('Admin_roster');
+        expect(wrapper.find({name: 'AdminRoster'}).vm.$props.course).toEqual(course);
     });
 
-    test('current_tab parameter value = staff_roster', async () => {
-        wrapper = managed_mount(CourseAdmin, {
+    test('Staff roster tab', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
             mocks: get_router_mocks({current_tab: 'Staff_roster'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab).toEqual('Staff_roster');
-        expect(component.role_selected).toEqual(RosterChoice.staff);
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'StaffRoster'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'StaffRoster'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('Staff_roster');
+        expect(wrapper.find({name: 'StaffRoster'}).vm.$props.course).toEqual(course);
     });
 
-    test('current_tab parameter value = student_roster', async () => {
-        wrapper = managed_mount(CourseAdmin, {
+    test('Student roster tab', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
             mocks: get_router_mocks({current_tab: 'Student_roster'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab).toEqual('Student_roster');
-        expect(component.role_selected).toEqual(RosterChoice.student);
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'StudentRoster'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'StudentRoster'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('Student_roster');
+        expect(wrapper.find({name: 'StudentRoster'}).vm.$props.course).toEqual(course);
     });
 
-    test('current_tab parameter value = handgrader_roster', async () => {
-        wrapper = managed_mount(CourseAdmin, {
+    test('Handgrader roster tab', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
             mocks: get_router_mocks({current_tab: 'Handgrader_roster'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab).toEqual('Handgrader_roster');
-        expect(component.role_selected).toEqual(RosterChoice.handgrader);
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'HandgraderRoster'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'HandgraderRoster'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('Handgrader_roster');
+        expect(wrapper.find({name: 'HandgraderRoster'}).vm.$props.course).toEqual(course);
     });
 
-    test('current_tab parameter value = projects', async () => {
-        wrapper = managed_mount(CourseAdmin, {
+    test('Manage projects tab', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
             mocks: get_router_mocks({current_tab: 'projects'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab).toEqual('projects');
-        expect(component.role_selected).toEqual("");
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'ManageProjects'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'ManageProjects'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('projects');
+        expect(wrapper.find({name: 'ManageProjects'}).vm.$props.course).toEqual(course);
     });
 
-    test('current_tab parameter value = null', async () => {
-        wrapper = managed_mount(CourseAdmin, {
-            mocks: get_router_mocks({})
+    test('Late days tab', async () => {
+        course.num_late_days = 1;
+        let wrapper = managed_shallow_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'late_days'})
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.course).toEqual(course);
-        expect(component.current_tab_index).toEqual(0);
-        expect(component.role_selected).toEqual("");
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'EditLateDays'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'EditLateDays'}).isVisible()).toBe(true);
+        expect(wrapper.vm.current_tab).toEqual('late_days');
+        expect(wrapper.find({name: 'EditLateDays'}).vm.$props.course).toEqual(course);
     });
+
+    test('Late days tab requested, no late days, defaults to settings', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'late_days'})
+        });
+
+        expect(
+            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).exists())
+        ).toBe(true);
+
+        expect(wrapper.find({name: 'EditLateDays'}).exists()).toBe(false);
+        expect(wrapper.vm.current_tab).toEqual('settings');
+    });
+});
+
+test('Component observes course changes', async () => {
+    let wrapper = managed_shallow_mount(CourseAdmin, {mocks: get_router_mocks()});
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    let updated_course = deep_copy(course, Course);
+    updated_course.name = 'A very new name';
+
+    Course.notify_course_changed(updated_course);
+
+    expect(wrapper.vm.d_course).toBe(course);
+    expect(wrapper.vm.d_course).toEqual(updated_course);
+
+    let other_course = data_ut.make_course();
+    Course.notify_course_changed(other_course);
+
+    expect(wrapper.vm.d_course).toEqual(updated_course);
 });

@@ -21,14 +21,12 @@ beforeAll(() => {
 });
 
 let course = data_ut.make_course();
-let current_user = data_ut.make_user();
 
 beforeEach(() => {
     sinon.stub(Course, 'get_by_pk').returns(Promise.resolve(course));
     sinon.stub(User, 'get_current_user_roles').returns(
         Promise.resolve(data_ut.make_user_roles()));
 
-    data_ut.set_global_current_user(current_user);
     data_ut.set_global_current_course(course);
 });
 
@@ -105,7 +103,7 @@ describe('Changing tabs in project admin', () => {
             await wait_until(wrapper, w => w.find({name: 'HandgradingSettings'}).exists())
         ).toBe(true);
         expect(wrapper.find({name: 'HandgradingSettings'}).isVisible()).toBe(true);
-        expect(wrapper.vm.d_current_tab).toEqual('handgrading');
+        expect(wrapper.vm.current_tab).toEqual('handgrading');
         expect(wrapper.find({name: 'HandgradingSettings'}).vm.$props.project).toEqual(project);
     });
 
@@ -121,7 +119,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.find({name: 'InstructorFiles'}).exists())
         ).toBe(true);
-        expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
+        expect(wrapper.vm.current_tab).toEqual('instructor_files');
         expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(true);
         expect(wrapper.find({name: 'ProjectSettings'}).isVisible()).toBe(false);
         expect(router_replace.calledOnce).toBe(true);
@@ -130,7 +128,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).isVisible())
         ).toBe(true);
-        expect(wrapper.vm.d_current_tab).toEqual('settings');
+        expect(wrapper.vm.current_tab).toEqual('settings');
         expect(router_replace.secondCall.calledWith(
             {query: {current_tab: 'settings'}})
         ).toBe(true);
@@ -145,7 +143,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_current_tab).toEqual('instructor_files');
+        expect(wrapper.vm.current_tab).toEqual('instructor_files');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'instructor_files'}})
         ).toBe(true);
@@ -160,7 +158,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.find({name: 'ExpectedStudentFiles'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_current_tab).toEqual('expected_student_files');
+        expect(wrapper.vm.current_tab).toEqual('expected_student_files');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'expected_student_files'}})
         ).toBe(true);
@@ -175,7 +173,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.find({name: 'AGSuites'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_current_tab).toEqual('test_cases');
+        expect(wrapper.vm.current_tab).toEqual('test_cases');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'test_cases'}})
         ).toBe(true);
@@ -190,7 +188,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.find({name: 'MutationSuites'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_current_tab).toEqual('mutation_testing');
+        expect(wrapper.vm.current_tab).toEqual('mutation_testing');
         expect(router_replace.firstCall.calledWith(
         {query: {current_tab: 'mutation_testing'}})
         ).toBe(true);
@@ -205,7 +203,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.find({name: 'EditGroups'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_current_tab).toEqual('edit_groups');
+        expect(wrapper.vm.current_tab).toEqual('edit_groups');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'edit_groups'}})
         ).toBe(true);
@@ -217,7 +215,7 @@ describe('Changing tabs in project admin', () => {
         tabs.at(6).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_current_tab).toEqual('download_grades');
+        expect(wrapper.vm.current_tab).toEqual('download_grades');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'download_grades'}})
         ).toBe(true);
@@ -228,7 +226,7 @@ describe('Changing tabs in project admin', () => {
         tabs.at(7).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_current_tab).toEqual('rerun_tests');
+        expect(wrapper.vm.current_tab).toEqual('rerun_tests');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'rerun_tests'}})
         ).toBe(true);
@@ -242,7 +240,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.find({name: 'HandgradingSettings'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_current_tab).toEqual('handgrading');
+        expect(wrapper.vm.current_tab).toEqual('handgrading');
         expect(router_replace.firstCall.calledWith(
         {query: {current_tab: 'handgrading'}})
         ).toBe(true);
