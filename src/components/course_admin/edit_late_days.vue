@@ -125,6 +125,7 @@ export default class EditLateDays extends Vue {
     }
     catch (e) {
       if (!(e instanceof HttpError) || e.status !== 404) {
+        // istanbul ignore next
         throw e;
       }
       this.d_show_not_found_message = true;

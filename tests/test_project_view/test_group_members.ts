@@ -35,7 +35,7 @@ test('Member names shown', async () => {
 
 });
 
-test('Late days shown', async () => {
+test('Late days shown and updated on group change', async () => {
     let get_late_days_stub = sinon.stub(ag_cli.User, 'get_num_late_days');
     get_late_days_stub.withArgs(
         course.pk, group.member_names[0]
@@ -59,9 +59,21 @@ test('Late days shown', async () => {
     expect(wrapper.findAll('.header-cell').length).toEqual(2);
 
     let totals = wrapper.findAll({ref: 'late_days'});
+    expect(totals.length).toEqual(3);
     expect(totals.at(0).text()).toEqual('1');
     expect(totals.at(1).text()).toEqual('0');
     expect(totals.at(2).text()).toEqual('3');
+
+    let new_group = data_ut.make_group(project.pk);
+    get_late_days_stub.withArgs(
+        course.pk, new_group.member_names[0]
+    ).resolves({late_days_remaining: 10});
+
+    wrapper.setProps({group: new_group});
+    await wrapper.vm.$nextTick();
+    totals = wrapper.findAll({ref: 'late_days'});
+    expect(totals.at(0).text()).toEqual('10');
+    expect(totals.length).toEqual(1);
 });
 
 test('Course has no late days, late days not shown', async () => {

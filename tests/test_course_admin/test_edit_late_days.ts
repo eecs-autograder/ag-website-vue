@@ -82,6 +82,15 @@ test('Search for student', async () => {
     expect(get_validated_input_text(wrapper.find({ref: 'late_days_input'}))).toEqual('2');
 });
 
+test('Search for empty string does nothing', async () => {
+    let stub = sinon.stub(ag_cli.User, 'get_num_late_days');
+    wrapper.find({ref: 'search_button'}).trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+
+    expect(stub.callCount).toEqual(0);
+});
+
 test('404 handled on search', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, 'steve').rejects(new ag_cli.HttpError(404, ''));
