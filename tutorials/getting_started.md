@@ -133,7 +133,9 @@ The most important settings for a suite are:
 1. __Instructor Files and Student Files__: Specifies which files should be added to the grading environment. All files are added to the working directory of the environment. Instructor files are added after student files, therefore overwriting any student files with the same name.
 1. __Setup command__: This command will be run once at the beginning of the suite. If your tests require an executable to be compiled, an archive extracted, or some other setup action, it should be part of this command.
 
-__Note__: Commands can be any valid Bash command.
+__Note__: Commands can be (almost) any valid Bash command.
+
+__CAVEAT__: The executable bit on instructor files is not preserved when they are copied into the grading environment. As such, running a script using `./script.bash` __will not work__. Instead, __invoke the interpreter directly__, as in: `bash script.bash` or `python3 script.py`. You will also find that trying to change the permissions with `chmod` will fail, as instructor files are marked as read-only and owned by root to prevent student code from modifying them.
 
 #### Feedback Settings
 Feedback is highly customizable. In addition to controlling whether students are shown information such as score and the return code and output of commands, you can also configure separate feedback settings depending on what kind of user is looking at what kind of submission. For example:
