@@ -9,7 +9,7 @@
     </div>
     <div v-else id="all-semesters">
       <div v-for="current_term of courses_by_term"
-          class="single-semester-container">
+           class="single-semester-container">
         <div class="semester-name">
           {{current_term.term.semester}} {{current_term.term.year}}
         </div>
@@ -101,7 +101,8 @@ export default class CourseList extends Vue implements CourseObserver {
           this.courses_by_term, current_term,
           (item: TermCourses, term: Term) => terms_equal(item.term, term)
         );
-        term_courses.course_list.push(course);
+        array_add_unique(
+          term_courses.course_list, course, (first, second) => first.pk === second.pk);
       }
       else {
         array_add_unique(
