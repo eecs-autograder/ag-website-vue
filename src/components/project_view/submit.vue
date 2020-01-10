@@ -54,7 +54,7 @@
         <span class="allotment">
           {{late_days_remaining}}
         </span>
-        late day<template v-if="late_days_remaining !== 1">s</template> remaining.
+        late day token<template v-if="late_days_remaining !== 1">s</template> remaining.
       </div>
     </div>
 

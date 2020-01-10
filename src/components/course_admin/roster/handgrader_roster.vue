@@ -29,7 +29,7 @@ import { handle_api_errors_async, handle_global_errors_async, make_error_handler
     Roster
   }
 })
-export default class StudentRoster extends Vue {
+export default class HandgraderRoster extends Vue {
   @Prop({required: true, type: Course})
   course!: Course;
 

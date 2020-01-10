@@ -8,7 +8,27 @@
                   :initialize_from_url="true"
                   @update_group_selected="d_selected_group = $event"></group-lookup>
     <template v-if="d_selected_group !== null">
-      <group-members class="group-members" :group="d_selected_group"></group-members>
+      <group-members
+        class="group-members"
+        :group="d_selected_group"
+        :include_late_day_totals="true">
+      </group-members>
+
+      <div class="extra-info" v-if="d_selected_group !== null">
+        <div class="extension-text" v-if="d_selected_group.extended_due_date !== null">
+          Extension:
+          <span class="extension">{{format_datetime(d_selected_group.extended_due_date)}}</span>
+        </div>
+        <div class="bonus-submissions-wrapper"
+            v-if="project.num_bonus_submissions !== 0
+                  || d_selected_group.bonus_submissions_remaining !== 0">
+          <span class="num-bonus-submissions">
+            {{d_selected_group.bonus_submissions_remaining}}
+          </span>
+          bonus submission(s) remaining.
+        </div>
+      </div>
+
       <submission-list class="student-lookup-submission-list"
                        :course="course"
                        :project="project"
@@ -28,7 +48,7 @@ import GroupMembers from '@/components/project_view/group_members.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { Created, Destroyed } from '@/lifecycle';
-import { safe_assign } from '@/utils';
+import { format_datetime, safe_assign } from '@/utils';
 
 
 @Component({
@@ -50,6 +70,8 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
   d_selected_group: Group | null = null;
 
   d_loading = true;
+
+  readonly format_datetime = format_datetime;
 
   @handle_global_errors_async
   async created() {
@@ -90,6 +112,28 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 
 .group-members {
   margin: .5rem;
+}
+
+.extra-info {
+  margin: .625rem;
+}
+
+.extension {
+  color: $ocean-blue;
+}
+
+.extension-text {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.bonus-submissions-wrapper {
+  margin: .25rem 0;
+}
+
+.num-bonus-submissions {
+  color: darken($green, 5%);
+  font-weight: bold;
 }
 
 .student-lookup-submission-list {
