@@ -340,4 +340,28 @@ describe('Course_List.vue', () => {
         expect(fall_18_term.course_list[1]).toEqual(fall18_eecs370);
         expect(fall_18_term.course_list[2]).toEqual(fall18_eecs441);
     });
+
+    test('Course user is multiple roles for only displays once', async () => {
+        all_courses = {
+            courses_is_admin_for: [],
+            courses_is_staff_for: [fall18_eecs280],
+            courses_is_student_in: [fall18_eecs280],
+            courses_is_handgrader_for: []
+        };
+
+        sinon.stub(Course, 'get_courses_for_user').returns(Promise.resolve(all_courses));
+
+        wrapper = managed_mount(CourseList, {
+            stubs: ['router-link', 'router-view']
+        });
+        component = wrapper.vm;
+        await component.$nextTick();
+        await component.$nextTick();
+
+        expect(wrapper.findAll('.course').length).toEqual(1);
+
+        let course_displayed = wrapper.find('.course');
+        expect(course_displayed.html()).toContain(fall18_eecs280.name);
+        expect(course_displayed.html()).toContain(fall18_eecs280.subtitle);
+    });
 });
