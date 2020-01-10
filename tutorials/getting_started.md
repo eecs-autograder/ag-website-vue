@@ -124,6 +124,10 @@ Click on the "__Test Cases__" tab to start editing test cases. The 3 abstraction
 ### 1. Suites
 A suite is a collection of test cases to be run sequentially in an isolated environment (a new environment is created per suite per submission). Suite settings are largely concerned with setting up the grading environment for the test cases.
 
+Click the "Add Suite" to create a new test suite.
+
+![alt text](./pics/new_test_suite.png)
+
 The most important settings for a suite are:
 1. __Sandbox environment__: Specifies which environment (Docker image) the suite should be run in.
 1. __Instructor Files and Student Files__: Specifies which files should be added to the grading environment. All files are added to the working directory of the environment. Instructor files are added after student files, therefore overwriting any student files with the same name.
@@ -141,11 +145,19 @@ Feedback is highly customizable. In addition to controlling whether students are
 If you uncheck the "Suite must finish before students can submit again" box, then the suite will be considered "deferred." Deferred suites run in a separate queue and therefore may take longer to be graded. However, students don't have to wait for these suites to finish before they are allowed to submit again. This option is useful for suites of hidden test cases that students don't see until after the deadline.
 
 ### 2. Test Cases
+In the "Suites" sidebar, hover over the name of the suite you want to add a test to and click the plus icon.
+
+![alt text](./pics/new_test_case.png)
+
 A collection of one or more commands. When a test case has only one command, the editing interface will merge this layer with the "command" layer. Although test cases do offer some of their own feedback settings, these are rarely used.
 
 The score for a test case __cannot go below zero__.
 
 ### 3. Commands
+New test cases automatically and transparently contain one command.
+
+![alt text](./pics/selected_test.png)
+
 Commands hold the details for how a test case should be run. For example:
 - The actual Bash command to be run.
 - Whether to pipe some text or a file to stdin of the command.
