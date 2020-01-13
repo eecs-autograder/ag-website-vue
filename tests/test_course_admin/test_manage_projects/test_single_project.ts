@@ -8,7 +8,7 @@ import SingleProject from '@/components/course_admin/manage_projects/single_proj
 import ValidatedInput from '@/components/validated_input.vue';
 
 import { set_global_current_user } from '@/tests/data_utils';
-import { set_select_object_value, set_validated_input_text } from '@/tests/utils';
+import { set_select_object_value, set_validated_input_text, wait_until } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -335,6 +335,8 @@ describe('SingleProject.vue', () => {
             )
         ));
         wrapper.find('.clone-project-button').trigger('click');
+        await single_project.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_cloning)).toBe(true);
         await single_project.$nextTick();
 
         expect(wrapper.find({ref: 'clone_project_modal'}).exists()).toBe(true);

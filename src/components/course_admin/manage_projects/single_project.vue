@@ -6,7 +6,7 @@
       </router-link>
 
       <div class="toolbox">
-        <div class="copy-project tool-icon" @click="clone_project">
+        <div class="copy-project tool-icon" @click="start_clone_dialog">
           <i class="fas fa-copy"></i>
         </div>
 
@@ -20,7 +20,8 @@
            @close="d_show_clone_project_modal = false"
            ref="clone_project_modal"
            size="large"
-           click_outside_to_close>
+           :click_outside_to_close="!d_cloning"
+           :include_closing_x="!d_cloning">
       <div class="modal-header">
         Clone <span class="project-to-clone">"{{project.name}}"</span>
       </div>
@@ -51,9 +52,12 @@
         <APIErrors ref="api_errors"></APIErrors>
 
         <div class="button-footer modal-button-footer">
-          <button @click="add_cloned_project"
+          <button @click="clone_project"
                   class="clone-project-button"
-                  :disabled="!cloned_project_name_is_valid">Clone Project</button>
+                  :disabled="!cloned_project_name_is_valid || d_cloning">Clone Project</button>
+          <div class="loading-vertically-centered" v-if="d_cloning">
+            <i class="fa fa-spinner fa-pulse"></i>
+          </div>
         </div>
       </div>
     </modal>
@@ -73,7 +77,7 @@ import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_global_errors_async } from '@/error_handling';
-import { format_course_name, handle_api_errors_async } from '@/utils';
+import { format_course_name, handle_api_errors_async, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -105,6 +109,7 @@ export default class SingleProject extends Vue {
   cloned_project_name: string = "";
   cloned_project_name_is_valid = false;
   d_show_clone_project_modal = false;
+  d_cloning = false;
   course_index: number = 0;
 
   @handle_global_errors_async
@@ -115,19 +120,21 @@ export default class SingleProject extends Vue {
       course => course.pk === this.course.pk);
   }
 
-  async clone_project() {
+  async start_clone_dialog() {
     this.cloned_project_name = "";
     this.course_to_clone_to = this.course;
     this.d_show_clone_project_modal = true;
   }
 
   @handle_api_errors_async(handle_add_cloned_project_error)
-  async add_cloned_project() {
-    let new_project = await this.project.copy_to_course(
-      this.course_to_clone_to!.pk, this.cloned_project_name
-    );
-    (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
-    this.d_show_clone_project_modal = false;
+  clone_project() {
+    return toggle(this, 'd_cloning', async () => {
+      let new_project = await this.project.copy_to_course(
+        this.course_to_clone_to!.pk, this.cloned_project_name
+      );
+      (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
+      this.d_show_clone_project_modal = false;
+    });
   }
 }
 
@@ -142,6 +149,7 @@ export function handle_add_cloned_project_error(component: SingleProject, error:
 @import '@/styles/components/entity_with_toolbox.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/modal.scss';
 
 * {
