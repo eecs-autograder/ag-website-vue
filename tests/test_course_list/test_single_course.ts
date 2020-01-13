@@ -439,5 +439,5 @@ describe('SingleCourse.vue', () => {
         expect(component.new_course_name).toEqual("New Course");
         expect(component.new_course_semester).toEqual(course_1.semester);
         expect(component.new_course_year).toEqual(course_1.year);
-     });
+    });
 });

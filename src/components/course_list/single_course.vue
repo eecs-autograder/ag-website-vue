@@ -26,7 +26,8 @@
     <modal v-if="d_show_clone_course_modal"
            @close="d_show_clone_course_modal = false"
            ref="clone_course_modal"
-           click_outside_to_close
+           :include_closing_x="!d_cloning"
+           :click_outside_to_close="!d_cloning"
            size="large">
       <div class="modal-header">
         Clone <span class="course-to-copy">"{{format_course_name(course)}}"</span>
@@ -70,9 +71,12 @@
         <div class="button-footer modal-button-footer">
           <button type="submit"
                   class="create-clone-button"
-                  :disabled="!clone_course_form_is_valid || clone_course_pending">
+                  :disabled="!clone_course_form_is_valid || d_cloning">
             Clone Course
           </button>
+          <div class="loading-vertically-centered" v-if="d_cloning">
+            <i class="fa fa-spinner fa-pulse"></i>
+          </div>
         </div>
       </ValidatedForm>
     </modal>
@@ -114,7 +118,7 @@ export default class SingleCourse extends Vue {
   semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
   clone_course_form_is_valid = false;
 
-  clone_course_pending = false;
+  d_cloning = false;
   d_show_clone_course_modal = false;
 
   readonly is_not_empty = is_not_empty;
@@ -134,14 +138,14 @@ export default class SingleCourse extends Vue {
   @handle_api_errors_async(handle_add_copied_course_error)
   async make_copy_of_course() {
     try {
-      this.clone_course_pending = true;
+      this.d_cloning = true;
       await this.course.copy(
         this.new_course_name, this.new_course_semester, this.new_course_year
       );
       this.d_show_clone_course_modal = false;
     }
     finally {
-      this.clone_course_pending = false;
+      this.d_cloning = false;
     }
   }
 }
@@ -157,6 +161,7 @@ function handle_add_copied_course_error(component: SingleCourse, error: unknown)
 @import '@/styles/components/entity_with_toolbox.scss';
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/loading.scss';
 @import '@/styles/modal.scss';
 
 * {
