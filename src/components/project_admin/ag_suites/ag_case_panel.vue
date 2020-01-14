@@ -85,7 +85,6 @@
           <label class="label"> Command name </label>
           <validated-input ref="new_ag_test_command_name"
                            v-model="d_new_command_name"
-                           :show_warnings_on_blur="true"
                            :validators="[is_not_empty]">
           </validated-input>
         </div>
@@ -93,7 +92,6 @@
           <label class="label">Command</label>
           <validated-input ref="new_ag_test_command"
                            v-model="d_new_command"
-                           :show_warnings_on_blur="true"
                            :validators="[is_not_empty]">
           </validated-input>
         </div>
@@ -125,7 +123,6 @@
           <label class="label">Case Name</label>
           <validated-input ref="ag_test_case_clone_name"
                            v-model="d_cloned_case_name"
-                           :show_warnings_on_blur="true"
                            :validators="[is_not_empty]">
           </validated-input>
         </div>
