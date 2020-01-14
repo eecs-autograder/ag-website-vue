@@ -5,28 +5,27 @@
       on <span id="submission-timestamp">{{format_datetime(submission.timestamp)}}</span>
     </div>
 
-    <div v-if="show_score"
-          id="submission-score"> Score:
+    <div v-if="show_score" id="submission-score">
+      Score:
       <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
     </div>
     <div v-else-if="submission.status === GradingStatus.waiting_for_deferred"
-          id="deferred-tests-message" class="grading-status">
+          id="deferred-tests-message" class="info-spacing grading-status">
       Score hidden. Core tests finished. You can submit again now!
     </div>
     <div v-else-if="submission.status === GradingStatus.finished_grading"
-          id="deferred-tests-message" class="grading-status">
+          id="deferred-tests-message" class="info-spacing grading-status">
       Score hidden. All tests finished.
     </div>
 
-    <div v-if="show_auto_update_msg"
-          id="auto-update-message">
+    <div v-if="show_auto_update_msg" id="auto-update-message" class="info-spacing">
       This page will update automatically.
     </div>
 
     <div v-if="submission.status !== GradingStatus.waiting_for_deferred
                 && submission.status !== GradingStatus.finished_grading"
           id="grading-status-section"
-          class="grading-status">
+          class="grading-status info-spacing">
       <div v-if="submission.status === GradingStatus.received">
         We got your submission! It should be queued soon.
       </div>
@@ -53,31 +52,40 @@
       </div>
     </div>
 
+    <div class="info-spacing">
+      <button v-if="is_group_member
+                    && (submission_with_results.status === GradingStatus.received
+                        || submission_with_results.status === GradingStatus.queued)"
+              id="remove-submission-from-queue-button"
+              class="red-button"
+              @click="d_show_remove_submission_from_queue_modal = true">
+        Remove from Queue
+      </button>
+    </div>
+
     <div v-if="submission.is_bonus_submission"
           id="is-bonus-submission-message"
-          class="additional-submission-info">
+          class="info-spacing">
       <i class="fas fa-star bonus-icon"></i>
       This submission used one of your bonus submissions.
     </div>
 
     <div v-if="does_not_count_for_current_user"
          id="does-not-count-for-user-message"
-         class="additional-submission-info">
+         class="info-spacing">
       <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
-      Since you ran out of late days, this submission will
-      <span class="does-not-count">NOT</span> count towards your final grade.
+      Since you ran out of late day tokens, this submission will
+      <b>NOT</b> count towards your final grade.
     </div>
     <div v-else-if="submission_with_results.does_not_count_for.length"
-         class="additional-submission-info">
+         class="info-spacing">
       <div id="does-not-count-for-label">
         This submission does <span class="does-not-count">NOT</span> count
         for the following users:
       </div>
       <div id="does-not-count-for-list">
         <div v-for="(username, index) of submission.does_not_count_for"
-              :class="['single-user-submission-does-not-count-for',
-                      {'last-username-in-list':
-                        index === submission.does_not_count_for.length - 1}]">
+             class="does-not-count-for-list-item">
           <span class="list-icon">
             <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
           </span>
@@ -100,14 +108,6 @@
 
     <progress-overlay v-if="d_downloading_file" :progress="d_download_progress"></progress-overlay>
 
-    <button v-if="is_group_member
-                  && (submission_with_results.status === GradingStatus.received
-                      || submission_with_results.status === GradingStatus.queued)"
-            id="remove-submission-from-queue-button"
-            @click="d_show_remove_submission_from_queue_modal = true">
-      Remove from queue
-    </button>
-
     <div id="view-file-container" v-if="current_filename !== null">
       <view-file :filename="current_filename"
                   :file_contents="current_file_contents"
@@ -115,9 +115,18 @@
                   view_file_max_height="50vh"></view-file>
     </div>
 
+    <div class="discarded-files" v-if="submission.discarded_files.length !== 0">
+      <i class="fas fa-exclamation-triangle"></i>
+      The following unexpected files were <b>discarded</b>:
+      <div v-for="filename of submission.discarded_files" class="discarded-file">
+        <i class="far fa-trash-alt"></i>
+        {{filename}}
+      </div>
+    </div>
+
     <div v-if="d_globals.user_roles.is_staff
                 && submission_with_results.status !== GradingStatus.removed_from_queue"
-          id="adjust-feedback-section">
+          id="adjust-feedback-section" class="info-spacing">
       <span id="adjust-feedback-label"> Adjust Feedback </span>
       <select id="adjust-feedback-select"
               class="select"
@@ -173,7 +182,6 @@
            size="large"
            click_outside_to_close>
       <div class="modal-header">Confirm: Remove Submission from Queue</div>
-      <div class="modal-divider"></div>
       <div class="modal-body">
         <div>Are you sure you want to remove this submission from the grading queue?
           <ul>
@@ -188,17 +196,17 @@
 
       <APIErrors ref="api_errors"></APIErrors>
 
-      <div class="modal-button-container">
-        <button id="cancel-remove-submission-from-queue-button"
-                class="modal-cancel-button white-button"
-                @click="d_show_remove_submission_from_queue_modal = false">
-          Cancel
-        </button>
+      <div class="modal-button-footer">
         <button id="confirm-remove-submission-from-queue-button"
                 class="red-button"
                 :disabled="d_removing_from_queue"
                 @click="remove_submission_from_queue">
-          Remove
+          Remove from Queue
+        </button>
+        <button id="cancel-remove-submission-from-queue-button"
+                class="white-button"
+                @click="d_show_remove_submission_from_queue_modal = false">
+          Cancel
         </button>
       </div>
     </modal>
@@ -392,23 +400,19 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/components/submission_detail.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
 }
 
 #submission-detail {
-  padding: 0 15px 30px 15px;
-}
-
-#submission-detail-overview {
-  padding: 0 0 0 1px;
+  margin: .875rem;
 }
 
 #submitted-by {
-  font-size: 19px;
-  padding: 10px 0 5px 0;
+  font-size: 1.125rem;
+  margin-bottom: .375rem;
 }
 
 #submitter {
@@ -419,185 +423,107 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   color: $green;
 }
 
-#auto-update-message {
-  padding: 5px 0;
-}
-
-#grading-status-section {
-  padding: 5px 0 5px 0;
-}
-
-#grading-status-label {
-  font-size: 18px;
-  padding: 0 0 5px 0;
-}
-
-#grading-status-label span {
-  padding-left: 3px;
+#submission-score {
+  font-size: 1.25rem;
+  margin: .625rem 0;
 }
 
 .grading-status {
   color: darken($stormy-gray-dark, 15);
+
+  .queued-symbol {
+    font-weight: bold;
+    color: darken($sky-blue, 10%);
+  }
+
+  .being-graded-symbol {
+    color: $ocean-blue;
+  }
+
+  .finished-grading-symbol {
+    color: green;
+  }
+
+  .removed-symbol {
+    color: $orange;
+  }
+
+  .error-symbol {
+    color: crimson;
+  }
 }
 
-.queued-symbol {
-  font-weight: bold;
-  color: darken($sky-blue, 10%);
+.bonus-icon {
+  color: darken($light-blue, 10);
+  padding-right: .375rem;
 }
 
-.being-graded-symbol {
-  color: $ocean-blue;
+.submission-does-not-count-icon {
+  color: $coral-pink;
+  padding-right: .375rem;
 }
 
-.finished-grading-symbol {
-  color: green;
-}
-
-.removed-symbol {
-  color: $orange;
-}
-
-.error-symbol {
-  color: crimson;
-}
-
-#submission-score {
-  font-size: 19px;
-  padding: 5px 0 5px 0;
+.does-not-count-for-list-item {
+  margin: .25rem 0;
+  padding-left: 1rem;
 }
 
 .submitted-files {
-  padding: 5px 0;
-}
+  margin: 1rem 0 .375rem;
 
-.submitted-file {
-  padding: 4px 0;
-  color: $ocean-blue;
-}
+  .submitted-file {
+    margin: .25rem 0;
+    color: $ocean-blue;
+  }
 
-.open-file-link {
-  cursor: pointer;
-}
+  .open-file-link {
+    cursor: pointer;
+  }
 
-.current-file {
-  color: black;
-  cursor: default;
-}
+  .current-file {
+    color: black;
+    cursor: default;
+  }
 
-.download-file-icon {
-  padding: 0 10px;
-  cursor: pointer;
+  .download-file-icon {
+    padding-left: .625rem;
+    cursor: pointer;
+  }
 }
 
 #view-file-container {
-  margin-bottom: 2px;
+  margin-bottom: .625rem;
   border: 1px solid $pebble-medium;
 }
 
-#adjust-feedback-section {
-  padding: 5px 0 5px 0;
+.discarded-files {
+  margin: .625rem 0;
+  font-size: 1rem;
+
+  .discarded-file {
+    margin: .25rem 0;
+    padding-left: 1rem;
+  }
+
+  .fa-exclamation-triangle {
+    color: darken($light-yellow, 25%);
+  }
+
+  .fa-trash-alt {
+    color: $cherry;
+  }
 }
 
 #adjust-feedback-label {
-  padding: 0 2px 0 0;
+  padding-right: .125rem;
 }
 
 #adjust-feedback-select:disabled:hover {
   cursor: wait;
 }
 
-#remove-submission-from-queue-button {
-  @extend .red-button;
-  margin: 5px 0 10px 0;
-}
-
-.modal-cancel-button {
-  margin-right: 10px;
-}
-
-.modal-header {
-  font-size: 20px;
-  padding: 10px 0 5px 0;
-}
-
-.modal-divider {
-  background-color: darken($white-gray, 3);
-  height: 2px;
-  margin: 9px 0;
-}
-
-.modal-message {
-  line-height: 22px;
-  padding: 5px 0;
-}
-
-.modal-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  padding: 10px 0 0 0;
-}
-
-.bonus-icon {
-  color: darken($light-blue, 10);
-  padding-right: 5px;
-  width: 23px;
-}
-
-.submission-does-not-count-icon {
-  color: $coral-pink;
-  padding-right: 5px;
-  width: 23px;
-}
-
-.additional-submission-info {
-  padding: 5px 0;
-}
-
-#deferred-tests-message {
-  padding: 5px 0;
-}
-
-.list-icon {
-  padding-right: 5px;
-}
-
-.single-user-submission-does-not-count-for {
-  padding: 0 0 8px 20px;
-  display: flex;
-  flex-direction: row;
-}
-
-#does-not-count-for-label {
-  padding: 0 0 5px 0;
-}
-
-#does-not-count-for-list {
-  padding: 4px 0 0 0;
-  display: inline-block;
-  vertical-align: top;
-}
-
-#list-submission-does-not-count-for {
-  margin: 0;
-
-  li {
-    padding: 5px 0;
-  }
-}
-
-.does-not-count {
-  font-weight: bold;
-}
-
-.last-username-in-list {
-  padding-bottom: 0;
-}
-
-.modal-body {
-  li {
-    padding-bottom: 5px;
-  }
+.info-spacing {
+  margin: .625rem 0;
 }
 
 </style>

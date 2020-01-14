@@ -78,7 +78,8 @@ describe('SubmissionDetail tests', () => {
         submission_with_results.does_not_count_for = [user.username];
         let wrapper = make_wrapper();
         expect(wrapper.find('#does-not-count-for-user-message').exists()).toBe(true);
-        expect(wrapper.find('#does-not-count-for-user-message').text()).toContain('late days');
+        expect(wrapper.find('#does-not-count-for-user-message').text()).toContain(
+            'late day tokens');
     });
 
     test('Submission does not count for other member of group', () => {
@@ -299,6 +300,31 @@ describe('Submitted files tests', () => {
         submitted_files.at(1).find('.open-file-link').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
+    });
+});
+
+describe('Discarded files tests', () => {
+    test('No discarded files', () => {
+        let wrapper = make_wrapper();
+        expect(wrapper.find('.discarded-files').exists()).toBe(false);
+        expect(wrapper.find('.discarded-file').exists()).toBe(false);
+    });
+
+    test('Discarded files listed', () => {
+        let discarded_filenames = [
+            'file1',
+            'file2',
+        ];
+        submission_with_results.discarded_files = discarded_filenames;
+
+        let wrapper = make_wrapper();
+        expect(wrapper.find('.discarded-files').exists()).toBe(true);
+
+        let discarded = wrapper.findAll('.discarded-file');
+        expect(discarded.length).toEqual(discarded_filenames.length);
+
+        expect(compress_whitespace(discarded.at(0).text())).toEqual(discarded_filenames[0]);
+        expect(compress_whitespace(discarded.at(1).text())).toEqual(discarded_filenames[1]);
     });
 });
 
