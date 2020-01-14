@@ -47,8 +47,7 @@
           <label class="label"> Test name </label>
           <validated-input ref="new_case_name"
                            v-model="d_new_case_name"
-                           :validators="[is_not_empty]"
-                           :show_warnings_on_blur="true">
+                           :validators="[is_not_empty]">
           </validated-input>
         </div>
 
@@ -61,7 +60,6 @@
             <validated-input ref="command_name"
                              v-model="new_command.name"
                              :validators="[is_not_empty]"
-                             :show_warnings_on_blur="true"
                              input_style="width: 100%;
                                           min-width: 200px;
                                           max-width: 700px;">
@@ -85,7 +83,6 @@
             <validated-input ref="command"
                               v-model="new_command.cmd"
                               :validators="[is_not_empty]"
-                              :show_warnings_on_blur="true"
                               input_style="width: 100%;
                                            min-width: 200px;
                                            max-width: 700px;">
