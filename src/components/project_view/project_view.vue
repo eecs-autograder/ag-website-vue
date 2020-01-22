@@ -35,7 +35,7 @@
            v-if="handgrading_rubric !== null">
         Handgrading
         <template v-if="d_globals.user_roles.is_admin">
-          <router-link :to="`/web/project_admin/${project.pk}?current_tab=configure_handgrading`">
+          <router-link :to="`/web/project_admin/${project.pk}?current_tab=handgrading`">
             <i id="edit-handgrading-link" class="fas fa-cog cog"></i>
           </router-link>
         </template>
