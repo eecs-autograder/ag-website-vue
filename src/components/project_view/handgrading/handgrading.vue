@@ -297,7 +297,11 @@ import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async, make_error_handler_func, handle_api_errors_async } from '@/error_handling';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func,
+} from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { assert_not_null, deep_copy, toggle } from '@/utils';
 import {

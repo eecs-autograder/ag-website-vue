@@ -93,7 +93,7 @@ test('Reset handgrading result', async () => {
     expect(await wait_until(wrapper, w => !w.vm.d_resetting)).toBe(true);
 
     expect(wrapper.find({ref: 'reset_handgrading_modal'}).exists()).toBe(false);
-    expect(wrapper.vm.d_handgrading_result.pk).toEqual(new_result.pk);
+    expect(wrapper.vm.d_handgrading_result!.pk).toEqual(new_result.pk);
 });
 
 test('Has correct submission, no warning', async () => {
