@@ -18,19 +18,28 @@ import {
     wait_until,
 } from '@/tests/utils';
 
+let project: ag_cli.Project;
+let rubric: ag_cli.HandgradingRubric;
 let result: ag_cli.HandgradingResult;
 let submission: ag_cli.Submission;
 
+let has_correct_submission_stub: sinon.SinonStub;
+
 beforeEach(() => {
-    let project = data_ut.make_project(data_ut.make_course().pk);
+    project = data_ut.make_project(data_ut.make_course().pk);
+    data_ut.set_global_current_project(project);
     let group = data_ut.make_group(project.pk);
     submission = data_ut.make_submission(
         group, {submitted_filenames: ['file1.txt', 'file2.cpp', 'file3.py']});
+    rubric = data_ut.make_handgrading_rubric(project.pk);
     result = data_ut.make_handgrading_result(
-        data_ut.make_handgrading_rubric(project.pk), group.pk, submission.pk,
+        rubric, group.pk, submission.pk,
         {submitted_filenames: submission.submitted_filenames});
 
     data_ut.set_global_user_roles(data_ut.make_user_roles({is_staff: true}));
+
+    has_correct_submission_stub = sinon.stub(
+        ag_cli.HandgradingResult.prototype, 'has_correct_submission').resolves(true);
 });
 
 test('Result input is deep copied', async () => {
@@ -58,6 +67,84 @@ test('Result changed, new result deep copied', async () => {
 
     expect(wrapper.vm.d_handgrading_result).toEqual(new_result);
     expect(wrapper.vm.d_handgrading_result).not.toBe(new_result);
+});
+
+test('Reset handgrading result', async () => {
+    let new_result = data_ut.make_handgrading_result(rubric, result.group, submission.pk);
+    sinon.stub(ag_cli.HandgradingResult, 'reset').withArgs(result.group).resolves(new_result);
+
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: true,
+        }
+    });
+    expect(wrapper.find('.danger-zone-container').exists()).toBe(false);
+    expect(wrapper.find({ref: 'show_reset_handgrading_modal_button'}).exists()).toBe(false);
+
+    wrapper.setProps({readonly_handgrading_results: false});
+    await wrapper.vm.$nextTick();
+
+    wrapper.find({ref: 'show_reset_handgrading_modal_button'}).trigger('click');
+    await wrapper.vm.$nextTick();
+
+    wrapper.find({ref: 'reset_handgrading_button'}).trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(await wait_until(wrapper, w => !w.vm.d_resetting)).toBe(true);
+
+    expect(wrapper.find({ref: 'reset_handgrading_modal'}).exists()).toBe(false);
+    expect(wrapper.vm.d_handgrading_result.pk).toEqual(new_result.pk);
+});
+
+test('Has correct submission, no warning', async () => {
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: true,
+        }
+    });
+    expect(await wait_until(wrapper, w => w.vm.d_has_correct_submission !== null));
+    expect(wrapper.find('.has-wrong-submission').exists()).toBe(false);
+});
+
+test('Has incorrect submission, edit mode warning', async () => {
+    has_correct_submission_stub.resolves(false);
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: false,
+        }
+    });
+    expect(await wait_until(wrapper, w => w.vm.d_has_correct_submission !== null));
+    expect(wrapper.find('.has-wrong-submission').text()).toContain(
+        'reset this handgrading result');
+
+    project.ultimate_submission_policy = ag_cli.UltimateSubmissionPolicy.best;
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.has-wrong-submission').text()).not.toContain(
+        'most recent');
+    expect(wrapper.find('.has-wrong-submission').text()).toContain(
+        'best');
+
+    project.ultimate_submission_policy = ag_cli.UltimateSubmissionPolicy.most_recent;
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.has-wrong-submission').text()).toContain(
+        'most recent');
+    expect(wrapper.find('.has-wrong-submission').text()).not.toContain(
+        'best');
+});
+
+test('Has incorrect submission, readonly mode warning', async () => {
+    has_correct_submission_stub.resolves(false);
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: true,
+        }
+    });
+    expect(await wait_until(wrapper, w => w.vm.d_has_correct_submission !== null));
+    expect(wrapper.find('.has-wrong-submission').text()).toContain(
+        'contact your course staff');
 });
 
 describe('Adjust points test', () => {
