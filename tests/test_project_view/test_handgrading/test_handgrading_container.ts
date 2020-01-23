@@ -74,6 +74,8 @@ beforeEach(() => {
         }
     );
     get_staff_stub.resolves(staff);
+
+    sinon.stub(ag_cli.HandgradingResult.prototype, 'has_correct_submission').resolves(true);
 });
 
 describe('Filter group summaries tests', () => {

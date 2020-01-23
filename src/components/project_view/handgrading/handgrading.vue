@@ -1,6 +1,21 @@
 <template>
   <div class="handgrading">
     <div class="files">
+      <div class="has-wrong-submission"
+           v-if="d_has_correct_submission !== null && !d_has_correct_submission">
+        <i class="fas fa-exclamation-triangle"></i> The submission being handgraded
+        is not the {{
+          d_globals.current_project.ultimate_submission_policy
+            === UltimateSubmissionPolicy.most_recent ? 'most recent' : 'best'
+        }}.
+        <template v-if="readonly_handgrading_results">
+          Please contact your course staff to resolve this.
+        </template>
+        <template v-else>
+          You may want to reset this handgrading result.
+        </template>
+      </div>
+
       <file-panel v-for="filename of d_handgrading_result.submitted_filenames"
                   :key="filename"
                   :handgrading_result="d_handgrading_result"
@@ -10,6 +25,46 @@
                     || d_handgrading_result.handgrading_rubric.handgraders_can_leave_comments"
                   :readonly_handgrading_results="readonly_handgrading_results">
       </file-panel>
+
+      <div v-if="!readonly_handgrading_results" class="danger-zone-container">
+        <div class="danger-text">Reset Handgrading Result</div>
+        <button type="button"
+                class="delete-button"
+                ref="show_reset_handgrading_modal_button"
+                @click="d_show_reset_handgrading_modal = true">
+          Reset
+        </button>
+      </div>
+
+      <modal v-if="d_show_reset_handgrading_modal"
+             @close="d_show_reset_handgrading_modal = false"
+             ref="reset_handgrading_modal"
+             size="large"
+             :click_outside_to_close="!d_resetting"
+             :include_closing_x="!d_resetting">
+        <div class="modal-header">
+          Reset Handgrading Result
+        </div>
+        Are you sure you want to reset handgrading for the current
+        group?
+
+        <div class="modal-button-footer">
+          <button type="button"
+                  class="red-button"
+                  ref="reset_handgrading_button"
+                  :disabled="d_resetting"
+                  @click="reset_handgrading">
+            Reset
+          </button>
+          <button type="button"
+                  class="white-button"
+                  :disabled="d_resetting"
+                  @click="d_show_reset_handgrading_modal = false">
+            Cancel
+          </button>
+          <APIErrors ref="reset_api_errors"></APIErrors>
+        </div>
+      </modal>
     </div>
     <div class="grading-sidebar">
       <div class="grading-sidebar-header">
@@ -235,11 +290,18 @@ import {
   CriterionResultObserver,
   HandgradingResult,
   Location,
+  UltimateSubmissionPolicy,
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
+import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func,
+} from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { assert_not_null, deep_copy, toggle } from '@/utils';
 import {
@@ -271,7 +333,9 @@ class ProcessingSemaphore {
 
 @Component({
   components: {
+    APIErrors,
     FilePanel,
+    Modal,
     ValidatedInput,
   }
 })
@@ -299,11 +363,15 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   is_last!: boolean;
 
   d_handgrading_result: HandgradingResult | null = null;
+  d_has_correct_submission: boolean | null = null;
 
   get saving() {
     return this.d_saving.processing;
   }
   d_saving = new ProcessingSemaphore();
+
+  d_show_reset_handgrading_modal = false;
+  d_resetting = false;
 
   d_criteria_collapsed = false;
   d_comments_collapsed = false;
@@ -317,10 +385,17 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   readonly is_integer = is_integer;
   readonly is_not_empty = is_not_empty;
 
+  readonly UltimateSubmissionPolicy = UltimateSubmissionPolicy;
+
   created() {
     this.d_handgrading_result = deep_copy(this.handgrading_result, HandgradingResult);
     AppliedAnnotation.subscribe(this);
     Comment.subscribe(this);
+  }
+
+  @handle_global_errors_async
+  async mounted() {
+    this.d_has_correct_submission = await this.d_handgrading_result!.has_correct_submission();
   }
 
   beforeDestroy() {
@@ -408,6 +483,15 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     });
   }
 
+  @handle_api_errors_async(make_error_handler_func('reset_api_errors'))
+  reset_handgrading() {
+    return toggle(this, 'd_resetting', async () => {
+        this.d_handgrading_result = await HandgradingResult.reset(this.d_handgrading_result!.group);
+        this.d_has_correct_submission = true;
+        this.d_show_reset_handgrading_modal = false;
+    });
+  }
+
   update_applied_annotation_created(applied_annotation: AppliedAnnotation): void {
     if (applied_annotation.handgrading_result === this.d_handgrading_result!.pk) {
       this.d_handgrading_result!.applied_annotations.push(applied_annotation);
@@ -473,6 +557,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/section_header.scss';
 
 * {
@@ -489,6 +574,13 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   flex-grow: 1;
 }
 
+.has-wrong-submission {
+  .fa-exclamation-triangle {
+    color: darken($light-yellow, 25%);
+  }
+
+  margin: .375rem;
+}
 
 .grading-sidebar {
   $sidebar-width: 275px;
@@ -709,6 +801,10 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
 .divider {
   border-top: 1px solid $gray-blue-1;
+}
+
+.danger-zone-container {
+  margin: 4rem .375rem .375rem;
 }
 
 </style>
