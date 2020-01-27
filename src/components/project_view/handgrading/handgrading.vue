@@ -88,7 +88,7 @@
                       id="save-adjust-points"
                       class="green-button"
                       :disabled="saving || !d_adjust_points_is_valid"
-                      @click="save_handgrading_result">Save</button>
+                      @click="save_points_adjustment">Save</button>
               </template>
           </validated-input>
         </div>
@@ -252,13 +252,13 @@
           id="finished-grading-container"
           class="checkbox-input-container footer-item"
           @click="d_handgrading_result.finished_grading = !d_handgrading_result.finished_grading;
-                  save_handgrading_result()"
+                  save_finished_grading()"
         >
           <input type="checkbox"
                  class="checkbox"
                  id="finished-grading"
                  :disabled="saving"
-                 @change="save_handgrading_result"
+                 @change="save_finished_grading"
                  v-model="d_handgrading_result.finished_grading"/>
           <label for="finished-grading">Done</label>
         </div>
@@ -459,9 +459,16 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 
   @handle_global_errors_async
-  save_handgrading_result() {
+  save_points_adjustment() {
     return this.d_saving.process(() => {
-      return this.d_handgrading_result!.save();
+      return this.d_handgrading_result!.save_points_adjustment();
+    });
+  }
+
+  @handle_global_errors_async
+  save_finished_grading() {
+    return this.d_saving.process(async () => {
+      return this.d_handgrading_result!.save_finished_grading();
     });
   }
 

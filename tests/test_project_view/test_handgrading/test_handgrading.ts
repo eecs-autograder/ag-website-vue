@@ -189,7 +189,7 @@ describe('Adjust points test', () => {
                 readonly_handgrading_results: false,
             }
         });
-        let save_stub = sinon.stub(wrapper.vm.d_handgrading_result!, 'save');
+        let save_stub = sinon.stub(wrapper.vm.d_handgrading_result!, 'save_points_adjustment');
         expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('0');
         expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(false);
 
@@ -705,7 +705,8 @@ describe('Footer tests', () => {
             }
         });
 
-        let save_result_stub = sinon.stub(wrapper.vm.d_handgrading_result!, 'save');
+        let save_result_stub = sinon.stub(
+            wrapper.vm.d_handgrading_result!, 'save_finished_grading');
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
 
         wrapper.find('#finished-grading').trigger('click');
