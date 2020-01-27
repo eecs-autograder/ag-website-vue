@@ -49,13 +49,10 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
     // this.data is initialized to the same array referenced by data.
     // If sort_initial is true, this.data will be sorted according to less_func
     constructor(data: ElementType[] = [],
-                // This syntax is gross but necessary for all these arguments to be optional
-                // with defaults (and also be able to pass no arguments).
-                // IMPORTANT: Change the defaults together!!!
                 {less_func = default_less_func, sort_initial = false}: {
                     less_func?: LessFuncType<SentinalType>,
                     sort_initial?: boolean
-                } = {less_func: default_less_func, sort_initial: false}) {
+                } = {}) {
         this.data = data;
         this._less_func = less_func;
 

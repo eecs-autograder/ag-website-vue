@@ -1,17 +1,88 @@
 import { config, Wrapper } from '@vue/test-utils';
 
-import { AllCourses, Course, Semester, User } from 'ag-client-typescript';
+import { AllCourses, Course, HttpError, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
+import APIErrors from '@/components/api_errors.vue';
 import CourseList from '@/components/course_list/course_list.vue';
 
 import { managed_mount } from '@/tests/setup';
+
+import { wait_for_load, wait_until } from '../utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-describe('Course_List.vue', () => {
+let can_create_courses_stub: sinon.SinonStub;
+
+beforeEach(() => {
+    can_create_courses_stub = sinon.stub(User, 'current_can_create_courses').resolves(false);
+});
+
+describe('Create course tests', () => {
+    beforeEach(() => {
+        sinon.stub(Course, 'get_courses_for_user').resolves({
+            courses_is_admin_for: [],
+            courses_is_staff_for: [],
+            courses_is_student_in: [],
+            courses_is_handgrader_for: []
+        });
+    });
+
+    test('Create course button hidden', async () => {
+        let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(wrapper.find({ref: 'show_create_course_modal_button'}).exists()).toBe(false);
+    });
+
+    test('Create course', async () => {
+        let create_course_stub = sinon.stub(Course, 'create');
+        can_create_courses_stub.resolves(true);
+
+        let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        wrapper.find({ref: 'show_create_course_modal_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let new_course_data = {
+            name: 'An very new name',
+            semester: Semester.spring,
+            year: 2111,
+            num_late_days: 5,
+            allowed_guest_domain: '@llama.net',
+            subtitle: 'Great course',
+        };
+        wrapper.find({ref: 'new_course_form'}).vm.$emit('submit', new_course_data);
+        await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_course)).toBe(true);
+        expect(create_course_stub.calledOnceWith(new_course_data)).toBe(true);
+
+        expect(wrapper.find({ref: 'created_course_modal'}).exists()).toBe(false);
+    });
+
+    test('Create course API errors handled', async () => {
+        sinon.stub(Course, 'create').rejects(new HttpError(403, 'noope'));
+
+        can_create_courses_stub.resolves(true);
+        let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        wrapper.find({ref: 'show_create_course_modal_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'new_course_form'}).vm.$emit('submit', {});
+        await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_course)).toBe(true);
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'create_course_api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toEqual(1);
+    });
+});
+
+describe('CourseList tests', () => {
     let wrapper: Wrapper<CourseList>;
     let component: CourseList;
     let user: User;

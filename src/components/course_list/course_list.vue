@@ -3,6 +3,43 @@
     <div> <i class="fa fa-spinner fa-pulse"></i> </div>
   </div>
   <div v-else id="course-list">
+    <div v-if="d_can_create_courses" class="create-course-wrapper">
+      <button type="button"
+              class="flat-white-button"
+              @click="d_show_create_course_modal = true"
+              ref="show_create_course_modal_button">
+        <i class="fas fa-plus plus"></i> New Course
+      </button>
+
+      <modal v-if="d_show_create_course_modal"
+             ref="created_course_modal"
+             @close="d_show_create_course_modal = false"
+             :include_closing_x="!d_creating_course"
+             :click_outside_to_close="!d_creating_course">
+        <div class="modal-header">New Course</div>
+        <course-form ref="new_course_form"
+                     @submit="create_course"
+                     @form_validity_changed="d_new_course_form_is_valid = $event">
+
+          <APIErrors ref="create_course_api_errors"></APIErrors>
+          <div class="modal-button-footer">
+            <button type="submit"
+                    ref="create_course_button"
+                    class="save-button"
+                    :disabled="!d_new_course_form_is_valid || d_creating_course">
+              Save
+            </button>
+            <button type="button"
+                    ref="cancel_create_course_button"
+                    class="white-button"
+                    @click="d_show_create_course_modal = false"
+                    :disabled="d_creating_course">
+              Cancel
+            </button>
+          </div>
+        </course-form>
+      </modal>
+    </div>
     <div v-if="courses_by_term.length === 0"
         id="not-enrolled-message">
       <div> You are not enrolled in any courses. </div>
@@ -33,13 +70,22 @@ import { Component, Inject, Vue } from 'vue-property-decorator';
 import { AllCourses, Course, CourseObserver, Semester, User } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
+import APIErrors from '@/components/api_errors.vue';
+import CourseForm, { CourseFormData } from '@/components/course_admin/course_form.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import Modal from '@/components/modal.vue';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func,
+} from '@/error_handling';
 import {
   array_add_unique,
   array_get_unique,
   array_has_unique,
+  toggle,
 } from '@/utils';
+
 
 interface Term {
   semester: Semester | null;
@@ -53,6 +99,9 @@ interface TermCourses {
 
 @Component({
   components: {
+    APIErrors,
+    CourseForm,
+    Modal,
     SingleCourse
   }
 })
@@ -63,18 +112,32 @@ export default class CourseList extends Vue implements CourseObserver {
 
   all_courses: AllCourses | null = null;
   courses_by_term: TermCourses[] = [];
+  d_can_create_courses = false;
   d_loading = true;
+
+  d_show_create_course_modal = false;
+  d_creating_course = false;
+  d_new_course_form_is_valid = false;
 
   @handle_global_errors_async
   async created() {
     await this.get_and_sort_courses();
     await this.d_globals.set_current_course(null);
+    this.d_can_create_courses = await User.current_can_create_courses();
     Course.subscribe(this);
     this.d_loading = false;
 }
 
   beforeDestroy() {
     Course.unsubscribe(this);
+  }
+
+  @handle_api_errors_async(make_error_handler_func('create_course_api_errors'))
+  create_course(form_data: CourseFormData) {
+    return toggle(this, 'd_creating_course', async () => {
+        await Course.create(form_data);
+        this.d_show_create_course_modal = false;
+    });
   }
 
   is_admin(course: Course) {
@@ -173,7 +236,9 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/section_header.scss';
 
 * {
@@ -184,6 +249,10 @@ function term_descending(term_courses_a: TermCourses, term_courses_b: TermCourse
 
 #course-list {
   margin: 0 .5rem;
+}
+
+.create-course-wrapper {
+  margin: .75rem 0;
 }
 
 .semester-name {
