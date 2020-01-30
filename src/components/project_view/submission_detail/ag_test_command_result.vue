@@ -91,44 +91,28 @@
               ref="diffs">
       <legend class="legend"> Output Diffs </legend>
 
-      <div v-if="show_stdout_diff"
-           class="feedback-row">
-        <template v-if="!d_stdout_diff_loaded">
-          <div class="loading-output">
-            <i class="fa fa-spinner fa-pulse fa-fw"></i>
-          </div>
-        </template>
-        <template v-else class="feedback-output-content-lengthy">
-          <div v-if="d_stdout_diff !== null"
-               class="diff-container">
-            <diff ref="stdout_diff"
-                  :diff_contents="d_stdout_diff"
-                  diff_max_height="50vh"
-                  left_header="Expected Output"
-                  right_header="Student Output">
-            </diff>
-          </div>
-        </template>
+      <div v-if="d_output_size.stdout_diff_size !== null" class="feedback-row">
+        <div v-if="d_stdout_diff !== null" class="diff-container">
+          <diff ref="stdout_diff"
+                :diff_contents="d_stdout_diff"
+                diff_max_height="50vh"
+                :progress="d_stdout_diff_load_progress"
+                left_header="Expected Output"
+                right_header="Student Output">
+          </diff>
+        </div>
       </div>
 
-      <div v-if="show_stderr_diff"
-           class="feedback-row">
-        <template v-if="!d_stderr_diff_loaded">
-          <div class="loading-output">
-            <i class="fa fa-spinner fa-pulse fa-fw"></i>
-          </div>
-        </template>
-        <template v-else>
-          <div v-if="d_stderr_diff !== null"
-               class="diff-container">
-            <diff ref="stderr_diff"
-                  :diff_contents="d_stderr_diff"
-                  diff_max_height="50vh"
-                  left_header="Expected Error Output"
-                  right_header="Student Error Output">
-            </diff>
-          </div>
-        </template>
+      <div v-if="show_stderr_diff" class="feedback-row">
+        <div v-if="d_stderr_diff !== null" class="diff-container">
+          <diff ref="stderr_diff"
+                :diff_contents="d_stderr_diff"
+                diff_max_height="50vh"
+                :progress="d_stderr_diff_load_progress"
+                left_header="Expected Error Output"
+                right_header="Student Error Output">
+          </diff>
+        </div>
       </div>
     </fieldset>
 
@@ -143,22 +127,13 @@
            class="feedback-row">
         <div class="feedback-label"> Output: </div>
         <div class="feedback">
-          <template v-if="!d_stdout_content_loaded">
-            <div class="loading-output">
-              <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            </div>
-          </template>
-          <template v-else>
-            <div v-if="!d_stdout_content"
-                 class="short-output"> No output
-            </div>
-            <div v-else
-                 class="lengthy-output">
-              <view-file :file_contents="d_stdout_content"
-                         view_file_max_height="50vh"
-                         ref="stdout"></view-file>
-            </div>
-          </template>
+          <div v-if="!d_output_size.stdout_size === 0" class="short-output">No output</div>
+          <div v-else-if="d_stdout_content !== null" class="lengthy-output">
+            <view-file :file_contents="d_stdout_content"
+                        view_file_max_height="50vh"
+                        :progress="d_stdout_load_progress"
+                        ref="stdout"></view-file>
+          </div>
         </div>
       </div>
 
@@ -167,22 +142,13 @@
            class="feedback-row">
         <div class="feedback-label"> Error output: </div>
         <div class="feedback">
-          <template v-if="!d_stderr_content_loaded">
-            <div class="loading-output">
-              <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            </div>
-          </template>
-          <template v-else>
-            <div v-if="!d_stderr_content"
-                 class="short-output"> No output
-            </div>
-            <div v-else
-                 class="lengthy-output">
-              <view-file :file_contents="d_stderr_content"
-                         view_file_max_height="50vh"
-                         ref="stderr"></view-file>
-            </div>
-          </template>
+          <div v-if="d_output_size.stderr_size === 0" class="short-output">No output</div>
+          <div v-else-if="d_stderr_content !== null" class="lengthy-output">
+            <view-file :file_contents="d_stderr_content"
+                        view_file_max_height="50vh"
+                        :progress="d_stderr_load_progress"
+                        ref="stderr"></view-file>
+          </div>
         </div>
       </div>
     </fieldset>
@@ -223,15 +189,17 @@ export default class AGTestCommandResult extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
 
+  d_output_size: ResultOutput.AGTestCommandResultOutputSize | null = null;
+
   d_stdout_content: Promise<string> | null = null;
   d_stderr_content: Promise<string> | null = null;
-  d_stdout_diff: string[] | null = null;
-  d_stderr_diff: string[] | null = null;
-  d_stdout_content_loaded = false;
-  d_stderr_content_loaded = false;
-  d_stdout_diff_loaded = false;
-  d_stderr_diff_loaded = false;
-  d_output_size: ResultOutput.AGTestCommandResultOutputSize | null = null;
+  d_stdout_load_progress: number | null = null;
+  d_stderr_load_progress: number | null = null;
+
+  d_stdout_diff: Promise<string[]> | null = null;
+  d_stderr_diff: Promise<string[]> | null = null;
+  d_stdout_diff_load_progress: number | null = null;
+  d_stderr_diff_load_progress: number | null = null;
 
   @Watch('ag_test_command_result')
   async on_ag_test_command_result_change(new_value: AGTestCommandResultFeedback,
@@ -242,25 +210,8 @@ export default class AGTestCommandResult extends Vue {
   readonly ExpectedReturnCode = ExpectedReturnCode;
   readonly ValueFeedbackLevel = ValueFeedbackLevel;
 
-  async created() {
-    await this.get_output();
-  }
-
-  @handle_global_errors_async
-  async get_output() {
-    this.d_output_size = await ResultOutput.get_ag_test_cmd_result_output_size(
-      this.submission.pk,
-      this.ag_test_command_result.pk,
-      this.fdbk_category
-    );
-    this.d_stdout_content_loaded = false;
-    this.d_stderr_content_loaded = false;
-    this.d_stdout_diff_loaded = false;
-    this.d_stderr_content_loaded = false;
-    this.load_stdout_content();
-    this.load_stderr_content();
-    await this.load_stdout_diff();
-    await this.load_stderr_diff();
+  created() {
+    return this.get_output();
   }
 
   get show_correctness_fieldset() {
@@ -280,62 +231,93 @@ export default class AGTestCommandResult extends Vue {
     return this.d_output_size!.stderr_diff_size !== null;
   }
 
+  @handle_global_errors_async
+  async get_output() {
+    this.d_stdout_content = null;
+    this.d_stderr_content = null;
+    this.d_stdout_diff = null;
+    this.d_stderr_diff = null;
+
+    this.d_output_size = await ResultOutput.get_ag_test_cmd_result_output_size(
+      this.submission.pk,
+      this.ag_test_command_result.pk,
+      this.fdbk_category
+    );
+    this.load_stdout_diff();
+    this.load_stderr_diff();
+    this.load_stdout_content();
+    this.load_stderr_content();
+  }
+
+
   load_stdout_content() {
     if (this.d_output_size!.stdout_size === null || this.d_output_size!.stdout_size === 0) {
-      this.d_stdout_content = null;
+      return;
     }
-    else {
-      this.d_stdout_content = ResultOutput.get_ag_test_cmd_result_stdout(
-        this.submission!.pk,
-        this.ag_test_command_result.pk,
-        this.fdbk_category
-      );
-    }
-    this.d_stdout_content_loaded = true;
+
+    this.d_stdout_content = ResultOutput.get_ag_test_cmd_result_stdout(
+      this.submission!.pk,
+      this.ag_test_command_result.pk,
+      this.fdbk_category,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_stdout_load_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      }
+    );
   }
 
   load_stderr_content() {
     if (this.d_output_size!.stderr_size === null || this.d_output_size!.stderr_size === 0) {
-      this.d_stderr_content = null;
+      return;
     }
-    else {
-      this.d_stderr_content = ResultOutput.get_ag_test_cmd_result_stderr(
-        this.submission!.pk,
-        this.ag_test_command_result.pk,
-        this.fdbk_category
-      );
-    }
-    this.d_stderr_content_loaded = true;
+
+    this.d_stderr_content = ResultOutput.get_ag_test_cmd_result_stderr(
+      this.submission!.pk,
+      this.ag_test_command_result.pk,
+      this.fdbk_category,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_stderr_load_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      }
+    );
   }
 
-  async load_stdout_diff() {
+  load_stdout_diff() {
     if (this.d_output_size!.stdout_diff_size === null
         || this.d_output_size!.stdout_diff_size === 0) {
-      this.d_stdout_diff = null;
+      return;
     }
-    else {
-      this.d_stdout_diff = await ResultOutput.get_ag_test_cmd_result_stdout_diff(
-        this.submission!.pk,
-        this.ag_test_command_result.pk,
-        this.fdbk_category
-      );
-    }
-    this.d_stdout_diff_loaded = true;
+
+    this.d_stdout_diff = ResultOutput.get_ag_test_cmd_result_stdout_diff(
+      this.submission!.pk,
+      this.ag_test_command_result.pk,
+      this.fdbk_category,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_stdout_diff_load_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      }
+    );
   }
 
-  async load_stderr_diff() {
+  load_stderr_diff() {
     if (this.d_output_size!.stderr_diff_size === null
         || this.d_output_size!.stderr_diff_size === 0) {
-      this.d_stderr_diff = null;
+      return;
     }
-    else {
-      this.d_stderr_diff = await ResultOutput.get_ag_test_cmd_result_stderr_diff(
-        this.submission!.pk,
-        this.ag_test_command_result.pk,
-        this.fdbk_category
-      );
-    }
-    this.d_stderr_diff_loaded = true;
+
+    this.d_stderr_diff = ResultOutput.get_ag_test_cmd_result_stderr_diff(
+      this.submission!.pk,
+      this.ag_test_command_result.pk,
+      this.fdbk_category,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_stderr_diff_load_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      }
+    );
   }
 }
 </script>
@@ -353,6 +335,13 @@ export default class AGTestCommandResult extends Vue {
 
 .actual-return-code-incorrect {
   color: lighten($warning-red, 5);
+}
+
+.diff-container {
+    background-color: white;
+    border: 2px solid $pebble-medium;
+    border-radius: 3px;
+    margin-bottom: 5px;
 }
 
 </style>

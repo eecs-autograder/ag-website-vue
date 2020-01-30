@@ -7,7 +7,7 @@ import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, wait_until } from '@/tests/utils';
+import { compress_whitespace, wait_until, wait_for_load } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -94,6 +94,24 @@ describe('ViewFile.vue', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(0);
         expect(wrapper.find('.large-file-message').exists()).toBe(true);
+    });
+
+    test('1000 lines initially rendered, show more button used', async () => {
+        wrapper.setProps({file_contents: Promise.resolve(Array(2700).fill('spam').join('\n'))});
+        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.findAll('.line-of-file-content').length).toEqual(1000);
+
+        wrapper.find({ref: 'show_more_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.line-of-file-content').length).toEqual(2000);
+
+        wrapper.find({ref: 'show_more_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.line-of-file-content').length).toEqual(2700);
+
+        expect(wrapper.find({ref: 'show_more_button'}).exists()).toBe(false);
     });
 });
 

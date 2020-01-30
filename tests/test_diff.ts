@@ -1,6 +1,4 @@
-import { config, mount } from '@vue/test-utils';
-
-import * as sinon from 'sinon';
+import { config, mount, Wrapper } from '@vue/test-utils';
 
 import Diff from '@/components/diff.vue';
 
@@ -8,101 +6,84 @@ beforeAll(() => {
     config.logModifiedComponents = false;
 });
 
-afterEach(() => {
-    sinon.restore();
-});
-
 describe('Diff tests', () => {
-    let diff: string[];
-
-    beforeEach(() => {
-        diff = [
-            '  one\r\n',
-            '  two\n',
-            '- left one\n',
-            '- left two\n',
-            '- left three\n',
-            '  three\n',
-            '+ right one\n',
-            '+ right two\n',
-            '  four\n',
-            '  five\n',
-        ];
-    });
-
-    test('Diff rendering no whitespace', () => {
+    test('Diff rendering no whitespace', async () => {
         const wrapper = mount(Diff, {
             propsData: {
-                diff_contents: diff,
+                diff_contents: Promise.resolve([
+                    '  one\r\n',
+                    '  two\n',
+                    '- left one\n',
+                    '- left two\n',
+                    '- left three\n',
+                    '  three\n',
+                    '+ right one\n',
+                    '+ right two\n',
+                    '  four\n',
+                    '  five\n',
+                    '+ right three\n',
+                ]),
             }
         });
+        await wrapper.vm.$nextTick();
 
         let rows = wrapper.findAll('.diff-body tr');
-        expect(rows.length).toEqual(10);
+        expect(rows.length).toEqual(11);
 
         let expected_left = [
-            {line_number: 1, prefix: '  ', content: 'one\r\n'},
-            {line_number: 2, prefix: '  ', content: 'two\n'},
-            {line_number: 3, prefix: '- ', content: 'left one\n'},
-            {line_number: 4, prefix: '- ', content: 'left two\n'},
-            {line_number: 5, prefix: '- ', content: 'left three\n'},
-            {line_number: 6, prefix: '  ', content: 'three\n'},
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-            {line_number: 7, prefix: '  ', content: 'four\n'},
-            {line_number: 8, prefix: '  ', content: 'five\n'},
+            {line_number: 1, prefix: '', content: 'one'},
+            {line_number: 2, prefix: '', content: 'two'},
+            {line_number: 3, prefix: '-', content: 'left one'},
+            {line_number: 4, prefix: '-', content: 'left two'},
+            {line_number: 5, prefix: '-', content: 'left three'},
+            {line_number: 6, prefix: '', content: 'three'},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: 7, prefix: '', content: 'four'},
+            {line_number: 8, prefix: '', content: 'five'},
+            {line_number: '', prefix: '', content: ''},
         ];
-        expect(wrapper.vm.d_left).toEqual(expected_left);
 
         let expected_right = [
-            {line_number: 1, prefix: '  ', content: 'one\r\n'},
-            {line_number: 2, prefix: '  ', content: 'two\n'},
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-            {line_number: 3, prefix: '  ', content: 'three\n'},
-            {line_number: 4, prefix: '+ ', content: 'right one\n'},
-            {line_number: 5, prefix: '+ ', content: 'right two\n'},
-            {line_number: 6, prefix: '  ', content: 'four\n'},
-            {line_number: 7, prefix: '  ', content: 'five\n'},
+            {line_number: 1, prefix: '', content: 'one'},
+            {line_number: 2, prefix: '', content: 'two'},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: 3, prefix: '', content: 'three'},
+            {line_number: 4, prefix: '+', content: 'right one'},
+            {line_number: 5, prefix: '+', content: 'right two'},
+            {line_number: 6, prefix: '', content: 'four'},
+            {line_number: 7, prefix: '', content: 'five'},
+            {line_number: 8, prefix: '+', content: 'right three'},
         ];
-        expect(wrapper.vm.d_right).toEqual(expected_right);
 
-        expect(wrapper.vm.$el).toMatchSnapshot();
+        do_diff_render_test(wrapper, expected_left, expected_right, false);
     });
 
     test('Diff rendering with whitespace', async () => {
         const wrapper = mount(Diff, {
             propsData: {
-                diff_contents: [
-                    '  line one\r\n'
-                ],
+                diff_contents: Promise.resolve([
+                    '  line \tone\r\n',
+                    '- line \tone\r\n'
+                ]),
             }
         });
         wrapper.setData({d_show_whitespace: true});
         await wrapper.vm.$nextTick();
 
-        let rows = wrapper.findAll('.diff-body tr');
-        expect(rows.length).toEqual(1);
-        let cells = rows.at(0).findAll('td');
+        let expected_left = [
+            {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
+            {line_number: 2, prefix: '-', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
+        ];
 
-        expect(cells.at(1).find('.content').text()).toEqual('line\u2219one\\r\r\u21b5');
-        expect(cells.at(3).find('.content').text()).toEqual('line\u2219one\\r\r\u21b5');
-    });
+        let expected_right = [
+            {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
+            {line_number: '', prefix: '', content: ''},
+        ];
 
-    test('Diff rendering with whitespace snapshot', async () => {
-        const wrapper = mount(Diff, {
-            propsData: {
-                diff_contents: diff,
-            }
-        });
-        wrapper.setData({d_show_whitespace: true});
-        await wrapper.vm.$nextTick();
-
-        let rows = wrapper.findAll('.diff-body tr');
-        expect(rows.length).toEqual(10);
-
-        expect(wrapper.vm.$el).toMatchSnapshot();
+        do_diff_render_test(wrapper, expected_left, expected_right, true);
     });
 });
 
@@ -110,7 +91,7 @@ describe('Diff test edge cases', () => {
     test('Empty diff input', () => {
         const wrapper = mount(Diff, {
             propsData: {
-                diff_contents: [],
+                diff_contents: Promise.resolve([]),
             }
         });
 
@@ -118,75 +99,141 @@ describe('Diff test edge cases', () => {
         expect(rows.length).toEqual(0);
     });
 
-    test('Right side only', () => {
+    test('Right side only', async () => {
         const wrapper = mount(Diff, {
             propsData: {
-                diff_contents: [
+                diff_contents: Promise.resolve([
                     '+ one\n',
                     '+ two\n',
                     '+ three\n',
-                ],
+                ]),
             }
         });
+        await wrapper.vm.$nextTick();
 
-        let rows = wrapper.findAll('.diff-body tr');
-        expect(rows.length).toEqual(3);
-
-        expect(wrapper.vm.d_left).toEqual([
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-        ]);
+        let expected_left = [
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+        ];
 
         let expected_right = [
-            {line_number: 1, prefix: '+ ', content: 'one\n'},
-            {line_number: 2, prefix: '+ ', content: 'two\n'},
-            {line_number: 3, prefix: '+ ', content: 'three\n'},
+            {line_number: 1, prefix: '+', content: 'one'},
+            {line_number: 2, prefix: '+', content: 'two'},
+            {line_number: 3, prefix: '+', content: 'three'},
 
         ];
-        expect(wrapper.vm.d_right).toEqual(expected_right);
+
+        do_diff_render_test(wrapper, expected_left, expected_right, false);
     });
 
-    test('Left side only', () => {
+    test('Left side only', async () => {
         const wrapper = mount(Diff, {
             propsData: {
-                diff_contents: [
+                diff_contents: Promise.resolve([
                     '- one\n',
                     '- two\n',
                     '- three\n',
-                ]
+                ])
             }
         });
-
-        let rows = wrapper.findAll('.diff-body tr');
-        expect(rows.length).toEqual(3);
+        await wrapper.vm.$nextTick();
 
         let expected_left = [
-            {line_number: 1, prefix: '- ', content: 'one\n'},
-            {line_number: 2, prefix: '- ', content: 'two\n'},
-            {line_number: 3, prefix: '- ', content: 'three\n'},
+            {line_number: 1, prefix: '-', content: 'one'},
+            {line_number: 2, prefix: '-', content: 'two'},
+            {line_number: 3, prefix: '-', content: 'three'},
         ];
-        expect(wrapper.vm.d_left).toEqual(expected_left);
 
-        expect(wrapper.vm.d_right).toEqual([
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-            {line_number: null, prefix: null, content: null},
-        ]);
+        let expected_right = [
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+            {line_number: '', prefix: '', content: ''},
+        ];
+
+        do_diff_render_test(wrapper, expected_left, expected_right, false);
     });
 
-    test('Error invalid prefix', () => {
-        sinon.stub(console, 'error');
-        expect(() => {
-            mount(Diff, {
-                propsData: {
-                    diff_contents: [
-                        'spam\n',
-                        '- two\n',
-                        '- three\n',
-                    ]
-                }
-            });
-        }).toThrow('Invalid prefix: "sp". Prefixes must be one of: "- ", "+ ", "  "');
+    test('Invalid prefix treated as +', async () => {
+        let wrapper = mount(Diff, {
+            propsData: {
+                diff_contents: Promise.resolve([
+                    'spam\n',
+                    '- two\n',
+                    '- three\n',
+                ])
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        let expected_left = [
+            {line_number: 1, prefix: '-', content: 'two'},
+            {line_number: 2, prefix: '-', content: 'three'},
+        ];
+
+        let expected_right = [
+            {line_number: '1', prefix: '+', content: 'spam'},
+            {line_number: '', prefix: '', content: ''},
+        ];
+
+        do_diff_render_test(wrapper, expected_left, expected_right, false);
     });
 });
+
+test('1000 lines initially rendered, show more button used', async () => {
+    let diff_contents = Promise.resolve(Array(2700).fill('  spam'));
+    let wrapper = mount(Diff, {
+        propsData: {
+            diff_contents: diff_contents
+        }
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.findAll('.diff-body tr').length).toEqual(1000);
+
+    wrapper.find({ref: 'show_more_button'}).trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findAll('.diff-body tr').length).toEqual(2000);
+
+    wrapper.find({ref: 'show_more_button'}).trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findAll('.diff-body tr').length).toEqual((await diff_contents).length);
+
+    expect(wrapper.find({ref: 'show_more_button'}).exists()).toBe(false);
+});
+
+type RenderedDiffCell = {line_number: number | '', prefix: '+' | '-' | '', content: string};
+
+function do_diff_render_test(
+    wrapper: Wrapper<Diff>,
+    expected_left: RenderedDiffCell[],
+    expected_right: RenderedDiffCell[],
+    show_whitespace: boolean
+) {
+    let rows = wrapper.findAll('.diff-body tr');
+    expect(rows.length).toEqual(expected_left.length);
+    expect(rows.length).toEqual(expected_right.length);
+
+    let visible_selector = show_whitespace ? '.content.with-whitespace' : '.content.no-whitespace';
+    let hidden_selector = show_whitespace ? '.content.no-whitespace' : '.content.with-whitespace';
+
+    for (let [i, row] of rows.wrappers.entries()) {
+        let cells = row.findAll('td');
+
+        expect(cells.at(0).text()).toEqual(expected_left[i].line_number.toString());
+
+        expect(cells.at(1).find('.prefix').text()).toEqual(
+            expected_left[i].prefix);
+        expect(cells.at(1).find(visible_selector).text()).toEqual(
+            expected_left[i].content);
+        expect(cells.at(1).find(hidden_selector).isVisible()).toBe(false);
+
+        expect(cells.at(2).text()).toEqual(expected_right[i].line_number.toString());
+
+        expect(cells.at(3).find('.prefix').text()).toEqual(
+            expected_right[i].prefix);
+        expect(cells.at(3).find(visible_selector).text()).toEqual(
+            expected_right[i].content);
+        expect(cells.at(3).find(hidden_selector).isVisible()).toBe(false);
+    }
+}
