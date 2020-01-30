@@ -142,7 +142,7 @@ export default class AGSuiteSetupResult extends Vue {
   load_setup_stderr() {
     if (this.d_output_size!.setup_stderr_size === null
         || this.d_output_size!.setup_stderr_size === 0) {
-      return
+      return;
     }
 
     this.d_setup_stderr_content = ResultOutput.get_ag_test_suite_result_setup_stderr(
