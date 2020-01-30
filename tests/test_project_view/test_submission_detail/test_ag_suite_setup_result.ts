@@ -4,20 +4,69 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_suite_setup_result.vue';
+import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
+import { wait_fixed, wait_until } from '@/tests/utils';
 
 let submission: ag_cli.Submission;
 let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
 let group: ag_cli.Group;
 let user: ag_cli.User;
 
-let get_ag_test_suite_result_setup_stdout_stub: sinon.SinonStub;
-let get_ag_test_suite_result_setup_stderr_stub: sinon.SinonStub;
-let get_ag_test_suite_result_output_size_stub: sinon.SinonStub;
+let setup_stdout_stub: sinon.SinonStub;
+let setup_stderr_stub: sinon.SinonStub;
+let output_size_stub: sinon.SinonStub;
 
-let setup_stdout_content: string;
-let setup_stderr_content: string;
+function output_size_resolves(
+    submission_pk: number,
+    suite_pk: number,
+    {
+        setup_stdout_size = null,
+        setup_stderr_size = null,
+        setup_stdout_truncated = null,
+        setup_stderr_truncated = null,
+    }: {
+        setup_stdout_size?: number | null,
+        setup_stderr_size?: number | null,
+        setup_stdout_truncated?: boolean | null,
+        setup_stderr_truncated?: boolean | null,
+    } = {}
+) {
+    output_size_stub.withArgs(
+        submission_pk, suite_pk
+    ).resolves({
+        setup_stdout_size: setup_stdout_size,
+        setup_stderr_size: setup_stderr_size,
+        setup_stdout_truncated: setup_stdout_truncated,
+        setup_stderr_truncated: setup_stderr_truncated,
+    });
+}
+
+function progress_stub_resolves<T>(
+    submission_pk: number, suite_pk: number, stub: sinon.SinonStub, val: T
+) {
+    stub.withArgs(
+        submission_pk, suite_pk
+    ).callsFake((subm_pk, suite_result_pk, fdbk, on_upload_progress) => {
+        // tslint:disable-next-line: no-object-literal-type-assertion
+        on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 10});
+        return Promise.resolve(val);
+    });
+}
+
+async function make_wrapper() {
+    let wrapper = managed_mount(AGSuiteSetupResult, {
+        propsData: {
+            submission: submission,
+            ag_test_suite_result: ag_test_suite_result,
+            fdbk_category: ag_cli.FeedbackCategory.max
+        }
+    });
+    expect(await wait_until(wrapper, w => w.vm.d_output_size !== null));
+    return wrapper;
+}
 
 beforeEach(() => {
     user = data_ut.make_user();
@@ -25,172 +74,110 @@ beforeEach(() => {
     submission = data_ut.make_submission(group);
     ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
 
-    setup_stdout_content = "setup stdout content";
-    setup_stderr_content = "setup stderr content";
-
-    get_ag_test_suite_result_setup_stdout_stub = sinon.stub(
+    setup_stdout_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stdout'
-    ).returns(
-        Promise.resolve(setup_stdout_content)
-    );
+    ).rejects(new ag_cli.HttpError(500, 'Stub me'));
 
-    get_ag_test_suite_result_setup_stderr_stub = sinon.stub(
+    setup_stderr_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_ag_test_suite_result_setup_stderr'
-    ).returns(
-        Promise.resolve(setup_stderr_content)
-    );
+    ).rejects(new ag_cli.HttpError(500, 'Stub me'));
 
-    get_ag_test_suite_result_output_size_stub = sinon.stub(
+    output_size_stub = sinon.stub(
         ag_cli.ResultOutput, 'get_ag_test_suite_result_output_size'
-    ).returns(Promise.resolve(
-        {
-            setup_stdout_size: 2,
-            setup_stderr_size: 4
-        }
-    ));
+    ).rejects(new ag_cli.HttpError(500, 'Stub me'));
 });
 
-afterEach(() => {
-    sinon.restore();
-});
+describe('Setup output tests', () => {
+    test('Setup stdout available', async () => {
+        let stdout_content = 'i am stdouten';
+        output_size_resolves(
+            submission.pk, ag_test_suite_result.pk, {setup_stdout_size: stdout_content.length});
+        progress_stub_resolves(
+            submission.pk, ag_test_suite_result.pk, setup_stdout_stub, stdout_content);
 
-describe('AGSuiteSetupResult tests', () => {
-    let wrapper: Wrapper<AGSuiteSetupResult>;
-
-    test('show_setup_stdout === false', async () => {
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        await wrapper.vm.$nextTick();
+        let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(false);
-        expect(wrapper.find('#setup-stdout-section').exists()).toBe(false);
+        let stdout_viewer = <ViewFile> wrapper.find({ref: 'setup_stdout'}).vm;
+        expect(await stdout_viewer.file_contents).toEqual(stdout_content);
+        expect(stdout_viewer.progress).not.toBeNull();
+
+        expect(wrapper.find({ref: 'setup_stderr'}).exists()).toBe(false);
     });
 
-    test('setup_stdout === null && show_setup_stdout === true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
+    test('Setup stderr available', async () => {
+        let stderr_content = 'i am stderren';
+        output_size_resolves(
+            submission.pk, ag_test_suite_result.pk, {setup_stderr_size: stderr_content.length});
+        progress_stub_resolves(
+            submission.pk, ag_test_suite_result.pk, setup_stderr_stub, stderr_content);
 
-        get_ag_test_suite_result_output_size_stub.onFirstCall().returns(Promise.resolve(
-            {
-                setup_stdout_size: null,
-                setup_stderr_size: 2
-            }
-        ));
+        let wrapper = await make_wrapper();
+        await wrapper.vm.$nextTick();
 
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 10; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        let stderr_viewer = <ViewFile> wrapper.find({ref: 'setup_stderr'}).vm;
+        expect(await stderr_viewer.file_contents).toEqual(stderr_content);
+        expect(stderr_viewer.progress).not.toBeNull();
 
-        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_output_size!.setup_stdout_size).toBeNull();
-        expect(wrapper.vm.d_setup_stdout_content).toEqual(null);
-        expect(wrapper.find('#setup-stdout-section').text()).toContain("No output");
+        expect(wrapper.find({ref: 'setup_stdout'}).exists()).toBe(false);
     });
 
-    test('setup_stdout !== null and show_setup_stdout === true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_stdout = true;
+    test('Setup stdout and stderr available', async () => {
+        let stdout_content = 'i am stdouten';
+        let stderr_content = 'i am stderren';
+        output_size_resolves(
+            submission.pk, ag_test_suite_result.pk,
+            {setup_stdout_size: stdout_content.length, setup_stderr_size: stderr_content.length});
+        progress_stub_resolves(
+            submission.pk, ag_test_suite_result.pk, setup_stdout_stub, stdout_content);
+        progress_stub_resolves(
+            submission.pk, ag_test_suite_result.pk, setup_stderr_stub, stderr_content);
 
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+        let wrapper = await make_wrapper();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
-        expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
-        expect(wrapper.find('#setup-stdout-section').text()).toContain(setup_stdout_content);
+        let stdout_viewer = <ViewFile> wrapper.find({ref: 'setup_stdout'}).vm;
+        expect(await stdout_viewer.file_contents).toEqual(stdout_content);
+        expect(stdout_viewer.progress).not.toBeNull();
+
+        let stderr_viewer = <ViewFile> wrapper.find({ref: 'setup_stderr'}).vm;
+        expect(await stderr_viewer.file_contents).toEqual(stderr_content);
+        expect(stderr_viewer.progress).not.toBeNull();
     });
 
-    test('show_setup_stderr === false', async () => {
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+    test('Setup stdout empty', async () => {
+        output_size_resolves(submission.pk, ag_test_suite_result.pk,
+                             {setup_stdout_size: 0, setup_stderr_size: null});
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 5);
 
-        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(false);
-        expect(wrapper.find('#setup-stderr-section').exists()).toBe(false);
+        expect(wrapper.find({ref: 'setup_stderr_section'}).exists()).toBe(false);
+        expect(
+            wrapper.find({ref: 'setup_stdout_section'}).find('.short-output').text()
+        ).toEqual('No output');
+        expect(wrapper.find({ref: 'setup_stdout'}).exists()).toBe(false);
     });
 
-    test('setup_stderr === null && show_setup_stderr === true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
+    test('Setup stderr empty', async () => {
+        output_size_resolves(submission.pk, ag_test_suite_result.pk,
+                             {setup_stdout_size: null, setup_stderr_size: 0});
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 5);
 
-        get_ag_test_suite_result_output_size_stub.onFirstCall().returns(Promise.resolve(
-            {
-                setup_stdout_size: 3,
-                setup_stderr_size: null
-            }
-        ));
-
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_output_size!.setup_stderr_size).toBeNull();
-        expect(wrapper.vm.d_setup_stderr_content).toEqual(null);
-        expect(wrapper.find('#setup-stderr-section').text()).toContain("No output");
-    });
-
-    test('setup_stderr !== null and show_setup_stderr === true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_stderr = true;
-
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.ag_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
-        expect(get_ag_test_suite_result_output_size_stub.calledOnce).toBe(true);
-        expect(get_ag_test_suite_result_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
-        expect(wrapper.find('#setup-stderr-section').text()).toContain(setup_stderr_content);
+        expect(wrapper.find({ref: 'setup_stdout_section'}).exists()).toBe(false);
+        expect(
+            wrapper.find({ref: 'setup_stderr_section'}).find('.short-output').text()
+        ).toEqual('No output');
+        expect(wrapper.find({ref: 'setup_stderr'}).exists()).toBe(false);
     });
 });
 
 describe('AGSuiteSetupResult exit_status tests', () => {
     let wrapper: Wrapper<AGSuiteSetupResult>;
+
+    beforeEach(() => {
+        output_size_resolves(submission.pk, ag_test_suite_result.pk);
+    });
 
     test('setup_exit_status - setup_timed_out === null && setup_return_code === null', () => {
         wrapper = mount(AGSuiteSetupResult, {
@@ -257,107 +244,38 @@ describe('AGSuiteSetupResult exit_status tests', () => {
     });
 });
 
-describe('AGSuiteSetupResult tests concerning Watchers', () => {
-    let wrapper: Wrapper<AGSuiteSetupResult>;
+test('Output reloaded on fdbk_category change', async () => {
+    output_size_stub.onFirstCall().resolves(
+        {setup_stdout_size: 0, setup_stderr_size: 0}
+    ).onSecondCall().resolves({setup_stdout_size: 1, setup_stderr_size: 1});
 
-    beforeEach(async () => {
-        get_ag_test_suite_result_output_size_stub.onFirstCall().returns(
-            Promise.resolve(
-                {
-                    setup_stdout_size: 0,
-                    setup_stderr_size: 0
-                }
-            )
-        );
+    let setup_stdout_content = 'stdouuuuut';
+    let setup_stderr_content = 'stderrrrrrrrrrr';
 
-        get_ag_test_suite_result_output_size_stub.onSecondCall().returns(
-            Promise.resolve(
-                {
-                    setup_stdout_size: 1,
-                    setup_stderr_size: 1
-                }
-            )
-        );
+    setup_stdout_stub.onFirstCall().resolves(setup_stdout_content);
+    setup_stderr_stub.onFirstCall().resolves(setup_stderr_content);
 
-
-        get_ag_test_suite_result_setup_stdout_stub.onFirstCall().returns(
-            Promise.resolve(setup_stdout_content)
-        );
-        get_ag_test_suite_result_setup_stderr_stub.onFirstCall().returns(
-            Promise.resolve(setup_stderr_content)
-        );
-
-        wrapper = mount(AGSuiteSetupResult, {
-            propsData: {
-                ag_test_suite_result: ag_test_suite_result,
-                submission: submission,
-                fdbk_category: ag_cli.FeedbackCategory.max
-            }
-        });
-
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
+    let wrapper = managed_mount(AGSuiteSetupResult, {
+        propsData: {
+            ag_test_suite_result: ag_test_suite_result,
+            submission: submission,
+            fdbk_category: ag_cli.FeedbackCategory.max
         }
     });
+    await wait_fixed(wrapper, 4);
 
-    test('submission Watcher', async () => {
-        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
-        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
+    expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
+    expect(setup_stdout_stub.callCount).toEqual(0);
+    expect(setup_stderr_stub.callCount).toEqual(0);
+    expect(wrapper.vm.d_setup_stdout_content).toBeNull();
+    expect(wrapper.vm.d_setup_stderr_content).toBeNull();
 
-        let updated_submission = data_ut.make_submission(group);
-        wrapper.setProps({submission: updated_submission});
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
+    wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.normal});
+    await wait_fixed(wrapper, 4);
 
-        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_ag_test_suite_result_output_size_stub.calledTwice).toBe(false);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
-        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
-    });
-
-    test('ag_test_suite_result Watcher', async () => {
-        expect(wrapper.vm.ag_test_suite_result).toEqual(ag_test_suite_result);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
-        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
-
-        let updated_ag_test_suite_result = data_ut.make_ag_test_suite_result_feedback(1);
-        wrapper.setProps({ag_test_suite_result: updated_ag_test_suite_result});
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(ag_test_suite_result).not.toEqual(updated_ag_test_suite_result);
-        expect(wrapper.vm.ag_test_suite_result).toEqual(updated_ag_test_suite_result);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(1);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(1);
-        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
-        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
-    });
-
-    test('fdbk_category Watcher', async () => {
-        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
-        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
-
-        wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.normal});
-        for (let i = 0; i < 4; ++i) {
-            await wrapper.vm.$nextTick();
-        }
-
-        expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
-        expect(get_ag_test_suite_result_setup_stdout_stub.callCount).toEqual(0);
-        expect(get_ag_test_suite_result_setup_stderr_stub.callCount).toEqual(0);
-        expect(wrapper.vm.d_setup_stdout_content).toBeNull();
-        expect(wrapper.vm.d_setup_stderr_content).toBeNull();
-    });
+    expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
+    expect(setup_stdout_stub.callCount).toEqual(1);
+    expect(setup_stderr_stub.callCount).toEqual(1);
+    expect(await wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
+    expect(await wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
 });

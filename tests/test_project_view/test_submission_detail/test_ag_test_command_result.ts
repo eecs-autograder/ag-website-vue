@@ -259,7 +259,7 @@ function output_size_resolves(
     } = {}
 ) {
     output_size_stub.withArgs(
-        submission.pk, ag_test_command_result.pk
+        submission_pk, ag_test_command_result_pk
     ).resolves({
         stdout_size: stdout_size,
         stderr_size: stderr_size,
@@ -275,7 +275,7 @@ function progress_stub_resolves<T>(
 ) {
     stub.withArgs(
         submission_pk, ag_test_command_result_pk
-    ).callsFake((subm_pk, cmd_result, fdbk, on_upload_progress) => {
+    ).callsFake((subm_pk, cmd_result_pk, fdbk, on_upload_progress) => {
         // tslint:disable-next-line: no-object-literal-type-assertion
         on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 10});
         return Promise.resolve(val);
@@ -405,6 +405,30 @@ describe('Actual output tests', () => {
         let stderr_wrapper = <Wrapper<ViewFile>> wrapper.find({ref: 'stderr'});
         expect(await stderr_wrapper.vm.file_contents).toEqual(stderr);
         expect(stderr_wrapper.vm.progress).not.toBeNull();
+    });
+
+    test('Actual stdout empty', async () => {
+        output_size_resolves(
+            submission.pk, ag_test_command_result.pk, {stdout_size: 0, stderr_size: null});
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 5);
+
+        expect(wrapper.find({ref: 'actual_stderr_section'}).exists()).toBe(false);
+        expect(wrapper.find({ref: 'actual_stdout_section'}).find('.short-output').text()).toEqual(
+            'No output');
+        expect(wrapper.find({ref: 'stdout'}).exists()).toBe(false);
+    });
+
+    test('Actual stderr empty', async () => {
+        output_size_resolves(
+            submission.pk, ag_test_command_result.pk, {stdout_size: null, stderr_size: 0});
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 5);
+
+        expect(wrapper.find({ref: 'actual_stdout_section'}).exists()).toBe(false);
+        expect(wrapper.find({ref: 'actual_stderr_section'}).find('.short-output').text()).toEqual(
+            'No output');
+        expect(wrapper.find({ref: 'stderr'}).exists()).toBe(false);
     });
 });
 
