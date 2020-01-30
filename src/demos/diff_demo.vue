@@ -41,7 +41,7 @@ import Diff from '@/components/diff.vue';
 })
 export default class DiffDemo extends Vue {
 
-  balanced_diff = [
+  balanced_diff = Promise.resolve([
     '  one\r\n',
     '  two\n',
     '- left one\n',
@@ -52,9 +52,9 @@ export default class DiffDemo extends Vue {
     '+ right two\n',
     '  four\n',
     '  five\n'
-  ];
+  ]);
 
-  wide_diff = [
+  wide_diff = Promise.resolve([
     "  ./euchre.exe pack.in noshuffle 1 Alice Simple Bob Simple Cathy Simple Drew Simple\n",
     "- Hand 0\n",
     "- Jack of Diamonds turned up\n",
@@ -66,9 +66,9 @@ export default class DiffDemo extends Vue {
     "- Jack of Diamonds turned up\n",
     "- Jack of Diamonds turned up\n",
     "+ Hand 0\n",
-  ];
+  ]);
 
-  diff_no_right = [
+  diff_no_right = Promise.resolve([
     "-  ./euchre.exe pack.in noshuffle 1 Alice Simple Bob Simple Cathy Simple Drew Simple\n",
     "- Hand 0\n",
     "- Jack of Diamonds turned up\n",
@@ -80,9 +80,9 @@ export default class DiffDemo extends Vue {
     "- Jack of Diamonds turned up\n",
     "- Jack of Diamonds turned up\n",
     "- Hand 0\n",
-  ];
+  ]);
 
-  diff_empty = [];
+  diff_empty = Promise.resolve([]);
 }
 </script>
 

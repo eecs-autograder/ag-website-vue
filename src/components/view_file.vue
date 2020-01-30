@@ -2,7 +2,7 @@
   <div class="view-file-component"
        :style="{height: view_file_height, max_height: view_file_max_height}">
     <div v-if="d_loading" class="loading-container">
-      <progress-bar v-if="progress !==  null" :progress="progress"></progress-bar>
+      <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
       <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
     </div>
     <div v-else-if="file_is_large && !d_show_anyway" class="large-file-message">
@@ -11,55 +11,67 @@
         Click here to display its contents
       </button>
     </div>
-    <table v-else class="viewing-container" :class="{'saving': d_saving}">
-      <template v-for="(line, index) of d_file_contents.split('\n')">
-        <tr :class="{'commented-line': line_in_comment(index),
-                     'hovered-comment-line': d_hovered_comment !== null
-                                             && index >= d_hovered_comment.location.first_line
-                                             && index <= d_hovered_comment.location.last_line,
-                     'highlighted-region-line': d_first_highlighted_line !== null
-                                                && index >= d_first_highlighted_line
-                                                && index <= d_last_highlighted_line}"
-            @mousedown="start_highlighting(index)"
-            @mouseenter="grow_highlighted_region(index)"
-            @mouseup="stop_highlighting($event, index)"
-            ref="code_line">
-          <td class="line-number">{{index + 1}}</td>
-          <td class="line-of-file-content"
-              :style="{'user-select': (handgrading_enabled
-                                       && !readonly_handgrading_results) ? 'none' : 'auto'}"
-          >{{line === "" ? "\n" : line}}</td>
-        </tr>
-        <tr v-for="comment of handgrading_comments.get(index, [])">
-          <td></td>
-          <td>
-            <div class="comment"
-                 @mouseenter="d_hovered_comment = comment"
-                 @mouseleave="d_hovered_comment = null">
-              <div class="comment-header">
-                <div class="comment-line-range">
-                  {{comment.location.first_line !== comment.location.last_line
-                    ? `Lines ${comment.location.first_line + 1} - ${comment.location.last_line + 1}`
-                    :`Line ${comment.location.first_line + 1}`}}
+    <template v-else>
+      <table class="viewing-container" :class="{'saving': d_saving}">
+        <template v-for="(line_num, index) of num_lines_to_show">
+          <tr :class="{'commented-line': line_in_comment(index),
+                        'hovered-comment-line': d_hovered_comment !== null
+                                                && index >= d_hovered_comment.location.first_line
+                                                && index <= d_hovered_comment.location.last_line,
+                        'highlighted-region-line': d_first_highlighted_line !== null
+                                                  && index >= d_first_highlighted_line
+                                                  && index <= d_last_highlighted_line}"
+              @mousedown="start_highlighting(index)"
+              @mouseenter="grow_highlighted_region(index)"
+              @mouseup="stop_highlighting($event, index)"
+              ref="code_line">
+            <td class="line-number">{{line_num}}</td>
+            <td class="line-of-file-content"
+                :style="{'user-select': (handgrading_enabled
+                                          && !readonly_handgrading_results) ? 'none' : 'auto'}"
+            >{{split_content[index] === "" ? "\n" : split_content[index]}}</td>
+          </tr>
+          <tr v-for="comment of handgrading_comments.get(index, [])">
+            <td></td>
+            <td>
+              <div class="comment"
+                    @mouseenter="d_hovered_comment = comment"
+                    @mouseleave="d_hovered_comment = null">
+                <div class="comment-header">
+                  <div class="comment-line-range">
+                    {{comment.location.first_line !== comment.location.last_line
+                      ? `Lines ${comment.location.first_line + 1} `
+                        + `- ${comment.location.last_line + 1}`
+                      :`Line ${comment.location.first_line + 1}`}}
+                  </div>
+                  <i v-if="!readonly_handgrading_results
+                            && (enable_custom_comments || !comment.is_custom)"
+                      @click="delete_handgrading_comment(comment)"
+                      class="delete fas fa-times"></i>
                 </div>
-                <i v-if="!readonly_handgrading_results
-                         && (enable_custom_comments || !comment.is_custom)"
-                   @click="delete_handgrading_comment(comment)"
-                   class="delete fas fa-times"></i>
+                <div class="comment-message">
+                  {{comment.short_description}}
+                  <template
+                    v-if="comment.deduction !== 0"
+                  >({{comment.deduction}}<template v-if="comment.max_deduction !== null"
+                  >/{{comment.max_deduction}} max</template>)
+                  </template>
+                </div>
               </div>
-              <div class="comment-message">
-                {{comment.short_description}}
-                <template
-                  v-if="comment.deduction !== 0"
-                >({{comment.deduction}}<template v-if="comment.max_deduction !== null"
-                >/{{comment.max_deduction}} max</template>)
-                </template>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </template>
-    </table>
+            </td>
+          </tr>
+        </template>
+      </table>
+
+      <div class="show-more-button-container" v-if="d_num_lines_rendered < split_content.length">
+        <button type="button"
+                class="blue-button"
+                @click="render_more_lines"
+                ref="show_more_button">
+          Show more
+        </button>
+      </div>
+    </template>
 
     <context-menu ref="handgrading_context_menu"
                   v-if="handgrading_enabled"
@@ -164,6 +176,9 @@ export default class ViewFile extends Vue implements Created {
   d_saving = false;
   d_show_anyway = false;
 
+  readonly num_lines_per_page = 1000;
+  d_num_lines_rendered = this.num_lines_per_page;
+
   // If null, the component will behave normally (no handgrading).
   // When this field is non-null, handgrading functionality will be made available.
   @Prop({default: null, type: HandgradingResult})
@@ -199,11 +214,16 @@ export default class ViewFile extends Vue implements Created {
   }
 
   @Watch('file_contents')
-  async on_file_contents_change(new_content: string | Promise<string>, old_content: string) {
-    this.d_loading = true;
-    this.d_show_anyway = false;
-    this.d_file_contents = await new_content;
-    this.d_loading = false;
+  async on_file_contents_change(new_content: Promise<string>, old_content: string) {
+    return this.set_new_file_contents(new_content);
+  }
+
+  @handle_global_errors_async
+  private set_new_file_contents(new_content: Promise<string>) {
+    return toggle(this, 'd_loading', async () => {
+      this.d_show_anyway = false;
+      this.d_file_contents = await new_content;
+    });
   }
 
   @Watch('filename')
@@ -213,6 +233,24 @@ export default class ViewFile extends Vue implements Created {
 
   get file_is_large() {
     return this.d_file_contents.length > this.display_size_threshold;
+  }
+
+  // IMPORTANT: We want this to be a computed property. Indexing into
+  // a large reactive array in the template will significantly increase
+  // render times.
+  private get split_content() {
+    return this.d_file_contents.split('\n');
+  }
+
+  private get num_lines_to_show() {
+    return Math.min(this.d_num_lines_rendered, this.split_content.length);
+  }
+
+  private render_more_lines() {
+    this.d_num_lines_rendered = Math.min(
+      this.split_content.length,
+      this.d_num_lines_rendered + this.num_lines_per_page
+    );
   }
 
   get handgrading_enabled() {
@@ -389,6 +427,8 @@ table {
   align-items: center;
   margin: .875rem;
 
+  white-space: normal;
+
   .text {
     font-size: 1.25rem;
   }
@@ -420,6 +460,13 @@ table {
   white-space: pre-wrap;
   word-break: break-word;
   word-wrap: break-word;
+}
+
+.show-more-button-container {
+  display: flex;
+  padding: .375rem;
+
+  white-space: normal;
 }
 
 // Do NOT use loading-wrapper here

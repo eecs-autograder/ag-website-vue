@@ -25,51 +25,40 @@
       </div>
     </fieldset>
 
-    <fieldset v-if="ag_test_suite_result.fdbk_settings.show_setup_stdout
-                    || ag_test_suite_result.fdbk_settings.show_setup_stderr"
-              class="fieldset">
+    <fieldset v-if="d_output_size !== null
+                    && (d_output_size.setup_stdout_size !== null
+                        || d_output_size.setup_stderr_size !== null)"
+              class="fieldset"
+              ref="actual_output">
       <legend class="legend"> Actual Output </legend>
-      <div v-if="ag_test_suite_result.fdbk_settings.show_setup_stdout"
-           id="setup-stdout-section"
+
+      <div v-if="d_output_size.setup_stdout_size !== null"
+           ref="setup_stdout_section"
            class="feedback-row">
         <div class="feedback-label"> Output: </div>
         <div class="feedback">
-          <template v-if="!d_setup_stdout_loaded">
-            <div class="loading-output">
-              <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            </div>
-          </template>
-          <template v-else>
-            <div v-if="!d_setup_stdout_content"
-                 class="short-output"> No output </div>
-            <div v-else
-                 class="lengthy-output">
-              <view-file :file_contents="d_setup_stdout_content"
-                         view_file_max_height="50vh"></view-file>
-            </div>
-          </template>
+          <div v-if="d_output_size.setup_stdout_size === 0" class="short-output">No output</div>
+          <div v-else-if="d_setup_stdout_content !== null" class="lengthy-output">
+            <view-file :file_contents="d_setup_stdout_content"
+                        view_file_max_height="50vh"
+                        :progress="d_setup_stdout_load_progress"
+                        ref="setup_stdout"></view-file>
+          </div>
         </div>
       </div>
 
-      <div v-if="ag_test_suite_result.fdbk_settings.show_setup_stderr"
-           id="setup-stderr-section"
+      <div v-if="d_output_size.setup_stderr_size !== null"
+           ref="setup_stderr_section"
            class="feedback-row">
         <div class="feedback-label"> Error output: </div>
         <div class="feedback">
-          <template v-if="!d_setup_stderr_loaded">
-            <div class="loading-output">
-              <i class="fa fa-spinner fa-pulse fa-fw"></i>
-            </div>
-          </template>
-          <template v-else>
-            <div v-if="!d_setup_stderr_content"
-                 class="short-output"> No output </div>
-            <div v-else
-                 class="lengthy-output">
+            <div v-if="d_output_size.setup_stderr_size === 0" class="short-output">No output</div>
+            <div v-else-if="d_setup_stderr_content !== null" class="lengthy-output">
               <view-file :file_contents="d_setup_stderr_content"
-                         view_file_max_height="50vh"></view-file>
+                         view_file_max_height="50vh"
+                         :progress="d_setup_stderr_load_progress"
+                         ref="setup_stderr"></view-file>
             </div>
-          </template>
         </div>
       </div>
     </fieldset>
@@ -106,14 +95,13 @@ export default class AGSuiteSetupResult extends Vue {
 
   d_setup_stdout_content: Promise<string> | null = null;
   d_setup_stderr_content: Promise<string> | null = null;
-  d_setup_stdout_loaded = false;
-  d_setup_stderr_loaded = false;
+  d_setup_stdout_load_progress: number | null = 0;
+  d_setup_stderr_load_progress: number | null = 0;
   d_output_size: ResultOutput.AGTestSuiteResultOutputSize | null = null;
 
-  @Watch('ag_test_suite_result')
-  async on_ag_test_suite_result_change(new_value: AGTestSuiteResultFeedback,
-                                       old_value: AGTestSuiteResultFeedback) {
-    await this.get_output();
+  @Watch('fdbk_category')
+  on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+    return this.get_output();
   }
 
   async created() {
@@ -122,14 +110,13 @@ export default class AGSuiteSetupResult extends Vue {
 
   @handle_global_errors_async
   async get_output() {
-    this.d_output_size
-        = await ResultOutput.get_ag_test_suite_result_output_size(
-      this.submission!.pk,
-      this.ag_test_suite_result!.pk,
+    this.d_setup_stdout_content = null;
+    this.d_setup_stderr_content = null;
+    this.d_output_size = await ResultOutput.get_ag_test_suite_result_output_size(
+      this.submission.pk,
+      this.ag_test_suite_result.pk,
       this.fdbk_category
     );
-    this.d_setup_stdout_loaded = false;
-    this.d_setup_stderr_loaded = false;
     this.load_setup_stdout();
     this.load_setup_stderr();
   }
@@ -137,31 +124,37 @@ export default class AGSuiteSetupResult extends Vue {
   load_setup_stdout() {
     if (this.d_output_size!.setup_stdout_size === null
         || this.d_output_size!.setup_stdout_size === 0) {
-      this.d_setup_stdout_content = null;
+      return;
     }
-    else {
-      this.d_setup_stdout_content = ResultOutput.get_ag_test_suite_result_setup_stdout(
-        this.submission!.pk,
-        this.ag_test_suite_result!.pk,
-        this.fdbk_category
-      );
-    }
-    this.d_setup_stdout_loaded = true;
+
+    this.d_setup_stdout_content = ResultOutput.get_ag_test_suite_result_setup_stdout(
+      this.submission.pk,
+      this.ag_test_suite_result.pk,
+      this.fdbk_category,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_setup_stdout_load_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      }
+    );
   }
 
   load_setup_stderr() {
     if (this.d_output_size!.setup_stderr_size === null
         || this.d_output_size!.setup_stderr_size === 0) {
-        this.d_setup_stderr_content = null;
+      return;
     }
-    else {
-      this.d_setup_stderr_content = ResultOutput.get_ag_test_suite_result_setup_stderr(
-        this.submission!.pk,
-        this.ag_test_suite_result!.pk,
-        this.fdbk_category
-      );
-    }
-    this.d_setup_stderr_loaded = true;
+
+    this.d_setup_stderr_content = ResultOutput.get_ag_test_suite_result_setup_stderr(
+      this.submission.pk,
+      this.ag_test_suite_result.pk,
+      this.fdbk_category,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          this.d_setup_stderr_load_progress = 100 * (1.0 * event.loaded / event.total);
+        }
+      }
+    );
   }
 }
 </script>
@@ -170,7 +163,7 @@ export default class AGSuiteSetupResult extends Vue {
 @import '@/styles/components/submission_detail.scss';
 
 .timed-out-icon {
-  padding: 0 2px 0 5px;
+  padding: 0 .125rem 0 .375rem;
 }
 
 </style>

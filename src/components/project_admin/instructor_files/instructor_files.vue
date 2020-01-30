@@ -47,7 +47,6 @@ import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-types
 
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
-import MultiFileViewer from '@/components/multi_file_viewer.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
 import { BeforeDestroy, Created } from '@/lifecycle';
@@ -61,7 +60,6 @@ import SingleInstructorFile from './single_instructor_file.vue';
   components: {
     APIErrors,
     FileUpload,
-    MultiFileViewer,
     ProgressBar,
     SingleInstructorFile,
     ViewFile,

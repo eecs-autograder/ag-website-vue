@@ -1,5 +1,9 @@
 <template>
-  <div :class="{'fullscreen': d_fullscreen}">
+  <div v-if="d_loading" class="loading-container">
+    <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
+    <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
+  </div>
+  <div v-else :class="{'fullscreen': d_fullscreen}">
     <div class="diff-headers">
       <div class="header">{{left_header}}</div>
       <div class="header right-header">
@@ -11,37 +15,48 @@
       </div>
     </div>
 
-    <div class="diff-body-wrapper" :style="{'max-height': diff_max_height}">
+    <div class="diff-body-wrapper" :style="{'max-height': d_fullscreen ? 'none' : diff_max_height}">
       <table class="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
-          <tr v-for="(left_cell, i) of d_left">
-            <td :class="['line-num', line_num_highlighting[left_cell.prefix]]">
-              {{left_cell.line_number}}
+          <tr v-for="(n, i) in num_lines_to_show">
+            <td :class="['line-num', line_num_highlighting[left[i].prefix]]"
+                :style="{width: line_num_width}">
+              {{left[i].line_number}}
             </td>
-            <td :class="[content_highlighting[left_cell.prefix], 'code-cell']">
+            <td :class="[content_highlighting[left[i].prefix], 'code-cell']">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
-                   Do NOT add whitespace to these <span> elements.-->
-              <span class="prefix">{{left_cell.prefix !== null ? left_cell.prefix[0] : ' '}}</span>
-              <span class="content">{{
-                d_show_whitespace
-                    ? replace_whitespace(left_cell.content) : left_cell.content}}</span>
+                   Do NOT add whitespace to these elements.-->
+              <span class="prefix">{{left[i].prefix}}</span>
+              <span class="content no-whitespace" v-show="!d_show_whitespace">{{
+                left[i].content}}</span>
+              <span class="content with-whitespace" v-show="d_show_whitespace">{{
+                left_with_whitespace[i].content}}</span>
             </td>
 
-            <td :class="['line-num', line_num_highlighting[d_right[i].prefix]]">
-              {{d_right[i].line_number}}
+            <td :class="['line-num', line_num_highlighting[right[i].prefix]]"
+                :style="{width: line_num_width}">
+              {{right[i].line_number}}
             </td>
-            <td :class="[content_highlighting[d_right[i].prefix], 'code-cell']">
+            <td :class="[content_highlighting[right[i].prefix], 'code-cell']">
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
-                   Do NOT add whitespace to these <span> elements.-->
-              <span class="prefix">{{
-                d_right[i].prefix !== null ? d_right[i].prefix[0] : ' '}}</span>
-              <span class="content">{{
-                d_show_whitespace ? replace_whitespace(d_right[i].content)
-                                  : d_right[i].content}}</span>
+                    Do NOT add whitespace to these <span> elements.-->
+              <span class="prefix">{{right[i].prefix}}</span>
+              <span class="content no-whitespace" v-show="!d_show_whitespace">{{
+                right[i].content}}</span>
+              <span class="content with-whitespace" v-show="d_show_whitespace">{{
+                right_with_whitespace[i].content}}</span>
             </td>
           </tr>
         </tbody>
       </table>
+      <div class="show-more-button-container" v-if="d_num_lines_rendered < left.length">
+        <button type="button"
+                class="blue-button"
+                ref="show_more_button"
+                @click="render_more_lines">
+          Show more
+        </button>
+      </div>
     </div>
 
     <div class="toggle-container">
@@ -58,26 +73,31 @@
 </template>
 
 <script lang="ts">
+import { CreateElement } from 'vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
+import ProgressBar from './progress_bar.vue';
 import Toggle from './toggle.vue';
 
 
-interface DiffCell {
+interface DiffCellData {
   line_number: number | null;
-  prefix: string | null;
-  content: string | null;
+  prefix: string;
+  content: string;
 }
 
 export class DiffPrefixError extends Error {}
 
 @Component({
-  components: { Toggle }
+  components: {
+    ProgressBar,
+    Toggle,
+  }
 })
 export default class Diff extends Vue {
 
-  @Prop({default: [], type: Array})
-  diff_contents!: string[];
+  @Prop({default: Promise.resolve([]), type: Promise})
+  diff_contents!: Promise<string[]>;
 
   @Prop({default: "", type: String})
   left_header!: string;
@@ -88,50 +108,89 @@ export default class Diff extends Vue {
   @Prop({default: '100%', type: String})
   diff_max_height!: string;
 
-  d_left: DiffCell[] = [];
-  d_right: DiffCell[] = [];
+  // A number from 0 to 100 that will be displayed as
+  // the progress in loading diff_contents.
+  @Prop({default: null, type: Number})
+  progress!: number | null;
 
-  d_show_whitespace: boolean = false;
+  // IMPORTANT: We are intentionally making these member variables NON-REACTIVE
+  // by not initializing them here. This is very important for performance.
+  // Indexing into large reactive arrays in the template will significantly
+  // increase render times.
+  private left!: DiffCellData[];
+  private right!: DiffCellData[];
 
-  d_fullscreen = false;
-
-  created() {
-    let left_line_number = 1;
-    let right_line_number = 1;
-    for (let item of this.diff_contents) {
-      let prefix = item.substring(0, 2);
-      item = item.substring(2);
-      if (prefix === "- ") {
-        this.d_left.push({line_number: left_line_number, prefix: prefix, content: item});
-        left_line_number += 1;
-      }
-      else if (prefix === "+ ") {
-        this.d_right.push({line_number: right_line_number, prefix: prefix, content: item});
-        right_line_number += 1;
-      }
-      else if (prefix === "  ") {
-        this.pad_if_needed(this.d_left, this.d_right);
-
-        this.d_left.push({line_number: left_line_number, prefix: prefix, content: item});
-        this.d_right.push({line_number: right_line_number, prefix: prefix, content: item});
-
-        left_line_number += 1;
-        right_line_number += 1;
-      }
-      else {
-        throw new DiffPrefixError(
-          `Invalid prefix: "${prefix}". Prefixes must be one of: "- ", "+ ", "  "`);
-      }
-    }
-    this.pad_if_needed(this.d_left, this.d_right);
+  private get left_with_whitespace() {
+    return this.left.map(cell_data => {
+      return {
+        line_number: cell_data.line_number,
+        prefix: cell_data.prefix,
+        content: this.replace_whitespace(cell_data.content)
+      };
+    });
   }
 
-  pad_if_needed(left: DiffCell[], right: DiffCell[]) {
+  private get right_with_whitespace() {
+    return this.right.map(cell_data => {
+      return {
+        line_number: cell_data.line_number,
+        prefix: cell_data.prefix,
+        content: this.replace_whitespace(cell_data.content)
+      };
+    });
+  }
+
+  d_show_whitespace = false;
+  d_fullscreen = false;
+
+  d_loading = true;
+
+  readonly num_lines_per_page = 1000;
+  d_num_lines_rendered = this.num_lines_per_page;
+
+  async created() {
+    let left_line_number = 1;
+    let right_line_number = 1;
+
+    this.left = [];
+    this.right = [];
+
+    for (let item of await this.diff_contents) {
+      let prefix = item.substring(0, 2);
+      let content = item.substring(2);
+      if (prefix === "- ") {
+        this.left.push({line_number: left_line_number, prefix: prefix, content: content});
+        left_line_number += 1;
+      }
+      else if (prefix === "  ") {
+        this.pad_if_needed(this.left, this.right);
+
+        this.left.push({line_number: left_line_number, prefix: prefix, content: content});
+        this.right.push({line_number: right_line_number, prefix: prefix, content: content});
+
+        left_line_number += 1;
+        right_line_number += 1;
+      }
+      else if (prefix === "+ ") {
+        this.right.push({line_number: right_line_number, prefix: prefix, content: content});
+        right_line_number += 1;
+      }
+      else {  // Treat invalid prefixes as "+ "
+        this.right.push({line_number: right_line_number, prefix: "+ ", content: item});
+        right_line_number += 1;
+      }
+    }
+    this.pad_if_needed(this.left, this.right);
+
+    this.d_loading = false;
+ }
+
+  pad_if_needed(left: DiffCellData[], right: DiffCellData[]) {
     if (left.length === right.length) {
       return;
     }
-    let to_pad: DiffCell[];
-    let bigger: DiffCell[];
+    let to_pad: DiffCellData[];
+    let bigger: DiffCellData[];
     if (left.length > right.length) {
       bigger = left;
       to_pad = right;
@@ -141,37 +200,56 @@ export default class Diff extends Vue {
       to_pad = left;
     }
     while (to_pad.length < bigger.length) {
-      to_pad.push({line_number: null, prefix: null, content: null});
+      to_pad.push({line_number: null, prefix: ' ', content: ''});
     }
   }
 
-  replace_whitespace(current: string | null): string | null {
-    if (current === null) {
-      return null;
-    }
-    current = current.split(' ').join('\u2219');
-    current = current.split('\n').join('\u21b5\n');
-    current = current.split('\r').join('\\r\r');
-    return current;
-  }
-
-  line_num_highlighting = {
+  readonly line_num_highlighting = {
     '- ': 'negative-line-num',
     '+ ': 'positive-line-num',
     '  ': ''
   };
 
-  content_highlighting = {
+  readonly content_highlighting = {
     '- ': 'negative',
     '+ ': 'positive',
     '  ': ''
   };
 
+  replace_whitespace(str: string): string {
+    return str.replace(/[ \t\n\r]/g, (matched) => {
+      return this.special_char_replacements[matched];
+    });
+  }
+
+  readonly special_char_replacements: {[key: string]: string} = {
+    ' ': '\u2219',
+    '\t': '\u21e5\t',
+    '\n': '\u21b5\n',
+    '\r': '\\r\r',
+  };
+
+  private get num_lines_to_show() {
+    return Math.min(this.d_num_lines_rendered, this.left.length);
+  }
+
+  private render_more_lines() {
+    this.d_num_lines_rendered = Math.min(
+      this.left.length,
+      this.d_num_lines_rendered + this.num_lines_per_page
+    );
+  }
+
+  private get line_num_width() {
+    return `${this.num_lines_to_show.toString().length + 1}ch`;
+  }
 }
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
 
 * {
   box-sizing: border-box;
@@ -183,6 +261,9 @@ export default class Diff extends Vue {
   bottom: 0;
   left: 0;
   right: 0;
+
+  display: flex;
+  flex-direction: column;
 
   background-color: white;
   z-index: 10;
@@ -224,25 +305,30 @@ export default class Diff extends Vue {
 
 .diff-body {
   width: 100%;
+  table-layout: fixed;
 }
 
-.code-cell {
-  display: flex;
-}
 
 .line-num, .prefix, .content {
   margin: 0;
   padding: .25rem .375rem;
   font-family: "Lucida Console", Consolas, "Courier New", Courier, monospace;
+
+  // So that toggling whitespace doesn't make everything jump.
+  line-height: 1;
 }
 
 .line-num {
-  width: 1%;
-  min-width: 10px;
-  text-align: center;
+  // Note: we compute the width of this element dynamically.
+
+  text-align: right;
 
   user-select: none;
   color: lightslategray;
+}
+
+.code-cell {
+  display: flex;
 }
 
 .prefix {
@@ -273,6 +359,12 @@ $positive-color: hsl(120, 100%, 95%);
 
 .positive-line-num {
   background-color: darken($positive-color, 5%);
+}
+
+.show-more-button-container {
+  display: flex;
+  justify-content: center;
+  padding: .375rem;
 }
 
 .toggle-container {

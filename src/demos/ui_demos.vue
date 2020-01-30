@@ -44,10 +44,6 @@
               @click="d_current_tab ='modal'">
             Modal
           </div>
-          <div :class="['sidebar-item', {active: d_current_tab === 'multi_file'}]"
-              @click="d_current_tab ='multi_file'">
-            Multi-file Viewer
-          </div>
           <div :class="['sidebar-item', {active: d_current_tab === 'select_object'}]"
               @click="d_current_tab ='select_object'">
             Select Object
@@ -88,7 +84,6 @@
         <DropdownTypeaheadDemo v-show="d_current_tab === 'typeahead'"></DropdownTypeaheadDemo>
         <FileUploadDemo v-show="d_current_tab === 'upload'"></FileUploadDemo>
         <ModalDemo v-show="d_current_tab === 'modal'"></ModalDemo>
-        <MultiFileViewerDemo v-show="d_current_tab === 'multi_file'"></MultiFileViewerDemo>
         <SelectObjectDemo v-show="d_current_tab === 'select_object'"></SelectObjectDemo>
         <TabsDemo v-show="d_current_tab === 'tabs'"></TabsDemo>
         <TooltipDemo v-show="d_current_tab === 'tooltip'"></TooltipDemo>
@@ -120,7 +115,6 @@ import DropdownDemo from './dropdown_demo.vue';
 import DropdownTypeaheadDemo from './dropdown_typeahead_demo.vue';
 import FileUploadDemo from './file_upload_demo.vue';
 import ModalDemo from './modal_demo.vue';
-import MultiFileViewerDemo from './multi_file_viewer_demo.vue';
 import SelectObjectDemo from './select_object_demo.vue';
 import TabsDemo from './tabs_demo.vue';
 import ToggleDemo from './toggle_demo.vue';
@@ -141,7 +135,6 @@ import ViewFileDemo from './view_file_demo.vue';
     DropdownTypeaheadDemo,
     FileUploadDemo,
     ModalDemo,
-    MultiFileViewerDemo,
     SelectObjectDemo,
     Tab,
     Tabs,
