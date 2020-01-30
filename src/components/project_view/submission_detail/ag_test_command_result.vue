@@ -201,10 +201,9 @@ export default class AGTestCommandResult extends Vue {
   d_stdout_diff_load_progress: number | null = null;
   d_stderr_diff_load_progress: number | null = null;
 
-  @Watch('ag_test_command_result')
-  async on_ag_test_command_result_change(new_value: AGTestCommandResultFeedback,
-                                         old_value: AGTestCommandResultFeedback) {
-    await this.get_output();
+  @Watch('fdbk_category')
+  on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
+    return this.get_output();
   }
 
   readonly ExpectedReturnCode = ExpectedReturnCode;
@@ -249,14 +248,13 @@ export default class AGTestCommandResult extends Vue {
     this.load_stderr_content();
   }
 
-
   load_stdout_content() {
     if (this.d_output_size!.stdout_size === null || this.d_output_size!.stdout_size === 0) {
       return;
     }
 
     this.d_stdout_content = ResultOutput.get_ag_test_cmd_result_stdout(
-      this.submission!.pk,
+      this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category,
       (event: ProgressEvent) => {
@@ -273,7 +271,7 @@ export default class AGTestCommandResult extends Vue {
     }
 
     this.d_stderr_content = ResultOutput.get_ag_test_cmd_result_stderr(
-      this.submission!.pk,
+      this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category,
       (event: ProgressEvent) => {
@@ -291,7 +289,7 @@ export default class AGTestCommandResult extends Vue {
     }
 
     this.d_stdout_diff = ResultOutput.get_ag_test_cmd_result_stdout_diff(
-      this.submission!.pk,
+      this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category,
       (event: ProgressEvent) => {
@@ -309,7 +307,7 @@ export default class AGTestCommandResult extends Vue {
     }
 
     this.d_stderr_diff = ResultOutput.get_ag_test_cmd_result_stderr_diff(
-      this.submission!.pk,
+      this.submission.pk,
       this.ag_test_command_result.pk,
       this.fdbk_category,
       (event: ProgressEvent) => {

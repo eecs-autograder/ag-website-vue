@@ -127,7 +127,7 @@ export default class Diff extends Vue {
         prefix: cell_data.prefix,
         content: this.replace_whitespace(cell_data.content)
       };
-    })
+    });
   }
 
   private get right_with_whitespace() {
@@ -137,7 +137,7 @@ export default class Diff extends Vue {
         prefix: cell_data.prefix,
         content: this.replace_whitespace(cell_data.content)
       };
-    })
+    });
   }
 
   d_show_whitespace = false;
@@ -222,7 +222,7 @@ export default class Diff extends Vue {
     });
   }
 
-  readonly special_char_replacements = {
+  readonly special_char_replacements: {[key: string]: string} = {
     ' ': '\u2219',
     '\t': '\u21e5\t',
     '\n': '\u21b5\n',

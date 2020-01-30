@@ -7,7 +7,7 @@ import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, wait_until, wait_for_load } from '@/tests/utils';
+import { compress_whitespace, wait_for_load, wait_until } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -112,6 +112,15 @@ describe('ViewFile.vue', () => {
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(2700);
 
         expect(wrapper.find({ref: 'show_more_button'}).exists()).toBe(false);
+    });
+
+    test('Progress bar', async () => {
+        wrapper.vm.d_loading = true;
+        wrapper.setProps({progress: 42});
+
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find({name: 'ProgressBar'}).exists()).toBe(true);
+        expect(wrapper.find('viewing-container').exists()).toBe(false);
     });
 });
 

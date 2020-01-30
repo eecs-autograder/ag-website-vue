@@ -30,7 +30,7 @@ describe('Diff tests', () => {
         let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(11);
 
-        let expected_left = [
+        let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'one'},
             {line_number: 2, prefix: '', content: 'two'},
             {line_number: 3, prefix: '-', content: 'left one'},
@@ -44,7 +44,7 @@ describe('Diff tests', () => {
             {line_number: '', prefix: '', content: ''},
         ];
 
-        let expected_right = [
+        let expected_right: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'one'},
             {line_number: 2, prefix: '', content: 'two'},
             {line_number: '', prefix: '', content: ''},
@@ -73,12 +73,12 @@ describe('Diff tests', () => {
         wrapper.setData({d_show_whitespace: true});
         await wrapper.vm.$nextTick();
 
-        let expected_left = [
+        let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
             {line_number: 2, prefix: '-', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
         ];
 
-        let expected_right = [
+        let expected_right: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
             {line_number: '', prefix: '', content: ''},
         ];
@@ -111,13 +111,13 @@ describe('Diff test edge cases', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let expected_left = [
+        let expected_left: RenderedDiffCell[] = [
             {line_number: '', prefix: '', content: ''},
             {line_number: '', prefix: '', content: ''},
             {line_number: '', prefix: '', content: ''},
         ];
 
-        let expected_right = [
+        let expected_right: RenderedDiffCell[] = [
             {line_number: 1, prefix: '+', content: 'one'},
             {line_number: 2, prefix: '+', content: 'two'},
             {line_number: 3, prefix: '+', content: 'three'},
@@ -139,13 +139,13 @@ describe('Diff test edge cases', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let expected_left = [
+        let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '-', content: 'one'},
             {line_number: 2, prefix: '-', content: 'two'},
             {line_number: 3, prefix: '-', content: 'three'},
         ];
 
-        let expected_right = [
+        let expected_right: RenderedDiffCell[] = [
             {line_number: '', prefix: '', content: ''},
             {line_number: '', prefix: '', content: ''},
             {line_number: '', prefix: '', content: ''},
@@ -166,13 +166,13 @@ describe('Diff test edge cases', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let expected_left = [
+        let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '-', content: 'two'},
             {line_number: 2, prefix: '-', content: 'three'},
         ];
 
-        let expected_right = [
-            {line_number: '1', prefix: '+', content: 'spam'},
+        let expected_right: RenderedDiffCell[] = [
+            {line_number: 1, prefix: '+', content: 'spam'},
             {line_number: '', prefix: '', content: ''},
         ];
 
