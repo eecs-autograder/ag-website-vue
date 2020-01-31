@@ -17,7 +17,7 @@ import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_
 import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
-import { set_validated_input_text } from '@/tests/utils';
+import { set_validated_input_text, wait_until } from '@/tests/utils';
 
 beforeAll(() => {
     config.logModifiedComponents = false;
@@ -77,7 +77,7 @@ describe('EditSingleGroup tests', () => {
         ).vm;
         set_validated_input_text(wrapper.find({ref: 'bonus_submissions_remaining_input'}), "-4");
 
-        expect(component.edit_group_form_is_valid).toBe(false);
+        expect(component.d_edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
@@ -92,7 +92,7 @@ describe('EditSingleGroup tests', () => {
 
         set_validated_input_text(bonus_submissions_input, "spam");
 
-        expect(component.edit_group_form_is_valid).toBe(false);
+        expect(component.d_edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
@@ -139,6 +139,34 @@ describe('EditSingleGroup tests', () => {
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(save_group_stub.calledOnce);
+    });
+
+    test('Delete group', async () => {
+        let delete_group_stub = sinon.stub(wrapper.vm.d_group, 'pseudo_delete');
+        wrapper.find({ref: 'show_delete_modal_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'delete_group_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
+
+        expect(wrapper.find({ref: 'delete_group'}).exists()).toBe(false);
+        expect(delete_group_stub.calledOnce).toBe(true);
+    });
+
+    test('Delete group API errors handled', async () => {
+        sinon.stub(wrapper.vm.d_group, 'pseudo_delete').rejects(new HttpError(403, ''));
+
+        wrapper.find({ref: 'show_delete_modal_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find({ref: 'delete_group_button'}).trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.find({ref: 'delete_group_api_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
     });
 
     test("When the prop 'group' changes in the parent component, d_group is updated", async () => {
