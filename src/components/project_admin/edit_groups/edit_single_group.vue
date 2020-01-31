@@ -10,7 +10,7 @@
                         :project="project"
                         :course="course"
                         @submit="update_group"
-                        @form_validity_changed="edit_group_form_is_valid = $event"
+                        @form_validity_changed="d_edit_group_form_is_valid = $event"
                         :ignore_group_size_limits="true">
       <template v-slot:footer>
         <div id="datetime-picker-container" class="clearable-datetime-picker">
@@ -54,6 +54,45 @@
         </div>
       </template>
     </group-members-form>
+
+    <div class="danger-zone-container">
+      <div class="danger-text">Delete Group</div>
+      <button type="button"
+              class="delete-button"
+              @click="d_show_delete_group_modal = true"
+              ref="show_delete_modal_button">
+        Delete
+      </button>
+    </div>
+
+    <modal v-if="d_show_delete_group_modal"
+           @close="d_show_delete_group_modal = false"
+           :include_closing_x="!d_deleting"
+           :click_outside_to_close="!d_deleting"
+           ref="delete_group_modal">
+      <div class="modal-header">Confirm Delete</div>
+
+      NOTE: This will remove all members from the group, but will preserve
+      the database entry and all submissions associated with the group.
+
+      <APIErrors ref="delete_group_api_errors"></APIErrors>
+
+      <div class="modal-button-footer">
+        <button type="button"
+                class="red-button"
+                :disabled="d_deleting"
+                @click="delete_group"
+                ref="delete_group_button">
+          Delete
+        </button>
+        <button type="button"
+                class="white-button"
+                @click="d_show_delete_group_modal = false"
+                :disabled="d_deleting">
+          Cancel
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 
@@ -66,10 +105,12 @@ import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from '@/components/group_members_form.vue';
 import LastSaved from '@/components/last_saved.vue';
+import Modal from '@/components/modal.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, format_datetime, handle_api_errors_async } from '@/utils';
+import { make_error_handler_func } from '@/error_handling';
+import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
 @Component({
@@ -78,6 +119,7 @@ import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/vali
     DatetimePicker,
     GroupMembersForm,
     LastSaved,
+    Modal,
     Toggle,
     ValidatedForm,
     ValidatedInput,
@@ -113,8 +155,10 @@ export default class EditSingleGroup extends Vue {
   });
 
   d_saving = false;
+  d_edit_group_form_is_valid = true;
 
-  edit_group_form_is_valid = true;
+  d_show_delete_group_modal = false;
+  d_deleting = false;
 
   @Watch('group')
   on_group_selected_changed(new_group: Group, old_group: Group) {
@@ -137,6 +181,14 @@ export default class EditSingleGroup extends Vue {
     }
   }
 
+  @handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
+  async delete_group() {
+    return toggle(this, 'd_deleting', async () => {
+        await this.d_group.pseudo_delete();
+        this.d_show_delete_group_modal = false;
+    });
+  }
+
   get format_datetime() {
     return format_datetime;
   }
@@ -151,6 +203,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/components/datetime.scss';
 
 #edit-single-group-component {
