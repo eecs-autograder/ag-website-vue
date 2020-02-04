@@ -125,7 +125,7 @@
       <div v-if="d_output_size.stdout_size !== null"
            ref="actual_stdout_section"
            class="feedback-row">
-        <div class="feedback-label"> Output: </div>
+        <div class="feedback-label"> Output:  <br> spam </div>
         <div class="feedback">
           <div v-if="d_output_size.stdout_size === 0" class="short-output">No output</div>
           <div v-else-if="d_stdout_content !== null" class="lengthy-output">
