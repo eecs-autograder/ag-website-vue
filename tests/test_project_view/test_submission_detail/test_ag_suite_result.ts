@@ -1,11 +1,13 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
 import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
+import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_shallow_mount } from '@/tests/setup';
 
 let group: ag_cli.Group;
 let submission: ag_cli.Submission;
@@ -76,14 +78,10 @@ function check_all_case_correctness_levels(wrapper: Wrapper<AGSuiteResult>,
     expect(wrapper.vm.case_result_correctness(case_result)).toEqual(overall_correctness);
 }
 
-function make_wrapper(submission_in: ag_cli.Submission,
-                      suite_result: ag_cli.AGTestSuiteResultFeedback,
-                      fdbk_category: ag_cli.FeedbackCategory,
-                      is_first_suite: boolean = false) {
-
-    let wrapper = mount(AGSuiteResult, {
+function make_wrapper(is_first_suite: boolean) {
+    let wrapper = managed_shallow_mount(AGSuiteResult, {
         propsData: {
-            submission: submission_in,
+            submission: submission,
             ag_test_suite_result: ag_test_suite_result,
             fdbk_category: ag_cli.FeedbackCategory.max,
             is_first_suite: is_first_suite
@@ -97,7 +95,7 @@ describe('case_result_correctness tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
     beforeEach(() => {
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
+        wrapper = make_wrapper(false);
     });
 
     test('return_code_correctness === not_available AND output_correctness === not_available',
@@ -463,7 +461,7 @@ describe('case_result_return_code_correctness tests', () => {
         expect(ag_test_case_result.ag_test_command_results[1].return_code_correct).toBeNull();
         expect(ag_test_case_result.ag_test_command_results[2].return_code_correct).toBeNull();
 
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
+        wrapper = make_wrapper(false);
     });
 
     test('all commands have return_code_correct === null', async () => {
@@ -610,7 +608,7 @@ describe('case_result_output_correctness tests', () => {
     let wrapper: Wrapper<AGSuiteResult>;
 
     beforeEach(() => {
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
+        wrapper = make_wrapper(false);
     });
 
     test('case_result_output_correctness - not_available - every command has ' +
@@ -719,179 +717,102 @@ describe('case_result_output_correctness tests', () => {
     });
 });
 
+function get_setup_result_panel(wrapper: Wrapper<AGSuiteResult>) {
+    return <ResultPanel> wrapper.find({ref: 'setup_result_panel'}).vm;
+}
+
 describe('setup_correctness_level tests', () => {
-    let wrapper: Wrapper<AGSuiteResult>;
-
-    test('setup_correctness_level - show_setup_return_code === false', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = false;
+    test('setup_name null, not_available', () => {
+        ag_test_suite_result.setup_name = null;
         ag_test_suite_result.setup_return_code = 0;
 
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toEqual(0);
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.info_only);
+        let wrapper = make_wrapper(false);
+        expect(wrapper.find({ref: 'setup_result_panel'}).exists()).toBe(false);
     });
 
-    test('setup_correctness_level - setup_return_code === 0', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 0;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toEqual(0);
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-    });
-
-    test('setup_correctness_level - setup_return_code === null', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
+    test('setup_name not null, return code and time out null, info_only', () => {
+        ag_test_suite_result.setup_name = 'Setup!';
         ag_test_suite_result.setup_return_code = null;
+        ag_test_suite_result.setup_timed_out = null;
 
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBeNull();
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.not_available);
+        let wrapper = make_wrapper(false);
+        expect(get_setup_result_panel(wrapper).correctness_level).toEqual(
+            CorrectnessLevel.info_only);
     });
 
-    test('setup_correctness_level - setup_return_code !== 0 && setup_return_code !== null',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 1;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toEqual(0);
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-    });
-});
-
-describe('panel_is_active - setup_case tests', () => {
-    let wrapper: Wrapper<AGSuiteResult>;
-
-    test('setup_panel_is_active - show_setup_return_code === false',
-         async () => {
-        ag_test_suite_result.setup_return_code = 1;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.info_only);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(1);
-        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.ag_test_suite_result.fdbk_settings.show_setup_return_code).toBe(false);
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-    });
-
-    test('setup_panel_is_active - setup_correctness_level !== correct',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 1;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(1);
-        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.setup_is_incorrect).toBe(true);
-    });
-
-    test('setup_panel_is_active - setup_return_code === correct but ' +
-         'setup_timed_out === true',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
+    test('setup_name not null, return code 0, all_correct', () => {
+        ag_test_suite_result.setup_name = 'Setup!';
         ag_test_suite_result.setup_return_code = 0;
+
+        let wrapper = make_wrapper(false);
+        expect(get_setup_result_panel(wrapper).correctness_level).toEqual(
+            CorrectnessLevel.all_correct);
+    });
+
+    test('setup_name not null, return code nonzero, none_correct', () => {
+        ag_test_suite_result.setup_name = 'Setup!';
+        ag_test_suite_result.setup_return_code = 2;
+
+        let wrapper = make_wrapper(false);
+        expect(get_setup_result_panel(wrapper).correctness_level).toEqual(
+            CorrectnessLevel.none_correct);
+    });
+
+    test('setup_name not null, setup timed out, none_correct', () => {
+        ag_test_suite_result.setup_name = 'Setup!';
+        ag_test_suite_result.setup_return_code = null;
         ag_test_suite_result.setup_timed_out = true;
 
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
-        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBe(true);
-        expect(wrapper.vm.setup_is_incorrect).toBe(true);
-    });
-
-    test('setup_panel_is_active - setup_return_code === correct', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 0;
-        ag_test_suite_result.setup_timed_out = false;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
-        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBe(false);
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-    });
-
-    test('setup_panel_is_active - setup_return_code === correct' +
-         'AND setup_timed_out === null',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 0;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBe(0);
-        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-    });
-
-    test('setup_panel_is_active - setup_return_code === null', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.not_available);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).toBeNull();
-        expect(wrapper.vm.ag_test_suite_result.setup_timed_out).toBeNull();
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-    });
-
-    test('setup_panel_is_active - is_first_suite is false AND setup_is_incorrect is true',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 1;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.is_first_suite).toBe(false);
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.setup_is_incorrect).toBe(true);
-        expect(wrapper.vm.setup_panel_is_active).toBe(false);
-    });
-
-
-    test('setup_panel_is_active - is_first_suite is true AND setup_is_incorrect is true',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 1;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max, true);
-
-        expect(wrapper.vm.is_first_suite).toBe(true);
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.none_correct);
-        expect(wrapper.vm.setup_is_incorrect).toBe(true);
-        expect(wrapper.vm.setup_panel_is_active).toBe(true);
-    });
-
-    test('setup_panel_is_active - is_first_suite is true AND setup_is_incorrect is false',
-         async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
-        ag_test_suite_result.setup_return_code = 0;
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max, true);
-
-        expect(wrapper.vm.is_first_suite).toBe(true);
-        expect(wrapper.vm.setup_correctness_level).toEqual(CorrectnessLevel.all_correct);
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-        expect(wrapper.vm.setup_panel_is_active).toBe(false);
+        let wrapper = make_wrapper(false);
+        expect(get_setup_result_panel(wrapper).correctness_level).toEqual(
+            CorrectnessLevel.none_correct);
     });
 });
 
-describe('panel_is_active - case tests', () => {
-    let wrapper: Wrapper<AGSuiteResult>;
+describe('Setup panel open initially tests', () => {
+    test('Not first suite, not open initially', () => {
+        ag_test_suite_result.setup_name = 'Setup';
+        ag_test_suite_result.setup_return_code = 1;
+        let wrapper = make_wrapper(false);
+        expect(get_setup_result_panel(wrapper).open_initially).toBe(false);
+    });
+
+    test('Is first suite, setup is correct, not open initially', () => {
+        ag_test_suite_result.setup_name = 'Setup';
+        ag_test_suite_result.setup_return_code = 0;
+        let wrapper = make_wrapper(true);
+        expect(get_setup_result_panel(wrapper).open_initially).toBe(false);
+    });
+
+    test('Is first suite, setup is info only, not open initially', () => {
+        ag_test_suite_result.setup_name = 'Setup';
+        ag_test_suite_result.setup_return_code = null;
+        ag_test_suite_result.setup_timed_out = null;
+        let wrapper = make_wrapper(true);
+        expect(get_setup_result_panel(wrapper).open_initially).toBe(false);
+    });
+
+    test('Is first suite, setup is incorrect, is open initially', () => {
+        ag_test_suite_result.setup_name = 'Setup';
+        ag_test_suite_result.setup_return_code = 3;
+        ag_test_suite_result.setup_timed_out = false;
+        let wrapper = make_wrapper(true);
+        expect(get_setup_result_panel(wrapper).open_initially).toBe(true);
+    });
+
+    test('Is first suite, setup timed out, is open initially', () => {
+        ag_test_suite_result.setup_name = 'Setup';
+        ag_test_suite_result.setup_return_code = null;
+        ag_test_suite_result.setup_timed_out = true;
+        let wrapper = make_wrapper(true);
+        expect(get_setup_result_panel(wrapper).open_initially).toBe(true);
+    });
+});
+
+describe('First failed test case result panel open initially tests', () => {
+    function get_test_result_panel(wrapper: Wrapper<AGSuiteResult>, index: number) {
+        return <ResultPanel> wrapper.findAll({ref: 'test_result_panel'}).at(index).vm;
+    }
 
     let case_1: ag_cli.AGTestCaseResultFeedback;
     let case_1_command_1: ag_cli.AGTestCommandResultFeedback;
@@ -932,8 +853,8 @@ describe('panel_is_active - case tests', () => {
         ];
     });
 
-    test('setup_panel_is_active - setup_is_incorrect is true', async () => {
-        ag_test_suite_result.fdbk_settings.show_setup_return_code = true;
+    test('Setup is first failure, no tests open initially', async () => {
+        ag_test_suite_result.setup_name = 'Setup';
         ag_test_suite_result.setup_return_code = 1;
 
         for (let command of case_1.ag_test_command_results) {
@@ -944,94 +865,16 @@ describe('panel_is_active - case tests', () => {
             set_command_result_correctness(command, false, false, false);
         }
 
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
+        let wrapper = make_wrapper(true);
 
-        expect(wrapper.vm.setup_is_incorrect).toBe(true);
-        expect(wrapper.vm.first_incorrect_case).toBeNull();
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        )).toBe(false);
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
-        )).toBe(false);
+        let first = get_test_result_panel(wrapper, 0);
+        expect(first.open_initially).toBe(false);
+
+        let second = get_test_result_panel(wrapper, 1);
+        expect(second.open_initially).toBe(false);
     });
 
-    test('setup_is_incorrect is false && all cases have case_level_correctness ' +
-         '=== none_correcct - first_incorrect_case applied to first incorrect case',
-         async () => {
-        for (let command of case_1.ag_test_command_results) {
-            set_command_result_correctness(command, false, false, false);
-        }
-
-        for (let command of case_2.ag_test_command_results) {
-            set_command_result_correctness(command, false, false, false);
-        }
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max, true);
-
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-        expect(wrapper.vm.first_incorrect_case).toEqual(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        );
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        )).toBe(true);
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
-        )).toBe(false);
-    });
-
-    test('setup_is_incorrect is walse && all cases have case_level_correctness ' +
-         '=== all_correct - first_incorrect_case never set',
-         async () => {
-        for (let command of case_1.ag_test_command_results) {
-            set_command_result_correctness(command, true, true, true);
-        }
-
-        for (let command of case_2.ag_test_command_results) {
-            set_command_result_correctness(command, true, true, true);
-        }
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-        expect(wrapper.vm.first_incorrect_case).toBeNull();
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        )).toBe(false);
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
-        )).toBe(false);
-    });
-
-    test('setup_is_incorrect is false && all cases have case_level_correctness ' +
-         '=== some_correct - first_incorrect_case set to first incorrect case',
-         async () => {
-        for (let command of case_1.ag_test_command_results) {
-            set_command_result_correctness(command, true, true, false);
-        }
-
-        for (let command of case_2.ag_test_command_results) {
-            set_command_result_correctness(command, false, true, true);
-        }
-
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
-
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-        expect(wrapper.vm.first_incorrect_case).toEqual(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        );
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        )).toBe(true);
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
-        )).toBe(false);
-    });
-
-    test('setup_is_incorrect is false && some cases have case_level_correctness ' +
-         '=== all_correct - first_incorrect_case set to first incorrect case',
-         async () => {
+    test('First some_correct test open initially', async () => {
         for (let command of case_1.ag_test_command_results) {
             set_command_result_correctness(command, true, true, true);
         }
@@ -1040,17 +883,68 @@ describe('panel_is_active - case tests', () => {
             set_command_result_correctness(command, false, true, true);
         }
 
-        wrapper = make_wrapper(submission, ag_test_suite_result, ag_cli.FeedbackCategory.max);
+        let wrapper = make_wrapper(true);
 
-        expect(wrapper.vm.setup_is_incorrect).toBe(false);
-        expect(wrapper.vm.first_incorrect_case).toEqual(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
-        );
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[0]
-        )).toBe(false);
-        expect(wrapper.vm.get_case_is_active(
-            wrapper.vm.ag_test_suite_result.ag_test_case_results[1]
-        )).toBe(true);
+
+        let first = get_test_result_panel(wrapper, 0);
+        expect(first.open_initially).toBe(false);
+
+        let second = get_test_result_panel(wrapper, 1);
+        expect(second.open_initially).toBe(true);
+    });
+
+    test('First none_correct test open initially', async () => {
+        for (let command of case_1.ag_test_command_results) {
+            set_command_result_correctness(command, true, true, true);
+        }
+
+        for (let command of case_2.ag_test_command_results) {
+            set_command_result_correctness(command, false, false, false);
+        }
+
+        let wrapper = make_wrapper(true);
+
+
+        let first = get_test_result_panel(wrapper, 0);
+        expect(first.open_initially).toBe(false);
+
+        let second = get_test_result_panel(wrapper, 1);
+        expect(second.open_initially).toBe(true);
+    });
+
+    test('All tests all_correct, none open initially', async () => {
+        for (let command of case_1.ag_test_command_results) {
+            set_command_result_correctness(command, true, true, true);
+        }
+
+        for (let command of case_2.ag_test_command_results) {
+            set_command_result_correctness(command, true, true, true);
+        }
+
+        let wrapper = make_wrapper(true);
+
+        let first = get_test_result_panel(wrapper, 0);
+        expect(first.open_initially).toBe(false);
+
+        let second = get_test_result_panel(wrapper, 1);
+        expect(second.open_initially).toBe(false);
+    });
+
+    test('All tests none_correct, first one open initially', async () => {
+        for (let command of case_1.ag_test_command_results) {
+            set_command_result_correctness(command, false, false, false);
+        }
+
+        for (let command of case_2.ag_test_command_results) {
+            set_command_result_correctness(command, false, false, false);
+        }
+
+        let wrapper = make_wrapper(true);
+
+        let first = get_test_result_panel(wrapper, 0);
+        expect(first.open_initially).toBe(true);
+
+        let second = get_test_result_panel(wrapper, 1);
+        expect(second.open_initially).toBe(false);
     });
 });

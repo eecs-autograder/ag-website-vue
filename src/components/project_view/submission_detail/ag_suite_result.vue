@@ -9,27 +9,27 @@
     </div>
 
     <result-panel
-      v-if="ag_test_suite_result.setup_return_code !== null
-            || ag_test_suite_result.setup_timed_out"
-      ref="ag_case_setup_result_detail_panel"
-      :name="ag_test_suite_result.setup_name ? ag_test_suite_result.setup_name : 'Setup'"
+      v-if="ag_test_suite_result.setup_name !== null"
+      ref="setup_result_panel"
+      :name="ag_test_suite_result.setup_name !== '' ? ag_test_suite_result.setup_name : 'Setup'"
       :correctness_level="setup_correctness_level"
-      :open_initially="setup_panel_is_active">
+      :open_initially="is_first_suite && setup_correctness_level === CorrectnessLevel.none_correct">
       <AGSuiteSetupResult :submission="submission"
-                         :ag_test_suite_result="ag_test_suite_result"
-                         :fdbk_category="fdbk_category">
+                          :ag_test_suite_result="ag_test_suite_result"
+                          :fdbk_category="fdbk_category">
       </AGSuiteSetupResult>
     </result-panel>
 
     <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
       <result-panel
-        ref="ag_case_result_detail_panel"
+        ref="test_result_panel"
         :key="ag_test_case_result.pk"
         :name="ag_test_case_result.ag_test_case_name"
         :correctness_level="case_result_correctness(ag_test_case_result)"
         :points_awarded="ag_test_case_result.total_points"
         :points_possible="ag_test_case_result.total_points_possible"
-        :open_initially="get_case_is_active(ag_test_case_result)"
+        :open_initially="first_incorrect_case !== null
+                         && first_incorrect_case.pk === ag_test_case_result.pk"
         :is_multi_command_case="ag_test_case_result.ag_test_command_results.length > 1">
         <AGCaseResult
           :submission="submission"
@@ -82,14 +82,20 @@ export default class AGSuiteResult extends Vue {
 
   readonly CorrectnessLevel = CorrectnessLevel;
 
-  get setup_is_incorrect(): boolean {
-    return this.setup_correctness_level === CorrectnessLevel.none_correct
-           || (this.ag_test_suite_result!.setup_timed_out !== null
-               && this.ag_test_suite_result!.setup_timed_out!);
+  private get setup_correctness_level(): CorrectnessLevel {
+    if (this.ag_test_suite_result.setup_name === null) {
+      return CorrectnessLevel.not_available;
+    }
+    if (this.ag_test_suite_result.setup_return_code === null
+        && this.ag_test_suite_result.setup_timed_out === null) {
+      return CorrectnessLevel.info_only;
+    }
+    return setup_return_code_correctness(this.ag_test_suite_result.setup_return_code,
+                                         this.ag_test_suite_result.setup_timed_out);
   }
 
-  get first_incorrect_case(): AGTestCaseResultFeedback | null {
-    if (this.setup_is_incorrect) {
+  private get first_incorrect_case(): AGTestCaseResultFeedback | null {
+    if (!this.is_first_suite || this.setup_correctness_level === CorrectnessLevel.none_correct) {
       return null;
     }
 
@@ -101,23 +107,6 @@ export default class AGSuiteResult extends Vue {
       }
     }
     return null;
-  }
-
-  get setup_correctness_level(): CorrectnessLevel {
-    if (!this.ag_test_suite_result!.fdbk_settings.show_setup_return_code) {
-      return CorrectnessLevel.info_only;
-    }
-    return setup_return_code_correctness(this.ag_test_suite_result!.setup_return_code,
-                                         this.ag_test_suite_result!.setup_timed_out);
-  }
-
-  get setup_panel_is_active(): boolean {
-    return this.is_first_suite && this.setup_is_incorrect;
-  }
-
-  get_case_is_active(ag_test_case: AGTestCaseResultFeedback): boolean {
-    return this.first_incorrect_case !== null
-           && this.first_incorrect_case.pk === ag_test_case.pk;
   }
 
   case_result_correctness(case_result: AGTestCaseResultFeedback): CorrectnessLevel {
@@ -224,7 +213,7 @@ export default class AGSuiteResult extends Vue {
 @import '@/styles/components/submission_detail.scss';
 
 #ag-test-suite-name {
-  font-size: 19px;
+  font-size: 1.25rem;
   font-weight: bold;
   padding: 0 0 10px 0;
 }
