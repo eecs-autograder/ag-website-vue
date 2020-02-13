@@ -1,23 +1,10 @@
-# AG Website (Vue)
-A re-implementation of autograder-website using Vue.
+# AG Website
+The website frontend for autograder.io, implemented using Vue and Typescript.
 
 ## Setup
-First, install Docker Community Edition: https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce-1
-
-Then, clone the repo, install dependencies, and build the Docker images. 
-```
-git clone --recursive https://github.com/eecs-autograder/ag-website-vue.git
-cd ag-website-vue
-npm install
-docker-compose build
-```
+Follow the [dev stack setup tutorial](https://github.com/eecs-autograder/autograder-full-stack/blob/master/docs/development_setup.md) for the [autograder-full-stack repo](https://github.com/eecs-autograder/autograder-full-stack).
 
 ## Dev commands
-To run the dev server (runs on localhost:8080):
-```
-docker-compose up -d
-```
-
 To run the unit tests (with coverage):
 ```
 npm test
@@ -33,34 +20,34 @@ Note: Not all of the items below are enforcable with TSLint, but they must still
         - Note that npm will overwrite the formatting to 2 spaces on package.json when you use `npm install --save <package>`. Don't bother trying to format package.json yourself.
     - Since .vue files have typescript, html, and css in them, we will use 2 spaces for all of their contents. HTML benefits the most from 2-space indentation.
     - In Vue single-file components, indent one level inside the `<template>` tag, but not in the `<script>` or `<style>` tags.
-        
+
         **Yes:**
         ```
         <template>
           <div>...</div>
         </template>
-        
+
         <script lang="ts">
         @Component
         class MyComponent { ... }
         </script>
-        
+
         <style scoped lang="scss">
         .my-class { ... }
         </style>
         ```
-    
+
         **No:**
         ```
         <template>
           <div>...</div>
         </template>
-        
+
         <script lang="ts">
           @Component
           class MyComponent { ... }
         </script>
-        
+
         <style scoped lang="scss">
           .my-class { ... }
         </style>
@@ -138,14 +125,14 @@ Note: Not all of the items below are enforcable with TSLint, but they must still
     - When an imported function, class, enum, etc. needs to be made available to a component
       template, add a readonly variable with the same name to the class.
     ```
-    import { MyEnum, my_func } from 'utils'; 
+    import { MyEnum, my_func } from 'utils';
     @Component
     class MyComponent {
         readonly MyEnum = MyEnum;
         readonly my_func = my_func;
     }
     ```
-    
+
 - When wrapping a line at an operator, break _before_ the operator:
 ```
 // Yes
@@ -202,14 +189,33 @@ let my_list = [
     // "@/tests" is mapped to "tests" in tsconfig.json.
     import { egg } from "@/tests/utils";
     ```
-    
+
     - Group imports in the following order:
         - Vue libraries whose paths start with 'vue'
         - Vue libraries whose paths start with '@vue'
-        - 3rd-party libraries 
+        - 3rd-party libraries
         - Imports from this project
         - Imports from this project's `@/test` directory.
         - Parent directory relative imports
         - Current directory relative imports.
     - Separate each group with a blank line.
     - Note: TSLint will enforce these rules.
+- HTML/CSS
+    - Prefer classes to id's unless you can guarantee that only one element
+      with the id will exist at a time.
+        - Prefer using nested or otherwise more specific CSS class selectors
+          when you need to override some imported style.
+    - Avoid adding a class or id solely for the purpose of being able to
+      select an element in test cases. Prefer to use a Vue ref in for this
+      purpose.
+- Copying objects in components
+    - If a component needs to modify the members of an object passed as input
+      via `@Prop`, make a deep copy of that object and modify the copy.
+    - Similarly, if a component does NOT need to modify members of an `@Prop`
+      input, do NOT copy the object.
+    - When receiving a new or updated object from an observer `update_` function,
+      make a deep copy of the object.
+    - Use the `deep_copy` function in `src/utils.ts` to make deep copies of
+      class instances that have a constructor and/or member functions. For other
+      objects, `JSON.parse(JSON.stringify(...))` is the preferred approach.
+
