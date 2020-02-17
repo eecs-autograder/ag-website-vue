@@ -137,12 +137,6 @@ __Note__: Commands can be (almost) any valid Bash command.
 
 __CAVEAT__: The executable bit on instructor files is not preserved when they are copied into the grading environment. As such, running a script using `./script.bash` __will not work__. Instead, __invoke the interpreter directly__, as in: `bash script.bash` or `python3 script.py`. You will also find that trying to change the permissions with `chmod` will fail, as instructor files are marked as read-only and owned by root to prevent student code from modifying them.
 
-#### Feedback Settings
-Feedback is highly customizable. In addition to controlling whether students are shown information such as score and the return code and output of commands, you can also configure separate feedback settings depending on what kind of user is looking at what kind of submission. For example:
-- Admins can control the feedback students see depending on whether the submission in question is the student's final graded submission or a submission past the student's daily limit.
-    - Note: Students will not receive final graded submission feedback unless the conditions listed in under "Publish final grades" in [Access Settings](#access-settings) have been met.
-- Admins can control what staff see when looking up student submissions by changing the "Student Lookup" settings.
-
 #### "Deferred" Suites
 If you uncheck the "Suite must finish before students can submit again" box, then the suite will be considered "deferred." Deferred suites run in a separate queue and therefore may take longer to be graded. However, students don't have to wait for these suites to finish before they are allowed to submit again. This option is useful for suites of hidden test cases that students don't see until after the deadline.
 
@@ -153,7 +147,7 @@ In the "Suites" sidebar, hover over the name of the suite you want to add a test
 
 A collection of one or more commands. When a test case has only one command, the editing interface will merge this layer with the "command" layer. Although test cases do offer some of their own feedback settings, these are rarely used.
 
-The score for a test case __cannot go below zero__.
+The score for a test case __will not go below zero__. If a students score would go below zero, it is set to zero instead. Tests with multiple commands can take advantage of this by __awarding points for some commands passing__ and __deducting points for some commands failing__.
 
 ### 3. Commands
 New test cases automatically and transparently contain one command.
@@ -186,6 +180,33 @@ For some simple programs, the default resource limits will be sufficient. Other 
 For Java and Octave programs, 2000000000 bytes (2GB) and 16 processes is usually sufficient.
 
 For Bash scrips or other programs that spawn subprocesses, 10 is usually sufficient. The process spawn limit can be increased as high as 150 processes.
+
+#### Feedback Settings
+Feedback is highly customizable. In most cases, you will only need to change the preset for "Normal" feedback for your tests:
+![alt text](./pics/change_feedback_preset.png)
+
+#### Feedback "Categories"
+For specific information on feedback categories, please refer to the tooltips associated with each category.
+
+![alt text](./pics/feedback_category_tooltip.png)
+
+Here are some useful tips about feedback categories:
+- Admins can control the feedback students see depending on whether the submission in question is the student's final graded submission or a submission past the student's daily limit.
+    - Note: Students will not receive final graded submission feedback unless the conditions listed under "Publish final grades" in [Access Settings](#access-settings) have been met.
+- Admins can control what staff see when looking up student submissions by changing the "Student Lookup" settings.
+
+#### Testing Your Feedback Settings
+Once you've saved your feedback settings, you can inspect them on one of your own submissions.
+Go to the the "My Submissions" tab in the project page, and then select the feedback category you wish to inspect using the "Adjuct Feedback" dropdown:
+![alt text](./pics/test_feedback_settings.png)
+
+#### Advanced Feedback Settings
+If none of the feedback presets match your needs, you can adjust settings individually by
+clicking on "Advanced Settings":
+![alt text](./pics/advanced_fdbk_settings.png)
+
+### Cloning test Cases
+Test cases within the same suite often have
 
 ## Downloading Grades
 Under the "__Grades & Files__" tab you can download a csv file containing project scores (including handgrading, if applicable) or a zip archive containing student files. Select your desired options and click "__Start task__". A download link will appear once your csv or zip file is ready.
