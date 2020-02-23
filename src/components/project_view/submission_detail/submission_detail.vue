@@ -9,13 +9,13 @@
       Score:
       <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
     </div>
-    <div v-else-if="submission.status === GradingStatus.waiting_for_deferred"
-          id="deferred-tests-message" class="info-spacing grading-status">
-      Score hidden. Core tests finished. You can submit again now!
+    <div v-if="submission.status === GradingStatus.waiting_for_deferred"
+         id="deferred-tests-message" class="info-spacing grading-status">
+      Core tests finished. You can submit again now!
     </div>
     <div v-else-if="submission.status === GradingStatus.finished_grading"
-          id="deferred-tests-message" class="info-spacing grading-status">
-      Score hidden. All tests finished.
+         id="deferred-tests-message" class="info-spacing grading-status">
+      All tests finished.
     </div>
 
     <div v-if="show_auto_update_msg" id="auto-update-message" class="info-spacing">

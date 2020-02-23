@@ -199,9 +199,8 @@ describe('Score and status display tests', () => {
         submission_with_results.results.total_points_possible = 8;
 
         let wrapper = make_wrapper();
-
-        expect(wrapper.find('#submission-score').exists()).toBe(true);
         expect(wrapper.find('#submission-score').text()).toContain("0/8");
+        expect(wrapper.find('#deferred-tests-message').text()).toContain('Core tests finished');
     });
 
     test('Status waiting_for_deferred, points possible zero, no score shown', () => {
@@ -211,7 +210,6 @@ describe('Score and status display tests', () => {
 
         let wrapper = make_wrapper();
         expect(wrapper.find('#submission-score').exists()).toBe(false);
-
         expect(wrapper.find('#deferred-tests-message').text()).toContain('Core tests finished');
     });
 
@@ -222,6 +220,7 @@ describe('Score and status display tests', () => {
 
         let wrapper = make_wrapper();
         expect(wrapper.find('#submission-score').text()).toContain("0/5");
+        expect(wrapper.find('#deferred-tests-message').text()).toContain('All tests finished');
     });
 
     test('Status finished_grading, points possible zero, no score shown', () => {
