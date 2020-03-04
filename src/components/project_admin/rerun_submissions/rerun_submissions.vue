@@ -266,7 +266,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
     this.task_poller = new Poller(() => this.load_rerun_tasks(), 30);
     // tslint:disable-next-line no-floating-promises
-    // this.task_poller.start_after_delay();
+    this.task_poller.start_after_delay();
 
     this.d_loading = false;
   }
