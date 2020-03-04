@@ -5,7 +5,6 @@ import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
-import ValidatedForm from '@/components/validated_form.vue';
 
 beforeAll(() => {
     config.logModifiedComponents = false;

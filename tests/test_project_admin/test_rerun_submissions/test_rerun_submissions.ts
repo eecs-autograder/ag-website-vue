@@ -93,10 +93,11 @@ describe('Rerun list tests', () => {
         create_task_stub = sinon.stub(ag_cli.RerunSubmissionTask, 'create');
         create_task_stub.callsFake((project_pk, args) => {
             let new_task = new ag_cli.RerunSubmissionTask({
-                pk: 42,
+                pk: Math.floor(Math.random() * 10000),
                 project: project_pk,
                 progress: 0,
                 has_error: false,
+                is_cancelled: false,
                 ...args,
             });
             new_tasks.unshift(new ag_cli.RerunSubmissionTask(new_task));
@@ -109,12 +110,12 @@ describe('Rerun list tests', () => {
         wrapper.find({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_rerun_tasks).toEqual(new_tasks);
-        expect(wrapper.findAll({ref: 'task_row'}).length).toBe(1);
+        expect(wrapper.findAll({name: 'RerunTaskDetail'}).length).toBe(1);
 
         wrapper.find({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_rerun_tasks).toEqual(new_tasks);
-        expect(wrapper.findAll({ref: 'task_row'}).length).toBe(2);
+        expect(wrapper.findAll({name: 'RerunTaskDetail'}).length).toBe(2);
     });
 
     test('Manual refresh', async () => {
@@ -385,6 +386,7 @@ describe('Start rerun tests', () => {
                 progress: 0,
                 error_msg: '',
                 has_error: false,
+                is_cancelled: false,
                 rerun_all_submissions: true,
                 submission_pks: [],
                 rerun_all_ag_test_suites: true,

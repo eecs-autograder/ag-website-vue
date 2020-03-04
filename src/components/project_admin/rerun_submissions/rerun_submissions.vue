@@ -166,27 +166,15 @@
           <tr>
             <th>Started At</th>
             <th>Progress</th>
+            <th><!-- Cancel Button --></th>
           </tr>
         </thead>
         <tbody>
-          <tr ref="task_row" v-for="task of d_rerun_tasks">
-            <td class="started-at-cell">{{format_datetime(task.created_at)}}</td>
-            <td class="progress-cell">
-              <template v-if="task.has_error">
-                ERROR
-                <tooltip placement="top" width="large">
-                  An unexpected error occurred. Please contact <b>{{SYSADMIN_CONTACT}}</b>
-                  and include the information <b>"Rerun task ID: {{task.pk}}"</b> in your email.
-                </tooltip>
-              </template>
-              <template v-else>
-                {{task.progress}}%
-                <i v-if="task.progress !== 100"
-                   @click="refresh_task(task)"
-                   class="refresh-icon fas fa-sync-alt"></i>
-              </template>
-            </td>
-          </tr>
+          <rerun-task-detail
+            v-for="task of d_rerun_tasks"
+            :task="task"
+            :key="task.pk">
+          </rerun-task-detail>
         </tbody>
       </table>
     </div>
@@ -203,7 +191,6 @@ import APIErrors from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
@@ -217,6 +204,7 @@ import {
   update_changed_ag_test_case,
 } from '../suite_observer_utils';
 
+import RerunTaskDetail from './rerun_task_detail.vue';
 import SubmissionSelector from './submission_selector.vue';
 
 interface GroupWithSubmissions {
@@ -229,6 +217,7 @@ interface GroupWithSubmissions {
     APIErrors,
     Collapsible,
     GroupLookup,
+    RerunTaskDetail,
     SubmissionSelector,
     Tooltip,
   }
@@ -262,9 +251,6 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   d_starting_rerun = false;
   d_loading = true;
 
-  readonly format_datetime = format_datetime;
-  readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
-
   @handle_global_errors_async
   async created() {
     await this.load_rerun_tasks();
@@ -280,7 +266,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
     this.task_poller = new Poller(() => this.load_rerun_tasks(), 30);
     // tslint:disable-next-line no-floating-promises
-    this.task_poller.start_after_delay();
+    // this.task_poller.start_after_delay();
 
     this.d_loading = false;
   }
@@ -298,12 +284,6 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
   async load_rerun_tasks() {
     this.d_rerun_tasks = await ag_cli.RerunSubmissionTask.get_all_from_project(this.project.pk);
-  }
-
-  @handle_global_errors_async
-  async refresh_task(task: ag_cli.RerunSubmissionTask) {
-    let refreshed = await ag_cli.RerunSubmissionTask.get_by_pk(task.pk);
-    safe_assign(task, refreshed);
   }
 
   @handle_api_errors_async(handle_start_rerun_error)
@@ -667,15 +647,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 .rerun-table {
   text-align: left;
   width: 100%;
-  max-width: 500px;
-}
-
-.progress-cell {
-  margin-left: 1rem;
-}
-
-.refresh-icon {
-  cursor: pointer;
+  max-width: 550px;
 }
 
 </style>
