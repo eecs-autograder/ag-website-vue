@@ -61,7 +61,7 @@
           <button type="button"
                   @click="go_to_next_ag_test_case"
                   id="next-ag-test-case-button"
-                  :disabled="!next_ag_test_case_is_available">
+                  :disabled="next_ag_test_case === null">
             Next Test <i class="fas fa-angle-double-right" id="next"></i>
           </button>
         </span>
@@ -168,22 +168,23 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
   d_collapsed = false;
 
-  get parent_ag_test_case() {
-    if (this.d_active_ag_test_command !== null) {
-      let [parent_suite, parent_test_case] = find_parent_suite_and_test_case(
-        this.d_active_ag_test_command, this.d_ag_test_suites)!;
-      return parent_test_case;
-    }
-    return null;
+  get parent_ag_test_case(): AGTestCase | null {
+    let [parent_suite, parent_test_case] = this.parent_suite_and_test;
+    return parent_test_case;
   }
 
-  get parent_ag_test_suite() {
+  get parent_ag_test_suite(): AGTestSuite | null {
+    let [parent_suite, parent_test_case] = this.parent_suite_and_test;
+    return parent_suite;
+  }
+
+  private get parent_suite_and_test() {
     if (this.d_active_ag_test_command !== null) {
-      let [parent_suite, parent_test_case] = find_parent_suite_and_test_case(
-        this.d_active_ag_test_command, this.d_ag_test_suites)!;
-      return parent_suite;
+      let parent_tuple = find_parent_suite_and_test_case(
+        this.d_active_ag_test_command, this.d_ag_test_suites);
+      return parent_tuple === null ? [null, null] : parent_tuple;
     }
-    return null;
+    return [null, null];
   }
 
   @handle_global_errors_async
@@ -232,19 +233,27 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     return AGTestSuite.update_order(this.project.pk, this.d_ag_test_suites.map(suite => suite.pk));
   }
 
+  private get prev_ag_test_case(): [AGTestCase, AGTestCommand] | null {
+    if (this.d_active_ag_test_command === null) {
+      return null;
+    }
+
+
+  }
+
   get prev_ag_test_case_is_available() {
     if (this.d_active_ag_test_command !== null) {
-      let prev_suite: AGTestSuite;
-      let prev_case: AGTestCase;
+      let [parent_ag_test_suite, parent_ag_test_case] = this.parent_suite_and_test;
+      if (parent_ag_test_suite === null || parent_ag_test_case === null) {
+        // istanbul ignore next
+        return;
+      }
 
-      let [parent_ag_test_suite, parent_ag_test_case] = find_parent_suite_and_test_case(
-        this.d_active_ag_test_command!, this.d_ag_test_suites
-      )!;
       let suite_index = this.d_ag_test_suites.findIndex(
-        (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
+        (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite!.pk
       );
       let case_index = parent_ag_test_suite.ag_test_cases.findIndex(
-        (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case.pk
+        (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case!.pk
       );
       let command_index = parent_ag_test_case.ag_test_commands.findIndex(
         (ag_command: AGTestCommand) => ag_command.pk === this.d_active_ag_test_command!.pk
@@ -252,15 +261,15 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
       // if there is a command at the same index in the previous case
       if (case_index !== 0) {
-        prev_case = parent_ag_test_suite.ag_test_cases[case_index - 1];
+        let prev_case = parent_ag_test_suite.ag_test_cases[case_index - 1];
         return prev_case.ag_test_commands.length > command_index;
       }
       // you can go to the previous suite
       else if (suite_index !== 0) {
-        prev_suite = this.d_ag_test_suites[suite_index - 1];
+        let prev_suite = this.d_ag_test_suites[suite_index - 1];
         let num_cases = prev_suite.ag_test_cases.length;
         if (num_cases > 0) {
-          prev_case = prev_suite.ag_test_cases[num_cases - 1];
+          let prev_case = prev_suite.ag_test_cases[num_cases - 1];
           return prev_case.ag_test_commands.length > command_index;
         }
       }
@@ -268,18 +277,19 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     return false;
   }
 
-  get next_ag_test_case_is_available() {
+  get next_ag_test_case() {
     if (this.d_active_ag_test_command !== null) {
-      let next_suite: AGTestSuite;
-      let next_case: AGTestCase;
-      let [parent_ag_test_suite, parent_ag_test_case] = find_parent_suite_and_test_case(
-        this.d_active_ag_test_command!, this.d_ag_test_suites
-      )!;
+      let [parent_ag_test_suite, parent_ag_test_case] = this.parent_suite_and_test;
+      if (parent_ag_test_suite === null || parent_ag_test_case === null) {
+        // istanbul ignore next
+        return;
+      }
+
       let suite_index = this.d_ag_test_suites.findIndex(
-        (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite.pk
+        (ag_suite: AGTestSuite) => ag_suite.pk === parent_ag_test_suite!.pk
       );
       let case_index = parent_ag_test_suite.ag_test_cases.findIndex(
-        (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case.pk
+        (ag_case: AGTestCase) => ag_case.pk === parent_ag_test_case!.pk
       );
       let command_index = parent_ag_test_case.ag_test_commands.findIndex(
         (ag_command: AGTestCommand) => ag_command.pk === this.d_active_ag_test_command!.pk
@@ -288,14 +298,14 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
       let num_cases = parent_ag_test_suite.ag_test_cases.length;
       // if there is a command at the same index in the next case
       if (num_cases - 1 > case_index) {
-        next_case = parent_ag_test_suite.ag_test_cases[case_index + 1];
+        let next_case = parent_ag_test_suite.ag_test_cases[case_index + 1];
         return next_case.ag_test_commands.length > command_index;
       }
       // if you can go to the next suite
       else if (suite_index < this.d_ag_test_suites.length - 1) {
-        next_suite = this.d_ag_test_suites[suite_index + 1];
+        let next_suite = this.d_ag_test_suites[suite_index + 1];
         if (next_suite.ag_test_cases.length > 0) {
-          next_case = next_suite.ag_test_cases[0];
+          let next_case = next_suite.ag_test_cases[0];
           return next_case.ag_test_commands.length > command_index;
         }
       }
