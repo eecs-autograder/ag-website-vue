@@ -213,6 +213,16 @@ describe('Score and status display tests', () => {
         expect(wrapper.find('#deferred-tests-message').text()).toContain('Core tests finished');
     });
 
+    test('Status waiting_for_deferred, points possible zero string, no score shown', () => {
+        submission_with_results.status = ag_cli.GradingStatus.waiting_for_deferred;
+        submission_with_results.results.total_points = 0;
+        submission_with_results.results.total_points_possible = '0.00';
+
+        let wrapper = make_wrapper();
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
+        expect(wrapper.find('#deferred-tests-message').text()).toContain('Core tests finished');
+    });
+
     test('Status finished_grading, points possible nonzero, score shown', () => {
         submission_with_results.status = ag_cli.GradingStatus.finished_grading;
         submission_with_results.results.total_points = 0;
@@ -227,6 +237,17 @@ describe('Score and status display tests', () => {
         submission_with_results.status = ag_cli.GradingStatus.finished_grading;
         submission_with_results.results.total_points = 0;
         submission_with_results.results.total_points_possible = 0;
+
+        let wrapper = make_wrapper();
+        expect(wrapper.find('#submission-score').exists()).toBe(false);
+
+        expect(wrapper.find('#deferred-tests-message').text()).toContain('All tests finished');
+    });
+
+    test('Status finished_grading, points possible string zero, no score shown', () => {
+        submission_with_results.status = ag_cli.GradingStatus.finished_grading;
+        submission_with_results.results.total_points = 0;
+        submission_with_results.results.total_points_possible = '0.00';
 
         let wrapper = make_wrapper();
         expect(wrapper.find('#submission-score').exists()).toBe(false);

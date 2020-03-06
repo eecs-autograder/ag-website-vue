@@ -308,7 +308,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
     return (this.submission.status === GradingStatus.waiting_for_deferred
             || this.submission.status === GradingStatus.finished_grading)
            && this.submission_result !== null
-           && this.submission_result.total_points_possible !== 0;
+           && Number(this.submission_result.total_points_possible) !== 0;
   }
 
   get feedback_category(): FeedbackCategory {
