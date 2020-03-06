@@ -426,6 +426,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     let parent_suite = find_parent_suite(ag_test_case, this.d_ag_test_suites);
     if (parent_suite !== null) {
       parent_suite.ag_test_cases.push(ag_test_case);
+      this.update_active_item(ag_test_case);
     }
   }
 
