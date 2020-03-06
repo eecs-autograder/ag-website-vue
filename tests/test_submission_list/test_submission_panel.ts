@@ -93,6 +93,20 @@ describe('Submission status icons', () => {
         expect(wrapper.find('.submission-status .score').text()).toBe('1/4');
     });
 
+    test('waiting_for_deferred with points possible "0" string', () => {
+        let waiting_for_deferred = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.waiting_for_deferred},
+            {total_points_possible: '0.00'});
+        let wrapper = mount(SubmissionPanel, {
+            propsData: {
+                submission: waiting_for_deferred
+            }
+        });
+
+        expect(wrapper.find('.submission-status .fa-check-circle').exists()).toBe(true);
+        expect(wrapper.find('.submission-status .score').exists()).toBe(false);
+    });
+
     test('finished_grading icon', () => {
         let finished_grading = data_ut.make_submission_with_results(
             group, {status: ag_cli.GradingStatus.finished_grading});
@@ -118,6 +132,20 @@ describe('Submission status icons', () => {
 
         expect(wrapper.find('.submission-status .fa-check-circle').exists()).toBe(false);
         expect(wrapper.find('.submission-status .score').text()).toBe('3/5');
+    });
+
+    test('finished_grading with points possible "0" string', () => {
+        let finished_grading = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.finished_grading},
+            {total_points_possible: '0.00'});
+        let wrapper = mount(SubmissionPanel, {
+            propsData: {
+                submission: finished_grading
+            }
+        });
+
+        expect(wrapper.find('.submission-status .fa-check-circle').exists()).toBe(true);
+        expect(wrapper.find('.submission-status .score').exists()).toBe(false);
     });
 
     test('removed_from_queue icon', () => {

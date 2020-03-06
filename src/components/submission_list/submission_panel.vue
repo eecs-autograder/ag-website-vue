@@ -12,13 +12,13 @@
       </template>
 
       <template v-else-if="submission.status === GradingStatus.waiting_for_deferred">
-        <div v-if="submission.results.total_points_possible !== 0" class="score">
+        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score">
           {{submission.results.total_points}}/{{submission.results.total_points_possible}}
         </div>
         <i v-else class="far fa-check-circle"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.finished_grading">
-        <div v-if="submission.results.total_points_possible !== 0" class="score">
+        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score">
           {{submission.results.total_points}}/{{submission.results.total_points_possible}}
         </div>
         <i v-else class="far fa-check-circle"></i>
