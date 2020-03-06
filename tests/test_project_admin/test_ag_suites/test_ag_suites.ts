@@ -321,11 +321,15 @@ describe('Creating ag_test_case', () => {
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(0);
 
         let case_created = data_ut.make_ag_test_case(suite_1.pk);
+        let new_active_command = data_ut.make_ag_test_command(case_created.pk);
+        case_created.ag_test_commands.push(new_active_command);
         ag_cli.AGTestCase.notify_ag_test_case_created(case_created);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(case_created);
+        expect(wrapper.vm.d_active_ag_test_suite).toBe(null);
+        expect(wrapper.vm.d_active_ag_test_command).toBe(new_active_command);
     });
 });
 
