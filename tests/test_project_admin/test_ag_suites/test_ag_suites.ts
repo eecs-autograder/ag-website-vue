@@ -310,26 +310,48 @@ test('Update suites order', async () => {
 describe('Creating ag_test_case', () => {
     // Note that this also covers the case where a test was cloned
     test('Case created', async () => {
-        let suite_1 = data_ut.make_ag_test_suite(project.pk);
-
-        get_all_suites_from_project.resolves([suite_1]);
+        let suite = data_ut.make_ag_test_suite(project.pk);
+        get_all_suites_from_project.resolves([suite]);
 
         let wrapper = make_wrapper();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite_1);
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(0);
+        wrapper.vm.update_active_item(suite);
 
-        let case_created = data_ut.make_ag_test_case(suite_1.pk);
-        let new_active_command = data_ut.make_ag_test_command(case_created.pk);
-        case_created.ag_test_commands.push(new_active_command);
-        ag_cli.AGTestCase.notify_ag_test_case_created(case_created);
+        let new_ag_test_case = data_ut.make_ag_test_case(suite.pk);
+        let new_active_command = data_ut.make_ag_test_command(new_ag_test_case.pk);
+        new_ag_test_case.ag_test_commands.push(new_active_command);
+        ag_cli.AGTestCase.notify_ag_test_case_created(new_ag_test_case);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(1);
-        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(case_created);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(new_ag_test_case);
         expect(wrapper.vm.d_active_ag_test_suite).toBe(null);
         expect(wrapper.vm.d_active_ag_test_command).toBe(new_active_command);
+    });
+
+    // Regression test for bug introduced with first attempt at
+    // https://github.com/eecs-autograder/ag-website-vue/issues/400
+    test('Empty test case created', async () => {
+        let suite = data_ut.make_ag_test_suite(project.pk);
+        get_all_suites_from_project.resolves([suite]);
+
+        let wrapper = make_wrapper();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0]).toEqual(suite);
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases.length).toEqual(0);
+        wrapper.vm.update_active_item(suite);
+
+        let new_ag_test_case = data_ut.make_ag_test_case(suite.pk);
+        ag_cli.AGTestCase.notify_ag_test_case_created(new_ag_test_case);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].ag_test_cases[0]).toEqual(new_ag_test_case);
+        expect(wrapper.vm.d_active_ag_test_suite).toBe(suite);
+        expect(wrapper.vm.d_active_ag_test_command).toBeNull();
     });
 });
 

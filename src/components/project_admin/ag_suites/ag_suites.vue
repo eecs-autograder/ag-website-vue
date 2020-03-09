@@ -61,7 +61,7 @@
           <button type="button"
                   @click="go_to_next_ag_test_case"
                   id="next-ag-test-case-button"
-                  :disabled="next_ag_test_case === null">
+                  :disabled="!next_ag_test_case_is_available">
             Next Test <i class="fas fa-angle-double-right" id="next"></i>
           </button>
         </span>
@@ -168,6 +168,21 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
 
   d_collapsed = false;
 
+  @handle_global_errors_async
+  async created() {
+    AGTestSuite.subscribe(this);
+    AGTestCase.subscribe(this);
+    AGTestCommand.subscribe(this);
+    this.d_ag_test_suites = await AGTestSuite.get_all_from_project(this.project.pk);
+    this.d_loading = false;
+  }
+
+  beforeDestroy() {
+    AGTestSuite.unsubscribe(this);
+    AGTestCase.unsubscribe(this);
+    AGTestCommand.unsubscribe(this);
+  }
+
   get parent_ag_test_case(): AGTestCase | null {
     let [parent_suite, parent_test_case] = this.parent_suite_and_test;
     return parent_test_case;
@@ -187,29 +202,16 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     return [null, null];
   }
 
-  @handle_global_errors_async
-  async created() {
-    AGTestSuite.subscribe(this);
-    AGTestCase.subscribe(this);
-    AGTestCommand.subscribe(this);
-    this.d_ag_test_suites = await AGTestSuite.get_all_from_project(this.project.pk);
-    this.d_loading = false;
-  }
-
-  beforeDestroy() {
-    AGTestSuite.unsubscribe(this);
-    AGTestCase.unsubscribe(this);
-    AGTestCommand.unsubscribe(this);
-  }
-
   update_active_item(item: AGTestSuite | AGTestCase | AGTestCommand | null) {
     if (item instanceof AGTestSuite) {
       this.d_active_ag_test_suite = item;
       this.d_active_ag_test_command = null;
     }
     else if (item instanceof AGTestCase) {
-      this.d_active_ag_test_suite = null;
-      this.d_active_ag_test_command = item.ag_test_commands[0];
+      if (item.ag_test_commands.length > 0) {
+        this.d_active_ag_test_suite = null;
+        this.d_active_ag_test_command = item.ag_test_commands[0];
+      }
     }
     else if (item instanceof AGTestCommand) {
       this.d_active_ag_test_suite = null;
@@ -231,14 +233,6 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
   @handle_global_errors_async
   set_ag_test_suite_order() {
     return AGTestSuite.update_order(this.project.pk, this.d_ag_test_suites.map(suite => suite.pk));
-  }
-
-  private get prev_ag_test_case(): [AGTestCase, AGTestCommand] | null {
-    if (this.d_active_ag_test_command === null) {
-      return null;
-    }
-
-
   }
 
   get prev_ag_test_case_is_available() {
@@ -277,7 +271,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     return false;
   }
 
-  get next_ag_test_case() {
+  get next_ag_test_case_is_available() {
     if (this.d_active_ag_test_command !== null) {
       let [parent_ag_test_suite, parent_ag_test_case] = this.parent_suite_and_test;
       if (parent_ag_test_suite === null || parent_ag_test_case === null) {
@@ -436,6 +430,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
     let parent_suite = find_parent_suite(ag_test_case, this.d_ag_test_suites);
     if (parent_suite !== null) {
       parent_suite.ag_test_cases.push(ag_test_case);
+      // Cloning a test triggers an _ag_test_case_created notification.
       this.update_active_item(ag_test_case);
     }
   }
