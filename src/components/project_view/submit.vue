@@ -198,8 +198,10 @@ export default class Submit extends Vue {
 
   @handle_global_errors_async
   async created() {
-    let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user!.pk);
-    this.late_days_remaining = late_days.late_days_remaining;
+    if (this.project.allow_late_days) {
+      let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user!.pk);
+      this.late_days_remaining = late_days.late_days_remaining;
+    }
   }
 
   get num_submissions_per_day() {

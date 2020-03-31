@@ -18,6 +18,7 @@ let course: Course;
 let project: Project;
 let group: Group;
 
+let late_days_stub: sinon.SinonStub;
 let late_days_remaining: number;
 
 beforeEach(() => {
@@ -29,7 +30,9 @@ beforeEach(() => {
     late_days_remaining = 0;
 
     data_ut.set_global_current_user(current_user);
-    sinon.stub(User, 'get_num_late_days').withArgs(course.pk, current_user.pk).callsFake(() => {
+    late_days_stub = sinon.stub(
+        User, 'get_num_late_days'
+    ).withArgs(course.pk, current_user.pk).callsFake(() => {
         return Promise.resolve({late_days_remaining: late_days_remaining});
     });
 });
@@ -243,31 +246,6 @@ describe('Submit button text tests', () => {
 });
 
 describe('Group members tests', () => {
-    // test('Group size 1, no group members shown', () => {
-    //     const wrapper = mount(Submit, {
-    //         propsData: {
-    //             course: course,
-    //             project: project,
-    //             group: group,
-    //         }
-    //     });
-    //     expect(wrapper.find('#group-members-container').exists()).toBe(false);
-    // });
-
-    // test('Group size more than 1, group members shown', () => {
-    //     group.member_names = ['llama@llama.net', 'ninja@ninja.net'];
-
-    //     const wrapper = mount(Submit, {
-    //         propsData: {
-    //             course: course,
-    //             project: project,
-    //             group: group,
-    //         }
-    //     });
-
-    //     expect(wrapper.findAll('.group-member').length).toEqual(2);
-    // });
-
     test('GroupMembers component values, late days not shown', async () => {
         const wrapper = mount(Submit, {
             propsData: {
@@ -470,6 +448,8 @@ describe('Submission limit, bonus submission, late day tests', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#late-days-remaining').exists()).toBe(false);
+
+        expect(late_days_stub.notCalled).toBe(true);
     });
 });
 
