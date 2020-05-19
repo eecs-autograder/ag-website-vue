@@ -6,7 +6,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 import SelectObject from '@/components/select_object.vue';
 
 import { managed_mount } from '@/tests/setup';
-import { expect_html_element_has_value, find_by_name } from '@/tests/utils';
+import { emitted, expect_html_element_has_value, find_by_name } from '@/tests/utils';
 
 interface Thing {
     id: number;
@@ -66,7 +66,7 @@ describe('select-object tests', () => {
         wrapper.findAll('option').at(3).setSelected();
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_value).toEqual(things[3].id);
-        expect(wrapper.emitted('change')[0][0]).toEqual(things[3]);
+        expect(emitted(wrapper, 'change')[0][0]).toEqual(things[3]);
     });
 });
 

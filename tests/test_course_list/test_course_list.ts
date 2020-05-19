@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { AllCourses, Course, HttpError, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -6,13 +6,10 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import CourseList from '@/components/course_list/course_list.vue';
 
+import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 
 import { wait_for_load, wait_until } from '../utils';
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let can_create_courses_stub: sinon.SinonStub;
 
@@ -98,9 +95,7 @@ describe('CourseList tests', () => {
     let copy_of_course: Course;
 
     beforeEach(() => {
-        user = new User(
-            {pk: 1, username: 'ashberg', first_name: 'Ashley', last_name: 'IceBerg',
-             email: 'iceberg@umich.edu', is_superuser: false});
+        user = data_ut.make_user();
 
         copy_of_course = new Course(
             {pk: 11, name: "Clone", semester: Semester.fall, year: 2048, subtitle: '',
@@ -156,14 +151,14 @@ describe('CourseList tests', () => {
         await component.$nextTick();
         await component.$nextTick();
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(2);
         expect(component.courses_by_term.length).toEqual(1);
 
         copy_of_course.name = "Clonedd course";
         copy_of_course.year = 2042;
         Course.notify_course_created(copy_of_course);
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(3);
         expect(component.courses_by_term.length).toEqual(2);
         expect(component.courses_by_term[0].course_list[0]).toEqual(copy_of_course);
         expect(component.courses_by_term[1].course_list[0]).toEqual(fall18_eecs280);
@@ -190,7 +185,7 @@ describe('CourseList tests', () => {
         copy_of_course.year = 2018;
         Course.notify_course_created(copy_of_course);
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(3);
         expect(component.courses_by_term.length).toEqual(1);
         expect(component.courses_by_term[0].course_list[0]).toEqual(fall18_eecs280);
         expect(component.courses_by_term[0].course_list[1]).toEqual(copy_of_course);
@@ -258,8 +253,8 @@ describe('CourseList tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(1);
-        expect(component.all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(1);
+        expect(component.d_all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
 
         let all_displayed_courses = wrapper.findAll({name: 'SingleCourse'});
         expect(all_displayed_courses.length).toEqual(3);

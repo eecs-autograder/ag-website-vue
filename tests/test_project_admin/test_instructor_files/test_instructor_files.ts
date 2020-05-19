@@ -10,9 +10,6 @@ import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('InstructorFiles.vue', () => {
     let project: Project;

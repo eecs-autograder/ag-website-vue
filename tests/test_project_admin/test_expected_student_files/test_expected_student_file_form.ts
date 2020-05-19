@@ -1,15 +1,12 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { ExpectedStudentFile } from 'ag-client-typescript';
 
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { set_validated_input_text } from '@/tests/utils';
+import { emitted, set_validated_input_text } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Input property tests', () => {
     let wrapper: Wrapper<ExpectedStudentFileForm>;
@@ -63,10 +60,10 @@ describe('Valid form submit tests', () => {
         wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
         await component.$nextTick();
 
-        expect(wrapper.emitted().on_submit.length).toEqual(1);
-        expect(wrapper.emitted().on_submit[0][0].pattern).toEqual("tomato.cpp");
-        expect(wrapper.emitted().on_submit[0][0].min_num_matches).toEqual(1);
-        expect(wrapper.emitted().on_submit[0][0].max_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'on_submit').length).toEqual(1);
+        expect(emitted(wrapper, 'on_submit')[0][0].pattern).toEqual("tomato.cpp");
+        expect(emitted(wrapper, 'on_submit')[0][0].min_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'on_submit')[0][0].max_num_matches).toEqual(1);
     });
 
     test('Submit without wildcard present and exact match set to false', async () => {
@@ -79,10 +76,10 @@ describe('Valid form submit tests', () => {
         wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
         await component.$nextTick();
 
-        expect(wrapper.emitted().on_submit.length).toEqual(1);
-        expect(wrapper.emitted().on_submit[0][0].pattern).toEqual("cabbage.cpp");
-        expect(wrapper.emitted().on_submit[0][0].min_num_matches).toEqual(1);
-        expect(wrapper.emitted().on_submit[0][0].max_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'on_submit').length).toEqual(1);
+        expect(emitted(wrapper, 'on_submit')[0][0].pattern).toEqual("cabbage.cpp");
+        expect(emitted(wrapper, 'on_submit')[0][0].min_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'on_submit')[0][0].max_num_matches).toEqual(1);
     });
 
     test('Submit with wildcard present', async () => {
@@ -96,10 +93,10 @@ describe('Valid form submit tests', () => {
         wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
         await component.$nextTick();
 
-        expect(wrapper.emitted().on_submit.length).toEqual(1);
-        expect(wrapper.emitted().on_submit[0][0].pattern).toEqual("yellow_pepper_*.cpp");
-        expect(wrapper.emitted().on_submit[0][0].min_num_matches).toEqual(3);
-        expect(wrapper.emitted().on_submit[0][0].max_num_matches).toEqual(5);
+        expect(emitted(wrapper, 'on_submit').length).toEqual(1);
+        expect(emitted(wrapper, 'on_submit')[0][0].pattern).toEqual("yellow_pepper_*.cpp");
+        expect(emitted(wrapper, 'on_submit')[0][0].min_num_matches).toEqual(3);
+        expect(emitted(wrapper, 'on_submit')[0][0].max_num_matches).toEqual(5);
     });
 });
 

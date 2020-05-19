@@ -1,10 +1,7 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import Diff from '@/components/diff.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Diff tests', () => {
     test('Diff rendering no whitespace', async () => {

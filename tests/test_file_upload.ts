@@ -1,18 +1,13 @@
 import Vue from 'vue';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
 import FileUpload from '@/components/file_upload.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+import { emitted } from './utils';
 
-afterEach(() => {
-    sinon.restore();
-});
 
 interface HTMLInputEvent extends Event {
     target: HTMLInputElement & EventTarget;
@@ -313,7 +308,7 @@ describe('File Upload tests not involving the empty files modal', () => {
 
         final_upload_button.trigger('click');
 
-        expect(wrapper.emitted().upload_files.length).toBe(1);
+        expect(emitted(wrapper, 'upload_files').length).toBe(1);
         expect(wrapper.find(
             {ref: 'empty_file_found_in_upload_attempt_modal'}
         ).exists()).toBe(false);
@@ -358,7 +353,7 @@ describe("File Upload tests concerning the empty files modal", () => {
         let upload_despite_empty_files_button = wrapper.find('.upload-despite-empty-files-button');
         upload_despite_empty_files_button.trigger('click');
 
-        expect(wrapper.emitted().upload_files.length).toBe(1);
+        expect(emitted(wrapper, 'upload_files').length).toBe(1);
         expect(wrapper.find(
             {ref: 'empty_file_found_in_upload_attempt_modal'}
         ).exists()).toBe(false);

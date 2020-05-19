@@ -15,9 +15,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
 import { wait_for_load } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('EditGroups tests', () => {
     let wrapper: Wrapper<EditGroups>;

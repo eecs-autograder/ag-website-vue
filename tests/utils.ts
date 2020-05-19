@@ -4,6 +4,8 @@ import { RefSelector, Wrapper } from "@vue/test-utils";
 
 import SelectObject from '@/components/select_object.vue';
 import ValidatedInput from "@/components/validated_input.vue";
+import { assert_not_null } from '@/utils';
+
 export { sleep } from '@/utils';
 
 type DonePredicateFunc<T extends Vue> = (wrapper: Wrapper<T>) => boolean;
@@ -176,4 +178,13 @@ export async function do_input_blank_or_not_integer_test(
 
 export function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
     return <Wrapper<T>> wrapper.find({name: name});
+}
+
+// Thin wrapper function around the vue-test-utils Wrapper.emitted('string') method.
+// Asserts that the result of wrapper.emitted(event_name) is not undefined
+// and returns that result with a narrowed type.
+export function emitted(wrapper: Wrapper<Vue>, event_name: string) {
+    let result = wrapper.emitted(event_name);
+    assert_not_null(result);
+    return result;
 }

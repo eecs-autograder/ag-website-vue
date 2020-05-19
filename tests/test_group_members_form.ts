@@ -6,7 +6,7 @@ import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
 import { make_course, make_project } from '@/tests/data_utils';
-import { get_validated_input_text, set_validated_input_text } from '@/tests/utils';
+import { emitted, get_validated_input_text, set_validated_input_text } from '@/tests/utils';
 
 let course: Course = make_course({allowed_guest_domain: '@llama.net'});
 let project: Project;
@@ -195,7 +195,7 @@ describe('GroupMembersForm tests', () => {
 
         expect(get_validated_input_text(inputs.at(0))).toEqual('spam');
 
-        expect(wrapper.emitted().input).toEqual([[['spam']]]);
+        expect(emitted(wrapper, 'input')).toEqual([[['spam']]]);
     });
 
     test('value watcher', () => {
@@ -228,10 +228,10 @@ describe('GroupMembersForm tests', () => {
         expect((<ValidatedInput> inputs.at(0).vm).is_valid).toBe(false);
         expect((<ValidatedInput> inputs.at(1).vm).is_valid).toBe(true);
 
-        expect(wrapper.emitted().form_validity_changed).toEqual([[false]]);
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false]]);
         set_validated_input_text(inputs.at(0), 'wa@luigi.net');
-        expect(wrapper.emitted().form_validity_changed).toEqual([[false], [true]]);
-        expect(wrapper.emitted().input).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
+        expect(emitted(wrapper, 'input')).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
     });
 
     test('reset()', async () => {
@@ -265,6 +265,6 @@ describe('GroupMembersForm tests', () => {
 
         wrapper.find({name: 'ValidatedForm'}).vm.$emit('submit');
         await wrapper.vm.$nextTick();
-        expect(wrapper.emitted().submit[0][0]).toEqual(value);
+        expect(emitted(wrapper, 'submit')[0][0]).toEqual(value);
     });
 });

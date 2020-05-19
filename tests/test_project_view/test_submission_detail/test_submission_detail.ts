@@ -536,7 +536,7 @@ describe('Suite results tests', () => {
 
     test('Mutation test suite results shown', () => {
         let mutation_test_suite_pk = 1;
-        submission_with_results.results.student_test_suite_results = [
+        submission_with_results.results.mutation_test_suite_results = [
             data_ut.make_mutation_test_suite_result_feedback(mutation_test_suite_pk),
             data_ut.make_mutation_test_suite_result_feedback(mutation_test_suite_pk)
         ];
@@ -545,7 +545,7 @@ describe('Suite results tests', () => {
         let mutation_suite_results = find_by_name<MutationSuiteResults>(
             wrapper, 'MutationSuiteResults');
         expect(mutation_suite_results.vm.mutation_test_suite_results
-            ).toEqual(submission_with_results.results.student_test_suite_results);
+            ).toEqual(submission_with_results.results.mutation_test_suite_results);
     });
 
     test('No AG test suite results', () => {

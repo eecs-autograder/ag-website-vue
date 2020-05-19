@@ -23,6 +23,7 @@ import {
     ExpectedStudentFile,
     GradingStatus,
     Group,
+    GroupInvitation,
     GroupWithHandgradingResultSummary,
     HandgradingResult,
     HandgradingRubric,
@@ -33,6 +34,7 @@ import {
     MutationTestSuiteResultFeedback,
     PointsStyle,
     Project,
+    SandboxDockerImage,
     Semester,
     StdinSource,
     Submission,
@@ -47,7 +49,7 @@ import {
 import { GlobalData } from '@/app.vue';
 import { safe_assign } from "@/utils";
 
-export function* counter() {
+export function* counter(): Generator<number> {
     let count = 1;
     while (true) {
         yield count;
@@ -195,15 +197,38 @@ export function make_instructor_file(
     return new InstructorFile(defaults);
 }
 
+const GROUP_INVITATION_PKS = counter();
+
+export function make_group_invitation(
+    project_pk: number,
+    sender_username: string,
+    recipient_usernames: string[],
+    recipients_who_accepted: string[],
+): GroupInvitation {
+    let sender = make_user({username: sender_username});
+    let recipients = recipient_usernames.map(username => make_user({username: username}));
+    return new GroupInvitation({
+        pk: GROUP_INVITATION_PKS.next().value,
+        project: project_pk,
+        sender: sender,
+        recipients: recipients,
+        sender_username: sender_username,
+        recipient_usernames: recipient_usernames,
+        recipients_who_accepted: recipients_who_accepted,
+    });
+}
+
 const GROUP_PKS = counter();
 
 export function make_group(project_pk: number,
                            num_members: number = 1,
                            args: Partial<Group> = {}): Group {
+    let members = args.members ?? Array(num_members).fill(null).map(make_user);
     let defaults = {
         pk: GROUP_PKS.next().value,
         project: project_pk,
-        member_names: Array(num_members).fill('').map(() => `user_${random_id()}`),
+        members: members,
+        member_names: members.map(user => user.username),
         extended_due_date: null,
         bonus_submissions_remaining: 0,
         late_days_used: {},
@@ -255,7 +280,7 @@ export function make_submission_with_results(
         total_points: 0,
         total_points_possible: 0,
         ag_test_suite_results: [],
-        student_test_suite_results: [],
+        mutation_test_suite_results: [],
     };
     safe_assign(result_defaults, result_args);
     return {
@@ -263,6 +288,24 @@ export function make_submission_with_results(
         ...submission
     };
 }
+
+
+const SANDBOX_IMAGE_PKS = counter();
+
+export function make_sandbox_docker_image(
+    course_pk: number | null, args: Partial<SandboxDockerImage> = {}
+): SandboxDockerImage {
+    let defaults = {
+        pk: SANDBOX_IMAGE_PKS.next().value,
+        display_name: `Sandbox Image ${random_id()}`,
+        course: course_pk,
+        last_modified: now_str(),
+    };
+    safe_assign(defaults, args);
+    defaults.course = course_pk;
+    return new SandboxDockerImage(defaults);
+}
+
 
 const AG_TEST_SUITE_PKS = counter();
 
@@ -276,12 +319,7 @@ export function make_ag_test_suite(project_pk: number,
         read_only_instructor_files: true,
         setup_suite_cmd: "",
         setup_suite_cmd_name: "",
-        sandbox_docker_image: {
-            pk: 1,
-            name: "default",
-            tag: "default",
-            display_name: "Default"
-        },
+        sandbox_docker_image: make_sandbox_docker_image(null),
         allow_network_access: false,
         deferred: true,
         normal_fdbk_config: make_ag_test_suite_fdbk_config(),
@@ -376,9 +414,9 @@ export function make_ag_test_command(ag_test_case_pk: number,
         past_limit_submission_fdbk_config: make_ag_test_command_fdbk_config(),
         staff_viewer_fdbk_config: make_ag_test_command_fdbk_config(),
         time_limit: 10,
-        stack_size_limit: 10000000,
+        use_virtual_memory_limit: true,
         virtual_memory_limit: 500000000,
-        process_spawn_limit: 0
+        block_process_spawn: false,
     };
     safe_assign(defaults, args);
     defaults.ag_test_case = ag_test_case_pk;
@@ -407,8 +445,12 @@ export function make_ag_command(args: Partial<AGCommand> = {}): AGCommand {
         name: '',
         cmd: 'true',
         time_limit: 10,
-        stack_size_limit: 10000000,
+        use_virtual_memory_limit: true,
         virtual_memory_limit: 500000000,
+        block_process_spawn: true,
+
+        // IGNORED
+        stack_size_limit: 10000000,
         process_spawn_limit: 0,
     };
     safe_assign(defaults, args);
@@ -436,12 +478,7 @@ export function make_mutation_test_suite(
         points_per_exposed_bug: "0",
         max_points: null,
         deferred: false,
-        sandbox_docker_image: {
-            pk: 1,
-            name: "default",
-            tag: "default",
-            display_name: "Default"
-        },
+        sandbox_docker_image: make_sandbox_docker_image(null),
         allow_network_access: false,
         normal_fdbk_config: make_mutation_test_suite_fdbk_config(),
         ultimate_submission_fdbk_config: make_mutation_test_suite_fdbk_config(),
@@ -552,8 +589,8 @@ export function make_mutation_test_suite_result_feedback(
     args: Partial<MutationTestSuiteResultFeedback> = {}): MutationTestSuiteResultFeedback {
     let defaults = {
         pk: MUTATION_TEST_SUITE_RESULT_FEEDBACK_PKS.next().value,
-        student_test_suite_name: `Mutation Test Suite ${mutation_test_suite_pk}`,
-        student_test_suite_pk: mutation_test_suite_pk,
+        mutation_test_suite_name: `Mutation Test Suite ${mutation_test_suite_pk}`,
+        mutation_test_suite_pk: mutation_test_suite_pk,
         fdbk_settings: make_mutation_test_suite_fdbk_config(),
         has_setup_command: false,
         setup_command_name: null,

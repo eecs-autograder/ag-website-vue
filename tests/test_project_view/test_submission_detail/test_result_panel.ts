@@ -3,9 +3,6 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('ResultPanel tests', () => {
     let wrapper: Wrapper<ResultPanel>;

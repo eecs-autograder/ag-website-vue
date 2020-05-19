@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -16,23 +16,18 @@ import ValidatedInput from '@/components/validated_input.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('AGSuitePanel tests', () => {
     let wrapper: Wrapper<AGSuitePanel>;
     let component: AGSuitePanel;
     let project: Project;
     let ag_suite: AGTestSuite;
-    let ag_case_a: AGTestCase;
-    let ag_case_b: AGTestCase;
-    let ag_case_c: AGTestCase;
     let ag_command: AGTestCommand;
     let case_from_different_suite: AGTestCase;
 
@@ -40,13 +35,13 @@ describe('AGSuitePanel tests', () => {
         project = data_ut.make_project(data_ut.make_course().pk);
         ag_suite = data_ut.make_ag_test_suite(project.pk);
 
-        ag_case_a = data_ut.make_ag_test_case(ag_suite.pk);
-        ag_command = data_ut.make_ag_test_command(ag_case_a.pk);
+        ag_suite.ag_test_cases = [
+            data_ut.make_ag_test_case(ag_suite.pk),
+            data_ut.make_ag_test_case(ag_suite.pk),
+            data_ut.make_ag_test_case(ag_suite.pk),
+        ];
 
-        ag_case_b = data_ut.make_ag_test_case(ag_suite.pk);
-        ag_case_c = data_ut.make_ag_test_case(ag_suite.pk);
-
-        ag_suite.ag_test_cases = [ag_case_a, ag_case_b, ag_case_c];
+        ag_command = data_ut.make_ag_test_command(ag_suite.ag_test_cases[0].pk);
 
         case_from_different_suite = data_ut.make_ag_test_case(
             data_ut.make_ag_test_suite(project.pk).pk);
@@ -65,7 +60,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
         expect(component.d_cases_are_visible).toBe(true);
     });
 
@@ -75,7 +70,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
@@ -86,7 +81,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_suite);
+        expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_suite);
         expect(component.d_cases_are_visible).toBe(true);
     });
 
@@ -94,7 +89,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.findAll('.panel').at(0).trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted('update_active_item').length).toEqual(1);
+        expect(emitted(wrapper, 'update_active_item').length).toEqual(1);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
         await component.$nextTick();
@@ -116,7 +111,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('.panel').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
     });
 
     test('Command in suite becomes active', async () => {
@@ -133,7 +128,7 @@ describe('AGSuitePanel tests', () => {
         wrapper.find('.panel').trigger('click');
         await component.$nextTick();
 
-        expect(wrapper.emitted('update_active_item').length).toEqual(1);
+        expect(emitted(wrapper, 'update_active_item').length).toEqual(1);
     });
 
     test('d_new_case_name binding', async () => {

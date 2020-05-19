@@ -445,15 +445,14 @@ export default class HandgradingSettings extends Vue implements Created,
 
   @handle_global_errors_async
   async import_rubric() {
-    if (assert_not_null(this.d_project_to_import_from)) {
-      try {
-        this.d_import_request_pending = true;
-        this.d_handgrading_rubric = await HandgradingRubric.import_from_project(
-          this.project.pk, this.d_project_to_import_from.pk);
-      }
-      finally {
-        this.d_import_request_pending = false;
-      }
+    assert_not_null(this.d_project_to_import_from);
+    try {
+      this.d_import_request_pending = true;
+      this.d_handgrading_rubric = await HandgradingRubric.import_from_project(
+        this.project.pk, this.d_project_to_import_from.pk);
+    }
+    finally {
+      this.d_import_request_pending = false;
     }
   }
 
@@ -463,9 +462,8 @@ export default class HandgradingSettings extends Vue implements Created,
       this.d_saving = true;
       (<APIErrors> this.$refs.settings_form_errors).clear();
 
-      if (assert_not_null(this.d_handgrading_rubric)) {
-        await this.d_handgrading_rubric.save();
-      }
+      assert_not_null(this.d_handgrading_rubric);
+      await this.d_handgrading_rubric.save();
     }
     finally {
       this.d_saving = false;

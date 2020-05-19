@@ -52,7 +52,7 @@ import ViewFile from '@/components/view_file.vue';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
-import { array_get_unique, array_has_unique, array_remove_unique, handle_api_errors_async, toggle } from '@/utils';
+import { handle_api_errors_async, toggle } from '@/utils';
 
 import SingleInstructorFile from './single_instructor_file.vue';
 
@@ -99,18 +99,8 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     (<APIErrors> this.$refs.api_errors).clear();
     return toggle(this, 'd_uploading', async () => {
       for (let file of files) {
-        let file_already_exists = array_has_unique(
-          this.instructor_files,
-          file.name,
-          (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
-        );
-
-        if (file_already_exists) {
-          let file_to_update = array_get_unique(
-            this.instructor_files,
-            file.name,
-            (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
-          );
+        let file_to_update = this.instructor_files.find(item => item.name === file.name);
+        if (file_to_update !== undefined) {
           await file_to_update.set_content(file, (event: ProgressEvent) => {
             if (event.lengthComputable) {
               this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
@@ -118,7 +108,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
           });
         }
         else {
-          let file_to_add = await InstructorFile.create(
+          await InstructorFile.create(
             this.project.pk, file.name, file, (event: ProgressEvent) => {
               if (event.lengthComputable) {
                 this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);

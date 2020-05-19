@@ -6,47 +6,32 @@ import * as sinon from "sinon";
 import MutationCommand from '@/components/project_admin/mutation_suites/mutation_command.vue';
 import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 
+import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import {
-    do_input_blank_or_not_integer_test,
     do_invalid_text_input_test,
+    emitted,
     find_by_name,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid,
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('MutationCommand tests', () => {
     let wrapper: Wrapper<MutationCommand>;
-    let ag_command: AGCommand;
-
-    ag_command = {
-        name: "Command",
+    let ag_command = data_ut.make_ag_command({
+        name: 'Command',
         cmd: "Do something",
-        time_limit: 10,
-        stack_size_limit: 10000000,
-        virtual_memory_limit: 500000000,
-        process_spawn_limit: 16
-    };
+    });
 
     beforeEach(() => {
-        wrapper = mount(MutationCommand, {
+        wrapper = managed_mount(MutationCommand, {
             propsData: {
                 value: ag_command,
                 command_label: "Setup"
             }
         });
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('command name binding', async () => {
@@ -56,7 +41,7 @@ describe('MutationCommand tests', () => {
         let command_name_input = wrapper.find({ref: 'name'});
         set_validated_input_text(command_name_input, 'Tim Hortons');
 
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
         expect(wrapper.vm.d_ag_command!.name).toEqual('Tim Hortons');
         expect(validated_input_is_valid(command_name_input)).toEqual(true);
 
@@ -79,7 +64,7 @@ describe('MutationCommand tests', () => {
 
         expect(wrapper.vm.d_ag_command!.cmd).toEqual('Tim Hortons');
         expect(validated_input_is_valid(command_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
 
         wrapper.vm.d_ag_command!.cmd = 'Starbucks';
         expect(get_validated_input_text(command_input)).toEqual('Starbucks');
@@ -102,18 +87,14 @@ describe('MutationCommand tests', () => {
         resource_limit_settings.vm.$emit('field_change', {time_limit: new_time_limit});
 
         expect(wrapper.vm.d_ag_command!.time_limit).toEqual(new_time_limit);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
     });
 
     test('value Watcher', async () => {
-        let another_ag_command = {
+        let another_ag_command = data_ut.make_ag_command({
             name: "Another Command",
             cmd: "Do something else",
-            time_limit: 10,
-            stack_size_limit: 10000000,
-            virtual_memory_limit: 500000000,
-            process_spawn_limit: 16
-        };
+        });
         expect(wrapper.vm.d_ag_command).toEqual(ag_command);
 
         wrapper.setProps({value: another_ag_command});

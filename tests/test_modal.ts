@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils';
 
 import Modal from '@/components/modal.vue';
 
+import { emitted } from './utils';
+
 describe('Modal.vue', () => {
     test('Open and close modal using external boolean', () => {
         const component = {
@@ -64,12 +66,12 @@ describe('Modal.vue', () => {
 
     test('Modal emits "close" on click of x when include_closing_x is true', () => {
         const wrapper = mount(Modal);
-        expect(wrapper.emitted().close).toBeUndefined();
+        expect(wrapper.emitted('close')).toBeUndefined();
 
         let close_button = wrapper.find('.close-button');
         close_button.trigger('click');
 
-        expect(wrapper.emitted('close').length).toBe(1);
+        expect(emitted(wrapper, 'close').length).toBe(1);
     });
 
     test('Modal emits "close" when clicking outside the modal and ' +
@@ -94,7 +96,7 @@ describe('Modal.vue', () => {
         expect(wrapper.emitted('close')).toBeUndefined();
 
         outside_modal.trigger('click');
-        expect(wrapper.emitted('close').length).toEqual(1);
+        expect(emitted(wrapper, 'close').length).toEqual(1);
     });
 
     test('Modal container contains content inside parent\'s <modal></modal> tags', () => {

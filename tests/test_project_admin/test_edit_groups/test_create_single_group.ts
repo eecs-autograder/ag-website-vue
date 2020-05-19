@@ -14,9 +14,6 @@ import CreateSingleGroup from '@/components/project_admin/edit_groups/create_sin
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('CreateSingleGroup tests', () => {
     let wrapper: Wrapper<CreateSingleGroup>;

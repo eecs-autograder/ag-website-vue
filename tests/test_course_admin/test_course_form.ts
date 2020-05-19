@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { Course, Semester } from 'ag-client-typescript';
 
@@ -14,9 +14,6 @@ import {
 
 import * as data_ut from '../data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 test('Course form default year and allowed guest domain', async () => {
     let current_year = (new Date()).getFullYear();

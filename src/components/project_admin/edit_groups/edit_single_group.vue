@@ -110,7 +110,7 @@ import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { make_error_handler_func } from '@/error_handling';
-import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { assert_not_null, deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
 @Component({
@@ -141,18 +141,7 @@ export default class EditSingleGroup extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  d_group: Group = new Group({
-    pk: 0,
-    project: 0,
-    extended_due_date: null,
-    member_names: [],
-    bonus_submissions_remaining: 0,
-    late_days_used: {},
-    num_submissions: 0,
-    num_submits_towards_limit: 0,
-    created_at: "",
-    last_modified: ""
-  });
+  d_group: Group | null = null;
 
   d_saving = false;
   d_edit_group_form_is_valid = true;
@@ -171,6 +160,7 @@ export default class EditSingleGroup extends Vue {
 
   @handle_api_errors_async(handle_save_group_error)
   async update_group() {
+    assert_not_null(this.d_group);
     try {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
@@ -184,6 +174,7 @@ export default class EditSingleGroup extends Vue {
   @handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
   async delete_group() {
     return toggle(this, 'd_deleting', async () => {
+        assert_not_null(this.d_group);
         await this.d_group.pseudo_delete();
         this.d_show_delete_group_modal = false;
     });

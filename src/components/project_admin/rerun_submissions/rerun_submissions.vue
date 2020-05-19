@@ -3,15 +3,6 @@
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="rerun-submissions-component">
-    <div class="msg-spacing">
-      <i class="fas fa-exclamation-triangle"></i>
-      Do NOT delete any test cases (or suites or commands) while your rerun is in progress. <br>
-      Doing so may cause a retry loop. <br>
-      See <a href="https://github.com/eecs-autograder/autograder-server/issues/480"
-             target="_blank">this issue</a>
-      for progress updates.
-    </div>
-
     <div id="grades-can-change-header" class="step-header">0. Download Grades So Far</div>
     <div id="grades-can-change-msg">
       <div class="msg-spacing">
@@ -296,8 +287,8 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
             rerun_all_ag_test_suites: this.d_rerun_all_ag_test_cases,
             ag_test_suite_data: this.get_ag_test_suite_data_for_request(),
 
-            rerun_all_student_test_suites: this.d_rerun_all_mutation_test_suites,
-            student_suite_pks: [...this.d_selected_mutation_test_suite_pks.values()]
+            rerun_all_mutation_test_suites: this.d_rerun_all_mutation_test_suites,
+            mutation_suite_pks: [...this.d_selected_mutation_test_suite_pks.values()]
         });
 
         this.d_rerun_tasks.unshift(rerun);

@@ -43,9 +43,6 @@ import {
     wait_until,
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let ag_test_suite: AGTestSuite;
 let ag_test_case: AGTestCase;

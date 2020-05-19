@@ -54,33 +54,33 @@
     <div>
       <project-settings v-show="d_current_tab === 'settings'"
                         v-if="d_loaded_tabs.has('settings')"
-                        :project="project"> </project-settings>
+                        :project="d_project"> </project-settings>
       <instructor-files v-show="d_current_tab === 'instructor_files'"
                         v-if="d_loaded_tabs.has('instructor_files')"
-                        :project="project"></instructor-files>
+                        :project="d_project"></instructor-files>
       <expected-student-files v-show="d_current_tab === 'expected_student_files'"
                               v-if="d_loaded_tabs.has('expected_student_files')"
-                              :project="project"></expected-student-files>
+                              :project="d_project"></expected-student-files>
       <ag-suites v-show="d_current_tab === 'test_cases'"
                  v-if="d_loaded_tabs.has('test_cases')"
-                 :project="project"></ag-suites>
+                 :project="d_project"></ag-suites>
       <mutation-suites v-show="d_current_tab === 'mutation_testing'"
                        v-if="d_loaded_tabs.has('mutation_testing')"
-                       :project="project"></mutation-suites>
+                       :project="d_project"></mutation-suites>
       <edit-groups v-show="d_current_tab === 'edit_groups'"
                    v-if="d_loaded_tabs.has('edit_groups')"
                    :course="d_globals.current_course"
-                   :project="project"></edit-groups>
+                   :project="d_project"></edit-groups>
       <download-grades v-show="d_current_tab === 'download_grades'"
                        v-if="d_loaded_tabs.has('download_grades')"
-                       :project="project">
+                       :project="d_project">
       </download-grades>
       <rerun-submissions v-show="d_current_tab === 'rerun_tests'"
                          v-if="d_loaded_tabs.has('rerun_tests')"
-                         :project="project"></rerun-submissions>
+                         :project="d_project"></rerun-submissions>
       <handgrading-settings v-show="d_current_tab === 'handgrading'"
                             v-if="d_loaded_tabs.has('handgrading')"
-                            :project="project"></handgrading-settings>
+                            :project="d_project"></handgrading-settings>
     </div>
   </div>
 </template>
@@ -114,7 +114,7 @@ import Tabs from '@/components/tabs/tabs.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Destroyed, Mounted } from '@/lifecycle';
-import { array_remove_unique, deep_copy, get_query_param, safe_assign } from "@/utils";
+import { assert_not_null, deep_copy, get_query_param, safe_assign } from "@/utils";
 
 @Component({
   components: {
@@ -143,13 +143,13 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
   d_globals = this.globals;
 
   d_loading = true;
-  project: Project | null = null;
+  d_project: Project | null = null;
 
   @handle_global_errors_async
   async created() {
-    this.project = await Project.get_by_pk(Number(this.$route.params.project_id));
+    this.d_project = await Project.get_by_pk(Number(this.$route.params.project_id));
 
-    await this.d_globals.set_current_project(this.project);
+    await this.d_globals.set_current_project(this.d_project);
     Project.subscribe(this);
     InstructorFile.subscribe(this);
     ExpectedStudentFile.subscribe(this);
@@ -170,72 +170,87 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
   }
 
   update_project_changed(project: Project): void {
-    if (project.pk === this.project!.pk) {
-      this.project = deep_copy(project, Project);
+    if (project.pk === this.d_project!.pk) {
+      this.d_project = deep_copy(project, Project);
     }
   }
 
   update_instructor_file_created(instructor_file: InstructorFile) {
-    if (instructor_file.project === this.project!.pk) {
-      this.project!.instructor_files!.push(instructor_file);
-      this.project!.instructor_files!.sort(
-        (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
-      );
+    if (this.d_project === null || instructor_file.project !== this.d_project.pk) {
+      return;
     }
+    assert_not_null(this.d_project.instructor_files);
+    this.d_project.instructor_files.push(instructor_file);
+    this.d_project.instructor_files.sort(
+      (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
+    );
   }
 
   update_instructor_file_deleted(instructor_file: InstructorFile) {
-    if (instructor_file.project === this.project!.pk) {
-      array_remove_unique(
-        this.project!.instructor_files!, instructor_file.pk, (file, pk) => file.pk === pk);
+    if (this.d_project === null || instructor_file.project !== this.d_project.pk) {
+      return;
     }
+    assert_not_null(this.d_project.instructor_files);
+    this.d_project.instructor_files.splice(
+      this.d_project.instructor_files.findIndex(file => file.pk === instructor_file.pk),
+      1
+    );
   }
 
   update_instructor_file_renamed(instructor_file: InstructorFile) {
-    if (instructor_file.project === this.project!.pk) {
-      let index = this.project!.instructor_files!.findIndex(
-        (file) => file.pk === instructor_file.pk
-      );
-      Vue.set(this.project!.instructor_files!, index, instructor_file);
-
-      this.project!.instructor_files!.sort(
-        (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
-      );
+    if (this.d_project === null || instructor_file.project !== this.d_project.pk) {
+      return;
     }
+
+    assert_not_null(this.d_project.instructor_files);
+    let index = this.d_project.instructor_files.findIndex(
+      (file) => file.pk === instructor_file.pk
+    );
+    Vue.set(this.d_project.instructor_files, index, instructor_file);
+
+    this.d_project.instructor_files.sort(
+      (first: InstructorFile, second: InstructorFile) => first.name.localeCompare(second.name)
+    );
   }
 
   update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {
-    if (expected_student_file.project === this.project!.pk) {
-      this.project!.expected_student_files.push(expected_student_file);
-      this.project!.expected_student_files.sort(
-        (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
-          return first.pattern.localeCompare(second.pattern);
-        }
-      );
+    if (this.d_project === null || expected_student_file.project !== this.d_project.pk) {
+      return;
     }
+
+    this.d_project.expected_student_files.push(expected_student_file);
+    this.d_project.expected_student_files.sort(
+      (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
+        return first.pattern.localeCompare(second.pattern);
+      }
+    );
   }
 
   update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {
-    if (expected_student_file.project === this.project!.pk) {
-      let index = this.project!.expected_student_files.findIndex(
-        (file) => file.pk === expected_student_file.pk);
-      Vue.set(this.project!.expected_student_files, index, expected_student_file);
-
-      this.project!.expected_student_files.sort(
-        (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
-          return first.pattern.localeCompare(second.pattern);
-        }
-      );
+    if (this.d_project === null || expected_student_file.project !== this.d_project.pk) {
+      return;
     }
+
+    let index = this.d_project.expected_student_files.findIndex(
+      (file) => file.pk === expected_student_file.pk);
+    Vue.set(this.d_project.expected_student_files, index, expected_student_file);
+
+    this.d_project.expected_student_files.sort(
+      (first: ExpectedStudentFile, second: ExpectedStudentFile) => {
+        return first.pattern.localeCompare(second.pattern);
+      }
+    );
   }
 
   update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
-    if (expected_student_file.project === this.project!.pk) {
-      array_remove_unique(
-        this.project!.expected_student_files, expected_student_file.pk,
-        (file, pk) => file.pk === pk
-      );
+    if (this.d_project === null || expected_student_file.project !== this.d_project.pk) {
+      return;
     }
+
+    this.d_project.expected_student_files.splice(
+      this.d_project.expected_student_files.findIndex(item => item.pk === expected_student_file.pk),
+      1
+    );
   }
 
   update_instructor_file_content_changed(

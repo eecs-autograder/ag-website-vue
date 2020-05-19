@@ -7,9 +7,6 @@ import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_sui
 import * as data_ut from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     let wrapper: Wrapper<AGTestCommandAdvancedFdbkSettings>;

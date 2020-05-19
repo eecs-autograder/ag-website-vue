@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
@@ -12,7 +12,6 @@ import Tabs from '@/components/tabs/tabs.vue';
 let original_match_media: (query: string) => MediaQueryList;
 
 beforeEach(() => {
-    config.logModifiedComponents = false;
     original_match_media = window.matchMedia;
     Object.defineProperty(window, "matchMedia", {
         value: jest.fn(() => {

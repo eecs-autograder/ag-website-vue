@@ -11,7 +11,7 @@ import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace, find_by_name } from '@/tests/utils';
+import { compress_whitespace, emitted, find_by_name } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -572,7 +572,6 @@ describe('Submit tests', () => {
                     discarded_files: [],
                     missing_files: {},
                     status: GradingStatus.received,
-                    count_towards_daily_limit: true,
                     is_past_daily_limit: false,
                     is_bonus_submission: false,
                     count_towards_total_limit: true,
@@ -612,7 +611,7 @@ describe('Submit tests', () => {
 
         expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(false);
 
-        expect(wrapper.emitted().submitted.length).toEqual(1);
+        expect(emitted(wrapper, 'submitted').length).toEqual(1);
     });
 
     test('Submit API error', async () => {

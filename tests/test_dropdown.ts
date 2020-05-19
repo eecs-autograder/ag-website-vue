@@ -1,19 +1,13 @@
 import Vue from 'vue';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
 import Dropdown from '@/components/dropdown.vue';
 import { zip } from '@/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
-
-afterEach(() => {
-    sinon.restore();
-});
+import { emitted } from './utils';
 
 
 test('Scoped slot can be used to specify custom menu item text', () => {
@@ -204,7 +198,7 @@ describe('Dropdown tests', () => {
         await dropdown.$nextTick();
 
         expect(dropdown.is_open).toBe(false);
-        expect(wrapper.emitted().update_item_selected[0][0]).toEqual(item_values[0]);
+        expect(emitted(wrapper, 'update_item_selected')[0][0]).toEqual(item_values[0]);
     });
 
     test('Pressing enter emits the selected item and closes the menu', () => {
@@ -218,7 +212,7 @@ describe('Dropdown tests', () => {
         dropdown_container_wrapper.trigger("keydown", {code: "Enter" });
 
         expect(dropdown.is_open).toBe(false);
-        expect(wrapper.emitted().update_item_selected[0][0]).toEqual(item_values[1]);
+        expect(emitted(wrapper, 'update_item_selected')[0][0]).toEqual(item_values[1]);
     });
 
     test('Blur event closes dropdown', () => {

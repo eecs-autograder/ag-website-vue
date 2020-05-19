@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     Course,
@@ -15,17 +15,15 @@ import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from '@/components/group_members_form.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import { set_validated_input_text, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('EditSingleGroup tests', () => {
     let wrapper: Wrapper<EditSingleGroup>;
-    let component: EditSingleGroup;
     let course: Course;
     let group: Group;
     let project: Project;
@@ -48,27 +46,22 @@ describe('EditSingleGroup tests', () => {
         });
 
 
-        wrapper = mount(EditSingleGroup, {
+        wrapper = managed_mount(EditSingleGroup, {
             propsData: {
                 course: course,
                 project: project,
                 group: group
             }
         });
-        component = wrapper.vm;
-    });
-
-    afterEach(() => {
-        sinon.restore();
     });
 
     test('Group members form v-model binding', () => {
         let edit_group_form = <Wrapper<GroupMembersForm>> wrapper.find({ref: 'edit_group_form'});
-        expect(edit_group_form.vm.value).toBe(wrapper.vm.d_group.member_names);
+        expect(edit_group_form.vm.value).toBe(wrapper.vm.d_group?.member_names);
 
         let new_members = ['wa@luigi.net', 'spam@egg.net'];
         edit_group_form.vm.$emit('input', new_members);
-        expect(wrapper.vm.d_group.member_names).toEqual(new_members);
+        expect(wrapper.vm.d_group?.member_names).toEqual(new_members);
     });
 
     test('bonus_submissions_remaining cannot be a negative number', async () => {
@@ -77,7 +70,7 @@ describe('EditSingleGroup tests', () => {
         ).vm;
         set_validated_input_text(wrapper.find({ref: 'bonus_submissions_remaining_input'}), "-4");
 
-        expect(component.d_edit_group_form_is_valid).toBe(false);
+        expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
@@ -92,7 +85,7 @@ describe('EditSingleGroup tests', () => {
 
         set_validated_input_text(bonus_submissions_input, "spam");
 
-        expect(component.d_edit_group_form_is_valid).toBe(false);
+        expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
@@ -107,11 +100,11 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Revoking and granting extension', async () => {
-        expect(component.d_group.extended_due_date).not.toBeNull();
+        expect(wrapper.vm.d_group?.extended_due_date).not.toBeNull();
 
         let revoke_button = wrapper.find('#revoke-extension');
         revoke_button.trigger('click');
-        expect(component.d_group.extended_due_date).toBeNull();
+        expect(wrapper.vm.d_group?.extended_due_date).toBeNull();
 
         let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
         picker.vm.toggle_visibility();
@@ -120,11 +113,12 @@ describe('EditSingleGroup tests', () => {
         let now = moment();
         picker.vm.set_date_and_time(now.format());
         picker.vm.update_time_selected();
-        expect(component.d_group.extended_due_date).toEqual(now.format());
+        expect(wrapper.vm.d_group?.extended_due_date).toEqual(now.format());
     });
 
     test('API errors displayed on submit', async () => {
-        let save_group_stub = sinon.stub(component.d_group, 'save');
+        assert_not_null(wrapper.vm.d_group);
+        let save_group_stub = sinon.stub(wrapper.vm.d_group, 'save');
         save_group_stub.returns(Promise.reject(
             new HttpError(
                 400,
@@ -134,7 +128,7 @@ describe('EditSingleGroup tests', () => {
         );
 
         wrapper.find({ref: 'edit_group_form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
@@ -142,6 +136,7 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Delete group', async () => {
+        assert_not_null(wrapper.vm.d_group);
         let delete_group_stub = sinon.stub(wrapper.vm.d_group, 'pseudo_delete');
         wrapper.find({ref: 'show_delete_modal_button'}).trigger('click');
         await wrapper.vm.$nextTick();
@@ -155,6 +150,7 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Delete group API errors handled', async () => {
+        assert_not_null(wrapper.vm.d_group);
         sinon.stub(wrapper.vm.d_group, 'pseudo_delete').rejects(new HttpError(403, ''));
 
         wrapper.find({ref: 'show_delete_modal_button'}).trigger('click');
@@ -178,13 +174,13 @@ describe('EditSingleGroup tests', () => {
             bonus_submissions_remaining: 0,
          });
 
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_group).toEqual(group);
+        expect(wrapper.vm.d_group).toEqual(group);
 
         wrapper.setProps({group: different_group});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_group).toEqual(different_group);
+        expect(wrapper.vm.d_group).toEqual(different_group);
     });
 });

@@ -1,10 +1,7 @@
-import { config, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import Toggle from '@/components/toggle.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Toggle.vue', () => {
 

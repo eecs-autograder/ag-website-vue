@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { HttpError, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -18,10 +18,6 @@ import {
     set_validated_input_text, validated_input_is_valid
 } from "@/tests/utils";
 
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let wrapper: Wrapper<ProjectSettings>;
 let project: Project;

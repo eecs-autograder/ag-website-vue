@@ -1,4 +1,4 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     Group,
@@ -9,12 +9,12 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
+import { deep_copy } from '@/utils';
 
-import { make_course, make_project } from '@/tests/data_utils';
-import { wait_for_load } from '@/tests/utils';
+import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 
 describe('InvitationReceived tests', () => {
     let wrapper: Wrapper<InvitationReceived>;
@@ -24,45 +24,27 @@ describe('InvitationReceived tests', () => {
 
     beforeEach(async () => {
 
-        project = make_project(make_course().pk);
+        project = data_ut.make_project(data_ut.make_course().pk);
 
-        invitation = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "sean@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu"]
-        });
+        invitation = data_ut.make_group_invitation(
+            project.pk,
+            "sean@umich.edu",
+            ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            ["milo@umich.edu"]
+        );
 
-        user = new User({
-            pk: 3,
-            username: "alexis@umich.edu",
-            first_name: "Alexis",
-            last_name: "Bledel",
-            email: "RoryGilmore@umich.edu",
-            is_superuser: true
-        });
-
-        let globals = new GlobalData();
-        globals.current_user = user;
-        wrapper = mount(InvitationReceived, {
+        user = invitation.recipients[0];
+        data_ut.set_global_current_user(user);
+        wrapper = managed_mount(InvitationReceived, {
             propsData: {
                 value: invitation,
                 project: project
-            },
-            provide: {
-                globals: globals
             }
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     test('reject an invitation - cancel action in modal', async () => {
         expect(wrapper.vm.d_invitation!).toEqual(invitation);
-        expect(wrapper.vm.d_globals.current_user).toEqual(user);
         expect(wrapper.find({ref: 'confirm_reject_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(false);
 
@@ -125,21 +107,16 @@ describe('InvitationReceived tests', () => {
     });
 
     test('already_accepted', async () => {
-        let updated_invitation = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "sean@umich.edu",
-            project: 15,
-            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "alexis@umich.edu"]
-        });
-        expect(wrapper.vm.d_invitation!.invitees_who_accepted).not.toContain(user.username);
+        let updated_invitation = deep_copy(invitation, GroupInvitation);
+        updated_invitation.recipients_who_accepted.push(user.username);
+        expect(wrapper.vm.d_invitation!.recipients_who_accepted).not.toContain(user.username);
         expect(wrapper.vm.already_accepted).toBe(false);
         expect(wrapper.find({ref: 'accept_invitation_button'}).is('[disabled]')).toBe(false);
 
         wrapper.setProps({value: updated_invitation});
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_invitation!.invitees_who_accepted).toContain(user.username);
+        expect(wrapper.vm.d_invitation!.recipients_who_accepted).toContain(user.username);
         expect(wrapper.vm.already_accepted).toBe(true);
         expect(wrapper.find({ref: 'accept_invitation_button'}).is('[disabled]')).toBe(true);
     });
@@ -192,32 +169,16 @@ describe('InvitationReceived tests', () => {
     test('accept an invitation - confirm action in modal - successful ' +
          '& last person in group to accept invitation',
          async () => {
-        let group_created = new Group({
-            pk: 1,
-            project: 15,
-            extended_due_date: "2019-04-18T15:26:06.965696Z",
-            member_names: [
-                user.username,
-                "keiko@umich.edu",
-                "milo@umich.edu",
-                "sean@umich.edu"
-            ],
-            bonus_submissions_remaining: 0,
-            late_days_used: {},
-            num_submissions: 3,
-            num_submits_towards_limit: 2,
-            created_at: "9am",
-            last_modified: "10am"
-        });
+        let group_created = data_ut.make_group(
+            project.pk, 4, {members: [user, ...invitation.recipients]}
+        );
 
-        wrapper.setProps({invitation: new GroupInvitation({
-                pk: 1,
-                invitation_creator: "sean@umich.edu",
-                project: 15,
-                invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-                invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-            })
-        });
+        let updated_invitation = deep_copy(invitation, GroupInvitation);
+        updated_invitation.recipients_who_accepted = invitation.recipient_usernames.slice(1);
+        wrapper.setProps({invitation: updated_invitation});
+        expect(
+            updated_invitation.recipients_who_accepted.find(item => item === user.username)
+        ).toBeUndefined();
 
         let accept_invitation_stub = sinon.stub(
             wrapper.vm.d_invitation!, 'accept'
@@ -274,28 +235,23 @@ describe('InvitationReceived tests', () => {
     });
 
     test('prospective_group_members', async () => {
-        expect(wrapper.vm.d_invitation!.invited_usernames).toEqual([
+        expect(wrapper.vm.d_invitation!.recipient_usernames).toEqual([
             "alexis@umich.edu",
             "milo@umich.edu",
             "keiko@umich.edu"
         ]);
         expect(wrapper.vm.d_globals.current_user!.username).toEqual("alexis@umich.edu");
-        expect(wrapper.vm.d_invitation!.invitation_creator).toEqual("sean@umich.edu");
+        expect(wrapper.vm.d_invitation!.sender_username).toEqual("sean@umich.edu");
         expect(wrapper.vm.other_group_members).toEqual([
-            invitation.invitation_creator,
+            invitation.sender_username,
             "milo@umich.edu",
             "keiko@umich.edu"
         ]);
     });
 
     test('value Watcher', async () => {
-        let updated_invitation = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "sean@umich.edu",
-            project: 15,
-            invited_usernames: ["alexis@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-        });
+        let updated_invitation = deep_copy(invitation, GroupInvitation);
+        updated_invitation.recipients_who_accepted.push(user.username);
 
         expect(wrapper.vm.d_invitation).toEqual(invitation);
 

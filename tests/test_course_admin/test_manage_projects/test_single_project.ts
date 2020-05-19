@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, Project, Semester, UltimateSubmissionPolicy, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -7,16 +7,9 @@ import APIErrors from '@/components/api_errors.vue';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { set_global_current_user } from '@/tests/data_utils';
+import { make_user, set_global_current_user } from '@/tests/data_utils';
 import { set_select_object_value, set_validated_input_text, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
-
-afterEach(() => {
-   sinon.restore();
-});
 
 describe('SingleProject.vue', () => {
     let wrapper: Wrapper<SingleProject>;
@@ -31,11 +24,7 @@ describe('SingleProject.vue', () => {
     let user: User;
 
     beforeEach(() => {
-        user = new User({
-            pk: 1, username: 'ashberg', first_name: 'Ashley',
-            last_name: 'IceBerg', email: 'iceberg@umich.edu',
-            is_superuser: false});
-
+        user = make_user();
         set_global_current_user(user);
 
         course_1 = new Course({

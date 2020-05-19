@@ -1,12 +1,9 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import {  mount, Wrapper } from '@vue/test-utils';
 
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-import { expect_html_element_has_value, set_validated_input_text, sleep } from './utils';
+import { emitted, expect_html_element_has_value, set_validated_input_text, sleep } from './utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 const IS_NUMBER = (value: string): ValidatorResponse => {
     return {
@@ -578,8 +575,8 @@ describe('Custom from_string_fn and to_string_fn allow null tests', () => {
     test('Empty string converted to null', () => {
         set_validated_input_text(wrapper, '');
         expect(wrapper.vm.is_valid).toEqual(true);
-        expect(wrapper.emitted('input').length).toEqual(1);
-        expect(wrapper.emitted('input')[0][0]).toBeNull();
+        expect(emitted(wrapper, 'input').length).toEqual(1);
+        expect(emitted(wrapper, 'input')[0][0]).toBeNull();
     });
 
     test('null converted to empty string', () => {

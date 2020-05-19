@@ -1,6 +1,6 @@
 import { Route, VueRouter } from 'vue-router/types/router';
 
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -11,9 +11,8 @@ import GroupLookup from '@/components/group_lookup.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+import { emitted } from './utils';
+
 
 let groups: ag_cli.Group[];
 let router_replace: sinon.SinonStub;
@@ -70,8 +69,8 @@ describe('GroupLookup tests', () => {
 
         dropdown_typeahead.$emit('update_item_chosen', groups[3]);
 
-        expect(wrapper.emitted().update_group_selected.length).toEqual(1);
-        expect(wrapper.emitted().update_group_selected[0][0]).toEqual(groups[3]);
+        expect(emitted(wrapper, 'update_group_selected').length).toEqual(1);
+        expect(emitted(wrapper, 'update_group_selected')[0][0]).toEqual(groups[3]);
         check_replace_call(groups[3].pk);
     });
 });
@@ -84,8 +83,8 @@ test('Group selected initially from query param', () => {
         },
         mocks: get_router_mocks(groups[2].pk),
     });
-    expect(wrapper.emitted().update_group_selected.length).toEqual(1);
-    expect(wrapper.emitted().update_group_selected[0][0]).toEqual(groups[2]);
+    expect(emitted(wrapper, 'update_group_selected').length).toEqual(1);
+    expect(emitted(wrapper, 'update_group_selected')[0][0]).toEqual(groups[2]);
     check_replace_call(groups[2].pk);
 });
 
@@ -97,7 +96,7 @@ test('Group not selected from query param by default', async () => {
         },
         mocks: get_router_mocks(groups[2].pk),
     });
-    expect(wrapper.emitted().update_group_selected).toBeUndefined();
+    expect(wrapper.emitted('update_group_selected')).toBeUndefined();
     expect(router_replace.notCalled).toBe(true);
 });
 

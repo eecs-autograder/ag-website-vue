@@ -1,20 +1,15 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+import { emitted } from './utils';
 
-afterEach(() => {
-    sinon.restore();
-});
 
 @Component({
     template: `<div class="outermost">
@@ -135,7 +130,7 @@ describe('ContextMenu tests', () => {
         outside_input.element.focus();
         await context_menu.vm.$nextTick();
 
-        expect(context_menu.emitted().close.length).not.toEqual(0);
+        expect(emitted(context_menu, 'close').length).not.toEqual(0);
         expect(context_menu.isVisible()).toBe(false);
 
         wrapper.destroy();
@@ -149,7 +144,7 @@ describe('ContextMenu tests', () => {
 
         let disabled_wrapper = wrapper.find({ref: 'disabled_item'});
         disabled_wrapper.trigger('click');
-        expect(disabled_wrapper.emitted().click).toBeUndefined();
+        expect(disabled_wrapper.emitted('click')).toBeUndefined();
     });
 
     test("Position adjusted when too near right edge", async () => {

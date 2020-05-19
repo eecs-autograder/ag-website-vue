@@ -17,9 +17,6 @@ import {
     validated_input_is_valid
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('BuggyImplementation tests', () => {
     let wrapper: Wrapper<BuggyImplementations>;
@@ -59,7 +56,7 @@ describe('BuggyImplementation tests', () => {
 
         expect(wrapper.vm.d_mutation_test_suite!.points_per_exposed_bug).toEqual("905.7");
         expect(validated_input_is_valid(points_per_exposed_bug_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
 
         wrapper.vm.d_mutation_test_suite!.points_per_exposed_bug = "10.52";
         expect(get_validated_input_text(points_per_exposed_bug_input)).toEqual('10.52');
@@ -95,21 +92,21 @@ describe('BuggyImplementation tests', () => {
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
 
         override_max_points_checkbox.setChecked(false);
         expect(wrapper.vm.d_override_max_points).toEqual(false);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(false);
         expect(wrapper.findAll('#max-points').length).toEqual(0);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toBeNull();
-        expect(wrapper.emitted().input.length).toEqual(2);
+        expect(wrapper.emitted('input')?.length).toEqual(2);
 
         override_max_points_checkbox.setChecked(true);
         expect(wrapper.vm.d_override_max_points).toEqual(true);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
         expect(wrapper.findAll('#max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
-        expect(wrapper.emitted().input.length).toEqual(3);
+        expect(wrapper.emitted('input')?.length).toEqual(3);
 
         wrapper.vm.d_override_max_points = true;
         expect(wrapper.findAll('#max-points').length).toEqual(1);
@@ -127,7 +124,7 @@ describe('BuggyImplementation tests', () => {
 
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(3);
         expect(validated_input_is_valid(max_points_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
 
         wrapper.vm.d_mutation_test_suite!.max_points = 7;
         expect(get_validated_input_text(max_points_input)).toEqual('7');
@@ -167,7 +164,7 @@ describe('BuggyImplementation tests', () => {
 
         expect(wrapper.vm.d_mutation_test_suite!.max_num_student_tests).toEqual(3);
         expect(validated_input_is_valid(max_num_student_tests_input)).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
 
         wrapper.vm.d_mutation_test_suite!.max_num_student_tests = 7;
         expect(get_validated_input_text(max_num_student_tests_input)).toEqual('7');
@@ -215,7 +212,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[5]).toEqual("Bug_23");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[6]).toEqual("Bug_41");
         expect(wrapper.vm.d_buggy_impl_names_text).toEqual("");
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
     });
 
     test('adding buggy impl names by pressing enter', async () => {
@@ -246,7 +243,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[5]).toEqual("Bug_23");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[6]).toEqual("Bug_41");
         expect(wrapper.vm.d_buggy_impl_names_text).toEqual("");
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
     });
 
     test('adding buggy impl names - no duplicates allowed', async () => {
@@ -270,7 +267,7 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[2]).toEqual("Bug_4");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[3]).toEqual("Bug_12");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[4]).toEqual("Bug_13");
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
     });
 
     test('adding buggy impl names - empty strings cannot be added', async () => {
@@ -341,25 +338,25 @@ describe('BuggyImplementation tests', () => {
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[1]).toEqual("Bug_2");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[2]).toEqual("Bug_4");
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(wrapper.emitted('input')?.length).toEqual(1);
 
         wrapper.findAll('.remove-buggy-impl-name-container').at(1).trigger('click');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(2);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[1]).toEqual("Bug_4");
-        expect(wrapper.emitted().input.length).toEqual(2);
+        expect(wrapper.emitted('input')?.length).toEqual(2);
 
         wrapper.findAll('.remove-buggy-impl-name-container').at(0).trigger('click');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_4");
-        expect(wrapper.emitted().input.length).toEqual(3);
+        expect(wrapper.emitted('input')?.length).toEqual(3);
 
         wrapper.findAll('.remove-buggy-impl-name-container').at(0).trigger('click');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(0);
-        expect(wrapper.emitted().input.length).toEqual(4);
+        expect(wrapper.emitted('input')?.length).toEqual(4);
     });
 
     test('value - Watcher', async () => {

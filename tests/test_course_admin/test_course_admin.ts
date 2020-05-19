@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -10,10 +10,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
 import { wait_for_load, wait_until } from '@/tests/utils';
 
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let course: Course;
 let router_replace: sinon.SinonStub;

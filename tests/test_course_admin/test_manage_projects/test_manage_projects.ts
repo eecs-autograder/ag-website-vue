@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, Project, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -12,9 +12,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { find_by_name, set_validated_input_text, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Manage projects tests', () => {
     let component: ManageProjects;

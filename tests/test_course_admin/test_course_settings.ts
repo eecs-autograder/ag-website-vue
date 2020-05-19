@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, Semester } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -6,9 +6,6 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('CourseSettings.vue', () => {
     let wrapper: Wrapper<CourseSettings>;

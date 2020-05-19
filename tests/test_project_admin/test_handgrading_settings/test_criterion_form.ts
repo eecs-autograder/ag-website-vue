@@ -5,6 +5,7 @@ import { Criterion } from "ag-client-typescript";
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 
 import {
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
@@ -115,8 +116,8 @@ describe('CriterionForm tests', () => {
     test('form_validity_changed', () => {
         let wrapper = mount(CriterionForm);
         set_validated_input_text(wrapper.find({ref: 'short_description'}), 'An criterion');
-        expect(wrapper.emitted().form_validity_changed.length).toEqual(2);
-        expect(wrapper.emitted().form_validity_changed).toEqual([[false], [true]]);
+        expect(emitted(wrapper, 'form_validity_changed').length).toEqual(2);
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
     });
 
     test('Submit', () => {
@@ -126,9 +127,9 @@ describe('CriterionForm tests', () => {
         set_validated_input_text(wrapper.find({ref: 'points'}), '12');
 
         wrapper.vm.submit();
-        expect(wrapper.emitted().submit.length).toEqual(1);
+        expect(emitted(wrapper, 'submit').length).toEqual(1);
         expect(
-            wrapper.emitted().submit[0][0]
+            emitted(wrapper, 'submit')[0][0]
         ).toEqual(
             {short_description: 'An criterion', long_description: 'Very criterion', points: 12}
         );

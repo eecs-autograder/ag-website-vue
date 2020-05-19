@@ -1,14 +1,11 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { config, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('DropdownTypeahead.vue', () => {
     test('choices array is empty', async () => {

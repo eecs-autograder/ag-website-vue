@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -16,14 +16,12 @@ import ValidatedInput from '@/components/validated_input.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('commands_are_visible getter', () => {
     let wrapper: Wrapper<AGCasePanel>;
@@ -158,7 +156,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
     });
 
@@ -191,7 +189,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
 
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
@@ -209,7 +207,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
     });
 
@@ -218,7 +216,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
         await wrapper.vm.$nextTick();
@@ -250,7 +248,7 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.is_open).toBe(true);
         expect(wrapper.vm.commands_are_visible).toBe(true);
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
         await wrapper.vm.$nextTick();
@@ -270,13 +268,13 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-command').at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_command_green_2);
+        expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_command_green_2);
     });
 
     test('Add command - successful', async () => {

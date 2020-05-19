@@ -7,13 +7,6 @@ import APIErrors from '@/components/api_errors.vue';
 import CreateExpectedStudentFile from '@/components/project_admin/expected_student_files/create_expected_student_file.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
-
-afterEach(() => {
-   sinon.restore();
-});
 
 describe('CreateExpectedStudentFile tests', () => {
     let wrapper: Wrapper<CreateExpectedStudentFile>;

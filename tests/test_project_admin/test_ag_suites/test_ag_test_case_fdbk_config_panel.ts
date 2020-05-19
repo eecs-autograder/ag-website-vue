@@ -7,9 +7,6 @@ import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_t
 import { make_ag_test_case_feedback_config } from '@/tests/data_utils';
 import { checkbox_is_checked } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('AGTestCaseFdbkConfigPanel tests', () => {
     let wrapper: Wrapper<AGTestCaseFdbkConfigPanel>;

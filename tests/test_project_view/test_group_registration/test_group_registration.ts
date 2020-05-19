@@ -1,4 +1,4 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     Course,
@@ -12,12 +12,8 @@ import APIErrors from '@/components/api_errors.vue';
 import GroupRegistration from '@/components/project_view/group_registration/group_registration.vue';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 
-import {
-    make_course,
-    make_group,
-    make_project,
-    set_global_current_user
-} from '@/tests/data_utils';
+import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -26,9 +22,9 @@ describe('GroupRegistration tests', () => {
     let user: User;
 
     beforeEach(() => {
-        course = make_course();
+        course = data_ut.make_course();
 
-        project = make_project(
+        project = data_ut.make_project(
             course.pk,
             {
                disallow_group_registration: false,
@@ -36,16 +32,8 @@ describe('GroupRegistration tests', () => {
            }
         );
 
-        user = new User({
-            pk: 3,
-            username: "alexis@umich.edu",
-            first_name: "Alexis",
-            last_name: "Bledel",
-            email: "RoryGilmore@umich.edu",
-            is_superuser: true
-        });
-
-        set_global_current_user(user);
+        user = data_ut.make_user();
+        data_ut.set_global_current_user(user);
     });
 
     afterEach(() => {
@@ -54,10 +42,10 @@ describe('GroupRegistration tests', () => {
 
     test('Max group size 1, automatically work alone', async () => {
         let work_alone_stub = sinon.stub(Group, 'create_solo_group').resolves(
-            make_group(project.pk, 1, {member_names: [user.username]})
+            data_ut.make_group(project.pk, 1, {member_names: [user.username]})
         );
         project.max_group_size = 1;
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -75,7 +63,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
         project.min_group_size = 2;
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -95,7 +83,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
         project.disallow_group_registration = true;
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -112,7 +100,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -125,13 +113,12 @@ describe('GroupRegistration tests', () => {
     });
 
     test('created - user has sent an invitation for this project', async () => {
-        let group_invitation_sent = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "alexis@umich.edu",
-            project: project.pk,
-            invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-        });
+        let group_invitation_sent = data_ut.make_group_invitation(
+            project.pk,
+            "alexis@umich.edu",
+            ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            ["milo@umich.edu", "keiko@umich.edu"]
+        );
 
         sinon.stub(user, 'group_invitations_sent').returns(
             Promise.resolve(
@@ -142,7 +129,7 @@ describe('GroupRegistration tests', () => {
         );
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -159,13 +146,12 @@ describe('GroupRegistration tests', () => {
     });
 
     test('created - user has sent an invitation but not for this project', async () => {
-        let group_invitation_sent = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "alexis@umich.edu",
-            project: project.pk + 5,
-            invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-        });
+        let group_invitation_sent = data_ut.make_group_invitation(
+            data_ut.make_project(course.pk).pk,
+            "alexis@umich.edu",
+            ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            ["milo@umich.edu", "keiko@umich.edu"]
+        );
         sinon.stub(user, 'group_invitations_sent').returns(
             Promise.resolve(
                 [
@@ -175,7 +161,7 @@ describe('GroupRegistration tests', () => {
         );
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -191,27 +177,24 @@ describe('GroupRegistration tests', () => {
     });
 
     test('created - user has received a invitations from several projects', async () => {
-        let group_invitation_received_1 = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "laura@umich.edu",
-            project: project.pk + 1,
-            invited_usernames: ["alexis@umich.edu", "george@umich.edu"],
-            invitees_who_accepted: []
-        });
-        let group_invitation_received_2 = new GroupInvitation({
-            pk: 2,
-            invitation_creator: "linda@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu", "liz@umich.edu"],
-            invitees_who_accepted: ["liz@umich.edu"]
-        });
-        let group_invitation_received_3 = new GroupInvitation({
-            pk: 3,
-            invitation_creator: "james@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu", "violet@umich.edu"],
-            invitees_who_accepted: ["alexis@umich.edu"]
-        });
+        let group_invitation_received_1 = data_ut.make_group_invitation(
+            data_ut.make_project(course.pk).pk,
+            "laura@umich.edu",
+            ["alexis@umich.edu", "george@umich.edu"],
+            []
+        );
+        let group_invitation_received_2 = data_ut.make_group_invitation(
+            project.pk,
+            "linda@umich.edu",
+            ["alexis@umich.edu", "liz@umich.edu"],
+            ["liz@umich.edu"]
+        );
+        let group_invitation_received_3 = data_ut.make_group_invitation(
+            project.pk,
+            "james@umich.edu",
+            ["alexis@umich.edu", "violet@umich.edu"],
+            ["alexis@umich.edu"]
+        );
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([
             group_invitation_received_1,
@@ -219,7 +202,7 @@ describe('GroupRegistration tests', () => {
             group_invitation_received_3
         ]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -238,34 +221,30 @@ describe('GroupRegistration tests', () => {
     test('if invitation_sent is not null, it is an invitation sent by the user for ' +
          'the current project',
          async () => {
-        let invitation_sent_1 = new GroupInvitation({
-            pk: 1,
-            invitation_creator: user.username,
-            project: project.pk + 1,
-            invited_usernames: ["liz@umich.edu", "yanic@umich.edu"],
-            invitees_who_accepted: ["liz@umich.edu"]
-        });
-        let invitation_sent_2 = new GroupInvitation({
-            pk: 2,
-            invitation_creator: user.username,
-            project: project.pk,
-            invited_usernames: ["edward@umich.edu", "kelly@umich.edu"],
-            invitees_who_accepted: ["kelly@umich.edu"]
-        });
-        let invitation_sent_3 = new GroupInvitation({
-            pk: 3,
-            invitation_creator: user.username,
-            project: project.pk + 2,
-            invited_usernames: ["milo@umich.edu"],
-            invitees_who_accepted: [""]
-        });
-        let invitation_sent_4 = new GroupInvitation({
-            pk: 4,
-            invitation_creator: user.username,
-            project: project.pk + 3,
-            invited_usernames: ["melissa@umich.edu"],
-            invitees_who_accepted: [""]
-        });
+        let invitation_sent_1 = data_ut.make_group_invitation(
+            data_ut.make_project(course.pk).pk,
+            user.username,
+            ["liz@umich.edu", "yanic@umich.edu"],
+            ["liz@umich.edu"]
+        );
+        let invitation_sent_2 = data_ut.make_group_invitation(
+            project.pk,
+            user.username,
+            ["edward@umich.edu", "kelly@umich.edu"],
+            ["kelly@umich.edu"]
+        );
+        let invitation_sent_3 = data_ut.make_group_invitation(
+            data_ut.make_project(course.pk).pk,
+            user.username,
+            ["milo@umich.edu"],
+            [""]
+        );
+        let invitation_sent_4 = data_ut.make_group_invitation(
+            data_ut.make_project(course.pk).pk,
+            user.username,
+            ["melissa@umich.edu"],
+            [""]
+        );
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([
             invitation_sent_1,
@@ -274,7 +253,7 @@ describe('GroupRegistration tests', () => {
             invitation_sent_4
         ]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -289,7 +268,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -311,26 +290,13 @@ describe('GroupRegistration tests', () => {
     });
 
     test('work alone - confirm action in modal - successful',  async () => {
-        let work_alone_stub = sinon.stub(Group, 'create_solo_group').returns(Promise.resolve(
-            new Group({
-                pk: 100,
-                project: project.pk,
-                extended_due_date: "2019-04-18T15:26:06.965696Z",
-                member_names: [
-                    user.username,
-                ],
-                bonus_submissions_remaining: 0,
-                late_days_used: {},
-                num_submissions: 3,
-                num_submits_towards_limit: 2,
-                created_at: "9am",
-                last_modified: "10am"
-            })
-        ));
+        let work_alone_stub = sinon.stub(Group, 'create_solo_group').resolves(
+            data_ut.make_group(project.pk, 1, {members: [user]})
+        );
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -368,7 +334,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -399,20 +365,19 @@ describe('GroupRegistration tests', () => {
     });
 
     test('delete invitation - cancel action in modal', async () => {
-        let group_invitation_sent = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "alexis@umich.edu",
-            project: project.pk,
-            invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-        });
+        let group_invitation_sent = data_ut.make_group_invitation(
+            project.pk,
+            "alexis@umich.edu",
+            ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            ["milo@umich.edu", "keiko@umich.edu"]
+        );
         let reject_invitation_stub = sinon.stub(group_invitation_sent, 'reject');
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([
             group_invitation_sent
         ]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -440,20 +405,19 @@ describe('GroupRegistration tests', () => {
     });
 
     test('delete invitation - confirm action in modal - successful', async () => {
-        let group_invitation_sent = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "alexis@umich.edu",
-            project: project.pk,
-            invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-        });
+        let group_invitation_sent = data_ut.make_group_invitation(
+            project.pk,
+            "alexis@umich.edu",
+            ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            ["milo@umich.edu", "keiko@umich.edu"]
+        );
         let reject_invitation_stub = sinon.stub(group_invitation_sent, 'reject');
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([
             group_invitation_sent
         ]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -480,13 +444,12 @@ describe('GroupRegistration tests', () => {
     });
 
     test('delete invitation - confirm action in modal - unsuccessful', async () => {
-        let group_invitation_sent = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "alexis@umich.edu",
-            project: project.pk,
-            invited_usernames: ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
-            invitees_who_accepted: ["milo@umich.edu", "keiko@umich.edu"]
-        });
+        let group_invitation_sent = data_ut.make_group_invitation(
+            project.pk,
+            "alexis@umich.edu",
+            ["sean@umich.edu", "milo@umich.edu", "keiko@umich.edu"],
+            ["milo@umich.edu", "keiko@umich.edu"]
+        );
         let reject_invitation_stub = sinon.stub(group_invitation_sent, 'reject').returns(
             Promise.reject(
                 new HttpError(
@@ -500,7 +463,7 @@ describe('GroupRegistration tests', () => {
             group_invitation_sent
         ]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -534,7 +497,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -562,20 +525,19 @@ describe('GroupRegistration tests', () => {
     });
 
     test('send invitation - successful', async () => {
-        let group_invitation_created = new GroupInvitation({
-            pk: 2,
-            invitation_creator: user.username,
-            project: project.pk,
-            invited_usernames: ["milo@umich.edu"],
-            invitees_who_accepted: []
-        });
+        let group_invitation_created = data_ut.make_group_invitation(
+            project.pk,
+            user.username,
+            ["milo@umich.edu"],
+            []
+        );
         let send_invitation_stub = sinon.stub(GroupInvitation, 'send_invitation').returns(
             Promise.resolve(group_invitation_created)
         );
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -618,7 +580,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course
@@ -651,35 +613,31 @@ describe('GroupRegistration tests', () => {
 
     test('Rejecting a group invitation', async () => {
         project.max_group_size = 4;
-        let invitation_received_1 = new GroupInvitation({
-            pk: 1,
-            invitation_creator: "melissa@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu", "liz@umich.edu", "yanic@umich.edu"],
-            invitees_who_accepted: ["liz@umich.edu", "yanic@umich.edu"]
-        });
-        let invitation_received_2 = new GroupInvitation({
-            pk: 2,
-            invitation_creator: "lauren@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu", "edward@umich.edu", "kelly@umich.edu"],
-            invitees_who_accepted: ["kelly@umich.edu"]
-        });
-        let invitation_received_3 = new GroupInvitation({
-            pk: 3,
-            invitation_creator: "scott@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu", "milo@umich.edu"],
-            invitees_who_accepted: [""]
-        });
+        let invitation_received_1 = data_ut.make_group_invitation(
+            project.pk,
+            "melissa@umich.edu",
+            ["alexis@umich.edu", "liz@umich.edu", "yanic@umich.edu"],
+            ["liz@umich.edu", "yanic@umich.edu"]
+        );
+        let invitation_received_2 = data_ut.make_group_invitation(
+            project.pk,
+            "lauren@umich.edu",
+            ["alexis@umich.edu", "edward@umich.edu", "kelly@umich.edu"],
+            ["kelly@umich.edu"]
+        );
+        let invitation_received_3 = data_ut.make_group_invitation(
+            project.pk,
+            "scott@umich.edu",
+            ["alexis@umich.edu", "milo@umich.edu"],
+            [""]
+        );
 
-        let invitation_received_4 = new GroupInvitation({
-            pk: 4,
-            invitation_creator: "liza@umich.edu",
-            project: project.pk,
-            invited_usernames: ["alexis@umich.edu"],
-            invitees_who_accepted: [""]
-        });
+        let invitation_received_4 = data_ut.make_group_invitation(
+            project.pk,
+            "liza@umich.edu",
+            ["alexis@umich.edu"],
+            [""]
+        );
 
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([
             invitation_received_1,
@@ -689,7 +647,7 @@ describe('GroupRegistration tests', () => {
         ]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
-        wrapper = mount(GroupRegistration, {
+        wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
                 course: course

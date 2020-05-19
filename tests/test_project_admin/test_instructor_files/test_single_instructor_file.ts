@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { HttpError, InstructorFile } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
@@ -10,9 +10,6 @@ import ValidatedInput from '@/components/validated_input.vue';
 
 import { set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 jest.mock('file-saver');
 
@@ -147,7 +144,7 @@ describe('SingleInstructorFile tests', () => {
         get_content_stub.callsFake((on_download_progress) => {
             // tslint:disable-next-line: no-object-literal-type-assertion
             on_download_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
-            return Promise.resolve('File Contents');
+            return Promise.resolve(new Blob(['File Contents']));
         });
 
         wrapper.find('.download-file').trigger('click');

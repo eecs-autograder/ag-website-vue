@@ -250,11 +250,10 @@ import Draggable from 'vuedraggable';
 
 import {
     BugsExposedFeedbackLevel,
-    get_sandbox_docker_images,
     MutationTestSuite,
     MutationTestSuiteObserver,
     Project,
-    SandboxDockerImageData
+    SandboxDockerImage,
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -306,7 +305,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
-  d_docker_images: SandboxDockerImageData[] = [];
+  d_docker_images: SandboxDockerImage[] = [];
 
   d_active_mutation_test_suite: MutationTestSuite | null = null;
   d_add_mutation_test_suite_form_is_valid = true;
@@ -326,7 +325,9 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async created() {
     MutationTestSuite.subscribe(this);
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
-    this.d_docker_images = await get_sandbox_docker_images();
+    let global_images = await SandboxDockerImage.get_images(null);
+    let course_images = await SandboxDockerImage.get_images(this.project.course);
+    this.d_docker_images = global_images.concat(course_images);
     this.d_loading = false;
   }
 

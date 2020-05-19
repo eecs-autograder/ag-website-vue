@@ -24,8 +24,8 @@ beforeEach(() => {
         submission_pks: [],
         rerun_all_ag_test_suites: true,
         ag_test_suite_data: {},
-        rerun_all_student_test_suites: true,
-        student_suite_pks: [],
+        rerun_all_mutation_test_suites: true,
+        mutation_suite_pks: [],
     });
 
     cancel_stub = sinon.stub(task, 'cancel');

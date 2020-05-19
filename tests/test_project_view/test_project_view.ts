@@ -18,9 +18,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount, managed_shallow_mount } from '@/tests/setup';
 import { wait_for_load, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let wrapper: Wrapper<ProjectView>;
 let project: Project;

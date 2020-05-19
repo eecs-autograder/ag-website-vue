@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 // @ts-ignore
@@ -7,9 +7,8 @@ import * as timezone_mock from 'timezone-mock';
 import DatetimePicker, { InvalidDatetimeStrError } from '@/components/datetime/datetime_picker.vue';
 import TimePicker from "@/components/datetime/time_picker.vue";
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+import { emitted } from '../utils';
+
 
 beforeEach(() => {
     timezone_mock.register('US/Eastern');
@@ -82,11 +81,11 @@ describe('DatetimePicker tests', () => {
         expect(component.d_selected_month).toEqual(now.getMonth());
         expect(component.d_selected_year).toEqual(now.getFullYear());
 
-        expect(wrapper.emitted().input.length).toBe(1);
-        let emitted = new Date(wrapper.emitted('input')[0][0]);
-        expect(emitted.getFullYear()).toEqual(now.getFullYear());
-        expect(emitted.getMonth()).toEqual(now.getMonth());
-        expect(emitted.getDate()).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toBe(1);
+        let emitted_date = new Date(emitted(wrapper, 'input')[0][0]);
+        expect(emitted_date.getFullYear()).toEqual(now.getFullYear());
+        expect(emitted_date.getMonth()).toEqual(now.getMonth());
+        expect(emitted_date.getDate()).toEqual(1);
     });
 
     test('Initial value null, time change before day selected does not emit', () => {
@@ -95,16 +94,16 @@ describe('DatetimePicker tests', () => {
 
         let time_picker = <Wrapper<TimePicker>> wrapper.find({ref: 'time_picker'});
         time_picker.vm.go_to_prev_minute();
-        expect(time_picker.emitted('input').length).toEqual(1);
+        expect(emitted(time_picker, 'input').length).toEqual(1);
 
         expect(wrapper.emitted('input')).toBeUndefined();
 
         wrapper.setProps({value: "2019-12-25T18:36:37.746Z"});
         time_picker.vm.go_to_prev_minute();
-        expect(wrapper.emitted('input').length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
 
-        let emitted = new Date(wrapper.emitted('input')[0][0]);
-        expect(emitted.getMinutes()).toEqual(35);
+        let emitted_date = new Date(emitted(wrapper, 'input')[0][0]);
+        expect(emitted_date.getMinutes()).toEqual(35);
     });
 
     test('Invalid date str throws exception', () => {
@@ -147,12 +146,12 @@ describe('DatetimePicker tests', () => {
         expect(component.d_date.year()).toEqual(2020);
         expect(component.d_selected_year).toEqual(2020);
 
-        expect(wrapper.emitted().input.length).toBe(1);
+        expect(emitted(wrapper, 'input').length).toBe(1);
 
-        let emitted = new Date(wrapper.emitted('input')[0][0]);
-        expect(emitted.getFullYear()).toEqual(2020);
-        expect(emitted.getMonth()).toEqual(0);
-        expect(emitted.getDate()).toEqual(5);
+        let emitted_date = new Date(emitted(wrapper, 'input')[0][0]);
+        expect(emitted_date.getFullYear()).toEqual(2020);
+        expect(emitted_date.getMonth()).toEqual(0);
+        expect(emitted_date.getDate()).toEqual(5);
     });
 
     test("Value passed into 'value' prop changed by parent component", () => {

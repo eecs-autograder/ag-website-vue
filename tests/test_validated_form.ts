@@ -1,6 +1,6 @@
 import { Component, Vue } from "vue-property-decorator";
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
@@ -10,9 +10,6 @@ import { is_number } from "@/validators";
 
 import { get_validated_input_text, set_validated_input_text, sleep } from './utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('ValidatedForm.vue', () => {
     test('is_valid returns true only if all ValidatedInputs are valid ', async () => {

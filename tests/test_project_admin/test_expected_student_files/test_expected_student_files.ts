@@ -1,9 +1,8 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     ExpectedStudentFile,
     Project,
-    UltimateSubmissionPolicy
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
@@ -11,9 +10,6 @@ import ExpectedStudentFiles from '@/components/project_admin/expected_student_fi
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('ExpectedStudentFiles tests', () => {
     let wrapper: Wrapper<ExpectedStudentFiles>;

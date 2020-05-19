@@ -17,6 +17,7 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked,
+    emitted,
     expect_html_element_has_value,
     find_by_name,
     get_validated_input_text,
@@ -25,9 +26,6 @@ import {
     validated_input_is_valid,
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let ag_suite: AGTestSuite;
 let project: Project;
@@ -74,26 +72,12 @@ beforeEach(() => {
         student_files_needed: [student_file_1, student_file_2],
     });
 
-    sandbox_docker_image_1 = {
-        pk: 1,
-        name: "img1",
-        tag: "",
-        display_name: "Image 1"
-    };
-
-    sandbox_docker_image_2 = {
-        pk: 2,
-        name: "img2",
-        tag: "",
-        display_name: "Image 2"
-    };
-
-    sandbox_docker_image_3 = {
-        pk: 3,
-        name: "img3",
-        tag: "",
-        display_name: "Image 3"
-    };
+    sandbox_docker_image_1 = data_ut.make_sandbox_docker_image(
+        project.course, {display_name: "Image 1"});
+    sandbox_docker_image_2 = data_ut.make_sandbox_docker_image(
+        project.course, {display_name: "Image 2"});
+    sandbox_docker_image_3 = data_ut.make_sandbox_docker_image(
+        project.course, {display_name: "Image 3"});
 });
 
 test('Input property initialization and change', async () => {
@@ -140,7 +124,7 @@ describe('Field binding tests', () => {
                 ]
             }
         });
-        expect(wrapper.emitted().field_change).toBeUndefined();
+        expect(wrapper.emitted('field_change')).toBeUndefined();
     });
 
     test('suite name binding', async () => {
@@ -153,7 +137,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_suite!.name = "Thanks";
         expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Suite name cannot be empty - violates condition', async () => {
@@ -163,7 +147,7 @@ describe('Field binding tests', () => {
         set_validated_input_text(suite_name_input, '');
         expect(validated_input_is_valid(suite_name_input)).toBe(false);
 
-        expect(wrapper.emitted().field_change).toBeUndefined();
+        expect(wrapper.emitted('field_change')).toBeUndefined();
     });
 
     test('deferred binding', () => {
@@ -186,7 +170,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_suite!.deferred = false;
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('sandbox_docker_image binding', async () => {
@@ -204,7 +188,7 @@ describe('Field binding tests', () => {
         expect_html_element_has_value(
             sandbox_docker_image_input.find('.select'), sandbox_docker_image_3.pk.toString());
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Toggle allow_network_access', async () => {
@@ -225,7 +209,7 @@ describe('Field binding tests', () => {
 
         expect(wrapper.vm.d_suite!.allow_network_access).toEqual(true);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Read-only instructor files binding', () => {
@@ -249,7 +233,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_suite!.read_only_instructor_files = false;
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Adding an instructor file', async () => {
@@ -277,7 +261,7 @@ describe('Field binding tests', () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
         expect(wrapper.vm.d_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Removing an instructor file', async () => {
@@ -294,7 +278,7 @@ describe('Field binding tests', () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(1);
         expect(wrapper.vm.d_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('InstructorFile filter function on dropdown typeahead', async () => {
@@ -323,7 +307,7 @@ describe('Field binding tests', () => {
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('instructor_files_available', async () => {
@@ -344,7 +328,7 @@ describe('Field binding tests', () => {
             [instructor_file_2, instructor_file_3]
         );
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Adding a student file', async () => {
@@ -372,7 +356,7 @@ describe('Field binding tests', () => {
         expect(wrapper.vm.d_suite!.student_files_needed[1]).toEqual(student_file_2);
         expect(wrapper.vm.d_suite!.student_files_needed[2]).toEqual(student_file_3);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Removing a student file', async () => {
@@ -389,7 +373,7 @@ describe('Field binding tests', () => {
         expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(1);
         expect(wrapper.vm.d_suite!.student_files_needed[0]).toEqual(student_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
@@ -418,7 +402,7 @@ describe('Field binding tests', () => {
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('expected_student_files_available', async () => {
@@ -439,6 +423,6 @@ describe('Field binding tests', () => {
             [student_file_2, student_file_3]
         );
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 });

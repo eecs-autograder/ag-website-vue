@@ -33,7 +33,7 @@ function make_wrapper() {
 beforeEach(() => {
     project = data_ut.make_project(data_ut.make_course().pk);
 
-    get_sandbox_docker_images = sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
+    get_sandbox_docker_images = sinon.stub(ag_cli.SandboxDockerImage, 'get_images').returns(
         Promise.resolve([])
     );
     get_all_suites_from_project = sinon.stub(ag_cli.AGTestSuite, 'get_all_from_project').rejects();
@@ -70,7 +70,10 @@ describe('Creating ag_test_suite', () => {
 
     test('Creating a suite - successfully', async () => {
         let create_ag_suite_stub = sinon.stub(ag_cli.AGTestSuite, 'create').callsFake(
-            () => ag_cli.AGTestSuite.notify_ag_test_suite_created(new_suite)
+            () => {
+                ag_cli.AGTestSuite.notify_ag_test_suite_created(new_suite);
+                return Promise.resolve(new_suite);
+            }
         );
 
         let new_suite = data_ut.make_ag_test_suite(project.pk);

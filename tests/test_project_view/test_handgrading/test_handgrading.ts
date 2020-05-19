@@ -7,12 +7,14 @@ import * as sinon from 'sinon';
 
 import FilePanel from '@/components/project_view/handgrading/file_panel.vue';
 import Handgrading from '@/components/project_view/handgrading/handgrading.vue';
+import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked,
     compress_whitespace,
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
     wait_until,
@@ -359,12 +361,13 @@ describe('Checkbox tests', () => {
         beforeEach(async () => {
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/4');
             criteria = wrapper.findAll('.criterion');
+            assert_not_null(wrapper.vm.d_handgrading_result);
+            let criterion_result = wrapper.vm.d_handgrading_result.criterion_results[0];
             save_stub = sinon.stub(
-                wrapper.vm.d_handgrading_result!.criterion_results[0], 'save'
+                criterion_result, 'save'
             ).callsFake(() => {
-                ag_cli.CriterionResult.notify_criterion_result_changed(
-                    wrapper.vm.d_handgrading_result!.criterion_results[0]
-                );
+                ag_cli.CriterionResult.notify_criterion_result_changed(criterion_result);
+                return Promise.resolve();
             });
         });
 
@@ -390,10 +393,10 @@ describe('Checkbox tests', () => {
                 wrapper.vm.d_handgrading_result!, 'refresh'
             ).onFirstCall().callsFake(() => {
                 wrapper.vm.d_handgrading_result!.total_points = 3;
-                return Promise.resolve({});
+                return Promise.resolve();
             }).onSecondCall().callsFake(() => {
                 wrapper.vm.d_handgrading_result!.total_points = 2;
-                return Promise.resolve({});
+                return Promise.resolve();
             });
 
             criteria.at(0).trigger('click');
@@ -579,6 +582,7 @@ describe('Comment tests', () => {
             to_delete, 'delete'
         ).callsFake(() => {
             ag_cli.Comment.notify_comment_deleted(to_delete);
+            return Promise.resolve();
         });
         wrapper.findAll('.comment').at(0).find('.delete').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
@@ -596,6 +600,7 @@ describe('Comment tests', () => {
             to_delete, 'delete'
         ).callsFake(() => {
             ag_cli.Comment.notify_comment_deleted(to_delete);
+            return Promise.resolve();
         });
         wrapper.findAll('.comment').at(3).find('.delete').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
@@ -613,6 +618,7 @@ describe('Comment tests', () => {
             to_delete, 'delete'
         ).callsFake(() => {
             ag_cli.AppliedAnnotation.notify_applied_annotation_deleted(to_delete);
+            return Promise.resolve();
         });
         wrapper.findAll('.comment').at(2).find('.delete').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
@@ -753,7 +759,7 @@ describe('Footer tests', () => {
         });
 
         wrapper.find('#prev-button').trigger('click');
-        expect(wrapper.emitted().prev_group.length).toBe(1);
+        expect(emitted(wrapper, 'prev_group').length).toBe(1);
     });
 
     test('Next not disabled, emit events when clicked', () => {
@@ -765,7 +771,7 @@ describe('Footer tests', () => {
         });
 
         wrapper.find('#next-button').trigger('click');
-        expect(wrapper.emitted().next_group.length).toBe(1);
+        expect(emitted(wrapper, 'next_group').length).toBe(1);
     });
 
     test('Next labeled as "Skip" when unfinished', () => {

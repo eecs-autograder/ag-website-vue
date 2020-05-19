@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, Semester } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -6,12 +6,10 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { assert_not_null } from '@/utils';
 
 import { expect_html_element_has_value, set_validated_input_text } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('SingleCourse.vue', () => {
     let wrapper: Wrapper<SingleCourse>;
@@ -431,6 +429,8 @@ describe('SingleCourse.vue', () => {
         wrapper.find({ref: 'clone_course_form'}).trigger('submit');
         await component.$nextTick();
 
+        assert_not_null(course_1.semester);
+        assert_not_null(course_1.year);
         expect(copy_course_stub.firstCall.calledWith(
             "New Course", course_1.semester, course_1.year
         )).toBe(true);

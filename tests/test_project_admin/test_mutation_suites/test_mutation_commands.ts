@@ -9,12 +9,9 @@ import MutationCommands from '@/components/project_admin/mutation_suites/mutatio
 
 import { make_course, make_mutation_test_suite } from '@/tests/data_utils';
 import {
-    checkbox_is_checked,
+    checkbox_is_checked, emitted,
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('MutationCommands tests', () => {
     let wrapper: Wrapper<MutationCommands>;
@@ -44,17 +41,17 @@ describe('MutationCommands tests', () => {
         checkbox.setChecked(true);
         expect(wrapper.vm.d_mutation_test_suite!.use_setup_command).toEqual(true);
         expect(wrapper.findAll('#setup-command').length).toEqual(1);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
 
         checkbox.setChecked(false);
         expect(wrapper.vm.d_mutation_test_suite!.use_setup_command).toEqual(false);
         expect(wrapper.findAll('#setup-command').length).toEqual(0);
-        expect(wrapper.emitted().input.length).toEqual(2);
+        expect(emitted(wrapper, 'input').length).toEqual(2);
 
         checkbox.setChecked(true);
         expect(wrapper.vm.d_mutation_test_suite!.use_setup_command).toEqual(true);
         expect(wrapper.findAll('#setup-command').length).toEqual(1);
-        expect(wrapper.emitted().input.length).toEqual(3);
+        expect(emitted(wrapper, 'input').length).toEqual(3);
 
         wrapper.vm.d_mutation_test_suite!.use_setup_command = false;
         expect(checkbox_is_checked(checkbox)).toEqual(false);

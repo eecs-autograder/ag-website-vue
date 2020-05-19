@@ -86,12 +86,14 @@ describe('Create task tests', () => {
 
     beforeEach(async () => {
         http_post_stub = sinon.stub(ag_cli.HttpClient.get_instance(), 'post').callsFake(
-            (url: string, data: DownloadTask) => {
+            (url: string, data: unknown) => {
+                let task_data = <DownloadTask> data;
+                let result = make_download_task(project.pk, task_data.download_type, task_data);
+                result.progress = 100;
                 return Promise.resolve(
                     new ag_cli.HttpResponse({
                         status: 200,
-                        data: make_download_task(
-                            project.pk, data.download_type, {progress: 100, ...data}),
+                        data: result,
                         headers: {}
                     })
                 );

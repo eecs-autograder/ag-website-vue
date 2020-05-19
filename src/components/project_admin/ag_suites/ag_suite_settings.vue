@@ -193,10 +193,9 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
   AGTestSuite,
   ExpectedStudentFile,
-  get_sandbox_docker_images,
   InstructorFile,
   Project,
-  SandboxDockerImageData
+  SandboxDockerImage,
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -249,7 +248,7 @@ export default class AGSuiteSettings extends Vue {
   }
 
   d_ag_test_suite: AGTestSuite | null = null;
-  d_docker_images: SandboxDockerImageData[] = [];
+  d_docker_images: SandboxDockerImage[] = [];
   d_loading = true;
   d_saving = false;
   d_settings_form_is_valid = true;
@@ -264,7 +263,9 @@ export default class AGSuiteSettings extends Vue {
   @handle_global_errors_async
   async created() {
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
-    this.d_docker_images = await get_sandbox_docker_images();
+    let global_images = await SandboxDockerImage.get_images(null);
+    let course_images = await SandboxDockerImage.get_images(this.project.course);
+    this.d_docker_images = global_images.concat(course_images);
     this.d_loading = false;
   }
 

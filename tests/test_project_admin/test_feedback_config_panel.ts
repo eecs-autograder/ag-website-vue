@@ -12,9 +12,8 @@ import {
     make_ag_test_suite_fdbk_config
 } from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+import { emitted } from '../utils';
+
 
 describe('FeedbackConfigPanel tests', () => {
     let wrapper: Wrapper<FeedbackConfigPanel>;
@@ -132,19 +131,19 @@ describe('FeedbackConfigPanel tests', () => {
 
         config_preset_select_input.setValue(component.preset_names[2]);
         expect(
-            config_is_preset(wrapper.emitted().input[0][0],
+            config_is_preset(emitted(wrapper, 'input')[0][0],
                              ag_test_suite_fdbk_presets.get(component.preset_names[2]))
         ).toEqual(true);
 
         config_preset_select_input.setValue(component.preset_names[1]);
         expect(
-            config_is_preset(wrapper.emitted().input[1][0],
+            config_is_preset(emitted(wrapper, 'input')[1][0],
                              ag_test_suite_fdbk_presets.get(component.preset_names[1]))
         ).toEqual(true);
 
         config_preset_select_input.setValue(component.preset_names[0]);
         expect(
-            config_is_preset(wrapper.emitted().input[2][0],
+            config_is_preset(emitted(wrapper, 'input')[2][0],
                              ag_test_suite_fdbk_presets.get(component.preset_names[0]))
         ).toEqual(true);
     });

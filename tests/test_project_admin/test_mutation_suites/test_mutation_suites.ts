@@ -2,12 +2,9 @@ import { config, mount, Wrapper } from '@vue/test-utils';
 
 import {
     BugsExposedFeedbackLevel,
-    ExpectedStudentFile,
     HttpError,
-    InstructorFile,
     MutationTestSuite,
     Project,
-    SandboxDockerImageData
 } from 'ag-client-typescript';
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
@@ -30,123 +27,48 @@ import {
     wait_for_load,
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
-
-let sandbox_docker_image_1: SandboxDockerImageData;
-let sandbox_docker_image_2: SandboxDockerImageData;
-let sandbox_docker_image_3: SandboxDockerImageData;
-
-beforeEach(() => {
-    sandbox_docker_image_1 = {
-        pk: 1,
-        name: "img1",
-        tag: "",
-        display_name: "Image 1"
-    };
-
-    sandbox_docker_image_2 = {
-        pk: 2,
-        name: "img2",
-        tag: "",
-        display_name: "Image 2"
-    };
-
-    sandbox_docker_image_3 = {
-        pk: 3,
-        name: "img3",
-        tag: "",
-        display_name: "Image 3"
-    };
-
-    sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(Promise.resolve([
-        sandbox_docker_image_1,
-        sandbox_docker_image_2,
-        sandbox_docker_image_3
-    ]));
-});
 
 describe('MutationSuites tests', () => {
     let wrapper: Wrapper<MutationSuites>;
     let project: Project;
+    let expected_student_files: ag_cli.ExpectedStudentFile[];
+    let instructor_files: ag_cli.InstructorFile[];
+    let global_sandbox_docker_images: ag_cli.SandboxDockerImage[];
+    let course_sandbox_docker_images: ag_cli.SandboxDockerImage[];
+
     let mutation_test_suite_1: MutationTestSuite;
     let mutation_test_suite_2: MutationTestSuite;
     let mutation_test_suite_3: MutationTestSuite;
-    let student_file_1: ExpectedStudentFile;
-    let student_file_2: ExpectedStudentFile;
-    let student_file_3: ExpectedStudentFile;
-    let instructor_file_1: InstructorFile;
-    let instructor_file_2: InstructorFile;
-    let instructor_file_3: InstructorFile;
 
-    beforeEach(() => {
-        student_file_1 = new ExpectedStudentFile({
-            pk: 1,
-            project: 10,
-            pattern: "elephant*.cpp",
-            min_num_matches: 2,
-            max_num_matches: 4,
-            last_modified: "now"
-        });
+    beforeEach(async () => {
+        let course = data_ut.make_course();
 
-        student_file_2 = new ExpectedStudentFile({
-            pk: 2,
-            project: 10,
-            pattern: "monkey?.cpp",
-            min_num_matches: 1,
-            max_num_matches: 2,
-            last_modified: "now"
-        });
+        project = data_ut.make_project(course.pk);
+        expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, "elephant*.cpp"),
+            data_ut.make_expected_student_file(project.pk, "monkey?.cpp"),
+            data_ut.make_expected_student_file(project.pk, "zebra.cpp"),
+        ];
+        instructor_files =  [
+            data_ut.make_instructor_file(project.pk, "penguin.cpp"),
+            data_ut.make_instructor_file(project.pk, "rabit.cpp"),
+            data_ut.make_instructor_file(project.pk, "walrus.cpp"),
+        ];
+        project.expected_student_files = expected_student_files;
+        project.instructor_files = instructor_files;
 
-        student_file_3 = new ExpectedStudentFile({
-            pk: 3,
-            project: 10,
-            pattern: "zebra.cpp",
-            min_num_matches: 1,
-            max_num_matches: 1,
-            last_modified: "now"
-        });
-
-        instructor_file_1 = new InstructorFile({
-            pk: 4,
-            project: 10,
-            name: "penguin.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        instructor_file_2 = new InstructorFile({
-            pk: 5,
-            project: 10,
-            name: "rabbit.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        instructor_file_3 = new InstructorFile({
-            pk: 6,
-            project: 10,
-            name: "walrus.cpp",
-            size: 2,
-            last_modified: "now"
-        });
-
-        project = data_ut.make_project(
-            data_ut.make_course().pk,
-            {
-                instructor_files: [
-                    instructor_file_1,
-                    instructor_file_2,
-                    instructor_file_3
-                ],
-                expected_student_files: [
-                    student_file_1,
-                    student_file_2,
-                    student_file_3
-                ]
-            }
-        );
+        global_sandbox_docker_images = [
+            data_ut.make_sandbox_docker_image(null), data_ut.make_sandbox_docker_image(null)
+        ];
+        course_sandbox_docker_images = [
+            data_ut.make_sandbox_docker_image(course.pk),
+            data_ut.make_sandbox_docker_image(course.pk)
+        ];
+        sinon.stub(ag_cli.SandboxDockerImage, 'get_images').withArgs(
+            null
+        ).resolves(
+            global_sandbox_docker_images
+        ).withArgs(course.pk).resolves(course_sandbox_docker_images);
 
         mutation_test_suite_1 = data_ut.make_mutation_test_suite(project.pk);
         mutation_test_suite_2 = data_ut.make_mutation_test_suite(project.pk);
@@ -160,19 +82,12 @@ describe('MutationSuites tests', () => {
             ])
         );
 
-        wrapper = mount(MutationSuites, {
+        wrapper = managed_mount(MutationSuites, {
             propsData: {
                 project: project
             }
         });
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
+        expect(await wait_for_load(wrapper)).toBe(true);
     });
 
     test('Update mutation test suites order', async () => {
@@ -222,6 +137,7 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("Suite I");
 
         wrapper.vm.d_new_mutation_test_suite_name = "Suite II";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(d_new_mutation_test_suite_name_input)).toEqual("Suite II");
     });
 
@@ -238,9 +154,10 @@ describe('MutationSuites tests', () => {
                 new_mutation_suite
             )
         );
-        create_stub.callsFake(() => MutationTestSuite.notify_mutation_test_suite_created(
-            new_mutation_suite
-        ));
+        create_stub.callsFake(() => {
+            MutationTestSuite.notify_mutation_test_suite_created(new_mutation_suite);
+            return Promise.resolve(new_mutation_suite);
+        });
 
         wrapper.find('#add-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -359,7 +276,10 @@ describe('MutationSuites tests', () => {
     test('delete_mutation_test_suite - confirm deletion', async () => {
         let delete_stub = sinon.stub(mutation_test_suite_2, 'delete');
         delete_stub.callsFake(
-            () => MutationTestSuite.notify_mutation_test_suite_deleted(mutation_test_suite_2)
+            () => {
+                MutationTestSuite.notify_mutation_test_suite_deleted(mutation_test_suite_2);
+                return Promise.resolve();
+            }
         );
 
         wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
@@ -497,21 +417,25 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_mutation_test_suites[0]).toEqual(mutation_test_suite_1);
     });
 
-    test('Suite settings binding', async () => {
+    test('SandboxDockerImages loaded', async () => {
+        expect(wrapper.vm.d_docker_images).toEqual(
+            global_sandbox_docker_images.concat(course_sandbox_docker_images)
+        );
+    });
+
+    test('SuiteSettings bindings', async () => {
         wrapper.vm.d_active_mutation_test_suite = mutation_test_suite_1;
         await wrapper.vm.$nextTick();
-
 
         let suite_settings = find_by_name<SuiteSettings>(wrapper, 'SuiteSettings');
         expect(suite_settings.vm.suite).toEqual(mutation_test_suite_1);
         expect(suite_settings.vm.project).toEqual(project);
-        expect(suite_settings.vm.docker_images).toEqual([
-            sandbox_docker_image_1, sandbox_docker_image_2, sandbox_docker_image_3
-        ]);
+        expect(suite_settings.vm.docker_images).toEqual(
+            global_sandbox_docker_images.concat(course_sandbox_docker_images)
+        );
 
         let new_name = 'this is very new name';
         suite_settings.vm.$emit('field_change', {name: new_name});
-
         expect(wrapper.vm.d_active_mutation_test_suite!.name).toEqual(new_name);
     });
 
@@ -564,6 +488,8 @@ describe('MutationSuites tests', () => {
         wrapper.find({ref: 'past_limit_edit_feedback_settings'}).find(
             '.advanced-settings-label'
         ).trigger('click');
+
+        await wrapper.vm.$nextTick();
 
         // return code correctness
         expect(
@@ -724,6 +650,7 @@ describe('MutationSuites tests', () => {
 });
 
 test('Suite updates from other project ignored', async () => {
+    sinon.stub(ag_cli.SandboxDockerImage, 'get_images').returns(Promise.resolve([]));
     sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([]);
     let course = data_ut.make_course();
     let project = data_ut.make_project(course.pk);

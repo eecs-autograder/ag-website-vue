@@ -287,13 +287,12 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     let to_update = this.d_result_summaries.find(
       summary => summary.pk === handgrading_result.group);
 
-    if (assert_not_null(to_update)) {
-      to_update.handgrading_result = {
-        finished_grading: handgrading_result.finished_grading,
-        total_points: handgrading_result.total_points,
-        total_points_possible: handgrading_result.total_points_possible,
-      };
-    }
+    assert_not_null(to_update);
+    to_update.handgrading_result = {
+      finished_grading: handgrading_result.finished_grading,
+      total_points: handgrading_result.total_points,
+      total_points_possible: handgrading_result.total_points_possible,
+    };
   }
 
   update_handgrading_result_deleted(handgrading_result: ag_cli.HandgradingResult): void {

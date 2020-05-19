@@ -17,6 +17,7 @@ import { managed_mount } from '@/tests/setup';
 import {
     do_input_blank_or_not_integer_test,
     do_invalid_text_input_test,
+    emitted,
     find_by_name,
     get_validated_input_text,
     set_validated_input_text,
@@ -68,7 +69,7 @@ describe('Field binding tests', () => {
                 resource_limits: ag_command
             }
         });
-        expect(wrapper.emitted().field_change).toBeUndefined();
+        expect(wrapper.emitted('field_change')).toBeUndefined();
     });
 
     test('time_limit binding', async () => {
@@ -82,7 +83,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_resource_limits!.time_limit = 4;
         expect(get_validated_input_text(time_limit_input)).toEqual('4');
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_resource_limits);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
     });
 
     test('error - time_limit is blank or not an integer', async () => {
@@ -109,7 +110,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_resource_limits!.virtual_memory_limit = 4;
         expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_resource_limits);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
     });
 
     test('error - virtual_memory_limit is blank or not an integer', async () => {
@@ -138,7 +139,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_resource_limits!.stack_size_limit = 4;
         expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_resource_limits);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
     });
 
     test('error - stack_size_limit is blank or not an integer', async () => {
@@ -166,7 +167,7 @@ describe('Field binding tests', () => {
         wrapper.vm.d_resource_limits!.process_spawn_limit = 4;
         expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_resource_limits);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
     });
 
     test('error - process_spawn_limit is blank or not an integer', async () => {

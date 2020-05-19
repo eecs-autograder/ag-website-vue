@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -9,9 +9,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, wait_for_load, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('ViewFile.vue', () => {
     let wrapper: Wrapper<ViewFile>;

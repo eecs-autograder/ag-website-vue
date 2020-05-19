@@ -8,6 +8,8 @@ import TimePicker, {
     MinuteInputState,
 } from "@/components/datetime/time_picker.vue";
 
+import { emitted } from '../utils';
+
 describe('TimePicker Tests', () => {
     let wrapper: Wrapper<TimePicker>;
 
@@ -103,7 +105,7 @@ describe('TimePicker Tests', () => {
         wrapper.find({ref: 'next_hour_button'}).trigger('click');
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.d_time.hours).toEqual(13);
-        expect(wrapper.emitted().input.length).toBe(4);
+        expect(emitted(wrapper, 'input').length).toBe(4);
 
         wrapper.setProps({value: '23:00'});
         expect(wrapper.vm.hours_str).toEqual("11");
@@ -135,7 +137,7 @@ describe('TimePicker Tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("03");
         expect(wrapper.vm.d_time.hours).toEqual(15);
-        expect(wrapper.emitted().input.length).toBe(2);
+        expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test('Pressing the down arrow while the hours input has focus', () => {
@@ -154,7 +156,7 @@ describe('TimePicker Tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("09");
         expect(wrapper.vm.d_time.hours).toEqual(9);
-        expect(wrapper.emitted().input.length).toBe(4);
+        expect(emitted(wrapper, 'input').length).toBe(4);
     });
 
 
@@ -173,7 +175,7 @@ describe('TimePicker Tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.d_time.hours).toEqual(13);
 
-        expect(wrapper.emitted().input).toBeFalsy();
+        expect(wrapper.emitted('input')).toBeUndefined();
     });
 
     test('Pressing the up and down buttons increases/decreases the minutes_str', () => {
@@ -199,7 +201,7 @@ describe('TimePicker Tests', () => {
         wrapper.find({ref: 'prev_minute_button'}).trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("59");
         expect(wrapper.vm.d_time.minutes).toEqual(59);
-        expect(wrapper.emitted().input.length).toBe(5);
+        expect(emitted(wrapper, 'input').length).toBe(5);
     });
 
     test('Pressing the up arrow while the minutes input has focus', () => {
@@ -216,7 +218,7 @@ describe('TimePicker Tests', () => {
 
         expect(wrapper.vm.minutes_str).toEqual("00");
         expect(wrapper.vm.d_time.minutes).toEqual(0);
-        expect(wrapper.emitted().input.length).toBe(2);
+        expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test('Pressing the down arrow while the minutes input has focus', () => {
@@ -233,7 +235,7 @@ describe('TimePicker Tests', () => {
 
         expect(wrapper.vm.minutes_str).toEqual("56");
         expect(wrapper.vm.d_time.minutes).toEqual(56);
-        expect(wrapper.emitted().input.length).toBe(2);
+        expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test('Pressing key besides digit, backspace, up arrow has no effect on minutes', () => {
@@ -250,7 +252,7 @@ describe('TimePicker Tests', () => {
 
         expect(wrapper.vm.minutes_str).toEqual("58");
         expect(wrapper.vm.d_time.minutes).toEqual(58);
-        expect(wrapper.emitted().input).toBeFalsy();
+        expect(wrapper.emitted('input')).toBeUndefined();
     });
 
     test('Clicking on the period input toggles the value of period_str', () => {
@@ -306,7 +308,7 @@ describe('TimePicker HourInputState tests', () => {
 
     test("The hour_input_state begins in the 'awaiting_first_digit' state", () => {
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
-        expect(wrapper.emitted().input).toBeFalsy();
+        expect(wrapper.emitted('input')).toBeUndefined();
     });
 
     test("The hour_input_state remains in the 'awaiting_first_digit' state if a number" +
@@ -320,13 +322,13 @@ describe('TimePicker HourInputState tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("03");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
-        expect(wrapper.emitted().input.length).toBe(1);
+        expect(emitted(wrapper, 'input').length).toBe(1);
 
         hour_input.trigger("keydown", {code: "Digit7", key: "7"});
 
         expect(wrapper.vm.hours_str).toEqual("07");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
-        expect(wrapper.emitted().input.length).toBe(2);
+        expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test("The hour_input_state changes from the 'awaiting_first_digit' state to the " +
@@ -340,7 +342,7 @@ describe('TimePicker HourInputState tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.first_digit_was_one);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
         });
 
     test("When the hour_input_state is 'awaiting_first_digit' and the user enters a zero," +
@@ -355,7 +357,7 @@ describe('TimePicker HourInputState tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
-        expect(wrapper.emitted().input).toBeUndefined();
+        expect(wrapper.emitted('input')).toBeUndefined();
     });
 
     test("The hour_input_state changes from the 'first_digit_was_one' state to the " +
@@ -370,13 +372,13 @@ describe('TimePicker HourInputState tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.first_digit_was_one);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
 
         hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("11");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
-        expect(wrapper.emitted().input.length).toEqual(2);
+        expect(emitted(wrapper, 'input').length).toEqual(2);
     });
 
     test("When the hour_input_state is 'first_digit_was_one' and the user enters a digit," +
@@ -390,13 +392,13 @@ describe('TimePicker HourInputState tests', () => {
 
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.first_digit_was_one);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
 
         hour_input.trigger("keydown", {code: "Digit8", key: "8"});
 
         expect(wrapper.vm.hours_str).toEqual("08");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
-        expect(wrapper.emitted().input.length).toEqual(2);
+        expect(emitted(wrapper, 'input').length).toEqual(2);
     });
 });
 
@@ -432,13 +434,13 @@ describe('TimePicker MinuteInputState tests', () => {
 
             expect(wrapper.vm.minutes_str).toEqual("06");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
-            expect(wrapper.emitted().input.length).toEqual(1);
+            expect(emitted(wrapper, 'input').length).toEqual(1);
 
             minute_input.trigger("keydown", {code: "Digit9", key: "9"});
 
             expect(wrapper.vm.minutes_str).toEqual("09");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
-            expect(wrapper.emitted().input.length).toEqual(2);
+            expect(emitted(wrapper, 'input').length).toEqual(2);
         });
 
     test("The minute_input_state changes from the 'awaiting_first_digit' state if a digit " +
@@ -452,7 +454,7 @@ describe('TimePicker MinuteInputState tests', () => {
 
             expect(wrapper.vm.minutes_str).toEqual("04");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_second_digit);
-            expect(wrapper.emitted().input.length).toEqual(1);
+            expect(emitted(wrapper, 'input').length).toEqual(1);
         });
 
     test("The minute_input_state changes from the 'awaiting_second_digit' state if any " +
@@ -466,12 +468,12 @@ describe('TimePicker MinuteInputState tests', () => {
 
             expect(wrapper.vm.minutes_str).toEqual("04");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_second_digit);
-            expect(wrapper.emitted().input.length).toEqual(1);
+            expect(emitted(wrapper, 'input').length).toEqual(1);
 
             minute_input.trigger("keydown", {code: "Digit9", key: "9"});
 
             expect(wrapper.vm.minutes_str).toEqual("49");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
-            expect(wrapper.emitted().input.length).toEqual(2);
+            expect(emitted(wrapper, 'input').length).toEqual(2);
         });
 });

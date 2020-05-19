@@ -5,6 +5,7 @@ import { Annotation } from "ag-client-typescript";
 import AnnotationForm from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 
 import {
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
@@ -151,8 +152,8 @@ describe('AnnotationForm tests', () => {
     test('form_validity_changed', () => {
         let wrapper = mount(AnnotationForm);
         set_validated_input_text(wrapper.find({ref: 'short_description'}), 'An annotation');
-        expect(wrapper.emitted().form_validity_changed.length).toEqual(2);
-        expect(wrapper.emitted().form_validity_changed).toEqual([[false], [true]]);
+        expect(emitted(wrapper, 'form_validity_changed').length).toEqual(2);
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
     });
 
     test('Submit', () => {
@@ -163,9 +164,9 @@ describe('AnnotationForm tests', () => {
         set_validated_input_text(wrapper.find({ref: 'max_deduction'}), '-2');
 
         wrapper.vm.submit();
-        expect(wrapper.emitted().submit.length).toEqual(1);
+        expect(emitted(wrapper, 'submit').length).toEqual(1);
         expect(
-            wrapper.emitted().submit[0][0]
+            emitted(wrapper, 'submit')[0][0]
         ).toEqual({
             short_description: 'An annotation',
             long_description: 'Very annotation',

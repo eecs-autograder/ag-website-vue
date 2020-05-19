@@ -31,7 +31,7 @@ import { ExpectedStudentFile, ExpectedStudentFileObserver, Project } from 'ag-cl
 import CreateExpectedStudentFile from '@/components/project_admin/expected_student_files/create_expected_student_file.vue';
 import SingleExpectedStudentFile from '@/components/project_admin/expected_student_files/single_expected_student_file.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { array_remove_unique, deep_copy } from '@/utils';
+import { deep_copy } from '@/utils';
 
 @Component({
   components: {

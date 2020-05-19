@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     BugsExposedFeedbackLevel,
@@ -8,11 +8,8 @@ import {
 import MutationTestSuiteAdvancedFdbkSettings from '@/components/project_admin/mutation_suites/mutation_test_suite_advanced_fdbk_settings.vue';
 
 import { make_mutation_test_suite_fdbk_config } from '@/tests/data_utils';
-import { checkbox_is_checked } from '@/tests/utils';
+import { checkbox_is_checked, emitted } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     let wrapper: Wrapper<MutationTestSuiteAdvancedFdbkSettings>;
@@ -84,7 +81,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
 
         show_invalid_test_names.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_invalid_test_names).toEqual(true);
-        expect(wrapper.emitted().input.length).toEqual(1);
+        expect(emitted(wrapper, 'input').length).toEqual(1);
 
         show_invalid_test_names.setChecked(false);
         expect(wrapper.vm.d_feedback_config!.show_invalid_test_names).toEqual(false);

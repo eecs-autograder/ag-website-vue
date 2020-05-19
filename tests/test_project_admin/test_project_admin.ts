@@ -16,9 +16,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount, managed_shallow_mount } from '@/tests/setup';
 import { wait_for_load, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let course = data_ut.make_course();
 
@@ -28,10 +25,6 @@ beforeEach(() => {
         Promise.resolve(data_ut.make_user_roles()));
 
     data_ut.set_global_current_course(course);
-});
-
-afterEach(() => {
-    sinon.restore();
 });
 
 // As child components of the ProjectAdmin component get merged, their methods that make api calls
@@ -265,13 +258,13 @@ test('Project observer', async () => {
 
     let updated = new Project(project);
     updated.name = 'A new name';
-    expect(wrapper.vm.project!.name).not.toEqual(updated.name);
+    expect(wrapper.vm.d_project!.name).not.toEqual(updated.name);
     Project.notify_project_changed(updated);
-    expect(wrapper.vm.project!.name).toEqual(updated.name);
+    expect(wrapper.vm.d_project!.name).toEqual(updated.name);
 
     let other_project = data_ut.make_project(course.pk);
     Project.notify_project_changed(other_project);
-    expect(wrapper.vm.project).toEqual(updated);
+    expect(wrapper.vm.d_project).toEqual(updated);
 });
 
 describe('InstructorFileObserver tests', () => {
@@ -310,20 +303,20 @@ describe('InstructorFileObserver tests', () => {
         InstructorFile.notify_instructor_file_created(new_file);
 
         instructor_files.unshift(new_file);
-        expect(wrapper.vm.project!.instructor_files).toEqual(instructor_files);
+        expect(wrapper.vm.d_project?.instructor_files).toEqual(instructor_files);
     });
 
     test('Instructor file deleted', () => {
         InstructorFile.notify_instructor_file_deleted(instructor_files[1]);
         instructor_files.splice(1, 1);
-        expect(wrapper.vm.project!.instructor_files).toEqual(instructor_files);
+        expect(wrapper.vm.d_project?.instructor_files).toEqual(instructor_files);
     });
 
     test('Instructor file renamed', () => {
         let old_name = instructor_files[0].name;
         instructor_files[0].name = 'file4';
         InstructorFile.notify_instructor_file_renamed(instructor_files[0], old_name);
-        expect(wrapper.vm.project!.instructor_files).toEqual([
+        expect(wrapper.vm.d_project?.instructor_files).toEqual([
             instructor_files[1],
             instructor_files[2],
             instructor_files[0],
@@ -367,13 +360,13 @@ describe('ExpectedStudentFileObserver tests', () => {
         ExpectedStudentFile.notify_expected_student_file_created(new_file);
 
         expected_student_files.unshift(new_file);
-        expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
+        expect(wrapper.vm.d_project?.expected_student_files).toEqual(expected_student_files);
     });
 
     test('Expected file changed', () => {
         expected_student_files[0].pattern = 'file4';
         ExpectedStudentFile.notify_expected_student_file_changed(expected_student_files[0]);
-        expect(wrapper.vm.project!.expected_student_files).toEqual([
+        expect(wrapper.vm.d_project?.expected_student_files).toEqual([
             expected_student_files[1],
             expected_student_files[2],
             expected_student_files[0],
@@ -383,7 +376,7 @@ describe('ExpectedStudentFileObserver tests', () => {
     test('Expected file deleted', () => {
         ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_files[1]);
         expected_student_files.splice(1, 1);
-        expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
+        expect(wrapper.vm.d_project?.expected_student_files).toEqual(expected_student_files);
     });
 });
 
@@ -416,5 +409,5 @@ test('Observer updates from other project ignored', async () => {
     ExpectedStudentFile.notify_expected_student_file_changed(expected_student_file);
     ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_file);
 
-    expect(wrapper.vm.project).toEqual(project);
+    expect(wrapper.vm.d_project).toEqual(project);
 });
