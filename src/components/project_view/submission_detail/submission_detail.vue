@@ -239,9 +239,9 @@ import MutationSuiteResults from '@/components/project_view/submission_detail/mu
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 import ViewFile from '@/components/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';
-import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { format_datetime, toggle } from '@/utils';
 
 @Component({
   components: {

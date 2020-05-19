@@ -93,7 +93,8 @@ import { FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
+import { deep_copy } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({

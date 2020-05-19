@@ -182,11 +182,11 @@ import APIErrors from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async, safe_assign, toggle } from '@/utils';
+import { deep_copy, format_datetime, safe_assign, toggle } from '@/utils';
 
 import {
   find_parent_suite,

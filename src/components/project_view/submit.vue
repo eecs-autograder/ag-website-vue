@@ -149,8 +149,8 @@ import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { format_datetime, toggle } from '@/utils';
 
 interface ExpectedFilePatternMismatch {
   pattern: string;

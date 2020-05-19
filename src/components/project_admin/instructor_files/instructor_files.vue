@@ -49,10 +49,11 @@ import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
+import { handle_api_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
-import { handle_api_errors_async, toggle } from '@/utils';
+import { toggle } from '@/utils';
 
 import SingleInstructorFile from './single_instructor_file.vue';
 

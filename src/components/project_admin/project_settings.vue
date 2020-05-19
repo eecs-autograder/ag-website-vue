@@ -355,7 +355,8 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { deep_copy, format_datetime, format_datetime_short, format_time, handle_api_errors_async } from "@/utils";
+import { handle_api_errors_async } from '@/error_handling';
+import { deep_copy, format_datetime, format_datetime_short, format_time } from "@/utils";
 import {
   is_integer,
   is_non_negative,

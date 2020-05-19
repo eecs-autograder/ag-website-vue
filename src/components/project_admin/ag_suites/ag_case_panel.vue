@@ -190,8 +190,12 @@ import Modal from '@/components/modal.vue';
 import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
-import { handle_api_errors_async, toggle } from '@/utils';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func
+} from '@/error_handling';
+import { toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({

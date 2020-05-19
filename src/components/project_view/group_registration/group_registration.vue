@@ -163,8 +163,7 @@ import { GroupMember } from "@/components/project_admin/edit_groups/create_singl
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 
 @Component({
   components: {

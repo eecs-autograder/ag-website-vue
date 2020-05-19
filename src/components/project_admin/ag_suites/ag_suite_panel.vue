@@ -138,8 +138,7 @@ import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue'
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { is_not_empty } from '@/validators';
 
 export class NewCommandFields {

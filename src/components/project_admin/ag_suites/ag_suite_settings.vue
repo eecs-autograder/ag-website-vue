@@ -211,9 +211,13 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func
+} from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { deep_copy, format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';

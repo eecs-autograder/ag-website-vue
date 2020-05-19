@@ -76,8 +76,8 @@ import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { format_course_name, handle_api_errors_async, toggle } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { format_course_name, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({

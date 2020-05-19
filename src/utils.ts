@@ -4,9 +4,6 @@ import { Course } from 'ag-client-typescript';
 // @ts-ignore
 import moment from "moment";
 
-// FIXME: remove
-export { handle_api_errors_async } from '@/error_handling';
-
 export function sleep(seconds: number) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }

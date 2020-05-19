@@ -21,7 +21,7 @@ import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-cli
 
 import APIErrors from '@/components/api_errors.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
 
 @Component({
   components: {

@@ -99,7 +99,8 @@ import { GlobalData } from '@/app.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, format_datetime_short, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
+import { deep_copy, format_datetime_short } from '@/utils';
 import {
   is_integer,
   is_non_negative,
