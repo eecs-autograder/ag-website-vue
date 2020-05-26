@@ -16,6 +16,7 @@ type DonePredicateFunc<T extends Vue> = (wrapper: Wrapper<T>) => boolean;
 export async function wait_until<T extends Vue>(
     wrapper: Wrapper<T>, done_predicate: DonePredicateFunc<T>, max_awaits = 10
 ): Promise<boolean> {
+    await wrapper.vm.$nextTick();
     for (let i = 0; i < max_awaits && !done_predicate(wrapper); ++i) {
         await wrapper.vm.$nextTick();
     }
@@ -44,7 +45,7 @@ export function set_validated_input_text(wrapper: Wrapper<Vue>, value: string) {
     if (!is_validated_input(wrapper)) {
         throw new TypeError(`Expected ValidatedInput, but got "${wrapper.name()}"`);
     }
-    wrapper.find('.input').setValue(value);
+    return wrapper.find('.input').setValue(value);
 }
 
 // Gets the text that is currently entered in the validated input.
@@ -124,7 +125,7 @@ export function set_select_object_value(select_object_wrapper: Wrapper<Vue>,
             `Expected a select-option element, but got "${select_object_wrapper.name()}"`);
     }
 
-    select_object_wrapper.find('.select').setValue(select_value);
+    return select_object_wrapper.find('.select').setValue(select_value);
 }
 
 function is<T>(obj: unknown, condition: boolean): obj is T {
@@ -149,8 +150,7 @@ export async function do_invalid_text_input_test(
         expect(component_wrapper.find(<any> save_button_selector).is('[disabled]')).toBe(false);
     }
 
-    set_validated_input_text(input_wrapper, invalid_text);
-    await component_wrapper.vm.$nextTick();
+    await set_validated_input_text(input_wrapper, invalid_text);
 
     expect(validated_input_is_valid(input_wrapper)).toEqual(false);
 
@@ -171,7 +171,7 @@ export async function do_input_blank_or_not_integer_test(
     let original_text = get_validated_input_text(input_wrapper);
 
     await do_invalid_text_input_test(component_wrapper, input_selector, ' ', save_button_selector);
-    set_validated_input_text(input_wrapper, original_text);
+    await set_validated_input_text(input_wrapper, original_text);
     return do_invalid_text_input_test(
         component_wrapper, input_selector, 'not num', save_button_selector);
 }
@@ -188,3 +188,41 @@ export function emitted(wrapper: Wrapper<Vue>, event_name: string) {
     assert_not_null(result);
     return result;
 }
+
+// A type-checked version of wrapper.setProps()
+// Note that type checking does not cover whether the items in "props"
+// are input properties (as opposed to data members) for the component.
+export function set_props<T extends Vue>(wrapper: Wrapper<T>, props: Partial<T>) {
+    return wrapper.setProps(props);
+}
+
+// A type-checked version of wrapper.setData(). This function also introduces
+// an optional "recursive" flag (defaults to true to match wrapper.setData()).
+// When set to false, this function will only set the top-level keys rather
+// than recursing when the value is an object.
+//
+// Note that type checking does not cover whether the items in "data"
+// are data members (as opposed to input properties) for the component.
+export function set_data<T extends Vue>(
+    wrapper: Wrapper<T>, data: Partial<T>, recursive?: false): Promise<void>;
+export function set_data<T extends Vue>(
+    wrapper: Wrapper<T>, data: SetDataInputPartial<T>, recursive?: true): Promise<void>;
+export function set_data<T extends Vue>(
+    wrapper: Wrapper<T>, data: object, recursive = true
+) {
+    if (recursive) {
+        return wrapper.setData(data);
+    }
+
+    for (let [key, value] of Object.entries(data)) {
+        Vue.set(wrapper.vm, key, value);
+    }
+    return wrapper.vm.$nextTick();
+}
+
+// A (mostly) recursive version of Partial. Note that it does not recursively
+// apply to array elements.
+type SetDataInputPartial<T> = {
+    // tslint:disable-next-line
+    [Key in keyof T]?: T[Key] extends Array<infer U> ? Array<U> : SetDataInputPartial<T[Key]>
+};

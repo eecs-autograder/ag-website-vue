@@ -161,9 +161,7 @@ describe('GroupMembersForm tests', () => {
 
         let add_button = wrapper.find('.add-member-button');
         expect(add_button.is('[disabled]')).toBe(false);
-
-        add_button.trigger('click');
-        await wrapper.vm.$nextTick();
+        await add_button.trigger('click');
 
         let inputs = wrapper.findAll({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(2);
@@ -186,9 +184,7 @@ describe('GroupMembersForm tests', () => {
 
         let remove_button = wrapper.findAll('.remove-member-button').at(1);
         expect(remove_button.is('[disabled]')).toBe(false);
-
-        remove_button.trigger('click');
-        await wrapper.vm.$nextTick();
+        await remove_button.trigger('click');
 
         inputs = wrapper.findAll({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(1);
@@ -198,7 +194,7 @@ describe('GroupMembersForm tests', () => {
         expect(emitted(wrapper, 'input')).toEqual([[['spam']]]);
     });
 
-    test('value watcher', () => {
+    test('value watcher', async () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 project: project,
@@ -209,14 +205,12 @@ describe('GroupMembersForm tests', () => {
         expect(wrapper.vm.d_usernames).toEqual(['spam']);
 
         let new_value = ['egg'];
-        wrapper.setProps({
-            value: new_value
-        });
+        await wrapper.setProps({value: new_value});
         expect(wrapper.vm.d_usernames).not.toBe(new_value);
         expect(wrapper.vm.d_usernames).toEqual(new_value);
     });
 
-    test('Username input invalid non-email', () => {
+    test('Username input invalid non-email', async () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 project: project,
@@ -229,7 +223,7 @@ describe('GroupMembersForm tests', () => {
         expect((<ValidatedInput> inputs.at(1).vm).is_valid).toBe(true);
 
         expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false]]);
-        set_validated_input_text(inputs.at(0), 'wa@luigi.net');
+        await set_validated_input_text(inputs.at(0), 'wa@luigi.net');
         expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
         expect(emitted(wrapper, 'input')).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
     });
@@ -242,8 +236,7 @@ describe('GroupMembersForm tests', () => {
             }
         });
         let input = <Wrapper<ValidatedInput>> wrapper.find({name: 'ValidatedInput'});
-        set_validated_input_text(input, 'wa@luigi.net');
-        await wrapper.vm.$nextTick();
+        await set_validated_input_text(input, 'wa@luigi.net');
         expect(wrapper.vm.d_usernames).toEqual(['wa@luigi.net']);
 
         wrapper.vm.reset();

@@ -13,7 +13,7 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
-import { wait_for_load } from '@/tests/utils';
+import { set_data, wait_for_load } from '@/tests/utils';
 
 
 describe('EditGroups tests', () => {
@@ -237,26 +237,26 @@ describe('EditGroups tests', () => {
         expect(merge_groups.vm.groups).toEqual(component.groups_by_members.data);
     });
 
-    test('Toggling d_show_create_group_modal', () => {
+    test('Toggling d_show_create_group_modal', async () => {
         expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(false);
 
-        wrapper.setData({d_show_create_group_modal: true});
+        await set_data(wrapper, {d_show_create_group_modal: true});
         expect(wrapper.vm.d_show_create_group_modal).toBe(true);
         expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(true);
 
-        wrapper.setData({d_show_create_group_modal: false});
+        await set_data(wrapper, {d_show_create_group_modal: false});
         expect(wrapper.vm.d_show_create_group_modal).toBe(false);
         expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(false);
     });
 
-    test('Toggling d_show_merge_groups_modal', () => {
+    test('Toggling d_show_merge_groups_modal', async () => {
         expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(false);
 
-        wrapper.setData({d_show_merge_groups_modal: true});
+        await set_data(wrapper, {d_show_merge_groups_modal: true});
         expect(wrapper.vm.d_show_merge_groups_modal).toBe(true);
         expect(wrapper.find({ref: 'merge_groups_modal'}).exists()).toBe(true);
 
-        wrapper.setData({d_show_merge_groups_modal: false});
+        await set_data(wrapper, {d_show_merge_groups_modal: false});
         expect(wrapper.vm.d_show_merge_groups_modal).toBe(false);
         expect(wrapper.find({ref: 'merge_groups_modal'}).exists()).toBe(false);
     });

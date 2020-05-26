@@ -66,6 +66,7 @@ test('Result changed, new result deep copied', async () => {
     let new_result = new ag_cli.HandgradingResult(result);
     new_result.finished_grading = !new_result.finished_grading;
     wrapper.setProps({handgrading_result: new_result});
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.d_handgrading_result).toEqual(new_result);
     expect(wrapper.vm.d_handgrading_result).not.toBe(new_result);
@@ -225,8 +226,8 @@ describe('Adjust points test', () => {
                 readonly_handgrading_results: false,
             }
         });
-        await wrapper.vm.$nextTick();
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
+        await wrapper.vm.$nextTick();
         expect(wrapper.find({ref: 'adjust_points'}).exists()).toBe(false);
     });
 });
@@ -523,6 +524,7 @@ describe('Comment tests', () => {
     test('Handgraders not allowed to leave custom comments', async () => {
         wrapper.vm.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments = false;
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('#new-comment').exists()).toBe(false);
 
         expect(wrapper.findAll('.comment').at(0).find('.delete').exists()).toBe(false);
@@ -711,16 +713,17 @@ describe('Footer tests', () => {
             }
         });
 
+        assert_not_null(wrapper.vm.d_handgrading_result);
         let save_result_stub = sinon.stub(
-            wrapper.vm.d_handgrading_result!, 'save_finished_grading');
+            wrapper.vm.d_handgrading_result, 'save_finished_grading');
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
 
-        wrapper.find('#finished-grading').trigger('click');
+        await wrapper.find('#finished-grading').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(true);
         expect(save_result_stub.calledOnce).toBe(true);
 
-        wrapper.find('#finished-grading').trigger('click');
+        await wrapper.find('#finished-grading').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
         expect(save_result_stub.calledTwice).toBe(true);

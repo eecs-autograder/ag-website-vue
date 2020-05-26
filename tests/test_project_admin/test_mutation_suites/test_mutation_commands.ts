@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     MutationTestSuite
@@ -9,7 +9,7 @@ import MutationCommands from '@/components/project_admin/mutation_suites/mutatio
 
 import { make_course, make_mutation_test_suite } from '@/tests/data_utils';
 import {
-    checkbox_is_checked, emitted,
+    checkbox_is_checked, emitted, set_data,
 } from '@/tests/utils';
 
 
@@ -38,26 +38,26 @@ describe('MutationCommands tests', () => {
     test('use_setup_command binding', async () => {
         let checkbox = wrapper.find('#use-setup-command');
 
-        checkbox.setChecked(true);
+        await checkbox.setChecked(true);
         expect(wrapper.vm.d_mutation_test_suite!.use_setup_command).toEqual(true);
         expect(wrapper.findAll('#setup-command').length).toEqual(1);
         expect(emitted(wrapper, 'input').length).toEqual(1);
 
-        checkbox.setChecked(false);
+        await checkbox.setChecked(false);
         expect(wrapper.vm.d_mutation_test_suite!.use_setup_command).toEqual(false);
         expect(wrapper.findAll('#setup-command').length).toEqual(0);
         expect(emitted(wrapper, 'input').length).toEqual(2);
 
-        checkbox.setChecked(true);
+        await checkbox.setChecked(true);
         expect(wrapper.vm.d_mutation_test_suite!.use_setup_command).toEqual(true);
         expect(wrapper.findAll('#setup-command').length).toEqual(1);
         expect(emitted(wrapper, 'input').length).toEqual(3);
 
-        wrapper.vm.d_mutation_test_suite!.use_setup_command = false;
+        await set_data(wrapper, {d_mutation_test_suite: {use_setup_command: false}});
         expect(checkbox_is_checked(checkbox)).toEqual(false);
         expect(wrapper.findAll('#setup-command').length).toEqual(0);
 
-        wrapper.vm.d_mutation_test_suite!.use_setup_command = true;
+        await set_data(wrapper, {d_mutation_test_suite: {use_setup_command: true}});
         expect(checkbox_is_checked(checkbox)).toEqual(true);
         expect(wrapper.findAll('#setup-command').length).toEqual(1);
     });

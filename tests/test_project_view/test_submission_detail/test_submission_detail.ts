@@ -7,7 +7,7 @@ import SubmissionDetail from '@/components/project_view/submission_detail/submis
 
 import * as data_ut from '@/tests/data_utils.ts';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, expect_html_element_has_value, find_by_name } from '@/tests/utils';
+import { compress_whitespace, expect_html_element_has_value, find_by_name, wait_until } from '@/tests/utils';
 
 jest.mock('file-saver');
 
@@ -412,6 +412,7 @@ describe('Adjust feedback tests', () => {
         let adjust_feedback_category_input = wrapper.find('#adjust-feedback-select');
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.staff_viewer);
         await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_loading_results));
         expect(wrapper.vm.feedback_category).toEqual(ag_cli.FeedbackCategory.staff_viewer);
         expect(get_submission_result_stub.callCount).toEqual(1);
         expect(get_submission_result_stub.calledWith(
@@ -420,6 +421,7 @@ describe('Adjust feedback tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.ultimate_submission);
         await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_loading_results));
         expect(wrapper.vm.feedback_category).toEqual(
             ag_cli.FeedbackCategory.ultimate_submission);
         expect(get_submission_result_stub.callCount).toEqual(2);
@@ -429,6 +431,7 @@ describe('Adjust feedback tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.normal);
         await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_loading_results));
         expect(wrapper.vm.feedback_category).toEqual(ag_cli.FeedbackCategory.normal);
         expect(get_submission_result_stub.callCount).toEqual(3);
         expect(get_submission_result_stub.calledWith(
@@ -437,6 +440,7 @@ describe('Adjust feedback tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.past_limit_submission);
         await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_loading_results));
         expect(wrapper.vm.feedback_category).toEqual(
             ag_cli.FeedbackCategory.past_limit_submission
         );
@@ -447,6 +451,7 @@ describe('Adjust feedback tests', () => {
 
         adjust_feedback_category_input.setValue(ag_cli.FeedbackCategory.max);
         await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_loading_results));
         expect(wrapper.vm.feedback_category).toEqual(ag_cli.FeedbackCategory.max);
         expect(get_submission_result_stub.callCount).toEqual(5);
         expect(get_submission_result_stub.calledWith(

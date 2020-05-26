@@ -26,7 +26,9 @@ import {
     get_validated_input_text,
     set_select_object_value,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_for_load,
+    wait_until
 } from "@/tests/utils";
 
 let user: User;
@@ -44,10 +46,6 @@ beforeEach(() => {
 
 describe('Initialize handgrading tests', () => {
     let wrapper: Wrapper<HandgradingSettings>;
-
-    afterEach(() => {
-        sinon.restore();
-    });
 
     test('Create new handgrading rubric', async () => {
         sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve([course]));
@@ -78,12 +76,11 @@ describe('Initialize handgrading tests', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.vm.d_handgrading_rubric).toBeNull();
         expect(wrapper.find('#rubric-columns-container').exists()).toEqual(false);
 
-        wrapper.find('#new-rubric-button').trigger('click');
+        await wrapper.find('#new-rubric-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(new_rubric_stub.calledOnceWith(project.pk, {}));
@@ -122,9 +119,7 @@ describe('Initialize handgrading tests', () => {
                 project: current_project
             },
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_course_to_import_from).toEqual(course);
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
@@ -134,15 +129,13 @@ describe('Initialize handgrading tests', () => {
         let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
             {ref: 'project_to_import_from'});
         // "Select a project" is index 0, other_project is 1, project_to_import_from is 2
-        select_project_to_import_from.findAll('option').at(2).setSelected();
+        await select_project_to_import_from.findAll('option').at(2).setSelected();
 
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_to_import_from);
 
-        wrapper.find('#import-button-container .green-button').trigger('click');
+        await wrapper.find('#import-button-container .green-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_import_request_pending)).toBe(true);
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
 
         expect(get_projects_stub.calledOnceWith(course.pk));
@@ -189,16 +182,12 @@ describe('Initialize handgrading tests', () => {
                 project: current_project
             },
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_course_to_import_from).toEqual(course);
         expect(wrapper.vm.d_selected_course_projects).toEqual([]);
-        set_select_object_value(
+        await set_select_object_value(
             wrapper.find({ref: 'course_to_import_from'}), course_to_import_from.pk);
-
-        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual(
@@ -206,17 +195,14 @@ describe('Initialize handgrading tests', () => {
         let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
             {ref: 'project_to_import_from'});
         // "Select a project" is index 0, other_project is 1, project_to_import_from is 2
-        select_project_to_import_from.findAll('option').at(2).setSelected();
+        await select_project_to_import_from.findAll('option').at(2).setSelected();
 
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_to_import_from);
 
-        wrapper.find('#import-button-container .green-button').trigger('click');
+        await wrapper.find('#import-button-container .green-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_import_request_pending)).toBe(true);
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
-
         expect(import_rubric_stub.calledOnceWith(current_project.pk, project_to_import_from.pk));
     });
 
@@ -240,16 +226,14 @@ describe('Initialize handgrading tests', () => {
                 project: current_course_project
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual([project_with_rubric]);
 
-        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
+        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.findComponent(
             {ref: 'project_to_import_from'});
-        select_project_to_import_from.findAll('option').at(1).setSelected();
+        await select_project_to_import_from.findAll('option').at(1).setSelected();
 
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_with_rubric);
@@ -258,9 +242,8 @@ describe('Initialize handgrading tests', () => {
             wrapper.find('#import-button-container .green-button').is('[disabled]')
         ).toEqual(false);
 
-        set_select_object_value(
+        await set_select_object_value(
             wrapper.find({ref: 'course_to_import_from'}), no_projects_course.pk);
-        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual([]);
@@ -341,7 +324,7 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toEqual(42);
     });
 
-    test('Points style start at max, error max points empty, zero, or negative', () => {
+    test('Points style start at max, error max points empty, zero, or negative', async () => {
         // Switching points style should make the max points validators rerun
 
         expect(
@@ -350,21 +333,22 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toBeNull();
 
         wrapper.vm.d_handgrading_rubric!.points_style = PointsStyle.start_at_max_and_subtract;
+        await wrapper.vm.$nextTick();
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
 
-        wrapper.find('#points-style').setValue(PointsStyle.start_at_zero_and_add);
+        await wrapper.find('#points-style').setValue(PointsStyle.start_at_zero_and_add);
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
 
-        wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
+        await wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
 
-        set_validated_input_text(wrapper.find('#max-points'), '1');
+        await set_validated_input_text(wrapper.find('#max-points'), '1');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
 
-        set_validated_input_text(wrapper.find('#max-points'), '0');
+        await set_validated_input_text(wrapper.find('#max-points'), '0');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
 
-        set_validated_input_text(wrapper.find('#max-points'), '-1');
+        await set_validated_input_text(wrapper.find('#max-points'), '-1');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
     });
 
@@ -388,10 +372,9 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.handgraders_can_adjust_points).toEqual(true);
     });
 
-    test('Save button disabled when invalid', () => {
-        set_validated_input_text(wrapper.find('#max-points'), '-1');
+    test('Save button disabled when invalid', async () => {
+        await set_validated_input_text(wrapper.find('#max-points'), '-1');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
-
         expect(wrapper.find({ref: 'save_rubric_button'}).is('[disabled]')).toEqual(true);
     });
 
@@ -410,9 +393,8 @@ describe('Handgrading settings tests', () => {
 
         let api_errors = <APIErrors> wrapper.find({ref: 'settings_form_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
-        wrapper.find({ref: 'handgrading_settings_form'}).trigger('submit');
-
-        await wrapper.vm.$nextTick();
+        await wrapper.find({ref: 'handgrading_settings_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving));
 
         expect(api_errors.d_api_errors.length).toEqual(1);
     });

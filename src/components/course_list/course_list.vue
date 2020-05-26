@@ -146,6 +146,7 @@ export default class CourseList extends Vue implements CourseObserver {
 
   get courses_by_term(): TermCourses[] {
     if (this.d_all_courses === null) {
+      // istanbul ignore next
       return [];
     }
 

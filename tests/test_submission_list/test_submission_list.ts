@@ -229,6 +229,7 @@ describe('Submission list tests', () => {
 
         let new_submission = new ag_cli.Submission(new_submission_with_results);
         ag_cli.Submission.notify_submission_created(new_submission);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_submissions).toEqual([new_submission_with_results, submission]);
         expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);

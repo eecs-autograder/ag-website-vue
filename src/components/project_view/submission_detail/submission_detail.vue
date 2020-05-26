@@ -161,9 +161,9 @@
 
     <mutation-suite-results
       ref="mutation_suite_results"
-      v-if="submission_result.student_test_suite_results.length"
+      v-if="submission_result.mutation_test_suite_results.length"
       :submission="submission"
-      :mutation_test_suite_results="submission_result.student_test_suite_results"
+      :mutation_test_suite_results="submission_result.mutation_test_suite_results"
       :fdbk_category="feedback_category">
     </mutation-suite-results>
 

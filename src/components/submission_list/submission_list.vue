@@ -254,7 +254,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
         total_points: 0,
         total_points_possible: 0,
         ag_test_suite_results: [],
-        student_test_suite_results: [],
+        mutation_test_suite_results: [],
       },
       ...JSON.parse(JSON.stringify(submission))
     };

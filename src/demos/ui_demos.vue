@@ -85,7 +85,6 @@
         <FileUploadDemo v-show="d_current_tab === 'upload'"></FileUploadDemo>
         <ModalDemo v-show="d_current_tab === 'modal'"></ModalDemo>
         <SelectObjectDemo v-show="d_current_tab === 'select_object'"></SelectObjectDemo>
-        <TabsDemo v-show="d_current_tab === 'tabs'"></TabsDemo>
         <TooltipDemo v-show="d_current_tab === 'tooltip'"></TooltipDemo>
         <ToggleDemo v-show="d_current_tab === 'toggle'"></ToggleDemo>
         <ViewFileDemo v-show="d_current_tab === 'view_file'"></ViewFileDemo>
@@ -100,9 +99,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from "@/components/tabs/tab_header.vue";
-import Tabs from '@/components/tabs/tabs.vue';
 import Toggle from '@/components/toggle.vue';
 import ViewFile from '@/components/view_file.vue';
 
@@ -116,7 +112,6 @@ import DropdownTypeaheadDemo from './dropdown_typeahead_demo.vue';
 import FileUploadDemo from './file_upload_demo.vue';
 import ModalDemo from './modal_demo.vue';
 import SelectObjectDemo from './select_object_demo.vue';
-import TabsDemo from './tabs_demo.vue';
 import ToggleDemo from './toggle_demo.vue';
 import TooltipDemo from './tooltip_demo.vue';
 import ValidatedFormDemo from './validated_form_demo.vue';
@@ -136,10 +131,6 @@ import ViewFileDemo from './view_file_demo.vue';
     FileUploadDemo,
     ModalDemo,
     SelectObjectDemo,
-    Tab,
-    Tabs,
-    TabHeader,
-    TabsDemo,
     Toggle,
     ToggleDemo,
     TooltipDemo,

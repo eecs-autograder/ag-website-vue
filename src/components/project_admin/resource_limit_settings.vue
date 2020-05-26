@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <div class="resource-limit form-field-wrapper">
+      <!-- <div class="resource-limit form-field-wrapper">
         <label class="label"> Process spawn limit </label>
         <div class="resource-input">
           <validated-input ref="process_spawn_limit"
@@ -52,7 +52,7 @@
             <div slot="suffix" class="unit-suffix"> child processes </div>
           </validated-input>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="resource-limit-wrapper">
@@ -68,7 +68,6 @@
                               is_not_empty,
                               is_integer,
                               is_greater_than_or_equal_to_one,
-                              max_virtual_memory_validator,
                             ]"
                             :from_string_fn="string_to_num">
             <div slot="suffix" class="unit-suffix"> bytes </div>
@@ -76,7 +75,7 @@
         </div>
       </div>
 
-      <div class="resource-limit form-field-wrapper">
+      <!-- <div class="resource-limit form-field-wrapper">
         <label class="label"> Stack size limit </label>
         <div class="resource-input">
           <validated-input ref="stack_size_limit"
@@ -94,7 +93,7 @@
             <div slot="suffix" class="unit-suffix"> bytes </div>
           </validated-input>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -108,7 +107,7 @@ import {
   MAX_COMMAND_TIMEOUT,
   MAX_PROCESS_LIMIT,
   MAX_STACK_SIZE_LIMIT,
-  MAX_VIRTUAL_MEM_LIMIT,
+  // MAX_VIRTUAL_MEM_LIMIT,
 } from '@/constants';
 import {
   is_integer,
@@ -153,7 +152,7 @@ export default class ResourceLimitSettings extends Vue {
 
   readonly max_command_timeout_validator = make_max_value_validator(MAX_COMMAND_TIMEOUT);
   readonly max_stack_size_validator = make_max_value_validator(MAX_STACK_SIZE_LIMIT);
-  readonly max_virtual_memory_validator = make_max_value_validator(MAX_VIRTUAL_MEM_LIMIT);
+  // readonly max_virtual_memory_validator = make_max_value_validator(MAX_VIRTUAL_MEM_LIMIT);
   readonly max_process_limit_validator = make_max_value_validator(MAX_PROCESS_LIMIT);
 
   created() {

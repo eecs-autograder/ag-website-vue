@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { HttpError, InstructorFile, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
@@ -9,6 +9,7 @@ import InstructorFiles from '@/components/project_admin/instructor_files/instruc
 import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { wait_until } from '@/tests/utils';
 
 
 describe('InstructorFiles.vue', () => {
@@ -117,9 +118,11 @@ describe('InstructorFiles.vue', () => {
     test('Re-upload file being viewed, contents updated', async () => {
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Old Content"]));
 
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        await wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        expect(
+            await wait_until(wrapper, w => w.vm.current_filename === instructor_file_1.name)
+        ).toBe(true);
         let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
-        await wrapper.vm.$nextTick();
         expect(await view_file.vm.file_contents).toEqual('Old Content');
 
         InstructorFile.notify_instructor_file_content_changed(

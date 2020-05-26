@@ -572,8 +572,7 @@ describe('GroupRegistration tests', () => {
             Promise.reject(
                 new HttpError(
                     400,
-                    {__all__:
-                            "Error in 'invited_users': You cannot send an invitation to yourself."}
+                    {__all__: "Error in 'recipient_usernames'"}
                 )
             )
         );

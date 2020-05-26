@@ -108,9 +108,6 @@ import InstructorFiles from '@/components/project_admin/instructor_files/instruc
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun_submissions.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Destroyed, Mounted } from '@/lifecycle';
@@ -127,9 +124,6 @@ import { assert_not_null, deep_copy, get_query_param, safe_assign } from "@/util
     MutationSuites,
     ProjectSettings,
     RerunSubmissions,
-    Tab,
-    TabHeader,
-    Tabs
   }
 })
 export default class ProjectAdmin extends CurrentTabMixin implements ProjectObserver,

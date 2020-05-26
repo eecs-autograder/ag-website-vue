@@ -7,6 +7,7 @@ import CriterionForm from "@/components/project_admin/handgrading_settings/crite
 import {
     emitted,
     get_validated_input_text,
+    set_props,
     set_validated_input_text,
     validated_input_is_valid
 } from "@/tests/utils";
@@ -46,7 +47,7 @@ describe('CriterionForm tests', () => {
         });
     });
 
-    test('Input watcher', () => {
+    test('Input watcher', async () => {
         let wrapper = mount(CriterionForm);
         expect(wrapper.vm.d_form_data).toEqual({
             short_description: '',
@@ -54,8 +55,7 @@ describe('CriterionForm tests', () => {
             points: 0
         });
 
-        wrapper.setProps({criterion: criterion});
-
+        await set_props(wrapper, {criterion: criterion});
         expect(wrapper.vm.d_form_data).not.toBe(criterion);
 
         expect(wrapper.vm.d_form_data).toEqual({

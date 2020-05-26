@@ -13,7 +13,7 @@
 
       <result-panel
         ref="mutation_test_suite_detail_panel"
-        :name="mutation_test_suite_result.student_test_suite_name"
+        :name="mutation_test_suite_result.mutation_test_suite_name"
         :correctness_level="mutation_suite_correctness(mutation_test_suite_result)"
         :points_awarded="parseFloat(mutation_test_suite_result.total_points)"
         :points_possible="parseFloat(mutation_test_suite_result.total_points_possible)">

@@ -121,8 +121,7 @@ test('API error handled in login', async () => {
 
     let wrapper = make_wrapper();
     expect(await wait_for_load(wrapper)).toBe(true);
-    wrapper.find({ref: 'login_button'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find({ref: 'login_button'}).trigger('click');
 
     expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
 });
@@ -193,7 +192,7 @@ test('Logout', async () => {
     expect(await wait_for_load(wrapper)).toBe(true);
     expect(wrapper.find('#welcome').exists()).toBe(false);
 
-    wrapper.find({ref: 'logout_button'}).trigger('click');
+    await wrapper.find({ref: 'logout_button'}).trigger('click');
     expect(delete_cookie_stub.calledOnce).toBe(true);
 
     expect(wrapper.vm.globals.current_user).toBeNull();

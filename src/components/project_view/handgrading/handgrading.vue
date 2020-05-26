@@ -248,12 +248,7 @@
           <i class="fas fa-chevron-left"></i>
           Prev
         </button>
-        <div
-          id="finished-grading-container"
-          class="checkbox-input-container footer-item"
-          @click="d_handgrading_result.finished_grading = !d_handgrading_result.finished_grading;
-                  save_finished_grading()"
-        >
+        <div id="finished-grading-container" class="checkbox-input-container footer-item">
           <input type="checkbox"
                  class="checkbox"
                  id="finished-grading"

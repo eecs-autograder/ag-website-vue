@@ -98,9 +98,6 @@ import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster
 import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 import Dropdown from '@/components/dropdown.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Mounted } from '@/lifecycle';
@@ -116,9 +113,6 @@ import { get_query_param, safe_assign } from "@/utils";
     EditLateDays,
     CourseSettings,
     Dropdown,
-    Tab,
-    TabHeader,
-    Tabs,
   }
 })
 export default class CourseAdmin extends CurrentTabMixin implements CourseObserver,

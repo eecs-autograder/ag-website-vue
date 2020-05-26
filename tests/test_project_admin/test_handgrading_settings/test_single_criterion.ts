@@ -21,7 +21,7 @@ beforeEach(() => {
 });
 
 describe('SingleCriterion tests', () => {
-    test('Input value and watcher', () => {
+    test('Input value and watcher', async () => {
         const wrapper = mount(SingleCriterion, {propsData: {criterion: criterion}});
         expect(wrapper.vm.d_criterion).not.toBe(criterion);
         expect(wrapper.vm.d_criterion).toEqual(criterion);
@@ -35,15 +35,17 @@ describe('SingleCriterion tests', () => {
             last_modified: ''
         });
         wrapper.setProps({criterion: other});
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_criterion).not.toBe(other);
         expect(wrapper.vm.d_criterion).toEqual(other);
     });
 
-    test('Toggle edit mode', () => {
+    test('Toggle edit mode', async () => {
         const wrapper = mount(SingleCriterion, {propsData: {criterion: criterion}});
-        expect(wrapper.find({ref: 'criterion_form'}).exists()).toEqual(false);
+        expect(wrapper.findComponent({ref: 'criterion_form'}).exists()).toEqual(false);
         wrapper.vm.d_edit_mode = true;
-        expect(wrapper.find({ref: 'criterion_form'}).exists()).toEqual(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'criterion_form'}).exists()).toEqual(true);
     });
 
     test('Short description displyed', () => {
@@ -51,19 +53,21 @@ describe('SingleCriterion tests', () => {
         expect(wrapper.find('.short-description').text()).toEqual(criterion.short_description);
     });
 
-    test('Points displayed', () => {
+    test('Points displayed', async () => {
         const wrapper = mount(SingleCriterion, {propsData: {criterion: criterion}});
         expect(wrapper.find('.points').text()).toEqual('4 points');
 
         wrapper.vm.d_criterion.points = 1;
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.points').text()).toEqual('1 point');
     });
 
-    test('Long description displayed when not empty', () => {
+    test('Long description displayed when not empty', async () => {
         const wrapper = mount(SingleCriterion, {propsData: {criterion: criterion}});
         expect(wrapper.find('.long-description').text()).toEqual(criterion.long_description);
 
         wrapper.vm.d_criterion.long_description = '';
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.long-description').exists()).toEqual(false);
     });
 });
@@ -79,20 +83,16 @@ describe('Save criterion tests', () => {
         save_stub = sinon.stub(wrapper.vm.d_criterion, 'save').returns(Promise.resolve());
     });
 
-    afterEach(() => {
-       sinon.restore();
-    });
-
     test('Save', async () => {
         expect(wrapper.vm.d_criterion_form_is_valid).toEqual(true);
 
-        (<CriterionForm> wrapper.find({ref: 'criterion_form'}).vm).d_form_data = {
+        (<CriterionForm> wrapper.findComponent({ref: 'criterion_form'}).vm).d_form_data = {
             short_description: 'new short description',
             points: 78,
             long_description: 'new long description',
         };
 
-        wrapper.find({ref: 'criterion_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'criterion_form'}).trigger('submit');
 
         await wrapper.vm.$nextTick();
 
@@ -118,11 +118,11 @@ describe('Save criterion tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'save_criterion_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'save_criterion_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
 
         expect(wrapper.vm.d_criterion_form_is_valid).toEqual(true);
-        wrapper.find({ref: 'criterion_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'criterion_form'}).trigger('submit');
 
         await wrapper.vm.$nextTick();
 
@@ -142,31 +142,31 @@ describe('Delete criterion tests', () => {
     test('Delete', async () => {
         wrapper.find('.delete-icon').trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'delete_criterion_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
 
         wrapper.find('.delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(delete_stub.calledOnce).toEqual(true);
-        expect(wrapper.find({ref: 'delete_criterion_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(false);
     });
 
     test('Cancel delete', async () => {
         wrapper.find('.delete-icon').trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'delete_criterion_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
 
         wrapper.find('.cancel-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(delete_stub.called).toEqual(false);
-        expect(wrapper.find({ref: 'delete_criterion_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(false);
     });
 
     test('API error', async () => {
         wrapper.find('.delete-icon').trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'delete_criterion_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'delete_criterion_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_criterion_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
 
         delete_stub.returns(Promise.reject(new HttpError(403, 'Permission denied')));
@@ -174,6 +174,6 @@ describe('Delete criterion tests', () => {
         wrapper.find('.delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
-        expect(wrapper.find({ref: 'delete_criterion_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
     });
 });

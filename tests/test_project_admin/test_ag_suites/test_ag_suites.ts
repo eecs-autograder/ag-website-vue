@@ -14,6 +14,7 @@ import {
     set_validated_input_text,
     validated_input_is_valid,
     wait_for_load,
+    wait_until,
 } from '@/tests/utils';
 
 
@@ -50,21 +51,21 @@ describe('Creating ag_test_suite', () => {
 
     test('d_new_ag_test_suite_name binding', async () => {
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-button').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
 
-        let d_new_ag_test_suite_name_input = wrapper.find({ref: 'new_ag_test_suite_name'});
+        let d_new_ag_test_suite_name_input = wrapper.findComponent({ref: 'new_ag_test_suite_name'});
 
-        set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
+        await set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
         expect(validated_input_is_valid(d_new_ag_test_suite_name_input)).toBe(true);
         expect(wrapper.vm.d_new_ag_test_suite_name).toEqual("Suite I");
 
         wrapper.vm.d_new_ag_test_suite_name = "Suite II";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(d_new_ag_test_suite_name_input)).toEqual("Suite II");
     });
 
@@ -79,25 +80,25 @@ describe('Creating ag_test_suite', () => {
         let new_suite = data_ut.make_ag_test_suite(project.pk);
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-button').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
         wrapper.vm.d_new_ag_test_suite_name = "Sweet";
-        wrapper.find('#add-ag-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-form').trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_adding_suite)).toBe(true);
 
         expect(create_ag_suite_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_new_ag_test_suite_name).toBe("");
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(1);
         expect(wrapper.vm.d_active_ag_test_suite).toEqual(new_suite);
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
     });
 
     test('Creating a suite - unsuccessfully', async () => {
@@ -111,26 +112,26 @@ describe('Creating ag_test_suite', () => {
         );
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-button').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
         wrapper.vm.d_new_ag_test_suite_name = "Sweet";
-        wrapper.find('#add-ag-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-form').trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_adding_suite)).toBe(true);
 
         expect(create_ag_suite_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
     });
 });
 
@@ -303,7 +304,7 @@ test('Update suites order', async () => {
     let wrapper = make_wrapper();
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'ag_test_suite_order'}).vm.$emit('change');
+    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('change');
     await wrapper.vm.$nextTick();
     expect(
         order_stub.calledOnceWith(project.pk, suites.map(suite => suite.pk))

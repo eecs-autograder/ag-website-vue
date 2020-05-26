@@ -12,7 +12,6 @@ import { compress_whitespace, wait_for_load, wait_until } from '@/tests/utils';
 
 describe('ViewFile.vue', () => {
     let wrapper: Wrapper<ViewFile>;
-    let component: ViewFile;
     const filename = 'ke$ha_file.cpp';
     const content = Promise.resolve('line one\nline two');
     const height_in = "250px";
@@ -25,15 +24,14 @@ describe('ViewFile.vue', () => {
                 view_file_height: height_in
             }
         });
-        component = wrapper.vm;
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
     });
 
     test('ViewFile data set to values passed in by parent', async () => {
         let view_file_wrapper = wrapper.find('.view-file-component');
         expect(view_file_wrapper.element.style.height).toEqual('250px');
-        expect(component.d_filename).toBe(filename);
-        expect(component.d_file_contents).toBe(await content);
+        expect(wrapper.vm.d_filename).toBe(filename);
+        expect(wrapper.vm.d_file_contents).toBe(await content);
     });
 
     test('File content and line numbers displayed in order', async () => {
@@ -54,8 +52,8 @@ describe('ViewFile.vue', () => {
         expect(content_lines.at(0).text()).toContain('line one');
         expect(content_lines.at(1).text()).toContain('line two');
 
-        wrapper.setProps({file_contents: Promise.resolve("Blue \nMoon")});
-        await component.$nextTick();
+        await wrapper.setProps({file_contents: Promise.resolve("Blue \nMoon")});
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         content_lines = wrapper.findAll('.line-of-file-content');
         expect(content_lines.length).toEqual(2);
@@ -65,50 +63,46 @@ describe('ViewFile.vue', () => {
 
     test('The filename of a ViewFile Component can change', async () => {
         let new_filename = "macklemore.cpp";
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_filename).toEqual(filename);
+        expect(wrapper.vm.d_filename).toEqual(filename);
 
         wrapper.setProps({filename: new_filename});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_filename).toEqual(new_filename);
+        expect(wrapper.vm.d_filename).toEqual(new_filename);
     });
 
     test('File too large, user prompted before displaying', async () => {
-        wrapper.setProps({display_size_threshold: 2});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({display_size_threshold: 2});
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(0);
         expect(wrapper.find('.large-file-message').exists()).toBe(true);
 
-        wrapper.find('.large-file-message .orange-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('.large-file-message .orange-button').trigger('click');
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(2);
         expect(wrapper.find('.large-file-message').exists()).toBe(false);
 
         // display anyway flag should be reset when content changes.
-        wrapper.setProps({file_contents: Promise.resolve('Some content')});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({file_contents: Promise.resolve('Some content')});
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(0);
         expect(wrapper.find('.large-file-message').exists()).toBe(true);
     });
 
     test('1000 lines initially rendered, show more button used', async () => {
-        wrapper.setProps({file_contents: Promise.resolve(Array(2700).fill('spam').join('\n'))});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps(
+            {file_contents: Promise.resolve(Array(2700).fill('spam').join('\n'))});
         expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(1000);
 
-        wrapper.find({ref: 'show_more_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'show_more_button'}).trigger('click');
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(2000);
 
-        wrapper.find({ref: 'show_more_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'show_more_button'}).trigger('click');
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(2700);
 
-        expect(wrapper.find({ref: 'show_more_button'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'show_more_button'}).exists()).toBe(false);
     });
 
     test('Progress bar', async () => {
@@ -116,7 +110,7 @@ describe('ViewFile.vue', () => {
         wrapper.setProps({progress: 42});
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({name: 'ProgressBar'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'ProgressBar'}).exists()).toBe(true);
         expect(wrapper.find('viewing-container').exists()).toBe(false);
     });
 });
@@ -187,7 +181,7 @@ describe('ViewFile handgrading tests', () => {
         ];
         expect(wrapper.findAll('.commented-line').length).toEqual(highlighted_line_indices.length);
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         for (let index of highlighted_line_indices) {
             expect(code_lines.at(index).classes()).toEqual(['commented-line']);
         }
@@ -221,12 +215,12 @@ describe('ViewFile handgrading tests', () => {
         );
     });
 
-    test('Hovered comment highlighted differently', () => {
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+    test('Hovered comment highlighted differently', async () => {
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         let single_line_comment = wrapper.findAll('.comment').at(1);
-        single_line_comment.trigger('mouseenter');
+        await single_line_comment.trigger('mouseenter');
         expect(code_lines.at(5).classes()).toContain('hovered-comment-line');
-        single_line_comment.trigger('mouseleave');
+        await single_line_comment.trigger('mouseleave');
         expect(code_lines.at(5).classes()).not.toContain('hovered-comment-line');
     });
 
@@ -256,13 +250,13 @@ describe('ViewFile handgrading tests', () => {
             let new_applied_annotation = make_create_result(0, 0);
             create_stub.resolves(new_applied_annotation);
 
-            let code_lines = wrapper.findAll({ref: 'code_line'});
+            let code_lines = wrapper.findAllComponents({ref: 'code_line'});
             code_lines.at(0).trigger('mousedown');
             code_lines.at(0).trigger('mouseup');
 
             await wrapper.vm.$nextTick();
 
-            wrapper.findAll({name: 'ContextMenuItem'}).at(0).trigger('click');
+            wrapper.findAllComponents({name: 'ContextMenuItem'}).at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
@@ -287,7 +281,9 @@ describe('ViewFile handgrading tests', () => {
                 annotation_no_long_description.short_description
             );
 
-            expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(false);
+            expect(
+                wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()
+            ).toBe(false);
             expect(wrapper.vm.d_first_highlighted_line).toBeNull();
             expect(wrapper.vm.d_last_highlighted_line).toBeNull();
         });
@@ -298,7 +294,7 @@ describe('ViewFile handgrading tests', () => {
             let new_applied_annotation = make_create_result(0, 2);
             create_stub.resolves(new_applied_annotation);
 
-            let code_lines = wrapper.findAll({ref: 'code_line'});
+            let code_lines = wrapper.findAllComponents({ref: 'code_line'});
             // Highlighed region expands up and down
             code_lines.at(1).trigger('mousedown');
             code_lines.at(0).trigger('mouseenter');
@@ -308,7 +304,7 @@ describe('ViewFile handgrading tests', () => {
 
             await wrapper.vm.$nextTick();
 
-            wrapper.findAll({name: 'ContextMenuItem'}).at(0).trigger('click');
+            wrapper.findAllComponents({name: 'ContextMenuItem'}).at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
@@ -331,7 +327,9 @@ describe('ViewFile handgrading tests', () => {
                 annotation_no_long_description.short_description
             );
 
-            expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(false);
+            expect(
+                wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()
+            ).toBe(false);
             expect(wrapper.vm.d_first_highlighted_line).toBeNull();
             expect(wrapper.vm.d_last_highlighted_line).toBeNull();
         });
@@ -355,15 +353,15 @@ describe('ViewFile handgrading tests', () => {
         );
         let create_stub = sinon.stub(ag_cli.Comment, 'create').resolves(new_comment);
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        wrapper.findAll({name: 'ContextMenuItem'}).at(2).trigger('click');
+        wrapper.findAllComponents({name: 'ContextMenuItem'}).at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'comment_text'}).setValue(text);
+        wrapper.findComponent({ref: 'comment_text'}).setValue(text);
         wrapper.find('.modal .green-button').trigger('click');
 
         expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
@@ -400,12 +398,12 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.findAll('.comment').at(1).find('.delete').exists()).toBe(true);
         expect(wrapper.findAll('.comment').at(2).find('.delete').exists()).toBe(true);
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'ContextMenuItem'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'ContextMenuItem'}).length).toEqual(2);
     });
 
     test('Delete applied annotation', async () => {
@@ -441,7 +439,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(1).trigger('mouseenter');
         code_lines.at(2).trigger('mouseenter');
@@ -457,7 +455,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(1).trigger('mouseenter');
         code_lines.at(2).trigger('mouseenter');
@@ -471,7 +469,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mouseenter');
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
@@ -487,11 +485,11 @@ describe('ViewFile handgrading tests', () => {
     });
 
     test('Highlighting disabled when context menu open', async () => {
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
@@ -527,15 +525,15 @@ describe('ViewFile handgrading tests', () => {
         }
     });
 
-    test('Highlighting events ignored while handgrading disabled', () => {
-        wrapper.setProps({handgrading_result: null});
-        wrapper.setData({d_handgrading_result: null});
+    test('Highlighting events ignored while handgrading disabled', async () => {
+        await wrapper.setProps({handgrading_result: null});
+        await wrapper.setData({d_handgrading_result: null});
 
         expect(wrapper.findAll('.delete').length).toEqual(0);
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(1).trigger('mouseenter');
         code_lines.at(2).trigger('mouseenter');
@@ -558,12 +556,12 @@ describe('ViewFile handgrading tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let code_lines = wrapper.findAll({ref: 'code_line'});
+        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
-        expect(wrapper.find({ref: 'handgrading_context_menu'}).text()).toEqual('');
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).text()).toEqual('');
     });
 });

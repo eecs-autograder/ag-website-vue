@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     AGTestSuite,
@@ -21,6 +21,7 @@ import {
     expect_html_element_has_value,
     find_by_name,
     get_validated_input_text,
+    set_data,
     set_select_object_value,
     set_validated_input_text,
     validated_input_is_valid,
@@ -106,6 +107,7 @@ test('Input property initialization and change', async () => {
     expect(inner_wrapper.vm.d_suite).not.toBe(ag_suite);
 
     outer_wrapper.vm.change_suite_field();
+    await outer_wrapper.vm.$nextTick();
 
     expect(inner_wrapper.vm.d_suite).not.toBe(original);
     expect(inner_wrapper.vm.d_suite!.name).toEqual(new_name);
@@ -129,12 +131,12 @@ describe('Field binding tests', () => {
 
     test('suite name binding', async () => {
         let suite_name_input = wrapper.find({ref: 'suite_name'});
-        set_validated_input_text(suite_name_input, 'Sweet Name');
+        await set_validated_input_text(suite_name_input, 'Sweet Name');
 
         expect(wrapper.vm.d_suite!.name).toEqual("Sweet Name");
         expect(validated_input_is_valid(suite_name_input)).toEqual(true);
 
-        wrapper.vm.d_suite!.name = "Thanks";
+        await set_data(wrapper, {d_suite: {name: "Thanks"}});
         expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
@@ -150,24 +152,24 @@ describe('Field binding tests', () => {
         expect(wrapper.emitted('field_change')).toBeUndefined();
     });
 
-    test('deferred binding', () => {
+    test('deferred binding', async () => {
         let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
 
-        synchronous_checkbox.setChecked(true);
+        await synchronous_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.deferred).toEqual(false);
 
-        synchronous_checkbox.setChecked(false);
+        await synchronous_checkbox.setChecked(false);
         expect(wrapper.vm.d_suite!.deferred).toEqual(true);
 
-        synchronous_checkbox.setChecked(true);
+        await synchronous_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.deferred).toEqual(false);
 
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
 
-        wrapper.vm.d_suite!.deferred = true;
+        await set_data(wrapper, {d_suite: {deferred: true}});
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
 
-        wrapper.vm.d_suite!.deferred = false;
+        await set_data(wrapper, {d_suite: {deferred: false}});
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
@@ -212,25 +214,25 @@ describe('Field binding tests', () => {
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
-    test('Read-only instructor files binding', () => {
+    test('Read-only instructor files binding', async () => {
         let read_only_checkbox = wrapper.find('#read-only-instructor-files');
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(true);
 
-        read_only_checkbox.setChecked(false);
+        await read_only_checkbox.setChecked(false);
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(false);
 
-        read_only_checkbox.setChecked(true);
+        await read_only_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(true);
 
-        read_only_checkbox.setChecked(false);
+        await read_only_checkbox.setChecked(false);
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(false);
 
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
 
-        wrapper.vm.d_suite!.read_only_instructor_files = true;
+        await set_data(wrapper, {d_suite: {read_only_instructor_files: true}});
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(true);
 
-        wrapper.vm.d_suite!.read_only_instructor_files = false;
+        await set_data(wrapper, {d_suite: {read_only_instructor_files: false}});
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);

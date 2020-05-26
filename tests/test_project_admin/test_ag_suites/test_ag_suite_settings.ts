@@ -14,6 +14,7 @@ import { managed_mount } from '@/tests/setup';
 import {
     find_by_name,
     get_validated_input_text,
+    set_data,
     set_validated_input_text,
     validated_input_is_valid,
     wait_for_load,
@@ -93,34 +94,34 @@ describe('AGSuiteSettings tests', () => {
 
     test('setup_suite_cmd_name binding', async () => {
         let setup_suite_cmd_name_input = wrapper.find({ref: 'setup_suite_cmd_name'});
-        set_validated_input_text(setup_suite_cmd_name_input, 'sunflower');
+        await set_validated_input_text(setup_suite_cmd_name_input, 'sunflower');
 
         expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("sunflower");
         expect(validated_input_is_valid(setup_suite_cmd_name_input)).toEqual(true);
 
-        set_validated_input_text(setup_suite_cmd_name_input, '');
+        await set_validated_input_text(setup_suite_cmd_name_input, '');
         expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("");
         expect(validated_input_is_valid(setup_suite_cmd_name_input)).toEqual(true);
 
-        wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name = "Rainbow";
+        await set_data(wrapper, {d_ag_test_suite: {setup_suite_cmd_name: "Rainbow"}});
         expect(get_validated_input_text(setup_suite_cmd_name_input)).toEqual("Rainbow");
     });
 
     test('setup_suite_cmd binding', async () => {
         let setup_suite_cmd_input = wrapper.find({ref: 'setup_suite_cmd'});
 
-        set_validated_input_text(setup_suite_cmd_input, 'three to the right');
+        await set_validated_input_text(setup_suite_cmd_input, 'three to the right');
 
         expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd).toEqual(
             "three to the right"
         );
         expect(validated_input_is_valid(setup_suite_cmd_input)).toEqual(true);
 
-        set_validated_input_text(setup_suite_cmd_input, '');
+        await set_validated_input_text(setup_suite_cmd_input, '');
         expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd).toEqual("");
         expect(validated_input_is_valid(setup_suite_cmd_input)).toEqual(true);
 
-        wrapper.vm.d_ag_test_suite!.setup_suite_cmd = "four to the left";
+        await set_data(wrapper, {d_ag_test_suite: {setup_suite_cmd: "four to the left"}});
         expect(get_validated_input_text(setup_suite_cmd_input)).toEqual(
             "four to the left"
         );

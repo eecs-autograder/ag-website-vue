@@ -45,26 +45,25 @@ test('Select and edit student from list', async () => {
     expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(true);
     expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
 
-    set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '  ');
+    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '  ');
     expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(false);
     expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(true);
 
-    set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '0');
+    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '0');
     expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(true);
     expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
 
-    set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '-1');
+    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '-1');
     expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(false);
     expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(true);
 
-    set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '1');
+    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '1');
     expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(true);
     expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
 
     let set_late_days_stub = sinon.stub(ag_cli.User, 'set_num_late_days');
-    wrapper.find({ref: 'late_day_form'}).trigger('submit');
+    await wrapper.find({ref: 'late_day_form'}).trigger('submit');
 
-    await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
     expect(set_late_days_stub.calledOnceWith(course.pk, users[1].username, 1));
 });
@@ -75,8 +74,7 @@ test('Search for student', async () => {
         course.pk, other_username).resolves({late_days_remaining: 2});
     find_by_name<DropdownTypeahead>(
         wrapper, 'DropdownTypeahead').vm.filter_text = '  ' + other_username + '   ';
-    wrapper.find({ref: 'search_button'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find({ref: 'search_button'}).trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
     expect(get_validated_input_text(wrapper.find({ref: 'late_days_input'}))).toEqual('2');
@@ -84,8 +82,7 @@ test('Search for student', async () => {
 
 test('Search for empty string does nothing', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days');
-    wrapper.find({ref: 'search_button'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find({ref: 'search_button'}).trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
     expect(stub.callCount).toEqual(0);

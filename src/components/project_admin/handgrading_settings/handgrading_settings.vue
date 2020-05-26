@@ -341,7 +341,7 @@ export default class HandgradingSettings extends Vue implements Created,
 
   d_override_max_points = false;
 
-  private d_loading = true;
+  d_loading = true;
   private d_mounted = false;
   d_saving = false;
   d_settings_form_is_valid = false;

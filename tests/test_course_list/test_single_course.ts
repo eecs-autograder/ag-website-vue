@@ -8,7 +8,7 @@ import SingleCourse from '@/components/course_list/single_course.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { assert_not_null } from '@/utils';
 
-import { expect_html_element_has_value, set_validated_input_text } from '@/tests/utils';
+import { expect_html_element_has_value, set_data, set_validated_input_text } from '@/tests/utils';
 
 
 describe('SingleCourse.vue', () => {
@@ -98,20 +98,19 @@ describe('SingleCourse.vue', () => {
         component = wrapper.vm;
         await component.$nextTick();
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
 
         let semester_select = wrapper.find('#semester');
 
         expect(component.new_course_semester).toEqual(course_1.semester);
 
-        semester_select.setValue(Semester.summer);
+        await semester_select.setValue(Semester.summer);
         expect(component.new_course_semester).toEqual(Semester.summer);
 
-        semester_select.setValue(Semester.winter);
+        await semester_select.setValue(Semester.winter);
         expect(component.new_course_semester).toEqual(Semester.winter);
 
-        component.new_course_semester = Semester.spring;
+        await set_data(wrapper, {new_course_semester: Semester.spring});
         expect_html_element_has_value(semester_select, Semester.spring);
     });
 

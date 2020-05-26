@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
@@ -118,12 +118,10 @@ describe('ResultPanel tests', () => {
         });
         expect(wrapper.vm.d_is_open).toBe(false);
 
-        wrapper.find('.panel-header-closed').trigger('click');
-
+        await wrapper.find('.panel-header-closed').trigger('click');
         expect(wrapper.vm.d_is_open).toBe(true);
 
-        wrapper.find('.panel-header-open').trigger('click');
-
+        await wrapper.find('.panel-header-open').trigger('click');
         expect(wrapper.vm.d_is_open).toBe(false);
     });
 
