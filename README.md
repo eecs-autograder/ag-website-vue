@@ -205,9 +205,11 @@ let my_list = [
       with the id will exist at a time.
         - Prefer using nested or otherwise more specific CSS class selectors
           when you need to override some imported style.
+    - Use skewer-case for class and id names.
     - Avoid adding a class or id solely for the purpose of being able to
-      select an element in test cases. Prefer to use a Vue ref in for this
-      purpose.
+      select an element in test cases. Prefer to use a `data-testid=xxx` attribute
+      and `wrapper.find('[data-testid=xxx]')` for this purpose. Use snake_case for
+      `data-testid` values.
 - Copying objects in components
     - If a component needs to modify the members of an object passed as input
       via `@Prop`, make a deep copy of that object and modify the copy.

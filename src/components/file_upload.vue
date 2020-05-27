@@ -54,7 +54,7 @@
 
     <modal v-if="d_show_empty_files_found_in_upload_attempt_modal"
            @close="d_show_empty_files_found_in_upload_attempt_modal = false"
-           ref="empty_file_found_in_upload_attempt_modal"
+           data-testid="empty_file_found_in_upload_attempt_modal"
            size="large"
            :include_closing_x="false">
       <div class="modal-header">Empty Files detected</div>

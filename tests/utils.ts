@@ -42,9 +42,6 @@ export async function wait_for_load<T extends (Wrapper<Vue> & {vm: {d_loading: b
 // Prefer calling this function rather than inlining its definition so that our tests
 // are more robust against changes to the ValidatedInput implementation.
 export function set_validated_input_text(wrapper: Wrapper<Vue>, value: string) {
-    if (!is_validated_input(wrapper)) {
-        throw new TypeError(`Expected ValidatedInput, but got "${wrapper.name()}"`);
-    }
     return wrapper.find('.input').setValue(value);
 }
 
@@ -52,32 +49,25 @@ export function set_validated_input_text(wrapper: Wrapper<Vue>, value: string) {
 // Prefer calling this function rather than inlining its definition so that our tests
 // are more robust against changes to the ValidatedInput implementation.
 export function get_validated_input_text(wrapper: Wrapper<Vue>): string {
-    if (!is_validated_input(wrapper)) {
-        throw new TypeError(`Expected ValidatedInput, but got "${wrapper.name()}"`);
-    }
     return (<HTMLInputElement> wrapper.find('.input').element).value;
 }
 
 // Verifies that the given wrapper holds a ValidatedInput and returns whether it is valid.
 export function validated_input_is_valid(wrapper: Wrapper<Vue>): boolean {
-    if (!is_validated_input(wrapper)) {
-        throw new TypeError(`Expected ValidatedInput, but got "${wrapper.name()}"`);
+    let validated_input = <ValidatedInput> wrapper.vm;
+    if (validated_input.is_valid === undefined) {
+        throw new TypeError(
+            'Expected a ValidatedInput component, '
+            + 'but the given component has no "is_valid" attribute.'
+        );
     }
-    return wrapper.vm.is_valid;
-}
-
-function is_validated_input(wrapper: Wrapper<Vue>): wrapper is Wrapper<ValidatedInput> {
-    return wrapper.name() === 'ValidatedInput';
+    return validated_input.is_valid;
 }
 
 // Verifies that the given wrapper holds an input tag and returns whether it is checked.
 // Also verifies that the input tag is a checkbox or radio button.
 export function checkbox_is_checked(wrapper: Wrapper<Vue>): boolean {
-    if (!is_html_input_or_select(wrapper)) {
-        throw new TypeError(
-            `Expected an input, select, or option element, but got "${wrapper.name()}"`);
-    }
-
+    assert_is_html_input_or_select(wrapper);
     if (wrapper.element.type !== 'checkbox' && wrapper.element.type !== 'radio') {
         throw new TypeError(
             `Expected a checkbox or radio button, but got "${wrapper.element.type }"`);
@@ -90,28 +80,21 @@ export function checkbox_is_checked(wrapper: Wrapper<Vue>): boolean {
 // and checks whether that element has the expected value, failing the current test
 // if it does not.
 export function expect_html_element_has_value(wrapper: Wrapper<Vue>, expected: unknown) {
-    if (!is_html_input_or_select(wrapper)) {
-        throw new TypeError(
-            `Expected an input, select, or option element, but got "${wrapper.name()}"`);
-    }
+    assert_is_html_input_or_select(wrapper);
     expect(wrapper.element.value).toEqual(expected);
 }
 
 // Like expect_html_element_has_value, but works only on SelectObject components.
 export function expect_select_object_has_value(wrapper: Wrapper<Vue>, expected: unknown) {
-    if (wrapper.name() !== 'SelectObject') {
-        throw new TypeError(`Expected a SelectObject element, but got "${wrapper.name()}"`);
-    }
     expect_html_element_has_value(wrapper.find('.select'), expected);
 }
 
 type InputOrSelect = Wrapper<Vue>
                      & {element: HTMLInputElement & HTMLSelectElement & HTMLOptionElement};
-function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelect {
-    let name = wrapper.name().toLowerCase();
-    return name === 'input'
-           || name === 'select'
-           || name === 'option';
+function assert_is_html_input_or_select(wrapper: Wrapper<Vue>): asserts wrapper is InputOrSelect {
+    if (!['input', 'select', 'option'].includes(wrapper.element.tagName)) {
+        throw new TypeError('Expected an input, select, or option tag');
+    }
 }
 
 // Sets the selected item of a select-object tag.
@@ -119,17 +102,7 @@ function is_html_input_or_select(wrapper: Wrapper<Vue>): wrapper is InputOrSelec
 // the object itself.
 export function set_select_object_value(select_object_wrapper: Wrapper<Vue>,
                                         select_value: unknown) {
-    if (!is<SelectObject>(select_object_wrapper.vm,
-                          select_object_wrapper.name() === 'SelectObject')) {
-        throw new TypeError(
-            `Expected a select-option element, but got "${select_object_wrapper.name()}"`);
-    }
-
     return select_object_wrapper.find('.select').setValue(select_value);
-}
-
-function is<T>(obj: unknown, condition: boolean): obj is T {
-    return condition;
 }
 
 export function compress_whitespace(str: string): string {
@@ -147,7 +120,7 @@ export async function do_invalid_text_input_test(
     expect(validated_input_is_valid(input_wrapper)).toEqual(true);
     if (save_button_selector !== null) {
         // tslint:disable-next-line
-        expect(component_wrapper.find(<any> save_button_selector).is('[disabled]')).toBe(false);
+        expect(component_wrapper.find(<any> save_button_selector).element).not.toBeDisabled();
     }
 
     await set_validated_input_text(input_wrapper, invalid_text);
@@ -157,7 +130,7 @@ export async function do_invalid_text_input_test(
     if (save_button_selector !== null)  {
         // tslint:disable-next-line
         let save_button_wrapper = component_wrapper.find(<any> save_button_selector);
-        expect(save_button_wrapper.is('[disabled]')).toBe(true);
+        expect(save_button_wrapper.element).toBeDisabled();
     }
 }
 
@@ -177,7 +150,7 @@ export async function do_input_blank_or_not_integer_test(
 }
 
 export function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
-    return <Wrapper<T>> wrapper.find({name: name});
+    return <Wrapper<T>> wrapper.findComponent({name: name});
 }
 
 // Thin wrapper function around the vue-test-utils Wrapper.emitted('string') method.

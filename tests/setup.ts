@@ -2,6 +2,7 @@ import { Vue } from 'vue-property-decorator';
 
 import { mount, shallowMount, VueClass, Wrapper } from '@vue/test-utils';
 
+import '@testing-library/jest-dom';
 import { HttpClient } from "ag-client-typescript";
 import * as sinon from 'sinon';
 

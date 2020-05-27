@@ -9,13 +9,13 @@ test('start_open true', () => {
         }
     });
 
-    expect(wrapper.find({ref: 'body'}).isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
 });
 
 test('start_open default false', () => {
     let wrapper = managed_mount(Collapsible);
 
-    expect(wrapper.find({ref: 'body'}).isVisible()).toBe(false);
+    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
 });
 
 test('include_caret default true', () => {

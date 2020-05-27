@@ -39,7 +39,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
 
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.states);
 
@@ -93,7 +94,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
         search_bar.trigger("click");
 
@@ -140,7 +142,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
 
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
@@ -180,7 +183,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -284,7 +288,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -353,7 +358,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -446,7 +452,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -522,7 +529,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -584,7 +592,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -636,7 +645,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");

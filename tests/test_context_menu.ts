@@ -76,7 +76,7 @@ class WrapperComponent extends Vue {
 describe('ContextMenu tests', () => {
     test("Context Menu Item click handlers", async () => {
         let wrapper = mount(WrapperComponent);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu = <ContextMenu> wrapper.findComponent({ref: 'context_menu'}).vm;
 
         let context_menu_area = wrapper.find('.context-menu-area');
         let greeting = wrapper.find('.greeting');
@@ -88,7 +88,7 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_1 = wrapper.find({ref: 'item_1'});
+        let context_menu_item_1 = wrapper.findComponent({ref: 'item_1'});
         context_menu_item_1.trigger('click');
         await context_menu.$nextTick();
 
@@ -97,7 +97,7 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_2 = wrapper.find({ref: 'item_2'});
+        let context_menu_item_2 = wrapper.findComponent({ref: 'item_2'});
         context_menu_item_2.trigger('click');
         await context_menu.$nextTick();
 
@@ -106,7 +106,7 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_3 = wrapper.find({ref: 'item_3'});
+        let context_menu_item_3 = wrapper.findComponent({ref: 'item_3'});
 
         context_menu_item_3.trigger('click');
         await context_menu.$nextTick();
@@ -118,12 +118,12 @@ describe('ContextMenu tests', () => {
 
     test("Clicking outside the context menu emits close event", async () => {
         let wrapper = mount(WrapperComponent);
-        let context_menu = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
+        let context_menu = <Wrapper<ContextMenu>> wrapper.findComponent({ref: 'context_menu'});
         let context_menu_area = wrapper.find('.context-menu-area');
         context_menu_area.trigger('click');
         await context_menu.vm.$nextTick();
 
-        expect(context_menu.isVisible()).toBe(true);
+        expect(context_menu.element).toBeVisible();
 
         let outside_input = wrapper.find('#outside');
         outside_input.trigger('click');
@@ -131,25 +131,25 @@ describe('ContextMenu tests', () => {
         await context_menu.vm.$nextTick();
 
         expect(emitted(context_menu, 'close').length).not.toEqual(0);
-        expect(context_menu.isVisible()).toBe(false);
+        expect(context_menu.element).not.toBeVisible();
 
         wrapper.destroy();
     });
 
     test("Click event not emitted when disabled item clicked", async () => {
         let wrapper = mount(WrapperComponent);
-        let menu_wrapper = <Wrapper<ContextMenu>> wrapper.find({ref: 'context_menu'});
+        let menu_wrapper = <Wrapper<ContextMenu>> wrapper.findComponent({ref: 'context_menu'});
         wrapper.find('.context-menu-area').trigger('click');
         await menu_wrapper.vm.$nextTick();
 
-        let disabled_wrapper = wrapper.find({ref: 'disabled_item'});
+        let disabled_wrapper = wrapper.findComponent({ref: 'disabled_item'});
         disabled_wrapper.trigger('click');
         expect(disabled_wrapper.emitted('click')).toBeUndefined();
     });
 
     test("Position adjusted when too near right edge", async () => {
         let wrapper = mount(WrapperComponent);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu = <ContextMenu> wrapper.findComponent({ref: 'context_menu'}).vm;
 
         sinon.stub(document.body, 'clientWidth').value(800);
         sinon.stub(document.body, 'clientHeight').value(500);
@@ -171,7 +171,7 @@ describe('ContextMenu tests', () => {
 
     test("Position adjusted when too close to bottom edge", async () => {
         let wrapper = mount(WrapperComponent);
-        let context_menu = <ContextMenu> wrapper.find({ref: 'context_menu'}).vm;
+        let context_menu = <ContextMenu> wrapper.findComponent({ref: 'context_menu'}).vm;
 
         sinon.stub(document.body, 'clientWidth').value(800);
         sinon.stub(document.body, 'clientHeight').value(500);
@@ -208,7 +208,7 @@ describe('ContextMenu tests', () => {
         };
 
         let wrapper = mount(component);
-        expect(wrapper.find({ref: 'context_menu'}).text()).toContain('Hello');
+        expect(wrapper.findComponent({ref: 'context_menu'}).text()).toContain('Hello');
     });
 
     test("Pressing esc closes the context menu", async () => {
@@ -218,12 +218,12 @@ describe('ContextMenu tests', () => {
 
         context_menu_area.trigger('click');
         await wrapper.vm.$nextTick();
-        expect(context_menu_wrapper.isVisible()).toBe(true);
+        expect(context_menu_wrapper.element).toBeVisible();
 
         context_menu_wrapper.trigger('keyup.esc');
         await wrapper.vm.$nextTick();
 
-        expect(context_menu_wrapper.isVisible()).toBe(false);
+        expect(context_menu_wrapper.element).not.toBeVisible();
 
         wrapper.destroy();
     });

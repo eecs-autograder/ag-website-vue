@@ -6,7 +6,7 @@
          :class="d_is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
       <slot name="header"></slot>
     </div>
-    <div v-show="d_is_open" ref="body">
+    <div v-show="d_is_open" data-testid="collapsible_body">
       <slot></slot>
     </div>
   </div>

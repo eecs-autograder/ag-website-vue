@@ -22,6 +22,7 @@
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.8.0",
     "@types/file-saver": "^2.0.0",
     "@types/jest": "^23.1.4",
     "@types/lodash": "^4.14.120",

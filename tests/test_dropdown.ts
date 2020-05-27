@@ -13,7 +13,7 @@ import { emitted, set_props } from './utils';
 test('Scoped slot can be used to specify custom menu item text', () => {
     const component = {
         template: `
-            <dropdown :items="[{name: 'steve'}, {name: 'stove'}]" ref="dropdown">
+            <dropdown :items="[{name: 'steve'}, {name: 'stove'}]" data-testid="dropdown">
                 <template slot="header">
                     <p ref="header">Hello</p>
                 </template>
@@ -28,7 +28,7 @@ test('Scoped slot can be used to specify custom menu item text', () => {
 
     const wrapper = mount(component);
     let expected_texts = ['steve', 'stove'];
-    let menu_items = wrapper.find({ref: 'dropdown'}).findAll('.dropdown-row');
+    let menu_items = wrapper.find('[data-testid=dropdown]').findAll('.dropdown-row');
     for (let [expected, menu_item] of zip(expected_texts, menu_items.wrappers)) {
         expect(menu_item.text()).toEqual(expected);
     }

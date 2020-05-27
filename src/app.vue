@@ -54,7 +54,7 @@
         <div id="current-user">
           <button @click="login"
                   type="button"
-                  ref="login_button"
+                  data-testid="login_button"
                   class="blue-button"
                   v-if="globals.current_user === null">
             Sign In
@@ -69,7 +69,7 @@
               <div class="username">{{globals.current_user.username}}</div>
               <div class="sign-out-button-wrapper">
                 <button @click="logout"
-                        ref="logout_button"
+                        data-testid="logout_button"
                         type="button"
                         class="flat-white-button">
                   Sign Out

@@ -30,7 +30,7 @@ describe('GroupMembersForm tests', () => {
 
         expect(wrapper.vm.d_usernames).toEqual(
             ['@llama.net', '@llama.net', '@llama.net', '@llama.net']);
-        let inputs = wrapper.findAll({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(4);
         for (let i = 0; i < inputs.length; ++i) {
             expect(get_validated_input_text(inputs.at(i))).toEqual(course.allowed_guest_domain);
@@ -50,7 +50,7 @@ describe('GroupMembersForm tests', () => {
         expect(wrapper.vm.d_usernames).not.toBe(value);
         expect(wrapper.vm.d_usernames).toEqual(value);
 
-        let inputs = wrapper.findAll({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(value.length);
         for (let i = 0; i < inputs.length; ++i) {
             expect(get_validated_input_text(inputs.at(i))).toEqual(value[i]);
@@ -127,7 +127,7 @@ describe('GroupMembersForm tests', () => {
             }
         });
 
-        expect(wrapper.find('.add-member-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.add-member-button').element).toBeDisabled();
     });
 
     test('Remove member buttons disabled when num inputs is min_num_inputs', () => {
@@ -145,7 +145,7 @@ describe('GroupMembersForm tests', () => {
 
         let remove_buttons = wrapper.findAll('.remove-member-button');
         for (let i = 0; i < remove_buttons.length; ++i) {
-            expect(remove_buttons.at(i).is('[disabled]')).toBe(true);
+            expect(remove_buttons.at(i).element).toBeDisabled();
         }
     });
 
@@ -160,10 +160,10 @@ describe('GroupMembersForm tests', () => {
         });
 
         let add_button = wrapper.find('.add-member-button');
-        expect(add_button.is('[disabled]')).toBe(false);
+        expect(add_button.element).not.toBeDisabled();
         await add_button.trigger('click');
 
-        let inputs = wrapper.findAll({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(2);
 
         expect(get_validated_input_text(inputs.at(0))).toEqual('spam');
@@ -179,14 +179,14 @@ describe('GroupMembersForm tests', () => {
                 value: ['spam', 'egg']
             }
         });
-        let inputs = wrapper.findAll({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(2);
 
         let remove_button = wrapper.findAll('.remove-member-button').at(1);
-        expect(remove_button.is('[disabled]')).toBe(false);
+        expect(remove_button.element).not.toBeDisabled();
         await remove_button.trigger('click');
 
-        inputs = wrapper.findAll({name: 'ValidatedInput'});
+        inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
         expect(inputs.length).toEqual(1);
 
         expect(get_validated_input_text(inputs.at(0))).toEqual('spam');
@@ -218,7 +218,7 @@ describe('GroupMembersForm tests', () => {
                 value: ['spam', 'egg@spam.com']
             }
         });
-        let inputs = wrapper.findAll({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
         expect((<ValidatedInput> inputs.at(0).vm).is_valid).toBe(false);
         expect((<ValidatedInput> inputs.at(1).vm).is_valid).toBe(true);
 
@@ -235,7 +235,7 @@ describe('GroupMembersForm tests', () => {
                 course: course,
             }
         });
-        let input = <Wrapper<ValidatedInput>> wrapper.find({name: 'ValidatedInput'});
+        let input = <Wrapper<ValidatedInput>> wrapper.findComponent({name: 'ValidatedInput'});
         await set_validated_input_text(input, 'wa@luigi.net');
         expect(wrapper.vm.d_usernames).toEqual(['wa@luigi.net']);
 
@@ -256,7 +256,7 @@ describe('GroupMembersForm tests', () => {
             }
         });
 
-        wrapper.find({name: 'ValidatedForm'}).vm.$emit('submit');
+        wrapper.findComponent({name: 'ValidatedForm'}).vm.$emit('submit');
         await wrapper.vm.$nextTick();
         expect(emitted(wrapper, 'submit')[0][0]).toEqual(value);
     });

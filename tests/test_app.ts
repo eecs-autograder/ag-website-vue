@@ -106,12 +106,14 @@ describe('app.vue tests', () => {
     });
 
     test('Global errors displayed', async () => {
-        expect(wrapper.find({ref: 'global_errors'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({ref: 'global_errors'}).element).not.toBeVisible();
         GlobalErrorsSubject.get_instance().report_error(new HttpError(401, 'log in plz'));
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'global_errors'}).isVisible()).toBe(true);
-        expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
+        expect(wrapper.findComponent({ref: 'global_errors'}).element).toBeVisible();
+        expect(
+            (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
+        ).toBe(1);
     });
 });
 
@@ -121,9 +123,11 @@ test('API error handled in login', async () => {
 
     let wrapper = make_wrapper();
     expect(await wait_for_load(wrapper)).toBe(true);
-    await wrapper.find({ref: 'login_button'}).trigger('click');
+    await wrapper.find('[data-testid=login_button]').trigger('click');
 
-    expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
+    expect(
+        (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
+    ).toBe(1);
 });
 
 describe('Login tests', () => {
@@ -159,7 +163,7 @@ describe('Login tests', () => {
         expect(location_assign_stub.callCount).toEqual(0);
         expect(wrapper.vm.globals.current_user).toBeNull();
 
-        wrapper.find({ref: 'login_button'}).trigger('click');
+        wrapper.find('[data-testid=login_button]').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(location_assign_stub.calledOnceWith(fake_redirect_url)).toBe(true);
@@ -192,7 +196,7 @@ test('Logout', async () => {
     expect(await wait_for_load(wrapper)).toBe(true);
     expect(wrapper.find('#welcome').exists()).toBe(false);
 
-    await wrapper.find({ref: 'logout_button'}).trigger('click');
+    await wrapper.find('[data-testid=logout_button]').trigger('click');
     expect(delete_cookie_stub.calledOnce).toBe(true);
 
     expect(wrapper.vm.globals.current_user).toBeNull();

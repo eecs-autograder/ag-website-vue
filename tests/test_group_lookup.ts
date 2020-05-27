@@ -52,7 +52,8 @@ describe('GroupLookup tests', () => {
     test('filter text matches username (case_insensitive)', async () => {
         await component.$nextTick();
 
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'group_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
 
         dropdown_typeahead.filter_text = "ILTERm";
@@ -64,7 +65,8 @@ describe('GroupLookup tests', () => {
     });
 
     test('When a group is selected from the typeahead, an event is emitted', () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'group_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
 
         dropdown_typeahead.$emit('update_item_chosen', groups[3]);
