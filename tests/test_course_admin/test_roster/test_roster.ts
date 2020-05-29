@@ -359,14 +359,12 @@ describe('Roster tests', () => {
         expect(validated_input_component.d_input_value).toBe(username_input);
         expect(validated_input_component.d_error_msg).toContain("hollyflax");
 
-        let add_users_button = wrapper.find({ref: 'add_users_button'});
-        expect(add_users_button.is('[disabled]')).toBe(true);
-        expect(wrapper.find({ref: 'replace_users_button'}).is('[disabled]')).toBe(true);
+        let add_users_button = wrapper.find('[data-testid=add_users_button]');
+        expect(add_users_button.element).toBeDisabled();
+        expect(wrapper.find('[data-testid=replace_users_button]').element).toBeDisabled();
         expect(roster.d_form_is_valid).toEqual(false);
 
-        roster_form_wrapper.trigger('submit');
-        await roster.$nextTick();
-
+        await roster_form_wrapper.trigger('submit');
         expect(wrapper.emitted('add_users')).toBeUndefined();
     });
 
@@ -397,7 +395,7 @@ describe('Roster tests', () => {
     });
 
     test('Replace users button hidden by default', async () => {
-        expect(wrapper.find({ref: 'replace_users_button'}).exists()).toBe(false);
+        expect(wrapper.find('[data-testid=replace_users_button]').exists()).toBe(false);
     });
 
     test('Clicking replace users button emits event', async () => {
@@ -412,9 +410,8 @@ describe('Roster tests', () => {
         await wrapper.vm.$nextTick();
         expect(validated_input_component.is_valid).toBe(true);
 
-        expect(wrapper.find({ref: 'replace_users_button'}).is('[disabled]')).toBe(false);
-        wrapper.find({ref: 'replace_users_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(wrapper.find('[data-testid=replace_users_button]').element).not.toBeDisabled();
+        await wrapper.find('[data-testid=replace_users_button]').trigger('click');
 
         expect(emitted(wrapper, 'replace_users')[0][0]).toEqual(usernames);
 
@@ -424,12 +421,12 @@ describe('Roster tests', () => {
     test('Reset form', async () => {
         set_validated_input_text(validated_input, 'user@user.com');
         await wrapper.vm.$nextTick();
-        let add_users_button = wrapper.find({ref: 'add_users_button'});
-        expect(add_users_button.is('[disabled]')).toBe(false);
+        let add_users_button = wrapper.find('[data-testid=add_users_button]');
+        expect(add_users_button.element).not.toBeDisabled();
 
         wrapper.vm.reset_form();
         await wrapper.vm.$nextTick();
         expect(get_validated_input_text(validated_input)).toEqual('');
-        expect(add_users_button.is('[disabled]')).toBe(true);
+        expect(add_users_button.element).toBeDisabled();
     });
 });

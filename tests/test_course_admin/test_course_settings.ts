@@ -36,7 +36,7 @@ describe('CourseSettings.vue', () => {
             year: 2222,
             num_late_days: 48,
         };
-        wrapper.find({ref: 'course_form'}).vm.$emit('submit', updated_data);
+        wrapper.findComponent({ref: 'course_form'}).vm.$emit('submit', updated_data);
         await component.$nextTick();
 
         expect(wrapper.vm.d_course.name).toEqual(updated_data.name);
@@ -59,10 +59,10 @@ describe('CourseSettings.vue', () => {
 
         expect(component.d_settings_form_is_valid).toBe(true);
 
-        wrapper.find({ref: 'course_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'course_form'}).trigger('submit');
         await component.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(2);
     });
 });

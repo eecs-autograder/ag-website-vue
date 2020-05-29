@@ -8,7 +8,7 @@
 
       <div :style="{'visibility': is_enabled ? 'visible' : 'hidden'}"
            class="preset-selection-container"
-           ref="preset_selection">
+           data-testid="preset_selection">
         <span class="preset-label">Preset:</span>
         <select class="select"
                 v-model="d_selected_preset_name"

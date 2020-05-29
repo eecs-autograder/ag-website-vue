@@ -18,11 +18,11 @@
       </div>
 
       <div class="invitation-footer">
-        <button ref="accept_invitation_button"
+        <button data-testid="accept_invitation_button"
                 class="green-button"
                 :disabled="already_accepted || d_accepting"
                 @click="d_show_confirm_accept_invitation_modal = true"> Accept </button>
-        <button ref="reject_invitation_button"
+        <button data-testid="reject_invitation_button"
                 class="orange-button"
                 @click="d_show_confirm_reject_invitation_modal = true"> Reject </button>
       </div>
@@ -43,11 +43,11 @@
       </ul>
       <APIErrors ref="accept_invitation_api_errors"></APIErrors>
       <div class="modal-button-footer">
-        <button ref="confirm_accept_button"
+        <button data-testid="confirm_accept_button"
                 class="green-button"
                 :disabled="d_accepting"
                 @click="accept_invitation"> Accept </button>
-        <button ref="cancel_accept_button"
+        <button data-testid="cancel_accept_button"
                 class="white-button"
                 @click="d_show_confirm_accept_invitation_modal = false">
           Cancel (Do Nothing)
@@ -73,11 +73,11 @@
         </div>
         <APIErrors ref="reject_invitation_api_errors"></APIErrors>
         <div class="modal-button-footer">
-          <button ref="confirm_reject_button"
+          <button data-testid="confirm_reject_button"
                   class="orange-button"
                   :disabled="d_rejecting"
                   @click="reject_invitation"> Reject </button>
-          <button ref="cancel_reject_button"
+          <button data-testid="cancel_reject_button"
                   class="white-button"
                   @click="d_show_confirm_reject_invitation_modal = false">
             Cancel (Do Nothing)

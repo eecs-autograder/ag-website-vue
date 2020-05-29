@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
@@ -17,7 +17,6 @@ import { emitted } from '../utils';
 
 describe('FeedbackConfigPanel tests', () => {
     let wrapper: Wrapper<FeedbackConfigPanel>;
-    let component: FeedbackConfigPanel;
     let ag_test_suite_normal_feedback_config: AGTestSuiteFeedbackConfig;
     let ag_test_suite_default_config: AGTestSuiteFeedbackConfig;
     let ag_test_suite_fdbk_presets: SafeMap<string, AGTestSuiteFeedbackPreset>;
@@ -72,10 +71,9 @@ describe('FeedbackConfigPanel tests', () => {
                 value: null
             }
         });
-        component = wrapper.vm;
 
-        expect(component.d_configuration).toBe(null);
-        expect(component.selected_preset_name).toEqual("Custom");
+        expect(wrapper.vm.d_configuration).toBe(null);
+        expect(wrapper.vm.selected_preset_name).toEqual("Custom");
     });
 
     test('selected_preset_name binding', async () => {
@@ -85,30 +83,29 @@ describe('FeedbackConfigPanel tests', () => {
                 value: ag_test_suite_normal_feedback_config
             }
         });
-        component = wrapper.vm;
 
-        expect(component.preset_names.length).toEqual(3);
-        expect(component.preset_names).toEqual([
+        expect(wrapper.vm.preset_names.length).toEqual(3);
+        expect(wrapper.vm.preset_names).toEqual([
             'Public Setup',
             'Pass/Fail Setup',
             'Private Setup'
         ]);
         let config_preset_select_input = wrapper.find('.select');
 
-        config_preset_select_input.setValue(component.preset_names[0]);
-        await component.$nextTick();
+        config_preset_select_input.setValue(wrapper.vm.preset_names[0]);
+        await wrapper.vm.$nextTick();
 
-        expect(component.selected_preset_name).toEqual(component.preset_names[0]);
+        expect(wrapper.vm.selected_preset_name).toEqual(wrapper.vm.preset_names[0]);
 
-        config_preset_select_input.setValue(component.preset_names[1]);
-        await component.$nextTick();
+        config_preset_select_input.setValue(wrapper.vm.preset_names[1]);
+        await wrapper.vm.$nextTick();
 
-        expect(component.selected_preset_name).toEqual(component.preset_names[1]);
+        expect(wrapper.vm.selected_preset_name).toEqual(wrapper.vm.preset_names[1]);
 
-        config_preset_select_input.setValue(component.preset_names[2]);
-        await component.$nextTick();
+        config_preset_select_input.setValue(wrapper.vm.preset_names[2]);
+        await wrapper.vm.$nextTick();
 
-        expect(component.selected_preset_name).toEqual(component.preset_names[2]);
+        expect(wrapper.vm.selected_preset_name).toEqual(wrapper.vm.preset_names[2]);
     });
 
     test("Change preset", async () => {
@@ -118,10 +115,9 @@ describe('FeedbackConfigPanel tests', () => {
                 value: ag_test_suite_normal_feedback_config
             }
         });
-        component = wrapper.vm;
 
-        expect(component.preset_names.length).toEqual(3);
-        expect(component.preset_names).toEqual([
+        expect(wrapper.vm.preset_names.length).toEqual(3);
+        expect(wrapper.vm.preset_names).toEqual([
             'Public Setup',
             'Pass/Fail Setup',
             'Private Setup'
@@ -129,22 +125,22 @@ describe('FeedbackConfigPanel tests', () => {
 
         let config_preset_select_input = wrapper.find('.select');
 
-        config_preset_select_input.setValue(component.preset_names[2]);
+        config_preset_select_input.setValue(wrapper.vm.preset_names[2]);
         expect(
             config_is_preset(emitted(wrapper, 'input')[0][0],
-                             ag_test_suite_fdbk_presets.get(component.preset_names[2]))
+                             ag_test_suite_fdbk_presets.get(wrapper.vm.preset_names[2]))
         ).toEqual(true);
 
-        config_preset_select_input.setValue(component.preset_names[1]);
+        config_preset_select_input.setValue(wrapper.vm.preset_names[1]);
         expect(
             config_is_preset(emitted(wrapper, 'input')[1][0],
-                             ag_test_suite_fdbk_presets.get(component.preset_names[1]))
+                             ag_test_suite_fdbk_presets.get(wrapper.vm.preset_names[1]))
         ).toEqual(true);
 
-        config_preset_select_input.setValue(component.preset_names[0]);
+        config_preset_select_input.setValue(wrapper.vm.preset_names[0]);
         expect(
             config_is_preset(emitted(wrapper, 'input')[2][0],
-                             ag_test_suite_fdbk_presets.get(component.preset_names[0]))
+                             ag_test_suite_fdbk_presets.get(wrapper.vm.preset_names[0]))
         ).toEqual(true);
     });
 
@@ -180,28 +176,27 @@ describe('FeedbackConfigPanel tests', () => {
                 value: public_setup_fdbk_config
             }
         });
-        component = wrapper.vm;
 
-        expect(component.d_configuration).toEqual(public_setup_fdbk_config);
-        expect(component.selected_preset_name).toEqual("Public Setup");
+        expect(wrapper.vm.d_configuration).toEqual(public_setup_fdbk_config);
+        expect(wrapper.vm.selected_preset_name).toEqual("Public Setup");
 
         wrapper.setProps({value: ag_test_suite_default_config});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_configuration).toEqual(ag_test_suite_default_config);
-        expect(component.selected_preset_name).toEqual("Custom");
+        expect(wrapper.vm.d_configuration).toEqual(ag_test_suite_default_config);
+        expect(wrapper.vm.selected_preset_name).toEqual("Custom");
 
         wrapper.setProps({value: pass_fail_setup_fdbk_config});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_configuration).toEqual(pass_fail_setup_fdbk_config);
-        expect(component.selected_preset_name).toEqual("Pass/Fail Setup");
+        expect(wrapper.vm.d_configuration).toEqual(pass_fail_setup_fdbk_config);
+        expect(wrapper.vm.selected_preset_name).toEqual("Pass/Fail Setup");
 
         wrapper.setProps({value: private_setup_fdbk_config});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_configuration).toEqual(private_setup_fdbk_config);
-        expect(component.selected_preset_name).toEqual("Private Setup");
+        expect(wrapper.vm.d_configuration).toEqual(private_setup_fdbk_config);
+        expect(wrapper.vm.selected_preset_name).toEqual("Private Setup");
     });
 
     test('Preset selector hidden when input value is null', async () => {
@@ -211,16 +206,15 @@ describe('FeedbackConfigPanel tests', () => {
                 value: ag_test_suite_normal_feedback_config
             }
         });
-        component = wrapper.vm;
 
-        expect(component.d_configuration).toEqual(ag_test_suite_normal_feedback_config);
-        expect(wrapper.find({ref: 'preset_selection'}).isVisible()).toBe(true);
+        expect(wrapper.vm.d_configuration).toEqual(ag_test_suite_normal_feedback_config);
+        expect(wrapper.find('[data-testid=preset_selection]').element).toBeVisible();
 
         wrapper.setProps({value: null});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_configuration).toEqual(null);
-        expect(wrapper.find({ref: 'preset_selection'}).isVisible()).toBe(false);
+        expect(wrapper.vm.d_configuration).toEqual(null);
+        expect(wrapper.find('[data-testid=preset_selection]').element).not.toBeVisible();
     });
 
     test('Presets not provided, no preset dropdown', async () => {
@@ -230,6 +224,6 @@ describe('FeedbackConfigPanel tests', () => {
             }
         });
 
-        expect(wrapper.find({ref: 'preset_selection'}).isVisible()).toBe(false);
+        expect(wrapper.find('[data-testid=preset_selection]').element).not.toBeVisible();
     });
 });

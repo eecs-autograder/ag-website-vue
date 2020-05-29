@@ -47,25 +47,25 @@ describe('MergeGroups tests', () => {
 
     test('Merge button disabled when less than 2 groups selected', async () => {
         let merge_button = wrapper.find('#merge-groups-button');
-        expect(merge_button.is('[disabled]')).toEqual(true);
+        expect(merge_button.element).toBeDisabled();
 
         wrapper.vm.group_1 = group_1;
         wrapper.vm.group_2 = group_2;
 
         await wrapper.vm.$nextTick();
-        expect(merge_button.is('[disabled]')).toEqual(false);
+        expect(merge_button.element).not.toBeDisabled();
 
         wrapper.vm.group_1 = null;
         await wrapper.vm.$nextTick();
-        expect(merge_button.is('[disabled]')).toEqual(true);
+        expect(merge_button.element).toBeDisabled();
 
         wrapper.vm.group_1 = group_1;
         await wrapper.vm.$nextTick();
-        expect(merge_button.is('[disabled]')).toEqual(false);
+        expect(merge_button.element).not.toBeDisabled();
 
         wrapper.vm.group_2 = null;
         await wrapper.vm.$nextTick();
-        expect(merge_button.is('[disabled]')).toEqual(true);
+        expect(merge_button.element).toBeDisabled();
     });
 
     test('available_groups when both group_1 and group_2 are null', async () => {
@@ -139,7 +139,7 @@ describe('MergeGroups tests', () => {
         wrapper.find('#merge-groups-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(merge_groups_stub.firstCall.thisValue.pk).toEqual(group_2.pk);
         expect(merge_groups_stub.firstCall.calledWith(group_4.pk)).toBe(true);

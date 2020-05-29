@@ -38,31 +38,31 @@ beforeEach(async () => {
 test('Select and edit student from list', async () => {
     sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, users[1].username).resolves({late_days_remaining: 3});
-    wrapper.find({ref: 'lookup'}).vm.$emit('update_item_chosen', users[1].username);
+    wrapper.findComponent({ref: 'lookup'}).vm.$emit('item_selected', users[1].username);
     await wrapper.vm.$nextTick();
 
-    expect(get_validated_input_text(wrapper.find({ref: 'late_days_input'}))).toEqual('3');
-    expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(true);
-    expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
+    expect(get_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}))).toEqual('3');
+    expect(validated_input_is_valid(wrapper.findComponent({ref: 'late_days_input'}))).toBe(true);
+    expect(wrapper.find('[data-testid=save_button]').element).not.toBeDisabled();
 
-    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '  ');
-    expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(false);
-    expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(true);
+    await set_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}), '  ');
+    expect(validated_input_is_valid(wrapper.findComponent({ref: 'late_days_input'}))).toBe(false);
+    expect(wrapper.find('[data-testid=save_button]').element).toBeDisabled();
 
-    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '0');
-    expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(true);
-    expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
+    await set_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}), '0');
+    expect(validated_input_is_valid(wrapper.findComponent({ref: 'late_days_input'}))).toBe(true);
+    expect(wrapper.find('[data-testid=save_button]').element).not.toBeDisabled();
 
-    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '-1');
-    expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(false);
-    expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(true);
+    await set_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}), '-1');
+    expect(validated_input_is_valid(wrapper.findComponent({ref: 'late_days_input'}))).toBe(false);
+    expect(wrapper.find('[data-testid=save_button]').element).toBeDisabled();
 
-    await set_validated_input_text(wrapper.find({ref: 'late_days_input'}), '1');
-    expect(validated_input_is_valid(wrapper.find({ref: 'late_days_input'}))).toBe(true);
-    expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
+    await set_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}), '1');
+    expect(validated_input_is_valid(wrapper.findComponent({ref: 'late_days_input'}))).toBe(true);
+    expect(wrapper.find('[data-testid=save_button]').element).not.toBeDisabled();
 
     let set_late_days_stub = sinon.stub(ag_cli.User, 'set_num_late_days');
-    await wrapper.find({ref: 'late_day_form'}).trigger('submit');
+    await wrapper.findComponent({ref: 'late_day_form'}).trigger('submit');
 
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
     expect(set_late_days_stub.calledOnceWith(course.pk, users[1].username, 1));
@@ -74,15 +74,15 @@ test('Search for student', async () => {
         course.pk, other_username).resolves({late_days_remaining: 2});
     find_by_name<DropdownTypeahead>(
         wrapper, 'DropdownTypeahead').vm.filter_text = '  ' + other_username + '   ';
-    await wrapper.find({ref: 'search_button'}).trigger('click');
+    await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
-    expect(get_validated_input_text(wrapper.find({ref: 'late_days_input'}))).toEqual('2');
+    expect(get_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}))).toEqual('2');
 });
 
 test('Search for empty string does nothing', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days');
-    await wrapper.find({ref: 'search_button'}).trigger('click');
+    await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
     expect(stub.callCount).toEqual(0);
@@ -92,7 +92,7 @@ test('404 handled on search', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, 'steve').rejects(new ag_cli.HttpError(404, ''));
     find_by_name<DropdownTypeahead>(wrapper, 'DropdownTypeahead').vm.filter_text = 'steve';
-    wrapper.find({ref: 'search_button'}).trigger('click');
+    wrapper.find('[data-testid=search_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
@@ -101,8 +101,7 @@ test('404 handled on search', async () => {
     stub.withArgs(
         course.pk, 'stove').resolves({late_days_remaining: 2});
     find_by_name<DropdownTypeahead>(wrapper, 'DropdownTypeahead').vm.filter_text = 'stove';
-    wrapper.find({ref: 'search_button'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
     expect(wrapper.find('.user-not-found').exists()).toBe(false);
@@ -111,13 +110,11 @@ test('404 handled on search', async () => {
 test('API Errors handled on save', async () => {
     sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, users[1].username).resolves({late_days_remaining: 3});
-    wrapper.find({ref: 'lookup'}).vm.$emit('update_item_chosen', users[1].username);
+    wrapper.findComponent({ref: 'lookup'}).vm.$emit('item_selected', users[1].username);
     await wrapper.vm.$nextTick();
 
     sinon.stub(ag_cli.User, 'set_num_late_days').rejects(new ag_cli.HttpError(403, ''));
-    wrapper.find({ref: 'late_day_form'}).trigger('submit');
-
-    await wrapper.vm.$nextTick();
+    await wrapper.findComponent({ref: 'late_day_form'}).trigger('submit');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
     expect(find_by_name<APIErrors>(wrapper, 'APIErrors').vm.d_api_errors.length).toEqual(1);

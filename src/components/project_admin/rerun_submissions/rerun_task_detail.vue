@@ -39,7 +39,7 @@
       </div>
       <div class="modal-button-footer">
         <button type="button"
-                ref="stop_task_button"
+                data-testid="stop_task_button"
                 class="orange-button"
                 :disabled="d_cancelling"
                 @click="cancel_task">

@@ -368,7 +368,7 @@ describe('AGSuitePanel tests', () => {
 
         await set_validated_input_text(new_case_name_input, " ");
         expect(new_case_name_validator.is_valid).toBe(false);
-        expect(wrapper.find('.modal-create-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.modal-create-button').element).toBeDisabled();
     });
 
     test('new_command.name binding', async () => {
@@ -393,9 +393,9 @@ describe('AGSuitePanel tests', () => {
         await wrapper.find('.add-ag-test-command-button').trigger('click');
 
         let new_command_name_input = wrapper.findAllComponents({ref: 'command_name'}).at(0);
-        let new_command_name_validator = <ValidatedInput> wrapper.findAll(
-            {ref: 'command_name'}
-        ).at(0).vm;
+        let new_command_name_validator = <ValidatedInput> wrapper.findAllComponents({
+            ref: 'command_name'
+        }).at(0).vm;
 
         expect(new_command_name_validator.is_valid).toBe(false);
 
@@ -406,9 +406,7 @@ describe('AGSuitePanel tests', () => {
         expect(new_command_name_validator.is_valid).toBe(false);
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find('.modal-create-button').is(
-            '[disabled]'
-        )).toBe(true);
+        expect(wrapper.find('.modal-create-button').element).toBeDisabled();
     });
 
     test('new_command.cmd binding', async () => {
@@ -442,9 +440,7 @@ describe('AGSuitePanel tests', () => {
         expect(new_command_validator.is_valid).toBe(false);
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find('.modal-create-button').is(
-            '[disabled]'
-        )).toBe(true);
+        expect(wrapper.find('.modal-create-button').element).toBeDisabled();
     });
 
     test('Watcher for test_suite', async () => {

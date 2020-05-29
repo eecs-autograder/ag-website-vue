@@ -197,7 +197,7 @@ describe('Dropdown tests', () => {
         await highlighted_item.trigger('click');
 
         expect(dropdown.is_open).toBe(false);
-        expect(emitted(wrapper, 'update_item_selected')[0][0]).toEqual(item_values[0]);
+        expect(emitted(wrapper, 'item_selected')[0][0]).toEqual(item_values[0]);
     });
 
     test('Pressing enter emits the selected item and closes the menu', async () => {
@@ -211,7 +211,7 @@ describe('Dropdown tests', () => {
         await dropdown_container_wrapper.trigger("keydown", {code: "Enter" });
 
         expect(dropdown.is_open).toBe(false);
-        expect(emitted(wrapper, 'update_item_selected')[0][0]).toEqual(item_values[1]);
+        expect(emitted(wrapper, 'item_selected')[0][0]).toEqual(item_values[1]);
     });
 
     test('Blur event closes dropdown', async () => {

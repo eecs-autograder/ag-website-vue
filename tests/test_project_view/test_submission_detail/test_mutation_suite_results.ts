@@ -567,7 +567,9 @@ describe('MutationSuiteResults tests', () => {
         expect(wrapper.vm.submission).toEqual(submission);
         expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.past_limit_submission);
         expect(wrapper.vm.mutation_test_suite_results.length).toEqual(2);
-        expect(wrapper.findAll({ref: 'mutation_test_suite_detail_panel'}).length).toEqual(2);
+        expect(
+            wrapper.findAllComponents({ref: 'mutation_test_suite_detail_panel'}).length
+        ).toEqual(2);
     });
 
     test('mutation_test_suite_results prop receives a different value', async () => {
@@ -577,11 +579,15 @@ describe('MutationSuiteResults tests', () => {
             data_ut.make_mutation_test_suite_result_feedback(3)
         ];
 
-        expect(wrapper.findAll({ref: 'mutation_test_suite_detail_panel'}).length).toEqual(2);
+        expect(
+            wrapper.findAllComponents({ref: 'mutation_test_suite_detail_panel'}).length
+        ).toEqual(2);
 
         wrapper.setProps({mutation_test_suite_results: updated_mutation_test_suite_results});
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({ref: 'mutation_test_suite_detail_panel'}).length).toEqual(3);
+        expect(
+            wrapper.findAllComponents({ref: 'mutation_test_suite_detail_panel'}).length
+        ).toEqual(3);
     });
 });

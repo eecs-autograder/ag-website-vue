@@ -31,7 +31,7 @@
     <div class="form-field-wrapper">
       <label class="label" for="semester"> Semester </label>
       <div>
-        <select ref="semester" v-model="d_form_data.semester" class="select">
+        <select data-testid="semester" v-model="d_form_data.semester" class="select">
           <option v-for="semester of semesters" :value="semester">{{semester}}</option>
         </select>
       </div>

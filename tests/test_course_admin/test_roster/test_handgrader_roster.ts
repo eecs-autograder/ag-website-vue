@@ -75,7 +75,7 @@ describe('HandgraderRoster tests', () => {
 
         let remove_handgraders_stub = sinon.stub(course, 'remove_handgraders');
 
-        wrapper.find({ref: 'handgrader_roster'}).vm.$emit('remove_user', [handgraders[2]]);
+        wrapper.findComponent({ref: 'handgrader_roster'}).vm.$emit('remove_user', [handgraders[2]]);
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 

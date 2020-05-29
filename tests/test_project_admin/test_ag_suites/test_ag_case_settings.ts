@@ -72,12 +72,12 @@ describe('AG test case settings form tests', () => {
         set_validated_input_text(wrapper.findComponent({ref: "name"}), 'Rain');
         await component.$nextTick();
 
-        expect(wrapper.findComponent({ref: 'save_button'}).is('[disabled]')).toBe(false);
+        expect(wrapper.findComponent({ref: 'save_button'}).element).not.toBeDisabled();
 
         set_validated_input_text(wrapper.findComponent({ref: "name"}), ' ');
         await component.$nextTick();
 
-        expect(wrapper.findComponent({ref: 'save_button'}).is('[disabled]')).toBe(true);
+        expect(wrapper.findComponent({ref: 'save_button'}).element).toBeDisabled();
     });
 
     test('save d_ag_case - successful', async () => {

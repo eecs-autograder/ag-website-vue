@@ -56,7 +56,8 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Group members form v-model binding', () => {
-        let edit_group_form = <Wrapper<GroupMembersForm>> wrapper.find({ref: 'edit_group_form'});
+        let edit_group_form
+            = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'edit_group_form'});
         expect(edit_group_form.vm.value).toBe(wrapper.vm.d_group?.member_names);
 
         let new_members = ['wa@luigi.net', 'spam@egg.net'];
@@ -65,20 +66,22 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('bonus_submissions_remaining cannot be a negative number', async () => {
-        let bonus_submissions_validator = <ValidatedInput> wrapper.find(
-            {ref: 'bonus_submissions_remaining_input'}
-        ).vm;
-        set_validated_input_text(wrapper.find({ref: 'bonus_submissions_remaining_input'}), "-4");
+        let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
+            ref: 'bonus_submissions_remaining_input'
+        }).vm;
+        await set_validated_input_text(
+            wrapper.findComponent({ref: 'bonus_submissions_remaining_input'}), "-4");
 
         expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
     test('bonus_submissions_remaining cannot be empty or not a number', async () => {
-        let bonus_submissions_input = wrapper.find({ref: 'bonus_submissions_remaining_input'});
-        let bonus_submissions_validator = <ValidatedInput> wrapper.find(
-            {ref: 'bonus_submissions_remaining_input'}
-        ).vm;
+        let bonus_submissions_input
+            = wrapper.findComponent({ref: 'bonus_submissions_remaining_input'});
+        let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
+            ref: 'bonus_submissions_remaining_input'
+        }).vm;
         set_validated_input_text(bonus_submissions_input, "");
 
         expect(bonus_submissions_validator.is_valid).toBe(false);
@@ -90,8 +93,9 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Clicking extension display opens datetime picker', () => {
-        let extension_display = wrapper.find('#extension');
-        let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
+        let extension_display = wrapper.find('[data-testid=extension]');
+        let picker
+            = <Wrapper<DatetimePicker>> wrapper.findComponent({ref: 'extension_datetime_picker'});
 
         expect(picker.vm.is_visible).toEqual(false);
 
@@ -102,11 +106,12 @@ describe('EditSingleGroup tests', () => {
     test('Revoking and granting extension', async () => {
         expect(wrapper.vm.d_group?.extended_due_date).not.toBeNull();
 
-        let revoke_button = wrapper.find('#revoke-extension');
-        revoke_button.trigger('click');
+        let revoke_button = wrapper.find('[data-testid=revoke_extension]');
+        await revoke_button.trigger('click');
         expect(wrapper.vm.d_group?.extended_due_date).toBeNull();
 
-        let picker = <Wrapper<DatetimePicker>> wrapper.find({ref: 'extension_datetime_picker'});
+        let picker
+            = <Wrapper<DatetimePicker>> wrapper.findComponent({ref: 'extension_datetime_picker'});
         picker.vm.toggle_visibility();
         expect(picker.vm.is_visible).toEqual(true);
 
@@ -127,10 +132,10 @@ describe('EditSingleGroup tests', () => {
             )
         );
 
-        wrapper.find({ref: 'edit_group_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'edit_group_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(save_group_stub.calledOnce);
     });
@@ -138,14 +143,14 @@ describe('EditSingleGroup tests', () => {
     test('Delete group', async () => {
         assert_not_null(wrapper.vm.d_group);
         let delete_group_stub = sinon.stub(wrapper.vm.d_group, 'pseudo_delete');
-        wrapper.find({ref: 'show_delete_modal_button'}).trigger('click');
+        wrapper.get('[data-testid=show_delete_modal_button]').trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'delete_group_button'}).trigger('click');
+        wrapper.get('[data-testid=delete_group_button]').trigger('click');
         await wrapper.vm.$nextTick();
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
 
-        expect(wrapper.find({ref: 'delete_group'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_group'}).exists()).toBe(false);
         expect(delete_group_stub.calledOnce).toBe(true);
     });
 
@@ -153,15 +158,15 @@ describe('EditSingleGroup tests', () => {
         assert_not_null(wrapper.vm.d_group);
         sinon.stub(wrapper.vm.d_group, 'pseudo_delete').rejects(new HttpError(403, ''));
 
-        wrapper.find({ref: 'show_delete_modal_button'}).trigger('click');
+        wrapper.get('[data-testid=show_delete_modal_button]').trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'delete_group_button'}).trigger('click');
+        wrapper.get('[data-testid=delete_group_button]').trigger('click');
         await wrapper.vm.$nextTick();
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'delete_group_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_group_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 

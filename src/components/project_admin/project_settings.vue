@@ -27,7 +27,7 @@
             {{format_datetime(d_project.soft_closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" class="clear-button" ref="clear_soft_closing_time"
+          <button type="button" class="clear-button" data-testid="clear_soft_closing_time"
                   @click.stop="d_project.soft_closing_time = null"
                   :disabled="d_project.soft_closing_time === null">
             <i class="fas fa-times"></i>
@@ -51,7 +51,7 @@
             {{format_datetime(d_project.closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" class="clear-button" ref="clear_closing_time"
+          <button type="button" class="clear-button" data-testid="clear_closing_time"
                   @click.stop="d_project.closing_time = null"
                   :disabled="d_project.closing_time === null">
             <i class="fas fa-times"></i>

@@ -46,30 +46,28 @@ describe('Changing Tabs', ()  => {
 
     test('Settings loaded initially, select another tab and then settings again', async () => {
         expect(
-            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'CourseSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'CourseSettings'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'CourseSettings'}).vm.$props.course).toEqual(course);
 
         let tabs = wrapper.findAll('.nav-link');
-        tabs.at(2).trigger('click');
+        await tabs.at(2).trigger('click');
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'ManageProjects'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'ManageProjects'}).exists())
         ).toBe(true);
         expect(wrapper.vm.current_tab).toEqual('projects');
-        expect(wrapper.find({name: 'ManageProjects'}).isVisible()).toBe(true);
-        expect(wrapper.find({name: 'CourseSettings'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'ManageProjects'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'CourseSettings'}).element).not.toBeVisible();
         expect(router_replace.calledOnce).toBe(true);
 
-        tabs.at(0).trigger('click');
-        expect(
-            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).isVisible())
-        ).toBe(true);
+        await tabs.at(0).trigger('click');
+        expect(wrapper.findComponent({name: 'CourseSettings'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('settings');
         expect(router_replace.secondCall.calledWith(
             {query: {current_tab: 'settings'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'ManageProjects'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'ManageProjects'}).element).not.toBeVisible();
     });
 
     test('Select admin roster', async () => {
@@ -84,7 +82,7 @@ describe('Changing Tabs', ()  => {
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Admin_roster'}}
         )).toBe(true);
-        expect(wrapper.find({name: 'AdminRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'AdminRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select staff roster', async () => {
@@ -99,7 +97,7 @@ describe('Changing Tabs', ()  => {
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Staff_roster'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'StaffRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'StaffRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select student roster', async () => {
@@ -114,7 +112,7 @@ describe('Changing Tabs', ()  => {
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Student_roster'}}
         )).toBe(true);
-        expect(wrapper.find({name: 'StudentRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'StudentRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select handgrader roster', async () => {
@@ -129,7 +127,7 @@ describe('Changing Tabs', ()  => {
         expect(router_replace.firstCall.calledWith(
             { query: { current_tab: 'Handgrader_roster'}}
         )).toBe(true);
-        expect(wrapper.find({name: 'HandgraderRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'HandgraderRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Select manage projects', async () => {
@@ -141,7 +139,7 @@ describe('Changing Tabs', ()  => {
         expect(wrapper.vm.current_tab).toEqual('projects');
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({ query: { current_tab: 'projects'}}));
-        expect(wrapper.find({name: 'ManageProjects'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'ManageProjects'}).vm.$props.course).toEqual(course);
     });
 
     test('Select late days', async () => {
@@ -160,7 +158,7 @@ describe('Changing Tabs', ()  => {
         expect(wrapper.vm.current_tab).toEqual('late_days');
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({ query: { current_tab: 'late_days'}}));
-        expect(wrapper.find({name: 'EditLateDays'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'EditLateDays'}).vm.$props.course).toEqual(course);
     });
 });
 
@@ -172,12 +170,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'CourseSettings'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'CourseSettings'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'CourseSettings'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('settings');
-        expect(wrapper.find({name: 'CourseSettings'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'CourseSettings'}).vm.$props.course).toEqual(course);
     });
 
     test('Admin roster tab', async () => {
@@ -186,12 +184,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'AdminRoster'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'AdminRoster'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'AdminRoster'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'AdminRoster'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('Admin_roster');
-        expect(wrapper.find({name: 'AdminRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'AdminRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Staff roster tab', async () => {
@@ -200,12 +198,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'StaffRoster'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'StaffRoster'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'StaffRoster'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'StaffRoster'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('Staff_roster');
-        expect(wrapper.find({name: 'StaffRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'StaffRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Student roster tab', async () => {
@@ -214,12 +212,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'StudentRoster'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'StudentRoster'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'StudentRoster'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'StudentRoster'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('Student_roster');
-        expect(wrapper.find({name: 'StudentRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'StudentRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Handgrader roster tab', async () => {
@@ -228,12 +226,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'HandgraderRoster'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'HandgraderRoster'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'HandgraderRoster'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgraderRoster'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('Handgrader_roster');
-        expect(wrapper.find({name: 'HandgraderRoster'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'HandgraderRoster'}).vm.$props.course).toEqual(course);
     });
 
     test('Manage projects tab', async () => {
@@ -242,12 +240,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'ManageProjects'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'ManageProjects'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'ManageProjects'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'ManageProjects'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('projects');
-        expect(wrapper.find({name: 'ManageProjects'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'ManageProjects'}).vm.$props.course).toEqual(course);
     });
 
     test('Late days tab', async () => {
@@ -257,12 +255,12 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'EditLateDays'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'EditLateDays'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'EditLateDays'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'EditLateDays'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('late_days');
-        expect(wrapper.find({name: 'EditLateDays'}).vm.$props.course).toEqual(course);
+        expect(wrapper.findComponent({name: 'EditLateDays'}).vm.$props.course).toEqual(course);
     });
 
     test('Late days tab requested, no late days, defaults to settings', async () => {
@@ -271,10 +269,10 @@ describe('Initially selected tab requested in query param', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'CourseSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'CourseSettings'}).exists())
         ).toBe(true);
 
-        expect(wrapper.find({name: 'EditLateDays'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'EditLateDays'}).exists()).toBe(false);
         expect(wrapper.vm.current_tab).toEqual('settings');
     });
 });

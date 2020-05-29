@@ -174,7 +174,7 @@ describe('Create task tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(errors.d_api_errors.length).toEqual(1);
     });
 });

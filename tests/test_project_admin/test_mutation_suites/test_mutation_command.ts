@@ -36,7 +36,7 @@ describe('MutationCommand tests', () => {
     test('command name binding', async () => {
         await set_props(wrapper, {include_command_name_input: true});
 
-        let command_name_input = wrapper.find({ref: 'name'});
+        let command_name_input = wrapper.findComponent({ref: 'name'});
         await set_validated_input_text(command_name_input, 'Tim Hortons');
 
         expect(emitted(wrapper, 'input').length).toEqual(1);
@@ -56,7 +56,7 @@ describe('MutationCommand tests', () => {
     });
 
     test('cmd binding', async () => {
-        let command_input = wrapper.find({ref: 'cmd'});
+        let command_input = wrapper.findComponent({ref: 'cmd'});
 
         await set_validated_input_text(command_input, 'Tim Hortons');
 

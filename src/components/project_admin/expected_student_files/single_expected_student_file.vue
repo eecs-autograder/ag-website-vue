@@ -35,7 +35,7 @@
 
     <div v-if="editing" :class="(editing) ? 'form-editing' : 'form-not-editing'">
       <expected-student-file-form ref="form"
-                                  @on_submit="update_expected_student_file($event)"
+                                  @submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
                                   @on_form_validity_changed="pattern_is_valid = $event">
         <template slot="form_footer">

@@ -104,7 +104,8 @@ describe('InstructorFiles.vue', () => {
         });
 
         let final_upload_button = wrapper.find('.upload-files-button');
-        file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
+        file_upload_component
+            = <FileUpload> wrapper.findComponent({ref: 'instructor_files_upload'}).vm;
         file_upload_component.d_files.insert(file_same_name_as_1);
 
         final_upload_button.trigger('click');
@@ -118,11 +119,11 @@ describe('InstructorFiles.vue', () => {
     test('Re-upload file being viewed, contents updated', async () => {
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Old Content"]));
 
-        await wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        await wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         expect(
             await wait_until(wrapper, w => w.vm.current_filename === instructor_file_1.name)
         ).toBe(true);
-        let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
+        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
         expect(await view_file.vm.file_contents).toEqual('Old Content');
 
         InstructorFile.notify_instructor_file_content_changed(
@@ -133,7 +134,8 @@ describe('InstructorFiles.vue', () => {
 
     test('Upload new instructor file', async () => {
         let final_upload_button = wrapper.find('.upload-files-button');
-        file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
+        file_upload_component
+            = <FileUpload> wrapper.findComponent({ref: 'instructor_files_upload'}).vm;
         file_upload_component.d_files.insert(uniquely_named_file);
 
         let create_stub = sinon.stub(InstructorFile, 'create');
@@ -158,7 +160,8 @@ describe('InstructorFiles.vue', () => {
 
     test('Error uploading instructor file', async () => {
         let final_upload_button = wrapper.find('.upload-files-button');
-        file_upload_component = <FileUpload> wrapper.find({ref: 'instructor_files_upload'}).vm;
+        file_upload_component
+            = <FileUpload> wrapper.findComponent({ref: 'instructor_files_upload'}).vm;
         file_upload_component.d_files.insert(uniquely_named_file);
 
         sinon.stub(InstructorFile, 'create').rejects(
@@ -168,7 +171,7 @@ describe('InstructorFiles.vue', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
@@ -180,15 +183,15 @@ describe('InstructorFiles.vue', () => {
                 return Promise.resolve(new Blob(['Monday']));
             }
         );
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
+        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
         expect(view_file.vm.filename).toEqual(instructor_file_1.name);
         expect(await view_file.vm.file_contents).toEqual('Monday');
 
         sinon.stub(instructor_file_2, 'get_content').resolves(new Blob(["Tuesday"]));
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(1).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(view_file.vm.filename).toEqual(instructor_file_2.name);
@@ -196,7 +199,7 @@ describe('InstructorFiles.vue', () => {
 
         // Check that contents are cached locally
 
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(view_file.vm.filename).toEqual(instructor_file_1.name);
@@ -211,10 +214,10 @@ describe('InstructorFiles.vue', () => {
         let renamed = new InstructorFile(instructor_file_1);
         renamed.name = 'Renamed';
 
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let view_file = <Wrapper<ViewFile>> wrapper.find({name: 'ViewFile'});
+        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
         expect(view_file.vm.filename).toEqual(instructor_file_1.name);
         expect(await view_file.vm.file_contents).toEqual(expected_content);
 
@@ -251,7 +254,7 @@ describe('InstructorFiles.vue', () => {
             return Promise.resolve(new Blob(["File 1 Content"]));
         });
 
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.current_filename).toBe(instructor_file_1.name);
 
@@ -259,7 +262,7 @@ describe('InstructorFiles.vue', () => {
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1)
         );
 
-        let file_to_delete = wrapper.findAll({name: 'SingleInstructorFile'}).at(0);
+        let file_to_delete = wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0);
         file_to_delete.find('.delete-file').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -272,7 +275,7 @@ describe('InstructorFiles.vue', () => {
         // the cached contents should have been cleared.
         expect(get_content_stub.calledOnce).toBe(true);
         InstructorFile.notify_instructor_file_created(instructor_file_1);
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(get_content_stub.calledTwice).toBe(true);
     });
@@ -280,12 +283,12 @@ describe('InstructorFiles.vue', () => {
     test('Open/close the sidebar', async () => {
         let sidebar_header = wrapper.find('.sidebar-header');
         expect(wrapper.vm.d_collapsed).toBe(false);
-        expect(wrapper.find('.sidebar-content').isVisible()).toBe(true);
+        expect(wrapper.find('.sidebar-content').element).toBeVisible();
         expect(sidebar_header.text().includes('Uploaded Files')).toBe(true);
 
         // Header text still shows up if we haven't selected a file
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Monday"]));
-        wrapper.findAll({name: 'SingleInstructorFile'}).at(0).trigger('click');
+        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.find('.collapse-show-button').trigger('click');
@@ -299,7 +302,7 @@ describe('InstructorFiles.vue', () => {
         wrapper.find('.collapse-show-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_collapsed).toBe(false);
-        expect(wrapper.find('.sidebar-content').isVisible()).toBe(true);
+        expect(wrapper.find('.sidebar-content').element).toBeVisible();
         expect(sidebar_header.text().includes('Uploaded Files')).toBe(true);
     });
 });

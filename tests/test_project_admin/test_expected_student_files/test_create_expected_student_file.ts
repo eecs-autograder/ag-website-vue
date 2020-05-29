@@ -60,12 +60,12 @@ describe('CreateExpectedStudentFile tests', () => {
 
     test('Successful creation of a file', async () => {
         let create_stub = sinon.stub(ExpectedStudentFile, 'create');
-        let form_wrapper = wrapper.find({ref: 'form'});
+        let form_wrapper = wrapper.findComponent({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
         await component.$nextTick();
 
-        wrapper.find('#expected-student-file-form').trigger('submit');
+        wrapper.findComponent({ref: 'form'}).trigger('submit');
         await component.$nextTick();
 
         expect(create_stub.getCall(0).args[0]).toEqual(project_1.pk);
@@ -78,7 +78,7 @@ describe('CreateExpectedStudentFile tests', () => {
     });
 
     test('Unsuccessful creation of a file - name is not unique', async () => {
-        let form_wrapper = wrapper.find({ref: 'form'});
+        let form_wrapper = wrapper.findComponent({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
         await component.$nextTick();
@@ -86,22 +86,22 @@ describe('CreateExpectedStudentFile tests', () => {
         sinon.stub(ExpectedStudentFile, 'create').rejects(
             new HttpError(400, {__all__: "File with this name already exists in project"})
         );
-        wrapper.find('#expected-student-file-form').trigger('submit');
+        wrapper.findComponent({ref: 'form'}).trigger('submit');
         await component.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
     });
 
     test("The 'create' button is disabled when an input value is invalid", async () => {
         expect(component.project).toEqual(project_1);
 
-        let form_wrapper = wrapper.find({ref: 'form'});
+        let form_wrapper = wrapper.findComponent({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "   ";
         await component.$nextTick();
 
-        expect(wrapper.find('.add-file-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.add-file-button').element).toBeDisabled();
         expect(component.pattern_is_valid).toBe(false);
     });
 });

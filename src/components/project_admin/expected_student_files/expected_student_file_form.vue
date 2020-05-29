@@ -1,68 +1,65 @@
 <template>
-  <div id="expected-student-file-form-component">
-    <validated-form id="expected-student-file-form"
-                    ref="expected_student_file_form"
-                    autocomplete="off"
-                    spellcheck="false"
-                    @submit="submit_form"
-                    @form_validity_changed="$emit('on_form_validity_changed', $event)">
+  <validated-form ref="expected_student_file_form"
+                  autocomplete="off"
+                  spellcheck="false"
+                  @submit="submit_form"
+                  @form_validity_changed="$emit('on_form_validity_changed', $event)">
 
+    <div class="input-wrapper">
+      <label class="input-label"> Filename </label>
+      <validated-input ref='pattern'
+                        v-model="d_expected_student_file.pattern"
+                        :validators="[is_not_empty]"
+                        input_style="border-width: 1px; margin-top: 4px;">
+      </validated-input>
+    </div>
+
+    <div class="exact-match-container">
+      <div class="radio-input">
+        <input ref="exact_match_button"
+                type="radio"
+                data-testid="exact_match_button"
+                :disabled="wildcard_is_present"
+                :value="true"
+                v-model="d_exact_match">
+        <label class="exact-match-label"> Exact Match </label>
+      </div>
+      <div class="radio-input">
+        <input ref="not_exact_match_button"
+                type="radio"
+                data-testid="not_exact_match_button"
+                :value="false"
+                v-model="d_exact_match">
+        <label class="wildcard-label"> Shell Wildcard </label>
+      </div>
+    </div>
+
+    <div v-if="!d_exact_match || wildcard_is_present"
+          class="min-max-container">
       <div class="input-wrapper">
-        <label class="input-label"> Filename </label>
-        <validated-input ref='pattern'
-                         v-model="d_expected_student_file.pattern"
-                         :validators="[is_not_empty]"
-                         input_style="border-width: 1px; margin-top: 4px;">
+        <label class="input-label"> Minimum number of matches </label>
+        <validated-input ref='min_num_matches'
+                          v-model="d_expected_student_file.min_num_matches"
+                          :validators="[is_not_empty,
+                                        is_number,
+                                        is_non_negative]"
+                          input_style="width: 75px; border-width: 1px; margin-top: 4px;">
         </validated-input>
       </div>
 
-      <div class="exact-match-container">
-        <div class="radio-input">
-          <input ref="exact_match_button"
-                 type="radio"
-                 id="exact-match-button"
-                 :disabled="wildcard_is_present"
-                 :value="true"
-                 v-model="d_exact_match">
-          <label class="exact-match-label"> Exact Match </label>
-        </div>
-        <div class="radio-input">
-          <input ref="not_exact_match_button"
-                 type="radio"
-                 id="not-exact-match-button"
-                 :value="false"
-                 v-model="d_exact_match">
-          <label class="wildcard-label"> Shell Wildcard </label>
-        </div>
+      <div class="input-wrapper">
+        <label class="input-label"> Maximum number of matches </label>
+        <validated-input ref='max_num_matches'
+                          v-model="d_expected_student_file.max_num_matches"
+                          :validators="[is_not_empty,
+                                        is_number]"
+                          input_style="width: 75px; border-width: 1px; margin-top: 4px;">
+        </validated-input>
       </div>
+    </div>
 
-      <div v-if="!d_exact_match || wildcard_is_present"
-           class="min-max-container">
-        <div class="input-wrapper">
-          <label class="input-label"> Minimum number of matches </label>
-          <validated-input ref='min_num_matches'
-                           v-model="d_expected_student_file.min_num_matches"
-                           :validators="[is_not_empty,
-                                         is_number,
-                                         is_non_negative]"
-                           input_style="width: 75px; border-width: 1px; margin-top: 4px;">
-          </validated-input>
-        </div>
-
-        <div class="input-wrapper">
-          <label class="input-label"> Maximum number of matches </label>
-          <validated-input ref='max_num_matches'
-                           v-model="d_expected_student_file.max_num_matches"
-                           :validators="[is_not_empty,
-                                         is_number]"
-                           input_style="width: 75px; border-width: 1px; margin-top: 4px;">
-          </validated-input>
-        </div>
-      </div>
-
-      <slot name="form_footer"></slot>
-    </validated-form>
-  </div>
+    <slot name="form_footer"></slot>
+  </validated-form>
 </template>
 
 <script lang="ts">
@@ -130,7 +127,7 @@ export default class ExpectedStudentFileForm extends Vue {
       this.d_expected_student_file.min_num_matches = 1;
       this.d_expected_student_file.max_num_matches = 1;
     }
-    this.$emit('on_submit', this.d_expected_student_file);
+    this.$emit('submit', this.d_expected_student_file);
   }
 
   reset() {
@@ -141,13 +138,6 @@ export default class ExpectedStudentFileForm extends Vue {
 </script>
 
 <style scoped lang="scss">
-
-#create-expected-student-file-component {
-  border-radius: 2px;
-  box-sizing: border-box;
-  margin-bottom: 12px;
-  width: 100%;
-}
 
 .radio-input {
   display: inline-block;

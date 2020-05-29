@@ -718,7 +718,7 @@ describe('case_result_output_correctness tests', () => {
 });
 
 function get_setup_result_panel(wrapper: Wrapper<AGSuiteResult>) {
-    return <ResultPanel> wrapper.find({ref: 'setup_result_panel'}).vm;
+    return <ResultPanel> wrapper.findComponent({ref: 'setup_result_panel'}).vm;
 }
 
 describe('setup_correctness_level tests', () => {
@@ -727,7 +727,7 @@ describe('setup_correctness_level tests', () => {
         ag_test_suite_result.setup_return_code = 0;
 
         let wrapper = make_wrapper(false);
-        expect(wrapper.find({ref: 'setup_result_panel'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_result_panel'}).exists()).toBe(false);
     });
 
     test('setup_name not null, return code and time out null, info_only', () => {
@@ -811,7 +811,7 @@ describe('Setup panel open initially tests', () => {
 
 describe('First failed test case result panel open initially tests', () => {
     function get_test_result_panel(wrapper: Wrapper<AGSuiteResult>, index: number) {
-        return <ResultPanel> wrapper.findAll({ref: 'test_result_panel'}).at(index).vm;
+        return <ResultPanel> wrapper.findAllComponents({ref: 'test_result_panel'}).at(index).vm;
     }
 
     let case_1: ag_cli.AGTestCaseResultFeedback;

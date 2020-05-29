@@ -28,7 +28,7 @@ test('Member names shown', async () => {
 
     expect(wrapper.findAll('.header-cell').length).toEqual(1);
 
-    let members = wrapper.findAll({ref: 'member_name'});
+    let members = wrapper.findAllComponents({ref: 'member_name'});
     expect(members.at(0).text()).toEqual(group.member_names[0]);
     expect(members.at(1).text()).toEqual(group.member_names[1]);
     expect(members.at(2).text()).toEqual(group.member_names[2]);
@@ -58,7 +58,7 @@ test('Late days shown and updated on group change', async () => {
     await wait_fixed(wrapper, 4);
     expect(wrapper.findAll('.header-cell').length).toEqual(2);
 
-    let totals = wrapper.findAll({ref: 'late_days'});
+    let totals = wrapper.findAllComponents({ref: 'late_days'});
     expect(totals.length).toEqual(3);
     expect(totals.at(0).text()).toEqual('1');
     expect(totals.at(1).text()).toEqual('0');
@@ -71,7 +71,7 @@ test('Late days shown and updated on group change', async () => {
 
     wrapper.setProps({group: new_group});
     await wrapper.vm.$nextTick();
-    totals = wrapper.findAll({ref: 'late_days'});
+    totals = wrapper.findAllComponents({ref: 'late_days'});
     expect(totals.at(0).text()).toEqual('10');
     expect(totals.length).toEqual(1);
 });
@@ -87,7 +87,7 @@ test('Course has no late days, late days not shown', async () => {
 
     await wait_fixed(wrapper, 4);
     expect(wrapper.findAll('.header-cell').length).toEqual(1);
-    expect(wrapper.find({ref: 'late_days'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'late_days'}).exists()).toBe(false);
 });
 
 test('Course has late days but include_late_days_false, late days not shown', async () => {
@@ -101,5 +101,5 @@ test('Course has late days but include_late_days_false, late days not shown', as
 
     await wait_fixed(wrapper, 4);
     expect(wrapper.findAll('.header-cell').length).toEqual(1);
-    expect(wrapper.find({ref: 'late_days'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'late_days'}).exists()).toBe(false);
 });

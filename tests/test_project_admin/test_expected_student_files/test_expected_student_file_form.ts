@@ -50,12 +50,12 @@ describe('Valid form submit tests', () => {
 
     test('Submit without wildcard present and exact match set to true', async () => {
         await set_data(wrapper, {d_expected_student_file: {pattern: "tomato.cpp"}});
-        await wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'expected_student_file_form'}).trigger('submit');
 
-        expect(emitted(wrapper, 'on_submit').length).toEqual(1);
-        expect(emitted(wrapper, 'on_submit')[0][0].pattern).toEqual("tomato.cpp");
-        expect(emitted(wrapper, 'on_submit')[0][0].min_num_matches).toEqual(1);
-        expect(emitted(wrapper, 'on_submit')[0][0].max_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'submit').length).toEqual(1);
+        expect(emitted(wrapper, 'submit')[0][0].pattern).toEqual("tomato.cpp");
+        expect(emitted(wrapper, 'submit')[0][0].min_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'submit')[0][0].max_num_matches).toEqual(1);
     });
 
     test('Submit without wildcard present and exact match set to false', async () => {
@@ -63,12 +63,12 @@ describe('Valid form submit tests', () => {
             d_exact_match: false,
             d_expected_student_file: {pattern: "cabbage.cpp"}
         });
-        await wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'expected_student_file_form'}).trigger('submit');
 
-        expect(emitted(wrapper, 'on_submit').length).toEqual(1);
-        expect(emitted(wrapper, 'on_submit')[0][0].pattern).toEqual("cabbage.cpp");
-        expect(emitted(wrapper, 'on_submit')[0][0].min_num_matches).toEqual(1);
-        expect(emitted(wrapper, 'on_submit')[0][0].max_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'submit').length).toEqual(1);
+        expect(emitted(wrapper, 'submit')[0][0].pattern).toEqual("cabbage.cpp");
+        expect(emitted(wrapper, 'submit')[0][0].min_num_matches).toEqual(1);
+        expect(emitted(wrapper, 'submit')[0][0].max_num_matches).toEqual(1);
     });
 
     test('Submit with wildcard present', async () => {
@@ -80,12 +80,12 @@ describe('Valid form submit tests', () => {
                 max_num_matches: 5,
             }
         });
-        await wrapper.find({ref: 'expected_student_file_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'expected_student_file_form'}).trigger('submit');
 
-        expect(emitted(wrapper, 'on_submit').length).toEqual(1);
-        expect(emitted(wrapper, 'on_submit')[0][0].pattern).toEqual("yellow_pepper_*.cpp");
-        expect(emitted(wrapper, 'on_submit')[0][0].min_num_matches).toEqual(3);
-        expect(emitted(wrapper, 'on_submit')[0][0].max_num_matches).toEqual(5);
+        expect(emitted(wrapper, 'submit').length).toEqual(1);
+        expect(emitted(wrapper, 'submit')[0][0].pattern).toEqual("yellow_pepper_*.cpp");
+        expect(emitted(wrapper, 'submit')[0][0].min_num_matches).toEqual(3);
+        expect(emitted(wrapper, 'submit')[0][0].max_num_matches).toEqual(5);
     });
 });
 
@@ -110,13 +110,13 @@ describe('Wildcard chars present and exact_match setting', () => {
     test('exact_match set to false overrides wildcard_is_present', async () => {
         expect(wrapper.vm.wildcard_is_present).toBe(false);
         expect(wrapper.vm.d_exact_match).toBe(true);
-        expect(wrapper.find('#exact-match-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('[data-testid=exact_match_button]').element).not.toBeDisabled();
 
         await set_data(wrapper, {d_expected_student_file: {pattern: "zucch!ni.cpp"}});
 
         expect(wrapper.vm.wildcard_is_present).toBe(true);
         expect(wrapper.vm.d_exact_match).toBe(false);
-        expect(wrapper.find('#exact-match-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('[data-testid=exact_match_button]').element).toBeDisabled();
     });
 
     test('min_ and max_num_matches editable when wildcard chars present', async () => {
@@ -152,8 +152,8 @@ describe('Invalid input tests', () => {
     });
 
     test('Error pattern is blank', async () => {
-        let pattern_input = wrapper.find({ref: "pattern"});
-        let pattern_validator = <ValidatedInput> wrapper.find({ref: "pattern" }).vm;
+        let pattern_input = wrapper.findComponent({ref: "pattern"});
+        let pattern_validator = <ValidatedInput> wrapper.findComponent({ref: "pattern" }).vm;
 
         await set_validated_input_text(pattern_input, "hello*");
         expect(pattern_validator.is_valid).toBe(true);
@@ -178,11 +178,10 @@ describe('Invalid input tests', () => {
     test('Error min_num_matches is negative', async () => {
         await set_data(wrapper, {d_exact_match: false});
 
-        let min_num_matches_validator = <ValidatedInput> wrapper.find(
-            {ref: "min_num_matches" }
-        ).vm;
+        let min_num_matches_validator
+            = <ValidatedInput> wrapper.findComponent({ref: "min_num_matches" }).vm;
 
-        await set_validated_input_text(wrapper.find({ref: "min_num_matches"}), "-2");
+        await set_validated_input_text(wrapper.findComponent({ref: "min_num_matches"}), "-2");
         expect(min_num_matches_validator.is_valid).toBe(false);
     });
 

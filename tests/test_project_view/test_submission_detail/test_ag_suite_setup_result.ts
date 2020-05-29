@@ -98,11 +98,11 @@ describe('Setup output tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        let stdout_viewer = <ViewFile> wrapper.find({ref: 'setup_stdout'}).vm;
+        let stdout_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stdout'}).vm;
         expect(await stdout_viewer.file_contents).toEqual(stdout_content);
         expect(stdout_viewer.progress).not.toBeNull();
 
-        expect(wrapper.find({ref: 'setup_stderr'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_stderr'}).exists()).toBe(false);
     });
 
     test('Setup stderr available', async () => {
@@ -115,11 +115,11 @@ describe('Setup output tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        let stderr_viewer = <ViewFile> wrapper.find({ref: 'setup_stderr'}).vm;
+        let stderr_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stderr'}).vm;
         expect(await stderr_viewer.file_contents).toEqual(stderr_content);
         expect(stderr_viewer.progress).not.toBeNull();
 
-        expect(wrapper.find({ref: 'setup_stdout'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_stdout'}).exists()).toBe(false);
     });
 
     test('Setup stdout and stderr available', async () => {
@@ -136,11 +136,11 @@ describe('Setup output tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        let stdout_viewer = <ViewFile> wrapper.find({ref: 'setup_stdout'}).vm;
+        let stdout_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stdout'}).vm;
         expect(await stdout_viewer.file_contents).toEqual(stdout_content);
         expect(stdout_viewer.progress).not.toBeNull();
 
-        let stderr_viewer = <ViewFile> wrapper.find({ref: 'setup_stderr'}).vm;
+        let stderr_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stderr'}).vm;
         expect(await stderr_viewer.file_contents).toEqual(stderr_content);
         expect(stderr_viewer.progress).not.toBeNull();
     });
@@ -151,11 +151,11 @@ describe('Setup output tests', () => {
         let wrapper = await make_wrapper();
         await wait_fixed(wrapper, 5);
 
-        expect(wrapper.find({ref: 'setup_stderr_section'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_stderr_section'}).exists()).toBe(false);
         expect(
-            wrapper.find({ref: 'setup_stdout_section'}).find('.short-output').text()
+            wrapper.findComponent({ref: 'setup_stdout_section'}).find('.short-output').text()
         ).toEqual('No output');
-        expect(wrapper.find({ref: 'setup_stdout'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_stdout'}).exists()).toBe(false);
     });
 
     test('Setup stderr empty', async () => {
@@ -164,11 +164,11 @@ describe('Setup output tests', () => {
         let wrapper = await make_wrapper();
         await wait_fixed(wrapper, 5);
 
-        expect(wrapper.find({ref: 'setup_stdout_section'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_stdout_section'}).exists()).toBe(false);
         expect(
-            wrapper.find({ref: 'setup_stderr_section'}).find('.short-output').text()
+            wrapper.findComponent({ref: 'setup_stderr_section'}).find('.short-output').text()
         ).toEqual('No output');
-        expect(wrapper.find({ref: 'setup_stderr'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'setup_stderr'}).exists()).toBe(false);
     });
 });
 

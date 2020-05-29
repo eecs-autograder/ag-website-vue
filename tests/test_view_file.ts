@@ -282,8 +282,8 @@ describe('ViewFile handgrading tests', () => {
             );
 
             expect(
-                wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()
-            ).toBe(false);
+                wrapper.findComponent({ref: 'handgrading_context_menu'}).element
+            ).not.toBeVisible();
             expect(wrapper.vm.d_first_highlighted_line).toBeNull();
             expect(wrapper.vm.d_last_highlighted_line).toBeNull();
         });
@@ -328,8 +328,8 @@ describe('ViewFile handgrading tests', () => {
             );
 
             expect(
-                wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()
-            ).toBe(false);
+                wrapper.findComponent({ref: 'handgrading_context_menu'}).element
+            ).not.toBeVisible();
             expect(wrapper.vm.d_first_highlighted_line).toBeNull();
             expect(wrapper.vm.d_last_highlighted_line).toBeNull();
         });
@@ -489,7 +489,7 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
-        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).element).toBeVisible();
 
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
@@ -561,7 +561,7 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).element).toBeVisible();
         expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).text()).toEqual('');
     });
 });

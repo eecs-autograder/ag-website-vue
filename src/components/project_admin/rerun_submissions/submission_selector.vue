@@ -18,15 +18,15 @@
       </div>
       <div v-else class="selector-body">
         <div class="button-footer">
-          <button ref="select_all_button" class="white-button" @click="select_all">
+          <button data-testid="select_all_button" class="white-button" @click="select_all">
             <i class="far fa-check-square"></i>
             Select All
           </button>
-          <button ref="clear_all_button" class="white-button" @click="clear_all">
+          <button data-testid="clear_all_button" class="white-button" @click="clear_all">
             <i class="far fa-square"></i>
             Clear All
           </button>
-          <button ref="remove_group_button"
+          <button data-testid="remove_group_button"
                   class="white-button"
                   @click="$emit('remove_group', group)">
             <i class="fas fa-times"></i>

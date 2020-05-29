@@ -16,7 +16,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -71,7 +71,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -118,7 +118,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -159,7 +159,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -250,7 +250,7 @@ describe('DropdownTypeahead.vue', () => {
               placeholder_text="Enter a State"
               :choices="states"
               :filter_fn="states_filter_fn"
-              @update_item_chosen="add_item($event)">
+              @item_selected="add_item($event)">
               <template slot-scope="{ item }">
                 <span> {{ item.state }}</span>
               </template>
@@ -319,7 +319,7 @@ describe('DropdownTypeahead.vue', () => {
                               placeholder_text="Enter a Name"
                               :choices="strangers"
                               :filter_fn="stranger_things_filter_fn"
-                              @update_item_chosen="add_item($event)">
+                              @item_selected="add_item($event)">
               <template slot-scope="{ item }">
                 <span> {{ item.first_name }} {{ item.last_name}}</span>
               </template>
@@ -413,7 +413,7 @@ describe('DropdownTypeahead.vue', () => {
                           placeholder_text="Enter a Name"
                           :choices="strangers"
                           :filter_fn="stranger_things_filter_fn"
-                          @update_item_chosen="add_item($event)">
+                          @item_selected="add_item($event)">
           <template slot-scope="{ item }">
             <span> {{ item.first_name }} {{ item.last_name}}</span>
           </template>
@@ -497,7 +497,7 @@ describe('DropdownTypeahead.vue', () => {
                           placeholder_text="Enter a Name"
                           :choices="strangers"
                           :filter_fn="stranger_things_filter_fn"
-                          @update_item_chosen="add_item($event)">
+                          @item_selected="add_item($event)">
                         </dropdown-typeahead>
                       </div>`,
             components: {
@@ -560,7 +560,7 @@ describe('DropdownTypeahead.vue', () => {
                       placeholder_text="Enter a Name"
                       :choices="strangers"
                       :filter_fn="stranger_things_filter_fn"
-                      @update_item_chosen="add_item($event)">
+                      @item_selected="add_item($event)">
                     </dropdown-typeahead>
                   </div>`,
             components: {
@@ -616,7 +616,7 @@ describe('DropdownTypeahead.vue', () => {
                           <dropdown-typeahead ref="dropdown_typeahead"
                             placeholder_text="Enter a Season"
                             :choices="seasons"
-                            @update_item_chosen="add_item_3($event)"
+                            @item_selected="add_item_3($event)"
                             :filter_fn="seasons_filter_fn">
                             <template slot="no_matching_results">
                               No Matching Results

@@ -64,9 +64,9 @@ describe('Modal.vue', () => {
         wrapper.setData({show_modal: true});
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
-        expect(wrapper.find('.modal-mask').isVisible()).toBe(true);
-        expect(wrapper.find('.modal-container').isVisible()).toBe(true);
-        expect(wrapper.find('.close-button').isVisible()).toBe(true);
+        expect(wrapper.find('.modal-mask').element).toBeVisible();
+        expect(wrapper.find('.modal-container').element).toBeVisible();
+        expect(wrapper.find('.close-button').element).toBeVisible();
     });
 
     test('Modal emits "close" on click of x when include_closing_x is true', async () => {

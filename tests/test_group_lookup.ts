@@ -69,7 +69,7 @@ describe('GroupLookup tests', () => {
             = <DropdownTypeahead> wrapper.findComponent({ref: 'group_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual(groups);
 
-        dropdown_typeahead.$emit('update_item_chosen', groups[3]);
+        dropdown_typeahead.$emit('item_selected', groups[3]);
 
         expect(emitted(wrapper, 'update_group_selected').length).toEqual(1);
         expect(emitted(wrapper, 'update_group_selected')[0][0]).toEqual(groups[3]);

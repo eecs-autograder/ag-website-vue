@@ -2,7 +2,7 @@
   <div class="dropdown-typeahead-container">
     <Dropdown ref="dropdown_component"
               :items="filtered_choices"
-              @update_item_selected="$emit('update_item_chosen', $event)">
+              @item_selected="$emit('item_selected', $event)">
       <template slot="header">
         <input :class="typeahead_class"
                type=text

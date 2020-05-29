@@ -121,7 +121,7 @@ describe('Save annotation tests', () => {
         wrapper.setProps({annotation: new_input});
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_annotation_form_is_valid).toEqual(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toEqual(true);
+        expect(wrapper.find('.save-button').element).toBeDisabled();
     });
 
     test('API error', async () => {

@@ -92,7 +92,7 @@ describe('MutationSuites tests', () => {
 
     test('Update mutation test suites order', async () => {
         let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
-        wrapper.find({ref: 'mutation_test_suite_order'}).vm.$emit('change');
+        wrapper.findComponent({ref: 'mutation_test_suite_order'}).vm.$emit('change');
         await wrapper.vm.$nextTick();
         expect(
             order_stub.calledOnceWith(project.pk, [
@@ -129,9 +129,8 @@ describe('MutationSuites tests', () => {
 
         expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("");
 
-        let d_new_mutation_test_suite_name_input = wrapper.find(
-            {ref: 'new_mutation_test_suite_name'}
-        );
+        let d_new_mutation_test_suite_name_input
+            = wrapper.findComponent({ref: 'new_mutation_test_suite_name'});
         set_validated_input_text(d_new_mutation_test_suite_name_input, "Suite I");
         expect(validated_input_is_valid(d_new_mutation_test_suite_name_input)).toBe(true);
         expect(wrapper.vm.d_new_mutation_test_suite_name).toEqual("Suite I");
@@ -144,9 +143,7 @@ describe('MutationSuites tests', () => {
     test('add mutation_test_suite - successful', async () => {
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
         expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'new_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(false);
 
         let new_mutation_suite = data_ut.make_mutation_test_suite(project.pk);
         let create_stub = sinon.stub(MutationTestSuite, 'create').returns(
@@ -163,13 +160,10 @@ describe('MutationSuites tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(true);
-        expect(wrapper.find(
-            {ref: 'new_mutation_test_suite_modal'}
-        ).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(true);
 
-        let d_new_mutation_test_suite_name_input = wrapper.find(
-            {ref: 'new_mutation_test_suite_name'}
-        );
+        let d_new_mutation_test_suite_name_input
+            = wrapper.findComponent({ref: 'new_mutation_test_suite_name'});
 
         set_validated_input_text(d_new_mutation_test_suite_name_input, "Suite 4");
         expect(validated_input_is_valid(d_new_mutation_test_suite_name_input)).toBe(true);
@@ -183,9 +177,7 @@ describe('MutationSuites tests', () => {
         expect(create_stub.firstCall.calledWith(project.pk, {name: "Suite 4"})).toBe(true);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(4);
         expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'new_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(false);
     });
 
     test('add mutation_test_suite - unsuccessful', async () => {
@@ -198,21 +190,16 @@ describe('MutationSuites tests', () => {
             )
         );
         expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'new_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(false);
 
         wrapper.find('#add-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(true);
-        expect(wrapper.find(
-            {ref: 'new_mutation_test_suite_modal'}
-        ).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(true);
 
-        let d_new_mutation_test_suite_name_input = wrapper.find(
-            {ref: 'new_mutation_test_suite_name'}
-        );
+        let d_new_mutation_test_suite_name_input
+            = wrapper.findComponent({ref: 'new_mutation_test_suite_name'});
 
         set_validated_input_text(d_new_mutation_test_suite_name_input, "Suite 2");
         expect(validated_input_is_valid(d_new_mutation_test_suite_name_input)).toBe(true);
@@ -225,11 +212,9 @@ describe('MutationSuites tests', () => {
         expect(create_stub.firstCall.calledWith(project.pk, {name: "Suite 2"})).toBe(true);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
         expect(wrapper.vm.d_show_new_mutation_test_suite_modal).toBe(true);
-        expect(wrapper.find(
-            {ref: 'new_mutation_test_suite_modal'}
-        ).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
@@ -240,7 +225,7 @@ describe('MutationSuites tests', () => {
         let save_stub = sinon.stub(wrapper.vm.d_active_mutation_test_suite!, 'save');
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').element).not.toBeDisabled();
 
         wrapper.find('#mutation-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
@@ -263,12 +248,12 @@ describe('MutationSuites tests', () => {
         );
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('.save-button').element).not.toBeDisabled();
 
         wrapper.find('#mutation-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(save_stub.callCount).toEqual(1);
     });
@@ -288,17 +273,17 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
         expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'delete_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'delete_mutation_test_suite_modal'}).exists()
+        ).toBe(false);
 
         wrapper.find('.delete-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(true);
-        expect(wrapper.find(
-            {ref: 'delete_mutation_test_suite_modal'}
-        ).exists()).toBe(true);
+        expect(
+            wrapper.findComponent({ref: 'delete_mutation_test_suite_modal'}).exists()
+        ).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -309,9 +294,9 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_mutation_test_suites[1]).toEqual(mutation_test_suite_3);
         expect(wrapper.vm.d_active_mutation_test_suite).toBeNull();
         expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'delete_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'delete_mutation_test_suite_modal'}).exists()
+        ).toBe(false);
     });
 
     test('delete_mutation_test_suite - cancel deletion', async () => {
@@ -323,17 +308,17 @@ describe('MutationSuites tests', () => {
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
         expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'delete_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'delete_mutation_test_suite_modal'}).exists()
+        ).toBe(false);
 
         wrapper.find('.delete-mutation-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(true);
-        expect(wrapper.find(
-            {ref: 'delete_mutation_test_suite_modal'}
-        ).exists()).toBe(true);
+        expect(
+            wrapper.findComponent({ref: 'delete_mutation_test_suite_modal'}).exists()
+        ).toBe(true);
 
         wrapper.find('.modal-cancel-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -341,9 +326,9 @@ describe('MutationSuites tests', () => {
         expect(delete_stub.callCount).toEqual(0);
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
         expect(wrapper.vm.d_show_delete_mutation_test_suite_modal).toBe(false);
-        expect(wrapper.find(
-            {ref: 'delete_mutation_test_suite_modal'}
-        ).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'delete_mutation_test_suite_modal'}).exists()
+        ).toBe(false);
     });
 
     test('API errors handled on delete', async () => {
@@ -359,7 +344,7 @@ describe('MutationSuites tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        let errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
         expect(errors.d_api_errors.length).toEqual(1);
     });
 
@@ -485,7 +470,7 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.visible
         ).toBe(true);
 
-        wrapper.find({ref: 'past_limit_edit_feedback_settings'}).find(
+        wrapper.findComponent({ref: 'past_limit_edit_feedback_settings'}).find(
             '.advanced-settings-label'
         ).trigger('click');
 

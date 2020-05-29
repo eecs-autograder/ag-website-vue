@@ -30,7 +30,7 @@
         <div class="danger-text">Reset Handgrading Result</div>
         <button type="button"
                 class="delete-button"
-                ref="show_reset_handgrading_modal_button"
+                data-testid="show_reset_handgrading_modal_button"
                 @click="d_show_reset_handgrading_modal = true">
           Reset
         </button>
@@ -51,7 +51,7 @@
         <div class="modal-button-footer">
           <button type="button"
                   class="red-button"
-                  ref="reset_handgrading_button"
+                  data-testid="reset_handgrading_button"
                   :disabled="d_resetting"
                   @click="reset_handgrading">
             Reset

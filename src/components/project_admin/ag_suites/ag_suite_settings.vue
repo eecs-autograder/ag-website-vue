@@ -1,9 +1,9 @@
 <template>
-  <div id="ag-test-suite-settings-component" v-if="d_ag_test_suite !== null">
+  <div v-if="d_ag_test_suite !== null">
     <div v-if="!d_loading">
       <!------------------------ Suite Settings ------------------------------------->
 
-      <validated-form id="ag-test-suite-settings-form"
+      <validated-form data-testid="ag_test_suite_settings_form"
                       autocomplete="off"
                       spellcheck="false"
                       @submit="save_ag_test_suite_settings"

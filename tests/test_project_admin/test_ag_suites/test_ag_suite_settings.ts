@@ -93,7 +93,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('setup_suite_cmd_name binding', async () => {
-        let setup_suite_cmd_name_input = wrapper.find({ref: 'setup_suite_cmd_name'});
+        let setup_suite_cmd_name_input = wrapper.findComponent({ref: 'setup_suite_cmd_name'});
         await set_validated_input_text(setup_suite_cmd_name_input, 'sunflower');
 
         expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("sunflower");
@@ -108,7 +108,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('setup_suite_cmd binding', async () => {
-        let setup_suite_cmd_input = wrapper.find({ref: 'setup_suite_cmd'});
+        let setup_suite_cmd_input = wrapper.findComponent({ref: 'setup_suite_cmd'});
 
         await set_validated_input_text(setup_suite_cmd_input, 'three to the right');
 
@@ -130,9 +130,7 @@ describe('AGSuiteSettings tests', () => {
     test('Save suite settings - successful', async () => {
         let save_stub = sinon.stub(wrapper.vm.d_ag_test_suite!, 'save');
 
-        wrapper.find('#ag-test-suite-settings-form').trigger('submit');
-        await wrapper.vm.$nextTick();
-
+        await wrapper.get('[data-testid=ag_test_suite_settings_form]').trigger('submit');
         expect(save_stub.calledOnce).toBe(true);
     });
 
@@ -147,12 +145,10 @@ describe('AGSuiteSettings tests', () => {
             )
         );
 
-        wrapper.find('#ag-test-suite-settings-form').trigger('submit');
-        await wrapper.vm.$nextTick();
-
+        await wrapper.get('[data-testid=ag_test_suite_settings_form]').trigger('submit');
         expect(save_stub.calledOnce).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
@@ -161,34 +157,34 @@ describe('AGSuiteSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('.delete-ag-test-suite-button').trigger('click');
+        wrapper.get('.delete-ag-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(true);
 
-        wrapper.find('.modal-delete-button').trigger('click');
+        wrapper.get('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(delete_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
     });
 
     test('API errors handled on suite deletion', async () => {
         sinon.stub(wrapper.vm.d_ag_test_suite!, 'delete').rejects(new ag_cli.HttpError(403, 'err'));
         await wrapper.vm.$nextTick();
 
-        wrapper.find('.delete-ag-test-suite-button').trigger('click');
+        wrapper.get('.delete-ag-test-suite-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find('.modal-delete-button').trigger('click');
+        wrapper.get('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(1);
     });
 
@@ -242,12 +238,12 @@ describe('AG test suite feedback tests', () => {
         await wrapper.vm.$nextTick();
 
         let normal_config_panel
-            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'normal_config_panel'});
+            = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({ref: 'normal_config_panel'});
         expect(normal_config_panel.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
 
         let normal_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
-                {ref: 'normal_edit_feedback_settings'});
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+                ref: 'normal_edit_feedback_settings'});
         expect(normal_advanced_settings.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
 
         let new_val = data_ut.make_ag_test_suite_fdbk_config({
@@ -279,14 +275,15 @@ describe('AG test suite feedback tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let final_graded_config_panel
-            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'final_graded_config_panel'});
+        let final_graded_config_panel = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({
+            ref: 'final_graded_config_panel'
+        });
         expect(final_graded_config_panel.vm.value).toEqual(
             ag_test_suite.ultimate_submission_fdbk_config);
 
         let final_graded_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
-                {ref: 'final_graded_edit_feedback_settings'});
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+                ref: 'final_graded_edit_feedback_settings'});
         expect(final_graded_advanced_settings.vm.value).toEqual(
             ag_test_suite.ultimate_submission_fdbk_config);
 
@@ -319,14 +316,15 @@ describe('AG test suite feedback tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let past_limit_config_panel
-            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'past_limit_config_panel'});
+        let past_limit_config_panel = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({
+            ref: 'past_limit_config_panel'
+        });
         expect(past_limit_config_panel.vm.value).toEqual(
             ag_test_suite.past_limit_submission_fdbk_config);
 
         let past_limit_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
-                {ref: 'past_limit_edit_feedback_settings'});
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+                ref: 'past_limit_edit_feedback_settings'});
         expect(past_limit_advanced_settings.vm.value).toEqual(
             ag_test_suite.past_limit_submission_fdbk_config);
 
@@ -359,14 +357,15 @@ describe('AG test suite feedback tests', () => {
         });
         await wrapper.vm.$nextTick();
 
-        let student_lookup_config_panel
-            = <Wrapper<FeedbackConfigPanel>> wrapper.find({ref: 'student_lookup_config_panel'});
+        let student_lookup_config_panel = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({
+            ref: 'student_lookup_config_panel'
+        });
         expect(student_lookup_config_panel.vm.value).toEqual(
             ag_test_suite.staff_viewer_fdbk_config);
 
         let student_lookup_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.find(
-                {ref: 'student_lookup_edit_feedback_settings'});
+            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+                ref: 'student_lookup_edit_feedback_settings'});
         expect(student_lookup_advanced_settings.vm.value).toEqual(
             ag_test_suite.staff_viewer_fdbk_config);
 

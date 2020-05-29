@@ -42,7 +42,8 @@ describe('CreateSingleGroup tests', () => {
         let create_group_stub = sinon.stub(Group, 'create');
         let group_members = ["abernard@cornell.edu", "amartin@cornell.edu"];
 
-        let group_form = <Wrapper<GroupMembersForm>> wrapper.find({ref: 'create_group_form'});
+        let group_form
+            = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'create_group_form'});
         group_form.vm.$emit('submit', group_members);
         await component.$nextTick();
 
@@ -59,11 +60,12 @@ describe('CreateSingleGroup tests', () => {
             )
         ));
 
-        let group_form = <Wrapper<GroupMembersForm>> wrapper.find({ref: 'create_group_form'});
+        let group_form
+            = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'create_group_form'});
         group_form.vm.$emit('submit', ["abernard@cornell.edu", "amartin@cornell.edu"]);
         await component.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 });

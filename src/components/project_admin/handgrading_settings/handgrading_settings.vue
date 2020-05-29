@@ -153,7 +153,7 @@
             <APIErrors ref="settings_form_errors"></APIErrors>
             <div class="button-footer">
               <button class="save-button"
-                      ref="save_rubric_button"
+                      data-testid="save_rubric_button"
                       type="submit"
                       :disabled="!d_settings_form_is_valid || d_saving">Save</button>
               <last-saved
@@ -226,7 +226,7 @@
         <APIErrors ref="create_criterion_errors"></APIErrors>
         <div class="modal-button-footer">
           <button type="submit" class="save-button"
-                  ref="create_criterion_button"
+                  data-testid="create_criterion_button"
                   :disabled="d_creating_criterion
                              || !d_create_criterion_form_is_valid">Create</button>
           <button type="button" class="white-button"
@@ -245,7 +245,7 @@
         <APIErrors ref="create_annotation_errors"></APIErrors>
         <div class="modal-button-footer">
           <button type="submit" class="save-button"
-                  ref="create_annotation_button"
+                  data-testid="create_annotation_button"
                   :disabled="d_creating_annotation
                              || !d_create_annotation_form_is_valid">Create</button>
           <button type="button" class="white-button"

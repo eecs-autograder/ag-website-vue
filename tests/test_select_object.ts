@@ -80,9 +80,9 @@ test('Override body slot, no initial value', () => {
     });
 
     expect(wrapper.findAll('option').length).toBe(things.length + 1);
-    expect(wrapper.findAll('option').at(0).is('[selected]')).toBe(true);
-    expect(wrapper.findAll('option').at(1).is('[selected]')).toBe(false);
-    expect(wrapper.findAll('option').at(3).is('[selected]')).toBe(false);
+    expect(wrapper.findAll('option').at(0).element).toHaveAttribute('selected');
+    expect(wrapper.findAll('option').at(1).element).not.toHaveAttribute('selected');
+    expect(wrapper.findAll('option').at(3).element).not.toHaveAttribute('selected');
 });
 
 test('Null option', async () => {
@@ -102,7 +102,7 @@ test('Null option', async () => {
 
     await wrapper.setProps({value: things[1]});
     expect(wrapper.findAll('option').length).toBe(things.length + 1);
-    expect(wrapper.findAll('option').at(0).is('[selected]')).toBe(false);
+    expect(wrapper.findAll('option').at(0).element).not.toHaveAttribute('selected');
     expect_html_element_has_value(wrapper.find('select'), things[1].id.toString());
 
     await wrapper.setProps({value: null});
@@ -181,5 +181,5 @@ test('Initially selected disabled option', async () => {
 
     expect(wrapper.vm.d_value).toBeNull();
     expect_html_element_has_value(wrapper.find('select'), '');
-    expect(wrapper.findAll('option').at(0).is('[selected]')).toBe(true);
+    expect(wrapper.findAll('option').at(0).element).toHaveAttribute('selected');
 });

@@ -1,4 +1,4 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     MutationTestSuite, Project
@@ -44,7 +44,7 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('points_per_exposed_bug binding', async () => {
-        let points_per_exposed_bug_input = wrapper.find({ref: 'points_per_exposed_bug'});
+        let points_per_exposed_bug_input = wrapper.findComponent({ref: 'points_per_exposed_bug'});
 
         await set_validated_input_text(points_per_exposed_bug_input, '905.7');
 
@@ -112,7 +112,7 @@ describe('BuggyImplementation tests', () => {
     test('max_points binding', async () => {
         await set_data(wrapper, {d_override_max_points: true});
 
-        let max_points_input = wrapper.find({ref: 'max_points'});
+        let max_points_input = wrapper.findComponent({ref: 'max_points'});
         await set_validated_input_text(max_points_input, '3');
 
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(3);
@@ -130,7 +130,7 @@ describe('BuggyImplementation tests', () => {
     test('Error: max_points is blank or not a number', async () => {
         await set_data(wrapper, {d_override_max_points: true});
 
-        let max_points_input = wrapper.find({ref: 'max_points'});
+        let max_points_input = wrapper.findComponent({ref: 'max_points'});
         await set_validated_input_text(max_points_input, '0');
 
         return do_input_blank_or_not_integer_test(wrapper, {ref: 'max_points'}, null);
@@ -139,7 +139,7 @@ describe('BuggyImplementation tests', () => {
     test('Error: max_points must be greater than or equal to zero', async () => {
         await set_data(wrapper, {d_override_max_points: true});
 
-        let max_points_input = wrapper.find({ref: 'max_points'});
+        let max_points_input = wrapper.findComponent({ref: 'max_points'});
         await set_validated_input_text(max_points_input, '0');
 
         return do_invalid_text_input_test(wrapper, {ref: 'max_points'}, '-1', null);
@@ -148,7 +148,7 @@ describe('BuggyImplementation tests', () => {
     test('max_num_student_tests binding', async () => {
         await set_data(wrapper, {d_override_max_points: true});
 
-        let max_num_student_tests_input = wrapper.find({ref: 'max_num_student_tests'});
+        let max_num_student_tests_input = wrapper.findComponent({ref: 'max_num_student_tests'});
 
         await set_validated_input_text(max_num_student_tests_input, '3');
 
@@ -165,19 +165,21 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('buggy_impl_names binding', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
+        let buggy_implementation_names_input
+            = wrapper.findComponent({ref: 'buggy_impl_names_input'});
         await buggy_implementation_names_input.setValue('cricket, mosquito, bee');
 
         expect(wrapper.vm.d_buggy_impl_names_text).toEqual('cricket, mosquito, bee');
 
         await set_data(wrapper, {d_buggy_impl_names_text: "ladybug ant"});
         expect(
-            (<HTMLInputElement> wrapper.find({ref: 'buggy_impl_names_input'}).element)
+            (<HTMLInputElement> wrapper.findComponent({ref: 'buggy_impl_names_input'}).element)
                 .value).toEqual('ladybug ant');
     });
 
     test('adding buggy impl names by pressing the add-buggy-impl-names-button', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
+        let buggy_implementation_names_input
+            = wrapper.findComponent({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -204,7 +206,8 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('adding buggy impl names by pressing enter', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
+        let buggy_implementation_names_input
+            = wrapper.findComponent({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -218,7 +221,7 @@ describe('BuggyImplementation tests', () => {
 
         await buggy_implementation_names_input.trigger('click');
 
-        await wrapper.find({ref: 'buggy_impl_names_input'}).trigger('keyup.enter');
+        await wrapper.findComponent({ref: 'buggy_impl_names_input'}).trigger('keyup.enter');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(7);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -233,7 +236,8 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('adding buggy impl names - no duplicates allowed', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
+        let buggy_implementation_names_input
+            = wrapper.findComponent({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
@@ -256,7 +260,8 @@ describe('BuggyImplementation tests', () => {
     });
 
     test('adding buggy impl names - empty strings cannot be added', async () => {
-        let buggy_implementation_names_input = wrapper.find({ref: 'buggy_impl_names_input'});
+        let buggy_implementation_names_input
+            = wrapper.findComponent({ref: 'buggy_impl_names_input'});
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(4);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");

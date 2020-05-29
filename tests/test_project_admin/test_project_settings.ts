@@ -37,14 +37,14 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.soft_closing_time = (new Date()).toISOString();
         await wrapper.vm.$nextTick();
 
-        let button = wrapper.findComponent({ref: 'clear_soft_closing_time'});
-        expect(button.is('[disabled]')).toEqual(false);
+        let button = wrapper.find('[data-testid=clear_soft_closing_time]');
+        expect(button.element).not.toBeDisabled();
 
         button.trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project.soft_closing_time).toBeNull();
-        expect(button.is('[disabled]')).toEqual(true);
+        expect(button.element).toBeDisabled();
     });
 
     test('Clicking soft closing time toggles time picker visibility', async () => {
@@ -67,14 +67,14 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.closing_time = (new Date()).toISOString();
         await wrapper.vm.$nextTick();
 
-        let button = wrapper.findComponent({ref: 'clear_closing_time'});
-        expect(button.is('[disabled]')).toEqual(false);
+        let button = wrapper.find('[data-testid=clear_closing_time]');
+        expect(button.element).not.toBeDisabled();
 
         button.trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project.closing_time).toBeNull();
-        expect(button.is('[disabled]')).toEqual(true);
+        expect(button.element).toBeDisabled();
     });
 
     test('Clicking closing time toggles time picker visibility', async () => {
@@ -252,9 +252,7 @@ describe('ProjectSettings tests', () => {
 
         let ultimate_submission_policy_input = wrapper.find('#ultimate-submission-policy');
 
-        expect(ultimate_submission_policy_input.findAll('option').at(2).is('[disabled]')).toEqual(
-            true
-        );
+        expect(ultimate_submission_policy_input.findAll('option').at(2).element).toBeDisabled();
         expect_html_element_has_value(ultimate_submission_policy_input,
                                       UltimateSubmissionPolicy.best_with_normal_fdbk);
 
@@ -299,14 +297,14 @@ describe('ProjectSettings tests', () => {
     test('allow_submissions_past_limit checkbox disabled when submission_limit_per_day is null',
          async () => {
         expect(wrapper.vm.d_project.submission_limit_per_day).toBeNull();
-        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(true);
+        expect(wrapper.find('#allow-submissions-past-limit').element).toBeDisabled();
 
         set_validated_input_text(wrapper.find('#submission-limit-per-day'), '7');
 
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project.submission_limit_per_day).not.toBeNull();
-        expect(wrapper.find('#allow-submissions-past-limit').is('[disabled]')).toEqual(false);
+        expect(wrapper.find('#allow-submissions-past-limit').element).not.toBeDisabled();
     });
 
     test('Clicking submission limit reset time toggles time picker visibility', async () => {
@@ -336,8 +334,9 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_show_reset_time_picker = true;
         await wrapper.vm.$nextTick();
 
-        let time = <Wrapper<TimePicker>> wrapper.findComponent(
-            {ref: 'submission_limit_reset_time_picker'});
+        let time = <Wrapper<TimePicker>> wrapper.findComponent({
+            ref: 'submission_limit_reset_time_picker'
+        });
         wrapper.vm.d_project.submission_limit_reset_time = '08:00';
         await wrapper.vm.$nextTick();
         expect(time.vm.value).toEqual('08:00');
@@ -371,7 +370,7 @@ describe('ProjectSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         let checkbox = wrapper.find('#groups-combine-daily-submissions');
-        expect(checkbox.is('[disabled]')).toEqual(false);
+        expect(checkbox.element).not.toBeDisabled();
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project.groups_combine_daily_submissions).toEqual(true);
@@ -396,7 +395,7 @@ describe('ProjectSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         let checkbox = wrapper.find('#groups-combine-daily-submissions');
-        expect(checkbox.is('[disabled]')).toEqual(true);
+        expect(checkbox.element).toBeDisabled();
     });
 
     test('Allow late days binding', async () => {
@@ -558,9 +557,9 @@ describe('Invalid input tests', () => {
 
     test('num_bonus_submissions is empty or not a number', async () => {
         let bonus_submissions_input = wrapper.findComponent({ref: "bonus_submissions_input"});
-        let bonus_submissions_validator = <ValidatedInput> wrapper.find(
-            {ref: "bonus_submissions_input"}
-        ).vm;
+        let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
+            ref: "bonus_submissions_input"
+        }).vm;
 
         expect(bonus_submissions_validator.is_valid).toBe(true);
 
@@ -578,9 +577,9 @@ describe('Invalid input tests', () => {
     });
 
     test('num_bonus_submissions is negative', async () => {
-        let bonus_submissions_validator = <ValidatedInput> wrapper.find(
-            {ref: "bonus_submissions_input"}
-        ).vm;
+        let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
+            ref: "bonus_submissions_input"
+        }).vm;
 
         expect(bonus_submissions_validator.is_valid).toBe(true);
 

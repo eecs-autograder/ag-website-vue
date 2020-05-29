@@ -843,7 +843,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test('prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, ' +
@@ -856,7 +856,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test("prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, " +
@@ -869,7 +869,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test("prev_ag_test_case_is_available (true) - suite index != 0, case index is 0, " +
@@ -879,7 +879,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('prev_ag_test_case_is_available (false) - suite index is 0, case index != 0, ' +
@@ -889,7 +889,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test('prev_ag_test_case_is_available (true) - suite index is 0, case index != 0, prev ' +
@@ -899,7 +899,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('go_to_prev_command - prev case in same suite', async () => {
@@ -908,7 +908,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_1);
 
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#prev-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -921,7 +921,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_2_case_1_command_2);
 
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#prev-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -956,7 +956,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (true) - suite index is 0, case index is 0, next ' +
@@ -966,7 +966,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (false) - suite is the last suite, case is the ' +
@@ -976,7 +976,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
@@ -988,7 +988,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (false) - suite is not the last suite, case is ' +
@@ -998,7 +998,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (true) - suite is not the last suite, case is' +
@@ -1008,7 +1008,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('go_to_next_command - next case in same suite', async () => {
@@ -1017,7 +1017,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_1_command_1);
 
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#next-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -1030,7 +1030,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_2);
 
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#next-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 

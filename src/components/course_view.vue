@@ -3,12 +3,12 @@
     <div> <i class="fa fa-spinner fa-pulse"></i> </div>
   </div>
   <div v-else id="project-list-component">
-    <div v-if="projects.length === 0" id="no-projects-message">
+    <div v-if="d_projects.length === 0" id="no-projects-message">
       No projects have been published yet.
     </div>
 
     <template v-else>
-      <div class="project entity" v-for="project of projects" :key="project.pk">
+      <div class="project entity" v-for="project of d_projects" :key="project.pk">
         <router-link class="project-name info name"
                       :class="{'round-bottom-corners': !d_globals.user_roles.is_admin}"
                       :to="`/web/project/${project.pk}`">
@@ -46,16 +46,16 @@ export default class CourseView extends Vue {
   globals!: GlobalData;
   d_globals = this.globals;
 
-  course!: Course;
+  private d_course: Course | null = null;
   d_loading = true;
-  projects: Project[] = [];
+  private d_projects: Project[] = [];
 
   @handle_global_errors_async
   async created() {
-    this.course = await Course.get_by_pk(Number(this.$route.params.course_id));
-    this.projects = await Project.get_all_from_course(this.course.pk);
+    this.d_course = await Course.get_by_pk(Number(this.$route.params.course_id));
+    this.d_projects = await Project.get_all_from_course(this.d_course.pk);
 
-    await this.d_globals.set_current_course(this.course);
+    await this.d_globals.set_current_course(this.d_course);
     this.d_loading = false;
   }
 }

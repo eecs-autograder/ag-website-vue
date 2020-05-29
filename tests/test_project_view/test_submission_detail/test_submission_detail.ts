@@ -370,11 +370,13 @@ describe('Adjust feedback tests', () => {
 
         let wrapper = make_wrapper();
 
-        expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'past_limit_feedback_option'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'max_feedback_option'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
+        expect(
+            wrapper.findComponent({ref: 'ultimate_submission_feedback_option'}).exists()
+        ).toBe(true);
+        expect(wrapper.findComponent({ref: 'normal_feedback_option'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'past_limit_feedback_option'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'max_feedback_option'}).exists()).toBe(false);
     });
 
     test('adjust_feedback - is_staff === true && is_group_member === true', () => {
@@ -382,11 +384,13 @@ describe('Adjust feedback tests', () => {
 
         let wrapper = make_wrapper();
 
-        expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'past_limit_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'max_feedback_option'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
+        expect(
+            wrapper.findComponent({ref: 'ultimate_submission_feedback_option'}).exists()
+        ).toBe(true);
+        expect(wrapper.findComponent({ref: 'normal_feedback_option'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'past_limit_feedback_option'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'max_feedback_option'}).exists()).toBe(true);
     });
 
     test('adjust_feedback - is_admin === true && is_group_member === false', () => {
@@ -395,11 +399,13 @@ describe('Adjust feedback tests', () => {
 
         let wrapper = make_wrapper();
 
-        expect(wrapper.find({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'ultimate_submission_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'normal_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'past_limit_feedback_option'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'max_feedback_option'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'staff_viewer_feedback_option'}).exists()).toBe(true);
+        expect(
+            wrapper.findComponent({ref: 'ultimate_submission_feedback_option'}).exists()
+        ).toBe(true);
+        expect(wrapper.findComponent({ref: 'normal_feedback_option'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'past_limit_feedback_option'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'max_feedback_option'}).exists()).toBe(true);
     });
 
     test('adjust_feedback - select different feedback category', async () => {
@@ -536,7 +542,7 @@ describe('Adjust feedback tests', () => {
 describe('Suite results tests', () => {
     test('No mutation test suite results', () => {
         let wrapper = make_wrapper();
-        expect(wrapper.find({name: 'MutationSuiteResults'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'MutationSuiteResults'}).exists()).toBe(false);
     });
 
     test('Mutation test suite results shown', () => {
@@ -555,7 +561,7 @@ describe('Suite results tests', () => {
 
     test('No AG test suite results', () => {
         let wrapper = make_wrapper();
-        expect(wrapper.findAll({name: 'AGSuiteResult'}).length).toEqual(0);
+        expect(wrapper.findAllComponents({name: 'AGSuiteResult'}).length).toEqual(0);
     });
 
     test('AG test suite results shown', () => {
@@ -566,11 +572,11 @@ describe('Suite results tests', () => {
         ];
 
         let wrapper = make_wrapper();
-        expect(wrapper.findAll({name: 'AGSuiteResult'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'AGSuiteResult'}).length).toEqual(2);
     });
 });
 
-describe('Remove from queue tests', async () => {
+describe('Remove from queue tests', () => {
     test('Remove from queue button shown when grading status is received or queued', async () => {
         do_remove_from_queue_button_test(ag_cli.GradingStatus.being_graded, false);
         do_remove_from_queue_button_test(ag_cli.GradingStatus.error, false);
@@ -622,7 +628,7 @@ describe('Remove from queue tests', async () => {
 
         expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
-        expect(wrapper.find({ref: 'api_errors'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'api_errors'}).exists()).toBe(false);
     });
 
     test('Remove submission from queue - confirm action - unsuccessful', async () => {
@@ -648,7 +654,7 @@ describe('Remove from queue tests', async () => {
 
         expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(true);
-        expect(wrapper.find({ref: 'api_errors'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'api_errors'}).exists()).toBe(true);
     });
 });
 

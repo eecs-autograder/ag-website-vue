@@ -80,22 +80,22 @@ describe('TimePicker Tests', () => {
         expect(wrapper.vm.am_pm_str).toEqual("PM");
         expect(wrapper.vm.d_time.hours).toEqual(13);
 
-        await wrapper.find({ref: 'prev_hour_button'}).trigger('click');
+        await wrapper.find('[data-testid=prev_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("12");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
         expect(wrapper.vm.d_time.hours).toEqual(12);
 
-        await wrapper.find({ref: 'prev_hour_button'}).trigger('click');
+        await wrapper.find('[data-testid=prev_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("11");
         expect(wrapper.vm.am_pm_str).toEqual("AM");
         expect(wrapper.vm.d_time.hours).toEqual(11);
 
-        await wrapper.find({ref: 'next_hour_button'}).trigger('click');
+        await wrapper.find('[data-testid=next_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("12");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
         expect(wrapper.vm.d_time.hours).toEqual(12);
 
-        await wrapper.find({ref: 'next_hour_button'}).trigger('click');
+        await wrapper.find('[data-testid=next_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.d_time.hours).toEqual(13);
         expect(emitted(wrapper, 'input').length).toBe(4);
@@ -105,12 +105,12 @@ describe('TimePicker Tests', () => {
         expect(wrapper.vm.am_pm_str).toEqual("PM");
         expect(wrapper.vm.d_time.hours).toEqual(23);
 
-        await wrapper.find({ref: 'next_hour_button'}).trigger('click');
+        await wrapper.find('[data-testid=next_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("12");
         expect(wrapper.vm.am_pm_str).toEqual("AM");
         expect(wrapper.vm.d_time.hours).toEqual(0);
 
-        await wrapper.find({ref: 'prev_hour_button'}).trigger('click');
+        await wrapper.find('[data-testid=prev_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("11");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
         expect(wrapper.vm.d_time.hours).toEqual(23);
@@ -175,23 +175,23 @@ describe('TimePicker Tests', () => {
         expect(wrapper.vm.minutes_str).toEqual("58");
         expect(wrapper.vm.d_time.minutes).toEqual(58);
 
-        await wrapper.find({ref: 'next_minute_button'}).trigger('click');
+        await wrapper.find('[data-testid=next_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("59");
         expect(wrapper.vm.d_time.minutes).toEqual(59);
 
-        await wrapper.find({ref: 'next_minute_button'}).trigger('click');
+        await wrapper.find('[data-testid=next_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("00");
         expect(wrapper.vm.d_time.minutes).toEqual(0);
 
-        await wrapper.find({ref: 'next_minute_button'}).trigger('click');
+        await wrapper.find('[data-testid=next_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("01");
         expect(wrapper.vm.d_time.minutes).toEqual(1);
 
-        await wrapper.find({ref: 'prev_minute_button'}).trigger('click');
+        await wrapper.find('[data-testid=prev_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("00");
         expect(wrapper.vm.d_time.minutes).toEqual(0);
 
-        await wrapper.find({ref: 'prev_minute_button'}).trigger('click');
+        await wrapper.find('[data-testid=prev_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("59");
         expect(wrapper.vm.d_time.minutes).toEqual(59);
         expect(emitted(wrapper, 'input').length).toBe(5);
@@ -304,7 +304,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find({ref: 'hour_input'});
+        let hour_input = wrapper.find('[data-testid=hour_input]');
         await hour_input.trigger("keydown", {code: "Digit3", key: "3"});
 
         expect(wrapper.vm.hours_str).toEqual("03");
@@ -324,7 +324,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find({ref: 'hour_input'});
+        let hour_input = wrapper.find('[data-testid=hour_input]');
         await hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -339,7 +339,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find({ref: 'hour_input'});
+        let hour_input = wrapper.find('[data-testid=hour_input]');
         await hour_input.trigger("keydown", {code: "Digit0", key: "0"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -354,7 +354,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find({ref: 'hour_input'});
+        let hour_input = wrapper.find('[data-testid=hour_input]');
         await hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -374,7 +374,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find({ref: 'hour_input'});
+        let hour_input = wrapper.find('[data-testid=hour_input]');
         await hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -410,7 +410,7 @@ describe('TimePicker MinuteInputState tests', () => {
             expect(wrapper.vm.minutes_str).toEqual("36");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
 
-            let minute_input = wrapper.find({ref: 'minute_input'});
+            let minute_input = wrapper.find('.minute-input');
             await minute_input.trigger("keydown", {code: "Digit6", key: "6"});
 
             expect(wrapper.vm.minutes_str).toEqual("06");
@@ -430,7 +430,7 @@ describe('TimePicker MinuteInputState tests', () => {
             expect(wrapper.vm.minutes_str).toEqual("36");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
 
-            let minute_input = wrapper.find({ref: 'minute_input'});
+            let minute_input = wrapper.find('.minute-input');
             await minute_input.trigger("keydown", {code: "Digit4", key: "4"});
 
             expect(wrapper.vm.minutes_str).toEqual("04");
@@ -444,7 +444,7 @@ describe('TimePicker MinuteInputState tests', () => {
             expect(wrapper.vm.minutes_str).toEqual("36");
             expect(wrapper.vm.minute_input_state).toEqual(MinuteInputState.awaiting_first_digit);
 
-            let minute_input = wrapper.find({ref: 'minute_input'});
+            let minute_input = wrapper.find('.minute-input');
             await minute_input.trigger("keydown", {code: "Digit4", key: "4"});
 
             expect(wrapper.vm.minutes_str).toEqual("04");

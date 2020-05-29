@@ -63,7 +63,7 @@ describe('DatetimePicker tests', () => {
         expect(wrapper.vm.d_date.month()).toEqual(now.getMonth());
         expect(wrapper.vm.d_date.year()).toEqual(now.getFullYear());
 
-        let time_picker = <Wrapper<TimePicker>> wrapper.find({ref: 'time_picker'});
+        let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
         expect(time_picker.vm.d_time.hours).toEqual(now.getHours());
         let minutes_diff = Math.abs(time_picker.vm.d_time.minutes - now.getMinutes());
         expect(minutes_diff).toBeLessThan(1);
@@ -175,7 +175,7 @@ describe('DatetimePicker tests', () => {
         expect(wrapper.vm.d_date.month()).toEqual(6);
         expect(wrapper.vm.d_date.year()).toEqual(2019);
 
-        let time_picker = <Wrapper<TimePicker>> wrapper.find({ref: 'time_picker'});
+        let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
         expect(time_picker.vm.d_time.hours).toEqual(8);
         expect(time_picker.vm.d_time.minutes).toEqual(20);
 

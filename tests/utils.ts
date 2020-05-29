@@ -1,6 +1,6 @@
 import { Vue } from "vue-property-decorator";
 
-import { RefSelector, Wrapper } from "@vue/test-utils";
+import { RefSelector, VueClass, Wrapper } from "@vue/test-utils";
 
 import SelectObject from '@/components/select_object.vue';
 import ValidatedInput from "@/components/validated_input.vue";
@@ -92,8 +92,9 @@ export function expect_select_object_has_value(wrapper: Wrapper<Vue>, expected: 
 type InputOrSelect = Wrapper<Vue>
                      & {element: HTMLInputElement & HTMLSelectElement & HTMLOptionElement};
 function assert_is_html_input_or_select(wrapper: Wrapper<Vue>): asserts wrapper is InputOrSelect {
-    if (!['input', 'select', 'option'].includes(wrapper.element.tagName)) {
-        throw new TypeError('Expected an input, select, or option tag');
+    if (!['input', 'select', 'option'].includes(wrapper.element.tagName.toLowerCase())) {
+        throw new TypeError(
+            `Expected an input, select, or option tag, but got ${wrapper.element.tagName}`);
     }
 }
 
@@ -111,16 +112,14 @@ export function compress_whitespace(str: string): string {
 
 export async function do_invalid_text_input_test(
     component_wrapper: Wrapper<Vue>,
-    input_selector: string | RefSelector,
+    input_selector: RefSelector,
     invalid_text: string,
-    save_button_selector: string | RefSelector | null
+    save_button_selector: string | null
 ) {
-    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
-    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
+    let input_wrapper = component_wrapper.findComponent(input_selector);
     expect(validated_input_is_valid(input_wrapper)).toEqual(true);
     if (save_button_selector !== null) {
-        // tslint:disable-next-line
-        expect(component_wrapper.find(<any> save_button_selector).element).not.toBeDisabled();
+        expect(component_wrapper.find(save_button_selector).element).not.toBeDisabled();
     }
 
     await set_validated_input_text(input_wrapper, invalid_text);
@@ -128,19 +127,17 @@ export async function do_invalid_text_input_test(
     expect(validated_input_is_valid(input_wrapper)).toEqual(false);
 
     if (save_button_selector !== null)  {
-        // tslint:disable-next-line
-        let save_button_wrapper = component_wrapper.find(<any> save_button_selector);
+        let save_button_wrapper = component_wrapper.find(save_button_selector);
         expect(save_button_wrapper.element).toBeDisabled();
     }
 }
 
 export async function do_input_blank_or_not_integer_test(
     component_wrapper: Wrapper<Vue>,
-    input_selector: string | RefSelector,
-    save_button_selector: string | RefSelector | null
+    input_selector: RefSelector,
+    save_button_selector: string | null
 ) {
-    // See https://github.com/Microsoft/TypeScript/issues/14107#issuecomment-483995795
-    let input_wrapper = component_wrapper.find(<any> input_selector); // tslint:disable-line
+    let input_wrapper = component_wrapper.findComponent(input_selector);
     let original_text = get_validated_input_text(input_wrapper);
 
     await do_invalid_text_input_test(component_wrapper, input_selector, ' ', save_button_selector);
@@ -149,6 +146,7 @@ export async function do_input_blank_or_not_integer_test(
         component_wrapper, input_selector, 'not num', save_button_selector);
 }
 
+// Use find_component() instead
 export function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
     return <Wrapper<T>> wrapper.findComponent({name: name});
 }

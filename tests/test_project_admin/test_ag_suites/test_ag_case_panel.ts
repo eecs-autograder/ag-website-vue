@@ -284,7 +284,8 @@ describe('AGCasePanel tests', () => {
         expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
 
-        await wrapper.findAll({ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
+        await wrapper.findAllComponents(
+            {ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
         expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
@@ -394,9 +395,9 @@ describe('AGCasePanel tests', () => {
         let ag_test_case_clone_name = wrapper.findComponent({ref: 'ag_test_case_clone_name'});
         await set_validated_input_text(ag_test_case_clone_name, 'Water');
 
-        expect(wrapper.findComponent({ref: 'modal_clone_ag_test_case_button'}).is(
-            '[disabled]'
-        )).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'modal_clone_ag_test_case_button'}).element
+        ).not.toBeDisabled();
 
         await wrapper.findComponent({ref: 'clone_ag_test_case_form'}).trigger('submit');
 
@@ -466,9 +467,9 @@ describe('AGCasePanel tests', () => {
         let ag_test_case_clone_name = wrapper.findComponent({ref: 'ag_test_case_clone_name'});
         await set_validated_input_text(ag_test_case_clone_name, 'Purple Case');
 
-        expect(wrapper.findComponent({ref: 'modal_clone_ag_test_case_button'}).is(
-            '[disabled]'
-        )).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'modal_clone_ag_test_case_button'}).element
+        ).not.toBeDisabled();
 
         await wrapper.findComponent({ref: 'clone_ag_test_case_form'}).trigger('submit');
 

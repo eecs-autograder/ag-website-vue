@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-single-group-component">
+  <div class="edit-single-group-component">
     <div class="created-at">
       <span class="timestamp-label">Created: </span>
       <span class="timestamp">{{format_datetime(d_group.created_at)}}</span>
@@ -13,14 +13,14 @@
                         @form_validity_changed="d_edit_group_form_is_valid = $event"
                         :ignore_group_size_limits="true">
       <template v-slot:footer>
-        <div id="datetime-picker-container" class="clearable-datetime-picker">
+        <div class="datetime-picker-container clearable-datetime-picker">
           <div class="label">Extension</div>
-          <div id="extension" class="datetime-input"
+          <div data-testid="extension" class="datetime-input"
               @click="$refs.extension_datetime_picker.toggle_visibility()">
             {{format_datetime(d_group.extended_due_date)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" id="revoke-extension"
+          <button type="button" data-testid="revoke_extension"
                   class="clear-button"
                   @click.stop="d_group.extended_due_date = null"
                   :disabled="d_group.extended_due_date === null">
@@ -60,7 +60,7 @@
       <button type="button"
               class="delete-button"
               @click="d_show_delete_group_modal = true"
-              ref="show_delete_modal_button">
+              data-testid="show_delete_modal_button">
         Delete
       </button>
     </div>
@@ -82,7 +82,7 @@
                 class="red-button"
                 :disabled="d_deleting"
                 @click="delete_group"
-                ref="delete_group_button">
+                data-testid="delete_group_button">
           Delete
         </button>
         <button type="button"
@@ -197,7 +197,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/modal.scss';
 @import '@/styles/components/datetime.scss';
 
-#edit-single-group-component {
+.edit-single-group-component {
   padding-top: 1rem;
 }
 
@@ -210,7 +210,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   }
 }
 
-#datetime-picker-container {
+.datetime-picker-container {
   padding-top: 1rem;
 }
 

@@ -7,7 +7,7 @@
       <button type="button"
               class="flat-white-button"
               @click="d_show_create_course_modal = true"
-              ref="show_create_course_modal_button">
+              data-testid="show_create_course_modal_button">
         <i class="fas fa-plus plus"></i> New Course
       </button>
 
@@ -24,13 +24,13 @@
           <APIErrors ref="create_course_api_errors"></APIErrors>
           <div class="modal-button-footer">
             <button type="submit"
-                    ref="create_course_button"
+                    data-testid="create_course_button"
                     class="save-button"
                     :disabled="!d_new_course_form_is_valid || d_creating_course">
               Save
             </button>
             <button type="button"
-                    ref="cancel_create_course_button"
+                    data-testid="cancel_create_course_button"
                     class="white-button"
                     @click="d_show_create_course_modal = false"
                     :disabled="d_creating_course">

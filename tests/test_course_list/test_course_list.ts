@@ -30,7 +30,7 @@ describe('Create course tests', () => {
     test('Create course button hidden', async () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);
-        expect(wrapper.find({ref: 'show_create_course_modal_button'}).exists()).toBe(false);
+        expect(wrapper.find('[data-testid=show_create_course_modal_button]').exists()).toBe(false);
     });
 
     test('Create course', async () => {
@@ -40,8 +40,7 @@ describe('Create course tests', () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        wrapper.find({ref: 'show_create_course_modal_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_create_course_modal_button]').trigger('click');
 
         let new_course_data = {
             name: 'An very new name',
@@ -51,12 +50,12 @@ describe('Create course tests', () => {
             allowed_guest_domain: '@llama.net',
             subtitle: 'Great course',
         };
-        wrapper.find({ref: 'new_course_form'}).vm.$emit('submit', new_course_data);
+        wrapper.findComponent({ref: 'new_course_form'}).vm.$emit('submit', new_course_data);
         await wrapper.vm.$nextTick();
         expect(await wait_until(wrapper, w => !w.vm.d_creating_course)).toBe(true);
         expect(create_course_stub.calledOnceWith(new_course_data)).toBe(true);
 
-        expect(wrapper.find({ref: 'created_course_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'created_course_modal'}).exists()).toBe(false);
     });
 
     test('Create course API errors handled', async () => {
@@ -66,15 +65,14 @@ describe('Create course tests', () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        wrapper.find({ref: 'show_create_course_modal_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_create_course_modal_button]').trigger('click');
 
-        wrapper.find({ref: 'new_course_form'}).vm.$emit('submit', {});
+        wrapper.findComponent({ref: 'new_course_form'}).vm.$emit('submit', {});
         await wrapper.vm.$nextTick();
         expect(await wait_until(wrapper, w => !w.vm.d_creating_course)).toBe(true);
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'create_course_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_course_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(1);
     });
 });
@@ -256,7 +254,7 @@ describe('CourseList tests', () => {
         expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(1);
         expect(component.d_all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
 
-        let all_displayed_courses = wrapper.findAll({name: 'SingleCourse'});
+        let all_displayed_courses = wrapper.findAllComponents({name: 'SingleCourse'});
         expect(all_displayed_courses.length).toEqual(3);
         expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
 
@@ -340,8 +338,8 @@ describe('CourseList tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let fall_2018_term = wrapper.find('.single-semester-container');
-        let fall_2018_courses = fall_2018_term.findAll({name: 'SingleCourse'});
+        expect(wrapper.findAll('.single-semester-container').length).toEqual(1);
+        let fall_2018_courses = wrapper.findAllComponents({name: 'SingleCourse'});
 
         expect(fall_2018_courses.length).toEqual(3);
         expect(fall_2018_courses.at(0).html()).toContain("EECS 280");

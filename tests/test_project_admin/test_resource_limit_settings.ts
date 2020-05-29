@@ -72,7 +72,7 @@ describe('Field binding tests', () => {
     });
 
     test('time_limit binding', async () => {
-        let time_limit_input = wrapper.find({ref: 'time_limit'});
+        let time_limit_input = wrapper.findComponent({ref: 'time_limit'});
 
         await set_validated_input_text(time_limit_input, '9');
 
@@ -99,7 +99,7 @@ describe('Field binding tests', () => {
     });
 
     test('virtual_memory_limit binding', async () => {
-        let virtual_memory_limit_input = wrapper.find({ref: 'virtual_memory_limit'});
+        let virtual_memory_limit_input = wrapper.findComponent({ref: 'virtual_memory_limit'});
 
         await set_validated_input_text(virtual_memory_limit_input, '9');
 
@@ -129,7 +129,7 @@ describe('Field binding tests', () => {
     // });
 
     // test('stack_size_limit binding', async () => {
-    //     let stack_size_limit_input = wrapper.find({ref: 'stack_size_limit'});
+    //     let stack_size_limit_input = wrapper.findComponent({ref: 'stack_size_limit'});
 
     //     await set_validated_input_text(stack_size_limit_input, '9');
 
@@ -157,7 +157,7 @@ describe('Field binding tests', () => {
     // });
 
     // test('process_spawn_limit binding', async () => {
-    //     let process_spawn_limit_input = wrapper.find({ref: 'process_spawn_limit'});
+    //     let process_spawn_limit_input = wrapper.findComponent({ref: 'process_spawn_limit'});
 
     //     await set_validated_input_text(process_spawn_limit_input, '9');
 

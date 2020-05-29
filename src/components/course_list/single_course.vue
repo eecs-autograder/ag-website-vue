@@ -47,7 +47,7 @@
         <div class="form-field-wrapper">
           <label class="label"> Semester </label>
           <div class="dropdown">
-            <select id="semester"
+            <select data-testid="semester"
                     v-model="new_course_semester"
                     class="select">
               <option v-for="semester of semesters" :value="semester">{{semester}}</option>

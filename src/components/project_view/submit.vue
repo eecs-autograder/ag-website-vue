@@ -115,7 +115,7 @@
       </template>
       <div class="modal-button-footer">
         <button type="button"
-                ref="submit_button"
+                data-testid="submit_button"
                 :class="file_mismatches_present ? 'orange-button' : 'green-button'"
                 @click="submit"
                 :disabled="d_submitting">
@@ -123,7 +123,7 @@
         </button>
         <button type="button"
                 class="white-button"
-                ref="cancel_submit_button"
+                data-testid="cancel_submit_button"
                 @click="d_show_confirm_submit_modal = false"
                 :disabled="d_submitting">Cancel</button>
       </div>

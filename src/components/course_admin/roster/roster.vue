@@ -19,7 +19,7 @@
         <slot name="before_save_button"></slot>
         <div class="button-footer">
           <button type="submit"
-                  ref="add_users_button"
+                  data-testid="add_users_button"
                   class="save-button"
                   :disabled="!d_form_is_valid">
             Add to Roster
@@ -27,7 +27,7 @@
 
           <button v-if="include_replace_button"
                   type="button"
-                  ref="replace_users_button"
+                  data-testid="replace_users_button"
                   @click="replace_users"
                   class="orange-button"
                   :disabled="!d_form_is_valid">

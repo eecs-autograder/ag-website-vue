@@ -130,7 +130,7 @@ describe('Field binding tests', () => {
     });
 
     test('suite name binding', async () => {
-        let suite_name_input = wrapper.find({ref: 'suite_name'});
+        let suite_name_input = wrapper.findComponent({ref: 'suite_name'});
         await set_validated_input_text(suite_name_input, 'Sweet Name');
 
         expect(wrapper.vm.d_suite!.name).toEqual("Sweet Name");
@@ -143,7 +143,7 @@ describe('Field binding tests', () => {
     });
 
     test('Suite name cannot be empty - violates condition', async () => {
-        let suite_name_input = wrapper.find({ref: 'suite_name'});
+        let suite_name_input = wrapper.findComponent({ref: 'suite_name'});
         expect(validated_input_is_valid(suite_name_input)).toBe(true);
 
         set_validated_input_text(suite_name_input, '');
@@ -153,7 +153,7 @@ describe('Field binding tests', () => {
     });
 
     test('deferred binding', async () => {
-        let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
+        let synchronous_checkbox = wrapper.find('[data-testid=synchronous_or_deferred]');
 
         await synchronous_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.deferred).toEqual(false);
@@ -176,7 +176,7 @@ describe('Field binding tests', () => {
     });
 
     test('sandbox_docker_image binding', async () => {
-        let sandbox_docker_image_input = wrapper.find({ref: 'sandbox_docker_image'});
+        let sandbox_docker_image_input = wrapper.findComponent({ref: 'sandbox_docker_image'});
         set_select_object_value(sandbox_docker_image_input, sandbox_docker_image_2.pk);
         await wrapper.vm.$nextTick();
 
@@ -194,7 +194,7 @@ describe('Field binding tests', () => {
     });
 
     test('Toggle allow_network_access', async () => {
-        let allow_network_access_toggle = wrapper.find({ref: 'allow_network_access'});
+        let allow_network_access_toggle = wrapper.findComponent({ref: 'allow_network_access'});
 
         wrapper.vm.d_suite!.allow_network_access = true;
         await wrapper.vm.$nextTick();
@@ -215,7 +215,7 @@ describe('Field binding tests', () => {
     });
 
     test('Read-only instructor files binding', async () => {
-        let read_only_checkbox = wrapper.find('#read-only-instructor-files');
+        let read_only_checkbox = wrapper.find('[data-testid=read_only_instructor_files]');
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(true);
 
         await read_only_checkbox.setChecked(false);
@@ -239,29 +239,14 @@ describe('Field binding tests', () => {
     });
 
     test('Adding an instructor file', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
-
-        let search_bar = wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "a";
+        let dropdown_typeahead = wrapper.findComponent({ref: 'instructor_files_typeahead'});
+        dropdown_typeahead.vm.$emit('item_selected', instructor_file_3);
         await wrapper.vm.$nextTick();
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(3);
-        expect(wrapper.vm.d_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(wrapper.vm.d_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-        expect(wrapper.vm.d_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
+        expect(wrapper.vm.d_suite!.instructor_files_needed).toEqual([
+            instructor_file_1, instructor_file_2, instructor_file_3
+        ]);
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
@@ -284,9 +269,8 @@ describe('Field binding tests', () => {
     });
 
     test('InstructorFile filter function on dropdown typeahead', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'instructor_files_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
 
         dropdown_typeahead.filter_text = "a";
@@ -334,24 +318,9 @@ describe('Field binding tests', () => {
     });
 
     test('Adding a student file', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([student_file_3]);
-
-        let search_bar = wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "a";
+        let dropdown_typeahead = wrapper.findComponent({ref: 'student_files_typeahead'});
+        dropdown_typeahead.vm.$emit('item_selected', student_file_3);
         await wrapper.vm.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
-
-        search_bar.trigger('keydown', {code: 'Enter'});
-        await dropdown_typeahead.$nextTick();
 
         expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(3);
         expect(wrapper.vm.d_suite!.student_files_needed[0]).toEqual(student_file_1);
@@ -379,9 +348,8 @@ describe('Field binding tests', () => {
     });
 
     test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'student_files_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual([student_file_3]);
 
         dropdown_typeahead.filter_text = "e";

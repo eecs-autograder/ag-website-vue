@@ -17,14 +17,13 @@
     <div class="form-field-wrapper">
       <label class="label"> Suite name </label>
       <validated-input ref="suite_name"
-                       id="input-name"
                        v-model="d_suite.name"
                        @input="$emit('field_change', d_suite)"
                        :validators="[is_not_empty]">
       </validated-input>
 
       <div class="checkbox-input-container">
-        <input id="synchronous-or-deferred"
+        <input data-testid="synchronous_or_deferred"
                type="checkbox"
                class="checkbox"
                :checked="!d_suite.deferred"
@@ -68,7 +67,7 @@
       </div>
 
       <div class="checkbox-input-container">
-        <input id="read-only-instructor-files"
+        <input data-testid="read_only_instructor_files"
                 type="checkbox"
                 class="checkbox"
                 v-model="d_suite.read_only_instructor_files"
@@ -87,7 +86,7 @@
                             placeholder_text="Enter a filename"
                             :choices="instructor_files_available"
                             :filter_fn="instructor_file_filter_fn"
-                            @update_item_chosen="add_instructor_file($event)">
+                            @item_selected="add_instructor_file($event)">
           <template slot-scope="{item}">
             <span class="typeahead-row">
               {{item.name}}
@@ -117,7 +116,7 @@
                             placeholder_text="Enter a filename"
                             :choices="expected_student_files_available"
                             :filter_fn="expected_student_file_filter_fn"
-                            @update_item_chosen="add_student_file($event)">
+                            @item_selected="add_student_file($event)">
           <template slot-scope="{item}">
             <span class="typeahead-row">
               {{item.pattern}}

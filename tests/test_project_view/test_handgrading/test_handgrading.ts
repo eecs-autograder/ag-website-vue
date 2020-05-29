@@ -83,19 +83,19 @@ test('Reset handgrading result', async () => {
         }
     });
     expect(wrapper.find('.danger-zone-container').exists()).toBe(false);
-    expect(wrapper.find({ref: 'show_reset_handgrading_modal_button'}).exists()).toBe(false);
+    expect(wrapper.find('[data-testid=show_reset_handgrading_modal_button]').exists()).toBe(false);
 
     wrapper.setProps({readonly_handgrading_results: false});
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'show_reset_handgrading_modal_button'}).trigger('click');
+    wrapper.find('[data-testid=show_reset_handgrading_modal_button]').trigger('click');
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'reset_handgrading_button'}).trigger('click');
+    wrapper.find('[data-testid=reset_handgrading_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_resetting)).toBe(true);
 
-    expect(wrapper.find({ref: 'reset_handgrading_modal'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'reset_handgrading_modal'}).exists()).toBe(false);
     expect(wrapper.vm.d_handgrading_result!.pk).toEqual(new_result.pk);
 });
 
@@ -159,14 +159,18 @@ describe('Adjust points test', () => {
                 readonly_handgrading_results: false,
             }
         });
-        expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('43');
+        expect(
+            get_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}))
+        ).toEqual('43');
 
-        set_validated_input_text(wrapper.find({ref: 'adjust_points'}), '-1');
+        set_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}), '-1');
         expect(wrapper.vm.d_handgrading_result!.points_adjustment).toEqual(-1);
 
         wrapper.vm.d_handgrading_result!.points_adjustment = -2;
         await wrapper.vm.$nextTick();
-        expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('-2');
+        expect(
+            get_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}))
+        ).toEqual('-2');
     });
 
     test('Invalid empty adjust points', async () => {
@@ -176,13 +180,15 @@ describe('Adjust points test', () => {
                 readonly_handgrading_results: false,
             }
         });
-        expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('0');
-        expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(false);
+        expect(
+            get_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}))
+        ).toEqual('0');
+        expect(wrapper.find('#save-adjust-points').element).not.toBeDisabled();
 
-        set_validated_input_text(wrapper.find({ref: 'adjust_points'}), '  ');
+        set_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}), '  ');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_result!.points_adjustment).toEqual(0);
-        expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#save-adjust-points').element).toBeDisabled();
     });
 
     test('Save adjusted points', async () => {
@@ -193,11 +199,13 @@ describe('Adjust points test', () => {
             }
         });
         let save_stub = sinon.stub(wrapper.vm.d_handgrading_result!, 'save_points_adjustment');
-        expect(get_validated_input_text(wrapper.find({ref: 'adjust_points'}))).toEqual('0');
-        expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(false);
+        expect(
+            get_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}))
+        ).toEqual('0');
+        expect(wrapper.find('#save-adjust-points').element).not.toBeDisabled();
 
-        set_validated_input_text(wrapper.find({ref: 'adjust_points'}), '-1');
-        expect(wrapper.find('#save-adjust-points').is('[disabled]')).toBe(false);
+        set_validated_input_text(wrapper.findComponent({ref: 'adjust_points'}), '-1');
+        expect(wrapper.find('#save-adjust-points').element).not.toBeDisabled();
         wrapper.find('#save-adjust-points').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
@@ -215,7 +223,7 @@ describe('Adjust points test', () => {
         });
         await wrapper.vm.$nextTick();
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
-        expect(wrapper.find({ref: 'adjust_points'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'adjust_points'}).exists()).toBe(true);
     });
 
     test("Handgraders can't adjust points", async () => {
@@ -228,7 +236,7 @@ describe('Adjust points test', () => {
         });
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'adjust_points'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'adjust_points'}).exists()).toBe(false);
     });
 });
 
@@ -239,7 +247,7 @@ test('One file panel per submitted file', async () => {
             readonly_handgrading_results: false,
         }
     });
-    let panels = <WrapperArray<FilePanel>> wrapper.findAll({name: 'FilePanel'});
+    let panels = <WrapperArray<FilePanel>> wrapper.findAllComponents({name: 'FilePanel'});
     expect(panels.length).toEqual(3);
     expect(panels.at(0).vm.filename).toEqual('file1.txt');
     expect(panels.at(1).vm.filename).toEqual('file2.cpp');
@@ -318,17 +326,17 @@ describe('Checkbox tests', () => {
 
     test('Expand/collapse checkbox list', async () => {
         expect(wrapper.findAll('.criterion').length).toEqual(2);
-        expect(wrapper.findAll('.criterion').isVisible()).toBe(true);
+        expect(wrapper.findAll('.criterion').at(0).element).toBeVisible();
 
         wrapper.findAll('.collapsible-section-header').at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.criterion').length).toEqual(2);
-        expect(wrapper.findAll('.criterion').isVisible()).toBe(false);
+        expect(wrapper.findAll('.criterion').at(0).element).not.toBeVisible();
 
         wrapper.findAll('.collapsible-section-header').at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.criterion').length).toEqual(2);
-        expect(wrapper.findAll('.criterion').isVisible()).toBe(true);
+        expect(wrapper.findAll('.criterion').at(0).element).toBeVisible();
     });
 
     test('Checkboxes displayed', async () => {
@@ -479,17 +487,17 @@ describe('Comment tests', () => {
 
     test('Expand/collapse comment list', async () => {
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').isVisible()).toBe(true);
+        expect(wrapper.findAll('.comment').at(0).element).toBeVisible();
 
         wrapper.findAll('.collapsible-section-header').at(1).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').isVisible()).toBe(false);
+        expect(wrapper.findAll('.comment').at(0).element).not.toBeVisible();
 
         wrapper.findAll('.collapsible-section-header').at(1).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').isVisible()).toBe(true);
+        expect(wrapper.findAll('.comment').at(0).element).toBeVisible();
     });
 
     test('Staff can leave custom comment', async () => {
@@ -668,17 +676,17 @@ describe('Annotations reference list', () => {
 
     test('Expand/collapse annotation list', async () => {
         expect(wrapper.findAll('.annotation').length).toEqual(2);
-        expect(wrapper.findAll('.annotation').isVisible()).toBe(false);
+        expect(wrapper.findAll('.annotation').at(0).element).not.toBeVisible();
 
         wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.annotation').length).toEqual(2);
-        expect(wrapper.findAll('.annotation').isVisible()).toBe(true);
+        expect(wrapper.findAll('.annotation').at(0).element).toBeVisible();
 
         wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.annotation').length).toEqual(2);
-        expect(wrapper.findAll('.annotation').isVisible()).toBe(false);
+        expect(wrapper.findAll('.annotation').at(0).element).not.toBeVisible();
     });
 
     test('Annotations listed', async () => {
@@ -738,7 +746,7 @@ describe('Footer tests', () => {
             }
         });
 
-        expect(wrapper.find('#prev-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-button').element).toBeDisabled();
     });
 
     test('Next disabled', () => {
@@ -750,7 +758,7 @@ describe('Footer tests', () => {
             }
         });
 
-        expect(wrapper.find('#next-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-button').element).toBeDisabled();
     });
 
     test('Prev not disabled, emit events when clicked', () => {
@@ -898,7 +906,7 @@ test('Read-only mode', async () => {
 
     // Adjust points and leave comment are gone
     expect(wrapper.find('#adjust-points-container').exists()).toBe(false);
-    expect(wrapper.find({ref: 'adjust_points'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'adjust_points'}).exists()).toBe(false);
     expect(wrapper.find('#new-comment').exists()).toBe(false);
 
     // Checkboxes are not toggleable
@@ -921,7 +929,7 @@ test('Read-only mode', async () => {
     expect(wrapper.findAll('.delete').length).toEqual(0);
 
     // Annotation reference list is not shown
-    expect(wrapper.find({ref: 'annotation_reference'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'annotation_reference'}).exists()).toBe(false);
     expect(wrapper.findAll('.annotation').length).toEqual(0);
 
     // Comments still shown

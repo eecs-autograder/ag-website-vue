@@ -87,8 +87,8 @@ describe('Submit tab tests', () => {
         wrapper = managed_mount(ProjectView, {mocks: get_router_mocks()});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'GroupRegistration'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'GroupRegistration'}).exists()).toBe(true);
     });
 
     test('Current user is in new group', async () => {
@@ -96,8 +96,8 @@ describe('Submit tab tests', () => {
         wrapper = managed_mount(ProjectView, {mocks: get_router_mocks()});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'GroupRegistration'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'GroupRegistration'}).exists()).toBe(true);
 
         let new_group = data_ut.make_group(project.pk, 1, {member_names: [user.username]});
         Group.notify_group_created(new_group);
@@ -105,8 +105,8 @@ describe('Submit tab tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.group).toEqual(new_group);
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'GroupRegistration'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'GroupRegistration'}).exists()).toBe(false);
     });
 
     test('Current user not in new group', async () => {
@@ -121,8 +121,8 @@ describe('Submit tab tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.group).toBe(null);
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'GroupRegistration'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'GroupRegistration'}).exists()).toBe(true);
     });
 
     test('New group is for different project', async () => {
@@ -138,8 +138,8 @@ describe('Submit tab tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.group).toBe(null);
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'GroupRegistration'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'GroupRegistration'}).exists()).toBe(true);
     });
 
     test('Submit tab hidden from handgraders', async () => {
@@ -147,8 +147,8 @@ describe('Submit tab tests', () => {
         wrapper = managed_mount(ProjectView, {mocks: get_router_mocks()});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'submit_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'submit_tab'}).exists()).toBe(false);
     });
 
     test('Guests can see submit tab', async () => {
@@ -156,8 +156,8 @@ describe('Submit tab tests', () => {
         wrapper = managed_mount(ProjectView, {mocks: get_router_mocks()});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'submit_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'submit_tab'}).exists()).toBe(true);
     });
 
     test('My Submissions tab selected after submission', async () => {
@@ -166,7 +166,7 @@ describe('Submit tab tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(refresh_stub.callCount).toEqual(0);
-        wrapper.find({name: 'Submit'}).vm.$emit('submitted');
+        wrapper.findComponent({name: 'Submit'}).vm.$emit('submitted');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_current_tab).toEqual('my_submissions');
         expect(refresh_stub.callCount).toEqual(1);
@@ -182,13 +182,13 @@ describe('My submissions tab tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_current_tab).toEqual('submit');
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(false);
 
         wrapper.findAll('.nav-link').at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_current_tab).toEqual('submit');
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(false);
     });
 
     test('My submissions tab hidden from handgraders', async () => {
@@ -197,8 +197,8 @@ describe('My submissions tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'my_submissions'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'my_submissions_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'my_submissions_tab'}).exists()).toBe(false);
     });
 
     test('Guests can see my submissions tab', async () => {
@@ -207,8 +207,8 @@ describe('My submissions tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'my_submissions'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'my_submissions_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'my_submissions_tab'}).exists()).toBe(true);
     });
 });
 
@@ -219,7 +219,7 @@ describe('Student lookup tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'student_lookup'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({ref: 'student_lookup_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'student_lookup_tab'}).exists()).toBe(false);
     });
 
     test('Student lookup tab hidden from handgraders', async () => {
@@ -228,7 +228,7 @@ describe('Student lookup tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'student_lookup'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({ref: 'student_lookup_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'student_lookup_tab'}).exists()).toBe(false);
     });
 
     test('Staff can see student lookup tab', async () => {
@@ -237,7 +237,7 @@ describe('Student lookup tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'student_lookup'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({ref: 'student_lookup_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'student_lookup_tab'}).exists()).toBe(true);
     });
 });
 
@@ -248,8 +248,8 @@ describe('Handgrading tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'handgrading_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'handgrading_tab'}).exists()).toBe(false);
     });
 
     test('Handgrading rubric exists, handgrading tab shown to staff', async () => {
@@ -260,8 +260,8 @@ describe('Handgrading tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'handgrading_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_tab'}).exists()).toBe(true);
     });
 
     test('Handgrading rubric exists, handgrading tab shown to handgrader', async () => {
@@ -272,8 +272,8 @@ describe('Handgrading tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'handgrading_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_tab'}).exists()).toBe(true);
     });
 
     test('Handgrading rubric exists, handgrading hidden from student', async () => {
@@ -284,8 +284,8 @@ describe('Handgrading tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'handgrading_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'handgrading_tab'}).exists()).toBe(false);
     });
 
     test('Handgrading tab selected initially for handgraders, no query param', async () => {
@@ -295,8 +295,8 @@ describe('Handgrading tab tests', () => {
         wrapper = managed_shallow_mount(ProjectView, {mocks: get_router_mocks()});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'handgrading_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_tab'}).exists()).toBe(true);
         expect(wrapper.vm.d_current_tab).toEqual('handgrading');
     });
 });
@@ -309,8 +309,8 @@ describe('Handgrading result tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading_result'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'handgrading_result_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'handgrading_result_tab'}).exists()).toBe(false);
     });
 
     test('No group, handgrading result not requested', async () => {
@@ -320,8 +320,8 @@ describe('Handgrading result tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading_result'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'handgrading_result_tab'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'handgrading_result_tab'}).exists()).toBe(false);
     });
 
     test('Handgrading result exists, handgrading result tab shown', async () => {
@@ -332,8 +332,8 @@ describe('Handgrading result tab tests', () => {
             ProjectView, {mocks: get_router_mocks({current_tab: 'handgrading_result'})});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(true);
-        expect(wrapper.find({ref: 'handgrading_result_tab'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'handgrading_result_tab'}).exists()).toBe(true);
     });
 });
 
@@ -348,11 +348,11 @@ describe('Tab selection and lazy loading tests', ()  => {
 
         wrapper = managed_shallow_mount(ProjectView, {mocks: get_router_mocks()});
         expect(await wait_for_load(wrapper)).toBe(true);
-        expect(wrapper.find({name: 'Submit'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'StudentLookup'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Submit'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'StudentLookup'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
     });
 
     test('Requested tab on load', async () => {
@@ -361,9 +361,9 @@ describe('Tab selection and lazy loading tests', ()  => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'SubmissionList'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'SubmissionList'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'SubmissionList'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).element).toBeVisible();
         expect(wrapper.vm.d_current_tab).toEqual('my_submissions');
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'my_submissions'}}));
@@ -371,32 +371,29 @@ describe('Tab selection and lazy loading tests', ()  => {
 
     test('Submit tab loaded initially, select another tab and then submit again', async () => {
         expect(
-            await wait_until(wrapper, w => w.find({name: 'Submit'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'Submit'}).exists())
         ).toBe(true);
 
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'SubmissionList'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'SubmissionList'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'SubmissionList'}).isVisible()).toBe(true);
-        expect(wrapper.find({name: 'Submit'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'Submit'}).element).not.toBeVisible();
         expect(wrapper.vm.d_current_tab).toEqual('my_submissions');
         expect(router_replace.calledOnce).toBe(true);
 
-        tabs.at(0).trigger('click');
-        expect(
-            await wait_until(wrapper, w => w.find({name: 'Submit'}).isVisible())
-        ).toBe(true);
+        await tabs.at(0).trigger('click');
         expect(wrapper.vm.d_current_tab).toEqual('submit');
         expect(router_replace.calledTwice).toBe(true);
         expect(router_replace.secondCall.calledWith({query: {current_tab: 'submit'}}));
-        expect(wrapper.find({name: 'SubmissionList'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).element).not.toBeVisible();
     });
 
     test('Clicking on my_submissions tab', async () => {
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(false);
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
         await wrapper.vm.$nextTick();
@@ -405,14 +402,14 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'my_submissions'}}));
 
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'SubmissionList'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).element).toBeVisible();
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({name: 'SubmissionList'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'SubmissionList'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'SubmissionList'}).element).not.toBeVisible();
     });
 
     test('Clicking on student_lookup tab', async () => {
@@ -424,12 +421,12 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'student_lookup'}}));
 
-        expect(wrapper.find({name: 'StudentLookup'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'StudentLookup'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'StudentLookup'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'StudentLookup'}).element).toBeVisible();
     });
 
     test('Clicking on handgrading tab', async () => {
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(false);
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(3).trigger('click');
         await wrapper.vm.$nextTick();
@@ -438,18 +435,18 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'handgrading'}}));
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'HandgradingContainer'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).element).toBeVisible();
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'HandgradingContainer'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).element).not.toBeVisible();
     });
 
     test('Clicking on handgrading results tab', async () => {
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(4).trigger('click');
         await wrapper.vm.$nextTick();
@@ -458,13 +455,13 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'handgrading_result'}}));
 
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'Handgrading'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Handgrading'}).element).toBeVisible();
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(true);
-        expect(wrapper.find({name: 'Handgrading'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(true);
+        expect(wrapper.findComponent({name: 'Handgrading'}).element).not.toBeVisible();
     });
 });

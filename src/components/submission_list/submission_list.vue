@@ -30,6 +30,7 @@
           <template v-for="(submission, index) of d_submissions">
             <div v-if="index !== 0" class="divider"></div>
             <submission-panel
+              data-testid="all_submissions_submission_panel"
               :submission="d_ultimate_submission !== null
                               && d_ultimate_submission.pk === submission.pk
                             ? d_ultimate_submission : submission"
