@@ -169,50 +169,45 @@ $check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container, .unpadded-checkbox-container {
     box-sizing: border-box;
-    position: relative;
 
-    .checkbox-label {
-        color: lighten(black, 10);
+    .checkbox-label, .label {
         display: inline-block;
         font-size: .875rem;
         font-weight: bold;
     }
 
-    .checkbox  {
-        clip: rect(0,0,0,0);
-        position: absolute;
+    $right-margin: .25rem;
+    $icon-padding: .125rem;
+
+    .checkbox {
+        padding: 0;
+        margin-right: $right-margin;
+        display: inline-block;
     }
 
-    .checkbox + label::before {
-        color: transparent;
+    .checkbox::before {
         content: '\f0c8';
         font-family: "Font Awesome 5 Free";
         font-size: .625rem;
-        font-weight: 900;
-        background-color: $checkbox-background-dark;
-        background-image: linear-gradient(lighten($checkbox-background-dark, 8),
-                                        lighten($checkbox-background-dark, 3));
-        border-color: hsl(220, 12%, 66%);
-        border-radius: 3px;
-        border-style: solid;
-        border-width: 1px;
-        box-shadow: 0 0.5px 0.5px $pebble-dark;
-        display: inline-block;
-        padding: 2px 2px 2px 2px;
-        margin-right: .25rem;
+        font-weight: bold;
+
         min-width: .625rem;
-        position: relative;
-        bottom: 2px;
-    }
+        padding: $icon-padding;
+        margin-right: $right-margin + $icon-padding;
 
-    .checkbox:active + label::before {
+        color: transparent;
         background-color: $checkbox-background-dark;
-        background-image: linear-gradient(lighten($checkbox-background-dark, 5),
-                                        lighten($checkbox-background-dark, 0));
-        box-shadow: 0 0.5px 0.5px transparent;
+        background-image: linear-gradient(
+            lighten($checkbox-background-dark, 8),
+            lighten($checkbox-background-dark, 3)
+        );
+
+        border: 1px solid hsl(220, 12%, 66%);
+        border-radius: 3px;
+        box-shadow: 0 0.5px 0.5px $pebble-dark;
     }
 
-    .checkbox:checked + label::before {
+    .checkbox:checked::before {
         content: '\f00c';
         color: black;
     }
@@ -225,17 +220,17 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         box-shadow: 0 0.5px 0.5px transparent;
     }
 
-    .checkbox:disabled + label::before {
+    .checkbox:disabled + label {
+        color: rgba($check-mark-disabled, 0.6);
+    }
+
+    .checkbox:disabled::before {
         color: transparent;
         @extend %disabled-checkbox-shared;
     }
 
-    .checkbox:checked:disabled + label::before {
+    .checkbox:checked:disabled::before {
         color: rgba($check-mark-disabled, 0.4);
         @extend %disabled-checkbox-shared;
-    }
-
-    .checkbox:disabled + label {
-        color: rgba($check-mark-disabled, 0.6);
     }
 }

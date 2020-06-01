@@ -12,6 +12,7 @@ import {
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    checkbox_is_checked,
     do_input_blank_or_not_integer_test,
     do_invalid_text_input_test,
     emitted,
@@ -98,16 +99,35 @@ describe('Field binding tests', () => {
             wrapper, {ref: 'time_limit'}, (MAX_COMMAND_TIMEOUT + 1).toString(), null);
     });
 
+    test('use_virtual_memory_limit binding', async () => {
+        let checkbox = wrapper.find('[data-testid=limit_virtual_memory]');
+        expect(checkbox_is_checked(checkbox)).toBe(true);
+        expect(wrapper.vm.d_resource_limits.use_virtual_memory_limit).toBe(true);
+
+        await checkbox.setChecked(false);
+        expect(wrapper.vm.d_resource_limits.use_virtual_memory_limit).toBe(false);
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_resource_limits.use_virtual_memory_limit).toBe(true);
+
+        await set_data(wrapper, {d_resource_limits: {use_virtual_memory_limit: false}});
+        expect(checkbox_is_checked(checkbox)).toBe(false);
+
+        await set_data(wrapper, {d_resource_limits: {use_virtual_memory_limit: true}});
+        expect(checkbox_is_checked(checkbox)).toBe(true);
+    });
+
     test('virtual_memory_limit binding', async () => {
         let virtual_memory_limit_input = wrapper.findComponent({ref: 'virtual_memory_limit'});
 
-        await set_validated_input_text(virtual_memory_limit_input, '9');
 
-        expect(wrapper.vm.d_resource_limits!.virtual_memory_limit).toEqual(9);
+        await set_validated_input_text(virtual_memory_limit_input, '9');
+        expect(wrapper.vm.d_resource_limits!.virtual_memory_limit).toEqual(9000000);
         expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
 
-        await set_data(wrapper, {d_resource_limits: {virtual_memory_limit: 4}});
-        expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('4');
+        await set_data(wrapper, {d_resource_limits: {virtual_memory_limit: 2500000000}});
+        expect(get_validated_input_text(virtual_memory_limit_input)).toEqual('2500');
+        expect(validated_input_is_valid(virtual_memory_limit_input)).toEqual(true);
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
     });
@@ -122,66 +142,21 @@ describe('Field binding tests', () => {
             wrapper, {ref: 'virtual_memory_limit'}, '0', null);
     });
 
-    // test('error - virtual_memory_limit too large', async () => {
-    //     return do_invalid_text_input_test(
-    //         wrapper,
-    //         {ref: 'virtual_memory_limit'}, (MAX_VIRTUAL_MEM_LIMIT + 1).toString(), null);
-    // });
+    test('block_process_spawn binding', async () => {
+        let checkbox = wrapper.find('[data-testid=block_process_spawn]');
+        expect(checkbox_is_checked(checkbox)).toBe(true);
+        expect(wrapper.vm.d_resource_limits.block_process_spawn).toBe(true);
 
-    // test('stack_size_limit binding', async () => {
-    //     let stack_size_limit_input = wrapper.findComponent({ref: 'stack_size_limit'});
+        await checkbox.setChecked(false);
+        expect(wrapper.vm.d_resource_limits.block_process_spawn).toBe(false);
 
-    //     await set_validated_input_text(stack_size_limit_input, '9');
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_resource_limits.block_process_spawn).toBe(true);
 
-    //     expect(wrapper.vm.d_resource_limits!.stack_size_limit).toEqual(9);
-    //     expect(validated_input_is_valid(stack_size_limit_input)).toEqual(true);
+        await set_data(wrapper, {d_resource_limits: {block_process_spawn: false}});
+        expect(checkbox_is_checked(checkbox)).toBe(false);
 
-    //     await set_data(wrapper, {d_resource_limits: {stack_size_limit: 4}});
-    //     expect(get_validated_input_text(stack_size_limit_input)).toEqual('4');
-
-    //     expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
-    // });
-
-    // test('error - stack_size_limit is blank or not an integer', async () => {
-    //     return do_input_blank_or_not_integer_test(
-    //         wrapper, {ref: 'stack_size_limit'}, null);
-    // });
-
-    // test('error - stack_size_limit must be >= 1', async () => {
-    //     return do_invalid_text_input_test(wrapper, {ref: 'stack_size_limit'}, '0', null);
-    // });
-
-    // test('error - stack_size_limit too large', async () => {
-    //     return do_invalid_text_input_test(
-    //         wrapper, {ref: 'stack_size_limit'}, (MAX_STACK_SIZE_LIMIT + 1).toString(), null);
-    // });
-
-    // test('process_spawn_limit binding', async () => {
-    //     let process_spawn_limit_input = wrapper.findComponent({ref: 'process_spawn_limit'});
-
-    //     await set_validated_input_text(process_spawn_limit_input, '9');
-
-    //     expect(wrapper.vm.d_resource_limits!.process_spawn_limit).toEqual(9);
-    //     expect(validated_input_is_valid(process_spawn_limit_input)).toEqual(true);
-
-    //     await set_data(wrapper, {d_resource_limits: {process_spawn_limit: 4}});
-    //     expect(get_validated_input_text(process_spawn_limit_input)).toEqual('4');
-
-    //     expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_resource_limits);
-    // });
-
-    // test('error - process_spawn_limit is blank or not an integer', async () => {
-    //     return do_input_blank_or_not_integer_test(
-    //         wrapper, {ref: 'process_spawn_limit'}, null);
-    // });
-
-    // test('error - process_spawn_limit must be >= 0', async () => {
-    //     return do_invalid_text_input_test(
-    //         wrapper, {ref: 'process_spawn_limit'}, '-1', null);
-    // });
-
-    // test('error - process_spawn_limit too large', async () => {
-    //     return do_invalid_text_input_test(
-    //         wrapper, {ref: 'process_spawn_limit'}, (MAX_PROCESS_LIMIT + 1).toString(), null);
-    // });
+        await set_data(wrapper, {d_resource_limits: {block_process_spawn: true}});
+        expect(checkbox_is_checked(checkbox)).toBe(true);
+    });
 });

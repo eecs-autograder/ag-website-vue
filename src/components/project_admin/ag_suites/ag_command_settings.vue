@@ -413,12 +413,12 @@
           </template>
           <template slot="settings">
             <div id="first-failure-checkbox-wrapper" class="checkbox-input-container">
+              <label for="first-failure-config-enabled">
               <input id="first-failure-config-enabled"
                      type="checkbox"
                      @change="toggle_first_failure_feedback"
                      class="checkbox"
                      :checked="d_ag_test_command.first_failed_test_normal_fdbk_config !== null">
-              <label for="first-failure-config-enabled">
                 Enabled
               </label>
             </div>
