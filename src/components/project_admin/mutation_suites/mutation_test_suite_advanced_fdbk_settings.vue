@@ -183,8 +183,6 @@ import {
   MutationTestSuiteFeedbackConfig
 } from 'ag-client-typescript';
 
-import { hyphenate } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
-
 @Component
 export default class EditFeedbackSettingsMutationSuite extends Vue {
 
@@ -198,7 +196,6 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
   d_is_open = false;
 
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
-  readonly hyphenate = hyphenate;
 
   @Watch('value')
   on_value_changed(new_value: MutationTestSuiteFeedbackConfig,

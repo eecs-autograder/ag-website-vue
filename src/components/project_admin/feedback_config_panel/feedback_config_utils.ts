@@ -43,11 +43,6 @@ export interface AGTestCommandFeedbackPreset {
     show_whether_timed_out: boolean;
 }
 
-export function hyphenate(str: string) {
-    let hyphenated_str = str.toLowerCase().replace(' ', '-');
-    return hyphenated_str;
-}
-
 export class FeedbackDescriptions {
     static normal = `
         The feedback students get before the deadline has passed on submissions

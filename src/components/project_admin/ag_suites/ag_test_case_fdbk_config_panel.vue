@@ -35,8 +35,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { AGTestCaseFeedbackConfig } from 'ag-client-typescript';
 
-import { hyphenate } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
-
 import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
 
 @Component({
@@ -49,7 +47,6 @@ export default class AGTestCaseFdbkConfigPanel extends Vue {
   @Prop({required: true, type: Object})
   value!: AGTestCaseFeedbackConfig;
 
-  readonly hyphenate = hyphenate;
   d_feedback_config: AGTestCaseFeedbackConfig | null = null;
 
   @Watch('value')

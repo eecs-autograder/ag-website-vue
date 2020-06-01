@@ -591,7 +591,6 @@ import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
   FeedbackDescriptions,
-  hyphenate
 } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import SelectObject from '@/components/select_object.vue';
