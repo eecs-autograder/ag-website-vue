@@ -28,7 +28,6 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
 
         wrapper = managed_mount(AGTestCommandAdvancedFdbkSettings, {
             propsData: {
-                config_name: "normal",
                 ag_test_case: ag_test_case,
                 value: feedback_config
             }
@@ -36,16 +35,16 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('visible binding - case has only one command', async () => {
-        let visible_input = wrapper.find('#normal-cmd-visible');
+        let visible_input = wrapper.find('[data-testid=cmd_is_visible]');
 
         expect(wrapper.vm.ag_test_case.ag_test_commands.length).toEqual(1);
         expect(wrapper.vm.d_feedback_config!.visible).toEqual(false);
-        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(1);
+        expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(1);
 
         await visible_input.setChecked(true);
 
         expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
-        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(0);
+        expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(0);
     });
 
     test('visible binding - case has more than one command', async () => {
@@ -56,15 +55,15 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         ];
         await set_props(wrapper, {ag_test_case: case_with_more_than_one_command});
 
-        let visible_input = wrapper.find('#normal-cmd-visible');
+        let visible_input = wrapper.find('[data-testid=cmd_is_visible]');
 
         expect(wrapper.vm.d_feedback_config!.visible).toEqual(false);
-        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(1);
+        expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(1);
 
         await visible_input.setChecked(true);
 
         expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
-        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(1);
+        expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(1);
 
         expect(checkbox_is_checked(visible_input)).toEqual(true);
 
@@ -77,13 +76,13 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         await set_props(wrapper, {ag_test_case: ag_test_case});
 
         expect(wrapper.vm.d_feedback_config?.visible).toEqual(true);
-        expect(wrapper.findAll('#normal-cmd-visible').length).toEqual(0);
+        expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(0);
     });
 
     test('return_code_fdbk_level binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let return_code_fdbk_level_input = wrapper.find('#normal-return-code-fdbk-level');
+        let return_code_fdbk_level_input = wrapper.find('[data-testid=return_code_fdbk_level]');
 
         await return_code_fdbk_level_input.setValue(ValueFeedbackLevel.correct_or_incorrect);
         expect(wrapper.vm.d_feedback_config!.return_code_fdbk_level).toEqual(
@@ -104,7 +103,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     test('stdout_fdbk_level binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let stdout_fdbk_level_input = wrapper.find('#normal-stdout-fdbk-level');
+        let stdout_fdbk_level_input = wrapper.find('[data-testid=stdout_fdbk_level]');
 
         await stdout_fdbk_level_input.setValue(ValueFeedbackLevel.correct_or_incorrect);
         expect(wrapper.vm.d_feedback_config!.stdout_fdbk_level).toEqual(
@@ -125,7 +124,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     test('stderr_fdbk_level binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let stderr_fdbk_level_input = wrapper.find('#normal-stderr-fdbk-level');
+        let stderr_fdbk_level_input = wrapper.find('[data-testid=stderr_fdbk_level]');
 
         await stderr_fdbk_level_input.setValue(ValueFeedbackLevel.correct_or_incorrect);
         expect(wrapper.vm.d_feedback_config!.stderr_fdbk_level).toEqual(
@@ -146,7 +145,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     test('show_points binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let show_points_input = wrapper.find('#normal-show-points');
+        let show_points_input = wrapper.find('[data-testid=show_points]');
 
         await show_points_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_points).toEqual(true);
@@ -169,7 +168,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     test('show_actual_stdout binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let show_actual_stdout_input = wrapper.find('#normal-show-actual-stdout');
+        let show_actual_stdout_input = wrapper.find('[data-testid=show_actual_stdout]');
 
         await show_actual_stdout_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_actual_stdout).toEqual(true);
@@ -192,7 +191,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     test('show_actual_stderr binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let show_actual_stderr_input = wrapper.find('#normal-show-actual-stderr');
+        let show_actual_stderr_input = wrapper.find('[data-testid=show_actual_stderr]');
 
         await show_actual_stderr_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_actual_stderr).toEqual(true);
@@ -215,7 +214,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     test('show_whether_timed_out binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 
-        let show_whether_timed_out_input = wrapper.find('#normal-show-whether-timed-out');
+        let show_whether_timed_out_input = wrapper.find('[data-testid=show_whether_timed_out]');
 
         await show_whether_timed_out_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_whether_timed_out).toEqual(true);
@@ -246,14 +245,6 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         });
         await set_props(wrapper, {'value': new_config});
         expect(wrapper.vm.d_feedback_config).toEqual(new_config);
-    });
-
-    test('config_name Prop', async () => {
-        await set_data(wrapper, {d_is_open: true});
-        expect(wrapper.vm.config_name).toEqual("normal");
-
-        await set_props(wrapper, {'config_name': "first-failure"});
-        expect(wrapper.vm.config_name).toEqual("first-failure");
     });
 
     test('toggle_is_open', async () => {

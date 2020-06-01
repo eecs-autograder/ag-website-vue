@@ -43,7 +43,7 @@ describe('AGTestCaseFdbkConfigPanel tests', () => {
     });
 
     test('visible binding', async () => {
-        let visible_input = wrapper.find('#normal-case-visible');
+        let visible_input = wrapper.find('[data-testid=is_visible]');
 
         await visible_input.setChecked(true);
         expect(component.d_feedback_config!.visible).toEqual(true);
@@ -64,7 +64,7 @@ describe('AGTestCaseFdbkConfigPanel tests', () => {
     });
 
     test('show_individual_commands binding', async () => {
-        let show_individual_commands_input = wrapper.find('#normal-show-individual-commands');
+        let show_individual_commands_input = wrapper.find('[data-testid=show_individual_commands]');
 
         await show_individual_commands_input.setChecked(true);
         expect(component.d_feedback_config!.show_individual_commands).toEqual(true);

@@ -36,13 +36,12 @@
         <div class="checkbox-input-container"
              ref="submission_checkbox"
              v-for="submission of d_submissions" :key="submission.pk">
-          <input
-            :id="`submission-${submission.pk}`"
-            type="checkbox"
-            class="checkbox"
-            :checked="d_selected_submissions.has(submission)"
-            @change="toggle_submission(submission)"/>
-          <label :for="`submission-${submission.pk}`">
+          <label>
+            <input
+              type="checkbox"
+              class="checkbox"
+              :checked="d_selected_submissions.has(submission)"
+              @change="toggle_submission(submission)"/>
             {{format_datetime(submission.timestamp)}}
           </label>
         </div>

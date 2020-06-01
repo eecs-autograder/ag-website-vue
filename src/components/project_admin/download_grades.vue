@@ -46,12 +46,8 @@
 
       <div class="option-container">
         <div class="checkbox-input-container">
-          <input id="include-staff"
-                  type="checkbox"
-                  class="checkbox"
-                  v-model="d_include_staff"/>
-          <label class="checkbox-label"
-                  for="include-staff">
+          <label class="checkbox-label">
+          <input id="include-staff" type="checkbox" class="checkbox" v-model="d_include_staff"/>
             Include staff
           </label>
         </div>

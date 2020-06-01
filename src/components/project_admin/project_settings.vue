@@ -68,23 +68,21 @@
           <legend class="legend"> Access </legend>
 
           <div class="checkbox-input-container">
-            <input id="visible-to-students"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_project.visible_to_students"/>
-            <label class="checkbox-label"
-                   for="visible-to-students">
+            <label class="checkbox-label">
+              <input data-testid="visible_to_students"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.visible_to_students"/>
               Publish project
             </label>
           </div>
 
           <div class="checkbox-input-container">
-            <input id="guests-can-submit"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_project.guests_can_submit"/>
-            <label class="checkbox-label"
-                   for="guests-can-submit">
+            <label class="checkbox-label">
+              <input data-testid="guests_can_submit"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.guests_can_submit"/>
               Anyone with the link can submit
             </label>
             <tooltip width="large" placement="top">
@@ -94,12 +92,11 @@
           </div>
 
           <div class="checkbox-input-container">
-            <input id="disallow-student-submissions"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_project.disallow_student_submissions"/>
-            <label class="checkbox-label"
-                   for="disallow-student-submissions">
+            <label class="checkbox-label">
+              <input data-testid="disallow_student_submissions"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.disallow_student_submissions"/>
               Disable submitting
             </label>
             <tooltip width="large" placement="top">
@@ -109,13 +106,12 @@
           </div>
 
           <div class="checkbox-input-container">
-            <input id="publish-final-grades"
-                   type="checkbox"
-                   class="checkbox"
-                   :checked="!d_project.hide_ultimate_submission_fdbk"
-                   @change="d_project.hide_ultimate_submission_fdbk = !$event.target.checked"/>
-            <label class="checkbox-label"
-                   for="publish-final-grades">
+            <label class="checkbox-label">
+              <input data-testid="publish_final_grades"
+                     type="checkbox"
+                     class="checkbox"
+                     :checked="!d_project.hide_ultimate_submission_fdbk"
+                     @change="d_project.hide_ultimate_submission_fdbk = !$event.target.checked"/>
               Publish final grades
             </label>
             <tooltip width="large" placement="top">
@@ -159,12 +155,11 @@
           </div>
 
           <div class="checkbox-input-container">
-            <input id="disallow-group-registration"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_project.disallow_group_registration"/>
-            <label class="checkbox-label"
-                   for="disallow-group-registration">
+            <label class="checkbox-label">
+              <input data-testid="disallow_group_registration"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.disallow_group_registration"/>
               Disable group registration
             </label>
             <tooltip width="large" placement="top">
@@ -226,13 +221,12 @@
 
           </div>
           <div class="checkbox-input-container">
-            <input id="allow-submissions-past-limit"
-                   type="checkbox"
-                   class="checkbox"
-                   :disabled="d_project.submission_limit_per_day === null"
-                   v-model="d_project.allow_submissions_past_limit"/>
-            <label class="checkbox-label"
-                   for="allow-submissions-past-limit">
+            <label class="checkbox-label">
+              <input data-testid="allow_submissions_past_limit"
+                     type="checkbox"
+                     class="checkbox"
+                     :disabled="d_project.submission_limit_per_day === null"
+                     v-model="d_project.allow_submissions_past_limit"/>
               Allow submissions past limit
             </label>
           </div>
@@ -265,13 +259,12 @@
           </div>
 
           <div class="checkbox-input-container">
-            <input id="groups-combine-daily-submissions"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_project.groups_combine_daily_submissions"
-                   :disabled="d_project.max_group_size === 1"/>
-            <label class="checkbox-label"
-                   for="groups-combine-daily-submissions">
+            <label class="checkbox-label">
+              <input data-testid="groups_combine_daily_submissions"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.groups_combine_daily_submissions"
+                     :disabled="d_project.max_group_size === 1"/>
               Groups get more submissions than individuals
             </label>
             <tooltip width="large" placement="top">
@@ -293,12 +286,11 @@
           </div>
 
           <div class="checkbox-input-container">
-            <input id="allow-late-days"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_project.allow_late_days"/>
-            <label class="checkbox-label"
-                   for="allow-late-days">
+            <label class="checkbox-label">
+              <input data-testid="allow_late_days"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.allow_late_days"/>
               Allow late day tokens
             </label>
             <tooltip width="medium" placement="top">

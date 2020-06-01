@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     BugsExposedFeedbackLevel,
@@ -463,18 +463,16 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.visible
         ).toBe(false);
 
-        wrapper.find('#past-limit-mutation-suite-visible').setChecked(true);
+        wrapper.findAll('[data-testid=mutation_suite_is_visible]').at(2).setChecked(true);
         await wrapper.vm.$nextTick();
 
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.visible
         ).toBe(true);
 
-        wrapper.findComponent({ref: 'past_limit_edit_feedback_settings'}).find(
+        await wrapper.findComponent({ref: 'past_limit_edit_feedback_settings'}).find(
             '.advanced-settings-label'
         ).trigger('click');
-
-        await wrapper.vm.$nextTick();
 
         // return code correctness
         expect(
@@ -482,7 +480,7 @@ describe('MutationSuites tests', () => {
                 .bugs_exposed_fdbk_level
         ).toEqual(BugsExposedFeedbackLevel.exposed_bug_names);
 
-        wrapper.find('#past-limit-bugs-exposed-fdbk-level').setValue(
+        wrapper.find('[data-testid=bugs_exposed_fdbk_level]').setValue(
             BugsExposedFeedbackLevel.num_bugs_exposed
         );
         expect(
@@ -496,7 +494,7 @@ describe('MutationSuites tests', () => {
                 .show_invalid_test_names
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-invalid-test-names').setChecked(true);
+        wrapper.find('[data-testid=show_invalid_test_names]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_invalid_test_names
@@ -507,7 +505,7 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.show_points
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-points').setChecked(true);
+        wrapper.find('[data-testid=show_points]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.show_points
         ).toBe(true);
@@ -518,7 +516,7 @@ describe('MutationSuites tests', () => {
                 .show_setup_return_code
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-setup-return-code').setChecked(true);
+        wrapper.find('[data-testid=show_setup_return_code]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_setup_return_code
@@ -530,7 +528,7 @@ describe('MutationSuites tests', () => {
                 .show_setup_stdout
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-setup-stdout').setChecked(true);
+        wrapper.find('[data-testid=show_setup_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_setup_stdout
@@ -542,7 +540,7 @@ describe('MutationSuites tests', () => {
                 .show_setup_stderr
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-setup-stderr').setChecked(true);
+        wrapper.find('[data-testid=show_setup_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_setup_stderr
@@ -554,7 +552,7 @@ describe('MutationSuites tests', () => {
                 .show_get_test_names_return_code
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-get-test-names-return-code').setChecked(true);
+        wrapper.find('[data-testid=show_test_name_discovery_return_code]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_get_test_names_return_code
@@ -566,7 +564,7 @@ describe('MutationSuites tests', () => {
                 .show_get_test_names_stdout
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-get-test-names-stdout').setChecked(true);
+        wrapper.find('[data-testid=show_test_name_discovery_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_get_test_names_stdout
@@ -578,7 +576,7 @@ describe('MutationSuites tests', () => {
                 .show_get_test_names_stderr
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-get-test-names-stderr').setChecked(true);
+        wrapper.find('[data-testid=show_test_name_discovery_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_get_test_names_stderr
@@ -590,7 +588,7 @@ describe('MutationSuites tests', () => {
                 .show_validity_check_stdout
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-validity-check-stdout').setChecked(true);
+        wrapper.find('[data-testid=show_validity_check_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stdout
@@ -602,7 +600,7 @@ describe('MutationSuites tests', () => {
                 .show_validity_check_stderr
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-validity-check-stderr').setChecked(true);
+        wrapper.find('[data-testid=show_validity_check_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stderr
@@ -614,7 +612,7 @@ describe('MutationSuites tests', () => {
                 .show_grade_buggy_impls_stdout
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-grade-buggy-impls-stdout').setChecked(true);
+        wrapper.find('[data-testid=show_grade_buggy_impls_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_grade_buggy_impls_stdout
@@ -626,7 +624,7 @@ describe('MutationSuites tests', () => {
                 .show_grade_buggy_impls_stderr
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-grade-buggy-impls-stderr').setChecked(true);
+        wrapper.find('[data-testid=show_grade_buggy_impls_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stderr

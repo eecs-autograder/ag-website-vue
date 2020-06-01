@@ -1,14 +1,12 @@
 <template>
   <div id="mutation-commands-component">
     <div class="checkbox-input-container">
-      <input id="use-setup-command"
-             type="checkbox"
-             class="checkbox"
-             @change="$emit('input', d_mutation_test_suite)"
-             v-model="d_mutation_test_suite.use_setup_command"/>
-      <label class="checkbox-label"
-             id="use-setup-command-label"
-             for="use-setup-command">
+      <label class="label" id="use-setup-command-label">
+        <input id="use-setup-command"
+               type="checkbox"
+               class="checkbox"
+               @change="$emit('input', d_mutation_test_suite)"
+               v-model="d_mutation_test_suite.use_setup_command"/>
         Use Setup Command
       </label>
     </div>

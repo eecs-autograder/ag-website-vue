@@ -6,21 +6,23 @@
 
     <template v-slot:settings>
       <div class="checkbox-input-container">
-        <input :id="`${hyphenate(config_name)}-case-visible`"
-              type="checkbox"
-              @change="$emit('input', d_feedback_config)"
-              class="checkbox"
-              v-model="d_feedback_config.visible">
-        <label :for="`${hyphenate(config_name)}-case-visible`"> Case is Visible </label>
+        <label class="label">
+          <input data-testid="is_visible"
+                 type="checkbox"
+                 @change="$emit('input', d_feedback_config)"
+                 class="checkbox"
+                 v-model="d_feedback_config.visible">
+          Test is Visible
+        </label>
       </div>
 
       <div class="checkbox-input-container">
-        <input :id="`${hyphenate(config_name)}-show-individual-commands`"
-              type="checkbox"
-              @change="$emit('input', d_feedback_config)"
-              class="checkbox"
-              v-model="d_feedback_config.show_individual_commands">
-        <label :for="`${hyphenate(config_name)}-show-individual-commands`">
+        <label class="label">
+          <input data-testid="show_individual_commands"
+                 type="checkbox"
+                 @change="$emit('input', d_feedback_config)"
+                 class="checkbox"
+                 v-model="d_feedback_config.show_individual_commands">
           Show Individual Commands
         </label>
       </div>
@@ -41,8 +43,8 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
   components: {FeedbackConfigPanel}
 })
 export default class AGTestCaseFdbkConfigPanel extends Vue {
-  @Prop({required: true, type: String})
-  config_name!: string;
+  // @Prop({required: true, type: String})
+  // config_name!: string;
 
   @Prop({required: true, type: Object})
   value!: AGTestCaseFeedbackConfig;

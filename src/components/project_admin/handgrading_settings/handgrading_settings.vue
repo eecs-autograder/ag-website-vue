@@ -82,11 +82,13 @@
                           @form_validity_changed="d_settings_form_is_valid = $event">
 
             <div class="checkbox-input-container">
-              <input id="publish-grades"
-                     class="checkbox"
-                     type="checkbox"
-                     v-model="d_handgrading_rubric.show_grades_and_rubric_to_students"/>
-              <label for="publish-grades" class="checkbox-label">Publish grades and rubric</label>
+              <label class="checkbox-label">
+                <input id="publish-grades"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.show_grades_and_rubric_to_students"/>
+                Publish grades and rubric
+              </label>
             </div>
 
             <div class="form-field-wrapper extra-space">
@@ -121,11 +123,11 @@
             </div>
 
             <div class="checkbox-input-container">
-              <input id="handgraders-can-leave-comments"
-                     class="checkbox"
-                     type="checkbox"
-                     v-model="d_handgrading_rubric.handgraders_can_leave_comments"/>
-              <label for="handgraders-can-leave-comments" class="checkbox-label">
+              <label class="checkbox-label">
+                <input id="handgraders-can-leave-comments"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.handgraders_can_leave_comments"/>
                 Handgraders can leave comments
                 <tooltip placement="top" width="large">
                   Allow handgraders to leave custom comments.
@@ -136,11 +138,11 @@
             </div>
 
             <div class="checkbox-input-container">
-              <input id="handgraders-can-adjust-points"
-                     class="checkbox"
-                     type="checkbox"
-                     v-model="d_handgrading_rubric.handgraders_can_adjust_points"/>
-              <label for="handgraders-can-adjust-points" class="checkbox-label">
+              <label class="checkbox-label">
+                <input id="handgraders-can-adjust-points"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.handgraders_can_adjust_points"/>
                 Handgraders can adjust points
                 <tooltip placement="top" width="large">
                   Allow handgraders to make arbitrary total handgrading score adjustments.

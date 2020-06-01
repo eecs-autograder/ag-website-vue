@@ -21,14 +21,13 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
 
         wrapper = managed_mount(AGTestSuiteAdvancedFdbkSettings, {
             propsData: {
-                config_name: "normal",
                 value: feedback_config
             }
         });
     });
 
     test('visible binding', async () => {
-        let visible_input = wrapper.find('#normal-suite-visible');
+        let visible_input = wrapper.find('[data-testid=suite_is_visible]');
 
         await visible_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
@@ -53,7 +52,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     test('show_individual_tests binding', async () => {
         await wrapper.setData({d_is_open: true});
 
-        let show_individual_tests_input = wrapper.find('#normal-show-individual-tests');
+        let show_individual_tests_input = wrapper.find('[data-testid=show_individual_tests]');
 
         show_individual_tests_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_individual_tests).toEqual(true);
@@ -79,7 +78,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.setData({d_is_open: true});
         await wrapper.vm.$nextTick();
 
-        let show_setup_return_code_input = wrapper.find('#normal-show-setup-return-code');
+        let show_setup_return_code_input = wrapper.find('[data-testid=show_setup_return_code]');
 
         await show_setup_return_code_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_return_code).toEqual(true);
@@ -105,7 +104,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.setData({d_is_open: true});
         await wrapper.vm.$nextTick();
 
-        let show_setup_timed_out_input = wrapper.find('#normal-show-setup-timed-out');
+        let show_setup_timed_out_input = wrapper.find('[data-testid=show_setup_timed_out]');
 
         show_setup_timed_out_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(true);
@@ -132,7 +131,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.setData({d_is_open: true});
         await wrapper.vm.$nextTick();
 
-        let show_setup_stdout_input = wrapper.find('#normal-show-setup-stdout');
+        let show_setup_stdout_input = wrapper.find('[data-testid=show_setup_stdout]');
 
         show_setup_stdout_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(true);
@@ -158,7 +157,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.setData({d_is_open: true});
         await wrapper.vm.$nextTick();
 
-        let show_setup_stderr_input = wrapper.find('#normal-show-setup-stderr');
+        let show_setup_stderr_input = wrapper.find('[data-testid=show_setup_stderr]');
 
         show_setup_stderr_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(true);
@@ -191,15 +190,6 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_feedback_config!).toEqual(new_val);
-    });
-
-    test('config_name Prop', async () => {
-        expect(wrapper.vm.config_name).toEqual("normal");
-
-        wrapper.setProps({'config_name': "past-limit"});
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.config_name).toEqual("past-limit");
     });
 
     test('toggle_is_open', async () => {

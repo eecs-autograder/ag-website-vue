@@ -144,7 +144,7 @@ describe('AG test case settings form tests', () => {
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(false);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);
 
-        wrapper.find('#past-limit-case-visible').setChecked(true);
+        await wrapper.findAll('[data-testid=is_visible]').at(2).setChecked(true);
 
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(true);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(true);
@@ -156,7 +156,7 @@ describe('AG test case settings form tests', () => {
             component.d_ag_test_case!.past_limit_submission_fdbk_config.show_individual_commands
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-individual-commands').setChecked(true);
+        await wrapper.findAll('[data-testid=show_individual_commands]').at(2).setChecked(true);
 
         expect(
             past_limit_config_panel_component.d_feedback_config!.show_individual_commands
@@ -168,8 +168,7 @@ describe('AG test case settings form tests', () => {
 
     test('Checkboxes in ag case config panels do not react to changes in other panels',
          async () => {
-        wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
-        await component.$nextTick();
+        await wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
 
         expect(component.d_ag_test_case!.normal_fdbk_config.show_individual_commands).toBe(false);
         expect(
@@ -182,7 +181,7 @@ describe('AG test case settings form tests', () => {
             component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands
         ).toBe(false);
 
-        wrapper.find('#student-lookup-show-individual-commands').setChecked(true);
+        await wrapper.findAll('[data-testid=show_individual_commands]').at(3).setChecked(true);
 
         expect(component.d_ag_test_case!.normal_fdbk_config.show_individual_commands).toBe(false);
         expect(

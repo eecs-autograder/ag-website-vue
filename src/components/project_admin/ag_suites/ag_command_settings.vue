@@ -333,42 +333,42 @@
                 ref="diff_options">
         <legend class="legend"> Diff Options </legend>
         <div class="checkbox-input-container">
-          <input id="ignore-case"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_case">
-          <label class="checkbox-label"
-                  for="ignore-case"> Ignore case sensitivity
+          <label class="checkbox-label">
+            <input id="ignore-case"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_case">
+            Ignore case
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input id="ignore-whitespace"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_whitespace">
-          <label class="checkbox-label"
-                  for="ignore-whitespace"> Ignore whitespace
+          <label class="checkbox-label">
+            <input id="ignore-whitespace"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_whitespace">
+            Ignore whitespace
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input id="ignore-whitespace-changes"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_whitespace_changes">
-          <label class="checkbox-label"
-                  for="ignore-whitespace-changes"> Ignore whitespace changes
+          <label class="checkbox-label">
+            <input id="ignore-whitespace-changes"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_whitespace_changes">
+            Ignore whitespace changes
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input id="ignore-blank-lines"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_blank_lines">
-          <label class="checkbox-label"
-                  for="ignore-blank-lines"> Ignore blank lines
+          <label class="checkbox-label">
+            <input id="ignore-blank-lines"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_blank_lines">
+            Ignore blank lines
           </label>
         </div>
       </fieldset>
@@ -413,12 +413,12 @@
           </template>
           <template slot="settings">
             <div id="first-failure-checkbox-wrapper" class="checkbox-input-container">
-              <label for="first-failure-config-enabled">
-              <input id="first-failure-config-enabled"
-                     type="checkbox"
-                     @change="toggle_first_failure_feedback"
-                     class="checkbox"
-                     :checked="d_ag_test_command.first_failed_test_normal_fdbk_config !== null">
+              <label>
+                <input id="first-failure-config-enabled"
+                       type="checkbox"
+                       @change="toggle_first_failure_feedback"
+                       class="checkbox"
+                       :checked="d_ag_test_command.first_failed_test_normal_fdbk_config !== null">
                 Enabled
               </label>
             </div>
@@ -630,7 +630,6 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
   }
 })
 export default class AGTestCommandSettings extends Vue {
-
   @Prop({required: true, type: AGTestCommand})
   ag_test_command!: AGTestCommand;
 

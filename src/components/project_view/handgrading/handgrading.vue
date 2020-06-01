@@ -249,13 +249,15 @@
           Prev
         </button>
         <div id="finished-grading-container" class="checkbox-input-container footer-item">
+          <label>
           <input type="checkbox"
                  class="checkbox"
                  id="finished-grading"
                  :disabled="saving"
                  @change="save_finished_grading"
                  v-model="d_handgrading_result.finished_grading"/>
-          <label for="finished-grading">Done</label>
+            Done
+          </label>
         </div>
         <button type="button"
                 id="next-button"

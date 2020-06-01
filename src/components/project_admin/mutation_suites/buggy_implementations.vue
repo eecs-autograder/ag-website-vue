@@ -19,14 +19,12 @@
     </div>
 
     <div class="checkbox-input-container">
-      <input id="override-max-points"
-             type="checkbox"
-             class="checkbox"
-             @change="toggle_override_max_points"
-             v-model="d_override_max_points"/>
-      <label class="checkbox-label"
-             id="override-max-points-label"
-             for="override-max-points">
+      <label class="label" id="override-max-points-label">
+        <input id="override-max-points"
+               type="checkbox"
+               class="checkbox"
+               @change="toggle_override_max_points"
+               v-model="d_override_max_points"/>
         Override max points
       </label>
     </div>

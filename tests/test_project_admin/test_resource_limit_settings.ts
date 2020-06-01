@@ -102,13 +102,13 @@ describe('Field binding tests', () => {
     test('use_virtual_memory_limit binding', async () => {
         let checkbox = wrapper.find('[data-testid=limit_virtual_memory]');
         expect(checkbox_is_checked(checkbox)).toBe(true);
-        expect(wrapper.vm.d_resource_limits.use_virtual_memory_limit).toBe(true);
+        expect(wrapper.vm.d_resource_limits?.use_virtual_memory_limit).toBe(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_resource_limits.use_virtual_memory_limit).toBe(false);
+        expect(wrapper.vm.d_resource_limits?.use_virtual_memory_limit).toBe(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_resource_limits.use_virtual_memory_limit).toBe(true);
+        expect(wrapper.vm.d_resource_limits?.use_virtual_memory_limit).toBe(true);
 
         await set_data(wrapper, {d_resource_limits: {use_virtual_memory_limit: false}});
         expect(checkbox_is_checked(checkbox)).toBe(false);
@@ -145,13 +145,13 @@ describe('Field binding tests', () => {
     test('block_process_spawn binding', async () => {
         let checkbox = wrapper.find('[data-testid=block_process_spawn]');
         expect(checkbox_is_checked(checkbox)).toBe(true);
-        expect(wrapper.vm.d_resource_limits.block_process_spawn).toBe(true);
+        expect(wrapper.vm.d_resource_limits?.block_process_spawn).toBe(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_resource_limits.block_process_spawn).toBe(false);
+        expect(wrapper.vm.d_resource_limits?.block_process_spawn).toBe(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_resource_limits.block_process_spawn).toBe(true);
+        expect(wrapper.vm.d_resource_limits?.block_process_spawn).toBe(true);
 
         await set_data(wrapper, {d_resource_limits: {block_process_spawn: false}});
         expect(checkbox_is_checked(checkbox)).toBe(false);

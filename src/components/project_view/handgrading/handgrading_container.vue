@@ -20,11 +20,13 @@
 
               <div id="filter-menu" class="menu">
                 <div class="checkbox-input-container">
-                  <input v-model="d_include_staff"
-                          id="include-staff"
-                          type="checkbox"
-                          class="checkbox">
-                  <label for="include-staff">Include Staff</label>
+                  <label>
+                    <input v-model="d_include_staff"
+                           id="include-staff"
+                           type="checkbox"
+                           class="checkbox">
+                    Include Staff
+                  </label>
                 </div>
 
                 <div id="select-status">

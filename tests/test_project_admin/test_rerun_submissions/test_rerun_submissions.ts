@@ -228,7 +228,7 @@ test('Selecting and unselecting AG test suites', async () => {
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(1).text())
     ).toEqual('0 test case(s) from 0 suite(s)');
-    let checkboxes = wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'});
+    let checkboxes = wrapper.findAll('[data-testid=ag_test_suite_checkbox]');
     await checkboxes.at(1).setChecked(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
@@ -259,7 +259,7 @@ test('Selecting and unselecting test cases', async () => {
     await wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
 
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(0);
-    await wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(0).setChecked(true);
+    await wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0).setChecked(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(1).text())
@@ -268,7 +268,7 @@ test('Selecting and unselecting test cases', async () => {
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(0);
 
-    await wrapper.findAllComponents({ref: 'ag_test_case_checkbox'}).at(1).setChecked(true);
+    await wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1).setChecked(true);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(1);
@@ -278,7 +278,7 @@ test('Selecting and unselecting test cases', async () => {
         ).has(ag_test_suites[0].ag_test_cases[1].pk)
     ).toBe(true);
 
-    await wrapper.findAllComponents({ref: 'ag_test_case_checkbox'}).at(0).setChecked(true);
+    await wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(0).setChecked(true);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(2);
@@ -293,7 +293,7 @@ test('Selecting and unselecting test cases', async () => {
         ).has(ag_test_suites[0].ag_test_cases[1].pk)
     ).toBe(true);
 
-    await wrapper.findAllComponents({ref: 'ag_test_case_checkbox'}).at(1).setChecked(false);
+    await wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1).setChecked(false);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(1);
@@ -311,10 +311,10 @@ test('Selecting test case also selects suite, unselecting suite unselects tests'
 
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(0);
 
-    wrapper.findAllComponents({ref: 'ag_test_case_checkbox'}).at(1).setChecked(true);
+    wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1).setChecked(true);
     await wrapper.vm.$nextTick();
     expect(
-        checkbox_is_checked(wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(0))
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0))
     ).toBe(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
@@ -326,21 +326,21 @@ test('Selecting test case also selects suite, unselecting suite unselects tests'
         ).has(ag_test_suites[0].ag_test_cases[1].pk)
     ).toBe(true);
     expect(
-        checkbox_is_checked(wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(0))
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0))
     ).toBe(true);
 
     // Add another suite so we make sure the right one is unchecked later
-    wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(1).setChecked(true);
+    wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(1).setChecked(true);
 
-    wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(0).setChecked(false);
+    wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0).setChecked(false);
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.has(ag_test_suites[0].pk)).toBe(false);
     expect(
-        checkbox_is_checked(wrapper.findAllComponents({ref: 'ag_test_case_checkbox'}).at(1))
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1))
     ).toBe(false);
     expect(
-        checkbox_is_checked(wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(1))
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(1))
     ).toBe(true);
 });
 
@@ -353,7 +353,7 @@ test('Selecting and unselecting mutation test suites', async () => {
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(2).text())
     ).toEqual('0 mutation test suite(s)');
-    let checkboxes = wrapper.findAllComponents({ref: 'mutation_test_suite_checkbox'});
+    let checkboxes = wrapper.findAll('[data-testid=mutation_test_suite_checkbox]');
     await checkboxes.at(1).setChecked(true);
     expect(wrapper.vm.d_selected_mutation_test_suite_pks.size).toEqual(1);
     expect(
@@ -451,8 +451,8 @@ describe('Start rerun tests', () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
 
-        wrapper.findAllComponents({ref: 'ag_test_case_checkbox'}).at(0).setChecked(true);
-        wrapper.findAllComponents({ref: 'ag_test_suite_checkbox'}).at(1).setChecked(true);
+        wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(0).setChecked(true);
+        wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(1).setChecked(true);
 
         wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
@@ -480,7 +480,7 @@ describe('Start rerun tests', () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-mutation-test-suites').setChecked(false);
 
-        wrapper.findAllComponents({ref: 'mutation_test_suite_checkbox'}).at(1).setChecked(true);
+        wrapper.findAll('[data-testid=mutation_test_suite_checkbox]').at(1).setChecked(true);
 
         wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();

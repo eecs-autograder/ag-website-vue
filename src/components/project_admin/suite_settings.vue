@@ -23,14 +23,13 @@
       </validated-input>
 
       <div class="checkbox-input-container">
-        <input data-testid="synchronous_or_deferred"
-               type="checkbox"
-               class="checkbox"
-               :checked="!d_suite.deferred"
-               @change="d_suite.deferred = !$event.target.checked;
-                        $emit('field_change', d_suite)"/>
-        <label class="checkbox-label"
-                for="synchronous-or-deferred">
+        <label class="checkbox-label">
+          <input data-testid="synchronous_or_deferred"
+                 type="checkbox"
+                 class="checkbox"
+                 :checked="!d_suite.deferred"
+                 @change="d_suite.deferred = !$event.target.checked;
+                          $emit('field_change', d_suite)"/>
           Suite must finish before students can submit again
         </label>
       </div>
@@ -67,13 +66,12 @@
       </div>
 
       <div class="checkbox-input-container">
-        <input data-testid="read_only_instructor_files"
-                type="checkbox"
-                class="checkbox"
-                v-model="d_suite.read_only_instructor_files"
-                @change="$emit('field_change', d_suite)"/>
-        <label class="checkbox-label"
-                for="read-only-instructor-files">
+        <label class="checkbox-label">
+          <input data-testid="read_only_instructor_files"
+                 type="checkbox"
+                 class="checkbox"
+                 v-model="d_suite.read_only_instructor_files"
+                 @change="$emit('field_change', d_suite)"/>
           Instructor files are read-only
         </label>
       </div>

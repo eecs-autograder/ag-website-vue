@@ -93,7 +93,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('visible_to_students binding', async () => {
-        let checkbox = wrapper.find('#visible-to-students');
+        let checkbox = wrapper.find('[data-testid=visible_to_students]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project.visible_to_students).toEqual(true);
@@ -114,7 +114,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('guests_can_submit binding', async () => {
-        let checkbox = wrapper.find('#guests-can-submit');
+        let checkbox = wrapper.find('[data-testid=guests_can_submit]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project.guests_can_submit).toEqual(true);
@@ -135,7 +135,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('disallow_student_submissions binding', async () => {
-        let checkbox = wrapper.find('#disallow-student-submissions');
+        let checkbox = wrapper.find('[data-testid=disallow_student_submissions]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project.disallow_student_submissions).toEqual(true);
@@ -156,7 +156,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('disallow_group_registration binding', async () => {
-        let checkbox = wrapper.find('#disallow-group-registration');
+        let checkbox = wrapper.find('[data-testid=disallow_group_registration]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project.disallow_group_registration).toEqual(true);
@@ -199,7 +199,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Publish final grades binding', async () => {
-        let publish_grades = wrapper.find('#publish-final-grades');
+        let publish_grades = wrapper.find('[data-testid=publish_final_grades]');
 
         await publish_grades.setChecked(true);
         expect(wrapper.vm.d_project.hide_ultimate_submission_fdbk).toEqual(false);
@@ -296,15 +296,16 @@ describe('ProjectSettings tests', () => {
 
     test('allow_submissions_past_limit checkbox disabled when submission_limit_per_day is null',
          async () => {
+        let allow_past_limit_checkbox = wrapper.find('[data-testid=allow_submissions_past_limit]');
         expect(wrapper.vm.d_project.submission_limit_per_day).toBeNull();
-        expect(wrapper.find('#allow-submissions-past-limit').element).toBeDisabled();
+        expect(allow_past_limit_checkbox.element).toBeDisabled();
 
         set_validated_input_text(wrapper.find('#submission-limit-per-day'), '7');
 
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project.submission_limit_per_day).not.toBeNull();
-        expect(wrapper.find('#allow-submissions-past-limit').element).not.toBeDisabled();
+        expect(allow_past_limit_checkbox.element).not.toBeDisabled();
     });
 
     test('Clicking submission limit reset time toggles time picker visibility', async () => {
@@ -369,7 +370,7 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.max_group_size = 2;
         await wrapper.vm.$nextTick();
 
-        let checkbox = wrapper.find('#groups-combine-daily-submissions');
+        let checkbox = wrapper.find('[data-testid=groups_combine_daily_submissions]');
         expect(checkbox.element).not.toBeDisabled();
 
         await checkbox.setChecked(true);
@@ -394,12 +395,12 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.max_group_size = 1;
         await wrapper.vm.$nextTick();
 
-        let checkbox = wrapper.find('#groups-combine-daily-submissions');
+        let checkbox = wrapper.find('[data-testid=groups_combine_daily_submissions]');
         expect(checkbox.element).toBeDisabled();
     });
 
     test('Allow late days binding', async () => {
-        let checkbox = wrapper.find('#allow-late-days');
+        let checkbox = wrapper.find('[data-testid=allow_late_days]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project.allow_late_days).toEqual(true);
