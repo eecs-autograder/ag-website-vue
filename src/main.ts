@@ -8,6 +8,7 @@ import CourseList from '@/components/course_list/course_list.vue';
 import ProjectList from '@/components/course_view.vue';
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
 import ProjectView from '@/components/project_view/project_view.vue';
+import SuperuserDashboard from '@/components/superuser_dashboard.vue';
 import UIDemos from '@/demos/ui_demos.vue';
 
 import App from './app.vue';
@@ -21,6 +22,7 @@ const ROUTES = [
     { path: '/web/course/:course_id', name: "course_view", component: ProjectList },
     { path: '/web/project_admin/:project_id', name: 'project_admin', component: ProjectAdmin },
     { path: '/web/project/:project_id', component: ProjectView },
+    { path: '/web/superusers', component: SuperuserDashboard },
     { path: '/__demos__', component: UIDemos }
 ];
 
