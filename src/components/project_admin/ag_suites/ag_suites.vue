@@ -4,15 +4,15 @@
       <div class="sidebar-container">
         <div class="sidebar-menu">
           <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-            <span class="collapse-sidebar-button" @click="d_collapsed = !d_collapsed">
+            <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
               <i class="fas fa-bars"></i>
             </span>
             <template v-if="!d_collapsed">
-              <span id="ag-test-suites-title"> Suites </span>
+              <span class="sidebar-header-text"> Suites </span>
               <button type="button"
-                      id="add-ag-test-suite-button"
+                      class="sidebar-new-button"
                       @click="open_new_ag_test_suite_modal()">
-                <i class="fas fa-plus plus"></i> Add Suite
+                <i class="fas fa-plus sidebar-plus"></i> Add Suite
               </button>
             </template>
           </div>
@@ -559,7 +559,7 @@ $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 3.125rem,
+  $sidebar-header-height: 2.625rem,
   $background-color: white,
   $border-color: $border-color,
   $page-footer-height: $footer-height,
@@ -567,46 +567,9 @@ $border-color: $gray-blue-1;
 );
 
 .sidebar-container {
-  .sidebar-menu {
-    border-left: none;
-    border-top: none;
-    border-bottom: none;
-  }
-
-  .sidebar-header {
-    padding: .25rem .5rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .sidebar-header-closed {
-    border-bottom: 1px solid $border-color;
-  }
-
   .sidebar-content {
     padding-top: .125rem;
   }
-}
-
-.collapse-sidebar-button .fa-bars:hover {
-  color: $stormy-gray-dark;
-  cursor: pointer;
-}
-
-#ag-test-suites-title {
-  font-size: 1.125rem;
-  margin: 0 .5rem;
-}
-
-#add-ag-test-suite-button {
-  @extend .white-button;
-  box-shadow: none;
-  margin-left: auto;
-}
-
-.plus {
-  padding-right: .25rem;
 }
 
 .body {

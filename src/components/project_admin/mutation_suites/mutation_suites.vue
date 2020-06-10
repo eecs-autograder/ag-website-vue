@@ -6,16 +6,17 @@
     <div class="sidebar-container">
       <div id="mutation-test-suite-sidebar" class="sidebar-menu">
         <div id="sidebar-header"
-              class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-          <span class="collapse-sidebar-button" @click="d_collapsed = !d_collapsed">
+             class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
           </span>
           <template v-if="!d_collapsed">
-            <div id="sidebar-title"> Suites </div>
+            <div class="sidebar-header-text"> Suites </div>
             <button type="button"
-                    id="add-mutation-test-suite-button"
+                    data-testid="add-mutation-test-suite-button"
+                    class="sidebar-new-button"
                     @click="open_new_mutation_test_suite_modal">
-              <i class="fas fa-plus plus"></i> Add Suite
+              <i class="fas fa-plus sidebar-plus"></i> Add Suite
             </button>
           </template>
         </div>
@@ -584,58 +585,32 @@ $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 3.125rem,
+  $sidebar-header-height: 2.625rem,
   $background-color: white,
   $border-color: $border-color,
   $stretch: true,
 );
 
 .sidebar-container {
-  .sidebar-menu {
-    border-left: none;
-    border-top: none;
-    border-bottom: none;
-  }
-
-  .sidebar-header {
-    padding: .25rem .5rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .sidebar-header-closed {
-    border-bottom: 1px solid $border-color;
-  }
-
   .body {
     padding: .625rem .875rem;
     overflow-x: hidden;
   }
 }
 
-.collapse-sidebar-button .fa-bars:hover {
-  color: $stormy-gray-dark;
-  cursor: pointer;
-}
-
-#sidebar-title {
-  font-size: 1.125rem;
-  margin: 0 8px;
-}
-
-#add-mutation-test-suite-button {
-  @extend .white-button;
-  box-shadow: none;
-  margin-left: auto;
-}
-
-.plus {
-  font-size: .75rem;
-  margin-right: .25rem;
-}
-
 @include list-panels();
+
+.panel .icons .icon {
+  padding: .375rem;
+
+  &:hover {
+    color: darken($stormy-gray-dark, 20%);
+  }
+}
+
+.handle {
+  cursor: grabbing;
+}
 
 .item-to-delete {
   color: $ocean-blue;

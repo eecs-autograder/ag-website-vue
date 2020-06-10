@@ -14,10 +14,10 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <span class="collapse-show-button" @click="d_collapsed = !d_collapsed">
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
           </span>
-          <span class="header-text"
+          <span class="sidebar-header-text"
                 v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
         </div>
 
@@ -175,6 +175,7 @@ $border-color: hsl(220, 40%, 94%);
   $sidebar-width: 300px,
   $sidebar-header-height: 2.25rem,
   $border-color: $border-color,
+  $include-top-border: true,
   $background-color: white,
   $active-color: $pebble-light
 );
@@ -190,22 +191,13 @@ $border-color: hsl(220, 40%, 94%);
   font-size: 1.125rem;
 }
 
-.collapse-show-button {
-  cursor: pointer;
-  background: white;
-  border: none;
+.sidebar-collapse-button {
   color: $ocean-blue;
   outline: none;
-  padding: 0 .5rem;
-  font-size: 1rem;
-}
 
-.collapse-show-button:hover {
-  color: darken($ocean-blue, 10);
-}
-
-.header-text {
-  padding-right: .5rem;
+  &:hover {
+    color: darken($ocean-blue, 10);
+  }
 }
 
 .sidebar-item {

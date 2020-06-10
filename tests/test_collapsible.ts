@@ -31,3 +31,11 @@ test('include_caret false', () => {
     });
     expect(wrapper.find('.caret').exists()).toBe(false);
 });
+
+test('stay_open true', () => {
+    fail();
+});
+
+test('stay_open false', () => {
+    fail();
+});

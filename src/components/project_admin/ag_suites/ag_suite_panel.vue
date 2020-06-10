@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="panel" :class="{'active': suite_is_active}"
+    <div class="panel level-0" :class="{'active': suite_is_active}"
          @click="update_ag_test_suite_panel_when_clicked()">
       <div class="text">
         <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
@@ -350,6 +350,10 @@ function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknow
 
 .add-ag-test-command-button .fa-plus {
   padding-right: .25rem;
+}
+
+.handle {
+  cursor: grabbing;
 }
 
 .duplicate-ag-test-command-msg {

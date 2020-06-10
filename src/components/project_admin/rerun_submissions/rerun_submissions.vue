@@ -73,7 +73,7 @@
       </div>
       <collapsible class="ag-test-suite-collapsible"
                    v-for="ag_test_suite of d_ag_test_suites">
-        <template v-slot:header>
+        <template v-slot:header_text>
           <div class="unpadded-checkbox-container ag-test-suite-header">
             <label>
               <input
@@ -81,8 +81,9 @@
                 class="checkbox"
                 data-testid="ag_test_suite_checkbox"
                 :checked="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
-                @change="toggle_ag_test_suite_selected(ag_test_suite)"/>
-                {{ag_test_suite.name}}
+                @change="toggle_ag_test_suite_selected(ag_test_suite)"
+                @click.stop/>
+              {{ag_test_suite.name}}
             </label>
           </div>
         </template>
@@ -611,7 +612,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 }
 
 .choose-ag-test-suites-wrapper {
-  max-width: 300px;
+  max-width: 500px;
 }
 
 .ag-test-suite-collapsible {
@@ -622,12 +623,17 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
   width: 100%;
   margin-left: .25rem;
   @include section-header(
-    $with-left-divider: false, $line-spacing: .25rem, $line-color: $pebble-dark);
+    $with-left-divider: false, $line-spacing: .25rem, $line-color: $pebble-dark
+  );
+
+  white-space: nowrap;
 }
 
 .ag-test-case-checkbox-wrapper {
   margin: .25rem 0;
   margin-left: 2.5rem;
+
+  white-space: nowrap;
 }
 
 .button-footer {

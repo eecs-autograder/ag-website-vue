@@ -1,6 +1,6 @@
 <template>
   <div id="superuser-dashboard">
-    <!-- <sandbox-images></sandbox-images> -->
+    <sandbox-images></sandbox-images>
   </div>
 </template>
 

@@ -6,8 +6,13 @@
     // also subtracted from 100vh to determine the max-height of .sidebar-content.
     $sidebar-header-height,
 
+    $sidebar-header-font-size: 1.125rem,
+
     // Border color around the sidebar menu
     $border-color: none,
+
+    // Set to true to include a border at the top of the sidebar header.
+    $include-top-border: false,
 
     // Background color of the whole sidebar menu
     $background-color: transparent,
@@ -50,6 +55,15 @@
             background-color: $background-color;
             @if $border-color != none {
                 border: 1px solid $border-color;
+                border-left: none;
+
+                @if $stretch {
+                    border-bottom: none;
+                }
+
+                @if not $include-top-border {
+                    border-top: none;
+                }
             }
 
             .sidebar-header, .sidebar-content {
@@ -60,13 +74,58 @@
 
             .sidebar-header {
                 height: $sidebar-header-height;
+                font-size: $sidebar-header-font-size;
 
                 position: sticky;
                 top: 0;
+
+                padding: .25rem .5rem;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+
+                .sidebar-collapse-button {
+                    color: $ocean-blue;
+
+                    &:hover {
+                        color: darken($ocean-blue, 10);
+                        cursor: pointer;
+                    }
+                }
+
+                .sidebar-header-text {
+                    margin: 0 .5rem;
+                    font-weight: bold;
+                }
+
+                @import '@/styles/button_styles.scss';
+
+                .sidebar-new-button {
+                    @extend .white-button;
+                    box-shadow: none;
+                    margin-left: auto;
+
+                    // Make button text and padding smaller
+                    // proportional to the header text.
+                    font-size: .875em;
+                    padding: .25em .625em;
+
+                    @import '@/styles/colors.scss';
+
+                    color: darken($green, 20%);
+
+                    .sidebar-plus {
+                        padding-right: .25rem;
+                    }
+                }
             }
 
             .sidebar-header-closed {
                 min-width: auto;
+
+                @if $stretch {
+                    border-bottom: 1px solid $border-color;
+                }
             }
 
             $max-height: calc(
