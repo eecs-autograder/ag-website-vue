@@ -161,16 +161,15 @@ import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-
-import { handle_global_errors_async, handle_api_errors_async, make_error_handler_func } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map' ;
-import { assert_not_null, format_datetime_short, toggle, deep_copy, safe_assign } from '@/utils';
+import { assert_not_null, deep_copy, format_datetime_short, safe_assign, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
+import BuildImageStatusIcon from './build_image_status_icon.vue';
 import BuildImageTaskDetail from './build_image_task_detail.vue';
 import BuildSandboxImage from './build_sandbox_image.vue';
-import BuildImageStatusIcon from './build_image_status_icon.vue';
 
 interface BuildTasksForImage {
   image: SandboxDockerImage;
@@ -269,7 +268,7 @@ export default class SandboxImages extends Vue {
 
     let result: BuildTasksForImage[] = [];
     for (let image of this.d_sandbox_images) {
-      result.push({image: image, build_tasks: tasks_by_image_pk.get(image.pk, [])})
+      result.push({image: image, build_tasks: tasks_by_image_pk.get(image.pk, [])});
     }
 
     return result;
@@ -279,7 +278,7 @@ export default class SandboxImages extends Vue {
     return this.d_build_tasks.filter(task => {
       return task.image === null
         && (task.status === BuildImageStatus.queued
-            || task.status === BuildImageStatus.in_progress)
+            || task.status === BuildImageStatus.in_progress);
     });
   }
 
@@ -352,7 +351,7 @@ $border-color: $gray-blue-1;
 }
 
 .body {
-  padding: .25rem .5rem;
+  padding: 0 .5rem .5rem;
 }
 
 .edit-image-header {

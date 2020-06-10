@@ -13,16 +13,16 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import APIErrors from '@/components/api_errors.vue';
-import FileUpload from '@/components/file_upload.vue';
-
-import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
-import { toggle } from '@/utils';
 import {
   BuildSandboxDockerImageTask,
   Course,
   SandboxDockerImage,
 } from 'ag-client-typescript';
+
+import APIErrors from '@/components/api_errors.vue';
+import FileUpload from '@/components/file_upload.vue';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
+import { toggle } from '@/utils';
 
 @Component({
   components: {
