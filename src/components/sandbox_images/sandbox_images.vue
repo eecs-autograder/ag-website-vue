@@ -158,7 +158,6 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Collapsible from '@/components/collapsible.vue';
 import FileUpload from '@/components/file_upload.vue';
-import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
@@ -184,7 +183,6 @@ interface BuildTasksForImage {
     BuildImageTaskDetail,
     Collapsible,
     FileUpload,
-    Modal,
     ValidatedForm,
     ValidatedInput,
   }
@@ -204,7 +202,6 @@ export default class SandboxImages extends Vue {
 
   d_sidebar_collapsed = false;
 
-  d_show_new_image_modal = false;
   d_starting_build = false;
   d_file_upload_progress = 0;
 
@@ -317,7 +314,6 @@ export default class SandboxImages extends Vue {
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
-@import '@/styles/modal.scss';
 @import '@/styles/section_header.scss';
 
 $border-color: $gray-blue-1;
