@@ -31,7 +31,19 @@
           If the problem persists, please contact <b>{{SYSADMIN_CONTACT}}</b> and include
           the information <b>"Image Build ID: {{build_task.pk}}"</b> in your email.
         </div>
+        <pre
+          class="internal-error-msg"
+          v-if="d_globals.current_user.is_superuser"
+        >{{build_task.internal_error_msg}}</pre>
       </template>
+      <span class="refresh-icon">
+        <i
+          class="fas fa-sync-alt"
+          v-if="build_task.status === BuildImageStatus.queued
+                || build_task.status === BuildImageStatus.in_progress"
+          @click="$emit('refresh_selected_build_task')"
+        ></i>
+      </span>
     </div>
 
     <div class="started-at">
@@ -52,10 +64,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { BuildImageStatus, BuildSandboxDockerImageTask } from 'ag-client-typescript';
 
+import { GlobalData } from '@/app.vue';
 import ViewFile from '@/components/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_global_errors_async } from '@/error_handling';
@@ -70,6 +83,10 @@ import BuildImageStatusIcon from './build_image_status_icon.vue';
   }
 })
 export default class BuildImageTaskDetail extends Vue {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   @Prop({required: true, type: BuildSandboxDockerImageTask})
   build_task!: BuildSandboxDockerImageTask;
 
@@ -91,6 +108,11 @@ export default class BuildImageTaskDetail extends Vue {
 
   @handle_global_errors_async
   load_output() {
+    if (this.build_task.status === BuildImageStatus.queued) {
+      // Output file might not exist yet.
+      return;
+    }
+
     this.d_progress = 0;
     let output = this.build_task.get_output((event) => {
       if (event.lengthComputable) {
@@ -134,5 +156,18 @@ export default class BuildImageTaskDetail extends Vue {
 
 .output {
   border-top: 1px solid $pebble-dark;
+}
+
+.refresh-icon {
+  cursor: pointer;
+  font-size: .875rem;
+  color: $navy-blue;
+}
+
+.internal-error-msg {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-weight: normal;
+  font-size: .875rem;
 }
 </style>

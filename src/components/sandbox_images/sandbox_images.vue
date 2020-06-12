@@ -132,13 +132,59 @@
         <build-sandbox-image
           :course="course"
           :sandbox_image="d_selected_image"
-          @new_build_task="d_build_tasks.push($event); d_selected_build_task = $event"
+          @new_build_task="d_build_tasks.push($event); select_build_task($event)"
           ></build-sandbox-image>
       </template>
 
       <build-image-task-detail
         v-if="d_selected_build_task !== null"
-        :build_task="d_selected_build_task"/>
+        :build_task="d_selected_build_task"
+        @refresh_selected_build_task="refresh_selected_build_task"/>
+
+
+    <div class="danger-zone-container" v-if="d_selected_image !== null">
+      <div class="danger-text">
+        Delete "{{d_selected_image.display_name}}"
+      </div>
+      <button class="delete-button"
+              data-testid="show_delete_modal_button"
+              type="button"
+              @click="d_show_delete_image_modal = true">
+        Delete
+      </button>
+
+      <modal v-if="d_show_delete_image_modal"
+              @close="d_show_delete_image_modal = false"
+              ref="delete_image_modal"
+              size="large"
+              :click_outside_to_close="!d_deleting"
+              :show_closing_x="!d_deleting">
+        <div class="modal-header">
+          Confirm Delete
+        </div>
+
+        <div class="modal-body">
+          Are you sure you want to delete the image
+          <span class="item-to-delete">
+            "{{d_selected_image.display_name}}"
+          </span> and its build history? <br><br>
+          Any test cases that rely on this image may have to be updated
+          before they'll run correctly again.<br>
+          THIS ACTION CANNOT BE UNDONE.
+
+          <APIErrors ref="delete_errors"></APIErrors>
+          <div class="modal-button-footer">
+            <button class="delete-button"
+                    :disabled="d_deleting"
+                    @click="delete_selected_image"> Delete </button>
+
+            <button class="modal-cancel-button white-button"
+                    @click="d_show_delete_image_modal = false"
+                    :disabled="d_deleting"> Cancel </button>
+          </div>
+        </div>
+      </modal>
+    </div>
     </div>
   </div>
 </template>
@@ -158,6 +204,7 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Collapsible from '@/components/collapsible.vue';
 import FileUpload from '@/components/file_upload.vue';
+import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
@@ -183,6 +230,7 @@ interface BuildTasksForImage {
     BuildImageTaskDetail,
     Collapsible,
     FileUpload,
+    Modal,
     ValidatedForm,
     ValidatedInput,
   }
@@ -213,13 +261,18 @@ export default class SandboxImages extends Vue {
 
   readonly is_not_empty = is_not_empty;
 
+  d_show_delete_image_modal = false;
+  d_deleting = false;
+
+  d_refreshing_selected_build_task = false;
+
   async created() {
     await this.load_images_and_build_tasks();
     this.d_loading = false;
 
     this.image_poller = new Poller(() => this.load_images_and_build_tasks(), 30);
     // tslint:disable-next-line no-floating-promises
-    this.image_poller.start_after_delay();
+    // this.image_poller.start_after_delay();
   }
 
   beforeDestroy() {
@@ -306,6 +359,33 @@ export default class SandboxImages extends Vue {
       safe_assign(this.d_selected_image, to_update);
     });
   }
+
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
+  delete_selected_image() {
+    return toggle(this, 'd_deleting', async () => {
+      assert_not_null(this.d_selected_image);
+      await this.d_selected_image.delete();
+
+      this.d_sandbox_images.splice(
+        this.d_sandbox_images.findIndex(image => image.pk === this.d_selected_image?.pk),
+        1
+      );
+      this.d_build_tasks = this.d_build_tasks.filter(
+        build_task => build_task.image?.pk !== this.d_selected_image?.pk
+      );
+
+      this.d_selected_image = null;
+    });
+  }
+
+  @handle_global_errors_async
+  refresh_selected_build_task() {
+    return toggle(this, 'd_refreshing_selected_build_task', async () => {
+      assert_not_null(this.d_selected_build_task);
+      let refreshed = await BuildSandboxDockerImageTask.get_by_pk(this.d_selected_build_task.pk);
+      safe_assign(this.d_selected_build_task, refreshed);
+    });
+  }
 }
 </script>
 
@@ -314,6 +394,7 @@ export default class SandboxImages extends Vue {
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/section_header.scss';
 
 $border-color: $gray-blue-1;
@@ -347,7 +428,7 @@ $border-color: $gray-blue-1;
 }
 
 .body {
-  padding: 0 .5rem .5rem;
+  padding: .5rem;
 }
 
 .edit-image-header {
@@ -356,7 +437,7 @@ $border-color: $gray-blue-1;
     $text-color: darken($ocean-blue, 5%),
   );
   font-size: 1.5rem;
-  margin: .5rem 0;
+  margin-bottom: .5rem;
 
 }
 

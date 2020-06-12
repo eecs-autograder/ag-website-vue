@@ -118,6 +118,10 @@
     .delete-button {
         @extend .red-button;
     }
+
+    .item-to-delete {
+       color: $ocean-blue;
+    }
  }
 
 // Inputs, selects, radios ----------------------------------------------------
