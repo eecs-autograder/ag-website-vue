@@ -70,7 +70,7 @@
           <div class="sidebar-section-header">Full Build History</div>
 
           <collapsible
-            v-for="build_task of d_build_tasks" :key="`build${build_task.pk}`"
+            v-for="build_task of full_build_history" :key="`build${build_task.pk}`"
             :include_caret="false"
             :is_active="d_selected_build_task !== null
                         && d_selected_build_task.pk === build_task.pk"
@@ -330,6 +330,10 @@ export default class SandboxImages extends Vue {
         && (task.status === BuildImageStatus.queued
             || task.status === BuildImageStatus.in_progress);
     });
+  }
+
+  get full_build_history() {
+    return this.d_build_tasks.sort((first, second) => second.pk - first.pk);
   }
 
   show_new_image_build() {
