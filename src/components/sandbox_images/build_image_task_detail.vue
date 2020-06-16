@@ -38,6 +38,7 @@
       </template>
       <span class="refresh-icon">
         <i
+          data-testid="refresh_button"
           class="fas fa-sync-alt"
           v-if="build_task.status === BuildImageStatus.queued
                 || build_task.status === BuildImageStatus.in_progress"
@@ -55,6 +56,7 @@
     <template v-if="build_task.status !== BuildImageStatus.queued">
       <div class="output-header">Build Output</div>
       <view-file
+        ref="output"
         v-if="d_output !== null"
         :file_contents="d_output"
         class="output"
@@ -101,7 +103,7 @@ export default class BuildImageTaskDetail extends Vue {
     return this.load_output();
   }
 
-  @Watch('build_task.status')
+  @Watch('build_task', {deep: true})
   on_build_task_status_change() {
     return this.load_output();
   }

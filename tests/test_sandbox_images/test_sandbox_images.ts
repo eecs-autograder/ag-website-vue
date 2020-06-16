@@ -393,6 +393,10 @@ describe('Edit and delete image tests', () => {
     test('Delete image', async () => {
         let delete_stub = sinon.stub(images[0], 'delete');
 
+        // When an image is deleted, it's build history should also be removed.
+        let associated_build_task = data_ut.make_build_sanbdox_docker_image_task(null, images[0]);
+        wrapper.vm.d_build_tasks.unshift(associated_build_task);
+
         await wrapper.find('[data-testid=show_delete_modal_button]').trigger('click');
         await wrapper.find('[data-testid=delete_image_button]').trigger('click');
 
@@ -401,6 +405,7 @@ describe('Edit and delete image tests', () => {
 
         expect(wrapper.vm.d_sandbox_images).toEqual(images.slice(1));
         expect(wrapper.findAllComponents(Collapsible).length).toEqual(images.length - 1);
+        expect(wrapper.vm.d_build_tasks.length).toEqual(0);
     });
 
     test('Delete image API errors handled', async () => {

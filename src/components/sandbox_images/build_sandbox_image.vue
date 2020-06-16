@@ -56,7 +56,8 @@ export default class BuildSandboxImage extends Vue {
         build_task = await this.sandbox_image.rebuild(files, progress_listener);
       }
       else {
-        build_task = await SandboxDockerImage.create_image(files, this.course?.pk  ?? null);
+        build_task = await SandboxDockerImage.create_image(
+          files, this.course?.pk  ?? null, progress_listener);
       }
 
       (<FileUpload> this.$refs.file_upload).clear_files();
