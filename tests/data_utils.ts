@@ -14,6 +14,8 @@ import {
     Annotation,
     AppliedAnnotation,
     BugsExposedFeedbackLevel,
+    BuildImageStatus,
+    BuildSandboxDockerImageTask,
     Comment,
     Course,
     Criterion,
@@ -35,6 +37,7 @@ import {
     PointsStyle,
     Project,
     SandboxDockerImage,
+    SandboxDockerImageData,
     Semester,
     StdinSource,
     Submission,
@@ -304,6 +307,30 @@ export function make_sandbox_docker_image(
     safe_assign(defaults, args);
     defaults.course = course_pk;
     return new SandboxDockerImage(defaults);
+}
+
+const IMAGE_BUILD_TASK_PKS = counter();
+
+export function make_build_sanbdox_docker_image_task(
+    course_pk: number | null, image: SandboxDockerImageData | null,
+    args: Partial<BuildSandboxDockerImageTask> = {}
+): BuildSandboxDockerImageTask {
+    let defaults = {
+        pk: IMAGE_BUILD_TASK_PKS.next().value,
+        created_at: now_str(),
+        status: BuildImageStatus.queued,
+        return_code: null,
+        timed_out: false,
+        filenames: [],
+        course_id: course_pk,
+        image: image,
+        validation_error_msg: '',
+        internal_error_msg: '',
+    };
+    safe_assign(defaults, args);
+    defaults.course_id = course_pk;
+    defaults.image = image;
+    return new BuildSandboxDockerImageTask(defaults);
 }
 
 

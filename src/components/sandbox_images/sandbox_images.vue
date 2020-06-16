@@ -11,6 +11,7 @@
         <template v-if="!d_sidebar_collapsed">
           <span class="sidebar-header-text">Sandbox Images</span>
           <button type="button" class="sidebar-new-button"
+                  data-testid="new_image_button"
                   @click="show_new_image_build">
             <i class="fas fa-plus sidebar-plus"></i> New Image
           </button>
@@ -20,9 +21,10 @@
       <div class="sidebar-content" v-if="!d_sidebar_collapsed">
         <div class="sidebar-section-header">In Progress</div>
         <collapsible
-          v-for="build_task of in_progress_new_image_tasks" :key="`build${build_task.pk}`"
+          ref="in_progress_build_panel"
+          v-for="build_task of in_progress_tasks" :key="`build${build_task.pk}`"
           :include_caret="false"
-          :is_active="d_selected_build_task !== null && d_selected_build_task.pk === build_task.pk"
+          :is_active="d_selected_build_task_pk === build_task.pk"
           @click="select_build_task(build_task)"
         >
           <template v-slot:header_text>
@@ -38,22 +40,23 @@
           <div class="sidebar-section-header">Images</div>
 
           <collapsible
+            ref="image_panel"
             v-for="item of completed_tasks_by_image" :key="`image${item.image.pk}`"
-            :stay_open="d_selected_image !== null && d_selected_image.pk !== item.image.pk"
+            :stay_open="d_selected_image_pk !== item.image.pk"
             @click="select_image(item.image)"
-            :is_active="d_selected_image !== null && d_selected_image.pk === item.image.pk"
+            :is_active="d_selected_image_pk === item.image.pk"
             :indentation_level="1"
           >
             <template v-slot:header_text>
               {{item.image.display_name}}
             </template>
             <collapsible
+              ref="image_build_history_panel"
               v-for="build_task of item.build_tasks" :key="`build${build_task.pk}`"
               :include_caret="false"
               :indentation_level="2"
               @click.stop="select_build_task(build_task)"
-              :is_active="d_selected_build_task !== null
-                          && d_selected_build_task.pk === build_task.pk"
+              :is_active="d_selected_build_task_pk === build_task.pk"
               :always_show_icons="true"
             >
               <template v-slot:header_text>
@@ -70,10 +73,10 @@
           <div class="sidebar-section-header">Full Build History</div>
 
           <collapsible
+            ref="full_build_history_panel"
             v-for="build_task of full_build_history" :key="`build${build_task.pk}`"
             :include_caret="false"
-            :is_active="d_selected_build_task !== null
-                        && d_selected_build_task.pk === build_task.pk"
+            :is_active="d_selected_build_task_pk === build_task.pk"
             :always_show_icons="true"
             @click="select_build_task(build_task)"
           >
@@ -89,13 +92,15 @@
       </div>
     </div>
     <div class="body" :class="{'body-closed': d_sidebar_collapsed}">
-      <template v-if="d_selected_image !== null">
-        <div class="edit-image-header">Edit "{{d_selected_image.display_name}}"</div>
+      <template v-if="selected_image !== null">
+        <div class="edit-image-header">Edit "{{selected_image.display_name}}"</div>
         <validated-form @submit="save_selected_image_name"
-                        @form_validity_changed="d_image_name_is_valid = $event">
+                        @form_validity_changed="d_image_name_is_valid = $event"
+                        ref="edit_image_form">
           <label class="label">
             Image Name
-            <validated-input v-model="d_edited_image_name" :validators="[is_not_empty]"/>
+            <validated-input
+              ref="edit_image_name" v-model="d_edited_image_name" :validators="[is_not_empty]"/>
           </label>
 
           <APIErrors ref="api_errors"/>
@@ -108,7 +113,7 @@
 
             <div class="last-saved-timestamp">
               <template v-if="!d_saving_image_name">
-                Last saved: {{format_datetime_short(d_selected_image.last_modified)}}
+                Last saved: {{format_datetime_short(selected_image.last_modified)}}
               </template>
               <i v-else class="loading fa fa-spinner fa-pulse"></i>
             </div>
@@ -121,30 +126,32 @@
            the "build image" component. If an image is selected, it
            will rebuild the selected image. Otherwise, it will build
            a new image. -->
-      <template v-if="d_selected_image !== null || d_selected_build_task === null">
-        <div class="edit-image-header extra-space" v-if="d_selected_image !== null">
-          Rebuild "{{d_selected_image.display_name}}"
+      <template v-if="selected_image !== null || selected_build_task === null">
+        <div class="edit-image-header extra-space" v-if="selected_image !== null">
+          Rebuild "{{selected_image.display_name}}"
         </div>
         <div v-else class="edit-image-header">
           Build New Image
         </div>
 
         <build-sandbox-image
+          ref="build_sandbox_image"
           :course="course"
-          :sandbox_image="d_selected_image"
+          :sandbox_image="selected_image"
           @new_build_task="d_build_tasks.push($event); select_build_task($event)"
           ></build-sandbox-image>
       </template>
 
       <build-image-task-detail
-        v-if="d_selected_build_task !== null"
-        :build_task="d_selected_build_task"
+        ref="build_image_task_detail"
+        v-if="selected_build_task !== null"
+        :build_task="selected_build_task"
         @refresh_selected_build_task="refresh_selected_build_task"/>
 
 
-    <div class="danger-zone-container" v-if="d_selected_image !== null">
+    <div class="danger-zone-container" v-if="selected_image !== null">
       <div class="danger-text">
-        Delete "{{d_selected_image.display_name}}"
+        Delete "{{selected_image.display_name}}"
       </div>
       <button class="delete-button"
               data-testid="show_delete_modal_button"
@@ -166,7 +173,7 @@
         <div class="modal-body">
           Are you sure you want to delete the image
           <span class="item-to-delete">
-            "{{d_selected_image.display_name}}"
+            "{{selected_image.display_name}}"
           </span> and its build history? <br><br>
           Any test cases that rely on this image may have to be updated
           before they'll run correctly again.<br>
@@ -175,6 +182,7 @@
           <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">
             <button class="delete-button"
+                    data-testid="delete_image_button"
                     :disabled="d_deleting"
                     @click="delete_selected_image"> Delete </button>
 
@@ -243,8 +251,8 @@ export default class SandboxImages extends Vue {
   d_sandbox_images: SandboxDockerImage[] = [];
   d_build_tasks: BuildSandboxDockerImageTask[] = [];
 
-  d_selected_image: SandboxDockerImage | null = null;
-  d_selected_build_task: BuildSandboxDockerImageTask | null = null;
+  private d_selected_image_pk: number | null = null;
+  private d_selected_build_task_pk: number | null = null;
 
   image_poller: Poller | null = null;
 
@@ -287,18 +295,6 @@ export default class SandboxImages extends Vue {
       await SandboxDockerImage.get_images(this.course?.pk ?? null),
       await BuildSandboxDockerImageTask.get_build_tasks(this.course?.pk ?? null)
     ]);
-
-    if (this.d_selected_image !== null) {
-      let image = this.d_sandbox_images.find(image => image.pk === this.d_selected_image?.pk);
-      assert_not_null(image);
-      this.d_selected_image = image;
-    }
-
-    if (this.d_selected_build_task !== null) {
-      let build_task = this.d_build_tasks.find(task => task.pk === this.d_selected_build_task?.pk);
-      assert_not_null(build_task);
-      this.d_selected_build_task = build_task;
-    }
   }
 
   // Returns an array of pairs. The first item in each pair is a
@@ -324,11 +320,10 @@ export default class SandboxImages extends Vue {
     return result;
   }
 
-  get in_progress_new_image_tasks() {
+  get in_progress_tasks() {
     return this.d_build_tasks.filter(task => {
-      return task.image === null
-        && (task.status === BuildImageStatus.queued
-            || task.status === BuildImageStatus.in_progress);
+      return (task.status === BuildImageStatus.queued
+              || task.status === BuildImageStatus.in_progress);
     });
   }
 
@@ -337,57 +332,80 @@ export default class SandboxImages extends Vue {
   }
 
   show_new_image_build() {
-    this.d_selected_image = null;
-    this.d_selected_build_task = null;
+    this.d_selected_image_pk = null;
+    this.d_selected_build_task_pk = null;
   }
 
   select_image(image: SandboxDockerImage) {
-    this.d_selected_image = image;
-    this.d_selected_build_task = null;
+    this.d_selected_image_pk = image.pk;
+    this.d_selected_build_task_pk = null;
     this.d_edited_image_name = image.display_name;
   }
 
   select_build_task(build_task: BuildSandboxDockerImageTask) {
-    this.d_selected_build_task = build_task;
-    this.d_selected_image = null;
+    this.d_selected_build_task_pk = build_task.pk;
+    this.d_selected_image_pk = null;
+  }
+
+  get selected_image() {
+    if (this.d_selected_image_pk === null) {
+      return null;
+    }
+
+    let image = this.d_sandbox_images.find(item => item.pk === this.d_selected_image_pk);
+    assert_not_null(image);
+    return image;
+  }
+
+  get selected_build_task() {
+    if (this.d_selected_build_task_pk === null) {
+      return null;
+    }
+
+    let task = this.d_build_tasks.find(item => item.pk === this.d_selected_build_task_pk);
+    assert_not_null(task);
+    return task;
   }
 
   @handle_api_errors_async(make_error_handler_func())
   save_selected_image_name() {
-    assert_not_null(this.d_selected_image);
-    let to_update = deep_copy(this.d_selected_image, SandboxDockerImage);
+    assert_not_null(this.selected_image);
+    let to_update = deep_copy(this.selected_image, SandboxDockerImage);
     to_update.display_name = this.d_edited_image_name;
     return toggle(this, 'd_saving_image_name', async () => {
       await to_update.save();
-      assert_not_null(this.d_selected_image);
-      safe_assign(this.d_selected_image, to_update);
+      let index = this.d_sandbox_images.findIndex(image => image.pk === this.d_selected_image_pk);
+      Vue.set(this.d_sandbox_images, index, to_update);
+      this.d_sandbox_images.sort(
+        (first, second) => first.display_name.localeCompare(second.display_name));
     });
   }
 
   @handle_api_errors_async(make_error_handler_func('delete_errors'))
   delete_selected_image() {
     return toggle(this, 'd_deleting', async () => {
-      assert_not_null(this.d_selected_image);
-      await this.d_selected_image.delete();
+      assert_not_null(this.selected_image);
+      await this.selected_image.delete();
 
       this.d_sandbox_images.splice(
-        this.d_sandbox_images.findIndex(image => image.pk === this.d_selected_image?.pk),
+        this.d_sandbox_images.findIndex(image => image.pk === this.d_selected_image_pk),
         1
       );
       this.d_build_tasks = this.d_build_tasks.filter(
-        build_task => build_task.image?.pk !== this.d_selected_image?.pk
+        build_task => build_task.image?.pk !== this.d_selected_image_pk
       );
 
-      this.d_selected_image = null;
+      this.d_selected_image_pk = null;
     });
   }
 
   @handle_global_errors_async
   refresh_selected_build_task() {
     return toggle(this, 'd_refreshing_selected_build_task', async () => {
-      assert_not_null(this.d_selected_build_task);
-      let refreshed = await BuildSandboxDockerImageTask.get_by_pk(this.d_selected_build_task.pk);
-      safe_assign(this.d_selected_build_task, refreshed);
+      assert_not_null(this.d_selected_build_task_pk);
+      let refreshed = await BuildSandboxDockerImageTask.get_by_pk(this.d_selected_build_task_pk);
+      let index = this.d_build_tasks.findIndex(task => task.pk === this.d_selected_build_task_pk);
+      Vue.set(this.d_build_tasks, index, refreshed);
     });
   }
 }
