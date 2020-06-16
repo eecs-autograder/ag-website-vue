@@ -126,7 +126,8 @@ test('Select build task', async () => {
     let wrapper = managed_mount(SandboxImages);
     expect(await wait_for_load(wrapper)).toBe(true);
 
-    let panels = wrapper.findAllComponents({ref: 'in_progress_build_panel'});
+    let panels
+        = <WrapperArray<Collapsible>> wrapper.findAllComponents({ref: 'in_progress_build_panel'});
     for (let panel of panels.wrappers) {
         expect(panel.vm.is_active).toBe(false);
     }
@@ -137,14 +138,14 @@ test('Select build task', async () => {
     expect(panels.at(1).vm.is_active).toBe(true);
     expect(panels.filter(panel => panel.vm.is_active).length).toEqual(1);
     expect(wrapper.vm.selected_build_task).toEqual(task2);
-    let build_task_detail = wrapper.findComponent(BuildImageTaskDetail);
+    let build_task_detail
+        = <Wrapper<BuildImageTaskDetail>> wrapper.findComponent(BuildImageTaskDetail);
     expect(build_task_detail.vm.build_task).toBe(task2);
 
     await panels.at(2).trigger('click');
     expect(panels.at(2).vm.is_active).toBe(true);
     expect(panels.filter(panel => panel.vm.is_active).length).toEqual(1);
     expect(wrapper.vm.selected_build_task).toEqual(task3);
-    let build_task_detail = wrapper.findComponent(BuildImageTaskDetail);
     expect(build_task_detail.vm.build_task).toBe(task3);
 });
 
@@ -351,7 +352,6 @@ describe('Edit and delete image tests', () => {
         await wrapper.vm.$nextTick();
     });
 
-
     test('Edit name', async () => {
         let save_stub = sinon.stub(ag_cli.SandboxDockerImage.prototype, 'save');
         let new_name = 'Z Image';
@@ -360,12 +360,12 @@ describe('Edit and delete image tests', () => {
         let input = wrapper.findComponent({ref: 'edit_image_name'});
         await set_validated_input_text(input, new_name);
         expect(validated_input_is_valid(input)).toBe(true);
-        expect(wrapper.vm.selected_image.display_name).toEqual(original_name);
+        expect(wrapper.vm.selected_image?.display_name).toEqual(original_name);
 
         await wrapper.findComponent({ref: 'edit_image_form'}).trigger('submit');
         expect(await wait_until(wrapper, w => !w.vm.d_saving_image_name)).toBe(true);
         expect(save_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.selected_image.display_name).toEqual(new_name);
+        expect(wrapper.vm.selected_image?.display_name).toEqual(new_name);
 
         // Images should be re-sorted
         expect(wrapper.vm.d_sandbox_images[1].pk).toEqual(images[0].pk);
@@ -417,5 +417,3 @@ describe('Edit and delete image tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 });
-
-
