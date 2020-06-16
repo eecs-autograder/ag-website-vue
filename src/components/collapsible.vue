@@ -58,6 +58,8 @@ export default class Collapsible extends Vue {
   @Prop({default: false, type: Boolean})
   always_show_icons!: boolean;
 
+  private d_is_open = this.start_open;
+
   toggle_is_open() {
     if (this.d_is_open && !this.stay_open) {
       this.d_is_open = false;
@@ -66,8 +68,6 @@ export default class Collapsible extends Vue {
       this.d_is_open = true;
     }
   }
-
-  d_is_open = this.start_open;
 }
 </script>
 

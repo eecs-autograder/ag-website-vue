@@ -10,6 +10,7 @@
             <template v-if="!d_collapsed">
               <span class="sidebar-header-text"> Suites </span>
               <button type="button"
+                      id="add-ag-test-suite-button"
                       class="sidebar-new-button"
                       @click="open_new_ag_test_suite_modal()">
                 <i class="fas fa-plus sidebar-plus"></i> Add Suite

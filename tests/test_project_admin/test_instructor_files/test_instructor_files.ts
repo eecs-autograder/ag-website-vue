@@ -291,7 +291,7 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find('.collapse-show-button').trigger('click');
+        wrapper.find('.sidebar-collapse-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_collapsed).toBe(true);
@@ -299,7 +299,7 @@ describe('InstructorFiles.vue', () => {
         expect(sidebar_header.text().includes('Uploaded Files')).toBe(false);
 
         // Re-open the sidebar
-        wrapper.find('.collapse-show-button').trigger('click');
+        wrapper.find('.sidebar-collapse-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_collapsed).toBe(false);
         expect(wrapper.find('.sidebar-content').element).toBeVisible();

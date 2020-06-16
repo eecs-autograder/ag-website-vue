@@ -431,12 +431,12 @@ test('Header is "Students" or "Groups based on max group size"', async () => {
     project.max_group_size = 1;
     set_summaries([]);
     let wrapper = await make_wrapper();
-    expect(wrapper.find('.sidebar-header .header-text').text()).toEqual('Students');
+    expect(wrapper.find('.sidebar-header .sidebar-header-text').text()).toEqual('Students');
 
     project.max_group_size = 2;
     wrapper.vm.$forceUpdate();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('.sidebar-header .header-text').text()).toEqual('Groups');
+    expect(wrapper.find('.sidebar-header .sidebar-header-text').text()).toEqual('Groups');
 });
 
 function set_summaries(summaries: ag_cli.GroupWithHandgradingResultSummary[]) {

@@ -13,7 +13,7 @@
           <template v-if="!d_collapsed">
             <div class="sidebar-header-text"> Suites </div>
             <button type="button"
-                    data-testid="add-mutation-test-suite-button"
+                    id="add-mutation-test-suite-button"
                     class="sidebar-new-button"
                     @click="open_new_mutation_test_suite_modal">
               <i class="fas fa-plus sidebar-plus"></i> Add Suite

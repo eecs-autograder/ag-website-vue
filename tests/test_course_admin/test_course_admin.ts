@@ -132,7 +132,7 @@ describe('Changing Tabs', ()  => {
 
     test('Select manage projects', async () => {
         let tabs = wrapper.findAll('.nav-link');
-        expect(tabs.length).toEqual(3);
+        expect(tabs.length).toEqual(4);
         tabs.at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -144,13 +144,13 @@ describe('Changing Tabs', ()  => {
 
     test('Select late days', async () => {
         let tabs = wrapper.findAll('.nav-link');
-        expect(tabs.length).toEqual(3);
+        expect(tabs.length).toEqual(4);
 
         wrapper.vm.d_course!.num_late_days = 1;
         await wrapper.vm.$nextTick();
 
         tabs = wrapper.findAll('.nav-link');
-        expect(tabs.length).toEqual(4);
+        expect(tabs.length).toEqual(5);
 
         tabs.at(3).trigger('click');
         await wrapper.vm.$nextTick();
