@@ -53,6 +53,18 @@
       image build started at <b>{{format_datetime(build_task.created_at)}}</b>
     </div>
 
+    <div class="files">
+      Files
+      <i class="fas fa-file-download"
+         @click="download_files"
+         data-testid="download_files_icon"></i>
+      <ul class="file-list">
+        <li class="filename" v-for="filename of build_task.filenames">{{filename}}</li>
+      </ul>
+    </div>
+
+    <progress-overlay v-if="d_downloading_files" :progress="d_download_progress"/>
+
     <template v-if="build_task.status !== BuildImageStatus.queued">
       <div class="output-header">Build Output</div>
       <view-file
@@ -69,18 +81,21 @@
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { BuildImageStatus, BuildSandboxDockerImageTask } from 'ag-client-typescript';
+import FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
+import ProgressOverlay from '@/components/progress_overlay.vue';
 import ViewFile from '@/components/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_global_errors_async } from '@/error_handling';
-import { blob_to_string, format_datetime } from '@/utils';
+import { blob_to_string, format_datetime, toggle } from '@/utils';
 
 import BuildImageStatusIcon from './build_image_status_icon.vue';
 
 @Component({
   components: {
     BuildImageStatusIcon,
+    ProgressOverlay,
     ViewFile,
   }
 })
@@ -96,8 +111,11 @@ export default class BuildImageTaskDetail extends Vue {
   readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
   readonly BuildImageStatus = BuildImageStatus;
 
-  private d_progress = 0;
+  private d_output_download_progress = 0;
   private d_output: Promise<string> | null = null;
+
+  private d_files_download_progress: number | null = null;
+  d_downloading_files = false;
 
   created() {
     return this.load_output();
@@ -109,16 +127,28 @@ export default class BuildImageTaskDetail extends Vue {
   }
 
   @handle_global_errors_async
+  private download_files() {
+    return toggle(this, 'd_downloading_files', async () => {
+      let content = this.build_task.get_files(event => {
+          if (event.lengthComputable) {
+              this.d_files_download_progress = 100 * (1.0 * event.loaded / event.total);
+          }
+      });
+      FileSaver.saveAs(new File([await content], `build${this.build_task.pk}_files.zip`));
+    });
+  }
+
+  @handle_global_errors_async
   load_output() {
     if (this.build_task.status === BuildImageStatus.queued) {
       // Output file might not exist yet.
       return;
     }
 
-    this.d_progress = 0;
+    this.d_output_download_progress = 0;
     let output = this.build_task.get_output((event) => {
       if (event.lengthComputable) {
-        this.d_progress = 100 * (1.0 * event.loaded / event.total);
+        this.d_output_download_progress = 100 * (1.0 * event.loaded / event.total);
       }
     });
     this.d_output = blob_to_string(output);
@@ -128,6 +158,10 @@ export default class BuildImageTaskDetail extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
+* {
+  box-sizing: border-box;
+}
 
 .status-info {
   font-size: 1.25rem;
@@ -166,10 +200,38 @@ export default class BuildImageTaskDetail extends Vue {
   color: $navy-blue;
 }
 
+.files {
+  margin: .75rem 0 0;
+  font-size: 1.125rem;
+  color: darken($stormy-gray-dark, 20%);
+
+  .fa-file-download {
+    margin-left: .125rem;
+    color: $ocean-blue;
+
+    &:hover {
+      color: darken($ocean-blue, 10%);
+      cursor: pointer;
+    }
+  }
+
+  .file-list {
+    margin: .25rem 0 0;
+    font-size: 1rem;
+  }
+}
+
+
 .internal-error-msg {
   white-space: pre-wrap;
   word-break: break-all;
   font-weight: normal;
   font-size: .875rem;
+
+  max-height: 400px;
+  overflow: auto;
+
+  border: 1px solid $pebble-dark;
+  padding: .25rem;
 }
 </style>

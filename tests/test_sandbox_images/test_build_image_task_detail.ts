@@ -9,10 +9,11 @@ import { assert_not_null, deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, set_props } from '@/tests/utils';
+import { compress_whitespace, set_props, wait_until } from '@/tests/utils';
+
+jest.mock('file-saver');
 
 let build_task: ag_cli.BuildSandboxDockerImageTask;
-// let wrapper: Wrapper<BuildImageTaskDetail>;
 let load_output_stub: sinon.SinonStub;
 let output: string;
 
@@ -123,4 +124,25 @@ test('Refresh button', async () => {
 
     await wrapper.find('[data-testid=refresh_button]').trigger('click');
     expect(wrapper.emitted('refresh_selected_build_task')?.length).toEqual(1);
+});
+
+test('Download files', async () => {
+    let filenames = ['Dockerfile', 'file1', 'another_file'];
+    build_task.filenames = filenames;
+
+    let get_files_stub = sinon.stub(build_task, 'get_files').callsFake(callback => {
+        assert_not_null(callback);
+        // tslint:disable-next-line: no-object-literal-type-assertion
+        callback(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
+        return Promise.resolve(new Blob(['nst']));
+    });
+    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
+
+    let filename_list_items = wrapper.findAll('.filename');
+    expect(filename_list_items.length).toEqual(filenames.length);
+    expect(filename_list_items.wrappers.map(w => w.text().trim())).toEqual(filenames);
+
+    await wrapper.find('[data-testid=download_files_icon]').trigger('click');
+    expect(await wait_until(wrapper, w => !w.vm.d_downloading_files)).toBe(true);
+    expect(get_files_stub.calledOnce).toBe(true);
 });
